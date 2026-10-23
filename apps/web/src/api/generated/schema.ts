@@ -1884,6 +1884,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/event-hosts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who you can host an event as: «Ως εγώ» and each business where you run events */
+        get: operations["PaleeWeb.CommunityEventController.hosts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/events": {
         parameters: {
             query?: never;
@@ -1894,7 +1911,8 @@ export interface paths {
         /** Your upcoming events at any box: going or on the waitlist */
         get: operations["PaleeWeb.CommunityEventController.mine"];
         put?: never;
-        post?: never;
+        /** Create an event as yourself (open to everyone or by invitation) or as a business; rate limited */
+        post: operations["PaleeWeb.CommunityEventController.host_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1964,6 +1982,23 @@ export interface paths {
         /** «Θα έρθω» (a place, or the waitlist when full) or «Δεν θα έρθω» */
         put: operations["PaleeWeb.CommunityEventController.rsvp"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/events/{id}/views": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Counts an open of the event page (once per person and day, without keeping who; hosts are not counted) */
+        post: operations["PaleeWeb.CommunityEventController.view"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4081,6 +4116,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/community/cohost-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Other hosts' requests for this box to co-host their events */
+        get: operations["PaleeWeb.AdminCommunityEventController.cohost_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/cohost-requests/{id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept or decline a co-host request, or withdraw after accepting */
+        post: operations["PaleeWeb.AdminCommunityEventController.answer_cohost_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/cohost-requests/{id}/trial-offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The co-host's own trial offer, once, to the people who came and are not members */
+        post: operations["PaleeWeb.AdminCommunityEventController.cohost_trial_offer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/event-analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Αναλυτικά»: views, RSVPs, waitlist, attendance and conversion */
+        get: operations["PaleeWeb.AdminCommunityEventController.analytics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/event-finances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Οικονομικά»: ticket income, refunds and outstanding, per event and in total */
+        get: operations["PaleeWeb.AdminCommunityEventController.finances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/community/events": {
         parameters: {
             query?: never;
@@ -4168,6 +4288,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/community/events/{id}/attendees/{user_id}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record that a paid place was given back (all of it unless amount_cents) */
+        put: operations["PaleeWeb.AdminCommunityEventController.refund"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/community/events/{id}/cancel": {
         parameters: {
             query?: never;
@@ -4180,6 +4317,41 @@ export interface paths {
         /** Cancel an event: this one or this and following; people going hear why */
         post: operations["PaleeWeb.AdminCommunityEventController.cancel"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/cohosts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The event's co-hosts and their answers */
+        get: operations["PaleeWeb.AdminCommunityEventController.cohosts"];
+        put?: never;
+        /** Ask a published box to co-host the event (and its later weeks) */
+        post: operations["PaleeWeb.AdminCommunityEventController.invite_cohost"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/cohosts/{cohost_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take a co-host off the event (and its later weeks) */
+        delete: operations["PaleeWeb.AdminCommunityEventController.remove_cohost"];
         options?: never;
         head?: never;
         patch?: never;
@@ -11081,6 +11253,11 @@ export interface components {
             distance_km: number | null;
             /** CommunityEvent */
             event: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -11110,6 +11287,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -11140,10 +11325,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -11217,6 +11425,11 @@ export interface components {
                 distance_km: number | null;
                 /** CommunityEvent */
                 event: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -11246,6 +11459,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -11276,10 +11497,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -11434,6 +11678,11 @@ export interface components {
                 distance_km: number | null;
                 /** CommunityEvent */
                 event: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -11463,6 +11712,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -11493,10 +11750,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -11691,6 +11971,11 @@ export interface components {
                      * @description The event as you see it now, when the post is an event card (attachment_type event)
                      */
                     event?: {
+                        /**
+                         * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                         * @enum {string}
+                         */
+                        audience: "group" | "club" | "open";
                         /** CommunityEventBox */
                         box: {
                             logo_url?: string | null;
@@ -11720,6 +12005,14 @@ export interface components {
                         };
                         /** Format: uuid */
                         club_id: string;
+                        /** @description ADR-185: boxes that co-host it (accepted) */
+                        cohosts: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            slug?: string | null;
+                        }[];
                         /** Format: uuid */
                         cover_media_id?: string | null;
                         cover_url?: string | null;
@@ -11750,10 +12043,33 @@ export interface components {
                         /** @description Event page: guests you can still bring (going, guest passes on) */
                         guests_left?: number | null;
                         guests_per_member: number;
+                        /** CommunityEventHost */
+                        host: {
+                            /** @enum {string} */
+                            kind: "person" | "business";
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /**
+                             * CommunityAuthor
+                             * @description The person hosting their own event
+                             */
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /** @description The business's box page; null for a person */
+                            slug?: string | null;
+                        };
                         /** Format: uuid */
                         id: string;
                         /** @description Event page opened with an invitation link */
                         invitation?: {
+                            /** @description ADR-185: the host's own invitation */
+                            host?: boolean;
                             /** CommunityAuthor */
                             inviter: {
                                 avatar_url?: string | null;
@@ -12050,6 +12366,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -12079,6 +12400,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -12109,10 +12438,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -12266,6 +12618,11 @@ export interface components {
                      * @description The event as you see it now, when the post is an event card (attachment_type event)
                      */
                     event?: {
+                        /**
+                         * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                         * @enum {string}
+                         */
+                        audience: "group" | "club" | "open";
                         /** CommunityEventBox */
                         box: {
                             logo_url?: string | null;
@@ -12295,6 +12652,14 @@ export interface components {
                         };
                         /** Format: uuid */
                         club_id: string;
+                        /** @description ADR-185: boxes that co-host it (accepted) */
+                        cohosts: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            slug?: string | null;
+                        }[];
                         /** Format: uuid */
                         cover_media_id?: string | null;
                         cover_url?: string | null;
@@ -12325,10 +12690,33 @@ export interface components {
                         /** @description Event page: guests you can still bring (going, guest passes on) */
                         guests_left?: number | null;
                         guests_per_member: number;
+                        /** CommunityEventHost */
+                        host: {
+                            /** @enum {string} */
+                            kind: "person" | "business";
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /**
+                             * CommunityAuthor
+                             * @description The person hosting their own event
+                             */
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /** @description The business's box page; null for a person */
+                            slug?: string | null;
+                        };
                         /** Format: uuid */
                         id: string;
                         /** @description Event page opened with an invitation link */
                         invitation?: {
+                            /** @description ADR-185: the host's own invitation */
+                            host?: boolean;
                             /** CommunityAuthor */
                             inviter: {
                                 avatar_url?: string | null;
@@ -12631,6 +13019,11 @@ export interface components {
                         distance_km: number | null;
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -12660,6 +13053,14 @@ export interface components {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -12690,10 +13091,33 @@ export interface components {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -12816,6 +13240,11 @@ export interface components {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -12845,6 +13274,14 @@ export interface components {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -12875,10 +13312,33 @@ export interface components {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -13099,6 +13559,11 @@ export interface components {
                     distance_km: number | null;
                     /** CommunityEvent */
                     event: {
+                        /**
+                         * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                         * @enum {string}
+                         */
+                        audience: "group" | "club" | "open";
                         /** CommunityEventBox */
                         box: {
                             logo_url?: string | null;
@@ -13128,6 +13593,14 @@ export interface components {
                         };
                         /** Format: uuid */
                         club_id: string;
+                        /** @description ADR-185: boxes that co-host it (accepted) */
+                        cohosts: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            slug?: string | null;
+                        }[];
                         /** Format: uuid */
                         cover_media_id?: string | null;
                         cover_url?: string | null;
@@ -13158,10 +13631,33 @@ export interface components {
                         /** @description Event page: guests you can still bring (going, guest passes on) */
                         guests_left?: number | null;
                         guests_per_member: number;
+                        /** CommunityEventHost */
+                        host: {
+                            /** @enum {string} */
+                            kind: "person" | "business";
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /**
+                             * CommunityAuthor
+                             * @description The person hosting their own event
+                             */
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /** @description The business's box page; null for a person */
+                            slug?: string | null;
+                        };
                         /** Format: uuid */
                         id: string;
                         /** @description Event page opened with an invitation link */
                         invitation?: {
+                            /** @description ADR-185: the host's own invitation */
+                            host?: boolean;
                             /** CommunityAuthor */
                             inviter: {
                                 avatar_url?: string | null;
@@ -13284,6 +13780,11 @@ export interface components {
                          * @description The event as you see it now, when the post is an event card (attachment_type event)
                          */
                         event?: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -13313,6 +13814,14 @@ export interface components {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -13343,10 +13852,33 @@ export interface components {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -16393,6 +16925,11 @@ export interface components {
         };
         /** CommunityEvent */
         CommunityEvent: {
+            /**
+             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+             * @enum {string}
+             */
+            audience: "group" | "club" | "open";
             /** CommunityEventBox */
             box: {
                 logo_url?: string | null;
@@ -16422,6 +16959,14 @@ export interface components {
             };
             /** Format: uuid */
             club_id: string;
+            /** @description ADR-185: boxes that co-host it (accepted) */
+            cohosts: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            }[];
             /** Format: uuid */
             cover_media_id?: string | null;
             cover_url?: string | null;
@@ -16452,10 +16997,33 @@ export interface components {
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
             guests_per_member: number;
+            /** CommunityEventHost */
+            host: {
+                /** @enum {string} */
+                kind: "person" | "business";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                /**
+                 * CommunityAuthor
+                 * @description The person hosting their own event
+                 */
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description The business's box page; null for a person */
+                slug?: string | null;
+            };
             /** Format: uuid */
             id: string;
             /** @description Event page opened with an invitation link */
             invitation?: {
+                /** @description ADR-185: the host's own invitation */
+                host?: boolean;
                 /** CommunityAuthor */
                 inviter: {
                     avatar_url?: string | null;
@@ -16521,6 +17089,84 @@ export interface components {
             title: string;
             waitlist_count: number;
         };
+        /** CommunityEventAnalyticsResponse */
+        CommunityEventAnalyticsResponse: {
+            events: {
+                /** @description Came of those going, % (once it ended) */
+                attendance_rate?: number | null;
+                came: number;
+                cancelled?: number;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description RSVPs of distinct viewers, % */
+                conversion_rate?: number | null;
+                /** Format: date-time */
+                ends_at?: string;
+                /** Format: uuid */
+                event_id: string;
+                going: number;
+                rsvps: number;
+                /** Format: date-time */
+                starts_at: string;
+                time_zone?: string | null;
+                title: string;
+                viewers: number;
+                views: number;
+                waitlisted: number;
+            }[];
+            /** CommunityEventAnalyticsTotal */
+            totals: {
+                /** @description Came of those going, % (once it ended) */
+                attendance_rate?: number | null;
+                came: number;
+                /** @description RSVPs of distinct viewers, % */
+                conversion_rate?: number | null;
+                events: number;
+                going: number;
+                rsvps: number;
+                viewers: number;
+                views: number;
+                waitlisted: number;
+            };
+        };
+        /** CommunityEventAnalyticsRow */
+        CommunityEventAnalyticsRow: {
+            /** @description Came of those going, % (once it ended) */
+            attendance_rate?: number | null;
+            came: number;
+            cancelled?: number;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @description RSVPs of distinct viewers, % */
+            conversion_rate?: number | null;
+            /** Format: date-time */
+            ends_at?: string;
+            /** Format: uuid */
+            event_id: string;
+            going: number;
+            rsvps: number;
+            /** Format: date-time */
+            starts_at: string;
+            time_zone?: string | null;
+            title: string;
+            viewers: number;
+            views: number;
+            waitlisted: number;
+        };
+        /** CommunityEventAnalyticsTotal */
+        CommunityEventAnalyticsTotal: {
+            /** @description Came of those going, % (once it ended) */
+            attendance_rate?: number | null;
+            came: number;
+            /** @description RSVPs of distinct viewers, % */
+            conversion_rate?: number | null;
+            events: number;
+            going: number;
+            rsvps: number;
+            viewers: number;
+            views: number;
+            waitlisted: number;
+        };
         /** CommunityEventAttendee */
         CommunityEventAttendee: {
             amount_cents?: number | null;
@@ -16559,6 +17205,12 @@ export interface components {
             queued_at: string;
             /** @description Finance issued a receipt */
             receipt_issued: boolean;
+            refund_cents?: number | null;
+            /**
+             * Format: date-time
+             * @description ADR-185: when the payment was given back
+             */
+            refunded_at?: string | null;
             /** CommunityAuthor */
             removed_by?: {
                 avatar_url?: string | null;
@@ -16612,6 +17264,12 @@ export interface components {
                 queued_at: string;
                 /** @description Finance issued a receipt */
                 receipt_issued: boolean;
+                refund_cents?: number | null;
+                /**
+                 * Format: date-time
+                 * @description ADR-185: when the payment was given back
+                 */
+                refunded_at?: string | null;
                 /** CommunityAuthor */
                 removed_by?: {
                     avatar_url?: string | null;
@@ -16663,6 +17321,12 @@ export interface components {
                 queued_at: string;
                 /** @description Finance issued a receipt */
                 receipt_issued: boolean;
+                refund_cents?: number | null;
+                /**
+                 * Format: date-time
+                 * @description ADR-185: when the payment was given back
+                 */
+                refunded_at?: string | null;
                 /** CommunityAuthor */
                 removed_by?: {
                     avatar_url?: string | null;
@@ -16714,6 +17378,12 @@ export interface components {
                 queued_at: string;
                 /** @description Finance issued a receipt */
                 receipt_issued: boolean;
+                refund_cents?: number | null;
+                /**
+                 * Format: date-time
+                 * @description ADR-185: when the payment was given back
+                 */
+                refunded_at?: string | null;
                 /** CommunityAuthor */
                 removed_by?: {
                     avatar_url?: string | null;
@@ -16755,10 +17425,188 @@ export interface components {
             kind?: string | null;
             name?: string | null;
         };
+        /** CommunityEventCohost */
+        CommunityEventCohost: {
+            logo_url?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            slug?: string | null;
+        };
+        /** CommunityEventCohostAnswerRequest */
+        CommunityEventCohostAnswerRequest: {
+            /**
+             * @description Accept or decline a request; removed withdraws after accepting
+             * @enum {string}
+             */
+            answer: "accepted" | "declined" | "removed";
+        };
+        /** CommunityEventCohostBox */
+        CommunityEventCohostBox: {
+            logo_url?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            slug?: string | null;
+        };
+        /** CommunityEventCohostInviteRequest */
+        CommunityEventCohostInviteRequest: {
+            /** @description The box page's address */
+            slug: string;
+        };
+        /** CommunityEventCohostRequest */
+        CommunityEventCohostRequest: {
+            answerable: boolean;
+            can_send_trial_offer: boolean;
+            /** CommunityEventCohostRequestEvent */
+            event: {
+                /** @enum {string} */
+                audience: "group" | "club" | "open";
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                starts_at: string;
+                time_zone?: string | null;
+                title: string;
+                weekly: boolean;
+            };
+            /** CommunityEventCohostRequestHost */
+            host: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            };
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            invited_at: string;
+            /** Format: date-time */
+            responded_at?: string | null;
+            /** @enum {string} */
+            status: "pending" | "accepted" | "declined" | "removed";
+            /** Format: date-time */
+            trial_offer_sent_at?: string | null;
+        };
+        /** CommunityEventCohostRequestEvent */
+        CommunityEventCohostRequestEvent: {
+            /** @enum {string} */
+            audience: "group" | "club" | "open";
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            starts_at: string;
+            time_zone?: string | null;
+            title: string;
+            weekly: boolean;
+        };
+        /** CommunityEventCohostRequestHost */
+        CommunityEventCohostRequestHost: {
+            logo_url?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            slug?: string | null;
+        };
+        /** CommunityEventCohostRequestsResponse */
+        CommunityEventCohostRequestsResponse: {
+            requests: {
+                answerable: boolean;
+                can_send_trial_offer: boolean;
+                /** CommunityEventCohostRequestEvent */
+                event: {
+                    /** @enum {string} */
+                    audience: "group" | "club" | "open";
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                    time_zone?: string | null;
+                    title: string;
+                    weekly: boolean;
+                };
+                /** CommunityEventCohostRequestHost */
+                host: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                invited_at: string;
+                /** Format: date-time */
+                responded_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "accepted" | "declined" | "removed";
+                /** Format: date-time */
+                trial_offer_sent_at?: string | null;
+            }[];
+        };
+        /** CommunityEventCohostRow */
+        CommunityEventCohostRow: {
+            /** CommunityEventCohostBox */
+            box: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            };
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            invited_at: string;
+            /** Format: date-time */
+            responded_at?: string | null;
+            /** @enum {string} */
+            status: "pending" | "accepted" | "declined" | "removed";
+        };
+        /** CommunityEventCohostsResponse */
+        CommunityEventCohostsResponse: {
+            cohosts: {
+                /** CommunityEventCohostBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                invited_at: string;
+                /** Format: date-time */
+                responded_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "accepted" | "declined" | "removed";
+            }[];
+        };
         /** CommunityEventCreatedResponse */
         CommunityEventCreatedResponse: {
             /** CommunityEvent */
             event: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -16788,6 +17636,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -16818,10 +17674,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -16890,6 +17769,76 @@ export interface components {
             /** @description Events made (weekly repeat) */
             occurrences: number;
         };
+        /** CommunityEventFinanceRow */
+        CommunityEventFinanceRow: {
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            currency: string;
+            /** Format: date-time */
+            ends_at?: string;
+            /** Format: uuid */
+            event_id: string;
+            net_cents: number;
+            outstanding_cents: number;
+            outstanding_count: number;
+            paid_cents: number;
+            paid_count: number;
+            price_cents: number;
+            refunded_cents: number;
+            refunded_count: number;
+            /** Format: date-time */
+            starts_at: string;
+            time_zone?: string | null;
+            title: string;
+        };
+        /** CommunityEventFinanceTotal */
+        CommunityEventFinanceTotal: {
+            currency: string;
+            events: number;
+            net_cents: number;
+            outstanding_cents: number;
+            outstanding_count: number;
+            paid_cents: number;
+            paid_count: number;
+            refunded_cents: number;
+            refunded_count: number;
+        };
+        /** CommunityEventFinancesResponse */
+        CommunityEventFinancesResponse: {
+            events: {
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                currency: string;
+                /** Format: date-time */
+                ends_at?: string;
+                /** Format: uuid */
+                event_id: string;
+                net_cents: number;
+                outstanding_cents: number;
+                outstanding_count: number;
+                paid_cents: number;
+                paid_count: number;
+                price_cents: number;
+                refunded_cents: number;
+                refunded_count: number;
+                /** Format: date-time */
+                starts_at: string;
+                time_zone?: string | null;
+                title: string;
+            }[];
+            /** @description One row per currency */
+            totals: {
+                currency: string;
+                events: number;
+                net_cents: number;
+                outstanding_cents: number;
+                outstanding_count: number;
+                paid_cents: number;
+                paid_count: number;
+                refunded_cents: number;
+                refunded_count: number;
+            }[];
+        };
         /**
          * CommunityEventGroup
          * @description The member group of a group event (free, for its members only)
@@ -16899,11 +17848,141 @@ export interface components {
             id: string;
             name?: string | null;
         } | null;
+        /** CommunityEventHost */
+        CommunityEventHost: {
+            /** @enum {string} */
+            kind: "person" | "business";
+            logo_url?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            /**
+             * CommunityAuthor
+             * @description The person hosting their own event
+             */
+            person?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            /** @description The business's box page; null for a person */
+            slug?: string | null;
+        };
+        /** CommunityEventHostChoice */
+        CommunityEventHostChoice: {
+            clubs: {
+                /** Format: uuid */
+                id: string;
+                kind: string;
+                name?: string | null;
+            }[];
+            /** @description "self" for «Ως εγώ», else the business's organisation id */
+            id: string;
+            /** @enum {string} */
+            kind: "self" | "business";
+            logo_url?: string | null;
+            name?: string | null;
+            /**
+             * Format: uuid
+             * @description The organisation it hosts as (null before your first own event)
+             */
+            organization_id?: string | null;
+            slug?: string | null;
+        };
+        /** CommunityEventHostClub */
+        CommunityEventHostClub: {
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            name?: string | null;
+        };
+        /** CommunityEventHostedRequest */
+        CommunityEventHostedRequest: {
+            address?: string | null;
+            /**
+             * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+             * @enum {string}
+             */
+            audience?: "group" | "club" | "open";
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
+             */
+            channel_id?: string;
+            /**
+             * Format: uuid
+             * @description As a business: which of its clubs (its gym club by default)
+             */
+            club_id?: string;
+            /**
+             * Format: uuid
+             * @description A ready box photo upload
+             */
+            cover_media_id?: string | null;
+            currency?: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
+            guest_pass_allowed?: boolean;
+            guests_per_member?: number;
+            /** @description «Διοργάνωση ως»: "self" (default) or the organisation id of a business where you run events */
+            host?: string;
+            latitude?: number | null;
+            /**
+             * Format: uuid
+             * @description A location of the box; or give place_name
+             */
+            location_id?: string | null;
+            longitude?: number | null;
+            open_to_non_members?: boolean;
+            place_name?: string | null;
+            price_cents?: number;
+            /**
+             * Format: date
+             * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+             */
+            repeat_until?: string;
+            /** Format: date-time */
+            starts_at: string;
+            /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+            time_zone?: string | null;
+            title: string;
+        };
+        /** CommunityEventHostsResponse */
+        CommunityEventHostsResponse: {
+            hosts: {
+                clubs: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** @description "self" for «Ως εγώ», else the business's organisation id */
+                id: string;
+                /** @enum {string} */
+                kind: "self" | "business";
+                logo_url?: string | null;
+                name?: string | null;
+                /**
+                 * Format: uuid
+                 * @description The organisation it hosts as (null before your first own event)
+                 */
+                organization_id?: string | null;
+                slug?: string | null;
+            }[];
+        };
         /** CommunityEventInviteResponse */
         CommunityEventInviteResponse: {
             /** Format: date-time */
             expires_at: string;
-            guests_left: number;
+            /** @description Null for the host's own link (no guest limit) */
+            guests_left?: number | null;
+            /** @description ADR-185: the host's invitation link */
+            host?: boolean;
             /** @description Member-app path that opens the event with the invitation */
             path: string;
             token: string;
@@ -16945,13 +18024,23 @@ export interface components {
             name: string | null;
             neighbourhood?: string | null;
         };
+        /** CommunityEventRefundRequest */
+        CommunityEventRefundRequest: {
+            /** @description What was given back; all of it when left out */
+            amount_cents?: number | null;
+        };
         /** CommunityEventRequest */
         CommunityEventRequest: {
             address?: string | null;
+            /**
+             * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+             * @enum {string}
+             */
+            audience?: "group" | "club" | "open";
             capacity?: number | null;
             /**
              * Format: uuid
-             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
              */
             channel_id?: string;
             /**
@@ -16992,6 +18081,11 @@ export interface components {
         CommunityEventResponse: {
             /** CommunityEvent */
             event: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -17021,6 +18115,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -17051,10 +18153,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -17160,6 +18285,11 @@ export interface components {
         /** CommunityEventUpdateRequest */
         CommunityEventUpdateRequest: {
             address?: string | null;
+            /**
+             * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+             * @enum {string}
+             */
+            audience?: "group" | "club" | "open";
             capacity?: number | null;
             /**
              * Format: uuid
@@ -17195,9 +18325,18 @@ export interface components {
             time_zone?: string | null;
             title?: string;
         };
+        /** CommunityEventViewResponse */
+        CommunityEventViewResponse: {
+            counted: boolean;
+        };
         /** CommunityEventsResponse */
         CommunityEventsResponse: {
             events: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -17227,6 +18366,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -17257,10 +18404,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -17374,6 +18544,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -17403,6 +18578,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -17433,10 +18616,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -17580,6 +18786,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -17609,6 +18820,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -17639,10 +18858,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -18286,6 +19528,11 @@ export interface components {
              * @description The event as you see it now, when the post is an event card (attachment_type event)
              */
             event?: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -18315,6 +19562,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -18345,10 +19600,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -18471,6 +19749,11 @@ export interface components {
          * @description The event as you see it now, when the post is an event card (attachment_type event)
          */
         CommunityPostEvent: {
+            /**
+             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+             * @enum {string}
+             */
+            audience: "group" | "club" | "open";
             /** CommunityEventBox */
             box: {
                 logo_url?: string | null;
@@ -18500,6 +19783,14 @@ export interface components {
             };
             /** Format: uuid */
             club_id: string;
+            /** @description ADR-185: boxes that co-host it (accepted) */
+            cohosts: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            }[];
             /** Format: uuid */
             cover_media_id?: string | null;
             cover_url?: string | null;
@@ -18530,10 +19821,33 @@ export interface components {
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
             guests_per_member: number;
+            /** CommunityEventHost */
+            host: {
+                /** @enum {string} */
+                kind: "person" | "business";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                /**
+                 * CommunityAuthor
+                 * @description The person hosting their own event
+                 */
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description The business's box page; null for a person */
+                slug?: string | null;
+            };
             /** Format: uuid */
             id: string;
             /** @description Event page opened with an invitation link */
             invitation?: {
+                /** @description ADR-185: the host's own invitation */
+                host?: boolean;
                 /** CommunityAuthor */
                 inviter: {
                     avatar_url?: string | null;
@@ -18661,6 +19975,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -18690,6 +20009,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -18720,10 +20047,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -22893,7 +24243,7 @@ export interface components {
                 active: boolean;
                 annual_price_cents: number | null;
                 /** @enum {string} */
-                audience: "gym" | "coach";
+                audience: "gym" | "coach" | "organiser";
                 code: string;
                 currency: string;
                 description: string | null;
@@ -23499,6 +24849,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -23528,6 +24883,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -23558,10 +24921,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -23991,7 +25377,7 @@ export interface components {
             active: boolean;
             annual_price_cents: number | null;
             /** @enum {string} */
-            audience: "gym" | "coach";
+            audience: "gym" | "coach" | "organiser";
             code: string;
             currency: string;
             description: string | null;
@@ -24026,7 +25412,7 @@ export interface components {
                 active: boolean;
                 annual_price_cents: number | null;
                 /** @enum {string} */
-                audience: "gym" | "coach";
+                audience: "gym" | "coach" | "organiser";
                 code: string;
                 currency: string;
                 description: string | null;
@@ -24588,6 +25974,11 @@ export interface components {
                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                  */
                 event?: {
+                    /**
+                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                     * @enum {string}
+                     */
+                    audience: "group" | "club" | "open";
                     /** CommunityEventBox */
                     box: {
                         logo_url?: string | null;
@@ -24617,6 +26008,14 @@ export interface components {
                     };
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: boxes that co-host it (accepted) */
+                    cohosts: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        slug?: string | null;
+                    }[];
                     /** Format: uuid */
                     cover_media_id?: string | null;
                     cover_url?: string | null;
@@ -24647,10 +26046,33 @@ export interface components {
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
                     guests_per_member: number;
+                    /** CommunityEventHost */
+                    host: {
+                        /** @enum {string} */
+                        kind: "person" | "business";
+                        logo_url?: string | null;
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /**
+                         * CommunityAuthor
+                         * @description The person hosting their own event
+                         */
+                        person?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description The business's box page; null for a person */
+                        slug?: string | null;
+                    };
                     /** Format: uuid */
                     id: string;
                     /** @description Event page opened with an invitation link */
                     invitation?: {
+                        /** @description ADR-185: the host's own invitation */
+                        host?: boolean;
                         /** CommunityAuthor */
                         inviter: {
                             avatar_url?: string | null;
@@ -26011,6 +27433,12 @@ export interface components {
                     queued_at: string;
                     /** @description Finance issued a receipt */
                     receipt_issued: boolean;
+                    refund_cents?: number | null;
+                    /**
+                     * Format: date-time
+                     * @description ADR-185: when the payment was given back
+                     */
+                    refunded_at?: string | null;
                     /** CommunityAuthor */
                     removed_by?: {
                         avatar_url?: string | null;
@@ -26062,6 +27490,12 @@ export interface components {
                     queued_at: string;
                     /** @description Finance issued a receipt */
                     receipt_issued: boolean;
+                    refund_cents?: number | null;
+                    /**
+                     * Format: date-time
+                     * @description ADR-185: when the payment was given back
+                     */
+                    refunded_at?: string | null;
                     /** CommunityAuthor */
                     removed_by?: {
                         avatar_url?: string | null;
@@ -26113,6 +27547,12 @@ export interface components {
                     queued_at: string;
                     /** @description Finance issued a receipt */
                     receipt_issued: boolean;
+                    refund_cents?: number | null;
+                    /**
+                     * Format: date-time
+                     * @description ADR-185: when the payment was given back
+                     */
+                    refunded_at?: string | null;
                     /** CommunityAuthor */
                     removed_by?: {
                         avatar_url?: string | null;
@@ -26128,6 +27568,11 @@ export interface components {
                     trial_offered_at?: string | null;
                 }[];
             };
+            /**
+             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+             * @enum {string}
+             */
+            audience: "group" | "club" | "open";
             /** CommunityEventBox */
             box: {
                 logo_url?: string | null;
@@ -26157,6 +27602,14 @@ export interface components {
             };
             /** Format: uuid */
             club_id: string;
+            /** @description ADR-185: boxes that co-host it (accepted) */
+            cohosts: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            }[];
             /** Format: uuid */
             cover_media_id?: string | null;
             cover_url?: string | null;
@@ -26187,10 +27640,33 @@ export interface components {
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
             guests_per_member: number;
+            /** CommunityEventHost */
+            host: {
+                /** @enum {string} */
+                kind: "person" | "business";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                /**
+                 * CommunityAuthor
+                 * @description The person hosting their own event
+                 */
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description The business's box page; null for a person */
+                slug?: string | null;
+            };
             /** Format: uuid */
             id: string;
             /** @description Event page opened with an invitation link */
             invitation?: {
+                /** @description ADR-185: the host's own invitation */
+                host?: boolean;
                 /** CommunityAuthor */
                 inviter: {
                     avatar_url?: string | null;
@@ -26323,6 +27799,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26374,6 +27856,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26425,6 +27913,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26440,6 +27934,11 @@ export interface components {
                         trial_offered_at?: string | null;
                     }[];
                 };
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -26469,6 +27968,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -26499,10 +28006,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -26597,10 +28127,15 @@ export interface components {
         /** StaffCommunityEventRequest */
         StaffCommunityEventRequest: {
             address?: string | null;
+            /**
+             * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+             * @enum {string}
+             */
+            audience?: "group" | "club" | "open";
             capacity?: number | null;
             /**
              * Format: uuid
-             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
              */
             channel_id?: string;
             /** Format: uuid */
@@ -26682,6 +28217,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26733,6 +28274,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26784,6 +28331,12 @@ export interface components {
                         queued_at: string;
                         /** @description Finance issued a receipt */
                         receipt_issued: boolean;
+                        refund_cents?: number | null;
+                        /**
+                         * Format: date-time
+                         * @description ADR-185: when the payment was given back
+                         */
+                        refunded_at?: string | null;
                         /** CommunityAuthor */
                         removed_by?: {
                             avatar_url?: string | null;
@@ -26799,6 +28352,11 @@ export interface components {
                         trial_offered_at?: string | null;
                     }[];
                 };
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -26828,6 +28386,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -26858,10 +28424,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -26954,6 +28543,11 @@ export interface components {
         };
         /** StaffCommunityEventRow */
         StaffCommunityEventRow: {
+            /**
+             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+             * @enum {string}
+             */
+            audience: "group" | "club" | "open";
             /** CommunityEventBox */
             box: {
                 logo_url?: string | null;
@@ -26983,6 +28577,14 @@ export interface components {
             };
             /** Format: uuid */
             club_id: string;
+            /** @description ADR-185: boxes that co-host it (accepted) */
+            cohosts: {
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            }[];
             /** Format: uuid */
             cover_media_id?: string | null;
             cover_url?: string | null;
@@ -27013,10 +28615,33 @@ export interface components {
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
             guests_per_member: number;
+            /** CommunityEventHost */
+            host: {
+                /** @enum {string} */
+                kind: "person" | "business";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                /**
+                 * CommunityAuthor
+                 * @description The person hosting their own event
+                 */
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description The business's box page; null for a person */
+                slug?: string | null;
+            };
             /** Format: uuid */
             id: string;
             /** @description Event page opened with an invitation link */
             invitation?: {
+                /** @description ADR-185: the host's own invitation */
+                host?: boolean;
                 /** CommunityAuthor */
                 inviter: {
                     avatar_url?: string | null;
@@ -27101,6 +28726,11 @@ export interface components {
         /** StaffCommunityEventsResponse */
         StaffCommunityEventsResponse: {
             events: {
+                /**
+                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                 * @enum {string}
+                 */
+                audience: "group" | "club" | "open";
                 /** CommunityEventBox */
                 box: {
                     logo_url?: string | null;
@@ -27130,6 +28760,14 @@ export interface components {
                 };
                 /** Format: uuid */
                 club_id: string;
+                /** @description ADR-185: boxes that co-host it (accepted) */
+                cohosts: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                }[];
                 /** Format: uuid */
                 cover_media_id?: string | null;
                 cover_url?: string | null;
@@ -27160,10 +28798,33 @@ export interface components {
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
                 guests_per_member: number;
+                /** CommunityEventHost */
+                host: {
+                    /** @enum {string} */
+                    kind: "person" | "business";
+                    logo_url?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /**
+                     * CommunityAuthor
+                     * @description The person hosting their own event
+                     */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description The business's box page; null for a person */
+                    slug?: string | null;
+                };
                 /** Format: uuid */
                 id: string;
                 /** @description Event page opened with an invitation link */
                 invitation?: {
+                    /** @description ADR-185: the host's own invitation */
+                    host?: boolean;
                     /** CommunityAuthor */
                     inviter: {
                         avatar_url?: string | null;
@@ -29827,6 +31488,11 @@ export interface operations {
                                     distance_km: number | null;
                                     /** CommunityEvent */
                                     event: {
+                                        /**
+                                         * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                         * @enum {string}
+                                         */
+                                        audience: "group" | "club" | "open";
                                         /** CommunityEventBox */
                                         box: {
                                             logo_url?: string | null;
@@ -29856,6 +31522,14 @@ export interface operations {
                                         };
                                         /** Format: uuid */
                                         club_id: string;
+                                        /** @description ADR-185: boxes that co-host it (accepted) */
+                                        cohosts: {
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            /** Format: uuid */
+                                            organization_id: string;
+                                            slug?: string | null;
+                                        }[];
                                         /** Format: uuid */
                                         cover_media_id?: string | null;
                                         cover_url?: string | null;
@@ -29886,10 +31560,33 @@ export interface operations {
                                         /** @description Event page: guests you can still bring (going, guest passes on) */
                                         guests_left?: number | null;
                                         guests_per_member: number;
+                                        /** CommunityEventHost */
+                                        host: {
+                                            /** @enum {string} */
+                                            kind: "person" | "business";
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            /** Format: uuid */
+                                            organization_id: string;
+                                            /**
+                                             * CommunityAuthor
+                                             * @description The person hosting their own event
+                                             */
+                                            person?: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            } | null;
+                                            /** @description The business's box page; null for a person */
+                                            slug?: string | null;
+                                        };
                                         /** Format: uuid */
                                         id: string;
                                         /** @description Event page opened with an invitation link */
                                         invitation?: {
+                                            /** @description ADR-185: the host's own invitation */
+                                            host?: boolean;
                                             /** CommunityAuthor */
                                             inviter: {
                                                 avatar_url?: string | null;
@@ -30012,6 +31709,11 @@ export interface operations {
                                          * @description The event as you see it now, when the post is an event card (attachment_type event)
                                          */
                                         event?: {
+                                            /**
+                                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                             * @enum {string}
+                                             */
+                                            audience: "group" | "club" | "open";
                                             /** CommunityEventBox */
                                             box: {
                                                 logo_url?: string | null;
@@ -30041,6 +31743,14 @@ export interface operations {
                                             };
                                             /** Format: uuid */
                                             club_id: string;
+                                            /** @description ADR-185: boxes that co-host it (accepted) */
+                                            cohosts: {
+                                                logo_url?: string | null;
+                                                name?: string | null;
+                                                /** Format: uuid */
+                                                organization_id: string;
+                                                slug?: string | null;
+                                            }[];
                                             /** Format: uuid */
                                             cover_media_id?: string | null;
                                             cover_url?: string | null;
@@ -30071,10 +31781,33 @@ export interface operations {
                                             /** @description Event page: guests you can still bring (going, guest passes on) */
                                             guests_left?: number | null;
                                             guests_per_member: number;
+                                            /** CommunityEventHost */
+                                            host: {
+                                                /** @enum {string} */
+                                                kind: "person" | "business";
+                                                logo_url?: string | null;
+                                                name?: string | null;
+                                                /** Format: uuid */
+                                                organization_id: string;
+                                                /**
+                                                 * CommunityAuthor
+                                                 * @description The person hosting their own event
+                                                 */
+                                                person?: {
+                                                    avatar_url?: string | null;
+                                                    /** Format: uuid */
+                                                    id: string;
+                                                    nickname?: string | null;
+                                                } | null;
+                                                /** @description The business's box page; null for a person */
+                                                slug?: string | null;
+                                            };
                                             /** Format: uuid */
                                             id: string;
                                             /** @description Event page opened with an invitation link */
                                             invitation?: {
+                                                /** @description ADR-185: the host's own invitation */
+                                                host?: boolean;
                                                 /** CommunityAuthor */
                                                 inviter: {
                                                     avatar_url?: string | null;
@@ -30268,6 +32001,11 @@ export interface operations {
                             distance_km: number | null;
                             /** CommunityEvent */
                             event: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -30297,6 +32035,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -30327,10 +32073,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -30525,6 +32294,11 @@ export interface operations {
                                  * @description The event as you see it now, when the post is an event card (attachment_type event)
                                  */
                                 event?: {
+                                    /**
+                                     * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                     * @enum {string}
+                                     */
+                                    audience: "group" | "club" | "open";
                                     /** CommunityEventBox */
                                     box: {
                                         logo_url?: string | null;
@@ -30554,6 +32328,14 @@ export interface operations {
                                     };
                                     /** Format: uuid */
                                     club_id: string;
+                                    /** @description ADR-185: boxes that co-host it (accepted) */
+                                    cohosts: {
+                                        logo_url?: string | null;
+                                        name?: string | null;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        slug?: string | null;
+                                    }[];
                                     /** Format: uuid */
                                     cover_media_id?: string | null;
                                     cover_url?: string | null;
@@ -30584,10 +32366,33 @@ export interface operations {
                                     /** @description Event page: guests you can still bring (going, guest passes on) */
                                     guests_left?: number | null;
                                     guests_per_member: number;
+                                    /** CommunityEventHost */
+                                    host: {
+                                        /** @enum {string} */
+                                        kind: "person" | "business";
+                                        logo_url?: string | null;
+                                        name?: string | null;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        /**
+                                         * CommunityAuthor
+                                         * @description The person hosting their own event
+                                         */
+                                        person?: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        } | null;
+                                        /** @description The business's box page; null for a person */
+                                        slug?: string | null;
+                                    };
                                     /** Format: uuid */
                                     id: string;
                                     /** @description Event page opened with an invitation link */
                                     invitation?: {
+                                        /** @description ADR-185: the host's own invitation */
+                                        host?: boolean;
                                         /** CommunityAuthor */
                                         inviter: {
                                             avatar_url?: string | null;
@@ -30741,7 +32546,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -30778,7 +32583,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -31595,6 +33400,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         events: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -31624,6 +33434,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -31654,10 +33472,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -31804,6 +33645,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -31833,6 +33679,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -31863,10 +33717,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -34332,6 +36209,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -34361,6 +36243,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -34391,10 +36281,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -36286,6 +38199,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         events: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -36315,6 +38233,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -36345,10 +38271,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -36432,10 +38381,15 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    /**
+                     * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+                     * @enum {string}
+                     */
+                    audience?: "group" | "club" | "open";
                     capacity?: number | null;
                     /**
                      * Format: uuid
-                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
                      */
                     channel_id?: string;
                     /**
@@ -36484,6 +38438,11 @@ export interface operations {
                     "application/json": {
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -36513,6 +38472,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -36543,10 +38510,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -36810,6 +38800,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         events: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -36839,6 +38834,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -36869,10 +38872,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -37027,6 +39053,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -37056,6 +39087,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -37086,10 +39125,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -37381,6 +39443,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -37410,6 +39477,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -37440,10 +39515,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -37620,6 +39718,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -37649,6 +39752,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -37679,10 +39790,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -37859,6 +39993,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -37888,6 +40027,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -37918,10 +40065,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -39460,6 +41630,47 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.CommunityEventController.hosts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Hosts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        hosts: {
+                            clubs: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** @description "self" for «Ως εγώ», else the business's organisation id */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "self" | "business";
+                            logo_url?: string | null;
+                            name?: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The organisation it hosts as (null before your first own event)
+                             */
+                            organization_id?: string | null;
+                            slug?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.CommunityEventController.mine": {
         parameters: {
             query?: never;
@@ -39477,6 +41688,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         events: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -39506,6 +41722,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -39536,10 +41760,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -39610,22 +41857,74 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.CommunityEventController.show": {
+    "PaleeWeb.CommunityEventController.host_create": {
         parameters: {
-            query?: {
-                /** @description The token of a guest pass link */
-                invite?: string;
-            };
+            query?: never;
             header?: never;
-            path: {
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    /**
+                     * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+                     * @enum {string}
+                     */
+                    audience?: "group" | "club" | "open";
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
+                     */
+                    channel_id?: string;
+                    /**
+                     * Format: uuid
+                     * @description As a business: which of its clubs (its gym club by default)
+                     */
+                    club_id?: string;
+                    /**
+                     * Format: uuid
+                     * @description A ready box photo upload
+                     */
+                    cover_media_id?: string | null;
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
+                    guest_pass_allowed?: boolean;
+                    guests_per_member?: number;
+                    /** @description «Διοργάνωση ως»: "self" (default) or the organisation id of a business where you run events */
+                    host?: string;
+                    latitude?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A location of the box; or give place_name
+                     */
+                    location_id?: string | null;
+                    longitude?: number | null;
+                    open_to_non_members?: boolean;
+                    place_name?: string | null;
+                    price_cents?: number;
+                    /**
+                     * Format: date
+                     * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+                     */
+                    repeat_until?: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                    /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+                    time_zone?: string | null;
+                    title: string;
+                };
+            };
+        };
         responses: {
-            /** @description Event */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -39633,6 +41932,11 @@ export interface operations {
                     "application/json": {
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -39662,6 +41966,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -39692,10 +42004,227 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                        /** @description Events made (weekly repeat) */
+                        occurrences: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.CommunityEventController.show": {
+        parameters: {
+            query?: {
+                /** @description The token of a guest pass link */
+                invite?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -39779,6 +42308,11 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    /**
+                     * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+                     * @enum {string}
+                     */
+                    audience?: "group" | "club" | "open";
                     capacity?: number | null;
                     /**
                      * Format: uuid
@@ -39826,6 +42360,11 @@ export interface operations {
                     "application/json": {
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -39855,6 +42394,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -39885,10 +42432,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -39990,6 +42560,11 @@ export interface operations {
                     "application/json": {
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -40019,6 +42594,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -40049,10 +42632,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -40143,7 +42749,10 @@ export interface operations {
                     "application/json": {
                         /** Format: date-time */
                         expires_at: string;
-                        guests_left: number;
+                        /** @description Null for the host's own link (no guest limit) */
+                        guests_left?: number | null;
+                        /** @description ADR-185: the host's invitation link */
+                        host?: boolean;
                         /** @description Member-app path that opens the event with the invitation */
                         path: string;
                         token: string;
@@ -40181,6 +42790,11 @@ export interface operations {
                     "application/json": {
                         /** CommunityEvent */
                         event: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -40210,6 +42824,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -40240,10 +42862,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -40309,6 +42954,30 @@ export interface operations {
                             title: string;
                             waitlist_count: number;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.CommunityEventController.view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description View */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counted: boolean;
                     };
                 };
             };
@@ -40382,6 +43051,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -40411,6 +43085,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -40441,10 +43123,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -40588,6 +43293,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -40617,6 +43327,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -40647,10 +43365,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -45955,7 +48696,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -46012,7 +48753,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -46056,7 +48797,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -46118,7 +48859,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -49136,6 +51877,277 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminCommunityEventController.cohost_requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Co-host requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            answerable: boolean;
+                            can_send_trial_offer: boolean;
+                            /** CommunityEventCohostRequestEvent */
+                            event: {
+                                /** @enum {string} */
+                                audience: "group" | "club" | "open";
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                                time_zone?: string | null;
+                                title: string;
+                                weekly: boolean;
+                            };
+                            /** CommunityEventCohostRequestHost */
+                            host: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            invited_at: string;
+                            /** Format: date-time */
+                            responded_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "accepted" | "declined" | "removed";
+                            /** Format: date-time */
+                            trial_offer_sent_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.answer_cohost_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Accept or decline a request; removed withdraws after accepting
+                     * @enum {string}
+                     */
+                    answer: "accepted" | "declined" | "removed";
+                };
+            };
+        };
+        responses: {
+            /** @description Co-host requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            answerable: boolean;
+                            can_send_trial_offer: boolean;
+                            /** CommunityEventCohostRequestEvent */
+                            event: {
+                                /** @enum {string} */
+                                audience: "group" | "club" | "open";
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                                time_zone?: string | null;
+                                title: string;
+                                weekly: boolean;
+                            };
+                            /** CommunityEventCohostRequestHost */
+                            host: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            invited_at: string;
+                            /** Format: date-time */
+                            responded_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "accepted" | "declined" | "removed";
+                            /** Format: date-time */
+                            trial_offer_sent_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.cohost_trial_offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description People notified */
+                        sent: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.analytics": {
+        parameters: {
+            query?: {
+                scope?: "all" | "upcoming" | "past";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Analytics */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** @description Came of those going, % (once it ended) */
+                            attendance_rate?: number | null;
+                            came: number;
+                            cancelled?: number;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description RSVPs of distinct viewers, % */
+                            conversion_rate?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string;
+                            /** Format: uuid */
+                            event_id: string;
+                            going: number;
+                            rsvps: number;
+                            /** Format: date-time */
+                            starts_at: string;
+                            time_zone?: string | null;
+                            title: string;
+                            viewers: number;
+                            views: number;
+                            waitlisted: number;
+                        }[];
+                        /** CommunityEventAnalyticsTotal */
+                        totals: {
+                            /** @description Came of those going, % (once it ended) */
+                            attendance_rate?: number | null;
+                            came: number;
+                            /** @description RSVPs of distinct viewers, % */
+                            conversion_rate?: number | null;
+                            events: number;
+                            going: number;
+                            rsvps: number;
+                            viewers: number;
+                            views: number;
+                            waitlisted: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.finances": {
+        parameters: {
+            query?: {
+                scope?: "all" | "upcoming" | "past";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Finances */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            currency: string;
+                            /** Format: date-time */
+                            ends_at?: string;
+                            /** Format: uuid */
+                            event_id: string;
+                            net_cents: number;
+                            outstanding_cents: number;
+                            outstanding_count: number;
+                            paid_cents: number;
+                            paid_count: number;
+                            price_cents: number;
+                            refunded_cents: number;
+                            refunded_count: number;
+                            /** Format: date-time */
+                            starts_at: string;
+                            time_zone?: string | null;
+                            title: string;
+                        }[];
+                        /** @description One row per currency */
+                        totals: {
+                            currency: string;
+                            events: number;
+                            net_cents: number;
+                            outstanding_cents: number;
+                            outstanding_count: number;
+                            paid_cents: number;
+                            paid_count: number;
+                            refunded_cents: number;
+                            refunded_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminCommunityEventController.index": {
         parameters: {
             query?: {
@@ -49155,6 +52167,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         events: {
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -49184,6 +52201,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -49214,10 +52239,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -49315,10 +52363,15 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    /**
+                     * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+                     * @enum {string}
+                     */
+                    audience?: "group" | "club" | "open";
                     capacity?: number | null;
                     /**
                      * Format: uuid
-                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
                      */
                     channel_id?: string;
                     /** Format: uuid */
@@ -49408,6 +52461,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49459,6 +52518,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49510,6 +52575,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49525,6 +52596,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -49554,6 +52630,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -49584,10 +52668,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -49742,6 +52849,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49793,6 +52906,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49844,6 +52963,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -49859,6 +52984,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -49888,6 +53018,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -49918,10 +53056,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -50029,6 +53190,11 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    /**
+                     * @description ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members
+                     * @enum {string}
+                     */
+                    audience?: "group" | "club" | "open";
                     capacity?: number | null;
                     /**
                      * Format: uuid
@@ -50115,6 +53281,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50166,6 +53338,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50217,6 +53395,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50232,6 +53416,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -50261,6 +53450,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -50291,10 +53488,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -50449,6 +53669,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50500,6 +53726,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50551,6 +53783,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50566,6 +53804,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -50595,6 +53838,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -50625,10 +53876,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -50789,6 +54063,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50840,6 +54120,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50891,6 +54177,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -50906,6 +54198,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -50935,6 +54232,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -50965,10 +54270,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -51130,6 +54458,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51181,6 +54515,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51232,6 +54572,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51247,6 +54593,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -51276,6 +54627,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -51306,10 +54665,428 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description What was given back; all of it when left out */
+                    amount_cents?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -51474,6 +55251,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51525,6 +55308,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51576,6 +55365,12 @@ export interface operations {
                                     queued_at: string;
                                     /** @description Finance issued a receipt */
                                     receipt_issued: boolean;
+                                    refund_cents?: number | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description ADR-185: when the payment was given back
+                                     */
+                                    refunded_at?: string | null;
                                     /** CommunityAuthor */
                                     removed_by?: {
                                         avatar_url?: string | null;
@@ -51591,6 +55386,11 @@ export interface operations {
                                     trial_offered_at?: string | null;
                                 }[];
                             };
+                            /**
+                             * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                             * @enum {string}
+                             */
+                            audience: "group" | "club" | "open";
                             /** CommunityEventBox */
                             box: {
                                 logo_url?: string | null;
@@ -51620,6 +55420,14 @@ export interface operations {
                             };
                             /** Format: uuid */
                             club_id: string;
+                            /** @description ADR-185: boxes that co-host it (accepted) */
+                            cohosts: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            }[];
                             /** Format: uuid */
                             cover_media_id?: string | null;
                             cover_url?: string | null;
@@ -51650,10 +55458,33 @@ export interface operations {
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
                             guests_per_member: number;
+                            /** CommunityEventHost */
+                            host: {
+                                /** @enum {string} */
+                                kind: "person" | "business";
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /**
+                                 * CommunityAuthor
+                                 * @description The person hosting their own event
+                                 */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                } | null;
+                                /** @description The business's box page; null for a person */
+                                slug?: string | null;
+                            };
                             /** Format: uuid */
                             id: string;
                             /** @description Event page opened with an invitation link */
                             invitation?: {
+                                /** @description ADR-185: the host's own invitation */
+                                host?: boolean;
                                 /** CommunityAuthor */
                                 inviter: {
                                     avatar_url?: string | null;
@@ -51743,6 +55574,137 @@ export interface operations {
                             };
                             waitlist_count: number;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.cohosts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Co-hosts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cohosts: {
+                            /** CommunityEventCohostBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            invited_at: string;
+                            /** Format: date-time */
+                            responded_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "accepted" | "declined" | "removed";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.invite_cohost": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The box page's address */
+                    slug: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Co-hosts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cohosts: {
+                            /** CommunityEventCohostBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            invited_at: string;
+                            /** Format: date-time */
+                            responded_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "accepted" | "declined" | "removed";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminCommunityEventController.remove_cohost": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                cohost_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Co-hosts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cohosts: {
+                            /** CommunityEventCohostBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            invited_at: string;
+                            /** Format: date-time */
+                            responded_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "accepted" | "declined" | "removed";
+                        }[];
                     };
                 };
             };
@@ -56374,7 +60336,7 @@ export interface operations {
                             active: boolean;
                             annual_price_cents: number | null;
                             /** @enum {string} */
-                            audience: "gym" | "coach";
+                            audience: "gym" | "coach" | "organiser";
                             code: string;
                             currency: string;
                             description: string | null;
@@ -59452,7 +63414,7 @@ export interface operations {
                         provider: {
                             editable: boolean;
                             /** @enum {string} */
-                            kind: "gym" | "coach";
+                            kind: "gym" | "coach" | "organiser";
                         };
                         scheduling: {
                             default_auto_approve: boolean;
@@ -59589,7 +63551,7 @@ export interface operations {
                         provider: {
                             editable: boolean;
                             /** @enum {string} */
-                            kind: "gym" | "coach";
+                            kind: "gym" | "coach" | "organiser";
                         };
                         scheduling: {
                             default_auto_approve: boolean;
@@ -67215,6 +71177,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -67244,6 +71211,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -67274,10 +71249,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -67569,6 +71567,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -67598,6 +71601,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -67628,10 +71639,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -67808,6 +71842,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -67837,6 +71876,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -67867,10 +71914,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -68047,6 +72117,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -68076,6 +72151,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -68106,10 +72189,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -69037,7 +73143,7 @@ export interface operations {
                             id: string;
                             name: string;
                             /** @enum {string} */
-                            provider_kind?: "gym" | "coach";
+                            provider_kind?: "gym" | "coach" | "organiser";
                             slug: string;
                             /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
@@ -77521,6 +81627,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -77550,6 +81661,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -77580,10 +81699,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -78770,7 +82912,7 @@ export interface operations {
                             active: boolean;
                             annual_price_cents: number | null;
                             /** @enum {string} */
-                            audience: "gym" | "coach";
+                            audience: "gym" | "coach" | "organiser";
                             code: string;
                             currency: string;
                             description: string | null;
@@ -78843,7 +82985,7 @@ export interface operations {
                         active: boolean;
                         annual_price_cents: number | null;
                         /** @enum {string} */
-                        audience: "gym" | "coach";
+                        audience: "gym" | "coach" | "organiser";
                         code: string;
                         currency: string;
                         description: string | null;
@@ -78917,7 +83059,7 @@ export interface operations {
                         active: boolean;
                         annual_price_cents: number | null;
                         /** @enum {string} */
-                        audience: "gym" | "coach";
+                        audience: "gym" | "coach" | "organiser";
                         code: string;
                         currency: string;
                         description: string | null;
@@ -79449,6 +83591,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -79478,6 +83625,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -79508,10 +83663,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -79803,6 +83981,11 @@ export interface operations {
                              * @description The event as you see it now, when the post is an event card (attachment_type event)
                              */
                             event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
                                 /** CommunityEventBox */
                                 box: {
                                     logo_url?: string | null;
@@ -79832,6 +84015,14 @@ export interface operations {
                                 };
                                 /** Format: uuid */
                                 club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
                                 /** Format: uuid */
                                 cover_media_id?: string | null;
                                 cover_url?: string | null;
@@ -79862,10 +84053,33 @@ export interface operations {
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
                                 guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Event page opened with an invitation link */
                                 invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
                                     /** CommunityAuthor */
                                     inviter: {
                                         avatar_url?: string | null;
@@ -80421,7 +84635,7 @@ export interface operations {
                             active: boolean;
                             annual_price_cents: number | null;
                             /** @enum {string} */
-                            audience: "gym" | "coach";
+                            audience: "gym" | "coach" | "organiser";
                             code: string;
                             currency: string;
                             description: string | null;
