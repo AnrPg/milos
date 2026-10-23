@@ -7,51 +7,71 @@
 import { PaleeMark } from "@/components/branding/PaleeMark";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { ApiError } from "@/api/client";
 import {
-  checkNicknameAvailable,
   inspectInvitation,
   type InvitationInspection,
-  type LoginRequest,
-  type RegisterRequest,
 } from "@/api/auth";
+import { AuthField } from "@/components/auth/AuthField";
+import { AuthNotice } from "@/components/auth/AuthShell";
+import { RecoveryCodesOffer } from "@/components/auth/RecoveryCodesOffer";
+import { SignupHandleField, useHandleSuggestion } from "@/components/auth/SignupHandleField";
+import {
+  passwordLongEnough,
+  registerFailure,
+  type FieldErrors,
+} from "@/components/auth/auth-errors";
 import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
 import { markReferralNewAccount } from "@/lib/referral-claim";
 
 type Mode = "register" | "login";
-type FieldErrors = Record<string, string[]>;
 
-const initialRegister: RegisterRequest = { nickname: "", password: "", role: "member", email: "" };
-const initialLogin: LoginRequest = { nickname: "", password: "" };
+type RegisterForm = {
+  display_name: string;
+  handle: string;
+  email: string;
+  password: string;
+  role: "member" | "athlete";
+};
+type LoginForm = { identifier: string; password: string };
 
-function flatFieldErrors(
-  errors: Record<string, unknown> | undefined,
-  message: string,
-): FieldErrors {
-  if (!errors) return {};
-  return Object.fromEntries(
-    Object.entries(errors).filter((entry): entry is [string, string[]] => {
-      const [, messages] = entry;
-      return Array.isArray(messages) && messages.every((m) => typeof m === "string");
-    }).map(([field, messages]) => [field, messages.map(() => message)]),
-  );
+const initialRegister: RegisterForm = { display_name: "", handle: "", password: "", role: "member", email: "" };
+const initialLogin: LoginForm = { identifier: "", password: "" };
+
+const MAX_DISPLAY_NAME_LENGTH = 50;
+
+// ADR-187: the server folds and fully checks the handle; this only catches
+// what is plainly missing before a round trip.
+function invalidRegisterFields(form: RegisterForm, t: (key: string) => string): FieldErrors {
+  const errors: FieldErrors = {};
+  const displayName = form.display_name.trim();
+
+  if (displayName.length === 0 || displayName.length > MAX_DISPLAY_NAME_LENGTH) {
+    errors.display_name = [t("displayNameRule")];
+  }
+  if (form.handle.trim().length < 3) errors.handle = [t("handleRule")];
+  if (!passwordLongEnough(form.password)) errors.password = [t("passwordRule")];
+
+  return errors;
 }
 
-function invalidCredentialFields(nickname: string, password: string, i18n: (key: string) => string): FieldErrors {
+function invalidLoginFields(form: LoginForm, t: (key: string) => string): FieldErrors {
   const errors: FieldErrors = {};
 
-  if (!/^[\p{L}0-9_]{3,30}$/u.test(nickname)) errors.nickname = [i18n("usernameRules4b5de12")];
-  if (password.length < 4) errors.password = [i18n("passwordRules0c63f14")];
+  if (form.identifier.trim().length === 0) errors.identifier = [t("identifierRequired")];
+  if (form.password.length === 0) errors.password = [t("passwordRequired")];
 
   return errors;
 }
 
 export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("authRecovery");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn, signUp, signUpInvited, status, tokens } = useSession();
@@ -59,19 +79,23 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const [mode, setMode] = useState<Mode>(() =>
     searchParams.get("token") ? "register" : initialMode,
   );
-  const [registerForm, setRegisterForm] = useState<RegisterRequest>(() => {
+  const [registerForm, setRegisterForm] = useState<RegisterForm>(() => {
     // A public join link (/join/<slug>) passes the role the organization grants.
     const requestedRole = searchParams.get("role");
     return requestedRole === "athlete" || requestedRole === "member"
       ? { ...initialRegister, role: requestedRole }
       : initialRegister;
   });
-  const [loginForm, setLoginForm] = useState<LoginRequest>(initialLogin);
+  const [loginForm, setLoginForm] = useState<LoginForm>(initialLogin);
+  // The handle follows the display name until the person types their own.
+  const [handleEdited, setHandleEdited] = useState(false);
+  // After sign-up, recovery codes are offered once before moving on.
+  const [offerRecoveryCodes, setOfferRecoveryCodes] = useState(false);
+  const registeringRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [nicknameStatus, setNicknameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
   const [invitationToken, setInvitationToken] = useState(
     () => searchParams.get("token") ?? "",
   );
@@ -108,30 +132,20 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const pendingAvatarRef = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (status !== "authenticated") return;
+  const continueAfterAuth = useCallback(() => {
     router.replace(searchParams.get("next") || "/");
-  }, [router, searchParams, status]);
+  }, [router, searchParams]);
 
-  // Debounced nickname availability check
   useEffect(() => {
-    if (mode !== "register") return;
-    const nickname = registerForm.nickname.trim();
-    if (nickname.length < 3) {
-      queueMicrotask(() => setNicknameStatus("idle"));
-      return;
-    }
-    queueMicrotask(() => setNicknameStatus("checking"));
-    const timer = setTimeout(async () => {
-      try {
-        const { available } = await checkNicknameAvailable(nickname);
-        setNicknameStatus(available ? "available" : "taken");
-      } catch {
-        setNicknameStatus("idle");
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [registerForm.nickname, mode]);
+    if (status !== "authenticated" || registeringRef.current) return;
+    continueAfterAuth();
+  }, [continueAfterAuth, status]);
+
+  const applySuggestedHandle = useCallback(
+    (handle: string) => setRegisterForm((form) => ({ ...form, handle })),
+    [],
+  );
+  useHandleSuggestion(registerForm.display_name, mode === "register" && !handleEdited, applySuggestedHandle);
 
   // After registration the session is committed and tokens become available —
   // upload the chosen avatar file at that point
@@ -166,28 +180,31 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
     try {
       await effect();
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(localizeError(err, i18n));
-        setFieldErrors(flatFieldErrors(err.payload.errors, i18n("apiValidationField")));
-      } else {
-        setError(err instanceof Error ? localizeError(err, i18n) : i18n("unexpectedRequestFailurea7ffd06"));
-      }
+      const failure = registerFailure(
+        err,
+        t,
+        (caught) =>
+          caught instanceof Error ? localizeError(caught, i18n) : i18n("unexpectedRequestFailurea7ffd06"),
+        i18n("apiValidationField"),
+      );
+      setError(failure.message);
+      setFieldErrors(failure.fieldErrors);
     } finally {
       setBusyAction(null);
     }
   }
 
-  const nicknameErrors = fieldErrors.nickname ?? [];
-  const emailErrors = fieldErrors.email ?? [];
-  const passwordErrors = fieldErrors.password ?? [];
-  const roleErrors = fieldErrors.role ?? [];
-  const nicknameInvalid = nicknameErrors.length > 0;
-  const passwordInvalid = passwordErrors.length > 0;
+  const passwordResetDone = searchParams.get("reset") === "done";
 
-  function validateCredentials(nickname: string, password: string) {
-    const errors = invalidCredentialFields(nickname, password, i18n);
+  function validate(errors: FieldErrors) {
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
+  }
+
+  function switchMode(next: Mode) {
+    setMode(next);
+    setError(null);
+    setFieldErrors({});
   }
 
   return (
@@ -200,6 +217,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           className="rounded-[2rem] p-7"
           style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
+          {offerRecoveryCodes ? <RecoveryCodesOffer onSkip={continueAfterAuth} /> : <>
           {/* Mode toggle */}
           <div className="mb-7 flex justify-center">
             <div
@@ -213,7 +231,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
-                onClick={() => setMode("register")}
+                onClick={() => switchMode("register")}
                 type="button"
               >
                 {i18n("registerd672995")}
@@ -225,7 +243,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
-                onClick={() => setMode("login")}
+                onClick={() => switchMode("login")}
                 type="button"
               >
                 {i18n("login4e5a289")}
@@ -278,85 +296,47 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   />
                 </div>
 
-                {/* Nickname */}
-                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  <div className="flex items-center justify-between">
-                    <span>{i18n("nicknamece2bd99")}</span>
-                    {nicknameStatus === "checking" && (
-                      <span className="text-xs" style={{ color: "var(--dim)" }}>{i18n("checking820d600")}</span>
-                    )}
-                    {nicknameStatus === "available" && (
-                      <span className="text-xs font-semibold" style={{ color: "var(--success)" }}>{i18n("availableaeed20b")}</span>
-                    )}
-                    {nicknameStatus === "taken" && (
-                      <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>{i18n("alreadyTakena92fd32")}</span>
-                    )}
-                  </div>
-                  <input
-                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{
-                      background: "var(--bg)",
-                      border: `1px solid ${nicknameInvalid ? "var(--danger)" : nicknameStatus === "available" ? "var(--success)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
-                      color: "var(--text)",
-                    }}
-                    value={registerForm.nickname}
-                    placeholder={i18n("chooseAUniqueNickname4b5894d")}
-                    aria-invalid={nicknameInvalid}
-                    onChange={(e) =>
-                      setRegisterForm((f) => ({ ...f, nickname: e.target.value }))
-                    }
-                  />
-                  {nicknameErrors.length > 0 && (
-                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-                      {nicknameErrors.join(", ")}
-                    </span>
-                  )}
-                </label>
+                <AuthField
+                  label={t("displayNameLabel")}
+                  value={registerForm.display_name}
+                  autoComplete="name"
+                  placeholder={t("displayNamePlaceholder")}
+                  maxLength={MAX_DISPLAY_NAME_LENGTH}
+                  errors={fieldErrors.display_name}
+                  onChange={(display_name) => setRegisterForm((f) => ({ ...f, display_name }))}
+                />
 
-                {/* Email */}
-                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  <span>{i18n("emailAddress")}</span>
-                  <input
-                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{
-                      background: "var(--bg)",
-                      border: `1px solid ${emailErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
-                      color: "var(--text)",
-                    }}
-                    type="email"
-                    autoComplete="email"
-                    value={registerForm.email}
-                    placeholder={i18n("emailAddressPlaceholder")}
-                    aria-invalid={emailErrors.length > 0}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, email: e.target.value }))}
-                  />
-                  {emailErrors.length > 0 && (
-                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-                      {emailErrors.join(", ")}
-                    </span>
-                  )}
-                </label>
+                <SignupHandleField
+                  value={registerForm.handle}
+                  errors={fieldErrors.handle}
+                  onChange={(handle) => {
+                    // Clearing the handle hands it back to the display name.
+                    setHandleEdited(handle.length > 0);
+                    setRegisterForm((f) => ({ ...f, handle }));
+                  }}
+                />
 
-                {/* Password */}
-                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  {i18n("password8be3c94")}
-                  <input
-                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: `1px solid ${passwordInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
-                    type="password"
-                    value={registerForm.password}
-                    placeholder={i18n("passwordRules0c63f14")}
-                    aria-invalid={passwordInvalid}
-                    onChange={(e) =>
-                      setRegisterForm((f) => ({ ...f, password: e.target.value }))
-                    }
-                  />
-                  {passwordErrors.length > 0 && (
-                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-                      {passwordErrors.join(", ")}
-                    </span>
-                  )}
-                </label>
+                <AuthField
+                  label={i18n("emailAddress")}
+                  value={registerForm.email}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder={i18n("emailAddressPlaceholder")}
+                  hint={t("emailNotice")}
+                  errors={fieldErrors.email}
+                  onChange={(email) => setRegisterForm((f) => ({ ...f, email }))}
+                />
+
+                <AuthField
+                  label={i18n("password8be3c94")}
+                  value={registerForm.password}
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder={t("passwordRule")}
+                  errors={fieldErrors.password}
+                  onChange={(password) => setRegisterForm((f) => ({ ...f, password }))}
+                />
 
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
                   {i18n("adminRegistrationCode")}
@@ -385,48 +365,6 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   </div>
                 ) : null}
 
-                {/* Role cards */}
-                {!invitationToken.trim() ? <div>
-                  <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("iAmA5191365")}</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(
-                      [
-                        { value: "member", label: i18n("gymMemberfeecab7"), description: i18n("trainWithAStructuredProgrammeeca768c") },
-                        { value: "athlete", label: i18n("autonomousAthlete89280a4"), description: i18n("selfDirectedTraininge36a9cb") },
-                      ] as const
-                    ).map(({ value, label, description }) => {
-                      const selected = registerForm.role === value;
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          className="rounded-2xl p-4 text-start transition-all"
-                          style={{
-                            background: selected
-                              ? "color-mix(in srgb, var(--primary) 12%, transparent)"
-                              : "var(--bg)",
-                            border: selected
-                              ? "1.5px solid var(--primary)"
-                              : "1.5px solid var(--border)",
-                          }}
-                          onClick={() => setRegisterForm((f) => ({ ...f, role: value }))}
-                        >
-                          <p className="text-sm font-semibold" style={{ color: selected ? "var(--primary-strong)" : "var(--text)" }}>
-                            {label}
-                          </p>
-                          <p className="mt-1 text-xs leading-snug" style={{ color: "var(--dim)" }}>
-                            {description}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {roleErrors.length > 0 && (
-                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
-                      {roleErrors.join(", ")}
-                    </span>
-                  )}
-                </div> : null}
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
@@ -436,24 +374,33 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     (invitationToken.trim().length > 0 && invitation === null)
                   }
                   onClick={() => {
-                    if (!validateCredentials(registerForm.nickname, registerForm.password)) return;
+                    if (!validate(invalidRegisterFields(registerForm, t))) return;
+                    const profile = {
+                      handle: registerForm.handle.trim(),
+                      display_name: registerForm.display_name.trim(),
+                      email: registerForm.email.trim(),
+                      password: registerForm.password,
+                    };
                     void runAction("register", async () => {
-                      if (invitation) {
-                        await signUpInvited({
-                          nickname: registerForm.nickname,
-                          password: registerForm.password,
-                          email: registerForm.email,
-                          invitation_token: invitationToken.trim(),
-                        });
-                      } else {
-                        // ADR-156: an invite kept on this device brought a new account.
-                        markReferralNewAccount();
-                        try {
-                          await signUp(registerForm);
-                        } catch (caught) {
-                          markReferralNewAccount(false);
-                          throw caught;
+                      // Hold the redirect: recovery codes are offered first.
+                      registeringRef.current = true;
+                      try {
+                        if (invitation) {
+                          await signUpInvited({ ...profile, invitation_token: invitationToken.trim() });
+                        } else {
+                          // ADR-156: an invite kept on this device brought a new account.
+                          markReferralNewAccount();
+                          try {
+                            await signUp({ ...profile, role: registerForm.role });
+                          } catch (caught) {
+                            markReferralNewAccount(false);
+                            throw caught;
+                          }
                         }
+                        setOfferRecoveryCodes(true);
+                      } catch (caught) {
+                        registeringRef.current = false;
+                        throw caught;
                       }
                     });
                   }}
@@ -464,48 +411,40 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
               </>
             ) : (
               <>
-                {/* Nickname */}
-                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  {i18n("nicknamece2bd99")}
-                  <input
-                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: `1px solid ${nicknameInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
-                    value={loginForm.nickname}
-                    aria-invalid={nicknameInvalid}
-                    onChange={(e) => setLoginForm((f) => ({ ...f, nickname: e.target.value }))}
-                  />
-                  {nicknameErrors.length > 0 && (
-                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-                      {nicknameErrors.join(", ")}
-                    </span>
-                  )}
-                </label>
+                {passwordResetDone ? <AuthNotice tone="success">{t("passwordChangedSignIn")}</AuthNotice> : null}
 
-                {/* Password */}
-                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  {i18n("password8be3c94")}
-                  <input
-                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: `1px solid ${passwordInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
-                    type="password"
-                    value={loginForm.password}
-                    aria-invalid={passwordInvalid}
-                    onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
-                  />
-                  {passwordErrors.length > 0 && (
-                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-                      {passwordErrors.join(", ")}
-                    </span>
-                  )}
-                </label>
+                <AuthField
+                  label={t("identifierLabel")}
+                  value={loginForm.identifier}
+                  autoComplete="username"
+                  errors={fieldErrors.identifier}
+                  onChange={(identifier) => setLoginForm((f) => ({ ...f, identifier }))}
+                />
+
+                <AuthField
+                  label={i18n("password8be3c94")}
+                  value={loginForm.password}
+                  type="password"
+                  autoComplete="current-password"
+                  errors={fieldErrors.password}
+                  onChange={(password) => setLoginForm((f) => ({ ...f, password }))}
+                />
+
+                <div className="-mt-1 text-end">
+                  <Link className="text-sm font-semibold" style={{ color: "var(--primary)" }} href="/forgot-password">
+                    {t("forgotPasswordLink")}
+                  </Link>
+                </div>
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
                   style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   disabled={busyAction === "login"}
                   onClick={() => {
-                    if (!validateCredentials(loginForm.nickname, loginForm.password)) return;
-                    void runAction("login", async () => { await signIn(loginForm); });
+                    if (!validate(invalidLoginFields(loginForm, t))) return;
+                    void runAction("login", async () => {
+                      await signIn({ identifier: loginForm.identifier.trim(), password: loginForm.password });
+                    });
                   }}
                   type="button"
                 >
@@ -527,6 +466,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
               {error}
             </p>
           ) : null}
+          </>}
         </div>
       </div>
     </main>

@@ -623,3 +623,16 @@ msgstr "%{box} heeft geweigerd «%{event}» mee te organiseren."
 
 msgid "%{box} no longer co-hosts «%{event}»."
 msgstr "%{box} organiseert «%{event}» niet meer mee."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "Verzoek om wachtwoordherstel"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "%{name} (@%{handle}) kan niet inloggen en heeft gevraagd om het wachtwoord te herstellen."
+
+msgid "Your password was reset"
+msgstr "Je wachtwoord is hersteld"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "Je wachtwoord is gewijzigd met een herstellink of een herstelcode, en je bent op alle apparaten uitgelogd. Was jij dit niet? Neem dan contact op met je sportschool of met Palee-support."

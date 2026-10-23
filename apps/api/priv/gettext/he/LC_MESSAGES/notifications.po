@@ -623,3 +623,16 @@ msgstr "%{box} דחה את האירוח המשותף של «%{event}»."
 
 msgid "%{box} no longer co-hosts «%{event}»."
 msgstr "%{box} כבר לא מארח במשותף את «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "בקשה לאיפוס סיסמה"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "%{name} (@%{handle}) לא מצליח/ה להתחבר וביקש/ה לאפס את הסיסמה."
+
+msgid "Your password was reset"
+msgstr "הסיסמה שלך אופסה"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "הסיסמה שלך שונתה באמצעות קישור איפוס או קוד שחזור, וכל המכשירים נותקו מהחשבון. אם זה לא היית את/ה, פנה/י למכון שלך או לתמיכה של Palee."

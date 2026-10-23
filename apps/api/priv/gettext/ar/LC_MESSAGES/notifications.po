@@ -623,3 +623,16 @@ msgstr "رفض %{box} المشاركة في استضافة «%{event}»."
 
 msgid "%{box} no longer co-hosts «%{event}»."
 msgstr "لم يعد %{box} يشارك في استضافة «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "طلب إعادة تعيين كلمة المرور"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "لا يستطيع %{name} (@%{handle}) تسجيل الدخول وطلب إعادة تعيين كلمة المرور."
+
+msgid "Your password was reset"
+msgstr "تمت إعادة تعيين كلمة مرورك"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "تم تغيير كلمة مرورك عبر رابط إعادة تعيين أو رمز استرداد، وتم تسجيل الخروج من جميع الأجهزة. إن لم تكن أنت من فعل ذلك، فتواصل مع ناديك الرياضي أو مع دعم Palee."

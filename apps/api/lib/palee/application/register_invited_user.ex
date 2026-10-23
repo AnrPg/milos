@@ -1,5 +1,5 @@
 defmodule Palee.Application.RegisterInvitedUser do
-  alias Palee.Application.{ManageCoachingRelationships, TokenIssuer}
+  alias Palee.Application.{ManageCoachingRelationships, RegisterProfile, TokenIssuer}
   alias Palee.Organizations.Domain.MembershipPolicy
   alias Palee.{Identity, Organizations}
 
@@ -10,7 +10,7 @@ defmodule Palee.Application.RegisterInvitedUser do
     with {:ok, invitation} <- Organizations.inspect_invitation(token),
          :ok <- authorize_role(invitation.role, allowed_roles),
          account_role = account_role_for_invitation(invitation.role),
-         {:ok, user} <- Identity.register(registration_params(params, account_role)),
+         {:ok, user} <- RegisterProfile.call(registration_params(params, account_role)),
          {:ok, redemption} <- redeem_or_cleanup(token, user),
          :ok <- start_invited_coaching(redemption, user),
          {:ok, user} <- align_account_role(user, account_role),
@@ -30,7 +30,8 @@ defmodule Palee.Application.RegisterInvitedUser do
 
   defp registration_params(params, account_role) do
     %{
-      nickname: value(params, :nickname),
+      handle: value(params, :handle) || value(params, :nickname),
+      display_name: value(params, :display_name),
       password: value(params, :password),
       role: self_registration_role(account_role),
       # Carried through so an email-bound invitation can be matched against the

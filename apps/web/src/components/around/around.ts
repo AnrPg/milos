@@ -185,9 +185,10 @@ export type ChipModel =
   | { key: ChipKey; kind: "toggle"; active: boolean };
 
 /** The chip row after «Φίλτρα (n)» and the saved filters (mockup `near`). */
-export function chipModel(filter: AroundFilter): ChipModel[] {
+/** `mine` (the person's interests, ADR-183) lead the discipline options. */
+export function chipModel(filter: AroundFilter, mine: string[] = []): ChipModel[] {
   const radiusOptions = Array.from(new Set([...RADIUS_CHIP_OPTIONS, filter.radius_km])).sort((a, b) => a - b);
-  const disciplines = Array.from(new Set([...CHIP_DISCIPLINES, ...filter.disciplines]));
+  const disciplines = Array.from(new Set([...mine, ...CHIP_DISCIPLINES, ...filter.disciplines]));
   return [
     { key: "radius", kind: "menu", options: radiusOptions.map(String), selected: [String(filter.radius_km)], multiple: false },
     {

@@ -4,6 +4,7 @@ import { expect, test, type Page } from "./support/test";
 const pages = [
   { path: "/about", heading: /palee/i },
   { path: "/register", heading: /create your account/i },
+  { path: "/forgot-password", heading: /forgot your password/i },
   {
     path: "/box/schedule",
     heading: /^schedule$/i,

@@ -1,17 +1,24 @@
 defmodule Palee.Identity.User do
+  @moduledoc """
+  A profile (ADR-187). Every foreign key in the schema points at profiles;
+  the credentials they share live on `Palee.Identity.Login`.
+
+  The `handle` and `display_name` fields map to the historical `nickname`
+  and `display_nickname` columns, which SQL functions and views reference.
+  """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Palee.Identity.{Domain.Locale, RegistrationPolicy}
-  alias Palee.Organizations.Domain.InvitationEmail
+  alias Palee.Identity.{Domain.Locale, Login, RegistrationPolicy}
+  alias Palee.Identity.Domain.{DisplayName, Handle, NameSearch}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "users" do
-    field :nickname, :string
-    field :password, :string, virtual: true
-    field :password_hash, :string
-    field :display_nickname, :string
+    field :handle, :string, source: :nickname
+    field :display_name, :string, source: :display_nickname
+    field :search_text, :string, default: ""
+    field :handle_changed_at, :utc_datetime_usec
     field :role, Ecto.Enum, values: RegistrationPolicy.roles()
     field :calendar_feed_token_version, :integer, default: 1
     field :security_version, :integer, default: 1
@@ -19,56 +26,36 @@ defmodule Palee.Identity.User do
     field :preferred_locale, :string, default: "en"
     # "frost" (light) or "graphite" (dark); nil is the default, frost.
     field :preferred_theme_slug, :string
-    # Nullable: every account created before F-10 predates this column.
-    field :email, :string
     field :completed_tours, {:array, :string}, default: []
     # ADR-179: the zone the person's device last reported; nil until it does.
     field :time_zone, :string
 
+    belongs_to :login, Login
+
     timestamps()
   end
 
-  def registration_changeset(user \\ %__MODULE__{}, params) do
+  @doc """
+  A new profile under `login_id`. `handle` is what the person typed (folded
+  here); `display_name` defaults to the typed handle so a profile always has
+  a name to show.
+  """
+  def profile_create_changeset(user \\ %__MODULE__{}, login_id, params) do
+    params = default_display_name(params)
+
     user
-    |> cast(params, [:nickname, :password, :role, :email])
-    |> validate_required([:nickname, :password, :role, :email])
-    |> maybe_validate_email()
-    |> validate_nickname()
-    |> normalize_and_preserve_nickname()
+    |> cast(params, [:handle, :display_name, :role])
+    |> put_change(:login_id, login_id)
+    |> validate_required([:handle, :display_name, :role])
     |> validate_inclusion(:role, RegistrationPolicy.self_register_roles())
-    |> validate_password()
-    |> unique_constraint(:nickname)
-  end
-
-  defp maybe_normalize_nickname(changeset) do
-    case Ecto.Changeset.get_change(changeset, :nickname) do
-      nil ->
-        changeset
-
-      _v ->
-        changeset
-        |> validate_nickname()
-        |> normalize_and_preserve_nickname()
-    end
-  end
-
-  defp maybe_validate_nickname(changeset) do
-    case Ecto.Changeset.get_change(changeset, :nickname) do
-      nil ->
-        changeset
-
-      _v ->
-        changeset
-        |> validate_nickname()
-        |> unique_constraint(:nickname)
-    end
-  end
-
-  defp maybe_validate_password(changeset) do
-    case Ecto.Changeset.get_change(changeset, :password) do
-      nil -> changeset
-      _v -> validate_password(changeset)
-    end
+    |> validate_handle()
+    |> validate_display_name()
+    |> put_search_text()
+    |> unique_constraint(:handle, name: :users_nickname_index, message: "has already been taken")
+    |> check_constraint(:login_id,
+      name: :users_profile_cap,
+      message: "has reached the profile limit"
+    )
   end
 
   def role_changeset(user, params) do
@@ -78,17 +65,18 @@ defmodule Palee.Identity.User do
     |> validate_inclusion(:role, RegistrationPolicy.roles())
   end
 
-  def profile_changeset(user, params) do
+  @doc "Profile-level settings. Credentials (email, password) change on the login."
+  def profile_changeset(user, params, now \\ DateTime.utc_now()) do
     user
-    |> cast(params, [:nickname, :password, :preferred_locale, :preferred_theme_slug, :email])
-    |> maybe_validate_email()
-    |> maybe_normalize_nickname()
-    |> maybe_validate_nickname()
-    |> maybe_validate_password()
+    |> cast(params, [:handle, :display_name, :preferred_locale, :preferred_theme_slug])
+    |> maybe_change_handle(now)
+    |> validate_display_name()
+    |> put_search_text()
     |> validate_inclusion(:preferred_locale, Locale.supported(), message: "is not supported")
     |> validate_inclusion(:preferred_theme_slug, Palee.Themes.slugs(),
       message: "is not supported"
     )
+    |> unique_constraint(:handle, name: :users_nickname_index, message: "has already been taken")
   end
 
   def tours_changeset(user, completed_tours) do
@@ -127,49 +115,80 @@ defmodule Palee.Identity.User do
     |> validate_number(:security_version, greater_than: 0)
   end
 
-  # Applied only when the caller actually supplied an address, so accounts
-  # without one keep working and an unrelated profile edit never has to
-  # invent a value.
-  defp maybe_validate_email(changeset) do
-    case get_change(changeset, :email) do
+  defp default_display_name(params) do
+    handle = value(params, :handle) || value(params, :nickname)
+    display = value(params, :display_name)
+
+    params
+    |> Map.new(fn {key, val} -> {to_string(key), val} end)
+    |> Map.put("handle", handle)
+    |> Map.put("display_name", if(blank?(display), do: handle, else: display))
+  end
+
+  defp maybe_change_handle(changeset, now) do
+    case get_change(changeset, :handle) do
       nil ->
         changeset
 
-      _email ->
+      _handle ->
         changeset
-        |> update_change(:email, &InvitationEmail.normalize/1)
-        |> validate_format(:email, ~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-          message: "must be a valid email address"
-        )
-        |> unique_constraint(:email, name: :users_email_unique_index)
+        |> validate_handle()
+        |> then(fn changeset ->
+          if get_change(changeset, :handle),
+            do: put_change(changeset, :handle_changed_at, now),
+            else: changeset
+        end)
     end
   end
 
-  defp validate_nickname(changeset) do
-    validate_change(changeset, :nickname, fn :nickname, nickname ->
-      if RegistrationPolicy.valid_nickname?(nickname),
-        do: [],
-        else: [nickname: "must be 3-30 letters, numbers, or underscores"]
-    end)
-  end
+  defp validate_handle(changeset) do
+    case get_change(changeset, :handle) do
+      typed when is_binary(typed) ->
+        if Handle.valid?(typed) do
+          normalized = Handle.normalize(typed)
 
-  defp normalize_and_preserve_nickname(changeset) do
-    case Ecto.Changeset.get_change(changeset, :nickname) do
-      nickname when is_binary(nickname) ->
-        changeset
-        |> put_change(:display_nickname, nickname)
-        |> put_change(:nickname, RegistrationPolicy.normalize_nickname(nickname))
+          if normalized == changeset.data.handle,
+            do: delete_change(changeset, :handle),
+            else: put_change(changeset, :handle, normalized)
+        else
+          add_error(
+            changeset,
+            :handle,
+            "must be 3-30 Latin letters, numbers, dots or underscores"
+          )
+        end
 
-      _ ->
+      _other ->
         changeset
     end
   end
 
-  defp validate_password(changeset) do
-    validate_change(changeset, :password, fn :password, password ->
-      if RegistrationPolicy.valid_password?(password),
-        do: [],
-        else: [password: "must be at least 4 characters"]
-    end)
+  defp validate_display_name(changeset) do
+    case get_change(changeset, :display_name) do
+      typed when is_binary(typed) ->
+        if DisplayName.valid?(typed),
+          do: put_change(changeset, :display_name, DisplayName.normalize(typed)),
+          else: add_error(changeset, :display_name, "must be 1-50 characters")
+
+      _other ->
+        changeset
+    end
   end
+
+  defp put_search_text(%Ecto.Changeset{valid?: false} = changeset), do: changeset
+
+  defp put_search_text(changeset) do
+    if changed?(changeset, :handle) or changed?(changeset, :display_name) do
+      put_change(
+        changeset,
+        :search_text,
+        NameSearch.key(get_field(changeset, :display_name), get_field(changeset, :handle))
+      )
+    else
+      changeset
+    end
+  end
+
+  defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
+  defp blank?(value), do: not is_binary(value) or String.trim(value) == ""
 end

@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { BODY_SETTINGS_KEY, fetchBodySettings } from "@/api/body";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
+import { PASSWORD_RESETS_KEY, fetchPasswordResets } from "@/api/password-resets";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
@@ -37,6 +38,7 @@ import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { OrganizationSelector } from "@/components/organization-selector";
 import { Popover } from "@/components/ui/Popover";
+import { ProfileSwitcherMenu } from "@/components/account/ProfileSwitcherMenu";
 
 export { adminHref } from "@/lib/organization-slug";
 
@@ -94,6 +96,7 @@ export function tenantBrandLogoUrl(
 export function TopNav() {
   const i18n = useUiTranslations();
   const t = useTranslations("Navigation");
+  const tResets = useTranslations("passwordResets");
   const pathname = usePathname();
   const router = useRouter();
   const view = useView();
@@ -167,6 +170,17 @@ export function TopNav() {
     staleTime: 15 * 1000,
   });
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
+  // ADR-187: handlers (vendor, staff, coaches) reach the password reset
+  // requests from the account menu, and only while there are any.
+  const canHandleResets = isVendor || memberships.some((membership) => hasStaffRole(membership));
+  const resetsQuery = useQuery({
+    queryKey: PASSWORD_RESETS_KEY,
+    enabled: authenticated && canHandleResets,
+    queryFn: () => fetchPasswordResets(tokens!.access_token),
+    staleTime: 60 * 1000,
+  });
+  const resetRequests = resetsQuery.data?.requests ?? [];
+  const resetsToAct = resetRequests.filter((request) => ["open", "mine", "expired"].includes(request.state)).length;
 
   // Chat delivery records notify recipients only. The event refreshes the
   // Messages badge without exposing the delivery record in Notifications.
@@ -324,7 +338,7 @@ export function TopNav() {
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
               align="end"
-              width={176}
+              width={(currentUser.profile_count ?? 1) > 1 ? 224 : 176}
               className="rounded-2xl py-1 shadow-[var(--shadow-lg)]"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
@@ -335,10 +349,16 @@ export function TopNav() {
                   <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
                     {currentUser.nickname}
                   </p>
+                  {currentUser.handle && currentUser.handle !== currentUser.nickname ? (
+                    <p className="truncate text-xs" style={{ color: "var(--dim)" }} dir="ltr">
+                      @{currentUser.handle}
+                    </p>
+                  ) : null}
                   <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {isVendor ? t("platform") : <SemanticLabel value={currentMembership?.role ?? currentUser.role} />}
                   </p>
                 </div>
+                <ProfileSwitcherMenu />
                 {showTenantShell ? (
                   <button
                     type="button"
@@ -365,6 +385,21 @@ export function TopNav() {
                 >
                   {t("profile")}
                 </Link>
+                {resetRequests.length > 0 ? (
+                  <Link
+                    href="/password-resets"
+                    className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                    style={{ color: "var(--text-soft)" }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {tResets("navLink")}
+                    {resetsToAct > 0 ? (
+                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+                        {resetsToAct > 99 ? "99+" : resetsToAct}
+                      </span>
+                    ) : null}
+                  </Link>
+                ) : null}
                 {isVendor ? (
                   <>
                     <Link

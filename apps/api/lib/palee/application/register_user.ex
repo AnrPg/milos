@@ -1,9 +1,9 @@
 defmodule Palee.Application.RegisterUser do
   alias Palee.Identity
-  alias Palee.Application.TokenIssuer
+  alias Palee.Application.{RegisterProfile, TokenIssuer}
 
   def call(params) do
-    with {:ok, user} <- Identity.register(params),
+    with {:ok, user} <- RegisterProfile.call(params),
          {:ok, tokens} <- issue_tokens_or_cleanup(user) do
       {:ok, Map.put(tokens, :user, user)}
     end

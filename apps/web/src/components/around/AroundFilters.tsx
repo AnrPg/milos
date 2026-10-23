@@ -38,6 +38,8 @@ import {
   type DayTime,
   type When,
 } from "./around";
+import { useMyInterests } from "@/components/interests/InterestsEditor";
+
 import { useAroundError, useNeighbourhoodName } from "./AreaPicker";
 import { useAround, useAroundArea, useNeighbourhoodSearch, useSavedFilterActions } from "./use-around";
 
@@ -61,6 +63,8 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
   const [saving, setSaving] = useState(false);
   const [managing, setManaging] = useState<SavedFilter | null>(null);
   const count = activeFilterCount(filter);
+  // ADR-183: what the person does is one tap away, never applied on its own.
+  const mine = useMyInterests().data?.disciplines ?? [];
 
   const label = (key: ChipKey, value: string) => {
     switch (key) {
@@ -77,7 +81,7 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
   const toggleLabels: Partial<Record<ChipKey, string>> = { free: t("costFree"), trial: t("costTrial"), posts: t("kind_posts") };
   const menuLabels: Partial<Record<ChipKey, string>> = { radius: t("chipRadius"), when: t("chipWhen"), discipline: t("chipDiscipline") };
 
-  const chips: FilterChip[] = chipModel(filter).map((chip) =>
+  const modelChips: FilterChip[] = chipModel(filter, mine).map((chip) =>
     chip.kind === "toggle"
       ? {
           key: chip.key,
@@ -96,6 +100,20 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
           onChange: (values: string[]) => setFilter(applyChip(filter, chip.key, values)),
         },
   );
+  const mineActive = mine.length > 0 && sameDisciplines(filter.disciplines, mine);
+  const chips: FilterChip[] =
+    mine.length > 0
+      ? [
+          {
+            key: "mine",
+            kind: "toggle",
+            label: t("myDisciplines"),
+            active: mineActive,
+            onToggle: () => setFilter({ ...filter, disciplines: mineActive ? [] : mine }),
+          },
+          ...modelChips,
+        ]
+      : modelChips;
 
   return (
     <>
@@ -609,4 +627,8 @@ function ToggleChip({ on, onClick, children }: { on: boolean; onClick: () => voi
       {children}
     </button>
   );
+}
+
+function sameDisciplines(a: string[], b: string[]) {
+  return a.length === b.length && a.every((key) => b.includes(key));
 }

@@ -618,4 +618,16 @@ msgid "%{box} declined to co-host «%{event}»."
 msgstr ""
 
 msgid "%{box} no longer co-hosts «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr ""
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr ""
+
+msgid "Your password was reset"
+msgstr ""
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr ""

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { searchUsers } from "@/api/messaging";
+import { PersonName } from "@/components/account/PersonName";
 import {
   fetchPRSharing,
   grantPRAccess,
@@ -16,7 +17,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-type Candidate = { id: string; nickname: string };
+type Candidate = { id: string; nickname: string; handle?: string | null };
 
 export const PR_SHARING_QUERY_KEY = ["pr-sharing"] as const;
 
@@ -94,7 +95,7 @@ export function PRSharingSettings() {
     searchTimer.current = setTimeout(async () => {
       try {
         const data = await searchUsers(token, value);
-        setCandidates(data.users.map((user) => ({ id: user.id, nickname: user.nickname })));
+        setCandidates(data.users.map((user) => ({ id: user.id, nickname: user.nickname, handle: user.handle })));
       } catch {
         setCandidates([]);
       } finally {
@@ -205,7 +206,7 @@ export function PRSharingSettings() {
             <ul className="space-y-1">
               {visibleCandidates.map((candidate) => (
                 <li key={candidate.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-2" style={{ border: "1px solid var(--border)" }}>
-                  <span className="text-sm" style={{ color: "var(--text)" }}>{candidate.nickname}</span>
+                  <PersonName name={candidate.nickname} handle={candidate.handle} />
                   <button
                     type="button"
                     disabled={grantMutation.isPending}

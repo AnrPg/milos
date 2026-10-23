@@ -599,6 +599,21 @@ defmodule Palee.Notifications do
         url: "/admin/schedule?open_slot=#{field(payload, :scheduled_class_id)}"
       })
 
+  # ADR-187: a person asked for a password reset; each event names one of
+  # the people who can handle it.
+  def process_event("password_reset_requested", payload),
+    do:
+      enqueue_simple(:password_reset_requested, payload, %{
+        request_id: field(payload, :request_id),
+        person_handle: field(payload, :person_handle),
+        person_name: field(payload, :person_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/password-resets?request=#{field(payload, :request_id)}"
+      })
+
+  def process_event("password_reset_completed", payload),
+    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings"})
+
   def process_event("coaching_reply_overdue", payload),
     do:
       enqueue_simple(:coaching_reply_overdue, payload, %{

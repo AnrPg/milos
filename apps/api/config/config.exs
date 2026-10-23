@@ -89,6 +89,7 @@ config :palee, :execution_abandonment_hours, 6
 config :palee, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :palee, :readiness_checker, Palee.Infrastructure.Readiness.Live
 config :palee, :identity_user_store, Palee.Infrastructure.Identity.EctoUserStore
+config :palee, :password_reset_store, Palee.Infrastructure.Identity.EctoPasswordResetStore
 
 config :palee,
        :organization_store,
@@ -199,6 +200,7 @@ config :palee,
 
 config :palee, :gazetteer_store, Palee.Infrastructure.Places.EctoGazetteerStore
 config :palee, :home_area_store, Palee.Infrastructure.Places.EctoHomeAreaStore
+config :palee, :interests_store, Palee.Infrastructure.Interests.EctoInterestsStore
 
 config :palee,
        :public_profile_store,

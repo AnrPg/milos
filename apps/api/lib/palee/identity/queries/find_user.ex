@@ -10,7 +10,12 @@ defmodule Palee.Identity.Queries.FindUser do
   def search_athletes(query) do
     UserStore.search_athletes(query)
     |> Enum.map(fn athlete ->
-      %{id: athlete.id, nickname: athlete.nickname, role: to_string(athlete.role)}
+      %{
+        id: athlete.id,
+        nickname: athlete.nickname,
+        handle: athlete.handle,
+        role: to_string(athlete.role)
+      }
     end)
   end
 end

@@ -100,7 +100,10 @@ export async function fetchUnreadCount(token: string, organizationSlug?: string 
 }
 
 export async function searchUsers(token: string, query: string) {
-  return apiRequest<{ users: { id: string; nickname: string; role: string }[] }>(
+  // ADR-187: `nickname` is the display name; `handle` tells same-named people apart.
+  return apiRequest<{
+    users: { id: string; nickname: string; handle?: string | null; avatar_url?: string | null; role: string }[];
+  }>(
     `/me/search/users?q=${encodeURIComponent(query)}`,
     { token },
   );

@@ -623,3 +623,16 @@ msgstr "Το %{box} αρνήθηκε να συνδιοργανώσει το «%{
 
 msgid "%{box} no longer co-hosts «%{event}»."
 msgstr "Το %{box} δεν συνδιοργανώνει πια το «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "Αίτημα επαναφοράς κωδικού"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "Ο/Η %{name} (@%{handle}) δεν μπορεί να συνδεθεί και ζήτησε επαναφορά κωδικού."
+
+msgid "Your password was reset"
+msgstr "Ο κωδικός σου άλλαξε"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "Ο κωδικός σου άλλαξε με σύνδεσμο επαναφοράς ή με κωδικό ανάκτησης, και αποσυνδέθηκαν όλες οι συσκευές. Αν δεν ήσουν εσύ, επικοινώνησε με το γυμναστήριό σου ή με την υποστήριξη του Palee."

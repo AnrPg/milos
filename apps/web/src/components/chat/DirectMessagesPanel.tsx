@@ -31,10 +31,12 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { PartnerThreads } from "@/components/partners/PartnerThreads";
 import { BoxConversationsList } from "@/components/trials/BoxConversationsList";
 import { Dialog } from "@/components/ui/Dialog";
+import { PersonName } from "@/components/account/PersonName";
 
 interface SearchResult {
   id: string;
   nickname: string;
+  handle?: string | null;
   role: string;
 }
 
@@ -252,10 +254,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                   >
                     {u.nickname[0]?.toUpperCase()}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                      {u.nickname}
-                    </p>
+                  <div className="min-w-0">
+                    <PersonName name={u.nickname} handle={u.handle} />
                     <p className="text-xs" style={{ color: "var(--dim)" }}>
                       <SemanticLabel value={u.role} />
                     </p>
