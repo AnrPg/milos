@@ -129,27 +129,30 @@ defmodule Palee.Shop.Domain.SalesReport do
 
   @doc """
   Sales attributed to a promotion code, a campaign or a source (a club feed
-  post, the public page...). `source` groups carry `source` and
-  `source_ref_id`; the `direct` source and orders without a code are the
-  unattributed rest.
+  post, the public page...). `source` groups carry `source`,
+  `source_ref_id` and `with_code` (the orders carried a promotion code); an
+  order is attributed when it has a source other than `direct` or a code.
   """
   def attribution(code_groups, campaign_groups, source_groups) do
-    {direct, attributed_sources} = Enum.split_with(source_groups, &(&1.source in [nil, "direct"]))
+    {unattributed, attributed} =
+      Enum.split_with(
+        source_groups,
+        &(&1.source in [nil, "direct"] and not Map.get(&1, :with_code, false))
+      )
 
     %{
       by_promotion_code: rank_groups(code_groups, :promotion_code),
       by_campaign: rank_groups(campaign_groups, :campaign_id),
       by_source:
-        attributed_sources
-        |> Enum.map(fn group ->
-          group
-          |> List.wrap()
-          |> totals()
-          |> Map.merge(Map.take(group, [:source, :source_ref_id]))
+        source_groups
+        |> Enum.reject(&(&1.source in [nil, "direct"]))
+        |> Enum.group_by(&{&1.source, &1.source_ref_id})
+        |> Enum.map(fn {{source, ref}, groups} ->
+          Map.merge(totals(groups), %{source: source, source_ref_id: ref})
         end)
-        |> Enum.sort_by(&{-&1.net_cents, &1.source}),
-      attributed: totals(attributed_sources),
-      unattributed: totals(direct)
+        |> Enum.sort_by(&{-&1.net_cents, &1.source, &1.source_ref_id || ""}),
+      attributed: totals(attributed),
+      unattributed: totals(unattributed)
     }
   end
 
