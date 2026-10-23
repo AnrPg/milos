@@ -16,6 +16,10 @@ defmodule Palee.Organizations.Domain.TenantDataPolicy do
               "Memberships, invitations, settings, the public profile and its tag suggestions, retired slug aliases, provisioning events, members' remembered provider selections (ADR-162) and the platform plan subscription (ADR-170) are removed with the organization row; the platform purge record replaces them as the audit trail.",
             excluded_columns: ["token_digest", "intended_email_digest"],
             tables: [
+              # ADR-184: removed with the organization row, like the rest.
+              %{table: "demo_records"},
+              %{table: "business_activation_links"},
+              %{table: "business_requests"},
               %{table: "profile_tag_suggestions"},
               %{table: "organization_public_profiles"},
               %{table: "registration_invitations"},

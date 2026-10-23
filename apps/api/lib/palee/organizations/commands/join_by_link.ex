@@ -5,7 +5,7 @@ defmodule Palee.Organizations.Commands.JoinByLink do
   """
 
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.JoinLinkPolicy
+  alias Palee.Organizations.Domain.{GoLivePolicy, JoinLinkPolicy}
   alias Palee.Organizations.OrganizationStore
 
   def call(slug, user_id, joined_at) when is_binary(slug) and is_binary(user_id) do
@@ -20,7 +20,9 @@ defmodule Palee.Organizations.Commands.JoinByLink do
     with %{} = organization <- OrganizationStore.get_organization_by_slug(slug),
          settings <- OrganizationStore.get_organization_settings(organization.id),
          join_link <- JoinLinkPolicy.from_settings(settings && settings.settings),
-         true <- JoinLinkPolicy.joinable?(join_link, organization.status) do
+         true <- JoinLinkPolicy.joinable?(join_link, organization.status),
+         # ADR-184: a business in demo mode is not reachable from outside.
+         :ok <- GoLivePolicy.check(organization, :join) do
       membership = OrganizationStore.get_membership(organization.id, user_id)
 
       case JoinLinkPolicy.join_decision(membership) do

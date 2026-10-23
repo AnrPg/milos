@@ -4,7 +4,7 @@ defmodule Palee.Application.SubmitGuestBooking do
   guest booking counts toward capacity and follows the class's approval mode.
   """
 
-  alias Palee.Application.{BookingTerms, SubmitBooking}
+  alias Palee.Application.{BookingTerms, GoLive, SubmitBooking}
   alias Palee.Scheduling
   alias Palee.Scheduling.Domain.BookingPolicy
 
@@ -13,6 +13,7 @@ defmodule Palee.Application.SubmitGuestBooking do
 
     with {:ok, guest_name} <- normalize_name(guest_name),
          %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found},
+         :ok <- GoLive.check_booking(context, user_id),
          :ok <- BookingPolicy.can_book_guest?(slot, user_id, now),
          terms = BookingTerms.for_slot(context, user_id, slot),
          :ok <-
