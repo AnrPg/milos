@@ -18,6 +18,7 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
     params =
       [q: query, limit: Keyword.get(opts, :limit, 5), lang: language(opts)]
       |> put_near(Keyword.get(opts, :near))
+      |> put_layers(Keyword.get(opts, :layers, []))
 
     with {:ok, features} <- get("/api/", params) do
       {:ok, features |> Enum.map(&to_place/1) |> Enum.reject(&is_nil/1)}
@@ -26,19 +27,22 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
 
   @impl true
   def reverse(latitude, longitude, opts) do
-    params = [
-      lat: latitude,
-      lon: longitude,
-      limit: 1,
-      lang: language(opts),
-      layer: "house",
-      layer: "street"
-    ]
+    params =
+      [lat: latitude, lon: longitude, limit: 1, lang: language(opts)]
+      |> put_layers(Keyword.get(opts, :layers, ~w(house street)))
 
     with {:ok, features} <- get("/reverse", params) do
       place = features |> Enum.map(&to_place/1) |> Enum.find(& &1)
-      {:ok, place && %{place | latitude: latitude, longitude: longitude}}
+      {:ok, place && pinned(place, latitude, longitude, opts)}
     end
+  end
+
+  # An address under a dropped pin keeps the pin; a looked-up area keeps its
+  # own centre (ADR-188 asks with `layers`).
+  defp pinned(place, latitude, longitude, opts) do
+    if Keyword.has_key?(opts, :layers),
+      do: place,
+      else: %{place | latitude: latitude, longitude: longitude}
   end
 
   defp get(path, params) do
@@ -79,7 +83,14 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
       city: city,
       country_code: props["countrycode"] && String.upcase(props["countrycode"]),
       latitude: lat * 1.0,
-      longitude: lng * 1.0
+      longitude: lng * 1.0,
+      name: props["name"],
+      state: props["state"],
+      country: props["country"],
+      layer: props["type"],
+      osm_ref: osm_ref(props["osm_type"], props["osm_id"]),
+      osm_value: props["osm_value"],
+      extent: extent(props["extent"])
     }
   end
 
@@ -91,6 +102,20 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
       kept -> Enum.join(Enum.uniq(kept), separator)
     end
   end
+
+  # "R12345": the OSM object, stable across languages and refreshes.
+  defp osm_ref(type, id) when type in ~w(N W R) and is_integer(id),
+    do: type <> Integer.to_string(id)
+
+  defp osm_ref(_type, _id), do: nil
+
+  defp extent([_, _, _, _] = box) do
+    if Enum.all?(box, &is_number/1), do: Enum.map(box, &(&1 * 1.0))
+  end
+
+  defp extent(_box), do: nil
+
+  defp put_layers(params, layers), do: params ++ Enum.map(layers, &{:layer, &1})
 
   defp put_near(params, {lat, lng}), do: params ++ [lat: lat, lon: lng]
   defp put_near(params, _near), do: params

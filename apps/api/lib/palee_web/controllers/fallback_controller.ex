@@ -118,6 +118,12 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "filter_alerts_unsupported", error: "Only Γύρω μου filters have alerts"})
   end
 
+  def call(conn, {:error, :invalid_place_ref}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_place_ref", error: "That search result has expired; search again"})
+  end
+
   def call(conn, {:error, :geocoder_unavailable}) do
     conn
     |> put_status(:service_unavailable)

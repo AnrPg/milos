@@ -25,6 +25,9 @@ export type AroundClubItem = components["schemas"]["AroundClubItem"];
 export type AroundPostItem = components["schemas"]["AroundPostItem"];
 export type AroundItem = AroundEventItem | AroundBoxItem | AroundClubItem | AroundPostItem;
 export type Neighbourhood = components["schemas"]["Neighbourhood"];
+/** A search result: a stored place, or (with `ref`) a place or address anywhere from the geocoder (ADR-188). */
+export type PlaceSuggestion = components["schemas"]["PlaceSuggestion"];
+export type PlaceSearch = { places: PlaceSuggestion[]; remote: components["schemas"]["NeighbourhoodsResponse"]["remote"] };
 export type AroundVisibility = components["schemas"]["AroundVisibility"];
 
 export const AROUND_KINDS: AroundKind[] = ["events", "boxes", "clubs", "posts"];
@@ -50,12 +53,22 @@ export function fetchAroundPins(token: string, bbox: AroundViewport, filter: Aro
   return apiRequest<AroundPinsResponse>("/around/pins", { method: "POST", token, body: { bbox, filter }, signal });
 }
 
-export async function searchNeighbourhoods(token: string, q: string, signal?: AbortSignal) {
+export async function searchNeighbourhoods(token: string, q: string, signal?: AbortSignal): Promise<PlaceSearch> {
   const data = await apiRequest<components["schemas"]["NeighbourhoodsResponse"]>(
     `/places/neighbourhoods?q=${encodeURIComponent(q)}`,
     { token, signal },
   );
-  return data.neighbourhoods ?? [];
+  return { places: data.neighbourhoods ?? [], remote: data.remote };
+}
+
+/** Stores a geocoder suggestion (an address becomes its neighbourhood) and returns the gazetteer place. */
+export async function importPlace(token: string, ref: string) {
+  const data = await apiRequest<components["schemas"]["PlaceImportResponse"]>("/places/neighbourhoods/import", {
+    method: "POST",
+    token,
+    body: { ref },
+  });
+  return data.neighbourhood;
 }
 
 export async function fetchAroundArea(token: string) {
