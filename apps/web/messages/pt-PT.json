@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Agora não",
     "displayNameLabel": "O teu nome",
     "displayNamePlaceholder": "É assim que os outros te veem",
+    "displayNameHint": "É só o nome que os outros veem online. Não serve para iniciar sessão.",
     "displayNameRule": "Usa entre 1 e 50 caracteres.",
     "handleLabel": "Nome de utilizador",
-    "handleHint": "Único, para que te encontrem e te mencionem.",
+    "handleHint": "Vais iniciar sessão com este identificador (ou o teu email), por isso lembra-te dele. Os outros encontram-te e mencionam-te com ele.",
     "handleRule": "Usa 3 a 30 letras latinas, algarismos, pontos ou underscores.",
     "handleChecking": "A verificar…",
     "handleAvailable": "@{handle} está livre",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Pedido de reposição da palavra-passe",
     "notifRequestedBody": "{name} (@{handle}) não consegue iniciar sessão e pediu para repor a palavra-passe.",
     "notifCompletedTitle": "A tua palavra-passe foi reposta",
-    "notifCompletedBody": "A tua palavra-passe foi alterada com uma ligação de reposição ou um código de recuperação, e a sessão foi terminada em todos os dispositivos. Se não foste tu, contacta o teu ginásio ou o apoio do Palee."
+    "notifCompletedBody": "A tua palavra-passe foi alterada com uma ligação de reposição ou um código de recuperação, e a sessão foi terminada em todos os dispositivos. Se não foste tu, contacta o teu ginásio ou o apoio do Palee.",
+    "logOpenRequests": "Pedidos em aberto",
+    "logHint": "Os pedidos são tratados na página de reposição de palavras-passe. Ninguém pode tratar um pedido da sua própria conta: vai para as outras pessoas que o podem fazer."
   },
   "FirstRun": {
     "progress": "Passo {step} de {total}",

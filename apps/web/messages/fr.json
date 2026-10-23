@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Pas maintenant",
     "displayNameLabel": "Ton nom",
     "displayNamePlaceholder": "Ce que les autres verront",
+    "displayNameHint": "Juste le nom affiché aux autres en ligne. Tu ne peux pas te connecter avec.",
     "displayNameRule": "Entre 1 et 50 caractères.",
     "handleLabel": "Nom d'utilisateur",
-    "handleHint": "Unique, pour qu'on puisse te trouver et te mentionner.",
+    "handleHint": "C'est avec cet identifiant (ou ton e-mail) que tu te connecteras, alors retiens-le. Les autres te trouvent et te mentionnent avec.",
     "handleRule": "De 3 à 30 lettres latines, chiffres, points ou tirets bas.",
     "handleChecking": "Vérification…",
     "handleAvailable": "@{handle} est disponible",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Demande de réinitialisation du mot de passe",
     "notifRequestedBody": "{name} (@{handle}) n’arrive pas à se connecter et a demandé à réinitialiser son mot de passe.",
     "notifCompletedTitle": "Votre mot de passe a été réinitialisé",
-    "notifCompletedBody": "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre salle ou le support Palee."
+    "notifCompletedBody": "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre salle ou le support Palee.",
+    "logOpenRequests": "Demandes en cours",
+    "logHint": "Les demandes se traitent sur la page des réinitialisations de mot de passe. Personne ne peut traiter une demande pour son propre compte : elle va aux autres personnes qui le peuvent."
   },
   "FirstRun": {
     "progress": "Étape {step} sur {total}",

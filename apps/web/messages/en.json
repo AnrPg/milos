@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Not now",
     "displayNameLabel": "Your name",
     "displayNamePlaceholder": "How others will see you",
+    "displayNameHint": "Just the name shown to people online. You can't sign in with it.",
     "displayNameRule": "Use 1–50 characters.",
     "handleLabel": "Handle",
-    "handleHint": "Unique, so people can find and mention you.",
+    "handleHint": "You'll sign in with this handle (or your email), so remember it. People also find and mention you by it.",
     "handleRule": "Use 3–30 Latin letters, numbers, dots or underscores.",
     "handleChecking": "Checking…",
     "handleAvailable": "@{handle} is free",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Password reset request",
     "notifRequestedBody": "{name} (@{handle}) can't sign in and asked for a password reset.",
     "notifCompletedTitle": "Your password was reset",
-    "notifCompletedBody": "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+    "notifCompletedBody": "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
+    "logOpenRequests": "Open requests",
+    "logHint": "Requests are handled on the Password resets page. Nobody can handle a request for their own account: it goes to the other people who can."
   },
   "FirstRun": {
     "progress": "Step {step} of {total}",

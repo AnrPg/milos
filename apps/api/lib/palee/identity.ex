@@ -5,6 +5,40 @@ defmodule Palee.Identity do
   alias Palee.Identity.UserStore
 
   defdelegate register(params), to: RegisterUser, as: :call
+
+  # ADR-184: mock people of a demo business, marked durably on the profile.
+  @doc """
+  Registers a mock person of the demo business `organization_id`. The mark
+  (`demo_organization_id`) is set at insert and never changes.
+  """
+  defdelegate register_demo_person(organization_id, params),
+    to: UserStore,
+    as: :create_demo_person
+
+  @doc "Whether an account (or account id) is a mock person of some demo business."
+  def demo_user?(%{demo_organization_id: organization_id}), do: not is_nil(organization_id)
+
+  def demo_user?(user_id) when is_binary(user_id),
+    do: user_id |> find_by_id() |> demo_user?()
+
+  def demo_user?(_user), do: false
+
+  @doc "The mock people of one demo business (the wipe and cleanup delete these)."
+  defdelegate demo_user_ids(organization_id), to: UserStore
+
+  @doc """
+  The ids among `user_ids` that `viewer_id` may discover, in their order. A
+  mock person is visible only to itself and to the active staff of its demo
+  business; everyone real is always kept. Every person-discovery path filters
+  through this (or the SQL `palee_demo_user_visible`).
+  """
+  defdelegate visible_user_ids(user_ids, viewer_id), to: UserStore
+
+  @doc "Whether `viewer_id` may discover the person `user_id` (see `visible_user_ids/2`)."
+  def visible_to?(user_id, viewer_id) when is_binary(user_id),
+    do: visible_user_ids([user_id], viewer_id) == [user_id]
+
+  def visible_to?(_user_id, _viewer_id), do: false
   defdelegate find_by_nickname(nickname), to: FindUser, as: :by_nickname
   defdelegate find_by_handle(handle), to: FindUser, as: :by_nickname
 

@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Non ora",
     "displayNameLabel": "Il tuo nome",
     "displayNamePlaceholder": "Come ti vedranno gli altri",
+    "displayNameHint": "È solo il nome che gli altri vedono online. Non puoi usarlo per accedere.",
     "displayNameRule": "Da 1 a 50 caratteri.",
     "handleLabel": "Nome utente",
-    "handleHint": "Unico, così le persone possono trovarti e menzionarti.",
+    "handleHint": "Accederai con questo handle (o con la tua email), quindi ricordalo. Gli altri ti trovano e ti menzionano con questo.",
     "handleRule": "Da 3 a 30 lettere latine, numeri, punti o trattini bassi.",
     "handleChecking": "Verifica in corso…",
     "handleAvailable": "@{handle} è libero",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Richiesta di reimpostazione della password",
     "notifRequestedBody": "{name} (@{handle}) non riesce ad accedere e ha chiesto di reimpostare la password.",
     "notifCompletedTitle": "La tua password è stata reimpostata",
-    "notifCompletedBody": "La tua password è stata cambiata con un link di reimpostazione o un codice di recupero, ed è stata chiusa la sessione su tutti i dispositivi. Se non sei stato tu, contatta la tua palestra o l'assistenza Palee."
+    "notifCompletedBody": "La tua password è stata cambiata con un link di reimpostazione o un codice di recupero, ed è stata chiusa la sessione su tutti i dispositivi. Se non sei stato tu, contatta la tua palestra o l'assistenza Palee.",
+    "logOpenRequests": "Richieste aperte",
+    "logHint": "Le richieste si gestiscono nella pagina di reimpostazione delle password. Nessuno può gestire una richiesta per il proprio account: va alle altre persone che possono farlo."
   },
   "FirstRun": {
     "progress": "Passo {step} di {total}",

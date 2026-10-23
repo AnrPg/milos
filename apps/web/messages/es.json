@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Ahora no",
     "displayNameLabel": "Tu nombre",
     "displayNamePlaceholder": "Así te verán los demás",
+    "displayNameHint": "Solo el nombre que ven los demás en línea. No sirve para iniciar sesión.",
     "displayNameRule": "Usa entre 1 y 50 caracteres.",
     "handleLabel": "Usuario",
-    "handleHint": "Único, para que te encuentren y te mencionen.",
+    "handleHint": "Iniciarás sesión con este identificador (o tu email), así que recuérdalo. Los demás te encuentran y te mencionan con él.",
     "handleRule": "Usa de 3 a 30 letras latinas, números, puntos o guiones bajos.",
     "handleChecking": "Comprobando…",
     "handleAvailable": "@{handle} está libre",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Solicitud de restablecimiento de contraseña",
     "notifRequestedBody": "{name} (@{handle}) no puede iniciar sesión y ha pedido restablecer su contraseña.",
     "notifCompletedTitle": "Tu contraseña se ha restablecido",
-    "notifCompletedBody": "Tu contraseña se cambió con un enlace de restablecimiento o un código de recuperación, y se cerró la sesión en todos los dispositivos. Si no fuiste tú, contacta con tu gimnasio o con el soporte de Palee."
+    "notifCompletedBody": "Tu contraseña se cambió con un enlace de restablecimiento o un código de recuperación, y se cerró la sesión en todos los dispositivos. Si no fuiste tú, contacta con tu gimnasio o con el soporte de Palee.",
+    "logOpenRequests": "Solicitudes abiertas",
+    "logHint": "Las solicitudes se gestionan en la página de restablecimiento de contraseñas. Nadie puede gestionar una solicitud de su propia cuenta: va a las demás personas que pueden hacerlo."
   },
   "FirstRun": {
     "progress": "Paso {step} de {total}",

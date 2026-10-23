@@ -9283,9 +9283,10 @@
     "recoveryOfferSkip": "Jetzt nicht",
     "displayNameLabel": "Dein Name",
     "displayNamePlaceholder": "So sehen dich die anderen",
+    "displayNameHint": "Nur der Name, den andere online sehen. Anmelden kannst du dich damit nicht.",
     "displayNameRule": "1–50 Zeichen.",
     "handleLabel": "Benutzername",
-    "handleHint": "Einzigartig, damit man dich finden und erwähnen kann.",
+    "handleHint": "Damit meldest du dich an (oder mit deiner E-Mail), merk es dir also. Andere finden und erwähnen dich damit.",
     "handleRule": "3–30 lateinische Buchstaben, Ziffern, Punkte oder Unterstriche.",
     "handleChecking": "Wird geprüft…",
     "handleAvailable": "@{handle} ist frei",
@@ -9486,7 +9487,9 @@
     "notifRequestedTitle": "Anfrage zum Zurücksetzen des Passworts",
     "notifRequestedBody": "{name} (@{handle}) kann sich nicht anmelden und bittet darum, das Passwort zurückzusetzen.",
     "notifCompletedTitle": "Dein Passwort wurde zurückgesetzt",
-    "notifCompletedBody": "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an dein Studio oder den Palee-Support."
+    "notifCompletedBody": "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an dein Studio oder den Palee-Support.",
+    "logOpenRequests": "Offene Anfragen",
+    "logHint": "Anfragen werden auf der Seite „Passwort-Zurücksetzungen“ bearbeitet. Niemand kann eine Anfrage für das eigene Konto bearbeiten – sie geht an die anderen, die das können."
   },
   "FirstRun": {
     "progress": "Schritt {step} von {total}",

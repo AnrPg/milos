@@ -83,7 +83,7 @@ defmodule Palee.Application.SocialProfile do
   end
 
   def person(%{user_id: viewer_id} = context, person_id) do
-    with {:ok, person} <- find(person_id) do
+    with {:ok, person} <- find(person_id, viewer_id) do
       followers = Community.follower_counts("user", [person.id])
 
       {:ok,
@@ -102,7 +102,7 @@ defmodule Palee.Application.SocialProfile do
 
   @doc "The person's profile posts the viewer may read, newest first."
   def posts(%{user_id: viewer_id} = context, person_id, params) do
-    with {:ok, person} <- find(person_id),
+    with {:ok, person} <- find(person_id, viewer_id),
          {:ok, before} <- Community.decode_feed_cursor(params[:cursor] || params["cursor"]) do
       posts =
         Community.list_profile_posts(context, %{
@@ -129,9 +129,11 @@ defmodule Palee.Application.SocialProfile do
   defp follows_me(context, person_id, viewer_id),
     do: match?(%{status: "active"}, Community.get_follow(context, person_id, "user", viewer_id))
 
-  defp find(id) do
+  # ADR-184: a mock person is a 404 for everyone but its demo business's staff.
+  defp find(id, viewer_id) do
     with {:ok, id} <- Ecto.UUID.cast(id),
-         %{id: _} = person <- Identity.find_by_id(id) do
+         %{id: _} = person <- Identity.find_by_id(id),
+         true <- Identity.visible_to?(person.id, viewer_id) do
       {:ok, person}
     else
       _missing -> {:error, :not_found}

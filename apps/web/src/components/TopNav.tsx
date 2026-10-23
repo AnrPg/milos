@@ -171,7 +171,7 @@ export function TopNav() {
   });
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
   // ADR-187: handlers (vendor, staff, coaches) reach the password reset
-  // requests from the account menu, and only while there are any.
+  // requests from the account menu, while there are any (the vendor always).
   const canHandleResets = isVendor || memberships.some((membership) => hasStaffRole(membership));
   const resetsQuery = useQuery({
     queryKey: PASSWORD_RESETS_KEY,
@@ -385,7 +385,7 @@ export function TopNav() {
                 >
                   {t("profile")}
                 </Link>
-                {resetRequests.length > 0 ? (
+                {resetRequests.length > 0 || isVendor ? (
                   <Link
                     href="/password-resets"
                     className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
