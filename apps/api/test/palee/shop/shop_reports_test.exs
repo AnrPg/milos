@@ -289,6 +289,60 @@ defmodule Palee.Shop.ShopReportsTest do
     end
   end
 
+  describe "with the ADR-190 writers" do
+    test "a desk sale and a partial refund reconcile and show in every view", ctx do
+      alias Palee.Application.Shop.{Checkout, Fulfilment, ManageCatalog}
+
+      {:ok, product} =
+        ManageCatalog.create(ctx.context, %{
+          title: "Chalk",
+          category: "gear",
+          variants: [%{price_cents: 800, cost_price_cents: 300, initial_quantity: 10}]
+        })
+
+      {:ok, _published} = ManageCatalog.set_status(ctx.context, product.id, :published)
+      [variant] = product.variants
+
+      {:ok, order, :created} =
+        Checkout.desk_sale(ctx.context, %{
+          lines: [%{variant_id: variant.id, quantity: 3}],
+          payment_method: "cash",
+          idempotency_key: "desk-#{System.unique_integer([:positive])}"
+        })
+
+      [order_line] = order.lines
+
+      {:ok, _refund} =
+        Fulfilment.refund(ctx.context, order.id, %{
+          lines: [%{order_line_id: order_line.id, quantity: 1, restock: true}],
+          reason: "Damaged",
+          idempotency_key: "refund-#{System.unique_integer([:positive])}"
+        })
+
+      now = DateTime.utc_now()
+      today = Palee.TimeZones.ZonedTime.local_date(now, "Europe/Athens")
+
+      assert {:ok, %{ok: true, days: [day]}} =
+               ReconcileShopRevenue.call(ctx.context, today, today, emit: false)
+
+      assert day.orders_cents == 1_600
+      assert day.invoice_lines_cents == 1_600
+      assert day.payments_cents == 1_600
+
+      {:ok, sales} = ShopReports.sales(ctx.context, %{"days" => "1"}, now)
+      assert sales.totals.net_cents == 1_600
+      assert sales.totals.refunded_cents == 800
+
+      {:ok, margin} = ShopReports.margin(ctx.context, %{"days" => "1"}, now)
+      assert margin.totals.cost_cents == 600
+      assert margin.totals.margin_cents == 1_000
+
+      totals = Finance.financial_summary(ctx.context, %{}).totals
+      assert totals.revenue_by_stream["shop"] == 1_600
+      assert Enum.sum(Map.values(totals.revenue_by_stream)) == totals.paid_revenue_cents
+    end
+  end
+
   describe "accounting export lineage" do
     test "walk-in shop payments and their refunds are exported with stream and source", ctx do
       order = F.paid_order(ctx.org, ~U[2026-12-15 09:00:00Z], [line(ctx)])
