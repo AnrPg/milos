@@ -636,3 +636,9 @@ msgstr "تمت إعادة تعيين كلمة مرورك"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "تم تغيير كلمة مرورك عبر رابط إعادة تعيين أو رمز استرداد، وتم تسجيل الخروج من جميع الأجهزة. إن لم تكن أنت من فعل ذلك، فتواصل مع ناديك الرياضي أو مع دعم Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "نشاطك التجريبي بانتظارك"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "لم يستخدم أحد %{business} منذ فترة. إذا لم يفتحه أحد خلال %{days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت."

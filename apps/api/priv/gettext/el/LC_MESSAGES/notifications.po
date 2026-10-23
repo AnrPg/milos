@@ -636,3 +636,9 @@ msgstr "Ο κωδικός σου άλλαξε"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "Ο κωδικός σου άλλαξε με σύνδεσμο επαναφοράς ή με κωδικό ανάκτησης, και αποσυνδέθηκαν όλες οι συσκευές. Αν δεν ήσουν εσύ, επικοινώνησε με το γυμναστήριό σου ή με την υποστήριξη του Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "Η demo επιχείρησή σου σε περιμένει"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "Κανείς δεν έχει χρησιμοποιήσει το %{business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες %{days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις."

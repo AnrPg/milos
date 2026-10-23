@@ -4446,7 +4446,9 @@
     "apiErrorInvalidActivationRole": "Elige propietario o administrador.",
     "apiErrorInvalidActivationLifetime": "Un enlace dura entre una hora y 30 días.",
     "apiErrorAccountNotFound": "Ninguna cuenta coincide.",
-    "apiErrorUnknownDemoSection": "No hay datos de prueba para esta pantalla."
+    "apiErrorUnknownDemoSection": "No hay datos de prueba para esta pantalla.",
+    "ntfBusinessDemoIdleTitle": "Tu negocio de demostración te espera",
+    "ntfBusinessDemoIdleBody": "Nadie ha usado {business} desde hace tiempo. Si nadie lo abre en los próximos {days} días, se eliminarán sus datos de demostración y se archivará. Puedes reabrirlo cuando quieras."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -9608,7 +9610,12 @@
       "send": "Enviar solicitud",
       "sending": "Enviando…",
       "sent": "Solicitud enviada. El equipo de Palee te responderá.",
-      "cancel": "Retirar solicitud"
+      "cancel": "Retirar solicitud",
+      "archivedTitle": "Demo archivada",
+      "archivedBody": "Archivada el {date} porque nadie la usó durante un tiempo. Vuelve a abrirla como demo vacía cuando quieras.",
+      "reopen": "Volver a abrir",
+      "reopening": "Abriendo…",
+      "reopened": "Abierta de nuevo. Vuelve a estar entre tus negocios, vacía, y el equipo de Palee tiene tu solicitud de activación."
     },
     "requestKind": {
       "conversion": "Cuenta de empresa",

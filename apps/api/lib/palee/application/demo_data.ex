@@ -46,14 +46,21 @@ defmodule Palee.Application.DemoData do
 
   @doc """
   Deletes every tracked demo row of the business in the caller's
-  transaction. Used by `remove/1` and by activation; the caller authorizes.
+  transaction. Used by `remove/1`, by activation and by the abandoned-demo
+  sweep; the caller authorizes. `opts[:keep_user_ids]` are accounts that are
+  never deleted even if a record named them (the sweep passes the owners).
   """
-  def wipe(context) do
+  def wipe(context, opts \\ []) do
+    keep = MapSet.new(Keyword.get(opts, :keep_user_ids, []))
     records = BusinessAccounts.list_demo_records(context)
     recorded = for %{source: "users", record_id: id} <- records, do: id
+
     # ADR-184: the mark is authoritative, so a mock person whose record went
-    # missing is still deleted.
-    people = Enum.uniq(recorded ++ Identity.demo_user_ids(context.organization_id))
+    # missing is still deleted. Kept accounts (the owners) never are.
+    people =
+      (recorded ++ Identity.demo_user_ids(context.organization_id))
+      |> Enum.uniq()
+      |> Enum.reject(&MapSet.member?(keep, &1))
 
     with :ok <- delete_people(people),
          :ok <- BusinessAccounts.delete_demo_rows(context, records),

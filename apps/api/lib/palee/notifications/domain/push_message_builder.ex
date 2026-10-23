@@ -947,6 +947,19 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-184 follow-up: the one reminder before an idle demo is archived.
+  def build("business_demo_idle", payload, localize) do
+    %{
+      title: localize.("Your demo business is waiting for you", %{}),
+      body:
+        localize.(
+          "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time.",
+          %{business: payload["business_name"] || "", days: payload["days_left"] || ""}
+        ),
+      url: payload["url"] || "/admin"
+    }
+  end
+
   # ADR-176: a class still without its WOD on its day.
   def build("class_workout_missing", payload, localize) do
     values = %{class: payload["class_name"] || "", when: payload["class_when"] || ""}

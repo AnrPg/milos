@@ -174,6 +174,64 @@ businesses, and are not part of this.
 
 ## Follow-ups
 
+### Abandoned demos
+Closes TD-184 (4). A demo business nobody uses is reminded once, then
+cleaned up and archived. It can always come back.
+
+- **Last activity** is `organizations.demo_last_active_at`. It is the latest
+  of two signals: a sign-in by one of the business's owners or admins
+  (`LoginUser`), and any `/api/org/:slug/...` request they make in it (the
+  `ResolveTenantContext` plug). Every change the business makes to itself
+  goes through such a request. The column is set at creation and written at
+  most once per `touch_interval_seconds` (one hour). Mock people cannot sign
+  in, other staff of a demo are refused by the gate, and the sweep itself
+  never touches it. So only a real owner or admin keeps a demo alive. The
+  definer `palee_touch_demo_activity/3` takes the acting account from the
+  session, so a request cannot touch another business.
+- **Thresholds** live in `config :palee, :abandoned_demos`
+  (`reminder_after_days` 60, `archive_after_days` 90,
+  `touch_interval_seconds` 3600). `BusinessAccounts.Domain.DemoLifecyclePolicy`
+  is the pure rule. It always keeps a notice period (archive minus reminder,
+  30 days) between the reminder and archiving, so a demo found idle for 200
+  days still gets its 30 days.
+- **The sweep** is `Workers.AbandonedDemosJob`, daily at 04:50, which runs
+  `Application.AbandonedDemos`:
+  - *Reminder:* `palee_claim_demo_reminder` sets `demo_reminder_sent_at`
+    only if it is still empty and the demo is still idle. Each owner then gets
+    one `business_demo_idle` notification (12 locales, push and in-app). Its
+    dedupe key is `business_demo_idle:<org>:<last activity>`, so a retried
+    job never sends twice and a later idle spell gets a new key. The claim
+    and the notification enqueue share one transaction.
+  - *Archive:* `palee_mark_demo_archived` sets `status = archived` and
+    `demo_archived_at`, re-checking idleness and the notice period. In the
+    same transaction the sweep runs the wipe that activation runs
+    (`DemoData.wipe/2`), which removes the tracked rows and the mock people
+    found through the `users` rows of `demo_records`. The business's owners
+    are passed as `keep_user_ids`, so an owner's account is never deleted
+    even by a bad record. The pending activation request is cancelled and a
+    live activation link is revoked. Owner memberships, settings and
+    configuration stay untouched.
+  - Any owner or admin activity resets the clock and clears the reminder
+    claim.
+- **Reopening.** An archived demo drops out of the owner's memberships and
+  the vendor queue. Εγώ › Ρυθμίσεις › Επαγγελματικός λογαριασμός lists it
+  (`GET /api/me/archived-demos`) with «Ξανάνοιγμα»
+  (`POST /api/me/archived-demos/:id/reopen`). Reopening makes it active
+  again, still in demo mode and empty, with a fresh clock and no reminder,
+  and files a new activation request. Signing up again, or filing a
+  conversion request for the same kind, reopens it the same way instead of
+  opening a second business. A conversion then needs no vendor review,
+  because the account already had that demo. Reopening is refused with
+  `business_account_exists` while the account has another live demo, so
+  the rule of one demo at a time holds.
+- **Classification.** The new columns sit on `organizations`, which is
+  platform-administered (`Tenancy.Audit`). They are written only by the
+  SECURITY DEFINER functions of migration
+  `20261209200000_abandoned_demo_cleanup`. The sweep's functions answer
+  only system sessions and vendors. The owner's functions
+  (`palee_archived_demo_businesses`, `palee_reopen_demo_business`) answer
+  only for the acting owner.
+
 ### Mock people stay private
 Date: 2026-10-23
 
@@ -212,7 +270,8 @@ Date: 2026-10-23
     unchanged: their viewers are the staff.
   - There are no @mention suggestions or follow/friend suggestion lists
     yet. A new one must filter through the same rule.
-- **Wipe and notifications read the mark too.** `DemoData.wipe/1` deletes
-  the recorded mock people plus any marked person of the business whose
-  record went missing. `palee_notification_suppressed` is true for a marked
+- **Wipe and notifications read the mark too.** `DemoData.wipe/2` (activation,
+  «remove demo data» and the abandoned-demo sweep) deletes the recorded mock
+  people plus any marked person of the business whose record went missing,
+  never one of `keep_user_ids`. `palee_notification_suppressed` is true for a marked
   person even without a demo record.

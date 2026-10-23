@@ -4,7 +4,7 @@ defmodule Palee.Application.LoginUser do
   A handle opens that profile; an email opens the profile used last on that
   login. Either way the profile becomes the login's last used one.
   """
-  alias Palee.Identity
+  alias Palee.{BusinessAccounts, Identity}
   alias Palee.Application.PasswordVerifier
   alias Palee.Application.TokenIssuer
 
@@ -17,6 +17,8 @@ defmodule Palee.Application.LoginUser do
          true <- PasswordVerifier.verify(password, user.password_hash),
          {:ok, tokens} <- TokenIssuer.issue_pair(user) do
       :ok = Identity.touch_last_used(user.login_id, user.id)
+      # ADR-184 follow-up: signing in keeps the account's demo businesses alive.
+      _touched = BusinessAccounts.touch_demo_activity_on_sign_in(user.id)
       {:ok, Map.put(tokens, :user, user)}
     else
       nil ->

@@ -50,6 +50,8 @@ function preferredUrl(notification: LinkableNotification) {
       : "/password-resets";
   }
   if (notification.type === "password_reset_completed") return "/me/settings";
+  // ADR-184 follow-up: the idle-demo reminder opens the demo's console (opening it keeps it).
+  if (notification.type === "business_demo_idle") return "/admin";
   // ADR-155: a visitor at the door opens the desk on that visitor.
   if (notification.type === "check_in_visitor") {
     const scanId = notification.payload.scan_id;

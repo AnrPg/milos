@@ -1236,6 +1236,8 @@ defmodule PaleeWeb.Router do
     get("/me/business-requests", BusinessAccountController, :my_requests)
     post("/me/business-requests", BusinessAccountController, :request_conversion)
     post("/me/business-requests/:id/cancel", BusinessAccountController, :cancel_request)
+    get("/me/archived-demos", BusinessAccountController, :archived_demos)
+    post("/me/archived-demos/:id/reopen", BusinessAccountController, :reopen_demo)
     post("/business-activation/inspect", BusinessAccountController, :inspect_activation)
     post("/business-activation/redeem", BusinessAccountController, :redeem_activation)
   end

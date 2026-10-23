@@ -33,4 +33,25 @@ defmodule Palee.BusinessAccounts.Ports.BusinessAccountStore do
   @callback demo_person?(Ecto.UUID.t(), Ecto.UUID.t()) :: boolean()
   @callback notification_suppressed?(Ecto.UUID.t() | nil, Ecto.UUID.t()) :: boolean()
   @callback deletable_sources() :: [String.t()]
+
+  # Abandoned demos (ADR-184 follow-up): the lifecycle columns of
+  # `organizations`, written only through narrow SECURITY DEFINER functions.
+  @callback touch_demo_activity(Ecto.UUID.t() | nil, DateTime.t(), pos_integer()) ::
+              non_neg_integer()
+  @callback idle_demo_organizations(DateTime.t()) :: [
+              %{
+                organization_id: Ecto.UUID.t(),
+                last_active_at: DateTime.t(),
+                reminder_sent_at: DateTime.t() | nil,
+                owner_ids: [Ecto.UUID.t()]
+              }
+            ]
+  @callback claim_demo_reminder(Ecto.UUID.t(), DateTime.t(), DateTime.t()) ::
+              {:ok, DateTime.t()} | :not_claimed
+  @callback mark_demo_archived(Ecto.UUID.t(), DateTime.t(), DateTime.t(), DateTime.t()) ::
+              boolean()
+  @callback close_demo_activation(Ecto.UUID.t(), DateTime.t()) :: :ok
+  @callback list_archived_demos() :: [map()]
+  @callback reopen_demo_business(Ecto.UUID.t(), DateTime.t()) ::
+              {:ok, Ecto.UUID.t()} | {:error, :not_found}
 end
