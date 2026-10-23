@@ -34,6 +34,7 @@ defmodule Palee.Identity do
 
   def local_today(_user_id, now), do: Palee.TimeZones.ZonedTime.local_date(now, time_zone(nil))
   defdelegate mark_tour_completed(user_id, audience), to: UserStore
+  defdelegate tour_audiences, to: Palee.Identity.Domain.ProductTours, as: :audiences
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore

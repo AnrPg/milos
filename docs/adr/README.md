@@ -182,3 +182,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-180 | Workouts in text sections, the WOD-assistant switch and per-section scoring | Accepted |
 | ADR-181 | Tabbed WOD editor and in-place, colour-coded assistant suggestions | Accepted |
 | ADR-182 | Themed dropdowns and date and time pickers instead of native controls | Accepted |
+| ADR-183 | The member first-run and account interests | Accepted |
