@@ -2,6 +2,12 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 export const SELECTED_ORGANIZATION_SLUG_KEY = "palee:selected-organization-slug";
 export const SESSION_UPDATED_EVENT = "palee:session-updated";
 export const SESSION_EXPIRED_EVENT = "palee:session-expired";
+/**
+ * ADR-184: a business in demo mode tried to go live (403
+ * `business_not_activated`). The demo-mode host shows one friendly notice.
+ */
+export const BUSINESS_NOT_ACTIVATED_EVENT = "palee:business-not-activated";
+export const BUSINESS_NOT_ACTIVATED_CODE = "business_not_activated";
 
 type SessionTokens = {
   access_token: string;
@@ -402,7 +408,11 @@ export async function apiRequest<T>(
           ? formatFieldErrors(payload.errors)
         : `Request failed with status ${response.status}`;
 
-    throw new ApiError(response.status, message, (payload as ApiErrorPayload) ?? {});
+    const errorPayload = (payload as ApiErrorPayload) ?? {};
+    if (errorPayload.code === BUSINESS_NOT_ACTIVATED_CODE && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(BUSINESS_NOT_ACTIVATED_EVENT));
+    }
+    throw new ApiError(response.status, message, errorPayload);
   }
 
   if (response.status === 204) {

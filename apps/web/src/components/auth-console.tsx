@@ -18,6 +18,7 @@ import {
 } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice } from "@/components/auth/AuthShell";
+import { BusinessSignUpLink } from "@/components/business/BusinessSignUp";
 import { RecoveryCodesOffer } from "@/components/auth/RecoveryCodesOffer";
 import { SignupHandleField, useHandleSuggestion } from "@/components/auth/SignupHandleField";
 import {
@@ -408,6 +409,13 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                 >
                   {busyAction === "register" ? i18n("creatingAccountbaab5b8") : i18n("createAccountaaf3744")}
                 </button>
+
+                {/* ADR-184: the quiet way in for gyms and independent coaches. */}
+                {invitationToken.trim().length === 0 ? (
+                  <div className="text-center">
+                    <BusinessSignUpLink />
+                  </div>
+                ) : null}
               </>
             ) : (
               <>

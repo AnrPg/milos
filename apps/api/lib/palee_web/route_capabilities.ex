@@ -46,7 +46,9 @@ defmodule PaleeWeb.RouteCapabilities do
     W.TrainingHistoryController => [:view_client_training],
     # ADR-174: the queue also requires view_health per athlete (service).
     W.StaffScalingController => [:manage_coaching],
-    W.AdminAiSettingsController => [:manage_settings]
+    W.AdminAiSettingsController => [:manage_settings],
+    # ADR-184: demo data and the activation request (owners and admins).
+    W.AdminBusinessController => [:manage_settings]
   }
 
   @actions %{

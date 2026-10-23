@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "Sur votre horloge ({zone})",
     "zonedTimeGymClock": "Les heures suivent l'horloge de la salle ({zone}).",
     "scoreFieldLabel": "Mesure {number}",
-    "removeScoreField": "Retirer la mesure {number}"
+    "removeScoreField": "Retirer la mesure {number}",
+    "apiErrorBusinessNotActivated": "L’équipe Palee active cette activité avant sa mise en ligne.",
+    "apiErrorBusinessAccountExists": "Tu as déjà une activité en attente d’activation.",
+    "apiErrorBusinessSignupClosed": "Demande à l’équipe Palee de transformer ton compte en compte professionnel.",
+    "apiErrorInvalidBusinessKind": "Choisis une salle ou un coach indépendant.",
+    "apiErrorInvalidBusinessRequest": "Vérifie les détails de la demande.",
+    "apiErrorBusinessRequestPending": "Tu as déjà une demande de ce type en attente.",
+    "apiErrorBusinessRequestClosed": "Cette demande a déjà reçu une réponse.",
+    "apiErrorInvalidActivationLink": "Ce lien d’activation n’est pas valable pour ton compte.",
+    "apiErrorBusinessAlreadyActive": "Cette activité est déjà active.",
+    "apiErrorInvalidActivationRole": "Choisis propriétaire ou administrateur.",
+    "apiErrorInvalidActivationLifetime": "Un lien dure entre une heure et 30 jours.",
+    "apiErrorAccountNotFound": "Aucun compte ne correspond.",
+    "apiErrorUnknownDemoSection": "Il n’y a pas de données de démo pour cet écran."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -9391,5 +9404,147 @@
     "saveInterests": "Enregistrer",
     "interestsSaved": "Enregistré.",
     "interestsHubHint": "Sports et niveau, pour les suggestions"
+  },
+  "Business": {
+    "common": {
+      "cancel": "Annuler",
+      "close": "Fermer"
+    },
+    "demo": {
+      "button": "Données de démo",
+      "working": "En cours…",
+      "eyebrow": "Mode démo",
+      "title": "Essaie avec des données de démo",
+      "intro": "Remplis cet écran avec des membres, des cours et des paiements fictifs. Rien n’atteint de vraies personnes tant que l’équipe Palee n’a pas activé ton activité.",
+      "fill": {
+        "all": "Remplir tous les écrans",
+        "members": "Ajouter des membres de démo",
+        "schedule": "Remplir la semaine de cours",
+        "finance": "Ajouter des forfaits et paiements de démo",
+        "workouts": "Ajouter des entraînements de démo"
+      },
+      "filled": "Cet écran a déjà des données de démo",
+      "remove": "Supprimer les données de démo",
+      "removeConfirm": "Supprimer tous les membres, cours et paiements de démo ? Ce que tu as configuré toi-même reste.",
+      "removeYes": "Supprimer"
+    },
+    "activation": {
+      "request": "Demander l’activation à l’équipe Palee",
+      "pending": "Ta demande d’activation est chez l’équipe Palee. Elle t’enverra un lien d’activation."
+    },
+    "notice": {
+      "eyebrow": "Mode démo",
+      "title": "Activation par l’équipe Palee",
+      "body": "Ton activité est en mode démo : tout fonctionne avec des données de démo, mais rien n’est encore public. Tant que l’équipe Palee ne l’a pas activée :",
+      "locked": {
+        "people": "aucun vrai membre ni membre du personnel ne peut rejoindre",
+        "public": "ta page publique reste cachée d’Autour de moi et de la recherche",
+        "bookings": "personne en dehors de ton équipe ne peut réserver",
+        "payments": "aucun vrai paiement n’est encaissé",
+        "messages": "aucun e-mail, notification ni message ne part vers quelqu’un en dehors de ton compte"
+      },
+      "howOwner": "Demande-le ci-dessous à l’équipe Palee. Après avoir échangé avec toi, elle t’envoie un lien d’activation : ouvre-le connecté avec ce compte.",
+      "howStaff": "Le propriétaire de cette activité peut demander l’activation à l’équipe Palee depuis le bouton démo des écrans d’administration."
+    },
+    "signUp": {
+      "link": "Compte professionnel",
+      "title": "Compte professionnel",
+      "intro": "Pour les salles, les box et les coachs indépendants. Tu commences en mode démo et l’équipe Palee t’active après avoir échangé avec toi.",
+      "account": "Ton compte",
+      "demoNote": "Jusqu’à l’activation, toi seul vois ton activité : données de démo, aucun vrai membre, réservation, paiement ni message.",
+      "submit": "Ouvrir mon activité",
+      "creating": "Ouverture…",
+      "personal": "Plutôt un compte personnel",
+      "nameRule": "Entre 2 et 120 caractères.",
+      "createdTitle": "Ton activité est ouverte",
+      "created": "Elle est en mode démo. Essaie chaque écran avec le bouton démo ; l’équipe Palee te contactera pour l’activation.",
+      "openConsole": "Aller à ma console",
+      "closed": "Ce compte a été créé il y a un moment, c’est donc l’équipe Palee qui ouvre l’activité pour toi. Envoie-lui une demande depuis les Réglages.",
+      "closedAction": "Ouvrir les Réglages"
+    },
+    "form": {
+      "kind": "Type d’activité",
+      "gymName": "Nom de la salle ou de la box",
+      "coachName": "Ton nom de coach",
+      "city": "Ville",
+      "phone": "Téléphone",
+      "phoneHint": "Pour que l’équipe Palee puisse te joindre pour l’activation.",
+      "message": "Ce que l’équipe Palee devrait savoir"
+    },
+    "kind": {
+      "gym": "Salle ou box",
+      "gymHint": "Cours, membres, une équipe",
+      "coach": "Coach indépendant",
+      "coachHint": "Tes clients, séances et Team"
+    },
+    "role": {
+      "owner": "Propriétaire",
+      "admin": "Administrateur"
+    },
+    "activate": {
+      "title": "Active ton activité",
+      "loading": "Vérification du lien…",
+      "invalid": "Ce lien d’activation n’est pas valable pour le compte avec lequel tu es connecté. Il a peut-être expiré ou déjà servi : demandes-en un nouveau à l’équipe Palee.",
+      "signedInAs": "Connecté en tant que {name}.",
+      "removes": "Les données de démo sont supprimées ({rows} éléments, dont {people} personnes de démo).",
+      "nothingToRemove": "Il n’y a aucune donnée de démo à supprimer.",
+      "keeps": "Tout ce que tu as configuré reste : réglages, image, cours, forfaits et le brouillon de ta page publique.",
+      "goesLive": "Ensuite tu peux inviter de vraies personnes, publier ta page, prendre des réservations et des paiements.",
+      "confirm": "Activer",
+      "working": "Activation…",
+      "doneTitle": "Tu es en ligne",
+      "done": "{name} est active. Les données de démo ont disparu et tout ce que tu as configuré t’attend."
+    },
+    "settings": {
+      "title": "Compte professionnel",
+      "description": "Gère une salle, une box ou ton propre coaching sur Palee",
+      "intro": "Demande à l’équipe Palee de transformer ce compte en activité. Elle l’ouvre en mode démo et te contacte pour l’activation.",
+      "send": "Envoyer la demande",
+      "sending": "Envoi…",
+      "sent": "Demande envoyée. L’équipe Palee te répondra.",
+      "cancel": "Retirer la demande"
+    },
+    "requestKind": {
+      "conversion": "Compte professionnel",
+      "activation": "Activation"
+    },
+    "status": {
+      "pending": "En attente",
+      "approved": "Acceptée",
+      "declined": "Refusée",
+      "cancelled": "Retirée",
+      "completed": "Activée"
+    },
+    "me": {
+      "row": "Compte professionnel",
+      "rowHint": "Une salle, une box ou ton coaching"
+    },
+    "console": {
+      "back": "Organisations",
+      "title": "Comptes professionnels",
+      "subtitle": "Demandes d’ouverture ou d’activation d’une activité, et toutes les activités encore en mode démo.",
+      "forbidden": "Seule l’équipe Palee peut ouvrir cette page.",
+      "requests": "Demandes",
+      "noRequests": "Aucune demande en attente.",
+      "demoBusinesses": "En mode démo",
+      "noDemoBusinesses": "Aucune activité n’est en mode démo.",
+      "role": "Rôle accordé",
+      "note": "Note pour le demandeur",
+      "approveConversion": "Ouvrir l’activité",
+      "approveActivation": "Créer le lien d’activation",
+      "decline": "Refuser",
+      "demoSince": "en démo depuis le {date}",
+      "liveLink": "Lien actif pour {name} ({role}), jusqu’au {date}",
+      "revoke": "Révoquer",
+      "account": "Compte",
+      "pickAccount": "Choisis un compte",
+      "issueLink": "Créer le lien d’activation",
+      "replaceLink": "Remplacer le lien",
+      "issued": "Lien d’activation ({role}). Envoie-le au propriétaire : il ne fonctionne qu’avec son compte.",
+      "linkLabel": "Lien d’activation",
+      "copy": "Copier",
+      "copied": "Copié",
+      "linkHint": "Affiché seulement maintenant. Un nouveau lien remplace celui-ci."
+    }
   }
 }
