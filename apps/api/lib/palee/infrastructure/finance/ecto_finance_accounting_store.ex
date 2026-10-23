@@ -154,6 +154,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
 
     receipt_query()
     |> maybe_filter(:user_id, filters["user_id"])
+    |> maybe_filter_users(filters["user_ids"])
     |> maybe_filter_receipt_search(filters["q"])
     |> maybe_date_range(filters["from"], filters["to"])
     |> order_by([receipt], desc: receipt.sequence)
@@ -195,6 +196,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
       where: is_nil(reversal.deleted_at)
     )
   end
+
+  # ADR-186 §7: a branch filter arrives as the people whose home branch it is.
+  defp maybe_filter_users(query, users) when is_list(users),
+    do: where(query, [receipt], receipt.user_id in ^users)
+
+  defp maybe_filter_users(query, _none), do: query
 
   defp maybe_filter(query, _field, value) when value in [nil, ""], do: query
 

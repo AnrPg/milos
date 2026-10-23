@@ -312,4 +312,161 @@ defmodule PaleeWeb.MultiBranchTest do
       assert length(owner_body["branches"]) == 3
     end
   end
+
+  describe "the finance operations lists follow the page filter" do
+    defp list_ids(user, path, key, params \\ %{}) do
+      body = user |> api() |> get(path, params) |> json_response(200)
+      {Enum.map(body[key], & &1["id"]), body["branch_filter"]}
+    end
+
+    test "members are listed at their home branch", ctx do
+      at_kifisia = client_with_package(ctx.organization, [ctx.kifisia.id])
+      at_marousi = client_with_package(ctx.organization, [ctx.marousi.id])
+      at_glyfada = client_with_package(ctx.organization, [ctx.glyfada.id])
+      path = "#{ctx.base}/finance/members"
+
+      {all, filter} = list_ids(ctx.owner, path, "members")
+      assert filter == %{"all_locations" => true, "location_ids" => []}
+      assert Enum.all?([at_kifisia.id, at_marousi.id, at_glyfada.id], &(&1 in all))
+
+      {kifisia, filter} = list_ids(ctx.owner, path, "members", %{location_ids: ctx.kifisia.id})
+      assert filter == %{"all_locations" => false, "location_ids" => [ctx.kifisia.id]}
+      assert kifisia == [at_kifisia.id]
+
+      # A branch outside the manager's scope drops out, never widens the list.
+      {mixed, filter} =
+        list_ids(ctx.manager, path, "members", %{
+          location_ids: "#{ctx.marousi.id},#{ctx.glyfada.id}"
+        })
+
+      assert filter["location_ids"] == [ctx.marousi.id]
+      assert mixed == [at_marousi.id]
+    end
+
+    test "packages valid at a chosen branch or everywhere", ctx do
+      package = fn name, ids ->
+        {:ok, package} =
+          Finance.create_package(%{
+            name: name,
+            package_type: "membership",
+            fields: if(ids, do: %{"facility.location_ids" => ids}, else: %{})
+          })
+
+        package.id
+      end
+
+      kifisia = package.("Κηφισιά", [ctx.kifisia.id])
+      glyfada = package.("Γλυφάδα", [ctx.glyfada.id])
+      everywhere = package.("Παντού", nil)
+      path = "#{ctx.base}/finance/packages"
+
+      {ids, filter} = list_ids(ctx.owner, path, "packages", %{location_ids: ctx.kifisia.id})
+      assert filter["location_ids"] == [ctx.kifisia.id]
+      assert kifisia in ids
+      assert everywhere in ids
+      refute glyfada in ids
+
+      {ids, filter} = list_ids(ctx.manager, path, "packages", %{location_ids: ctx.glyfada.id})
+      assert filter["location_ids"] == []
+      assert everywhere in ids
+      refute glyfada in ids
+      refute kifisia in ids
+
+      {ids, _filter} = list_ids(ctx.owner, path, "packages")
+      assert Enum.all?([kifisia, glyfada, everywhere], &(&1 in ids))
+    end
+
+    test "promotions valid at a chosen branch or everywhere", ctx do
+      create = fn body ->
+        api(ctx.owner)
+        |> post("#{ctx.base}/finance/promotions", body)
+        |> json_response(201)
+        |> get_in(["promotion_campaign", "id"])
+      end
+
+      marousi = create.(%{name: "Μαρούσι", location_ids: [ctx.marousi.id]})
+      glyfada = create.(%{name: "Γλυφάδα", location_ids: [ctx.glyfada.id]})
+      everywhere = create.(%{name: "Παντού", all_locations: true})
+      path = "#{ctx.base}/finance/promotions"
+
+      {ids, filter} =
+        list_ids(ctx.manager, path, "promotion_campaigns", %{location_ids: ctx.marousi.id})
+
+      assert filter == %{"all_locations" => false, "location_ids" => [ctx.marousi.id]}
+      assert marousi in ids
+      assert everywhere in ids
+      refute glyfada in ids
+
+      {ids, _filter} =
+        list_ids(ctx.owner, path, "promotion_campaigns", %{location_ids: ctx.glyfada.id})
+
+      assert glyfada in ids
+      assert everywhere in ids
+      refute marousi in ids
+    end
+
+    test "referrals and their rewards follow their people", ctx do
+      referrer = client_with_package(ctx.organization, [ctx.kifisia.id])
+      friend = client_with_package(ctx.organization, [ctx.kifisia.id])
+      other = client_with_package(ctx.organization, [ctx.glyfada.id])
+      other_friend = client_with_package(ctx.organization, [ctx.glyfada.id])
+
+      {:ok, program} =
+        Finance.create_referral_program(%{
+          name: "Φέρε φίλο",
+          reward_type: "credit",
+          reward_value: 1000
+        })
+
+      event = fn from, to ->
+        {:ok, membership} =
+          Finance.upsert_membership(to.id, %{
+            user_type_snapshot: "member",
+            status: "active",
+            signup_source: "direct"
+          })
+
+        {:ok, event} =
+          Finance.create_referral_event(%{
+            referral_program_id: program.id,
+            referrer_user_id: from.id,
+            referred_user_id: to.id,
+            membership_id: membership.id,
+            referrer_role_snapshot: "member",
+            referred_role_snapshot: "member"
+          })
+
+        {:ok, event} = Finance.update_referral_status(event.id, "approved")
+        {:ok, reward} = Finance.create_referral_reward(event.id, %{})
+        {event.id, reward.id}
+      end
+
+      {kifisia_event, kifisia_reward} = event.(referrer, friend)
+      {glyfada_event, glyfada_reward} = event.(other, other_friend)
+      params = %{location_ids: ctx.kifisia.id}
+
+      {events, filter} =
+        list_ids(ctx.owner, "#{ctx.base}/finance/referrals", "referral_events", params)
+
+      assert filter["location_ids"] == [ctx.kifisia.id]
+      assert kifisia_event in events
+      refute glyfada_event in events
+
+      {rewards, _filter} =
+        list_ids(ctx.owner, "#{ctx.base}/finance/referral-rewards", "referral_rewards", params)
+
+      assert kifisia_reward in rewards
+      refute glyfada_reward in rewards
+    end
+
+    test "refund receipts echo the filter", ctx do
+      body =
+        api(ctx.manager)
+        |> get("#{ctx.base}/finance/refund-receipts", %{location_ids: ctx.glyfada.id})
+        |> json_response(200)
+
+      assert body["branch_filter"] == %{"all_locations" => false, "location_ids" => []}
+      assert body["refund_receipts"] == []
+    end
+  end
 end
