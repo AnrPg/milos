@@ -6812,7 +6812,8 @@
     "visibilityOff": "Deine öffentlichen Beiträge erscheinen nicht in In der Nähe. Schaltest du es ein, erscheinen sie in der Mitte deines Hauptgebiets, nie genauer.",
     "visibilityNeedsArea": "Sie erscheinen erst, wenn du „Mein Gebiet“ festgelegt hast.",
     "notifTitle": "Neu in deiner Nähe",
-    "notifBody": "Neu für „{name}“: {count}"
+    "notifBody": "Neu für „{name}“: {count}",
+    "myDisciplines": "Meine Sportarten"
   },
   "CheckIn": {
     "loading": "Wird geladen…",
@@ -9181,7 +9182,7 @@
     "emailInUseAddProfile": "Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",
     "emailInUseUnknown": "Diese E-Mail-Adresse hat schon ein Konto. Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",
     "emailLimitReached": "Diese E-Mail-Adresse hat schon {limit} Konten, mehr sind nicht möglich. Nimm für ein neues Konto eine andere E-Mail-Adresse.",
-    "passwordRule": "Mindestens 4 Zeichen.",
+    "passwordRule": "Mindestens 4 Zeichen (Leerzeichen zählen nicht).",
     "passwordRequired": "Gib dein Passwort ein.",
     "identifierLabel": "E-Mail oder @Benutzername",
     "identifierRequired": "Gib deine E-Mail-Adresse oder deinen @Benutzernamen ein.",
@@ -9398,7 +9399,11 @@
     "codeLabel": "Einladungscode",
     "codeSubmit": "Beitreten",
     "codeFailed": "Der Code hat nicht funktioniert. Frag deine Box danach.",
-    "laterNote": "Kein Problem. Du kannst jederzeit über In der Nähe einer Box beitreten."
+    "laterNote": "Kein Problem. Du kannst jederzeit über In der Nähe einer Box beitreten.",
+    "backToMe": "Zurück zu Ich",
+    "saveInterests": "Speichern",
+    "interestsSaved": "Gespeichert.",
+    "interestsHubHint": "Sportarten und Level, für Vorschläge"
   },
   "Business": {
     "common": {

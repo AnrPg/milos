@@ -6812,7 +6812,8 @@
     "visibilityOff": "Tus publicaciones públicas no aparecen en Cerca de mí. Si lo activas, aparecerán en el centro de tu zona principal, nunca más cerca.",
     "visibilityNeedsArea": "Solo aparecen cuando hayas definido «Mi zona».",
     "notifTitle": "Novedades cerca de ti",
-    "notifBody": "Novedades para «{name}»: {count}"
+    "notifBody": "Novedades para «{name}»: {count}",
+    "myDisciplines": "Mis deportes"
   },
   "CheckIn": {
     "loading": "Cargando…",
@@ -9181,7 +9182,7 @@
     "emailInUseAddProfile": "Para añadir otro perfil, inicia sesión y añádelo desde Ajustes → Perfiles.",
     "emailInUseUnknown": "Este correo ya tiene una cuenta. Para añadir otro perfil, inicia sesión y añádelo desde Ajustes → Perfiles.",
     "emailLimitReached": "Este correo ya tiene {limit} cuentas, el máximo permitido. Usa otro correo para una cuenta nueva.",
-    "passwordRule": "Usa al menos 4 caracteres.",
+    "passwordRule": "Usa al menos 4 caracteres (los espacios no cuentan).",
     "passwordRequired": "Escribe tu contraseña.",
     "identifierLabel": "Correo o @usuario",
     "identifierRequired": "Escribe tu correo o tu @usuario.",
@@ -9398,7 +9399,11 @@
     "codeLabel": "Código de invitación",
     "codeSubmit": "Unirme",
     "codeFailed": "Ese código no funcionó. Compruébalo con tu box.",
-    "laterNote": "No pasa nada. Puedes unirte a un box cuando quieras desde Cerca de mí."
+    "laterNote": "No pasa nada. Puedes unirte a un box cuando quieras desde Cerca de mí.",
+    "backToMe": "Volver a Yo",
+    "saveInterests": "Guardar",
+    "interestsSaved": "Guardado.",
+    "interestsHubHint": "Deportes y nivel, para sugerencias"
   },
   "Business": {
     "common": {

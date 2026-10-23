@@ -6812,7 +6812,8 @@
     "visibilityOff": "Je openbare berichten verschijnen niet in In de buurt. Zet je het aan, dan verschijnen ze in het midden van je hoofdgebied, nooit preciezer.",
     "visibilityNeedsArea": "Ze verschijnen pas als je ‘Mijn gebied’ hebt ingesteld.",
     "notifTitle": "Nieuw bij jou in de buurt",
-    "notifBody": "Nieuw voor ‘{name}’: {count}"
+    "notifBody": "Nieuw voor ‘{name}’: {count}",
+    "myDisciplines": "Mijn sporten"
   },
   "CheckIn": {
     "loading": "Laden…",
@@ -9181,7 +9182,7 @@
     "emailInUseAddProfile": "Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
     "emailInUseUnknown": "Dit e-mailadres heeft al een account. Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
     "emailLimitReached": "Dit e-mailadres heeft al {limit} accounts, het maximum. Gebruik een ander e-mailadres voor een nieuw account.",
-    "passwordRule": "Minstens 4 tekens.",
+    "passwordRule": "Minstens 4 tekens (spaties tellen niet).",
     "passwordRequired": "Vul je wachtwoord in.",
     "identifierLabel": "E-mail of @gebruikersnaam",
     "identifierRequired": "Vul je e-mailadres of @gebruikersnaam in.",
@@ -9398,7 +9399,11 @@
     "codeLabel": "Uitnodigingscode",
     "codeSubmit": "Lid worden",
     "codeFailed": "Die code werkte niet. Vraag je box ernaar.",
-    "laterNote": "Geen probleem. Je kunt altijd via In de buurt lid worden van een box."
+    "laterNote": "Geen probleem. Je kunt altijd via In de buurt lid worden van een box.",
+    "backToMe": "Terug naar Ik",
+    "saveInterests": "Opslaan",
+    "interestsSaved": "Opgeslagen.",
+    "interestsHubHint": "Sporten en niveau, voor suggesties"
   },
   "Business": {
     "common": {

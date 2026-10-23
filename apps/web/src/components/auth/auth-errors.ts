@@ -113,3 +113,8 @@ export function handleInput(value: string) {
 }
 
 export const MIN_PASSWORD_LENGTH = 4;
+
+/** ANR's rule: at least 4 characters that are not whitespace (spaces still allowed). Mirrors the API. */
+export function passwordLongEnough(password: string) {
+  return Array.from(password.replace(/\s/gu, "")).length >= MIN_PASSWORD_LENGTH;
+}

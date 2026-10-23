@@ -6812,7 +6812,8 @@
     "visibilityOff": "As tuas publicações públicas não aparecem no Perto de mim. Se ativares, aparecem no centro da tua zona principal, nunca mais perto.",
     "visibilityNeedsArea": "Só aparecem depois de definires «A minha zona».",
     "notifTitle": "Novidades perto de ti",
-    "notifBody": "Novidades para «{name}»: {count}"
+    "notifBody": "Novidades para «{name}»: {count}",
+    "myDisciplines": "Os meus desportos"
   },
   "CheckIn": {
     "loading": "A carregar…",
@@ -9181,7 +9182,7 @@
     "emailInUseAddProfile": "Para adicionar outro perfil, inicia sessão e adiciona-o em Definições → Perfis.",
     "emailInUseUnknown": "Este email já tem uma conta. Para adicionar outro perfil, inicia sessão e adiciona-o em Definições → Perfis.",
     "emailLimitReached": "Este email já tem {limit} contas, o máximo permitido. Usa outro email para uma conta nova.",
-    "passwordRule": "Usa pelo menos 4 caracteres.",
+    "passwordRule": "Usa pelo menos 4 caracteres (os espaços não contam).",
     "passwordRequired": "Introduz a tua palavra-passe.",
     "identifierLabel": "Email ou @nome de utilizador",
     "identifierRequired": "Introduz o teu email ou @nome de utilizador.",
@@ -9398,7 +9399,11 @@
     "codeLabel": "Código de convite",
     "codeSubmit": "Entrar",
     "codeFailed": "Esse código não funcionou. Confirma-o com a tua box.",
-    "laterNote": "Sem problema. Podes entrar numa box quando quiseres a partir de Perto de mim."
+    "laterNote": "Sem problema. Podes entrar numa box quando quiseres a partir de Perto de mim.",
+    "backToMe": "Voltar a Eu",
+    "saveInterests": "Guardar",
+    "interestsSaved": "Guardado.",
+    "interestsHubHint": "Desportos e nível, para sugestões"
   },
   "Business": {
     "common": {

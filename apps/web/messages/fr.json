@@ -6812,7 +6812,8 @@
     "visibilityOff": "Tes publications publiques n’apparaissent pas dans Autour de moi. Si tu l’actives, elles apparaîtront au centre de ta zone principale, jamais plus près.",
     "visibilityNeedsArea": "Elles n’apparaissent qu’une fois « Ma zone » définie.",
     "notifTitle": "Du nouveau autour de toi",
-    "notifBody": "Nouveau pour « {name} » : {count}"
+    "notifBody": "Nouveau pour « {name} » : {count}",
+    "myDisciplines": "Mes sports"
   },
   "CheckIn": {
     "loading": "Chargement…",
@@ -9181,7 +9182,7 @@
     "emailInUseAddProfile": "Pour ajouter un autre profil, connecte-toi et ajoute-le depuis Réglages → Profils.",
     "emailInUseUnknown": "Cette adresse e-mail a déjà un compte. Pour ajouter un autre profil, connecte-toi et ajoute-le depuis Réglages → Profils.",
     "emailLimitReached": "Cette adresse e-mail a déjà {limit} comptes, le maximum autorisé. Utilise une autre adresse pour un nouveau compte.",
-    "passwordRule": "Au moins 4 caractères.",
+    "passwordRule": "Au moins 4 caractères (les espaces ne comptent pas).",
     "passwordRequired": "Saisis ton mot de passe.",
     "identifierLabel": "E-mail ou @nom d'utilisateur",
     "identifierRequired": "Saisis ton e-mail ou ton @nom d'utilisateur.",
@@ -9398,7 +9399,11 @@
     "codeLabel": "Code d'invitation",
     "codeSubmit": "Rejoindre",
     "codeFailed": "Ce code n'a pas fonctionné. Vérifie-le auprès de ta box.",
-    "laterNote": "Pas de souci. Tu peux rejoindre une box à tout moment depuis Autour de moi."
+    "laterNote": "Pas de souci. Tu peux rejoindre une box à tout moment depuis Autour de moi.",
+    "backToMe": "Retour à Moi",
+    "saveInterests": "Enregistrer",
+    "interestsSaved": "Enregistré.",
+    "interestsHubHint": "Sports et niveau, pour les suggestions"
   },
   "Business": {
     "common": {
