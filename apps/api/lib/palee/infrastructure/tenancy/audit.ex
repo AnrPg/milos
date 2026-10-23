@@ -45,6 +45,8 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     inventory_supplies
     inventory_supply_movements
     inventory_supply_reports
+    shop_products shop_variants shop_stock_movements shop_stock_levels
+    shop_orders shop_order_lines
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges
