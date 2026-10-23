@@ -43,9 +43,9 @@ one domain policy, plus a branch manager built on top of it (milestone M4).
   appointment checks are centralised in `Application.ClassLocation`.
 - Capability narrowing: scoped staff lose the capabilities that act on the
   whole business (`LocationScopePolicy.organization_wide/0`: gym settings,
-  packages, promotions, finance settings and reports, business analytics,
-  clubs, creating businesses, lifecycle, platform subscription, granting
-  admin). A new `manage_locations` capability (admin and owner) lets a branch
+  finance settings, clubs, creating businesses, lifecycle, platform
+  subscription, granting admin). Since §7/§8, reports, packages and
+  promotions are no longer withheld: they follow the branches instead. A new `manage_locations` capability (admin and owner) lets a branch
   manager edit their own branches without `manage_settings`; creating and
   archiving branches stay `manage_settings`. The narrowed capability map is
   what the memberships payload sends, so the web gates follow automatically.
@@ -68,8 +68,11 @@ all-scoped staff only unless the table says otherwise.
 | Cleaning areas and entries | area's branch | all-scoped only |
 | Machines and machine events | machine's branch | all-scoped only |
 | Supplies | unscoped | shared stock |
-| Inventory spending report, finance reports, business analytics | all-scoped only (capability narrowed) | per-branch split deferred (TD-187) |
-| People, directory, payments, packages sold | unscoped | members roam between branches |
+| Finance summary and queues, statistics, coaching athletes and programming week | filtered by branch (§7) | people count at their home branch; facts with neither count only for all-scoped staff |
+| Packages, promotions, programme assignments | covering scope (§8) | valid everywhere = visible to all staff; created or changed only inside the scope |
+| Seasons, referral programmes | all-scoped only (§8) | business-wide |
+| Inventory spending report | all-scoped only | stays single-branch (§7) |
+| People, directory, payments | unscoped | members roam between branches |
 | Community moderation | capability narrowed (`manage_community`) | the club is shared |
 
 Members and athletes keep their own views (bookings, self check-in, member
@@ -115,6 +118,62 @@ a preset (admin + branches).
   branch" for scoped staff.
 - A business with at most one active branch sees no new UI.
 
+### 7. Page branch filter on reports (follow-up, 2026-10-23)
+The finance, statistics and coaching admin pages get a header control
+«Καταστήματα: Όλα ▾»: a themed checklist in `ui/Popover`, remembered per page
+in the browser. It shows only to staff who see at least two active branches.
+
+- Endpoints accept `location_ids` (a list or one comma-separated string),
+  narrowed to the person's scope (`Organizations.report_filter/2`). Asking
+  for a branch outside the scope never widens it; it drops out.
+- Facts with a branch (check-ins, class attendance) are filtered by it.
+  Facts without one (payments, invoices, memberships, reviews, injuries,
+  workouts, coaching threads) are filtered by person.
+- Each person has at most one **home branch**
+  (`Organizations.Domain.BranchAttribution`):
+  1. Among the branches their packages allow, the one where they had the
+     most check-ins plus attended classes in the last 90 days.
+  2. With no activity, the only branch their packages allow, when they allow
+     exactly one.
+  3. Otherwise none.
+  One home per person keeps per-branch splits additive. People without one
+  count only in the business totals that all-scoped staff see.
+- When two or more branches are shown, the response carries `branches`: one
+  row per branch (finance: active memberships, paid revenue, open invoices;
+  statistics: check-ins, attended classes, active memberships, paid revenue).
+  `branch_filter` echoes what was applied.
+- `view_finance_reports`, `view_business_analytics`, `manage_packages` and
+  `manage_promotions` leave `organization_wide/0`. Gym settings, finance
+  settings, clubs, lifecycle, platform subscription and granting admin stay
+  narrowed.
+- Check-in, inventory and cleaning stay single-branch.
+
+### 8. «Ισχύει για» on create forms (follow-up, 2026-10-23)
+Create forms of staff who see two or more branches get «Ισχύει για» chips.
+They default to the person's branches (or the page filter, where there is
+one). The server re-checks every chip against the scope.
+
+- **One-place items** (class, class series, appointment slot): N chips
+  create N separate items in one transaction, all or nothing
+  (`ClassLocation.create_all/4` on `Scheduling.transaction/2` /
+  `Appointments.transaction/2`). The response adds `slots` / `series_list`,
+  and the UI confirms «Δημιουργήθηκαν N μαθήματα: …» with links. Editing
+  keeps the single branch picker: an item lives at one branch.
+- **Covering items** are one item valid at the chosen branches:
+  - packages: `facility.location_ids`;
+  - promotions and programme assignments: new `all_locations` +
+    `location_ids` columns (migration `20261208100000`).
+  Staff see a covering item when it is valid everywhere or at one of their
+  branches. They create or change it only inside their scope
+  (`Organizations.authorize_covering/2`). A branch staff member who names no
+  branches gets their own. «Όλα τα καταστήματα» (dynamic, future branches
+  included) is for all-scoped staff only.
+- A promotion valid at some branches applies only to a subscription whose
+  package is valid at one of them (or everywhere). Otherwise the redemption
+  fails with `promotion_location_not_included` (422).
+- Seasons and referral programmes are business-wide: only all-scoped staff
+  create or change them.
+
 ## Alternatives considered
 - **A new `branch_manager` role.** Rejected (section 4).
 - **Scope per role.** Rejected (section 1).
@@ -129,7 +188,8 @@ a preset (admin + branches).
 - Every new located feature must call `Organizations.authorize_location/2` or
   `filter_by_location_scope/2,3` (or `ClassLocation`), and decide what "no
   branch" means; this ADR's table is the place to record it.
-- Branch-scoped staff cannot see per-branch reports yet (TD-187).
+- Reports follow the branch filter (§7, resolves TD-187 for finance,
+  statistics and coaching; the inventory spending report stays all-scoped).
 - A branch-manager admin who also trains sees the filtered staff schedule;
   other scoped staff who also train keep the member view (TD-186).
 
@@ -142,3 +202,7 @@ a preset (admin + branches).
   `location_required` 422, `invalid_location_scope` 422,
   `owner_location_scope` 422, `cannot_change_own_membership` 403.
 - Tests: `location_scope_policy_test.exs`, `branch_scoped_staff_test.exs`.
+- §7/§8: `Application.BranchReport`, `CoveringBranches`, `PackageBranches`;
+  migration `20261208100000_covering_branch_scopes`; tests
+  `branch_attribution_test.exs`, `multi_branch_test.exs`; web
+  `admin/BranchFilter.tsx`, `admin/AppliesToBranches.tsx`.
