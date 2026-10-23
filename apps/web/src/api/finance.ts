@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { PackageCatalog } from "@/components/admin/finance/packages/package-catalog";
+import type { LocationScopePayload } from "@/lib/location-scope";
 
 export type FinanceRecord = Record<string, unknown>;
 
@@ -53,8 +54,17 @@ export async function purgeFinanceRecord(
   );
 }
 
-export async function fetchFinancePackages(token: string) {
-  return apiRequest<{ packages: FinanceRecord[] }>("/admin/finance/packages", { token });
+/** ADR-186 §7: the `location_ids` query of a list on a branch-filtered page, or "". */
+function branchQuery(locationIds?: string) {
+  return locationIds ? `?${new URLSearchParams({ location_ids: locationIds }).toString()}` : "";
+}
+
+/** `locationIds` (the page branch filter) keeps the packages valid at one of them or everywhere. */
+export async function fetchFinancePackages(token: string, locationIds?: string) {
+  return apiRequest<{ packages: FinanceRecord[]; branch_filter?: LocationScopePayload }>(
+    `/admin/finance/packages${branchQuery(locationIds)}`,
+    { token },
+  );
 }
 
 export async function fetchPackageCatalog(token: string) {
@@ -113,7 +123,7 @@ export async function backfillFinanceEntitlements(token: string, body: { dry_run
 
 export async function fetchFinanceMembers(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString();
-  return apiRequest<{ members: FinanceRecord[]; meta: FinanceRecord }>(
+  return apiRequest<{ members: FinanceRecord[]; meta: FinanceRecord; branch_filter?: LocationScopePayload }>(
     `/admin/finance/members${qs ? `?${qs}` : ""}`,
     { token },
   );
@@ -303,8 +313,12 @@ export async function fetchFinanceQueues(token: string, params: Record<string, s
   );
 }
 
-export async function fetchPromotionCampaigns(token: string) {
-  return apiRequest<{ promotion_campaigns: FinanceRecord[] }>("/admin/finance/promotions", { token });
+/** `locationIds` (the page branch filter) keeps the promotions valid at one of them or everywhere. */
+export async function fetchPromotionCampaigns(token: string, locationIds?: string) {
+  return apiRequest<{ promotion_campaigns: FinanceRecord[]; branch_filter?: LocationScopePayload }>(
+    `/admin/finance/promotions${branchQuery(locationIds)}`,
+    { token },
+  );
 }
 
 export async function createPromotionCampaign(token: string, body: FinanceRecord) {
@@ -340,8 +354,12 @@ export async function redeemPromotion(token: string, userId: string, body: Finan
   );
 }
 
-export async function fetchReferralEvents(token: string) {
-  return apiRequest<{ referral_events: FinanceRecord[] }>("/admin/finance/referrals", { token });
+/** `locationIds` (the page branch filter) keeps the referrals of people at home there. */
+export async function fetchReferralEvents(token: string, locationIds?: string) {
+  return apiRequest<{ referral_events: FinanceRecord[]; branch_filter?: LocationScopePayload }>(
+    `/admin/finance/referrals${branchQuery(locationIds)}`,
+    { token },
+  );
 }
 
 export async function createReferralEvent(token: string, body: FinanceRecord) {
@@ -383,8 +401,12 @@ export async function updateReferralEventStatus(token: string, referralEventId: 
   });
 }
 
-export async function fetchReferralRewards(token: string) {
-  return apiRequest<{ referral_rewards: FinanceRecord[] }>("/admin/finance/referral-rewards", { token });
+/** `locationIds` (the page branch filter) keeps the rewards of recipients at home there. */
+export async function fetchReferralRewards(token: string, locationIds?: string) {
+  return apiRequest<{ referral_rewards: FinanceRecord[]; branch_filter?: LocationScopePayload }>(
+    `/admin/finance/referral-rewards${branchQuery(locationIds)}`,
+    { token },
+  );
 }
 
 export async function createReferralReward(token: string, referralEventId: string, body: FinanceRecord) {

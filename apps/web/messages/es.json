@@ -9705,6 +9705,11 @@
     "appliesToCoveringHelp": "Un solo elemento, válido en las sedes que elijas.",
     "createdClasses": "{count, plural, one {Se creó # clase:} other {Se crearon # clases:}}",
     "createdSeries": "{count, plural, one {Se creó # serie de clases:} other {Se crearon # series de clases:}}",
-    "createdAppointmentSlots": "{count, plural, one {Se creó # hueco para citas.} other {Se crearon # huecos para citas, uno por sede.}}"
+    "createdAppointmentSlots": "{count, plural, one {Se creó # hueco para citas.} other {Se crearon # huecos para citas, uno por sede.}}",
+    "filterNoteMembers": "Cada socio aparece en su sede principal. Quienes no tienen una solo aparecen en «Todas».",
+    "filterNoteCovering": "Se muestra lo que es válido en una de las sedes elegidas o en todas.",
+    "filterNoteReferrals": "Los referidos y las recompensas siguen la sede principal de sus personas. Los programas valen para todo el negocio.",
+    "filterNoteAccounting": "Los recibos de reembolso siguen la sede principal del socio. La conciliación y las exportaciones abarcan todo el negocio.",
+    "filterNoteBusinessWide": "Esta pestaña abarca todo el negocio; el filtro de sedes no se aplica aquí."
   }
 }

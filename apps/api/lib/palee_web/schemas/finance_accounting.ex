@@ -96,7 +96,10 @@ defmodule PaleeWeb.Schemas.FinanceAccounting do
       title: "FinanceRefundReceiptCollection",
       type: :object,
       required: [:refund_receipts],
-      properties: %{refund_receipts: %Schema{type: :array, items: refund_receipt()}}
+      properties: %{
+        refund_receipts: %Schema{type: :array, items: refund_receipt()},
+        branch_filter: PaleeWeb.Schemas.LocationScope.filter_schema()
+      }
     }
   end
 
