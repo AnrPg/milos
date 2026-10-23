@@ -261,5 +261,8 @@ defmodule Palee.Organizations.OrganizationStore do
   @impl true
   def provider_kinds(organization_ids), do: impl().provider_kinds(organization_ids)
 
+  @impl true
+  def owned_organiser_organization(user_id), do: impl().owned_organiser_organization(user_id)
+
   defp impl, do: Application.fetch_env!(:palee, :organization_store)
 end

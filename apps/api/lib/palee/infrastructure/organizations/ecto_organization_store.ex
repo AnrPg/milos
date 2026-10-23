@@ -886,6 +886,23 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     :ok
   end
 
+  @impl true
+  def owned_organiser_organization(user_id) do
+    Organization
+    |> join(:inner, [organization], membership in OrganizationMembership,
+      on: membership.organization_id == organization.id
+    )
+    |> where(
+      [organization, membership],
+      membership.user_id == ^user_id and membership.status == :active and
+        fragment("'owner' = ANY(?)", membership.roles) and
+        organization.provider_kind == "organiser" and organization.status in [:active, :archived]
+    )
+    |> order_by([organization], asc: organization.inserted_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
   # ADR-185: a definer answers the kind of any organisation (event hosts are
   # shown as a person or a business to people outside them).
   @impl true

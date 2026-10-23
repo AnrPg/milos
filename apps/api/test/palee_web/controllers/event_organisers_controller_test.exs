@@ -10,7 +10,13 @@ defmodule PaleeWeb.EventOrganisersControllerTest do
   import Ecto.Query
   import Palee.TestFixtures
 
-  alias Palee.Application.{PublishBoxPublicProfile, UpdateBoxPublicProfile}
+  alias Palee.Application.{
+    OrganiserCleanup,
+    PublishBoxPublicProfile,
+    TenantDefaults,
+    UpdateBoxPublicProfile
+  }
+
   alias Palee.Community.{Event, EventViewMark, Post}
   alias Palee.{Notifications, Organizations, Repo}
   alias Palee.Organizations.{Organization, OrganizationMembership}
@@ -234,6 +240,38 @@ defmodule PaleeWeb.EventOrganisersControllerTest do
                  invite_token: token
                })
                |> json_response(200)
+    end
+
+    test "an organiser organisation without events is archived after a day and comes back",
+         ctx do
+      {:ok, organization, true} =
+        Organizations.ensure_organiser_organization(ctx.person, %{name: "Μαρία"},
+          seed_defaults: TenantDefaults.organiser("Μαρία")
+        )
+
+      assert {:ok, %{archived: 0}} = OrganiserCleanup.call()
+
+      Repo.update_all(from(o in Organization, where: o.id == ^organization.id),
+        set: [inserted_at: DateTime.add(DateTime.utc_now(), -2, :day)]
+      )
+
+      assert {:ok, %{archived: archived}} = OrganiserCleanup.call()
+      assert archived >= 1
+      assert Repo.get!(Organization, organization.id).status == :archived
+
+      assert %{"event" => %{"organization_id" => same}} =
+               own_event(ctx, ctx.person) |> json_response(201)
+
+      assert same == organization.id
+      assert Repo.get!(Organization, organization.id).status == :active
+
+      # One with an event is never swept.
+      Repo.update_all(from(o in Organization, where: o.id == ^organization.id),
+        set: [inserted_at: DateTime.add(DateTime.utc_now(), -2, :day)]
+      )
+
+      OrganiserCleanup.call()
+      assert Repo.get!(Organization, organization.id).status == :active
     end
 
     test "creating is rate limited", ctx do

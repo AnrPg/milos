@@ -144,4 +144,7 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
 
   @doc "ADR-185: the provider kind of each organisation (gym, coach, organiser)."
   @callback provider_kinds([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => String.t()}
+
+  @doc "ADR-185: the organiser organisation the person owns, active or archived."
+  @callback owned_organiser_organization(Ecto.UUID.t()) :: Organization.t() | nil
 end

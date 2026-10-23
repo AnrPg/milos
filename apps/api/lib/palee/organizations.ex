@@ -113,6 +113,10 @@ defmodule Palee.Organizations do
   def ensure_organiser_organization(account, params, opts \\ []),
     do: Palee.Organizations.Commands.EnsureOrganiserOrganization.call(account, params, opts)
 
+  @doc "ADR-185: archives an organiser organisation that never got an event (the sweep)."
+  def archive_empty_organiser(organization_id),
+    do: Palee.Organizations.Commands.EnsureOrganiserOrganization.archive_empty(organization_id)
+
   @doc "ADR-185: the provider kind of each organisation (any session)."
   def provider_kinds(organization_ids), do: OrganizationStore.provider_kinds(organization_ids)
 

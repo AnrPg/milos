@@ -17,7 +17,7 @@ defmodule Palee.Organizations.Commands.EnsureOrganiserOrganization do
 
   @kind "organiser"
 
-  @doc "The person's active organiser organisation, or nil."
+  @doc "The person's organiser organisation (active or archived), or nil."
   def find(user_id) when is_binary(user_id) do
     RepoContext.run(%{user_id: user_id}, fn -> owned(user_id) end)
   end
@@ -31,12 +31,35 @@ defmodule Palee.Organizations.Commands.EnsureOrganiserOrganization do
       :ok = OrganizationStore.lock_for_creation("organiser:" <> user_id)
 
       case find(user_id) do
+        %{status: :archived} = organization -> reactivate(organization, user_id)
         %{} = organization -> {:ok, {organization, false}}
         nil -> create(user_id, params, now, seed_defaults)
       end
     end)
     |> case do
       {:ok, {organization, created?}} -> {:ok, organization, created?}
+      error -> error
+    end
+  end
+
+  @doc """
+  ADR-185 clean-up: archives the person's organiser organisation when it
+  never got an event (the sweep passes ids from the definer function, which
+  only lists organiser organisations without events older than a day).
+  """
+  def archive_empty(organization_id) do
+    RepoContext.run(%{organization_id: organization_id}, fn ->
+      OrganizationStore.set_organization_status(organization_id, :archived)
+    end)
+  end
+
+  # «Ως εγώ» again after the sweep archived the empty organisation: it comes back.
+  defp reactivate(%{id: organization_id}, user_id) do
+    RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
+      OrganizationStore.set_organization_status(organization_id, :active)
+    end)
+    |> case do
+      {:ok, organization} -> {:ok, {organization, false}}
       error -> error
     end
   end
@@ -61,13 +84,8 @@ defmodule Palee.Organizations.Commands.EnsureOrganiserOrganization do
     end
   end
 
-  defp owned(user_id) do
-    user_id
-    |> OrganizationStore.list_memberships()
-    |> Enum.find_value(fn %{membership: membership, organization: organization} ->
-      if :owner in membership.roles and organization.provider_kind == @kind, do: organization
-    end)
-  end
+  # Archived too: the clean-up sweep archives an empty one and it comes back.
+  defp owned(user_id), do: OrganizationStore.owned_organiser_organization(user_id)
 
   defp organization_params(params) do
     name = value(params, :name)

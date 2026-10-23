@@ -319,7 +319,7 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
 
     secure_without_timestamps("community_event_cohosts")
 
-    staff ="palee_acting_user_runs_events(c.cohost_organization_id)"
+    staff = "palee_acting_user_runs_events(c.cohost_organization_id)"
 
     # A person's session reads the events co-hosted (accepted) by a box they
     # belong to, unless the event is for a member group only.
