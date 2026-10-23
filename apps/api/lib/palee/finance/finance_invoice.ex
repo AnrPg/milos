@@ -27,6 +27,10 @@ defmodule Palee.Finance.FinanceInvoice do
     field :deleted_by_id, :binary_id
     field :deletion_reason, :string
     field :params, :map, default: %{}
+    # ADR-190: which revenue stream the invoice belongs to, and the legal
+    # receipt reference once one exists (TD-190).
+    field :revenue_stream, :string, default: "membership"
+    field :fiscal_receipt_ref, :string
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -102,5 +106,49 @@ defmodule Palee.Finance.FinanceInvoice do
     else
       changeset
     end
+  end
+
+  @doc """
+  ADR-190: an invoice written by a revenue stream other than memberships
+  (the shop). A walk-in sale has no membership, which the database allows
+  for `revenue_stream = 'shop'` only.
+  """
+  def stream_changeset(invoice \\ %__MODULE__{}, params) do
+    invoice
+    |> cast(params, [
+      :membership_id,
+      :user_id,
+      :invoice_number,
+      :invoice_type,
+      :status,
+      :issue_date,
+      :due_date,
+      :subtotal_cents,
+      :discount_cents,
+      :total_cents,
+      :currency,
+      :notes,
+      :voided_at,
+      :params,
+      :revenue_stream,
+      :fiscal_receipt_ref
+    ])
+    |> validate_required([
+      :invoice_number,
+      :invoice_type,
+      :status,
+      :subtotal_cents,
+      :discount_cents,
+      :total_cents,
+      :currency,
+      :revenue_stream
+    ])
+    |> validate_inclusion(:revenue_stream, Palee.Finance.Domain.RevenueStream.keys())
+    |> validate_number(:total_cents, greater_than_or_equal_to: 0)
+    |> validate_length(:fiscal_receipt_ref, max: 120)
+    |> check_constraint(:membership_id, name: :finance_invoices_member_or_shop_check)
+    |> unique_constraint([:organization_id, :invoice_number],
+      name: :finance_invoices_organization_invoice_number_index
+    )
   end
 end

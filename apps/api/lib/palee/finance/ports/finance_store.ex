@@ -18,6 +18,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback reverse_credit_ledger_entry(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
   @callback get_invoice(Ecto.UUID.t()) :: {:ok, struct()} | {:error, :not_found}
+  @callback member_shop_terms(Ecto.UUID.t()) ::
+              %{membership_id: Ecto.UUID.t(), member_discount_percent: integer() | nil} | nil
   @callback update_invoice_params(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback update_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback mark_overdue_invoices() :: :ok | {:error, term()}
