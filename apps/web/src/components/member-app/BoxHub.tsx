@@ -17,6 +17,7 @@ import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/componen
 import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
 import { TodayAcrossCard } from "@/components/providers/TodayAcrossCard";
 import { SeasonsEntry } from "@/components/seasons/MySeasons";
+import { useHasBillingProviders } from "@/lib/billing-providers";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
 
@@ -38,6 +39,7 @@ export function BoxHub() {
   const tProviders = useTranslations("Providers");
   const tCoach = useTranslations("SoloCoach");
   const { membership } = useSelectedMembershipRole();
+  const { hasBillingProviders } = useHasBillingProviders();
   const { entitlement } = useClientEntitlement();
   const clubs = useMyClubs();
   const gymClub = gymClubFor(clubs.data ?? [], membership?.organization.id);
@@ -77,7 +79,11 @@ export function BoxHub() {
           </Suspense>
         </div>
         <div className="flex gap-2">
-          <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>
+          {hasBillingProviders ? (
+            <HubButton href={membership ? `/me/payments?box=${encodeURIComponent(membership.organization.slug)}` : "/me/payments"}>
+              {t("membershipOpen")}
+            </HubButton>
+          ) : null}
           {membership ? (
             <HubButton href={`/me/referrals?box=${encodeURIComponent(membership.organization.slug)}`}>{t("membershipReferral")}</HubButton>
           ) : null}
