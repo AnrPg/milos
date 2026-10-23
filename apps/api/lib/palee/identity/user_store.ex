@@ -4,6 +4,14 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def create_login_with_profile(params), do: impl().create_login_with_profile(params)
   @impl true
+  def create_demo_person(organization_id, params),
+    do: impl().create_demo_person(organization_id, params)
+
+  @impl true
+  def demo_user_ids(organization_id), do: impl().demo_user_ids(organization_id)
+  @impl true
+  def visible_user_ids(user_ids, viewer_id), do: impl().visible_user_ids(user_ids, viewer_id)
+  @impl true
   def add_profile(login_id, params), do: impl().add_profile(login_id, params)
   @impl true
   def get_login_by_email(email), do: impl().get_login_by_email(email)

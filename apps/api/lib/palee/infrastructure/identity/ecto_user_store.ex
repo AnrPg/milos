@@ -21,7 +21,14 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   # ADR-187: a new email creates a login and its first profile together.
   @impl true
-  def create_login_with_profile(params) do
+  def create_login_with_profile(params), do: create_login(params, nil)
+
+  # ADR-184: a mock person of a demo business, marked for good at insert.
+  @impl true
+  def create_demo_person(organization_id, params) when is_binary(organization_id),
+    do: create_login(params, organization_id)
+
+  defp create_login(params, demo_organization_id) do
     Repo.transaction(fn ->
       login_changeset = params |> Login.create_changeset() |> maybe_put_password_hash()
       profile_changeset = User.profile_create_changeset(%User{}, nil, params)
@@ -30,7 +37,10 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
            :ok <- ensure_handle_free(Ecto.Changeset.get_field(profile_changeset, :handle), nil),
            {:ok, login} <- Repo.insert(login_changeset),
            {:ok, user} <-
-             %User{} |> User.profile_create_changeset(login.id, params) |> Repo.insert(),
+             %User{}
+             |> User.profile_create_changeset(login.id, params)
+             |> Ecto.Changeset.put_change(:demo_organization_id, demo_organization_id)
+             |> Repo.insert(),
            {:ok, _login} <- login |> Login.last_used_changeset(user.id) |> Repo.update() do
         load_account(user.id)
       else
@@ -385,13 +395,13 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   end
 
   @impl true
-  def search_athletes(nil), do: list_by_role(:athlete)
-  def search_athletes(""), do: list_by_role(:athlete)
+  def search_athletes(nil), do: search_athletes("")
 
   def search_athletes(query) do
     profiles_query()
+    |> discoverable()
     |> where([user], user.role == :athlete)
-    |> matching_name(query)
+    |> then(&if(query == "", do: &1, else: matching_name(&1, query)))
     |> order_by([user], asc: user.handle)
     |> Repo.all()
     |> Enum.map(&to_account/1)
@@ -571,6 +581,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   def search_users("") do
     profiles_query()
+    |> discoverable()
     |> order_by([u], asc: u.handle)
     |> limit(20)
     |> Repo.all()
@@ -579,6 +590,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   def search_users(query) do
     profiles_query()
+    |> discoverable()
     |> matching_name(query)
     |> order_by(
       [u],
@@ -614,6 +626,42 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   defp wrap_result({:ok, %User{} = user}), do: {:ok, load_account(user.id)}
   defp wrap_result({:error, %Ecto.Changeset{} = changeset}), do: {:error, changeset}
+
+  @impl true
+  def demo_user_ids(organization_id) when is_binary(organization_id) do
+    User
+    |> where([user], user.demo_organization_id == ^organization_id)
+    |> select([user], user.id)
+    |> Repo.all()
+  end
+
+  # ADR-184: the ids among `user_ids` the viewer may discover. A mock person
+  # is kept only for itself and the active staff of its demo business
+  # (`palee_demo_user_visible`); everyone real is always kept. One indexed
+  # query over the marked rows only.
+  @impl true
+  def visible_user_ids([], _viewer_id), do: []
+
+  def visible_user_ids(user_ids, viewer_id) when is_list(user_ids) do
+    ids = user_ids |> Enum.reject(&is_nil/1) |> Enum.uniq()
+
+    hidden =
+      User
+      |> where([user], user.id in ^ids and not is_nil(user.demo_organization_id))
+      |> where(
+        [user],
+        not fragment("palee_demo_user_visible(?, ?)", user.id, type(^viewer_id, Ecto.UUID))
+      )
+      |> select([user], user.id)
+      |> Repo.all()
+      |> MapSet.new()
+
+    Enum.reject(user_ids, &MapSet.member?(hidden, &1))
+  end
+
+  # ADR-184: person discovery never lists mock people (there is no viewer
+  # who could be their staff in a global search).
+  defp discoverable(query), do: where(query, [user], is_nil(user.demo_organization_id))
 
   defp profiles_query do
     from(user in User, join: login in assoc(user, :login), preload: [login: login])
@@ -740,6 +788,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       time_zone: user.time_zone,
       email: login.email,
       inserted_at: user.inserted_at,
+      demo_organization_id: user.demo_organization_id,
       completed_tours: user.completed_tours || []
     }
   end

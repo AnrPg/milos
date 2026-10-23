@@ -20,7 +20,7 @@ defmodule Palee.Application.FindPRGrantee do
     with {:ok, nickname} <- normalize(nickname) do
       case Identity.find_by_nickname(nickname) do
         %{id: ^user_id} -> {:ok, %{grantee: nil}}
-        %{} = user -> {:ok, %{grantee: profile(user)}}
+        %{} = user -> {:ok, %{grantee: visible_profile(user, user_id)}}
         nil -> {:ok, %{grantee: nil}}
       end
     end
@@ -36,6 +36,10 @@ defmodule Palee.Application.FindPRGrantee do
   end
 
   defp normalize(_nickname), do: {:error, :bad_request}
+
+  # ADR-184: a mock person answers like an unknown nickname outside its demo business.
+  defp visible_profile(user, viewer_id),
+    do: if(Identity.visible_to?(user.id, viewer_id), do: profile(user))
 
   defp profile(user) do
     %{

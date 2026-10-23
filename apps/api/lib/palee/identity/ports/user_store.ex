@@ -4,6 +4,10 @@ defmodule Palee.Identity.Ports.UserStore do
   # ADR-187: logins (one per email) hold up to three profiles.
   @callback create_login_with_profile(map()) ::
               {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  @callback create_demo_person(Ecto.UUID.t(), map()) ::
+              {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  @callback demo_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
+  @callback visible_user_ids([Ecto.UUID.t()], Ecto.UUID.t() | nil) :: [Ecto.UUID.t()]
   @callback add_profile(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :not_found | :profile_limit | Ecto.Changeset.t()}
   @callback get_login_by_email(String.t() | nil) ::
