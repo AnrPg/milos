@@ -117,7 +117,7 @@ defmodule Palee.FakeGeocoder do
       place
       | name: place.name && String.replace(place.name, "München", "Munich"),
         country: "Germany",
-        state: place.state && String.replace(place.state, "Bayern", "Bavaria")
+        state: String.replace(place.state, "Bayern", "Bavaria")
     }
 
   defp search_address(query) do

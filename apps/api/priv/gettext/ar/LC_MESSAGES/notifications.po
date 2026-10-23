@@ -642,3 +642,36 @@ msgstr "نشاطك التجريبي بانتظارك"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "لم يستخدم أحد %{business} منذ فترة. إذا لم يفتحه أحد خلال %{days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت."
+
+msgid "Shop stock running low"
+msgstr "مخزون المتجر منخفض"
+
+msgid "New shop order"
+msgstr "طلب جديد في المتجر"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "الطلب #%{number} بانتظار التجهيز."
+
+msgid "Your order is ready"
+msgstr "طلبك جاهز"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "الطلب #%{number} جاهز للاستلام."
+
+msgid "Your order is waiting for you"
+msgstr "طلبك بانتظارك"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "الطلب #%{number} جاهز للاستلام. رمزك: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "تم إلغاء طلبك"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "تم إلغاء الطلب #%{number} ولم يتم خصم أي مبلغ."
+
+msgid "Back in stock"
+msgstr "متوفر من جديد"
+
+msgid "%{item} is available again."
+msgstr "%{item} متوفر من جديد."

@@ -642,3 +642,36 @@ msgstr "Демо бизнесът ти те очаква"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "Никой не е използвал %{business} от известно време. Ако никой не го отвори в следващите %{days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време."
+
+msgid "Shop stock running low"
+msgstr "Наличността в магазина намалява"
+
+msgid "New shop order"
+msgstr "Нова поръчка в магазина"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "Поръчка #%{number} чака да бъде подготвена."
+
+msgid "Your order is ready"
+msgstr "Поръчката ти е готова"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "Поръчка #%{number} е готова за вземане."
+
+msgid "Your order is waiting for you"
+msgstr "Поръчката ти те чака"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "Поръчка #%{number} е готова за вземане. Твоят код: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "Поръчката ти е отменена"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "Поръчка #%{number} е отменена и нищо не е таксувано."
+
+msgid "Back in stock"
+msgstr "Отново в наличност"
+
+msgid "%{item} is available again."
+msgstr "%{item} отново е налично."

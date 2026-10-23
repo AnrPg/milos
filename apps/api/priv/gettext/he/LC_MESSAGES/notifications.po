@@ -642,3 +642,36 @@ msgstr "העסק לדוגמה שלך מחכה לך"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "אף אחד לא השתמש ב-%{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-%{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת."
+
+msgid "Shop stock running low"
+msgstr "המלאי בחנות עומד להיגמר"
+
+msgid "New shop order"
+msgstr "הזמנה חדשה בחנות"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "הזמנה #%{number} ממתינה להכנה."
+
+msgid "Your order is ready"
+msgstr "ההזמנה שלך מוכנה"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "הזמנה #%{number} מוכנה לאיסוף."
+
+msgid "Your order is waiting for you"
+msgstr "ההזמנה שלך מחכה לך"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "הזמנה #%{number} מוכנה לאיסוף. הקוד שלך: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "ההזמנה שלך בוטלה"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "הזמנה #%{number} בוטלה ולא בוצע חיוב."
+
+msgid "Back in stock"
+msgstr "שוב במלאי"
+
+msgid "%{item} is available again."
+msgstr "%{item} שוב זמין."

@@ -84,7 +84,7 @@ defmodule PaleeWeb.Schemas.ShopReports do
     %Schema{
       title: title,
       type: :object,
-      required: [:window | Map.keys(properties)],
+      required: [:window | properties |> Map.keys() |> Enum.sort()],
       properties: Map.put(properties, :window, window()),
       additionalProperties: false
     }
