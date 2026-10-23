@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "No teu relógio ({zone})",
     "zonedTimeGymClock": "As horas seguem o relógio do ginásio ({zone}).",
     "scoreFieldLabel": "Pontuação {number}",
-    "removeScoreField": "Remover pontuação {number}"
+    "removeScoreField": "Remover pontuação {number}",
+    "apiErrorBusinessNotActivated": "A equipa Palee ativa este negócio antes de ficar público.",
+    "apiErrorBusinessAccountExists": "Já tens um negócio à espera de ativação.",
+    "apiErrorBusinessSignupClosed": "Pede à equipa Palee para transformar a tua conta numa conta empresarial.",
+    "apiErrorInvalidBusinessKind": "Escolhe um ginásio ou um treinador independente.",
+    "apiErrorInvalidBusinessRequest": "Verifica os dados do pedido.",
+    "apiErrorBusinessRequestPending": "Já tens um pedido deste tipo à espera.",
+    "apiErrorBusinessRequestClosed": "Este pedido já foi respondido.",
+    "apiErrorInvalidActivationLink": "Este link de ativação não é válido para a tua conta.",
+    "apiErrorBusinessAlreadyActive": "Este negócio já está ativo.",
+    "apiErrorInvalidActivationRole": "Escolhe proprietário ou administrador.",
+    "apiErrorInvalidActivationLifetime": "Um link dura entre uma hora e 30 dias.",
+    "apiErrorAccountNotFound": "Nenhuma conta corresponde.",
+    "apiErrorUnknownDemoSection": "Não há dados de demonstração para este ecrã."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -9386,5 +9399,147 @@
     "codeSubmit": "Entrar",
     "codeFailed": "Esse código não funcionou. Confirma-o com a tua box.",
     "laterNote": "Sem problema. Podes entrar numa box quando quiseres a partir de Perto de mim."
+  },
+  "Business": {
+    "common": {
+      "cancel": "Cancelar",
+      "close": "Fechar"
+    },
+    "demo": {
+      "button": "Dados de demonstração",
+      "working": "A processar…",
+      "eyebrow": "Modo de demonstração",
+      "title": "Experimenta com dados de demonstração",
+      "intro": "Preenche este ecrã com membros, aulas e pagamentos fictícios. Nada chega a pessoas reais até a equipa Palee ativar o teu negócio.",
+      "fill": {
+        "all": "Preencher todos os ecrãs",
+        "members": "Adicionar membros de demonstração",
+        "schedule": "Preencher a semana com aulas",
+        "finance": "Adicionar pacotes e pagamentos de demonstração",
+        "workouts": "Adicionar treinos de demonstração"
+      },
+      "filled": "Este ecrã já tem dados de demonstração",
+      "remove": "Remover dados de demonstração",
+      "removeConfirm": "Remover todos os membros, aulas e pagamentos de demonstração? O que configuraste fica.",
+      "removeYes": "Remover"
+    },
+    "activation": {
+      "request": "Pedir ativação à equipa Palee",
+      "pending": "O teu pedido de ativação está com a equipa Palee. Vais receber um link de ativação."
+    },
+    "notice": {
+      "eyebrow": "Modo de demonstração",
+      "title": "Ativação pela equipa Palee",
+      "body": "O teu negócio está em modo de demonstração: tudo funciona com dados de demonstração, mas nada fica público ainda. Até a equipa Palee o ativar:",
+      "locked": {
+        "people": "nenhum membro ou funcionário real pode entrar",
+        "public": "a tua página pública fica escondida de Perto de mim e da pesquisa",
+        "bookings": "ninguém fora da tua equipa pode reservar",
+        "payments": "não são recebidos pagamentos reais",
+        "messages": "não são enviados emails, notificações ou mensagens a ninguém fora da tua conta"
+      },
+      "howOwner": "Pede abaixo à equipa Palee. Depois de falarem contigo, enviam-te um link de ativação: abre-o com sessão iniciada nesta conta.",
+      "howStaff": "O proprietário deste negócio pode pedir a ativação à equipa Palee no botão de demonstração dos ecrãs de gestão."
+    },
+    "signUp": {
+      "link": "Conta empresarial",
+      "title": "Conta empresarial",
+      "intro": "Para ginásios, boxes e treinadores independentes. Começas em modo de demonstração e a equipa Palee ativa-te depois de falarem.",
+      "account": "A tua conta",
+      "demoNote": "Até à ativação só tu vês o teu negócio: dados de demonstração, sem membros, reservas, pagamentos ou mensagens reais.",
+      "submit": "Abrir o meu negócio",
+      "creating": "A abrir…",
+      "personal": "Prefiro uma conta pessoal",
+      "nameRule": "Entre 2 e 120 caracteres.",
+      "createdTitle": "O teu negócio está aberto",
+      "created": "Está em modo de demonstração. Experimenta cada ecrã com o botão de demonstração; a equipa Palee vai contactar-te sobre a ativação.",
+      "openConsole": "Ir para a minha consola",
+      "closed": "Esta conta foi criada há algum tempo, por isso é a equipa Palee que abre o negócio por ti. Envia-lhes um pedido nas Definições.",
+      "closedAction": "Abrir Definições"
+    },
+    "form": {
+      "kind": "Tipo de negócio",
+      "gymName": "Nome do ginásio ou box",
+      "coachName": "O teu nome como treinador",
+      "city": "Cidade",
+      "phone": "Telefone",
+      "phoneHint": "Para a equipa Palee te contactar sobre a ativação.",
+      "message": "Algo que a equipa Palee deva saber"
+    },
+    "kind": {
+      "gym": "Ginásio ou box",
+      "gymHint": "Aulas, membros, uma equipa",
+      "coach": "Treinador independente",
+      "coachHint": "Os teus clientes, sessões e Team"
+    },
+    "role": {
+      "owner": "Proprietário",
+      "admin": "Administrador"
+    },
+    "activate": {
+      "title": "Ativa o teu negócio",
+      "loading": "A verificar o link…",
+      "invalid": "Este link de ativação não é válido para a conta com que tens sessão iniciada. Pode ter expirado ou já ter sido usado: pede um novo à equipa Palee.",
+      "signedInAs": "Sessão iniciada como {name}.",
+      "removes": "Os dados de demonstração são removidos ({rows} registos, incluindo {people} pessoas de demonstração).",
+      "nothingToRemove": "Não há dados de demonstração para remover.",
+      "keeps": "Tudo o que configuraste fica: definições, imagem, aulas, pacotes e o rascunho da tua página pública.",
+      "goesLive": "Depois podes convidar pessoas reais, publicar a tua página e aceitar reservas e pagamentos.",
+      "confirm": "Ativar",
+      "working": "A ativar…",
+      "doneTitle": "Já estás ativo",
+      "done": "{name} está ativo. Os dados de demonstração foram removidos e tudo o que configuraste está à tua espera."
+    },
+    "settings": {
+      "title": "Conta empresarial",
+      "description": "Gere um ginásio, uma box ou o teu próprio treino no Palee",
+      "intro": "Pede à equipa Palee para transformar esta conta num negócio. Abrem-no em modo de demonstração e contactam-te sobre a ativação.",
+      "send": "Enviar pedido",
+      "sending": "A enviar…",
+      "sent": "Pedido enviado. A equipa Palee vai responder-te.",
+      "cancel": "Retirar pedido"
+    },
+    "requestKind": {
+      "conversion": "Conta empresarial",
+      "activation": "Ativação"
+    },
+    "status": {
+      "pending": "Pendente",
+      "approved": "Aprovado",
+      "declined": "Recusado",
+      "cancelled": "Retirado",
+      "completed": "Ativado"
+    },
+    "me": {
+      "row": "Conta empresarial",
+      "rowHint": "Um ginásio, uma box ou o teu treino"
+    },
+    "console": {
+      "back": "Organizações",
+      "title": "Contas empresariais",
+      "subtitle": "Pedidos para abrir ou ativar um negócio e todos os negócios ainda em modo de demonstração.",
+      "forbidden": "Só a equipa Palee pode abrir esta página.",
+      "requests": "Pedidos",
+      "noRequests": "Não há pedidos à espera.",
+      "demoBusinesses": "Em modo de demonstração",
+      "noDemoBusinesses": "Nenhum negócio está em modo de demonstração.",
+      "role": "Função que atribui",
+      "note": "Nota para quem pediu",
+      "approveConversion": "Abrir o negócio",
+      "approveActivation": "Emitir link de ativação",
+      "decline": "Recusar",
+      "demoSince": "em demonstração desde {date}",
+      "liveLink": "Link ativo para {name} ({role}), até {date}",
+      "revoke": "Revogar",
+      "account": "Conta",
+      "pickAccount": "Escolhe uma conta",
+      "issueLink": "Emitir link de ativação",
+      "replaceLink": "Substituir o link",
+      "issued": "Link de ativação ({role}). Envia-o ao proprietário: só funciona com a conta dele.",
+      "linkLabel": "Link de ativação",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "linkHint": "Só é mostrado agora. Um novo link substitui este."
+    }
   }
 }

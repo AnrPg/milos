@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "Op jouw klok ({zone})",
     "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone}).",
     "scoreFieldLabel": "Score {number}",
-    "removeScoreField": "Score {number} verwijderen"
+    "removeScoreField": "Score {number} verwijderen",
+    "apiErrorBusinessNotActivated": "Het Palee-team activeert dit bedrijf voordat het live gaat.",
+    "apiErrorBusinessAccountExists": "Je hebt al een bedrijf dat op activering wacht.",
+    "apiErrorBusinessSignupClosed": "Vraag het Palee-team om je account een zakelijk account te maken.",
+    "apiErrorInvalidBusinessKind": "Kies een sportschool of een zelfstandige coach.",
+    "apiErrorInvalidBusinessRequest": "Controleer de gegevens van het verzoek.",
+    "apiErrorBusinessRequestPending": "Je hebt al een verzoek van dit soort openstaan.",
+    "apiErrorBusinessRequestClosed": "Dit verzoek is al beantwoord.",
+    "apiErrorInvalidActivationLink": "Deze activeringslink geldt niet voor je account.",
+    "apiErrorBusinessAlreadyActive": "Dit bedrijf is al actief.",
+    "apiErrorInvalidActivationRole": "Kies eigenaar of beheerder.",
+    "apiErrorInvalidActivationLifetime": "Een link is één uur tot 30 dagen geldig.",
+    "apiErrorAccountNotFound": "Geen account gevonden.",
+    "apiErrorUnknownDemoSection": "Er zijn geen demogegevens voor dit scherm."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -9386,5 +9399,147 @@
     "codeSubmit": "Lid worden",
     "codeFailed": "Die code werkte niet. Vraag je box ernaar.",
     "laterNote": "Geen probleem. Je kunt altijd via In de buurt lid worden van een box."
+  },
+  "Business": {
+    "common": {
+      "cancel": "Annuleren",
+      "close": "Sluiten"
+    },
+    "demo": {
+      "button": "Demogegevens",
+      "working": "Bezig…",
+      "eyebrow": "Demomodus",
+      "title": "Probeer het met demogegevens",
+      "intro": "Vul dit scherm met verzonnen leden, lessen en betalingen. Niets bereikt echte mensen tot het Palee-team je bedrijf activeert.",
+      "fill": {
+        "all": "Alle schermen vullen",
+        "members": "Demoleden toevoegen",
+        "schedule": "De week vullen met lessen",
+        "finance": "Demopakketten en -betalingen toevoegen",
+        "workouts": "Demotrainingen toevoegen"
+      },
+      "filled": "Dit scherm heeft al demogegevens",
+      "remove": "Demogegevens verwijderen",
+      "removeConfirm": "Alle demoleden, -lessen en -betalingen verwijderen? Wat je zelf hebt ingesteld blijft.",
+      "removeYes": "Verwijderen"
+    },
+    "activation": {
+      "request": "Vraag het Palee-team om activering",
+      "pending": "Je activeringsverzoek ligt bij het Palee-team. Je krijgt een activeringslink."
+    },
+    "notice": {
+      "eyebrow": "Demomodus",
+      "title": "Activering door het Palee-team",
+      "body": "Je bedrijf staat in demomodus: alles werkt met demogegevens, maar nog niets gaat live. Tot het Palee-team het activeert:",
+      "locked": {
+        "people": "kunnen geen echte leden of medewerkers lid worden",
+        "public": "je openbare pagina blijft verborgen in In de buurt en zoeken",
+        "bookings": "niemand buiten je team kan boeken",
+        "payments": "worden geen echte betalingen ontvangen",
+        "messages": "gaan er geen e-mails, meldingen of berichten naar iemand buiten je account"
+      },
+      "howOwner": "Vraag het hieronder aan het Palee-team. Na een gesprek sturen ze je een activeringslink: open die terwijl je met dit account bent ingelogd.",
+      "howStaff": "De eigenaar van dit bedrijf kan het Palee-team om activering vragen via de demoknop in de beheerschermen."
+    },
+    "signUp": {
+      "link": "Zakelijk account",
+      "title": "Zakelijk account",
+      "intro": "Voor sportscholen, boxen en zelfstandige coaches. Je begint in demomodus en het Palee-team activeert je na een gesprek.",
+      "account": "Je account",
+      "demoNote": "Tot de activering zie alleen jij je bedrijf: demogegevens, geen echte leden, boekingen, betalingen of berichten.",
+      "submit": "Mijn bedrijf openen",
+      "creating": "Bezig met openen…",
+      "personal": "Liever een persoonlijk account",
+      "nameRule": "Tussen 2 en 120 tekens.",
+      "createdTitle": "Je bedrijf is geopend",
+      "created": "Het staat in demomodus. Probeer elk scherm met de demoknop; het Palee-team neemt contact op over de activering.",
+      "openConsole": "Naar mijn console",
+      "closed": "Dit account bestaat al even, dus het Palee-team opent het bedrijf voor je. Stuur ze een verzoek via Instellingen.",
+      "closedAction": "Instellingen openen"
+    },
+    "form": {
+      "kind": "Soort bedrijf",
+      "gymName": "Naam van de sportschool of box",
+      "coachName": "Je naam als coach",
+      "city": "Stad",
+      "phone": "Telefoon",
+      "phoneHint": "Zodat het Palee-team je kan bereiken over de activering.",
+      "message": "Iets wat het Palee-team moet weten"
+    },
+    "kind": {
+      "gym": "Sportschool of box",
+      "gymHint": "Lessen, leden, een team",
+      "coach": "Zelfstandige coach",
+      "coachHint": "Je klanten, sessies en Team"
+    },
+    "role": {
+      "owner": "Eigenaar",
+      "admin": "Beheerder"
+    },
+    "activate": {
+      "title": "Activeer je bedrijf",
+      "loading": "Link wordt gecontroleerd…",
+      "invalid": "Deze activeringslink geldt niet voor het account waarmee je bent ingelogd. Misschien is hij verlopen of al gebruikt: vraag het Palee-team om een nieuwe.",
+      "signedInAs": "Ingelogd als {name}.",
+      "removes": "De demogegevens worden verwijderd ({rows} records, waaronder {people} demopersonen).",
+      "nothingToRemove": "Er zijn geen demogegevens om te verwijderen.",
+      "keeps": "Alles wat je zelf hebt ingesteld blijft: instellingen, huisstijl, lessen, pakketten en het concept van je openbare pagina.",
+      "goesLive": "Daarna kun je echte mensen uitnodigen, je pagina publiceren en boekingen en betalingen ontvangen.",
+      "confirm": "Activeren",
+      "working": "Bezig met activeren…",
+      "doneTitle": "Je bent live",
+      "done": "{name} is actief. De demogegevens zijn weg en alles wat je hebt ingesteld staat klaar."
+    },
+    "settings": {
+      "title": "Zakelijk account",
+      "description": "Run een sportschool, een box of je eigen coaching op Palee",
+      "intro": "Vraag het Palee-team om dit account een bedrijf te maken. Ze openen het in demomodus en nemen contact op over de activering.",
+      "send": "Verzoek versturen",
+      "sending": "Bezig met versturen…",
+      "sent": "Verzoek verstuurd. Het Palee-team komt bij je terug.",
+      "cancel": "Verzoek intrekken"
+    },
+    "requestKind": {
+      "conversion": "Zakelijk account",
+      "activation": "Activering"
+    },
+    "status": {
+      "pending": "In behandeling",
+      "approved": "Goedgekeurd",
+      "declined": "Afgewezen",
+      "cancelled": "Ingetrokken",
+      "completed": "Geactiveerd"
+    },
+    "me": {
+      "row": "Zakelijk account",
+      "rowHint": "Een sportschool, een box of je coaching"
+    },
+    "console": {
+      "back": "Organisaties",
+      "title": "Zakelijke accounts",
+      "subtitle": "Verzoeken om een bedrijf te openen of te activeren, en alle bedrijven die nog in demomodus staan.",
+      "forbidden": "Alleen het Palee-team kan deze pagina openen.",
+      "requests": "Verzoeken",
+      "noRequests": "Er wachten geen verzoeken.",
+      "demoBusinesses": "In demomodus",
+      "noDemoBusinesses": "Geen enkel bedrijf staat in demomodus.",
+      "role": "Rol die het geeft",
+      "note": "Notitie voor de aanvrager",
+      "approveConversion": "Bedrijf openen",
+      "approveActivation": "Activeringslink aanmaken",
+      "decline": "Afwijzen",
+      "demoSince": "demo sinds {date}",
+      "liveLink": "Actieve link voor {name} ({role}), tot {date}",
+      "revoke": "Intrekken",
+      "account": "Account",
+      "pickAccount": "Kies een account",
+      "issueLink": "Activeringslink aanmaken",
+      "replaceLink": "Link vervangen",
+      "issued": "Activeringslink ({role}). Stuur hem naar de eigenaar: hij werkt alleen met diens account.",
+      "linkLabel": "Activeringslink",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd",
+      "linkHint": "Alleen nu zichtbaar. Een nieuwe link vervangt deze."
+    }
   }
 }

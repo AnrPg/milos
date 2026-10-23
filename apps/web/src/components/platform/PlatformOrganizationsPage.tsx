@@ -64,6 +64,7 @@ export function PlatformOrganizationsPage() {
   const purgeCopy = platformOrganizationPurgeCopy(locale);
   const slugCopy = platformOrganizationSlugCopy(locale);
   const tResets = useTranslations("passwordResets");
+  const tBusiness = useTranslations("Business");
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -234,6 +235,12 @@ export function PlatformOrganizationsPage() {
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {copy.tagSuggestions}
+          </Link>
+          <Link
+            href="/platform/business-accounts"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tBusiness("console.title")}
           </Link>
           <Link
             href="/platform/plans"

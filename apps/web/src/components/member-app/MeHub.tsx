@@ -14,7 +14,7 @@ import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
-import { ownsCoachPractice } from "@/lib/solo-coach";
+import { ownsBusiness, ownsCoachPractice } from "@/lib/solo-coach";
 import { clientExtraLinks, hasStaffRole } from "@/lib/role-navigation";
 import { setView } from "@/lib/view-mode";
 
@@ -35,6 +35,7 @@ export function MeHub() {
   const tCheckIn = useTranslations("CheckIn");
   const tBuddy = useTranslations("Buddy");
   const tCoach = useTranslations("SoloCoach");
+  const tBusiness = useTranslations("Business");
   const summary = useSocialSummary();
   const buddies = useBuddies();
   const buddyNames = recipientNames(activeBuddies(buddies.data), tBuddy("someone"));
@@ -107,6 +108,10 @@ export function MeHub() {
         {/* ADR-170: anyone can open a practice as an independent coach, once. */}
         {ownsCoachPractice(memberships) ? null : (
           <HubListRow href="/me/coach-practice" label={tCoach("me.row")} detail={tCoach("me.rowHint")} />
+        )}
+        {/* ADR-184: a gym or a coach practice, asked from the Palee team. */}
+        {ownsBusiness(memberships) ? null : (
+          <HubListRow href="/me/settings#business" label={tBusiness("me.row")} detail={tBusiness("me.rowHint")} />
         )}
       </HubList>
 

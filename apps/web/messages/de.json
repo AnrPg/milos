@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "Auf deiner Uhr ({zone})",
     "zonedTimeGymClock": "Zeiten nach der Uhr des Gyms ({zone}).",
     "scoreFieldLabel": "Wertung {number}",
-    "removeScoreField": "Wertung {number} entfernen"
+    "removeScoreField": "Wertung {number} entfernen",
+    "apiErrorBusinessNotActivated": "Das Palee-Team aktiviert dieses Business, bevor es live geht.",
+    "apiErrorBusinessAccountExists": "Du hast schon ein Business, das auf Aktivierung wartet.",
+    "apiErrorBusinessSignupClosed": "Bitte das Palee-Team, dein Konto zu einem Business-Konto zu machen.",
+    "apiErrorInvalidBusinessKind": "Wähle ein Studio oder einen selbstständigen Coach.",
+    "apiErrorInvalidBusinessRequest": "Prüf die Angaben der Anfrage.",
+    "apiErrorBusinessRequestPending": "Du hast schon eine solche Anfrage offen.",
+    "apiErrorBusinessRequestClosed": "Diese Anfrage wurde schon beantwortet.",
+    "apiErrorInvalidActivationLink": "Dieser Aktivierungslink gilt nicht für dein angemeldetes Konto.",
+    "apiErrorBusinessAlreadyActive": "Dieses Business ist bereits aktiv.",
+    "apiErrorInvalidActivationRole": "Wähle Inhaber:in oder Admin.",
+    "apiErrorInvalidActivationLifetime": "Ein Link gilt zwischen einer Stunde und 30 Tagen.",
+    "apiErrorAccountNotFound": "Kein passendes Konto gefunden.",
+    "apiErrorUnknownDemoSection": "Für diesen Bildschirm gibt es keine Demodaten."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -9386,5 +9399,147 @@
     "codeSubmit": "Beitreten",
     "codeFailed": "Der Code hat nicht funktioniert. Frag deine Box danach.",
     "laterNote": "Kein Problem. Du kannst jederzeit über In der Nähe einer Box beitreten."
+  },
+  "Business": {
+    "common": {
+      "cancel": "Abbrechen",
+      "close": "Schließen"
+    },
+    "demo": {
+      "button": "Demodaten",
+      "working": "Läuft…",
+      "eyebrow": "Demomodus",
+      "title": "Probier es mit Demodaten aus",
+      "intro": "Füll diesen Bildschirm mit erfundenen Mitgliedern, Kursen und Zahlungen. Nichts erreicht echte Menschen, bis das Palee-Team dein Business aktiviert.",
+      "fill": {
+        "all": "Alle Bildschirme füllen",
+        "members": "Demomitglieder hinzufügen",
+        "schedule": "Die Woche mit Kursen füllen",
+        "finance": "Demopakete und -zahlungen hinzufügen",
+        "workouts": "Demo-Workouts hinzufügen"
+      },
+      "filled": "Dieser Bildschirm hat Demodaten",
+      "remove": "Demodaten entfernen",
+      "removeConfirm": "Alle Demomitglieder, -kurse und -zahlungen entfernen? Was du selbst eingerichtet hast, bleibt.",
+      "removeYes": "Entfernen"
+    },
+    "activation": {
+      "request": "Aktivierung beim Palee-Team anfragen",
+      "pending": "Deine Aktivierungsanfrage liegt beim Palee-Team. Du bekommst einen Aktivierungslink."
+    },
+    "notice": {
+      "eyebrow": "Demomodus",
+      "title": "Aktivierung durch das Palee-Team",
+      "body": "Dein Business ist im Demomodus: Alles funktioniert mit Demodaten, aber noch geht nichts live. Bis das Palee-Team es aktiviert:",
+      "locked": {
+        "people": "keine echten Mitglieder oder Mitarbeitenden können beitreten",
+        "public": "deine öffentliche Seite bleibt in „In der Nähe“ und der Suche verborgen",
+        "bookings": "niemand außerhalb deines Teams kann buchen",
+        "payments": "es werden keine echten Zahlungen angenommen",
+        "messages": "keine E-Mails, Benachrichtigungen oder Nachrichten gehen an jemanden außerhalb deines Kontos"
+      },
+      "howOwner": "Frag unten beim Palee-Team an. Nach einem Gespräch schickt es dir einen Aktivierungslink: Öffne ihn, während du mit diesem Konto angemeldet bist.",
+      "howStaff": "Die Inhaberin oder der Inhaber kann die Aktivierung über den Demo-Button in der Verwaltung beim Palee-Team anfragen."
+    },
+    "signUp": {
+      "link": "Business-Konto",
+      "title": "Business-Konto",
+      "intro": "Für Studios, Boxen und selbstständige Coaches. Du startest im Demomodus, und das Palee-Team aktiviert dich nach einem Gespräch.",
+      "account": "Dein Konto",
+      "demoNote": "Bis zur Aktivierung sieht nur du dein Business: Demodaten, keine echten Mitglieder, Buchungen, Zahlungen oder Nachrichten.",
+      "submit": "Mein Business eröffnen",
+      "creating": "Wird eröffnet…",
+      "personal": "Lieber ein persönliches Konto",
+      "nameRule": "Zwischen 2 und 120 Zeichen.",
+      "createdTitle": "Dein Business ist eröffnet",
+      "created": "Es ist im Demomodus. Probier jeden Bildschirm mit dem Demo-Button aus; das Palee-Team meldet sich wegen der Aktivierung.",
+      "openConsole": "Zur Verwaltung",
+      "closed": "Dieses Konto ist schon etwas älter, daher eröffnet das Palee-Team das Business für dich. Schick ihm eine Anfrage aus den Einstellungen.",
+      "closedAction": "Einstellungen öffnen"
+    },
+    "form": {
+      "kind": "Art des Business",
+      "gymName": "Name des Studios oder der Box",
+      "coachName": "Dein Name als Coach",
+      "city": "Stadt",
+      "phone": "Telefon",
+      "phoneHint": "Damit das Palee-Team dich wegen der Aktivierung erreicht.",
+      "message": "Was das Palee-Team wissen sollte"
+    },
+    "kind": {
+      "gym": "Studio oder Box",
+      "gymHint": "Kurse, Mitglieder, ein Team",
+      "coach": "Selbstständiger Coach",
+      "coachHint": "Deine Kundschaft, Sessions und dein Team"
+    },
+    "role": {
+      "owner": "Inhaber:in",
+      "admin": "Admin"
+    },
+    "activate": {
+      "title": "Aktiviere dein Business",
+      "loading": "Link wird geprüft…",
+      "invalid": "Dieser Aktivierungslink gilt nicht für das Konto, mit dem du angemeldet bist. Vielleicht ist er abgelaufen oder schon benutzt: Bitte das Palee-Team um einen neuen.",
+      "signedInAs": "Angemeldet als {name}.",
+      "removes": "Die Demodaten werden entfernt ({rows} Einträge, davon {people} Demopersonen).",
+      "nothingToRemove": "Es gibt keine Demodaten zu entfernen.",
+      "keeps": "Alles, was du selbst eingerichtet hast, bleibt: Einstellungen, Branding, Kurse, Pakete und der Entwurf deiner öffentlichen Seite.",
+      "goesLive": "Danach kannst du echte Menschen einladen, deine Seite veröffentlichen, Buchungen und Zahlungen annehmen.",
+      "confirm": "Aktivieren",
+      "working": "Wird aktiviert…",
+      "doneTitle": "Du bist live",
+      "done": "{name} ist aktiv. Die Demodaten sind weg, und alles, was du eingerichtet hast, wartet auf dich."
+    },
+    "settings": {
+      "title": "Business-Konto",
+      "description": "Führe ein Studio, eine Box oder dein eigenes Coaching auf Palee",
+      "intro": "Bitte das Palee-Team, dieses Konto zu einem Business zu machen. Es eröffnet es für dich im Demomodus und meldet sich wegen der Aktivierung.",
+      "send": "Anfrage senden",
+      "sending": "Wird gesendet…",
+      "sent": "Anfrage gesendet. Das Palee-Team meldet sich bei dir.",
+      "cancel": "Anfrage zurückziehen"
+    },
+    "requestKind": {
+      "conversion": "Business-Konto",
+      "activation": "Aktivierung"
+    },
+    "status": {
+      "pending": "Offen",
+      "approved": "Angenommen",
+      "declined": "Abgelehnt",
+      "cancelled": "Zurückgezogen",
+      "completed": "Aktiviert"
+    },
+    "me": {
+      "row": "Business-Konto",
+      "rowHint": "Ein Studio, eine Box oder dein Coaching"
+    },
+    "console": {
+      "back": "Organisationen",
+      "title": "Business-Konten",
+      "subtitle": "Anfragen zum Eröffnen oder Aktivieren eines Business und alle Businesses, die noch im Demomodus sind.",
+      "forbidden": "Nur das Palee-Team kann diese Seite öffnen.",
+      "requests": "Anfragen",
+      "noRequests": "Keine Anfragen offen.",
+      "demoBusinesses": "Im Demomodus",
+      "noDemoBusinesses": "Kein Business ist im Demomodus.",
+      "role": "Vergebene Rolle",
+      "note": "Notiz an die anfragende Person",
+      "approveConversion": "Business eröffnen",
+      "approveActivation": "Aktivierungslink ausstellen",
+      "decline": "Ablehnen",
+      "demoSince": "Demo seit {date}",
+      "liveLink": "Aktiver Link für {name} ({role}), bis {date}",
+      "revoke": "Widerrufen",
+      "account": "Konto",
+      "pickAccount": "Konto wählen",
+      "issueLink": "Aktivierungslink ausstellen",
+      "replaceLink": "Link ersetzen",
+      "issued": "Aktivierungslink ({role}). Schick ihn der Inhaberin oder dem Inhaber: Er funktioniert nur mit deren Konto.",
+      "linkLabel": "Aktivierungslink",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "linkHint": "Wird nur jetzt angezeigt. Ein neuer Link ersetzt diesen."
+    }
   }
 }
