@@ -19,7 +19,9 @@ import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
 import { DateInput } from "@/components/ui/DateInput";
 import { listAdminLocations } from "@/api/facility";
 import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
-import { membershipLocationScope, type LocationScope } from "@/lib/location-scope";
+import { membershipLocationScope, toLocationScope, type LocationScope, type LocationScopePayload } from "@/lib/location-scope";
+import { BranchCoverageBadge } from "@/components/admin/BranchFilter";
+import type { FacilityLocation } from "@/api/facility";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
@@ -30,7 +32,8 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
 
 const BLANK = { name: "", description: "", starts_on: "", ends_on: "", active: true };
 
-export function PromotionsTab() {
+/** `locationIds`: the page branch filter (ADR-186 §7); promotions valid there or everywhere show. */
+export function PromotionsTab({ locationIds }: { locationIds?: string } = {}) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -52,9 +55,9 @@ export function PromotionsTab() {
   );
 
   const campaignsQuery = useQuery({
-    queryKey: ["admin", "finance", "promotions"],
+    queryKey: ["admin", "finance", "promotions", ...(locationIds ? [locationIds] : [])],
     enabled: Boolean(token),
-    queryFn: () => fetchPromotionCampaigns(token),
+    queryFn: () => fetchPromotionCampaigns(token, locationIds),
   });
 
   const campaigns = campaignsQuery.data?.promotion_campaigns ?? [];
@@ -73,7 +76,15 @@ export function PromotionsTab() {
   });
   const manyBranches = showsAppliesTo(locationsQuery.data);
   const [branchDraft, setBranchDraft] = useState<LocationScope | null>(null);
-  const branches: LocationScope = branchDraft ?? (everywhere ? "all" : defaultAppliesTo(locationsQuery.data));
+  // A new promotion defaults to the page filter, when one is set (§8).
+  const pageFilter = locationIds ? locationIds.split(",") : [];
+  const branches: LocationScope =
+    branchDraft ??
+    (pageFilter.length > 0
+      ? defaultAppliesTo(locationsQuery.data, pageFilter)
+      : everywhere
+        ? "all"
+        : defaultAppliesTo(locationsQuery.data));
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -117,7 +128,7 @@ export function PromotionsTab() {
         ) : activeCampaigns.length === 0 ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noActiveCampaignse543337")}</p>
         ) : (
-          <CampaignRows campaigns={activeCampaigns} onOpen={(id) => setParam("campaign", id)} />
+          <CampaignRows campaigns={activeCampaigns} locations={locationsQuery.data} onOpen={(id) => setParam("campaign", id)} />
         )}
       </div>
 
@@ -127,7 +138,7 @@ export function PromotionsTab() {
             {i18n("archivedPromotions314dfb3")} {inactiveCampaigns.length}
           </summary>
           <div style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}>
-            <CampaignRows campaigns={inactiveCampaigns} onOpen={(id) => setParam("campaign", id)} />
+            <CampaignRows campaigns={inactiveCampaigns} locations={locationsQuery.data} onOpen={(id) => setParam("campaign", id)} />
           </div>
         </details>
       ) : null}
@@ -217,7 +228,15 @@ export function PromotionsTab() {
   );
 }
 
-function CampaignRows({ campaigns, onOpen }: { campaigns: FinanceRecord[]; onOpen: (id: string) => void }) {
+function CampaignRows({
+  campaigns,
+  locations,
+  onOpen,
+}: {
+  campaigns: FinanceRecord[];
+  locations: FacilityLocation[] | null | undefined;
+  onOpen: (id: string) => void;
+}) {
   const i18n = useUiTranslations();
   return campaigns.map((campaign, index) => (
     <button
@@ -234,6 +253,10 @@ function CampaignRows({ campaigns, onOpen }: { campaigns: FinanceRecord[]; onOpe
         </p>
       </div>
       <div className="flex items-center gap-3">
+        <BranchCoverageBadge
+          target={toLocationScope(campaign.location_scope as LocationScopePayload | null | undefined)}
+          locations={locations}
+        />
         <span className="rounded-full px-3 py-1 text-xs font-semibold" style={campaign.active === false ? { background: "var(--border)", color: "var(--dim)" } : SPARK_ACTIVE_STYLE}>
           {campaign.active === false ? i18n("inactive09af574") : i18n("activea733b80")}
         </span>

@@ -9701,6 +9701,11 @@
     "appliesToCoveringHelp": "Eén item, geldig bij de gekozen vestigingen.",
     "createdClasses": "{count, plural, one {# les aangemaakt:} other {# lessen aangemaakt:}}",
     "createdSeries": "{count, plural, one {# lesreeks aangemaakt:} other {# lesreeksen aangemaakt:}}",
-    "createdAppointmentSlots": "{count, plural, one {# afspraakmoment aangemaakt.} other {# afspraakmomenten aangemaakt, één per vestiging.}}"
+    "createdAppointmentSlots": "{count, plural, one {# afspraakmoment aangemaakt.} other {# afspraakmomenten aangemaakt, één per vestiging.}}",
+    "filterNoteMembers": "Elk lid verschijnt bij zijn thuisvestiging. Mensen zonder thuisvestiging verschijnen alleen onder «Alle».",
+    "filterNoteCovering": "Toont wat geldt bij een van de gekozen vestigingen of bij alle.",
+    "filterNoteReferrals": "Doorverwijzingen en beloningen volgen de thuisvestiging van hun mensen. Programma's gelden voor het hele bedrijf.",
+    "filterNoteAccounting": "Terugbetalingsbewijzen volgen de thuisvestiging van het lid. Afstemming en exports gelden voor het hele bedrijf.",
+    "filterNoteBusinessWide": "Dit tabblad geldt voor het hele bedrijf; het vestigingsfilter is hier niet van toepassing."
   }
 }

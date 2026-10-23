@@ -9701,6 +9701,11 @@
     "appliesToCoveringHelp": "One item, valid at the branches you choose.",
     "createdClasses": "{count, plural, one {Created # class:} other {Created # classes:}}",
     "createdSeries": "{count, plural, one {Created # class series:} other {Created # class series:}}",
-    "createdAppointmentSlots": "{count, plural, one {Created # appointment slot.} other {Created # appointment slots, one per branch.}}"
+    "createdAppointmentSlots": "{count, plural, one {Created # appointment slot.} other {Created # appointment slots, one per branch.}}",
+    "filterNoteMembers": "Each member shows at their home branch. People without one show only under «All».",
+    "filterNoteCovering": "Showing what is valid at one of the chosen branches or at all of them.",
+    "filterNoteReferrals": "Referrals and rewards follow their people's home branch. Programmes apply to the whole business.",
+    "filterNoteAccounting": "Refund receipts follow the member's home branch. Reconciliation and exports cover the whole business.",
+    "filterNoteBusinessWide": "This tab covers the whole business; the branch filter does not apply here."
   }
 }

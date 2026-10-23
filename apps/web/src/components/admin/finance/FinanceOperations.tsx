@@ -26,7 +26,7 @@ import { SeasonsTab } from "@/components/admin/finance/tabs/SeasonsTab";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
-import { BranchFilterControl, useBranchFilter } from "@/components/admin/BranchFilter";
+import { BranchFilterControl, BranchFilterNote, useBranchFilter } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
@@ -35,6 +35,7 @@ export function FinanceOperations() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const accountingT = useTranslations("FinanceAccounting");
+  const branchT = useTranslations("BranchScope");
   const seasonsT = useTranslations("Seasons");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,9 +64,20 @@ export function FinanceOperations() {
   const requestedTab = searchParams.get("tab");
   const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
 
-  // ADR-186 §7: the attention figures follow the branch filter.
+  // ADR-186 §7: the attention figures and every tab follow the branch filter.
   const branchFilter = useBranchFilter("finance-operations");
   const locationIds = branchFilter.param;
+  // How the filter applies to the open tab; seasons and corporate clients are business-wide (§8).
+  const filterNotes: Record<Tab, string> = {
+    members: branchT("filterNoteMembers"),
+    packages: branchT("filterNoteCovering"),
+    promotions: branchT("filterNoteCovering"),
+    queues: branchT("filterNoteMembers"),
+    referrals: branchT("filterNoteReferrals"),
+    accounting: branchT("filterNoteAccounting"),
+    seasons: branchT("filterNoteBusinessWide"),
+    corporate: branchT("filterNoteBusinessWide"),
+  };
 
   const summaryQuery = useQuery({
     queryKey: ["admin", "finance", "summary", locationIds ?? "all"],
@@ -168,14 +180,16 @@ export function FinanceOperations() {
           options={TABS.map(({ id, label }) => ({ value: id, label }))}
         />
 
+        {locationIds ? <BranchFilterNote>{filterNotes[activeTab]}</BranchFilterNote> : null}
+
         {/* Active tab */}
-        {activeTab === "members" && <MembersTab />}
-        {activeTab === "packages" && <PackagesTab />}
+        {activeTab === "members" && <MembersTab locationIds={locationIds} />}
+        {activeTab === "packages" && <PackagesTab locationIds={locationIds} />}
         {activeTab === "seasons" && <SeasonsTab />}
-        {activeTab === "promotions" && <PromotionsTab />}
-        {activeTab === "referrals" && <ReferralsTab />}
-        {activeTab === "queues" && <QueuesTab />}
-        {activeTab === "accounting" && <AccountingTab />}
+        {activeTab === "promotions" && <PromotionsTab locationIds={locationIds} />}
+        {activeTab === "referrals" && <ReferralsTab locationIds={locationIds} />}
+        {activeTab === "queues" && <QueuesTab locationIds={locationIds} />}
+        {activeTab === "accounting" && <AccountingTab locationIds={locationIds} />}
         {activeTab === "corporate" && <CorporateTab />}
 
       </div>

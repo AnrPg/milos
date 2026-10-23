@@ -9701,6 +9701,11 @@
     "appliesToCoveringHelp": "Um só elemento, válido nos espaços que escolher.",
     "createdClasses": "{count, plural, one {Foi criada # aula:} other {Foram criadas # aulas:}}",
     "createdSeries": "{count, plural, one {Foi criada # série de aulas:} other {Foram criadas # séries de aulas:}}",
-    "createdAppointmentSlots": "{count, plural, one {Foi criada # vaga para marcações.} other {Foram criadas # vagas para marcações, uma por espaço.}}"
+    "createdAppointmentSlots": "{count, plural, one {Foi criada # vaga para marcações.} other {Foram criadas # vagas para marcações, uma por espaço.}}",
+    "filterNoteMembers": "Cada membro aparece no seu espaço principal. Quem não tem um só aparece em «Todos».",
+    "filterNoteCovering": "Mostra o que é válido num dos espaços escolhidos ou em todos.",
+    "filterNoteReferrals": "As referências e as recompensas seguem o espaço principal das suas pessoas. Os programas valem para todo o negócio.",
+    "filterNoteAccounting": "Os recibos de reembolso seguem o espaço principal do membro. A reconciliação e as exportações abrangem todo o negócio.",
+    "filterNoteBusinessWide": "Este separador abrange todo o negócio; o filtro de espaços não se aplica aqui."
   }
 }

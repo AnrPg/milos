@@ -37140,6 +37140,26 @@
       },
       "FinanceRefundReceiptCollection": {
         "properties": {
+          "branch_filter": {
+            "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+            "properties": {
+              "all_locations": {
+                "type": "boolean"
+              },
+              "location_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "all_locations",
+              "location_ids"
+            ],
+            "type": "object"
+          },
           "refund_receipts": {
             "items": {
               "properties": {
@@ -139448,7 +139468,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.members",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -140821,7 +140852,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.packages",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -142170,7 +142212,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.promotions",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144029,7 +144082,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.referral_rewards",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144108,7 +144172,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.referrals",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144372,6 +144447,16 @@
               "minimum": 1,
               "type": "integer"
             }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -144380,6 +144465,26 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "branch_filter": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "refund_receipts": {
                       "items": {
                         "properties": {
@@ -186480,6 +186585,26 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "branch_filter": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "refund_receipts": {
                       "items": {
                         "properties": {
