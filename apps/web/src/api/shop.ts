@@ -1,28 +1,38 @@
 import { apiRequest } from "@/api/client";
+import type { components } from "@/api/generated/schema";
 
 /**
- * The member side of the box shop (ADR-190): the storefront summary for the
- * Box card, the catalogue, one-screen checkout and the member's orders.
+ * The member side of the box shop (ADR-190): the storefront for the Box card,
+ * the catalogue, one-screen checkout, back-in-stock alerts and the member's
+ * orders and shop transactions, plus the public catalogue of a box page.
  *
- * Every call names the box in its path (`/org/{slug}/me/shop/...`), so a
- * product card in a post of another box still opens that box's shop.
+ * Every member call names the box in its path (`/org/{slug}/me/shop/...`), so
+ * a product card in a post of another box still opens that box's shop.
  *
- * The UI types below are what the screens read; the `Api*` types are the
- * shop-api OpenAPI schemas (PaleeWeb.Schemas.Shop: ShopMemberProduct,
- * ShopMemberVariant, ShopCartPreview, ShopOrder), mapped by the adapters
- * further down.
- * TODO(ADR-190): run `npm run generate:api` (needs `mix`) and alias the
- * `Api*` types to `components["schemas"][...]`, as the other api modules do.
+ * The UI types below are what the screens read; the `Api*` types alias the
+ * generated OpenAPI schemas (PaleeWeb.Schemas.Shop) and the adapters map them.
  */
+
+type Schemas = components["schemas"];
+
+export type ApiMemberProduct = Schemas["ShopMemberProduct"];
+export type ApiMemberVariant = Schemas["ShopMemberVariant"];
+export type ApiProductPhoto = Schemas["ShopProductPhoto"];
+export type ApiStorefront = Schemas["ShopStorefront"];
+export type ApiCartPreview = Schemas["ShopCartPreview"];
+export type ApiCheckoutBody = Schemas["ShopCheckoutBody"];
+export type ApiOrder = Schemas["ShopOrderList"]["orders"][number];
+export type ApiStockAlert = Schemas["ShopStockAlert"];
+export type ShopTransaction = Schemas["ShopTransaction"];
 
 export type ShopStockStatus = "ok" | "low" | "critical" | "out";
 export type ShopPaymentMode = "at_pickup" | "on_account" | "online";
-export type ShopOrderStatus = "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
-export type ShopPaymentStatus = "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+export type ShopOrderStatus = ApiOrder["status"];
+export type ShopPaymentStatus = ApiOrder["payment_status"];
 /** Where the member came from (ADR-190 `shop_orders.source`, ADR-192 attribution). */
-export type ShopOrderSource = "direct" | "club_post" | "promotion_code" | "public_page" | "other";
+export type ShopOrderSource = NonNullable<ApiCheckoutBody["source"]>;
 
-export type ShopPhoto = { id: string; url: string; alt?: string | null };
+export type ShopPhoto = { id: string; url: string; full_url: string | null; alt?: string | null };
 
 /** One option axis (size, colour), at most two per product. */
 export type ShopOptionAxis = {
@@ -52,6 +62,11 @@ export type ShopProductSummary = {
   photos: ShopPhoto[];
   options: { axes: ShopOptionAxis[] };
   variants: ShopVariant[];
+  /**
+   * Whether the package discount applies. The member presenter does not say
+   * which products are marked, so screens promise no member price and the
+   * cart preview (which knows) prices the basket.
+   */
   member_discount_applies: boolean;
   per_person_limit: number | null;
   /** «Νέο» for 14 days after publishing (the proposal, Προώθηση). */
@@ -98,7 +113,7 @@ export type ShopOrder = {
   cancel_reason: string | null;
   /** Unpicked orders are cancelled after this (7 days by default). */
   expires_at: string | null;
-  /** What the QR carries; the desk scans it at pickup. */
+  /** The short code the QR carries and the desk types or scans at pickup. */
   pickup_code: string;
   can_cancel: boolean;
   lines: ShopOrderLine[];
@@ -107,17 +122,17 @@ export type ShopOrder = {
 export type ShopOrderSummary = Pick<ShopOrder, "id" | "number" | "status" | "total_cents" | "currency" | "placed_at">;
 
 export type ShopStorefront = {
-  /** False while nothing is published: the Box card is absent. */
+  /** False while nothing is published (or the business is not live): the Box card is absent. */
   open: boolean;
+  closed_reason: ApiStorefront["closed_reason"];
   published_count: number;
   new_count: number;
   preview: { id: string; title: string; photo_url: string | null }[];
+  categories: string[];
   currency: string;
-  /** The member's package discount on products (ADR-097), when known. */
+  /** The member's package discount on marked products (ADR-097), when they have one. */
   member_discount_percent: number | null;
   pickup_locations: ShopPickupLocation[];
-  /** Pay-at-pickup is always on in the MVP; the basket preview says what else is allowed. */
-  payment_modes: { at_pickup: boolean; on_account: boolean };
   /** Online card payment: shown, greyed out and blocked until the payment provider ships. */
   online_payment: { available: boolean; reason: string | null };
   /** The member's orders not yet picked up. */
@@ -132,6 +147,8 @@ export type ShopQuote = {
   subtotal_cents: number;
   discount_cents: number;
   total_cents: number;
+  /** The package discount the price includes; never stacked with a promotion code. */
+  member_discount_percent: number | null;
   /** Where this basket can be picked up; empty = every branch of the box. */
   pickup_location_ids: string[];
   payment_modes: ShopPaymentMode[];
@@ -143,13 +160,16 @@ export type ShopQuote = {
 export type ShopOrderCreate = {
   lines: ShopCartItem[];
   pickup_location_id: string | null;
-  // "online" only once `online_payment.available` (TODO(ADR-190): the provider's card step).
+  // "online" only once `online_payment.available`; the provider's card step then supplies `payment_token`.
   payment_mode: ShopPaymentMode;
   promotion_code?: string | null;
   source: ShopOrderSource;
   source_ref_id?: string | null;
   idempotency_key: string;
 };
+
+/** A back-in-stock alert the member set on a sold-out variant. */
+export type ShopStockAlert = { id: string; variant_id: string; product_id: string | null; notified_at: string | null };
 
 const id = (value: string) => encodeURIComponent(value);
 const shopPath = (slug: string, path = "") => `/org/${id(slug)}/me/shop${path}`;
@@ -162,83 +182,12 @@ export const shopKeys = {
   preview: (slug: string, signature: string) => ["shop", slug, "preview", signature] as const,
   orders: (slug: string) => ["shop", slug, "orders"] as const,
   order: (slug: string, orderId: string) => ["shop", slug, "orders", orderId] as const,
+  stockAlerts: (slug: string) => ["shop", slug, "stock-alerts"] as const,
+  transactions: (slug: string) => ["shop", slug, "transactions"] as const,
+  publicProducts: (slug: string) => ["shop", "public", slug] as const,
 };
 
-// ── API shapes (PaleeWeb.Schemas.Shop) ───────────────────────────────────
-
-export type ApiMemberVariant = {
-  id: string;
-  product_id?: string;
-  title?: string | null;
-  option_values?: Record<string, string> | null;
-  price_cents: number;
-  currency: string;
-  compare_at_price_cents?: number | null;
-  available: "in_stock" | "low" | "sold_out";
-};
-
-export type ApiMemberProduct = {
-  id: string;
-  title: string;
-  description?: string | null;
-  category?: string | null;
-  media_ids?: string[];
-  /** TODO(ADR-190): photo URLs; the member presenter has `media_ids` only so far. */
-  photos?: ShopPhoto[];
-  options?: { axes?: ShopOptionAxis[] } | null;
-  per_person_limit?: number | null;
-  all_locations?: boolean;
-  location_ids?: string[];
-  published_at?: string | null;
-  /** TODO(ADR-190): not in ShopMemberProduct yet; the preview applies the discount either way. */
-  member_discount_applies?: boolean;
-  variants: ApiMemberVariant[];
-};
-
-type ApiOrderLine = {
-  id: string;
-  product_id?: string;
-  variant_id: string;
-  product_title: string;
-  variant_title?: string | null;
-  quantity: number;
-  unit_price_cents?: number;
-  discount_cents?: number;
-  total_cents: number;
-};
-
-export type ApiOrder = {
-  id: string;
-  number: number;
-  status: ShopOrderStatus;
-  payment_status: ShopPaymentStatus;
-  payment_mode?: string | null;
-  pickup_location_id?: string | null;
-  currency?: string;
-  subtotal_cents?: number;
-  discount_cents?: number;
-  total_cents: number;
-  placed_at?: string | null;
-  expires_at?: string | null;
-  ready_at?: string | null;
-  picked_up_at?: string | null;
-  cancelled_at?: string | null;
-  cancel_reason?: string | null;
-  lines: ApiOrderLine[];
-};
-
-type ApiPreview = {
-  currency?: string;
-  subtotal_cents?: number;
-  discount_cents?: number;
-  total_cents: number;
-  pickup_location_ids?: string[];
-  payment_modes: ShopPaymentMode[];
-  online_payment: { available: boolean; reason?: string | null };
-  promotion_code?: { id: string; code: string; applied: boolean } | null;
-};
-
-type ApiLocation = { id: string; name: string; address?: string | null; archived_at?: string | null };
+// ── Adapters ──────────────────────────────────────────────────────────────
 
 /** «Νέο» for 14 days after publishing (the proposal, Προώθηση). */
 const NEW_FOR_MS = 14 * 24 * 60 * 60 * 1000;
@@ -259,16 +208,35 @@ function toVariant(variant: ApiMemberVariant): ShopVariant {
   };
 }
 
+export function toPhoto(media: ApiProductPhoto): ShopPhoto | null {
+  const url = media.thumb_url ?? media.url ?? media.full_url ?? null;
+  return url ? { id: media.id, url, full_url: media.full_url ?? media.url ?? url, alt: media.alt_text ?? null } : null;
+}
+
+/** `options` is free-form in the schema; the API stores `{ axes: [{ name, values }] }`. */
+function toAxes(options: ApiMemberProduct["options"]): ShopOptionAxis[] {
+  const axes = (options as { axes?: unknown } | undefined)?.axes;
+  if (!Array.isArray(axes)) return [];
+  return axes.flatMap((axis) => {
+    const { name, values, kind } = (axis ?? {}) as { name?: unknown; values?: unknown; kind?: unknown };
+    if (typeof name !== "string" || !Array.isArray(values)) return [];
+    const strings = values.filter((value): value is string => typeof value === "string");
+    const known = kind === "size" || kind === "colour" || kind === "other" ? kind : null;
+    return [{ name, values: strings, kind: known }];
+  });
+}
+
 export function toShopProduct(product: ApiMemberProduct, now = Date.now()): ShopProduct {
   const published = product.published_at ? Date.parse(product.published_at) : Number.NaN;
+  const marked = (product as { member_discount_applies?: boolean }).member_discount_applies;
   return {
     id: product.id,
     title: product.title,
     category: product.category ?? null,
-    photos: product.photos ?? [],
-    options: { axes: product.options?.axes ?? [] },
+    photos: (product.media ?? []).map(toPhoto).filter((photo): photo is ShopPhoto => photo !== null),
+    options: { axes: toAxes(product.options) },
     variants: product.variants.map(toVariant),
-    member_discount_applies: product.member_discount_applies ?? true,
+    member_discount_applies: marked ?? false,
     per_person_limit: product.per_person_limit ?? null,
     is_new: Number.isFinite(published) && now - published < NEW_FOR_MS,
     published_at: product.published_at ?? null,
@@ -277,8 +245,8 @@ export function toShopProduct(product: ApiMemberProduct, now = Date.now()): Shop
   };
 }
 
-function toPlace(location: ApiLocation): ShopPickupLocation {
-  return { id: location.id, name: location.name, hint: location.address ?? null };
+function toPlace(location: ApiStorefront["pickup_locations"][number]): ShopPickupLocation {
+  return { id: location.id, name: location.name ?? "", hint: location.address ?? null };
 }
 
 export function toShopOrder(order: ApiOrder, places: ShopPickupLocation[] = []): ShopOrder {
@@ -300,8 +268,7 @@ export function toShopOrder(order: ApiOrder, places: ShopPickupLocation[] = []):
     cancelled_at: order.cancelled_at ?? null,
     cancel_reason: order.cancel_reason ?? null,
     expires_at: order.expires_at ?? null,
-    // TODO(ADR-190): the API has no pickup code yet; the desk finds the order by its id.
-    pickup_code: order.id,
+    pickup_code: order.pickup_code || String(order.number),
     // Fulfilment.cancel_mine: the buyer may cancel an unpaid order before pickup.
     can_cancel: order.status === "placed" && order.payment_status === "pending_payment",
     lines: order.lines.map((line) => ({
@@ -319,6 +286,43 @@ export function toShopOrder(order: ApiOrder, places: ShopPickupLocation[] = []):
   };
 }
 
+/** Order lines carry no photo; the catalogue's first photo of the product stands in. */
+function withLinePhotos(order: ShopOrder, products: ApiMemberProduct[]): ShopOrder {
+  const photos = new Map(products.map((product) => [product.id, (product.media ?? []).map(toPhoto).find(Boolean)?.url ?? null]));
+  return { ...order, lines: order.lines.map((line) => ({ ...line, photo_url: photos.get(line.product_id) ?? null })) };
+}
+
+export function toStorefront(data: ApiStorefront, orders: ShopOrderSummary[], now = Date.now()): ShopStorefront {
+  const products = data.products.map((product) => toShopProduct(product, now));
+  return {
+    open: data.open && products.length > 0,
+    closed_reason: data.closed_reason ?? null,
+    published_count: products.length,
+    new_count: products.filter((product) => product.is_new).length,
+    preview: products.map((product) => ({ id: product.id, title: product.title, photo_url: product.photos[0]?.url ?? null })),
+    categories: data.categories ?? [],
+    currency: products[0]?.variants[0]?.currency ?? "EUR",
+    member_discount_percent: data.member_discount?.percent ?? null,
+    pickup_locations: data.pickup_locations.map(toPlace),
+    online_payment: { available: data.online_payment.available, reason: data.online_payment.reason ?? null },
+    open_orders: orders,
+  };
+}
+
+export function toQuote(data: ApiCartPreview): ShopQuote {
+  return {
+    currency: data.currency ?? "EUR",
+    subtotal_cents: data.subtotal_cents ?? data.total_cents,
+    discount_cents: data.discount_cents ?? 0,
+    total_cents: data.total_cents,
+    member_discount_percent: data.member_discount?.percent ?? null,
+    pickup_location_ids: data.pickup_location_ids ?? [],
+    payment_modes: data.payment_modes ?? ["at_pickup"],
+    online_payment: { available: data.online_payment?.available ?? false, reason: data.online_payment?.reason ?? null },
+    promotion_code: data.promotion_code?.applied ? (data.promotion_code.code ?? null) : null,
+  };
+}
+
 const OPEN: ShopOrderStatus[] = ["placed", "ready_for_pickup"];
 
 async function quietly<T>(request: Promise<T>, fallback: T) {
@@ -331,11 +335,7 @@ async function quietly<T>(request: Promise<T>, fallback: T) {
 
 // ── Calls ─────────────────────────────────────────────────────────────────
 
-/** GET /org/{slug}/locations: the box's branches, the pickup points. */
-async function fetchPlaces(token: string, slug: string) {
-  const data = await apiRequest<{ locations?: ApiLocation[] }>(`/org/${id(slug)}/locations`, { token });
-  return (data.locations ?? []).filter((location) => !location.archived_at).map(toPlace);
-}
+const getStorefront = (token: string, slug: string) => apiRequest<ApiStorefront>(shopPath(slug, "/storefront"), { token });
 
 /** GET /org/{slug}/me/shop/products */
 export async function fetchShopProducts(token: string, slug: string): Promise<ShopProductSummary[]> {
@@ -350,79 +350,59 @@ export async function fetchShopProduct(token: string, slug: string, productId: s
   return toShopProduct(data.product);
 }
 
-/** GET /org/{slug}/me/shop/orders, as the open-order summaries. */
-async function fetchOpenOrders(token: string, slug: string): Promise<ShopOrderSummary[]> {
+/** GET /org/{slug}/me/shop/orders */
+export async function fetchShopOrders(token: string, slug: string): Promise<ShopOrderSummary[]> {
   const data = await apiRequest<{ orders?: ApiOrder[] }>(shopPath(slug, "/orders"), { token });
-  return (data.orders ?? [])
-    .filter((order) => OPEN.includes(order.status))
-    .map((order) => ({
-      id: order.id,
-      number: order.number,
-      status: order.status,
-      total_cents: order.total_cents,
-      currency: order.currency ?? "EUR",
-      placed_at: order.placed_at ?? new Date(0).toISOString(),
-    }));
+  return (data.orders ?? []).map((order) => ({
+    id: order.id,
+    number: order.number,
+    status: order.status,
+    total_cents: order.total_cents,
+    currency: order.currency ?? "EUR",
+    placed_at: order.placed_at ?? new Date(0).toISOString(),
+  }));
 }
 
-/**
- * What Box and the shop header need, built from the catalog, the branches
- * and the member's orders: the API has no storefront endpoint, and the
- * basket's payment modes and online flag come from the cart preview.
- */
-export async function fetchStorefront(token: string, slug: string): Promise<ShopStorefront | null> {
-  const [products, places, orders] = await Promise.all([
-    fetchShopProducts(token, slug),
-    quietly(fetchPlaces(token, slug), [] as ShopPickupLocation[]),
-    quietly(fetchOpenOrders(token, slug), [] as ShopOrderSummary[]),
+/** GET /org/{slug}/me/shop/storefront, with the member's orders not yet picked up. */
+export async function fetchStorefront(token: string, slug: string): Promise<ShopStorefront> {
+  const [data, orders] = await Promise.all([
+    getStorefront(token, slug),
+    quietly(fetchShopOrders(token, slug), [] as ShopOrderSummary[]),
   ]);
-  return {
-    open: products.length > 0,
-    published_count: products.length,
-    new_count: products.filter((product) => product.is_new).length,
-    preview: products.map((product) => ({ id: product.id, title: product.title, photo_url: product.photos[0]?.url ?? null })),
-    currency: products[0]?.variants[0]?.currency ?? "EUR",
-    // TODO(ADR-190): the member's package discount percent; the preview returns the discount in cents only.
-    member_discount_percent: null,
-    pickup_locations: places,
-    payment_modes: { at_pickup: true, on_account: false },
-    online_payment: { available: false, reason: null },
-    open_orders: orders,
-  };
+  return toStorefront(data, orders.filter((order) => OPEN.includes(order.status)));
 }
 
-/** POST /org/{slug}/me/shop/cart/preview: the server's price (with a promotion code), pickup branches, payment modes and online flag. */
+/** POST /org/{slug}/me/shop/cart/preview: the server's price (member discount or a promotion code), pickup branches, payment modes and online flag. */
 export async function previewShopCart(
   token: string,
   slug: string,
   body: { lines: ShopCartItem[]; pickup_location_id?: string | null; promotion_code?: string | null },
 ): Promise<ShopQuote> {
-  const data = await apiRequest<ApiPreview>(shopPath(slug, "/cart/preview"), { method: "POST", token, body });
-  return {
-    currency: data.currency ?? "EUR",
-    subtotal_cents: data.subtotal_cents ?? data.total_cents,
-    discount_cents: data.discount_cents ?? 0,
-    total_cents: data.total_cents,
-    pickup_location_ids: data.pickup_location_ids ?? [],
-    payment_modes: data.payment_modes ?? ["at_pickup"],
-    online_payment: { available: data.online_payment?.available ?? false, reason: data.online_payment?.reason ?? null },
-    promotion_code: data.promotion_code?.applied ? data.promotion_code.code : null,
-  };
+  return toQuote(await apiRequest<ApiCartPreview>(shopPath(slug, "/cart/preview"), { method: "POST", token, body }));
 }
 
 /** POST /org/{slug}/me/shop/orders (idempotent per idempotency_key). */
 export async function placeShopOrder(token: string, slug: string, body: ShopOrderCreate) {
-  const data = await apiRequest<{ order: ApiOrder }>(shopPath(slug, "/orders"), { method: "POST", token, body });
+  const request: ApiCheckoutBody = body;
+  const data = await apiRequest<{ order: ApiOrder }>(shopPath(slug, "/orders"), { method: "POST", token, body: request });
   return toShopOrder(data.order);
 }
 
-/** GET /org/{slug}/me/shop/orders/{id}, with its pickup branch's name. */
+/** GET /org/{slug}/me/shop/orders/{id}, with its pickup branch and the products' photos. */
 export async function fetchShopOrder(token: string, slug: string, orderId: string) {
-  const [data, places] = await Promise.all([
+  const [data, storefront] = await Promise.all([
     apiRequest<{ order: ApiOrder }>(shopPath(slug, `/orders/${id(orderId)}`), { token }),
-    quietly(fetchPlaces(token, slug), [] as ShopPickupLocation[]),
+    quietly(getStorefront(token, slug), null),
   ]);
-  return toShopOrder(data.order, places);
+  const order = toShopOrder(data.order, storefront?.pickup_locations.map(toPlace) ?? []);
+  return storefront ? withLinePhotos(order, storefront.products) : order;
+}
+
+/** POST /org/{slug}/me/shop/orders/{id}/pay: card payment of an online order, with the provider's token. */
+export async function payShopOrder(token: string, slug: string, orderId: string, paymentToken: string) {
+  const body: Schemas["ShopPayBody"] = { payment_token: paymentToken };
+  const data = await apiRequest<{ order: ApiOrder }>(shopPath(slug, `/orders/${id(orderId)}/pay`), { method: "POST", token, body });
+  return toShopOrder(data.order);
 }
 
 /** POST /org/{slug}/me/shop/orders/{id}/cancel */
@@ -435,8 +415,39 @@ export async function cancelShopOrder(token: string, slug: string, orderId: stri
   return toShopOrder(data.order);
 }
 
-/** «Ειδοποίησέ με»: a back-in-stock notice for one variant. */
-// TODO(ADR-190): no endpoint yet ("later" in the proposal §5); until then the button says it did not save.
+const toAlert = (alert: ApiStockAlert): ShopStockAlert => ({
+  id: alert.id,
+  variant_id: alert.variant_id,
+  product_id: alert.product_id ?? null,
+  notified_at: alert.notified_at ?? null,
+});
+
+/** GET /org/{slug}/me/shop/stock-alerts */
+export async function fetchStockAlerts(token: string, slug: string): Promise<ShopStockAlert[]> {
+  const data = await apiRequest<{ stock_alerts?: ApiStockAlert[] }>(shopPath(slug, "/stock-alerts"), { token });
+  return (data.stock_alerts ?? []).map(toAlert);
+}
+
+/** «Ειδοποίησέ με»: PUT /org/{slug}/me/shop/variants/{id}/stock-alert */
 export async function requestBackInStock(token: string, slug: string, variantId: string) {
-  await apiRequest<unknown>(shopPath(slug, `/variants/${id(variantId)}/notify`), { method: "POST", token });
+  const data = await apiRequest<{ stock_alert: ApiStockAlert }>(shopPath(slug, `/variants/${id(variantId)}/stock-alert`), { method: "PUT", token });
+  return toAlert(data.stock_alert);
+}
+
+/** DELETE /org/{slug}/me/shop/variants/{id}/stock-alert */
+export async function cancelBackInStock(token: string, slug: string, variantId: string) {
+  await apiRequest<unknown>(shopPath(slug, `/variants/${id(variantId)}/stock-alert`), { method: "DELETE", token });
+}
+
+/** GET /org/{slug}/me/shop/transactions: the member's shop purchases with invoices, payments and refunds. */
+export async function fetchShopTransactions(token: string, slug: string): Promise<ShopTransaction[]> {
+  const data = await apiRequest<{ transactions?: ShopTransaction[] }>(shopPath(slug, "/transactions"), { token });
+  return data.transactions ?? [];
+}
+
+/** GET /boxes/{slug}/shop/products: the products a box shows to anyone on its public page. */
+export async function fetchPublicShopProducts(slug: string): Promise<ShopProductSummary[]> {
+  const data = await apiRequest<{ products?: ApiMemberProduct[] }>(`/boxes/${id(slug)}/shop/products`, { scope: "account" });
+  const now = Date.now();
+  return (data.products ?? []).map((product) => toShopProduct(product, now));
 }

@@ -142,17 +142,17 @@ describe("the API documents", () => {
     );
     expect(input.partner_name).toBe("Nutri");
     expect(input.benefit).toEqual({ type: "percent", percent: 10, max_discount_cents: 2000, text: "σε όλα", min_spend_cents: null });
-    expect(input.rules.recurring).toEqual([{ weekdays: [1, 3], starts_at: "06:00:00", ends_at: "10:00:00" }]);
-    expect(input.rules.limits).toEqual({ max_claims: null, max_per_member: 1, period: "month", max_per_period: null, max_per_member_per_period: 1 });
-    expect(input.rules.eligibility?.package_ids).toEqual([]);
+    expect(input.rules?.recurring).toEqual([{ weekdays: [1, 3], starts_at: "06:00:00", ends_at: "10:00:00" }]);
+    expect(input.rules?.limits).toEqual({ max_claims: null, max_per_member: 1, period: "month", max_per_period: null, max_per_member_per_period: 1 });
+    expect(input.rules?.eligibility?.package_ids).toEqual([]);
     expect(input.rules).not.toHaveProperty("channel");
     expect(input.redemption).toEqual({ shared_code: "NUTRI10", link_url: null, low_pool_threshold: null, instructions: null });
 
     const link = toPerkInput(draft({ redemption_method: "partner_link", link_url: "https://shop.example/offer", benefit_type: "buy_x_get_y", buy_quantity: 2, get_quantity: 1, item: "shaker", channel: "online" }));
-    expect(link.redemption.shared_code).toBeNull();
-    expect(link.redemption.link_url).toBe("https://shop.example/offer");
+    expect(link.redemption?.shared_code).toBeNull();
+    expect(link.redemption?.link_url).toBe("https://shop.example/offer");
     expect(link.benefit).toEqual({ type: "buy_x_get_y", buy_quantity: 2, get_quantity: 1, item: "shaker", text: null, min_spend_cents: null });
-    expect(link.rules.channel).toBe("online");
+    expect(link.rules?.channel).toBe("online");
   });
 
   it("reads a saved perk back into the form", () => {
@@ -213,5 +213,19 @@ describe("partner code batches", () => {
 
   it("counts the codes handed out", () => {
     expect(codesHandedOut({ total: 50, free: 38 })).toBe(12);
+  });
+});
+
+describe("group eligibility", () => {
+  const base = { ...emptyPerkDraft("EUR"), partner_name: "Nutri", benefit_type: "percent" as const, percent: 10, shared_code: "NUTRI10" };
+
+  it("sends groups only when the business limits it to groups, and needs one chosen", () => {
+    expect(toPerkInput(base).rules?.eligibility?.group_ids).toEqual([]);
+    expect(perkDraftProblems({ ...base, groups_only: true })).toContain("groups");
+    const limited: PerkDraft = { ...base, groups_only: true, group_ids: ["g1"] };
+    expect(perkDraftProblems(limited)).not.toContain("groups");
+    expect(toPerkInput(limited).rules?.eligibility?.group_ids).toEqual(["g1"]);
+    expect(toPerkInput({ ...limited, groups_only: false }).rules?.eligibility?.group_ids).toEqual([]);
+    expect(ruleSectionsSet(limited).who).toBe(true);
   });
 });

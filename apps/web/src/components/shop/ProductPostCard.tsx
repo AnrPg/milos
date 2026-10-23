@@ -7,6 +7,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 
 import { ProductPhoto } from "./ShopParts";
+import { useShopProduct } from "./use-shop";
 
 type Data = Record<string, unknown>;
 
@@ -49,8 +50,9 @@ export function productPostHref(card: Data | null, snapshot: Data, postId: strin
  * and «Δες το», linking to Box › Κατάστημα where it is bought (principle 1:
  * a reference, not a second home). `card` is the live product the API puts
  * on the post (`ProductCards`); the snapshot covers a post read without it.
- * TODO(ADR-190): photos; the card has `media_ids` only, so it shows the
- * initials tile until the API adds image URLs.
+ * The card carries `media_ids` only, so the photo comes from the member
+ * product (cached, and reused by the product page); without it the tile
+ * shows the initials.
  */
 export function ProductPostCard({ card, snapshot, postId, organizationSlug }: { card: Data | null; snapshot: Data; postId: string | null; organizationSlug: string | null }) {
   const t = useTranslations("Shop");
@@ -77,11 +79,15 @@ export function ProductPostCard({ card, snapshot, postId, organizationSlug }: { 
             : null;
   const details = [price, state].filter(Boolean).join(" · ");
   const href = productPostHref(card, snapshot, postId, organizationSlug);
+  const productId = text(card, "product_id") ?? text(snapshot, "product_id") ?? "";
+  const sellable = status === "available" || status === "sold_out";
+  const detail = useShopProduct(sellable ? organizationSlug : null, productId);
+  const photo = detail.data?.photos[0] ?? null;
 
   const body = (
     <>
       <span className="w-14 shrink-0">
-        <ProductPhoto photo={null} title={title} />
+        <ProductPhoto photo={photo} title={title} />
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t("postEyebrow")}</span>

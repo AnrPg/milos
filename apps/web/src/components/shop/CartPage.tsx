@@ -147,7 +147,13 @@ export function CartPage() {
   const discountCents = quote ? quote.discount_cents : totals.discountCents;
   const totalCents = quote ? quote.total_cents : totals.totalCents;
   const subtotalCents = quote ? quote.subtotal_cents : totals.subtotalCents;
-  const percent = shop?.member_discount_percent ?? null;
+  // The package discount never stacks with a code: the row names whichever the server applied.
+  const percent = quote ? quote.member_discount_percent : (shop?.member_discount_percent ?? null);
+  const discountLabel = quote?.promotion_code
+    ? t("codeDiscount", { code: quote.promotion_code })
+    : percent
+      ? t("packageDiscount", { percent })
+      : t("packageDiscountPlain");
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
@@ -264,7 +270,7 @@ export function CartPage() {
           <Row label={t("subtotal")} value={<Money cents={subtotalCents} currency={currency} locale={locale} />} />
           {discountCents > 0 ? (
             <Row
-              label={percent ? t("packageDiscount", { percent }) : t("packageDiscountPlain")}
+              label={discountLabel}
               value={<span style={{ color: "var(--success)" }}>−<Money cents={discountCents} currency={currency} locale={locale} /></span>}
             />
           ) : null}

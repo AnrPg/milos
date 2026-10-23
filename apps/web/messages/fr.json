@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Commande annulée",
         "body": "La commande {number} chez {box} a été annulée."
+      },
+      "theProduct": "le produit",
+      "shop_back_in_stock": {
+        "title": "De retour en stock",
+        "body": "{product} est de nouveau disponible. Commandez-le avant la rupture."
       }
     },
     "packageDiscountPlain": "Remise du forfait",
     "codeApplied": "Code {code} appliqué",
     "postMembersOnly": "Pour les membres de la box",
     "postFewLeft": "Plus que quelques pièces",
-    "postWithCode": "{price} avec le code {code}"
+    "postWithCode": "{price} avec le code {code}",
+    "notifyCancel": "Ne pas me prévenir",
+    "codeDiscount": "Code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% sur {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Chaque créneau veut un jour et un début avant la fin.",
     "problem_period": "Fixe les prises par période ou par membre et par période.",
     "problem_maxDiscount": "Un montant supérieur à zéro.",
-    "problem_tenure": "Des jours entiers supérieurs à zéro."
+    "problem_tenure": "Des jours entiers supérieurs à zéro.",
+    "groupsAudience": "Groupes",
+    "groups_any": "Tous les membres",
+    "groups_only": "Seulement les membres de groupes",
+    "groupsLoading": "Chargement des groupes…",
+    "groupsEmpty": "Cette entreprise n'a pas encore de groupe actif.",
+    "groupMembers": "{count, plural, one {# membre} other {# membres}}",
+    "groupsHint": "Les membres d'au moins un groupe choisi peuvent l'obtenir. Avec des forfaits aussi, il leur faut les deux.",
+    "sum_groups": "{count, plural, one {# groupe} other {# groupes}}",
+    "problem_groups": "Choisissez au moins un groupe."
   },
   "EventWizard": {
     "step_host": "Organisateur",

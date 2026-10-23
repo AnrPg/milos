@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import type { MemberPerk, PerkCommon } from "@/api/perks";
+import type { MemberPerk } from "@/api/perks";
 import { formatDate } from "@/components/finance/MembershipEntitlement";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 
 /** The partner's logo, or its initials on a quiet tile. */
-export function PerkLogo({ name, url, size = 40 }: { name: string; url: string | null; size?: number }) {
+export function PerkLogo({ name, url, size = 40 }: { name: string; url?: string | null; size?: number }) {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -39,7 +39,7 @@ export function PerkLogo({ name, url, size = 40 }: { name: string; url: string |
 export function useBenefitText() {
   const t = useTranslations("Perks");
   const locale = useUiLocale();
-  return (perk: Pick<PerkCommon, "benefit" | "benefit_label">) => {
+  return (perk: Pick<MemberPerk, "benefit" | "benefit_label">) => {
     const benefit = perk.benefit;
     const what = benefit?.text?.trim();
     const item = benefit?.item?.trim();
@@ -74,7 +74,7 @@ export function useBenefitText() {
 export function useBenefitConditions() {
   const t = useTranslations("Perks");
   const locale = useUiLocale();
-  return (perk: Pick<PerkCommon, "benefit">) => {
+  return (perk: Pick<MemberPerk, "benefit">) => {
     const { benefit } = perk;
     const currency = benefit?.currency ?? "EUR";
     return [

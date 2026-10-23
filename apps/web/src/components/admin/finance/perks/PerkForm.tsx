@@ -6,6 +6,7 @@ import { useRef, useState, type ReactNode } from "react";
 
 import { ApiError } from "@/api/client";
 import { listAdminLocations } from "@/api/facility";
+import { STAFF_GROUPS_KEY, fetchStaffGroups } from "@/api/admin-community";
 import { fetchFinancePackages } from "@/api/finance";
 import type { PerkBenefitType, PerkChannel, PerkMethod, PerkPeriod, StaffPerk } from "@/api/perks";
 import { AppliesToBranches } from "@/components/admin/AppliesToBranches";
@@ -224,6 +225,7 @@ const ERROR_KEYS: Record<string, string> = {
   perk_cap_below_claims: "capBelowClaims",
   invalid_perk_codes: "problem_code",
   invalid_perk_packages: "problem_packages",
+  invalid_perk_groups: "problem_groups",
 };
 
 /** The fields the chosen benefit needs (`Palee.Perks.Benefit`). */
@@ -458,6 +460,12 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
   const packages = useQuery({ queryKey: ["admin", "finance", "packages"], enabled: Boolean(token), queryFn: () => fetchFinancePackages(token) });
   const locations = useQuery({ queryKey: ["admin", "locations"], enabled: Boolean(token), queryFn: () => listAdminLocations(token) });
   const packageOptions = (packages.data?.packages ?? []).filter((item) => item?.id && item.active !== false);
+  // Club groups (Κοινότητα): the live ones, plus any already chosen that has since been archived.
+  const groups = useQuery({ queryKey: STAFF_GROUPS_KEY, enabled: Boolean(token), queryFn: () => fetchStaffGroups(token) });
+  const groupOptions = [
+    ...(groups.data?.live ?? []),
+    ...(groups.data?.archived ?? []).filter((group) => draft.group_ids.includes(group.id)),
+  ];
   const money = (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: draft.currency }).format(cents / 100);
   const windows = draft.windows;
   const setWindows = (next: DraftWindow[]) => set("windows", next);
@@ -473,6 +481,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
     when: windows.length > 0 ? t("sum_windows", { count: windows.length }) : "",
     who: [
       draft.audience === "packages" ? t("sum_packages", { count: draft.package_ids.length }) : null,
+      draft.groups_only ? t("sum_groups", { count: draft.group_ids.length }) : null,
       !draft.all_locations ? t("sum_branches", { count: draft.location_ids.length }) : null,
       draft.min_tenure_days !== null ? t("sum_minTenure", { count: draft.min_tenure_days }) : null,
     ].filter(Boolean).join(" · "),
@@ -554,7 +563,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
     {
       id: "who",
       title: t("sec_who"),
-      open: Boolean(problem("packages") || problem("branches") || problem("tenure")),
+      open: Boolean(problem("packages") || problem("groups") || problem("branches") || problem("tenure")),
       body: (
         <div className="flex flex-col gap-3">
           <SegmentPicker
@@ -580,6 +589,35 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
               </div>
               <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t("packagesHint")}</span>
               {problem("packages") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("packages")}</span> : null}
+            </div>
+          ) : null}
+          <SegmentPicker
+            ariaLabel={t("groupsAudience")}
+            semantics="radiogroup"
+            stretch
+            value={draft.groups_only ? "groups" : "any"}
+            onChange={(value) => set("groups_only", value === "groups")}
+            options={[{ value: "any", label: t("groups_any") }, { value: "groups", label: t("groups_only") }]}
+          />
+          {draft.groups_only ? (
+            <div className="flex flex-col gap-1.5">
+              {groupOptions.length === 0 ? (
+                <span className="text-xs" style={{ color: "var(--text-soft)" }}>{groups.isLoading ? t("groupsLoading") : t("groupsEmpty")}</span>
+              ) : (
+                <div role="group" aria-label={t("groups_only")} className="grid grid-cols-1 gap-1.5 sm:grid-cols-2" data-testid="perk-groups">
+                  {groupOptions.map((group) => {
+                    const on = draft.group_ids.includes(group.id);
+                    return (
+                      <button key={group.id} type="button" aria-pressed={on} onClick={() => set("group_ids", on ? draft.group_ids.filter((value) => value !== group.id) : [...draft.group_ids, group.id])} className="flex min-h-11 items-center justify-between gap-2 rounded-xl px-3 text-start text-sm font-semibold" style={{ background: on ? "color-mix(in srgb, var(--primary) 12%, var(--panel))" : "var(--panel)", border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`, color: "var(--text)" }}>
+                        <span className="truncate">{group.name}</span>
+                        <span className="shrink-0 text-xs font-normal" style={{ color: "var(--dim)" }}>{t("groupMembers", { count: group.member_count })}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t("groupsHint")}</span>
+              {problem("groups") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("groups")}</span> : null}
             </div>
           ) : null}
           <AppliesToBranches

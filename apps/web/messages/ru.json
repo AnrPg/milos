@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Заказ отменён",
         "body": "Заказ {number} в {box} был отменён."
+      },
+      "theProduct": "товар",
+      "shop_back_in_stock": {
+        "title": "Снова в наличии",
+        "body": "{product} снова в наличии. Закажите, пока не закончился."
       }
     },
     "packageDiscountPlain": "Скидка пакета",
     "codeApplied": "Код {code} применён",
     "postMembersOnly": "Для участников бокса",
     "postFewLeft": "Осталось совсем немного",
-    "postWithCode": "{price} с кодом {code}"
+    "postWithCode": "{price} с кодом {code}",
+    "notifyCancel": "Не уведомлять",
+    "codeDiscount": "Код {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% на {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Каждому интервалу нужен день и начало раньше конца.",
     "problem_period": "Задайте лимит за период или на участника за период.",
     "problem_maxDiscount": "Сумма больше нуля.",
-    "problem_tenure": "Целые дни больше нуля."
+    "problem_tenure": "Целые дни больше нуля.",
+    "groupsAudience": "Группы",
+    "groups_any": "Все участники",
+    "groups_only": "Только участники групп",
+    "groupsLoading": "Загрузка групп…",
+    "groupsEmpty": "У этого бизнеса пока нет активных групп.",
+    "groupMembers": "{count, plural, one {# участник} few {# участника} many {# участников} other {# участника}}",
+    "groupsHint": "Получить могут участники хотя бы одной выбранной группы. Если выбраны и пакеты, нужно и то и другое.",
+    "sum_groups": "{count, plural, one {# группа} few {# группы} many {# групп} other {# группы}}",
+    "problem_groups": "Выберите хотя бы одну группу."
   },
   "EventWizard": {
     "step_host": "Организатор",

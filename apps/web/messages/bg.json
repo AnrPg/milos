@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Поръчката е отказана",
         "body": "Поръчка {number} в {box} беше отказана."
+      },
+      "theProduct": "продукта",
+      "shop_back_in_stock": {
+        "title": "Отново в наличност",
+        "body": "{product} отново е наличен. Поръчайте преди да свърши."
       }
     },
     "packageDiscountPlain": "Отстъпка от пакета",
     "codeApplied": "Кодът {code} е приложен",
     "postMembersOnly": "За членове на бокса",
     "postFewLeft": "Остават само няколко",
-    "postWithCode": "{price} с кода {code}"
+    "postWithCode": "{price} с кода {code}",
+    "notifyCancel": "Без известие",
+    "codeDiscount": "Код {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% за {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Всеки интервал иска ден и начало преди края.",
     "problem_period": "Задайте взимания на период или на член на период.",
     "problem_maxDiscount": "Сума над нула.",
-    "problem_tenure": "Цели дни над нула."
+    "problem_tenure": "Цели дни над нула.",
+    "groupsAudience": "Групи",
+    "groups_any": "Всички членове",
+    "groups_only": "Само членове на групи",
+    "groupsLoading": "Зареждане на групите…",
+    "groupsEmpty": "Този бизнес още няма активни групи.",
+    "groupMembers": "{count, plural, one {# член} other {# членове}}",
+    "groupsHint": "Получават го членовете на поне една избрана група. Ако има и пакети, им трябват и двете.",
+    "sum_groups": "{count, plural, one {# група} other {# групи}}",
+    "problem_groups": "Изберете поне една група."
   },
   "EventWizard": {
     "step_host": "Организатор",

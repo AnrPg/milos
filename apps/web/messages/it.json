@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Ordine annullato",
         "body": "L'ordine {number} presso {box} è stato annullato."
+      },
+      "theProduct": "il prodotto",
+      "shop_back_in_stock": {
+        "title": "Di nuovo disponibile",
+        "body": "{product} è di nuovo disponibile. Ordinalo prima che finisca."
       }
     },
     "packageDiscountPlain": "Sconto pacchetto",
     "codeApplied": "Codice {code} applicato",
     "postMembersOnly": "Per i membri del box",
     "postFewLeft": "Ne restano pochi",
-    "postWithCode": "{price} con il codice {code}"
+    "postWithCode": "{price} con il codice {code}",
+    "notifyCancel": "Non avvisarmi",
+    "codeDiscount": "Codice {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% su {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Ogni fascia vuole un giorno e un inizio prima della fine.",
     "problem_period": "Imposta utilizzi per periodo o per membro per periodo.",
     "problem_maxDiscount": "Un importo sopra zero.",
-    "problem_tenure": "Giorni interi sopra zero."
+    "problem_tenure": "Giorni interi sopra zero.",
+    "groupsAudience": "Gruppi",
+    "groups_any": "Tutti i membri",
+    "groups_only": "Solo membri dei gruppi",
+    "groupsLoading": "Caricamento dei gruppi…",
+    "groupsEmpty": "Questa attività non ha ancora gruppi attivi.",
+    "groupMembers": "{count, plural, one {# membro} other {# membri}}",
+    "groupsHint": "Lo ottengono i membri di almeno un gruppo scelto. Con anche i pacchetti, servono entrambi.",
+    "sum_groups": "{count, plural, one {# gruppo} other {# gruppi}}",
+    "problem_groups": "Scegli almeno un gruppo."
   },
   "EventWizard": {
     "step_host": "Organizzatore",

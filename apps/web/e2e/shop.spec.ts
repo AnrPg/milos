@@ -52,7 +52,8 @@ const tee = {
   id: "p-tee",
   title: "Box tee",
   category: "Apparel",
-  media_ids: [],
+  media_ids: ["m-1"],
+  media: [{ id: "m-1", thumb_url: "/placeholder-tee.png", url: "/placeholder-tee.png", full_url: "/placeholder-tee.png", alt_text: "Box tee" }],
   visibility: "members_only",
   published_at: new Date().toISOString(),
   per_person_limit: null,
@@ -78,13 +79,15 @@ const preview = {
   pickup_location_ids: ["loc-1"],
   payment_modes: ["at_pickup", "on_account"],
   online_payment: { available: false, reason: "no_provider" },
+  member_discount: { percent: 10, source: "membership_package", applies_to: "marked_products" },
 };
 
 const order = {
   id: "o-1",
   number: 42,
   status: "placed",
-  payment_status: "unpaid",
+  payment_status: "pending_payment",
+  pickup_code: "7Q4K",
   payment_mode: "at_pickup",
   channel: "online",
   state: "pending_payment",
@@ -109,7 +112,12 @@ async function common(page: Page) {
   await page.route("**/api/auth/me", (route) => route.fulfill(json(me.user)));
   await page.route("**/api/memberships", (route) => route.fulfill(json([membership])));
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
-  await page.route("**/api/org/kypseli/locations", (route) => route.fulfill(json({ locations: [{ id: "loc-1", name: "Kypseli", address: null, archived_at: null }] })));
+  await page.route("**/api/org/kypseli/me/shop/storefront", (route) =>
+    route.fulfill(json({ open: true, closed_reason: null, categories: ["Apparel"], products: [tee], member_discount: { percent: 10 }, pickup_locations: [{ id: "loc-1", name: "Kypseli", address: null }], online_payment: { available: false, reason: "no_provider" } })),
+  );
+  await page.route("**/api/org/kypseli/me/shop/orders", (route) => route.fulfill(json({ orders: [], counts: { placed: 0, ready_for_pickup: 0, picked_up: 0, cancelled: 0 } })));
+  await page.route("**/api/org/kypseli/me/shop/stock-alerts", (route) => route.fulfill(json({ stock_alerts: [] })));
+  await page.route("**/api/org/kypseli/me/shop/variants/*/stock-alert", (route) => route.fulfill(json({ stock_alert: { id: "a-1", variant_id: "v-m", product_id: tee.id, notified_at: null } })));
   await page.route("**/api/org/kypseli/me/shop/products", (route) => route.fulfill(json({ products: [tee] })));
   await page.route("**/api/org/kypseli/me/shop/products/p-tee", (route) => route.fulfill(json({ product: tee })));
   await page.route("**/api/org/kypseli/me/shop/cart/preview", (route) => route.fulfill(json(preview)));

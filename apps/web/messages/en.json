@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Order cancelled",
         "body": "Order {number} at {box} was cancelled."
+      },
+      "theProduct": "the product",
+      "shop_back_in_stock": {
+        "title": "Back in stock",
+        "body": "{product} is available again. Order it before it sells out."
       }
     },
     "packageDiscountPlain": "Package discount",
     "codeApplied": "Code {code} applied",
     "postMembersOnly": "For members of the box",
     "postFewLeft": "Only a few left",
-    "postWithCode": "{price} with code {code}"
+    "postWithCode": "{price} with code {code}",
+    "notifyCancel": "Don't notify me",
+    "codeDiscount": "Code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% on {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Each window needs a day and a start before its end.",
     "problem_period": "Set claims per period or per member per period.",
     "problem_maxDiscount": "An amount above zero.",
-    "problem_tenure": "Whole days above zero."
+    "problem_tenure": "Whole days above zero.",
+    "groupsAudience": "Groups",
+    "groups_any": "Any member",
+    "groups_only": "Only members of groups",
+    "groupsLoading": "Loading groups…",
+    "groupsEmpty": "This business has no live groups yet.",
+    "groupMembers": "{count, plural, one {# member} other {# members}}",
+    "groupsHint": "Members of at least one chosen group can claim it. With packages too, they need both.",
+    "sum_groups": "{count, plural, one {# group} other {# groups}}",
+    "problem_groups": "Choose at least one group."
   },
   "EventWizard": {
     "step_host": "Host",

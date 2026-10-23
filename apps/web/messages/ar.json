@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "تم إلغاء الطلب",
         "body": "تم إلغاء الطلب {number} في {box}."
+      },
+      "theProduct": "المنتج",
+      "shop_back_in_stock": {
+        "title": "عاد إلى المخزون",
+        "body": "{product} متوفر من جديد. اطلبه قبل نفاده."
       }
     },
     "packageDiscountPlain": "خصم الباقة",
     "codeApplied": "تم تطبيق الرمز {code}",
     "postMembersOnly": "لأعضاء النادي",
     "postFewLeft": "لم يتبقَّ إلا القليل",
-    "postWithCode": "{price} مع الرمز {code}"
+    "postWithCode": "{price} مع الرمز {code}",
+    "notifyCancel": "لا تنبهني",
+    "codeDiscount": "الرمز {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% على {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "كل فترة تحتاج يومًا وبداية قبل النهاية.",
     "problem_period": "حدّد المطالبات لكل فترة أو لكل عضو في كل فترة.",
     "problem_maxDiscount": "مبلغ أكبر من صفر.",
-    "problem_tenure": "أيام صحيحة أكبر من صفر."
+    "problem_tenure": "أيام صحيحة أكبر من صفر.",
+    "groupsAudience": "المجموعات",
+    "groups_any": "كل الأعضاء",
+    "groups_only": "أعضاء المجموعات فقط",
+    "groupsLoading": "جارٍ تحميل المجموعات…",
+    "groupsEmpty": "لا توجد مجموعات نشطة لهذا النشاط بعد.",
+    "groupMembers": "{count, plural, one {عضو واحد} two {عضوان} other {# أعضاء}}",
+    "groupsHint": "يحصل عليه أعضاء مجموعة واحدة مختارة على الأقل. ومع الباقات أيضًا يلزم الاثنان.",
+    "sum_groups": "{count, plural, one {مجموعة واحدة} two {مجموعتان} other {# مجموعات}}",
+    "problem_groups": "اختر مجموعة واحدة على الأقل."
   },
   "EventWizard": {
     "step_host": "المنظِّم",

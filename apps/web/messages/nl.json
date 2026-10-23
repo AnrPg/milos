@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Bestelling geannuleerd",
         "body": "Bestelling {number} bij {box} is geannuleerd."
+      },
+      "theProduct": "het product",
+      "shop_back_in_stock": {
+        "title": "Weer op voorraad",
+        "body": "{product} is weer beschikbaar. Bestel het voordat het op is."
       }
     },
     "packageDiscountPlain": "Pakketkorting",
     "codeApplied": "Code {code} toegepast",
     "postMembersOnly": "Voor leden van de box",
     "postFewLeft": "Nog maar een paar over",
-    "postWithCode": "{price} met de code {code}"
+    "postWithCode": "{price} met de code {code}",
+    "notifyCancel": "Niet laten weten",
+    "codeDiscount": "Code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% op {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Elk tijdvak heeft een dag nodig en een begin vóór het einde.",
     "problem_period": "Stel ophalingen per periode of per lid per periode in.",
     "problem_maxDiscount": "Een bedrag boven nul.",
-    "problem_tenure": "Hele dagen boven nul."
+    "problem_tenure": "Hele dagen boven nul.",
+    "groupsAudience": "Groepen",
+    "groups_any": "Alle leden",
+    "groups_only": "Alleen leden van groepen",
+    "groupsLoading": "Groepen laden…",
+    "groupsEmpty": "Dit bedrijf heeft nog geen actieve groepen.",
+    "groupMembers": "{count, plural, one {# lid} other {# leden}}",
+    "groupsHint": "Leden van minstens één gekozen groep kunnen het claimen. Met pakketten erbij hebben ze beide nodig.",
+    "sum_groups": "{count, plural, one {# groep} other {# groepen}}",
+    "problem_groups": "Kies minstens één groep."
   },
   "EventWizard": {
     "step_host": "Organisator",

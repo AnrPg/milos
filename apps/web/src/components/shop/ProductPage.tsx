@@ -11,7 +11,7 @@ import { addToCart, cartUnits, memberUnitPriceCents } from "@/lib/shop/cart";
 import { choose, initialSelection, isColourAxis, isSoldOut, orderableUnits, selectedVariant, valueStates, type Selection } from "@/lib/shop/variants";
 
 import { CartButton, ErrorNotice, Eyebrow, LoadingLine, Money, Panel, ProductPhoto, ShopHeader, Stepper } from "./ShopParts";
-import { shopHref, useBackInStock, useCart, useShopBox, useShopProduct, useStorefront } from "./use-shop";
+import { shopHref, useBackInStock, useCart, useShopBox, useShopProduct, useStockAlerts, useStorefront } from "./use-shop";
 
 /**
  * A product: photos, the price (and the member's price with their package),
@@ -66,6 +66,7 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
   const [added, setAdded] = useState(false);
   const [noticeFor, setNoticeFor] = useState<string | null>(null);
   const backInStock = useBackInStock(slug);
+  const alerts = useStockAlerts(slug);
 
   const variant = selectedVariant(axes, product.variants, selection);
   const max = variant ? orderableUnits(variant, product.per_person_limit) : null;
@@ -143,8 +144,22 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
           {soldOut && variant ? (
             <div className="flex flex-wrap items-center gap-2 text-sm" style={{ color: "var(--text-soft)" }}>
               <span>{t("variantSoldOut", { variant: variant.title ?? "" })}</span>
-              {noticeFor === variant.id && backInStock.isSuccess ? (
-                <span className="font-semibold" style={{ color: "var(--success)" }}>{t("notifyDone")}</span>
+              {alerts.data?.some((alert) => alert.variant_id === variant.id && !alert.notified_at) ? (
+                <>
+                  <span className="font-semibold" style={{ color: "var(--success)" }}>{t("notifyDone")}</span>
+                  <button
+                    type="button"
+                    className="min-h-9 font-bold underline"
+                    style={{ color: "var(--text-soft)" }}
+                    disabled={backInStock.isPending}
+                    onClick={() => {
+                      setNoticeFor(variant.id);
+                      backInStock.mutate({ variantId: variant.id, on: false });
+                    }}
+                  >
+                    {t("notifyCancel")}
+                  </button>
+                </>
               ) : (
                 <button
                   type="button"
@@ -153,7 +168,7 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
                   disabled={backInStock.isPending}
                   onClick={() => {
                     setNoticeFor(variant.id);
-                    backInStock.mutate(variant.id);
+                    backInStock.mutate({ variantId: variant.id, on: true });
                   }}
                 >
                   {t("notifyMe")}

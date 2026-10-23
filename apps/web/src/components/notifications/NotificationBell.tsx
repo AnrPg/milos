@@ -90,7 +90,7 @@ function NotificationCard({
   const tBuddy = useTranslations("Buddy");
   const tSeasons = useTranslations("Seasons");
   const tShop = useTranslations("Shop");
-  // ADR-190: a shop order ready for pickup, its reminder and a cancellation.
+  // ADR-190: a shop order ready for pickup, its reminder, a cancellation, and back in stock.
   function shopText(notification: NotificationRecord, part: "title" | "body") {
     return shopNotificationText(notification.type, notification.payload, part, (key, values) => tShop(key, values));
   }

@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Bestellung storniert",
         "body": "Bestellung {number} bei {box} wurde storniert."
+      },
+      "theProduct": "das Produkt",
+      "shop_back_in_stock": {
+        "title": "Wieder verfügbar",
+        "body": "{product} ist wieder verfügbar. Bestelle es, bevor es ausverkauft ist."
       }
     },
     "packageDiscountPlain": "Paketrabatt",
     "codeApplied": "Code {code} angewendet",
     "postMembersOnly": "Für Mitglieder der Box",
     "postFewLeft": "Nur noch wenige da",
-    "postWithCode": "{price} mit dem Code {code}"
+    "postWithCode": "{price} mit dem Code {code}",
+    "notifyCancel": "Nicht benachrichtigen",
+    "codeDiscount": "Code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% auf {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Jedes Fenster braucht einen Tag und einen Beginn vor dem Ende.",
     "problem_period": "Lege Abrufe pro Zeitraum oder pro Mitglied und Zeitraum fest.",
     "problem_maxDiscount": "Ein Betrag über null.",
-    "problem_tenure": "Ganze Tage über null."
+    "problem_tenure": "Ganze Tage über null.",
+    "groupsAudience": "Gruppen",
+    "groups_any": "Alle Mitglieder",
+    "groups_only": "Nur Mitglieder von Gruppen",
+    "groupsLoading": "Gruppen werden geladen…",
+    "groupsEmpty": "Dieses Unternehmen hat noch keine aktiven Gruppen.",
+    "groupMembers": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
+    "groupsHint": "Mitglieder mindestens einer gewählten Gruppe können es einlösen. Mit Paketen brauchen sie beides.",
+    "sum_groups": "{count, plural, one {# Gruppe} other {# Gruppen}}",
+    "problem_groups": "Wähle mindestens eine Gruppe."
   },
   "EventWizard": {
     "step_host": "Veranstalter",

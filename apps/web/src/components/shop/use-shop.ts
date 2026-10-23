@@ -5,8 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 import {
+  cancelBackInStock,
   cancelShopOrder,
+  fetchPublicShopProducts,
   fetchShopOrder,
+  fetchShopTransactions,
+  fetchStockAlerts,
+  payShopOrder,
   fetchShopProduct,
   fetchShopProducts,
   fetchStorefront,
@@ -77,6 +82,9 @@ export function useShopProduct(slug: string | null, productId: string) {
     queryKey: shopKeys.product(slug ?? "", productId),
     enabled: Boolean(token && slug && productId),
     queryFn: () => fetchShopProduct(token, slug!, productId),
+    // A post's card asks too, for its photo; a reader outside the box gets a refusal, not retries.
+    retry: false,
+    staleTime: 30_000,
     // The grid's card is enough to draw the page while the detail loads.
     placeholderData: () => {
       const list = queryClient.getQueryData<ShopProductSummary[]>(shopKeys.products(slug ?? ""));
@@ -143,9 +151,61 @@ export function useCancelOrder(slug: string | null) {
   });
 }
 
+/** The member's back-in-stock alerts, so «Ειδοποίησέ με» shows as already set. */
+export function useStockAlerts(slug: string | null) {
+  const token = useToken();
+  return useQuery({
+    queryKey: shopKeys.stockAlerts(slug ?? ""),
+    enabled: Boolean(token && slug),
+    queryFn: () => fetchStockAlerts(token, slug!),
+    staleTime: 60_000,
+  });
+}
+
+/** Sets (`on`) or removes a back-in-stock alert on one variant. */
 export function useBackInStock(slug: string | null) {
   const token = useToken();
-  return useMutation({ mutationFn: (variantId: string) => requestBackInStock(token, slug!, variantId) });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ variantId, on }: { variantId: string; on: boolean }) => {
+      if (on) await requestBackInStock(token, slug!, variantId);
+      else await cancelBackInStock(token, slug!, variantId);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shopKeys.stockAlerts(slug!) }),
+  });
+}
+
+/** Card payment of an online order, once the provider's card step hands over a token. */
+export function usePayOrder(slug: string | null) {
+  const token = useToken();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, paymentToken }: { orderId: string; paymentToken: string }) => payShopOrder(token, slug!, orderId, paymentToken),
+    onSuccess: async (order) => {
+      queryClient.setQueryData(shopKeys.order(slug!, order.id), order);
+      await queryClient.invalidateQueries({ queryKey: ["me", "billing"] });
+    },
+  });
+}
+
+/** The member's shop purchases (invoice, payments, refunds) in this box. */
+export function useShopTransactions(slug: string | null) {
+  const token = useToken();
+  return useQuery({
+    queryKey: shopKeys.transactions(slug ?? ""),
+    enabled: Boolean(token && slug),
+    queryFn: () => fetchShopTransactions(token, slug!),
+  });
+}
+
+/** A box's public catalogue, for its public page (no login). */
+export function usePublicShopProducts(slug: string | null) {
+  return useQuery({
+    queryKey: shopKeys.publicProducts(slug ?? ""),
+    enabled: Boolean(slug),
+    queryFn: () => fetchPublicShopProducts(slug!),
+    staleTime: 60_000,
+  });
 }
 
 /** The loaded catalogue as prices per variant, for the cart's totals. */

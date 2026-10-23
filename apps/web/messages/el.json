@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "Η παραγγελία ακυρώθηκε",
         "body": "Η παραγγελία {number} στο {box} ακυρώθηκε."
+      },
+      "theProduct": "το προϊόν",
+      "shop_back_in_stock": {
+        "title": "Ξαναήρθε",
+        "body": "Το {product} είναι ξανά διαθέσιμο. Παράγγειλέ το πριν τελειώσει."
       }
     },
     "packageDiscountPlain": "Έκπτωση πακέτου",
     "codeApplied": "Ο κωδικός {code} εφαρμόστηκε",
     "postMembersOnly": "Για μέλη του box",
     "postFewLeft": "Λίγα κομμάτια ακόμα",
-    "postWithCode": "{price} με τον κωδικό {code}"
+    "postWithCode": "{price} με τον κωδικό {code}",
+    "notifyCancel": "Να μη με ειδοποιήσεις",
+    "codeDiscount": "Κωδικός {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% σε {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "Κάθε διάστημα θέλει μέρα και έναρξη πριν από τη λήξη.",
     "problem_period": "Όρισε όριο ανά περίοδο ή ανά μέλος ανά περίοδο.",
     "problem_maxDiscount": "Ποσό πάνω από μηδέν.",
-    "problem_tenure": "Ακέραιες μέρες πάνω από μηδέν."
+    "problem_tenure": "Ακέραιες μέρες πάνω από μηδέν.",
+    "groupsAudience": "Ομάδες",
+    "groups_any": "Όλα τα μέλη",
+    "groups_only": "Μόνο μέλη ομάδων",
+    "groupsLoading": "Φόρτωση ομάδων…",
+    "groupsEmpty": "Δεν υπάρχουν ακόμα ενεργές ομάδες.",
+    "groupMembers": "{count, plural, one {# μέλος} other {# μέλη}}",
+    "groupsHint": "Το παίρνουν όσοι είναι σε τουλάχιστον μία από τις ομάδες. Αν έχεις διαλέξει και πακέτα, χρειάζονται και τα δύο.",
+    "sum_groups": "{count, plural, one {# ομάδα} other {# ομάδες}}",
+    "problem_groups": "Διάλεξε τουλάχιστον μία ομάδα."
   },
   "EventWizard": {
     "step_host": "Διοργάνωση",

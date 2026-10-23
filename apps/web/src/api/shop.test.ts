@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toShopOrder, toShopProduct, type ApiMemberProduct, type ApiOrder } from "./shop";
+import { toQuote, toShopOrder, toShopProduct, toStorefront, type ApiMemberProduct, type ApiOrder } from "./shop";
 
 const NOW = Date.parse("2026-10-23T12:00:00Z");
 
@@ -44,6 +44,9 @@ describe("shop order adapter", () => {
   const order: ApiOrder = {
     id: "o1",
     number: 42,
+    channel: "online",
+    state: "pending_payment",
+    pickup_code: "7Q4K",
     status: "placed",
     payment_status: "pending_payment",
     payment_mode: "at_pickup",
@@ -62,5 +65,54 @@ describe("shop order adapter", () => {
     expect(mapped.can_cancel).toBe(true);
     expect(toShopOrder({ ...order, payment_status: "paid" }).can_cancel).toBe(false);
     expect(toShopOrder({ ...order, status: "ready_for_pickup" }).can_cancel).toBe(false);
+  });
+
+  it("carries the short pickup code, falling back to the order number", () => {
+    expect(toShopOrder(order).pickup_code).toBe("7Q4K");
+    expect(toShopOrder({ ...order, pickup_code: null }).pickup_code).toBe("42");
+  });
+});
+
+describe("shop photos, storefront and quote adapters", () => {
+  it("uses the thumbnail for tiles and keeps the full size, skipping media without a URL", () => {
+    const mapped = toShopProduct(
+      product({ media: [{ id: "m1", thumb_url: "https://cdn/t.jpg", full_url: "https://cdn/f.jpg", alt_text: "Tee" }, { id: "m2" }] }),
+      NOW,
+    );
+    expect(mapped.photos).toEqual([{ id: "m1", url: "https://cdn/t.jpg", full_url: "https://cdn/f.jpg", alt: "Tee" }]);
+    // The member presenter does not mark products: no member price is promised.
+    expect(mapped.member_discount_applies).toBe(false);
+  });
+
+  it("reads the member discount, branches and online flag from the storefront", () => {
+    const shop = toStorefront(
+      {
+        open: true,
+        products: [product()],
+        member_discount: { percent: 10 },
+        pickup_locations: [{ id: "b1", name: "Κυψέλη", address: "Φωκίωνος 1" }],
+        online_payment: { available: false, reason: "provider_unavailable" },
+      },
+      [],
+      NOW,
+    );
+    expect(shop).toMatchObject({ open: true, published_count: 1, new_count: 1, member_discount_percent: 10 });
+    expect(shop.pickup_locations).toEqual([{ id: "b1", name: "Κυψέλη", hint: "Φωκίωνος 1" }]);
+    expect(shop.online_payment).toEqual({ available: false, reason: "provider_unavailable" });
+    expect(toStorefront({ open: true, products: [], pickup_locations: [], online_payment: { available: false } }, []).open).toBe(false);
+  });
+
+  it("prices the basket with the member discount or the applied code", () => {
+    const quote = toQuote({
+      total_cents: 5841,
+      subtotal_cents: 6490,
+      discount_cents: 649,
+      lines: [],
+      member_discount: { percent: 10 },
+      payment_modes: ["at_pickup", "online"],
+      online_payment: { available: false },
+      promotion_code: { code: "TEE10", applied: false },
+    });
+    expect(quote).toMatchObject({ member_discount_percent: 10, promotion_code: null, payment_modes: ["at_pickup", "online"] });
   });
 });

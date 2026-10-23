@@ -9982,13 +9982,20 @@
       "shop_order_cancelled": {
         "title": "ההזמנה בוטלה",
         "body": "הזמנה {number} ב־{box} בוטלה."
+      },
+      "theProduct": "המוצר",
+      "shop_back_in_stock": {
+        "title": "חזר למלאי",
+        "body": "{product} זמין שוב. הזמינו לפני שייגמר."
       }
     },
     "packageDiscountPlain": "הנחת חבילה",
     "codeApplied": "הקוד {code} הוחל",
     "postMembersOnly": "לחברי הבוקס",
     "postFewLeft": "נשארו רק מעט",
-    "postWithCode": "{price} עם הקוד {code}"
+    "postWithCode": "{price} עם הקוד {code}",
+    "notifyCancel": "אל תודיעו לי",
+    "codeDiscount": "קוד {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% על {what}",
@@ -10247,7 +10254,16 @@
     "problem_windows": "כל חלון צריך יום והתחלה לפני הסוף.",
     "problem_period": "הגדירו מימושים לתקופה או לכל חבר לתקופה.",
     "problem_maxDiscount": "סכום מעל אפס.",
-    "problem_tenure": "ימים שלמים מעל אפס."
+    "problem_tenure": "ימים שלמים מעל אפס.",
+    "groupsAudience": "קבוצות",
+    "groups_any": "כל החברים",
+    "groups_only": "רק חברי קבוצות",
+    "groupsLoading": "טוען קבוצות…",
+    "groupsEmpty": "לעסק הזה עדיין אין קבוצות פעילות.",
+    "groupMembers": "{count, plural, one {חבר אחד} other {# חברים}}",
+    "groupsHint": "מקבלים את זה חברים בלפחות קבוצה אחת שנבחרה. אם נבחרו גם חבילות, צריך את שתיהן.",
+    "sum_groups": "{count, plural, one {קבוצה אחת} other {# קבוצות}}",
+    "problem_groups": "בחר לפחות קבוצה אחת."
   },
   "EventWizard": {
     "step_host": "מארגן",

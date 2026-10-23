@@ -22,7 +22,7 @@ import type {
 /** The status a reader sees: a published perk past its window reads as expired, one not started yet as scheduled. */
 export type PerkPhase = PerkStatus | "scheduled";
 
-export function perkPhase(perk: { status: PerkStatus; valid_from: string | null; valid_until: string | null }, today: string): PerkPhase {
+export function perkPhase(perk: { status: PerkStatus; valid_from?: string | null; valid_until?: string | null }, today: string): PerkPhase {
   if (perk.status !== "published") return perk.status;
   if (perk.valid_until && today > perk.valid_until) return "expired";
   if (perk.valid_from && today < perk.valid_from) return "scheduled";
@@ -97,6 +97,9 @@ export type PerkDraft = {
   max_per_member_per_period: number | null;
   audience: "all_clients" | "packages";
   package_ids: string[];
+  /** Club groups; on top of the packages (a member must match both when both are set). */
+  groups_only: boolean;
+  group_ids: string[];
   min_tenure_days: number | null;
   all_locations: boolean;
   location_ids: string[];
@@ -136,6 +139,8 @@ export function emptyPerkDraft(currency = "EUR"): PerkDraft {
     max_per_member_per_period: null,
     audience: "all_clients",
     package_ids: [],
+    groups_only: false,
+    group_ids: [],
     min_tenure_days: null,
     all_locations: true,
     location_ids: [],
@@ -150,12 +155,13 @@ export function draftFromPerk(perk: StaffPerk): PerkDraft {
   const { benefit, rules, redemption } = perk;
   const limits = rules.limits ?? {};
   const packages = rules.eligibility?.package_ids ?? [];
+  const groups = rules.eligibility?.group_ids ?? [];
   return {
     ...emptyPerkDraft(benefit.currency ?? "EUR"),
     partner_name: perk.partner_name,
-    partner_url: perk.partner_url,
-    partner_address: perk.partner_address,
-    logo_media_id: perk.logo_media_id,
+    partner_url: perk.partner_url ?? null,
+    partner_address: perk.partner_address ?? null,
+    logo_media_id: perk.logo_media_id ?? null,
     benefit_type: benefit.type,
     percent: benefit.percent ?? null,
     amount_cents: benefit.amount_cents ?? null,
@@ -170,8 +176,8 @@ export function draftFromPerk(perk: StaffPerk): PerkDraft {
     link_url: redemption.link_url ?? null,
     low_pool_threshold: redemption.low_pool_threshold ?? null,
     instructions: redemption.instructions ?? null,
-    valid_from: rules.valid_from ?? perk.valid_from,
-    valid_until: rules.valid_until ?? perk.valid_until,
+    valid_from: rules.valid_from ?? perk.valid_from ?? null,
+    valid_until: rules.valid_until ?? perk.valid_until ?? null,
     channel: rules.channel && rules.channel !== "both" ? rules.channel : null,
     stacking: rules.stacking ?? null,
     windows: (rules.recurring ?? []).map((window) => ({ weekdays: window.weekdays, from: hhmm(window.starts_at), until: hhmm(window.ends_at) })),
@@ -182,10 +188,12 @@ export function draftFromPerk(perk: StaffPerk): PerkDraft {
     max_per_member_per_period: limits.max_per_member_per_period ?? null,
     audience: packages.length > 0 ? "packages" : "all_clients",
     package_ids: packages,
+    groups_only: groups.length > 0,
+    group_ids: groups,
     min_tenure_days: rules.eligibility?.min_tenure_days ?? null,
     all_locations: perk.all_locations,
     location_ids: perk.location_ids,
-    terms: perk.terms,
+    terms: perk.terms ?? null,
   };
 }
 
@@ -224,7 +232,7 @@ export function toPerkInput(draft: PerkDraft): StaffPerkInput {
     },
     eligibility: {
       package_ids: draft.audience === "packages" ? draft.package_ids : [],
-      group_ids: [],
+      group_ids: draft.groups_only ? draft.group_ids : [],
       min_tenure_days: draft.min_tenure_days,
     },
     ...(draft.channel ? { channel: draft.channel } : {}),
@@ -263,6 +271,7 @@ export type PerkDraftProblem =
   | "dates"
   | "windows"
   | "packages"
+  | "groups"
   | "branches"
   | "maxClaims"
   | "perMember"
@@ -290,6 +299,7 @@ export function perkDraftProblems(draft: PerkDraft): PerkDraftProblem[] {
   if (draft.valid_from && draft.valid_until && draft.valid_until < draft.valid_from) problems.push("dates");
   if (draft.windows.some((window) => window.weekdays.length === 0 || !window.from || !window.until || window.until <= window.from)) problems.push("windows");
   if (draft.audience === "packages" && draft.package_ids.length === 0) problems.push("packages");
+  if (draft.groups_only && draft.group_ids.length === 0) problems.push("groups");
   if (!draft.all_locations && draft.location_ids.length === 0) problems.push("branches");
   if (draft.max_claims !== null && !positiveInteger(draft.max_claims)) problems.push("maxClaims");
   if (!inRange(draft.max_per_member, 1000)) problems.push("perMember");
@@ -317,7 +327,7 @@ export function ruleSectionsSet(draft: PerkDraft): Record<RuleSection, boolean> 
   return {
     limits: draft.max_claims !== null || draft.max_per_member !== 1 || draft.period !== null || draft.min_spend_cents !== null || draft.max_discount_cents !== null,
     when: draft.windows.length > 0,
-    who: draft.audience === "packages" || !draft.all_locations || draft.min_tenure_days !== null,
+    who: draft.audience === "packages" || draft.groups_only || !draft.all_locations || draft.min_tenure_days !== null,
     where: draft.channel !== null || Boolean(draft.partner_address?.trim()),
     terms: Boolean(draft.terms?.trim() || draft.stacking?.trim() || draft.instructions?.trim()),
   };
