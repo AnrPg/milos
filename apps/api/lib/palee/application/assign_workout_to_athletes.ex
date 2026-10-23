@@ -72,7 +72,9 @@ defmodule Palee.Application.AssignWorkoutToAthletes do
         master_workout_id: workout.id,
         athlete_ids: [athlete.id],
         scheduled_for: value(params, :scheduled_for),
-        instructions: value(params, :instructions)
+        instructions: value(params, :instructions),
+        all_locations: value(params, :all_locations),
+        location_ids: value(params, :location_ids)
       })
       |> case do
         {:ok, assignment} ->

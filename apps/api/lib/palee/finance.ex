@@ -290,6 +290,7 @@ defmodule Palee.Finance do
   """
   def package_location_scopes(context),
     do: scoped(context, fn -> FinanceStore.package_location_scopes() end)
+
   defdelegate create_promotion_campaign(params), to: CreatePromotionCampaign, as: :call
 
   def create_promotion_campaign(context, params),

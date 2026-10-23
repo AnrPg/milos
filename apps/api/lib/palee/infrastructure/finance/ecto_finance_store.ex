@@ -4669,48 +4669,85 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&normalize_promotion_redemption/1)
   end
 
+  # ADR-186 §8: a promotion valid at some branches applies to a subscription
+  # whose package is valid at one of them (or everywhere).
+  defp validate_campaign_branches(campaign_id, _params) when not is_binary(campaign_id), do: :ok
+
+  defp validate_campaign_branches(campaign_id, params) do
+    with %PromotionCampaign{all_locations: false, location_ids: ids} <-
+           PromotionCampaign |> tenant_scope() |> Repo.get(campaign_id),
+         subscription_id when is_binary(subscription_id) <-
+           params["membership_package_subscription_id"],
+         %MembershipPackageSubscription{params_snapshot: snapshot} <-
+           Repo.get(MembershipPackageSubscription, subscription_id) do
+      case PackageContract.fields_from_params(snapshot || %{})["facility.location_ids"] do
+        package_ids when is_list(package_ids) and package_ids != [] ->
+          if Enum.any?(package_ids, &(&1 in ids)),
+            do: :ok,
+            else: {:error, :promotion_location_not_included}
+
+        _everywhere ->
+          :ok
+      end
+    else
+      _not_limited -> :ok
+    end
+  end
+
   defp build_redemption_params(membership, params) do
     case find_promotion_code(params) do
       {:ok, %PromotionCode{} = code} ->
-        {:ok,
-         params
-         |> Map.merge(%{
-           "promotion_campaign_id" => code.promotion_campaign_id,
-           "promotion_code_id" => code.id,
-           "membership_id" => membership.id,
-           "discount_type_snapshot" => code.discount_type,
-           "discount_value_snapshot" => code.discount_value
-         })
-         |> Map.put_new("redeemed_at", utc_now())}
+        with :ok <- validate_campaign_branches(code.promotion_campaign_id, params) do
+          redemption_from_code(membership, params, code)
+        end
 
       {:error, reason} ->
         {:error, reason}
 
       :not_requested ->
-        if is_binary(params["promotion_campaign_id"]) do
-          with %PromotionCampaign{} = campaign <-
-                 PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"]),
-               :ok <- validate_campaign_active(campaign),
-               :ok <- validate_campaign_window(campaign, GymClock.today()),
-               {:ok, {discount_type, discount_value}} <-
-                 PromotionRedemptionPolicy.validate_manual_discount(
-                   params["discount_type_snapshot"],
-                   params["discount_value_snapshot"]
-                 ) do
-            {:ok,
-             params
-             |> Map.put("promotion_campaign_id", campaign.id)
-             |> Map.put("membership_id", membership.id)
-             |> Map.put("discount_type_snapshot", discount_type)
-             |> Map.put("discount_value_snapshot", discount_value)
-             |> Map.put_new("redeemed_at", utc_now())}
-          else
-            nil -> {:error, :not_found}
-            {:error, reason} -> {:error, reason}
-          end
-        else
-          {:error, :bad_request}
+        with :ok <- validate_campaign_branches(params["promotion_campaign_id"], params) do
+          manual_redemption(membership, params)
         end
+    end
+  end
+
+  defp redemption_from_code(membership, params, code) do
+    {:ok,
+     params
+     |> Map.merge(%{
+       "promotion_campaign_id" => code.promotion_campaign_id,
+       "promotion_code_id" => code.id,
+       "membership_id" => membership.id,
+       "discount_type_snapshot" => code.discount_type,
+       "discount_value_snapshot" => code.discount_value
+     })
+     |> Map.put_new("redeemed_at", utc_now())}
+  end
+
+  defp manual_redemption(membership, params) do
+    if is_binary(params["promotion_campaign_id"]) do
+      with %PromotionCampaign{} = campaign <-
+             PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"]),
+           :ok <- validate_campaign_active(campaign),
+           :ok <- validate_campaign_window(campaign, GymClock.today()),
+           {:ok, {discount_type, discount_value}} <-
+             PromotionRedemptionPolicy.validate_manual_discount(
+               params["discount_type_snapshot"],
+               params["discount_value_snapshot"]
+             ) do
+        {:ok,
+         params
+         |> Map.put("promotion_campaign_id", campaign.id)
+         |> Map.put("membership_id", membership.id)
+         |> Map.put("discount_type_snapshot", discount_type)
+         |> Map.put("discount_value_snapshot", discount_value)
+         |> Map.put_new("redeemed_at", utc_now())}
+      else
+        nil -> {:error, :not_found}
+        {:error, reason} -> {:error, reason}
+      end
+    else
+      {:error, :bad_request}
     end
   end
 
@@ -4896,7 +4933,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp for_user_memberships(query, nil), do: query
 
   defp for_user_memberships(query, users) do
-    memberships = from(membership in Membership, where: membership.user_id in ^users, select: membership.id)
+    memberships =
+      from(membership in Membership, where: membership.user_id in ^users, select: membership.id)
+
     where(query, [record], record.membership_id in subquery(memberships))
   end
 
@@ -5218,7 +5257,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     ReferralReward
     |> where([reward], reward.status in ["pending", "approved"])
     |> then(fn query ->
-      if is_list(users), do: where(query, [reward], reward.recipient_user_id in ^users), else: query
+      if is_list(users),
+        do: where(query, [reward], reward.recipient_user_id in ^users),
+        else: query
     end)
     |> order_by([reward], asc: reward.inserted_at)
     |> limit(^limit)
@@ -5505,6 +5546,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       ends_on: campaign.ends_on,
       active: campaign.active,
       params: campaign.params || %{},
+      location_scope: %{
+        all_locations: campaign.all_locations != false,
+        location_ids:
+          if(campaign.all_locations == false, do: campaign.location_ids || [], else: [])
+      },
       inserted_at: campaign.inserted_at,
       updated_at: campaign.updated_at
     }

@@ -1207,6 +1207,11 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
       source_slot_id: assignment.source_scheduled_class_id,
       season_offering_id: assignment.season_offering_id,
+      location_scope: %{
+        all_locations: assignment.all_locations != false,
+        location_ids:
+          if(assignment.all_locations == false, do: assignment.location_ids || [], else: [])
+      },
       assignment_kind: AssignmentAudiencePolicy.kind(assignment.source_scheduled_class_id),
       workout: normalize_assigned_workout(assignment.master_workout)
     }

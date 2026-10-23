@@ -93,7 +93,11 @@ defmodule Palee.Application.BranchReport do
 
     activity = context |> Analytics.branch_activity(since) |> BranchAttribution.activity_counts()
 
-    BranchAttribution.home_branches(activity, Finance.package_location_scopes(context), active_ids)
+    BranchAttribution.home_branches(
+      activity,
+      Finance.package_location_scopes(context),
+      active_ids
+    )
   end
 
   defp visible_locations(context) do

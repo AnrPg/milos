@@ -22,7 +22,11 @@ defmodule Palee.Application.CreateAppointmentSlot do
   «Ισχύει για» (ADR-186 §8): one slot per branch of `location_ids`, created
   together or not at all; without the list, the one slot of `call/3`.
   """
-  def call_at_branches(%{organization_id: organization_id} = context, %{id: staff_id} = staff, params) do
+  def call_at_branches(
+        %{organization_id: organization_id} = context,
+        %{id: staff_id} = staff,
+        params
+      ) do
     listed? = Map.has_key?(params, :location_ids) or Map.has_key?(params, "location_ids")
     coach_id = value(params, :coach_id) || staff_id
 

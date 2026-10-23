@@ -1,5 +1,5 @@
 defmodule Palee.Application.DeleteAssignedWorkout do
-  alias Palee.Application.{BroadcastUserSync, TrackAnalyticsEvent}
+  alias Palee.Application.{BroadcastUserSync, CoveringBranches, TrackAnalyticsEvent}
   alias Palee.{Organizations, Workouts}
 
   def call(context, id) do
@@ -12,6 +12,7 @@ defmodule Palee.Application.DeleteAssignedWorkout do
     assignment = get_assigned_workout(context, id)
 
     with %{id: ^id} <- assignment,
+         :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(assignment)),
          :ok <- delete_assigned_workout(context, id) do
       broadcast_assignment_refresh(context, assignment)
       TrackAnalyticsEvent.call("workout_assignment_deleted", context, assignment)

@@ -42,6 +42,9 @@ defmodule PaleeWeb.AdminAssignedWorkoutController do
               },
               scheduled_for: %Schema{type: :string, format: :date},
               instructions: %Schema{type: :string},
+              # ADR-186 §8: «Ισχύει για»
+              all_locations: %Schema{type: :boolean},
+              location_ids: PaleeWeb.Schemas.LocationScope.targets_schema(),
               source_slot_id: %Schema{
                 type: :string,
                 format: :uuid,
@@ -94,7 +97,9 @@ defmodule PaleeWeb.AdminAssignedWorkoutController do
                 type: :array,
                 items: %Schema{type: :string, format: :uuid}
               },
-              instructions: %Schema{type: :string}
+              instructions: %Schema{type: :string},
+              all_locations: %Schema{type: :boolean},
+              location_ids: PaleeWeb.Schemas.LocationScope.targets_schema()
             },
             required: [:scheduled_for, :athlete_ids]
           }

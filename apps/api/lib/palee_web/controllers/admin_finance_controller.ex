@@ -251,7 +251,10 @@ defmodule PaleeWeb.AdminFinanceController do
             starts_on: %Schema{type: :string, format: :date, nullable: true},
             ends_on: %Schema{type: :string, format: :date, nullable: true},
             active: %Schema{type: :boolean},
-            params: %Schema{type: :object, additionalProperties: true}
+            params: %Schema{type: :object, additionalProperties: true},
+            # ADR-186 §8: «Ισχύει για»
+            all_locations: %Schema{type: :boolean},
+            location_ids: PaleeWeb.Schemas.LocationScope.targets_schema()
           },
           required: [:name],
           additionalProperties: false
@@ -649,7 +652,7 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def packages(conn, _params) do
-    with {:ok, payload} <- ListFinancePackages.call() do
+    with {:ok, payload} <- ListFinancePackages.call(conn.assigns.tenant_context) do
       json(conn, payload)
     end
   end
@@ -685,7 +688,7 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def package(conn, params) do
-    with {:ok, payload} <- GetFinancePackage.call(param_id(params)) do
+    with {:ok, payload} <- GetFinancePackage.call(conn.assigns.tenant_context, param_id(params)) do
       json(conn, payload)
     end
   end
@@ -697,7 +700,8 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def create_package(conn, params) do
-    with {:ok, package} <- CreateFinancePackage.call(body_params(conn, params)) do
+    with {:ok, package} <-
+           CreateFinancePackage.call(conn.assigns.tenant_context, body_params(conn, params)) do
       conn
       |> put_status(:created)
       |> json(%{package: package})
@@ -712,7 +716,12 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def update_package(conn, params) do
-    with {:ok, package} <- UpdateFinancePackage.call(param_id(params), body_params(conn, params)) do
+    with {:ok, package} <-
+           UpdateFinancePackage.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       json(conn, %{package: package})
     end
   end
@@ -725,7 +734,12 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def retire_package(conn, params) do
-    with {:ok, result} <- RetireFinancePackage.call(param_id(params), body_params(conn, params)) do
+    with {:ok, result} <-
+           RetireFinancePackage.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       json(conn, result)
     end
   end
@@ -1114,7 +1128,7 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def promotions(conn, _params) do
-    with {:ok, payload} <- ListFinancePromotions.call() do
+    with {:ok, payload} <- ListFinancePromotions.call(conn.assigns.tenant_context) do
       json(conn, payload)
     end
   end
@@ -1126,7 +1140,8 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def create_promotion(conn, params) do
-    with {:ok, campaign} <- CreateFinancePromotion.call(body_params(conn, params)) do
+    with {:ok, campaign} <-
+           CreateFinancePromotion.call(conn.assigns.tenant_context, body_params(conn, params)) do
       conn
       |> put_status(:created)
       |> json(%{promotion_campaign: campaign})
@@ -1140,7 +1155,8 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def promotion_codes(conn, params) do
-    with {:ok, payload} <- ListFinancePromotionCodes.call(param_id(params)) do
+    with {:ok, payload} <-
+           ListFinancePromotionCodes.call(conn.assigns.tenant_context, param_id(params)) do
       json(conn, payload)
     end
   end
@@ -1154,7 +1170,11 @@ defmodule PaleeWeb.AdminFinanceController do
 
   def create_promotion_code(conn, params) do
     with {:ok, code} <-
-           CreateFinancePromotionCode.call(param_id(params), body_params(conn, params)) do
+           CreateFinancePromotionCode.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{promotion_code: code})
@@ -1180,7 +1200,10 @@ defmodule PaleeWeb.AdminFinanceController do
 
   def create_referral_program(conn, params) do
     with {:ok, program} <-
-           CreateFinanceReferralProgram.call(body_params(conn, params)) do
+           CreateFinanceReferralProgram.call(
+             conn.assigns.tenant_context,
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{referral_program: program})
@@ -1196,7 +1219,11 @@ defmodule PaleeWeb.AdminFinanceController do
 
   def update_referral_program(conn, params) do
     with {:ok, program} <-
-           UpdateFinanceReferralProgram.call(param_id(params), body_params(conn, params)) do
+           UpdateFinanceReferralProgram.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       json(conn, %{referral_program: program})
     end
   end

@@ -322,8 +322,12 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
         )
         |> Repo.all()
 
-      Enum.map(check_ins, fn {user, location, count} -> {load_uuid(user), load_uuid(location), count, 0} end) ++
-        Enum.map(attended, fn {user, location, count} -> {load_uuid(user), load_uuid(location), 0, count} end)
+      Enum.map(check_ins, fn {user, location, count} ->
+        {load_uuid(user), load_uuid(location), count, 0}
+      end) ++
+        Enum.map(attended, fn {user, location, count} ->
+          {load_uuid(user), load_uuid(location), 0, count}
+        end)
     else
       []
     end

@@ -37,7 +37,13 @@ defmodule Palee.Organizations.Domain.BranchAttribution do
     counts =
       Enum.reduce(activity, %{}, fn {user_id, location_id, count}, acc ->
         if MapSet.member?(active, location_id) and is_integer(count) and count > 0,
-          do: Map.update(acc, user_id, %{location_id => count}, &Map.update(&1, location_id, count, fn c -> c + count end)),
+          do:
+            Map.update(
+              acc,
+              user_id,
+              %{location_id => count},
+              &Map.update(&1, location_id, count, fn c -> c + count end)
+            ),
           else: acc
       end)
 
@@ -85,7 +91,10 @@ defmodule Palee.Organizations.Domain.BranchAttribution do
 
   @doc "Rows of `{user_id, location_id, check_ins, attended}` as attribution activity."
   def activity_counts(rows),
-    do: Enum.map(rows, fn {user_id, location_id, check_ins, attended} -> {user_id, location_id, check_ins + attended} end)
+    do:
+      Enum.map(rows, fn {user_id, location_id, check_ins, attended} ->
+        {user_id, location_id, check_ins + attended}
+      end)
 
   @doc """
   What the per-branch splits leave out (people without a home branch), for an

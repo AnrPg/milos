@@ -12,6 +12,7 @@ defmodule Palee.Application.AssignWorkout do
   alias Palee.Application.{
     AuthorizeMemberProgramming,
     BroadcastUserSync,
+    CoveringBranches,
     TenantAssigneeRoles,
     TenantStaffRecipients,
     TrackAnalyticsEvent
@@ -25,7 +26,11 @@ defmodule Palee.Application.AssignWorkout do
     assignee_ids = athlete_ids(params)
     source_slot_id = source_slot_id(params)
 
-    with {:ok, roles} <- TenantAssigneeRoles.call(context, assignee_ids),
+    # ADR-186 §8: the programme is valid at the chosen branches, inside the
+    # acting coach's own.
+    with {:ok, target} <- CoveringBranches.for_new(context, CoveringBranches.requested(params)),
+         params = CoveringBranches.put_columns(params, target),
+         {:ok, roles} <- TenantAssigneeRoles.call(context, assignee_ids),
          {:ok, classified} <- AssignmentAudiencePolicy.classify(assignee_ids, roles),
          :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
          {:ok, params} <- attach_source_slot(context, params, source_slot_id, classified),
