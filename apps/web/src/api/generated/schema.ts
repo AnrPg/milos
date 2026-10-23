@@ -416,6 +416,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/business-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a gym or independent-coach business in demo mode (sign-up only)
+         * @description Within 30 minutes of registering. Older accounts file a conversion request (`business_signup_closed`).
+         */
+        post: operations["PaleeWeb.BusinessAccountController.sign_up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/business-activation/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What an activation link would activate (the account it names only) */
+        post: operations["PaleeWeb.BusinessAccountController.inspect_activation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/business-activation/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate the business: demo data removed, gates lifted */
+        post: operations["PaleeWeb.BusinessAccountController.redeem_activation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -1296,6 +1350,41 @@ export interface paths {
         put?: never;
         /** Claim an invite link: you become that person's buddy */
         post: operations["PaleeWeb.MyBuddiesController.claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/business-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The person's requests to the platform team */
+        get: operations["PaleeWeb.BusinessAccountController.my_requests"];
+        put?: never;
+        /** Ask the platform team to turn this account into a business */
+        post: operations["PaleeWeb.BusinessAccountController.request_conversion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/business-requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraw a pending request */
+        post: operations["PaleeWeb.BusinessAccountController.cancel_request"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3708,6 +3797,58 @@ export interface paths {
         /** Create a constrained presigned upload for a new organization logo */
         post: operations["PaleeWeb.AdminBrandingController.logo_upload_url"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/business": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Activation state and the sections holding demo data */
+        get: operations["PaleeWeb.AdminBusinessController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/business/activation-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the platform team to activate this business (owners) */
+        post: operations["PaleeWeb.AdminBusinessController.request_activation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/business/demo-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fill a screen's section (or all) with demo data (demo mode only) */
+        post: operations["PaleeWeb.AdminBusinessController.seed"];
+        /** Remove every demo row (demo mode only) */
+        delete: operations["PaleeWeb.AdminBusinessController.remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9530,6 +9671,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/activation-links/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a live activation link (vendors) */
+        delete: operations["PaleeWeb.PlatformBusinessAccountController.revoke_link"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/business-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pending requests and businesses in demo mode (vendors) */
+        get: operations["PaleeWeb.PlatformBusinessAccountController.queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/business-requests/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or decline a request (vendors)
+         * @description Approving a conversion creates the business in demo mode; approving an activation request issues the activation link for the requester.
+         */
+        post: operations["PaleeWeb.PlatformBusinessAccountController.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organization-purges": {
         parameters: {
             query?: never;
@@ -9593,6 +9788,23 @@ export interface paths {
         get: operations["PaleeWeb.PlatformOrganizationController.access"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/activation-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the activation link of a demo business for one account (vendors) */
+        post: operations["PaleeWeb.PlatformBusinessAccountController.issue_link"];
         delete?: never;
         options?: never;
         head?: never;
@@ -15094,6 +15306,304 @@ export interface components {
                 share_phone: boolean;
                 tz: string;
             };
+        };
+        /** BusinessAccountsQueue */
+        BusinessAccountsQueue: {
+            demo_businesses: {
+                link?: {
+                    /** Format: date_time */
+                    expires_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date_time */
+                    inserted_at: string;
+                    nickname?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** @description Only when just issued */
+                    path?: string | null;
+                    /** @enum {string} */
+                    role: "owner" | "admin";
+                    /** @enum {string} */
+                    state: "live" | "expired" | "redeemed" | "revoked";
+                    /** @description Only when just issued */
+                    token?: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                } | null;
+                /** BusinessOrganization */
+                organization: {
+                    /** Format: date_time */
+                    activated_at?: string | null;
+                    /** @enum {string} */
+                    activation: "demo" | "active";
+                    /** Format: date_time */
+                    demo_started_at?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                    provider_kind: string;
+                    slug: string;
+                };
+                owners: {
+                    nickname?: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
+            }[];
+            requests: {
+                /** @enum {string} */
+                business_kind: "gym" | "coach";
+                business_name: string;
+                city?: string | null;
+                /** Format: date_time */
+                decided_at?: string | null;
+                decision_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                /** @enum {string} */
+                kind: "conversion" | "activation";
+                message?: string | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                phone?: string | null;
+                /** @description Vendors: nickname */
+                requested_by?: string | null;
+                /** @enum {string} */
+                status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+            }[];
+        };
+        /** BusinessActivationLink */
+        BusinessActivationLink: {
+            /** Format: date_time */
+            expires_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: date_time */
+            inserted_at: string;
+            nickname?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            /** @description Only when just issued */
+            path?: string | null;
+            /** @enum {string} */
+            role: "owner" | "admin";
+            /** @enum {string} */
+            state: "live" | "expired" | "redeemed" | "revoked";
+            /** @description Only when just issued */
+            token?: string | null;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** BusinessActivationPreview */
+        BusinessActivationPreview: {
+            demo: {
+                people: number;
+                rows: number;
+                sections: string[];
+            };
+            /** Format: date_time */
+            expires_at: string;
+            /** BusinessOrganization */
+            organization: {
+                /** Format: date_time */
+                activated_at?: string | null;
+                /** @enum {string} */
+                activation: "demo" | "active";
+                /** Format: date_time */
+                demo_started_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                provider_kind: string;
+                slug: string;
+            };
+            /** @enum {string} */
+            role: "owner" | "admin";
+        };
+        /** BusinessActivationResult */
+        BusinessActivationResult: {
+            /** BusinessOrganization */
+            organization: {
+                /** Format: date_time */
+                activated_at?: string | null;
+                /** @enum {string} */
+                activation: "demo" | "active";
+                /** Format: date_time */
+                demo_started_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                provider_kind: string;
+                slug: string;
+            };
+            removed: {
+                people: number;
+                rows: number;
+            };
+            roles: string[];
+        };
+        /** BusinessDemoStatus */
+        BusinessDemoStatus: {
+            /** @enum {string} */
+            activation: "demo" | "active";
+            activation_request?: {
+                /** @enum {string} */
+                business_kind: "gym" | "coach";
+                business_name: string;
+                city?: string | null;
+                /** Format: date_time */
+                decided_at?: string | null;
+                decision_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                /** @enum {string} */
+                kind: "conversion" | "activation";
+                message?: string | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                phone?: string | null;
+                /** @description Vendors: nickname */
+                requested_by?: string | null;
+                /** @enum {string} */
+                status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+            } | null;
+            /** @description Demo mode applies: going-live actions answer business_not_activated */
+            gated: boolean;
+            sections: {
+                rows: number;
+                section: string;
+                seeded: boolean;
+            }[];
+        };
+        /** BusinessOrganization */
+        BusinessOrganization: {
+            /** Format: date_time */
+            activated_at?: string | null;
+            /** @enum {string} */
+            activation: "demo" | "active";
+            /** Format: date_time */
+            demo_started_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            provider_kind: string;
+            slug: string;
+        };
+        /** BusinessRequest */
+        BusinessRequest: {
+            /** @enum {string} */
+            business_kind: "gym" | "coach";
+            business_name: string;
+            city?: string | null;
+            /** Format: date_time */
+            decided_at?: string | null;
+            decision_note?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date_time */
+            inserted_at: string;
+            /** @enum {string} */
+            kind: "conversion" | "activation";
+            message?: string | null;
+            /** Format: uuid */
+            organization_id?: string | null;
+            phone?: string | null;
+            /** @description Vendors: nickname */
+            requested_by?: string | null;
+            /** @enum {string} */
+            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+        };
+        /** BusinessRequestDecision */
+        BusinessRequestDecision: {
+            activation_link?: {
+                /** Format: date_time */
+                expires_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                nickname?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                /** @description Only when just issued */
+                path?: string | null;
+                /** @enum {string} */
+                role: "owner" | "admin";
+                /** @enum {string} */
+                state: "live" | "expired" | "redeemed" | "revoked";
+                /** @description Only when just issued */
+                token?: string | null;
+                /** Format: uuid */
+                user_id: string;
+            } | null;
+            organization?: {
+                /** Format: date_time */
+                activated_at?: string | null;
+                /** @enum {string} */
+                activation: "demo" | "active";
+                /** Format: date_time */
+                demo_started_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                provider_kind: string;
+                slug: string;
+            } | null;
+            /** BusinessRequest */
+            request: {
+                /** @enum {string} */
+                business_kind: "gym" | "coach";
+                business_name: string;
+                city?: string | null;
+                /** Format: date_time */
+                decided_at?: string | null;
+                decision_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                /** @enum {string} */
+                kind: "conversion" | "activation";
+                message?: string | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                phone?: string | null;
+                /** @description Vendors: nickname */
+                requested_by?: string | null;
+                /** @enum {string} */
+                status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+            };
+        };
+        /** BusinessRequests */
+        BusinessRequests: {
+            requests: {
+                /** @enum {string} */
+                business_kind: "gym" | "coach";
+                business_name: string;
+                city?: string | null;
+                /** Format: date_time */
+                decided_at?: string | null;
+                decision_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                /** @enum {string} */
+                kind: "conversion" | "activation";
+                message?: string | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                phone?: string | null;
+                /** @description Vendors: nickname */
+                requested_by?: string | null;
+                /** @enum {string} */
+                status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+            }[];
         };
         /** CheckInBooking */
         CheckInBooking: {
@@ -30737,6 +31247,11 @@ export interface operations {
                         /** Format: date_time */
                         expires_at: string;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -30774,6 +31289,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -32226,6 +32746,147 @@ export interface operations {
                         } | null;
                         /** @enum {string} */
                         status: "pending" | "expired" | "unavailable";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.sign_up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    business_kind: "gym" | "coach";
+                    business_name: string;
+                    city?: string | null;
+                    default_locale?: string | null;
+                    message?: string | null;
+                    phone?: string | null;
+                    timezone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Business */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date_time */
+                        activated_at?: string | null;
+                        /** @enum {string} */
+                        activation: "demo" | "active";
+                        /** Format: date_time */
+                        demo_started_at?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        provider_kind: string;
+                        slug: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.inspect_activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        demo: {
+                            people: number;
+                            rows: number;
+                            sections: string[];
+                        };
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** BusinessOrganization */
+                        organization: {
+                            /** Format: date_time */
+                            activated_at?: string | null;
+                            /** @enum {string} */
+                            activation: "demo" | "active";
+                            /** Format: date_time */
+                            demo_started_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            provider_kind: string;
+                            slug: string;
+                        };
+                        /** @enum {string} */
+                        role: "owner" | "admin";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.redeem_activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Activated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BusinessOrganization */
+                        organization: {
+                            /** Format: date_time */
+                            activated_at?: string | null;
+                            /** @enum {string} */
+                            activation: "demo" | "active";
+                            /** Format: date_time */
+                            demo_started_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            provider_kind: string;
+                            slug: string;
+                        };
+                        removed: {
+                            people: number;
+                            rows: number;
+                        };
+                        roles: string[];
                     };
                 };
             };
@@ -35820,6 +36481,147 @@ export interface operations {
                             unread_messages?: number;
                             via_link: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.my_requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.request_conversion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    business_kind: "gym" | "coach";
+                    business_name: string;
+                    city?: string | null;
+                    message?: string | null;
+                    phone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        business_kind: "gym" | "coach";
+                        business_name: string;
+                        city?: string | null;
+                        /** Format: date_time */
+                        decided_at?: string | null;
+                        decision_note?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        inserted_at: string;
+                        /** @enum {string} */
+                        kind: "conversion" | "activation";
+                        message?: string | null;
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        phone?: string | null;
+                        /** @description Vendors: nickname */
+                        requested_by?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.cancel_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        business_kind: "gym" | "coach";
+                        business_name: string;
+                        city?: string | null;
+                        /** Format: date_time */
+                        decided_at?: string | null;
+                        decision_note?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        inserted_at: string;
+                        /** @enum {string} */
+                        kind: "conversion" | "activation";
+                        message?: string | null;
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        phone?: string | null;
+                        /** @description Vendors: nickname */
+                        requested_by?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
                 };
             };
@@ -45951,6 +46753,11 @@ export interface operations {
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -46008,6 +46815,11 @@ export interface operations {
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -46052,6 +46864,11 @@ export interface operations {
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -46114,6 +46931,11 @@ export interface operations {
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -47214,6 +48036,222 @@ export interface operations {
                             [key: string]: string;
                         };
                         upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBusinessController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        activation: "demo" | "active";
+                        activation_request?: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        } | null;
+                        /** @description Demo mode applies: going-live actions answer business_not_activated */
+                        gated: boolean;
+                        sections: {
+                            rows: number;
+                            section: string;
+                            seeded: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBusinessController.request_activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    city?: string | null;
+                    message?: string | null;
+                    phone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        business_kind: "gym" | "coach";
+                        business_name: string;
+                        city?: string | null;
+                        /** Format: date_time */
+                        decided_at?: string | null;
+                        decision_note?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        inserted_at: string;
+                        /** @enum {string} */
+                        kind: "conversion" | "activation";
+                        message?: string | null;
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        phone?: string | null;
+                        /** @description Vendors: nickname */
+                        requested_by?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBusinessController.seed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A demo section (members, schedule, finance, workouts) or all */
+                    section: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        activation: "demo" | "active";
+                        activation_request?: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        } | null;
+                        /** @description Demo mode applies: going-live actions answer business_not_activated */
+                        gated: boolean;
+                        sections: {
+                            rows: number;
+                            section: string;
+                            seeded: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBusinessController.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        activation: "demo" | "active";
+                        activation_request?: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        } | null;
+                        /** @description Demo mode applies: going-live actions answer business_not_activated */
+                        gated: boolean;
+                        sections: {
+                            rows: number;
+                            section: string;
+                            seeded: boolean;
+                        }[];
                     };
                 };
             };
@@ -69033,6 +70071,11 @@ export interface operations {
                         /** Format: date_time */
                         expires_at: string;
                         organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
                             /** Format: uuid */
                             id: string;
                             name: string;
@@ -77723,6 +78766,228 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PlatformBusinessAccountController.revoke_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        inserted_at: string;
+                        nickname?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** @description Only when just issued */
+                        path?: string | null;
+                        /** @enum {string} */
+                        role: "owner" | "admin";
+                        /** @enum {string} */
+                        state: "live" | "expired" | "redeemed" | "revoked";
+                        /** @description Only when just issued */
+                        token?: string | null;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformBusinessAccountController.queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queue */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        demo_businesses: {
+                            link?: {
+                                /** Format: date_time */
+                                expires_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date_time */
+                                inserted_at: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** @description Only when just issued */
+                                path?: string | null;
+                                /** @enum {string} */
+                                role: "owner" | "admin";
+                                /** @enum {string} */
+                                state: "live" | "expired" | "redeemed" | "revoked";
+                                /** @description Only when just issued */
+                                token?: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            /** BusinessOrganization */
+                            organization: {
+                                /** Format: date_time */
+                                activated_at?: string | null;
+                                /** @enum {string} */
+                                activation: "demo" | "active";
+                                /** Format: date_time */
+                                demo_started_at?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                provider_kind: string;
+                                slug: string;
+                            };
+                            owners: {
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                        }[];
+                        requests: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformBusinessAccountController.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "approve" | "decline";
+                    note?: string | null;
+                    /**
+                     * @description Activation requests: the role the link grants
+                     * @enum {string}
+                     */
+                    role?: "owner" | "admin";
+                };
+            };
+        };
+        responses: {
+            /** @description Decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        activation_link?: {
+                            /** Format: date_time */
+                            expires_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            nickname?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** @description Only when just issued */
+                            path?: string | null;
+                            /** @enum {string} */
+                            role: "owner" | "admin";
+                            /** @enum {string} */
+                            state: "live" | "expired" | "redeemed" | "revoked";
+                            /** @description Only when just issued */
+                            token?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        } | null;
+                        organization?: {
+                            /** Format: date_time */
+                            activated_at?: string | null;
+                            /** @enum {string} */
+                            activation: "demo" | "active";
+                            /** Format: date_time */
+                            demo_started_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            provider_kind: string;
+                            slug: string;
+                        } | null;
+                        /** BusinessRequest */
+                        request: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PlatformOrganizationPurgeController.index": {
         parameters: {
             query?: never;
@@ -77888,6 +79153,59 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformBusinessAccountController.issue_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    lifetime_seconds?: number;
+                    nickname?: string | null;
+                    /** @enum {string} */
+                    role: "owner" | "admin";
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Link */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        inserted_at: string;
+                        nickname?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** @description Only when just issued */
+                        path?: string | null;
+                        /** @enum {string} */
+                        role: "owner" | "admin";
+                        /** @enum {string} */
+                        state: "live" | "expired" | "redeemed" | "revoked";
+                        /** @description Only when just issued */
+                        token?: string | null;
+                        /** Format: uuid */
+                        user_id: string;
                     };
                 };
             };
