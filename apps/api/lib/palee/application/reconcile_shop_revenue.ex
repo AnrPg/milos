@@ -19,12 +19,12 @@ defmodule Palee.Application.ReconcileShopRevenue do
 
   alias Palee.Organizations
   alias Palee.Shop.Domain.RevenueReconciliation
-  alias Palee.Shop.{Observability, ShopReportStore}
+  alias Palee.Shop.ShopReportStore
   alias Palee.TimeZones.ZonedTime
 
   @lookback_days 7
   @max_days 366
-  @read_capabilities [:view_business_analytics, :view_finance_reports]
+  @read_capabilities [:view_business_analytics, :view_finance_reports, :manage_shop]
 
   def lookback_days, do: @lookback_days
 
@@ -100,7 +100,15 @@ defmodule Palee.Application.ReconcileShopRevenue do
   end
 
   defp report(organization_id, result) do
-    Observability.reconciliation_checked(result)
+    :telemetry.execute(
+      [:palee, :shop, :reconciliation, :checked],
+      %{
+        days: length(result.days),
+        drifted_days: length(result.drifted),
+        drift_cents: result.drift_cents
+      },
+      %{result: if(result.ok, do: "ok", else: "drift")}
+    )
 
     Enum.each(result.drifted, fn day ->
       Logger.warning("shop_revenue_drift",

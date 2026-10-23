@@ -21,8 +21,8 @@ defmodule Palee.Application.ShopReports do
   alias Palee.Shop.ShopReportStore
   alias Palee.TimeZones.ZonedTime
 
-  @read_capabilities [:view_business_analytics]
-  @write_capabilities [:manage_settings]
+  @read_capabilities [:view_business_analytics, :manage_shop]
+  @write_capabilities [:manage_shop, :manage_settings]
   @default_days 30
   @max_days 366
   @top_limit 10

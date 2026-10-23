@@ -23,8 +23,9 @@ defmodule Palee.Infrastructure.Observability.TelemetryLogReporter do
     [:palee, :shop, :order, :placed],
     [:palee, :shop, :order, :paid],
     [:palee, :shop, :order, :refunded],
-    [:palee, :shop, :stock, :movement],
-    [:palee, :shop, :stock, :low],
+    [:palee, :shop, :order, :cancelled],
+    [:palee, :shop, :stock, :moved],
+    [:palee, :shop, :stock, :status_changed],
     [:palee, :shop, :reconciliation, :checked],
     [:oban, :job, :exception],
     [:oban, :job, :discard],
@@ -67,7 +68,7 @@ defmodule Palee.Infrastructure.Observability.TelemetryLogReporter do
         :stream,
         :currency,
         :channel,
-        :method,
+        :payment_mode,
         :kind,
         :status
       ])

@@ -425,7 +425,7 @@ defmodule Palee.Infrastructure.Shop.EctoShopReportStore do
       JOIN orders ord ON ord.id = order_line.order_id
       WHERE line.organization_id = $1 AND line.revenue_stream = 'shop'
         AND line.source_type = 'shop_order_line'
-        AND invoice.deleted_at IS NULL AND invoice.voided_at IS NULL
+        AND invoice.deleted_at IS NULL AND invoice.voided_at IS NULL AND invoice.status <> 'void'
       GROUP BY 1, 2, 3
     ), refunds AS (
       SELECT payment.finance_invoice_id, sum(reversal.amount_cents) AS cents

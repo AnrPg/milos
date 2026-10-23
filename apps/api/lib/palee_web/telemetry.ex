@@ -8,6 +8,7 @@ defmodule PaleeWeb.Telemetry do
     MetricsPlug,
     OutboxProbe,
     PrometheusExporter,
+    RevenueStreamBridge,
     TelemetryLogReporter
   }
 
@@ -21,6 +22,8 @@ defmodule PaleeWeb.Telemetry do
   def init(_arg) do
     prometheus = Application.get_env(:palee, :prometheus_metrics, enabled: false)
     start_oban = Application.get_env(:palee, :start_oban, true)
+    # ADR-192: shop order events feed the revenue-by-stream counters.
+    RevenueStreamBridge.attach()
 
     prometheus
     |> children(start_oban: start_oban)
@@ -182,66 +185,93 @@ defmodule PaleeWeb.Telemetry do
     ]
   end
 
-  # ADR-192: the shop's orders, stock and revenue reconciliation
-  # (Palee.Shop.Observability is the event contract).
+  # ADR-192: the shop's orders, stock and revenue reconciliation, from the
+  # events of `Palee.Application.Shop.Observability` (ADR-190). Those events
+  # carry ids in their metadata; `shop_tags/1` keeps only closed-list values
+  # (anything else becomes "other"), so no label carries an id.
   defp shop_metrics do
-    [
-      counter("palee.shop.order.placed.count",
-        tags: [:channel],
-        description: "Shop orders placed, by channel (online pickup or desk)",
-        reporter_options: [prometheus_name: "palee_shop_orders_placed_total"]
-      ),
-      counter("palee.shop.order.paid.count",
-        tags: [:channel, :method],
-        description: "Shop orders paid, by channel and payment method",
-        reporter_options: [prometheus_name: "palee_shop_orders_paid_total"]
-      ),
-      sum("palee.shop.order.paid.amount_cents",
-        tags: [:channel],
-        description: "Shop order amounts paid, in cents",
-        reporter_options: [prometheus_name: "palee_shop_paid_cents_total"]
-      ),
-      counter("palee.shop.order.refunded.count",
-        tags: [:channel],
-        description: "Shop order refunds, by channel",
-        reporter_options: [prometheus_name: "palee_shop_refunds_total"]
-      ),
-      sum("palee.shop.order.refunded.amount_cents",
-        tags: [:channel],
-        description: "Shop order amounts refunded, in cents",
-        reporter_options: [prometheus_name: "palee_shop_refunded_cents_total"]
-      ),
-      counter("palee.shop.stock.movement.count",
-        tags: [:kind],
-        description: "Stock ledger movements, by kind",
-        reporter_options: [prometheus_name: "palee_shop_stock_movements_total"]
-      ),
-      sum("palee.shop.stock.movement.quantity",
-        tags: [:kind],
-        measurement: &abs(&1.quantity),
-        description: "Units moved through the stock ledger, by kind",
-        reporter_options: [prometheus_name: "palee_shop_stock_units_moved_total"]
-      ),
-      counter("palee.shop.stock.low.count",
-        tags: [:status],
-        description: "Variants that crossed into low, critical or out of stock",
-        reporter_options: [prometheus_name: "palee_shop_low_stock_alerts_total"]
-      ),
-      counter("palee.shop.reconciliation.checked.count",
-        event_name: [:palee, :shop, :reconciliation, :checked],
-        tags: [:result],
-        description: "Shop revenue reconciliation runs, by result (ok or drift)",
-        reporter_options: [prometheus_name: "palee_shop_reconciliation_runs_total"]
-      ),
-      sum("palee.shop.reconciliation.checked.drifted_days",
-        description: "Business days found drifting by the shop revenue reconciliation",
-        reporter_options: [prometheus_name: "palee_shop_reconciliation_drifted_days_total"]
-      ),
-      last_value("palee.shop.reconciliation.checked.drift_cents",
-        description: "Absolute drift, in cents, found by the latest reconciliation run",
-        reporter_options: [prometheus_name: "palee_shop_reconciliation_drift_cents"]
-      )
-    ]
+    order_counters =
+      for event <- ~w(placed paid ready picked_up cancelled refunded)a do
+        counter("palee.shop.order.#{event}.count",
+          tags: [:channel],
+          tag_values: &shop_tags/1,
+          description: "Shop orders #{event}, by channel (online = pickup order, pos = desk)",
+          reporter_options: [prometheus_name: "palee_shop_orders_#{event}_total"]
+        )
+      end
+
+    order_counters ++
+      [
+        sum("palee.shop.order.paid.amount_cents",
+          tags: [:channel, :payment_mode],
+          tag_values: &shop_tags/1,
+          description: "Shop order amounts paid, in cents",
+          reporter_options: [prometheus_name: "palee_shop_paid_cents_total"]
+        ),
+        sum("palee.shop.order.refunded.amount_cents",
+          tags: [:channel],
+          tag_values: &shop_tags/1,
+          description: "Shop order amounts refunded, in cents",
+          reporter_options: [prometheus_name: "palee_shop_refunded_cents_total"]
+        ),
+        counter("palee.shop.stock.moved.count",
+          tags: [:kind],
+          tag_values: &shop_tags/1,
+          description: "Stock ledger movements, by kind",
+          reporter_options: [prometheus_name: "palee_shop_stock_movements_total"]
+        ),
+        sum("palee.shop.stock.moved.quantity",
+          tags: [:kind],
+          tag_values: &shop_tags/1,
+          measurement: &abs(&1.quantity),
+          description: "Units moved through the stock ledger, by kind",
+          reporter_options: [prometheus_name: "palee_shop_stock_units_moved_total"]
+        ),
+        counter("palee.shop.stock.status_changed.count",
+          tags: [:status],
+          tag_values: &shop_tags/1,
+          keep: &(shop_tags(&1).status in ["low", "critical", "out"]),
+          description: "Low-stock alerts: variants that moved into low, critical or out of stock",
+          reporter_options: [prometheus_name: "palee_shop_low_stock_alerts_total"]
+        ),
+        counter("palee.shop.variant.price_changed.count",
+          description: "Variant price, compare-at or cost changes",
+          reporter_options: [prometheus_name: "palee_shop_price_changes_total"]
+        ),
+        counter("palee.shop.reconciliation.checked.count",
+          tags: [:result],
+          description: "Shop revenue reconciliation runs, by result (ok or drift)",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_runs_total"]
+        ),
+        sum("palee.shop.reconciliation.checked.drifted_days",
+          description: "Business days found drifting by the shop revenue reconciliation",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_drifted_days_total"]
+        ),
+        last_value("palee.shop.reconciliation.checked.drift_cents",
+          description: "Drift, in cents, found by the latest reconciliation run of a business",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_drift_cents"]
+        )
+      ]
+  end
+
+  @shop_label_values %{
+    channel: ~w(online pos),
+    payment_mode: ~w(at_pickup on_account online cash card_manual bank_transfer other),
+    kind: ~w(receive sale refund_restock adjustment transfer reserve release),
+    status: ~w(ok low critical out)
+  }
+
+  @doc false
+  def shop_tags(metadata) do
+    Map.new(@shop_label_values, fn {key, allowed} ->
+      value =
+        case Map.get(metadata, key) do
+          atom when is_atom(atom) and not is_nil(atom) -> Atom.to_string(atom)
+          other -> other
+        end
+
+      {key, if(value in allowed, do: value, else: "other")}
+    end)
   end
 
   defp http_metrics do
