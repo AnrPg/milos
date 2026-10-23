@@ -19,7 +19,7 @@ function persona() {
     nickname: "Maria",
     role: "member",
     email: "member@example.com",
-    completed_tours: ["admin", "member", "athlete"],
+    completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,
     memberships: [{ organization_slug: "kypseli", role: "member", settings: {} }],

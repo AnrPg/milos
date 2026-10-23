@@ -7,7 +7,7 @@ const user = {
   avatar_url: null,
   preferred_locale: "en",
   // The first-run product tour (ADR-107) would cover the chat button.
-  completed_tours: ["admin", "member", "athlete"],
+  completed_tours: ["admin", "member", "athlete", "first_run"],
 };
 const recipient = {
   id: "22222222-2222-4222-8222-222222222222",

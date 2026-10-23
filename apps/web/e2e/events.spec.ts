@@ -21,7 +21,7 @@ function personaFor(role: "member" | "admin", membershipRole: string) {
     nickname: role === "member" ? "Maria" : "Apostolos",
     role,
     email: `${role}@example.com`,
-    completed_tours: ["admin", "member", "athlete"],
+    completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,
     memberships: [{ organization_slug: "kypseli", role: membershipRole, settings: {} }],
