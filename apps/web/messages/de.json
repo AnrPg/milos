@@ -9486,7 +9486,9 @@
     "notifRequestedTitle": "Anfrage zum Zurücksetzen des Passworts",
     "notifRequestedBody": "{name} (@{handle}) kann sich nicht anmelden und bittet darum, das Passwort zurückzusetzen.",
     "notifCompletedTitle": "Dein Passwort wurde zurückgesetzt",
-    "notifCompletedBody": "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an dein Studio oder den Palee-Support."
+    "notifCompletedBody": "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an dein Studio oder den Palee-Support.",
+    "logOpenRequests": "Offene Anfragen",
+    "logHint": "Anfragen werden auf der Seite „Passwort-Zurücksetzungen“ bearbeitet. Niemand kann eine Anfrage für das eigene Konto bearbeiten – sie geht an die anderen, die das können."
   },
   "FirstRun": {
     "progress": "Schritt {step} von {total}",

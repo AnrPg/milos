@@ -9486,7 +9486,9 @@
     "notifRequestedTitle": "Demande de réinitialisation du mot de passe",
     "notifRequestedBody": "{name} (@{handle}) n’arrive pas à se connecter et a demandé à réinitialiser son mot de passe.",
     "notifCompletedTitle": "Votre mot de passe a été réinitialisé",
-    "notifCompletedBody": "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre salle ou le support Palee."
+    "notifCompletedBody": "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre salle ou le support Palee.",
+    "logOpenRequests": "Demandes en cours",
+    "logHint": "Les demandes se traitent sur la page des réinitialisations de mot de passe. Personne ne peut traiter une demande pour son propre compte : elle va aux autres personnes qui le peuvent."
   },
   "FirstRun": {
     "progress": "Étape {step} sur {total}",

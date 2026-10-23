@@ -9486,7 +9486,9 @@
     "notifRequestedTitle": "Password reset request",
     "notifRequestedBody": "{name} (@{handle}) can't sign in and asked for a password reset.",
     "notifCompletedTitle": "Your password was reset",
-    "notifCompletedBody": "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+    "notifCompletedBody": "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
+    "logOpenRequests": "Open requests",
+    "logHint": "Requests are handled on the Password resets page. Nobody can handle a request for their own account: it goes to the other people who can."
   },
   "FirstRun": {
     "progress": "Step {step} of {total}",

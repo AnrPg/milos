@@ -9486,7 +9486,9 @@
     "notifRequestedTitle": "Solicitud de restablecimiento de contraseña",
     "notifRequestedBody": "{name} (@{handle}) no puede iniciar sesión y ha pedido restablecer su contraseña.",
     "notifCompletedTitle": "Tu contraseña se ha restablecido",
-    "notifCompletedBody": "Tu contraseña se cambió con un enlace de restablecimiento o un código de recuperación, y se cerró la sesión en todos los dispositivos. Si no fuiste tú, contacta con tu gimnasio o con el soporte de Palee."
+    "notifCompletedBody": "Tu contraseña se cambió con un enlace de restablecimiento o un código de recuperación, y se cerró la sesión en todos los dispositivos. Si no fuiste tú, contacta con tu gimnasio o con el soporte de Palee.",
+    "logOpenRequests": "Solicitudes abiertas",
+    "logHint": "Las solicitudes se gestionan en la página de restablecimiento de contraseñas. Nadie puede gestionar una solicitud de su propia cuenta: va a las demás personas que pueden hacerlo."
   },
   "FirstRun": {
     "progress": "Paso {step} de {total}",
