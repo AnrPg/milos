@@ -56,8 +56,7 @@ export function BasicsStep({
         <input
           value={form.title}
           maxLength={120}
-          required
-          aria-required="true"
+          aria-required
           onChange={(event) => set({ title: event.target.value })}
           placeholder={t("fieldTitlePlaceholder")}
           className={fieldClass}
