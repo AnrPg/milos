@@ -9707,5 +9707,18 @@
     "filterNoteReferrals": "Doorverwijzingen en beloningen volgen de thuisvestiging van hun mensen. Programma's gelden voor het hele bedrijf.",
     "filterNoteAccounting": "Terugbetalingsbewijzen volgen de thuisvestiging van het lid. Afstemming en exports gelden voor het hele bedrijf.",
     "filterNoteBusinessWide": "Dit tabblad geldt voor het hele bedrijf; het vestigingsfilter is hier niet van toepassing."
+  },
+  "SiteInfo": {
+    "faqTitle": "Vragen over Palee",
+    "whatIsQuestion": "Wat is Palee?",
+    "whatIsAnswer": "Palee is een trainingsplatform voor sportscholen, coaches en atleten. Het brengt lesroosters en reserveringen, persoonlijke programma's, live workouts, gesprekken met de coach en voortgang bijhouden samen in één app.",
+    "whoForQuestion": "Voor wie is Palee?",
+    "whoForAnswer": "Voor eigenaren en medewerkers van sportscholen die lessen geven, coaches die programma's voor atleten maken en leden die lessen boeken en hun training bijhouden.",
+    "offlineQuestion": "Werkt Palee offline?",
+    "offlineAnswer": "Ja. Een workout loopt door zonder verbinding: afgevinkte stappen worden op het apparaat bewaard en gesynchroniseerd zodra de verbinding terug is.",
+    "adsQuestion": "Toont Palee advertenties?",
+    "adsAnswer": "Nee. Palee toont geen advertenties en volgt leden niet voor reclamedoeleinden. De trainingsvoortgang is van de atleet.",
+    "languagesQuestion": "Welke talen ondersteunt Palee?",
+    "languagesAnswer": "Engels, Grieks, Arabisch, Russisch, Duits, Spaans, Portugees, Hebreeuws, Italiaans, Bulgaars, Nederlands en Frans."
   }
 }
