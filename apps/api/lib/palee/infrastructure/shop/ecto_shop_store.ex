@@ -77,7 +77,12 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
 
       {:q, term}, query when is_binary(term) and term != "" ->
         pattern = "%" <> String.replace(term, ~r/[\\%_]/, "\\\\\\0") <> "%"
-        where(query, [product], ilike(product.title, ^pattern))
+
+        where(
+          query,
+          [product],
+          ilike(product.title, ^pattern) or ilike(product.category, ^pattern)
+        )
 
       _other, query ->
         query
@@ -391,19 +396,46 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     StockMovement
     |> tenant_scope()
     |> filter_movements(filters)
-    |> order_by([movement], desc: movement.occurred_at, desc: movement.inserted_at)
+    |> order_by([movement], desc: movement.occurred_at, desc: movement.id)
     |> limit(^Map.get(filters, :limit, 500))
     |> Repo.all()
   end
 
   defp filter_movements(query, filters) do
     Enum.reduce(filters, query, fn
-      {:variant_ids, ids}, query when is_list(ids) -> where(query, [m], m.variant_id in ^ids)
-      {:kinds, kinds}, query when is_list(kinds) -> where(query, [m], m.kind in ^kinds)
-      {:order_id, id}, query when is_binary(id) -> where(query, [m], m.order_id == ^id)
-      {:from, %DateTime{} = at}, query -> where(query, [m], m.occurred_at >= ^at)
-      {:location_ids, ids}, query when is_list(ids) -> where(query, [m], m.location_id in ^ids)
-      _other, query -> query
+      {:variant_ids, ids}, query when is_list(ids) ->
+        where(query, [m], m.variant_id in ^ids)
+
+      {:kinds, kinds}, query when is_list(kinds) ->
+        where(query, [m], m.kind in ^kinds)
+
+      {:order_id, id}, query when is_binary(id) ->
+        where(query, [m], m.order_id == ^id)
+
+      {:from, %DateTime{} = at}, query ->
+        where(query, [m], m.occurred_at >= ^at)
+
+      {:to, %DateTime{} = at}, query ->
+        where(query, [m], m.occurred_at < ^at)
+
+      {:location_ids, ids}, query when is_list(ids) ->
+        where(query, [m], m.location_id in ^ids)
+
+      # Keyset paging: rows strictly after the cursor's (occurred_at, id).
+      {:before, {%DateTime{} = at, id}}, query when is_binary(id) ->
+        where(query, [m], m.occurred_at < ^at or (m.occurred_at == ^at and m.id < ^id))
+
+      {:product_ids, ids}, query when is_list(ids) ->
+        where(
+          query,
+          [m],
+          m.variant_id in subquery(
+            from(variant in Variant, where: variant.product_id in ^ids, select: variant.id)
+          )
+        )
+
+      _other, query ->
+        query
     end)
   end
 
@@ -536,9 +568,24 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
       {:number, number}, query when is_integer(number) ->
         where(query, [order], order.number == ^number)
 
+      # Money kept: paid in full or in part, not refunded in full.
+      {:paid, true}, query ->
+        where(query, [order], order.payment_status in [:paid, :partially_refunded])
+
       _other, query ->
         query
     end)
+  end
+
+  @impl true
+  def order_counts(_context, filters) do
+    Order
+    |> tenant_scope()
+    |> filter_orders(Map.drop(filters, [:statuses, :limit]))
+    |> group_by([order], order.status)
+    |> select([order], {order.status, count(order.id)})
+    |> Repo.all()
+    |> Map.new()
   end
 
   @impl true

@@ -13,7 +13,7 @@ defmodule Palee.Application.Shop.ManageStock do
   """
 
   alias Palee.Application.Shop.{ManageCatalog, Observability}
-  alias Palee.{Organizations, Shop}
+  alias Palee.{Identity, Organizations, Shop}
 
   @doc "Records one movement on a variant; returns the variant with its stock and the ledger rows."
   def record(context, variant_id, params) do
@@ -30,6 +30,119 @@ defmodule Palee.Application.Shop.ManageStock do
     else
       {:error, {reason, _at}} when is_atom(reason) -> {:error, reason}
       error -> error
+    end
+  end
+
+  @max_page 200
+
+  @doc """
+  The stock ledger across every variant, newest first, one page at a time
+  (keyset `cursor`, `limit` up to #{@max_page}). `filters`: `location_ids`
+  (narrowed to the acting staff member's branches), `kinds`, `from`, `to`,
+  `variant_id`, `product_id`. Each row names its product, variant, order
+  number and who recorded it. Returns `%{movements, next_cursor}`.
+  """
+  def ledger_page(context, filters) do
+    limit = min(max(filters[:limit] || 50, 1), @max_page)
+
+    with {:ok, before} <- decode_cursor(filters[:cursor]) do
+      query =
+        %{
+          kinds: filters[:kinds],
+          from: filters[:from],
+          to: filters[:to],
+          before: before,
+          variant_ids: filters[:variant_id] && [filters[:variant_id]],
+          product_ids: filters[:product_id] && [filters[:product_id]],
+          location_ids: Organizations.restrict_location_filter(context, filters[:location_ids]),
+          limit: limit + 1
+        }
+        |> Map.reject(fn {_key, value} -> is_nil(value) end)
+
+      {page, rest} = context |> Shop.list_movements(query) |> Enum.split(limit)
+
+      {:ok,
+       %{
+         movements: describe(context, page),
+         next_cursor: if(rest != [] and page != [], do: encode_cursor(List.last(page)))
+       }}
+    end
+  end
+
+  defp describe(_context, []), do: []
+
+  defp describe(context, rows) do
+    variants =
+      context
+      |> Shop.list_variants(%{ids: rows |> Enum.map(& &1.variant_id) |> Enum.uniq()})
+      |> Map.new(&{&1.id, &1})
+
+    products =
+      context
+      |> Shop.list_products(%{
+        ids: variants |> Map.values() |> Enum.map(& &1.product_id) |> Enum.uniq(),
+        statuses: Shop.product_statuses()
+      })
+      |> Map.new(&{&1.id, &1})
+
+    orders =
+      case rows |> Enum.map(& &1.order_id) |> Enum.reject(&is_nil/1) |> Enum.uniq() do
+        [] -> %{}
+        _ids -> order_numbers(context, rows)
+      end
+
+    actors =
+      case rows |> Enum.map(& &1.user_id) |> Enum.reject(&is_nil/1) |> Enum.uniq() do
+        [] -> %{}
+        ids -> ids |> Identity.list_by_ids() |> Map.new(&{&1.id, &1.nickname})
+      end
+
+    Enum.map(rows, fn row ->
+      variant = variants[row.variant_id]
+      product = variant && products[variant.product_id]
+
+      row
+      |> Map.from_struct()
+      |> Map.drop([:__meta__])
+      |> Map.merge(%{
+        product_id: variant && variant.product_id,
+        product_title: product && product.title,
+        variant_title: variant && variant.title,
+        sku: variant && variant.sku,
+        order_number: orders[row.order_id],
+        actor_name: actors[row.user_id]
+      })
+    end)
+  end
+
+  defp order_numbers(context, rows) do
+    rows
+    |> Enum.map(& &1.order_id)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Enum.flat_map(fn id ->
+      case Shop.get_order(context, id) do
+        %{number: number} -> [{id, number}]
+        nil -> []
+      end
+    end)
+    |> Map.new()
+  end
+
+  defp encode_cursor(row),
+    do: Base.url_encode64("#{DateTime.to_iso8601(row.occurred_at)}|#{row.id}", padding: false)
+
+  defp decode_cursor(nil), do: {:ok, nil}
+  defp decode_cursor(""), do: {:ok, nil}
+
+  defp decode_cursor(cursor) do
+    with {:ok, text} <- Base.url_decode64(cursor, padding: false),
+         [at, id] <- String.split(text, "|", parts: 2),
+         {:ok, at, _offset} <- DateTime.from_iso8601(at),
+         {:ok, id} <- Ecto.UUID.cast(id) do
+      {:ok, {at, id}}
+    else
+      _invalid -> {:error, :invalid_cursor}
     end
   end
 

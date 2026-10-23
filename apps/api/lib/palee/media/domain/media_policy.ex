@@ -36,6 +36,17 @@ defmodule Palee.Media.Domain.MediaPolicy do
       types: @client_image_types,
       max_bytes: 8 * @mb
     },
+    # ADR-190: shop product photos, like box photos (public, re-encoded in
+    # the browser and inspected), uploaded by staff who manage the shop.
+    "shop_product_photo" => %{
+      scope: :tenant,
+      bucket: :media_public,
+      folder: "media/public/shop",
+      kind: "image",
+      processing: :inspect,
+      types: @client_image_types,
+      max_bytes: 8 * @mb
+    },
     # ADR-158: body photos go through the post pipeline (server-stripped
     # renditions) but never into a post; private bucket, signed URLs only.
     "body_photo" => %{

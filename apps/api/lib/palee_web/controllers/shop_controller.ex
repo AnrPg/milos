@@ -9,7 +9,17 @@ defmodule PaleeWeb.ShopController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.Shop.{Checkout, Fulfilment, ManageCatalog, ManageStock, PromoteProduct}
+  alias Palee.Application.{CompleteMediaUpload, RequestMediaUpload}
+
+  alias Palee.Application.Shop.{
+    Checkout,
+    Fulfilment,
+    ManageCatalog,
+    ManageStock,
+    ProductMedia,
+    PromoteProduct
+  }
+
   alias Palee.{Finance, Organizations, Shop}
   alias PaleeWeb.Schemas.Shop, as: S
   alias PaleeWeb.ShopJSON
@@ -28,33 +38,53 @@ defmodule PaleeWeb.ShopController do
   # ── Catalog ──────────────────────────────────────────────────────────────
 
   operation(:products,
-    summary: "Products with their variants and stock (drafts and published; archived on request)",
+    summary: "The console's catalog: one filter's products and the counts of every filter",
     parameters: [
       %Parameter{
         name: :status,
         in: :query,
         required: false,
-        schema: %Schema{type: :string, enum: ["draft", "published", "archived"]}
+        schema: %Schema{
+          type: :string,
+          enum: ["draft", "published", "archived", "low_stock"],
+          description: "None: drafts and published"
+        }
       },
-      %Parameter{name: :q, in: :query, required: false, schema: %Schema{type: :string}},
-      %Parameter{name: :category, in: :query, required: false, schema: %Schema{type: :string}}
+      %Parameter{
+        name: :q,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, description: "Title or category"}
+      },
+      %Parameter{name: :category, in: :query, required: false, schema: %Schema{type: :string}},
+      %Parameter{
+        name: :location_ids,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, description: "Comma-separated branch ids"}
+      }
     ],
-    responses: [ok: {"Products", "application/json", S.many(:products, S.product())}]
+    responses: [ok: {"Products", "application/json", S.product_list()}]
   )
 
   def products(conn, params) do
-    filters =
-      %{q: params[:q], category: params[:category]}
-      |> then(fn filters ->
-        case params[:status] do
-          nil -> filters
-          status -> Map.put(filters, :statuses, [String.to_existing_atom(status)])
-        end
-      end)
+    context = conn.assigns.tenant_context
 
-    products = ManageCatalog.list(conn.assigns.tenant_context, filters)
-    json(conn, %{products: Enum.map(products, &ShopJSON.product/1)})
+    %{products: products, counts: counts} =
+      ManageCatalog.list_view(context, %{
+        status: params[:status],
+        q: params[:q],
+        category: params[:category],
+        location_ids: location_ids(params)
+      })
+
+    json(conn, %{products: products_json(context, products), counts: counts})
   end
+
+  defp products_json(context, products),
+    do: context |> ProductMedia.attach(products) |> Enum.map(&ShopJSON.product/1)
+
+  defp product_json(context, product), do: ShopJSON.product(ProductMedia.attach(context, product))
 
   operation(:create_product,
     summary: "Create a draft product with its variants (and optional opening stock)",
@@ -63,8 +93,10 @@ defmodule PaleeWeb.ShopController do
   )
 
   def create_product(conn, _params) do
-    with {:ok, product} <- ManageCatalog.create(conn.assigns.tenant_context, conn.body_params) do
-      conn |> put_status(:created) |> json(%{product: ShopJSON.product(product)})
+    context = conn.assigns.tenant_context
+
+    with {:ok, product} <- ManageCatalog.create(context, conn.body_params) do
+      conn |> put_status(:created) |> json(%{product: product_json(context, product)})
     end
   end
 
@@ -75,21 +107,26 @@ defmodule PaleeWeb.ShopController do
   )
 
   def product(conn, %{id: id}) do
-    with {:ok, product} <- ManageCatalog.get(conn.assigns.tenant_context, id) do
-      json(conn, %{product: ShopJSON.product(product)})
+    context = conn.assigns.tenant_context
+
+    with {:ok, product} <- ManageCatalog.get(context, id) do
+      json(conn, %{product: product_json(context, product)})
     end
   end
 
   operation(:update_product,
-    summary: "Edit a product's details, photos, options, channels and branches",
+    summary:
+      "Edit a product's details, photos, options, channels and branches, and optionally its status and its variants, in one transaction",
     parameters: [@id],
     request_body: S.body(S.product_update_body()),
     responses: [ok: {"Product", "application/json", S.one(:product, S.product())}]
   )
 
   def update_product(conn, %{id: id}) do
-    with {:ok, product} <- ManageCatalog.update(conn.assigns.tenant_context, id, conn.body_params) do
-      json(conn, %{product: ShopJSON.product(product)})
+    context = conn.assigns.tenant_context
+
+    with {:ok, product} <- ManageCatalog.update(context, id, conn.body_params) do
+      json(conn, %{product: product_json(context, product)})
     end
   end
 
@@ -103,9 +140,10 @@ defmodule PaleeWeb.ShopController do
   )
 
   def set_product_status(conn, %{id: id}) do
-    with {:ok, product} <-
-           ManageCatalog.set_status(conn.assigns.tenant_context, id, conn.body_params.status) do
-      json(conn, %{product: ShopJSON.product(product)})
+    context = conn.assigns.tenant_context
+
+    with {:ok, product} <- ManageCatalog.set_status(context, id, conn.body_params.status) do
+      json(conn, %{product: product_json(context, product)})
     end
   end
 
@@ -168,10 +206,12 @@ defmodule PaleeWeb.ShopController do
          %Schema{
            type: :object,
            properties: %{
+             post_id: S.uuid(),
+             promotion_code_id: %{S.uuid() | nullable: true},
              post: PaleeWeb.Schemas.Community.post(),
              promotion_code: %{S.promotion_code() | nullable: true}
            },
-           required: [:post]
+           required: [:post_id, :post]
          }}
     ]
   )
@@ -181,7 +221,12 @@ defmodule PaleeWeb.ShopController do
            PromoteProduct.promote(conn.assigns.tenant_context, id, conn.body_params) do
       conn
       |> put_status(:created)
-      |> json(%{post: post, promotion_code: code && ShopJSON.promotion_code(code)})
+      |> json(%{
+        post_id: post.id,
+        promotion_code_id: code && code.id,
+        post: post,
+        promotion_code: code && ShopJSON.promotion_code(code)
+      })
     end
   end
 
@@ -214,7 +259,134 @@ defmodule PaleeWeb.ShopController do
     end
   end
 
+  # ── Photos ───────────────────────────────────────────────────────────────
+
+  operation(:photo_upload,
+    summary: "Reserve a product photo (shop_product_photo) and get a presigned upload for it",
+    request_body: S.body(PaleeWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", PaleeWeb.Schemas.Media.upload()}]
+  )
+
+  def photo_upload(conn, _params) do
+    with {:ok, upload} <-
+           RequestMediaUpload.call(
+             conn.assigns.tenant_context,
+             "shop_product_photo",
+             conn.body_params
+           ) do
+      json(conn, upload)
+    end
+  end
+
+  operation(:complete_photo,
+    summary: "Verify an uploaded product photo (type, size, no metadata) and mark it ready",
+    parameters: [@id],
+    responses: [ok: {"Media", "application/json", PaleeWeb.Schemas.Media.media_response()}]
+  )
+
+  def complete_photo(conn, %{id: id}) do
+    with {:ok, media} <-
+           CompleteMediaUpload.call(conn.assigns.tenant_context, "shop_product_photo", id) do
+      json(conn, %{media: media})
+    end
+  end
+
+  # ── Payment methods ──────────────────────────────────────────────────────
+
+  operation(:payment_methods,
+    summary:
+      "Ways to pay, from the payment port: desk methods staff record, and the online card (available: false until Palee has a card vendor)",
+    responses: [ok: {"Methods", "application/json", S.many(:payment_methods, S.payment_method())}]
+  )
+
+  def payment_methods(conn, _params) do
+    methods =
+      conn.assigns.tenant_context
+      |> Shop.payment_methods()
+      |> Enum.map(&(&1 |> Map.put(:id, &1.method) |> Map.delete(:method)))
+
+    json(conn, %{payment_methods: methods})
+  end
+
   # ── Stock ────────────────────────────────────────────────────────────────
+
+  operation(:ledger,
+    summary: "The stock ledger across every variant, newest first, one page at a time",
+    parameters: [
+      %Parameter{
+        name: :location_ids,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, description: "Comma-separated branch ids"}
+      },
+      %Parameter{
+        name: :kind,
+        in: :query,
+        required: false,
+        schema: %Schema{
+          type: :string,
+          description:
+            "Comma-separated kinds: receive, sale, refund_restock, adjustment, transfer, reserve, release"
+        }
+      },
+      %Parameter{name: :variant_id, in: :query, required: false, schema: S.uuid()},
+      %Parameter{name: :product_id, in: :query, required: false, schema: S.uuid()},
+      %Parameter{
+        name: :from,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, format: :"date-time"}
+      },
+      %Parameter{
+        name: :to,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, format: :"date-time", description: "Exclusive"}
+      },
+      %Parameter{name: :cursor, in: :query, required: false, schema: %Schema{type: :string}},
+      %Parameter{
+        name: :limit,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :integer, minimum: 1, maximum: 200}
+      }
+    ],
+    responses: [ok: {"Ledger", "application/json", S.ledger()}]
+  )
+
+  def ledger(conn, params) do
+    with {:ok, kinds} <- kinds(params[:kind]),
+         {:ok, page} <-
+           ManageStock.ledger_page(conn.assigns.tenant_context, %{
+             location_ids: location_ids(params),
+             kinds: kinds,
+             variant_id: params[:variant_id],
+             product_id: params[:product_id],
+             from: params[:from],
+             to: params[:to],
+             cursor: params[:cursor],
+             limit: params[:limit]
+           }) do
+      json(conn, %{
+        movements: Enum.map(page.movements, &ShopJSON.ledger_movement/1),
+        next_cursor: page.next_cursor
+      })
+    end
+  end
+
+  defp kinds(nil), do: {:ok, nil}
+
+  defp kinds(text) do
+    names = String.split(text, ",", trim: true)
+    known = Shop.movement_kinds()
+
+    Enum.reduce_while(names, {:ok, []}, fn name, {:ok, acc} ->
+      case Enum.find(known, &(Atom.to_string(&1) == name)) do
+        nil -> {:halt, {:error, :invalid_movement}}
+        kind -> {:cont, {:ok, [kind | acc]}}
+      end
+    end)
+  end
 
   operation(:movements,
     summary: "A variant's stock ledger, newest first",
@@ -261,7 +433,8 @@ defmodule PaleeWeb.ShopController do
   # ── Orders ───────────────────────────────────────────────────────────────
 
   operation(:orders,
-    summary: "Orders collected at the acting staff member's branches, newest first",
+    summary:
+      "Orders collected at the acting staff member's branches, newest first, with the count of every status",
     parameters: [
       %Parameter{
         name: :status,
@@ -278,19 +451,35 @@ defmodule PaleeWeb.ShopController do
         in: :query,
         required: false,
         schema: %Schema{type: :string, description: "Comma-separated branch ids"}
+      },
+      %Parameter{
+        name: :paid,
+        in: :query,
+        required: false,
+        schema: %Schema{
+          type: :boolean,
+          description: "Only orders with money kept (paid, or partly refunded)"
+        }
+      },
+      %Parameter{
+        name: :limit,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :integer, minimum: 1, maximum: 500}
       }
     ],
-    responses: [ok: {"Orders", "application/json", S.many(:orders, S.order())}]
+    responses: [ok: {"Orders", "application/json", S.order_list()}]
   )
 
   def orders(conn, params) do
     filters =
-      %{user_id: params[:user_id]}
+      %{user_id: params[:user_id], limit: params[:limit] || 200}
       |> maybe_put(:statuses, params[:status] && [String.to_existing_atom(params[:status])])
       |> maybe_put(:location_ids, location_ids(params))
+      |> maybe_put(:paid, if(params[:paid] == true, do: true))
 
-    orders = Fulfilment.list(conn.assigns.tenant_context, filters)
-    json(conn, %{orders: Enum.map(orders, &ShopJSON.staff_order/1)})
+    %{orders: orders, counts: counts} = Fulfilment.list_view(conn.assigns.tenant_context, filters)
+    json(conn, %{orders: Enum.map(orders, &ShopJSON.staff_order/1), counts: counts})
   end
 
   operation(:order,

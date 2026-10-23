@@ -125,11 +125,35 @@ defmodule PaleeWeb.Schemas.Shop do
           },
           published_at: @time,
           archived_at: @time,
+          media: %Schema{
+            type: :array,
+            items: product_photo(),
+            description: "The photos of media_ids, resolved (ready ones only, in order)"
+          },
           variants: %Schema{type: :array, items: variant()}
         }),
       required: [:id, :title, :status, :visibility, :variants]
     }
   end
+
+  def product_photo do
+    %Schema{
+      title: "ShopProductPhoto",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        url: @text,
+        thumb_url: @text,
+        full_url: @text,
+        width: %Schema{type: :integer, nullable: true},
+        height: %Schema{type: :integer, nullable: true},
+        alt_text: @text
+      },
+      required: [:id]
+    }
+  end
+
+  @status %Schema{type: :string, enum: ["draft", "published", "archived"]}
 
   @variant_body_props %{
     option_values: %Schema{type: :object, additionalProperties: %Schema{type: :string}},
@@ -168,6 +192,11 @@ defmodule PaleeWeb.Schemas.Shop do
         Map.merge(@product_props, %{
           options: %Schema{type: :array, items: option_axis(), maxItems: 2},
           price_cents: @cents,
+          status: %{
+            @status
+            | description:
+                "Created as a draft unless given; published runs the publish checks in the same transaction"
+          },
           variants: %Schema{
             type: :array,
             minItems: 1,
@@ -194,7 +223,27 @@ defmodule PaleeWeb.Schemas.Shop do
       type: :object,
       additionalProperties: false,
       properties:
-        Map.put(@product_props, :options, %Schema{type: :array, items: option_axis(), maxItems: 2})
+        Map.merge(@product_props, %{
+          options: %Schema{type: :array, items: option_axis(), maxItems: 2},
+          status: @status,
+          variants: %Schema{
+            type: :array,
+            minItems: 1,
+            maxItems: 200,
+            description:
+              "The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction.",
+            items: %Schema{
+              type: :object,
+              additionalProperties: false,
+              properties:
+                Map.merge(@variant_body_props, %{
+                  id: @nullable_uuid,
+                  initial_quantity: %Schema{type: :integer, minimum: 0},
+                  location_id: @nullable_uuid
+                })
+            }
+          }
+        })
     }
   end
 
@@ -592,6 +641,7 @@ defmodule PaleeWeb.Schemas.Shop do
         description: @text,
         category: @text,
         media_ids: %Schema{type: :array, items: @uuid},
+        media: %Schema{type: :array, items: product_photo()},
         options: %Schema{type: :object, additionalProperties: true},
         visibility: %Schema{type: :string, enum: ["members_only", "anyone"]},
         per_person_limit: %Schema{type: :integer, nullable: true},
@@ -766,6 +816,100 @@ defmodule PaleeWeb.Schemas.Shop do
         }
       },
       required: [:product_id, :status]
+    }
+  end
+
+  # ── Console lists ────────────────────────────────────────────────────────
+
+  def product_list do
+    %Schema{
+      title: "ShopProductList",
+      type: :object,
+      properties: %{
+        products: %Schema{type: :array, items: product()},
+        counts: %Schema{
+          type: :object,
+          description: "Products per filter, within the branch and search filters",
+          properties: %{
+            all: %Schema{type: :integer},
+            published: %Schema{type: :integer},
+            draft: %Schema{type: :integer},
+            archived: %Schema{type: :integer},
+            low_stock: %Schema{type: :integer}
+          },
+          required: [:all, :published, :draft, :archived, :low_stock]
+        }
+      },
+      required: [:products, :counts]
+    }
+  end
+
+  def order_list do
+    %Schema{
+      title: "ShopOrderList",
+      type: :object,
+      properties: %{
+        orders: %Schema{type: :array, items: order()},
+        counts: %Schema{
+          type: :object,
+          description: "Orders per status, within the branch, buyer and paid filters",
+          properties: %{
+            placed: %Schema{type: :integer},
+            ready_for_pickup: %Schema{type: :integer},
+            picked_up: %Schema{type: :integer},
+            cancelled: %Schema{type: :integer}
+          },
+          required: [:placed, :ready_for_pickup, :picked_up, :cancelled]
+        }
+      },
+      required: [:orders, :counts]
+    }
+  end
+
+  def ledger_movement do
+    %{
+      movement()
+      | title: "ShopLedgerMovement",
+        properties:
+          Map.merge(movement().properties, %{
+            product_id: @nullable_uuid,
+            product_title: @text,
+            variant_title: @text,
+            sku: @text,
+            order_number: %Schema{type: :integer, nullable: true},
+            actor_name: @text
+          })
+    }
+  end
+
+  def ledger do
+    %Schema{
+      title: "ShopLedgerPage",
+      type: :object,
+      properties: %{
+        movements: %Schema{type: :array, items: ledger_movement()},
+        next_cursor: %Schema{type: :string, nullable: true}
+      },
+      required: [:movements]
+    }
+  end
+
+  def payment_method do
+    %Schema{
+      title: "ShopPaymentMethod",
+      type: :object,
+      properties: %{
+        id: %Schema{
+          type: :string,
+          description:
+            "cash, card_manual (card at the terminal), bank_transfer, other, card_online"
+        },
+        channel: %Schema{type: :string, enum: ["pos", "online"]},
+        available: %Schema{type: :boolean},
+        reason: @text,
+        provider: @text
+      },
+      required: [:id, :channel, :available]
     }
   end
 end

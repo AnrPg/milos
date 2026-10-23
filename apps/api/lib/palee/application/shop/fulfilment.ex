@@ -23,14 +23,27 @@ defmodule Palee.Application.Shop.Fulfilment do
   alias Palee.{Identity, Organizations, Shop}
 
   @doc "Orders for the staff console (`filters`: states, user_id, location_ids, from)."
-  def list(context, filters \\ %{}) do
-    filters =
-      case Organizations.location_scope(context) do
-        :all -> filters
-        ids -> Map.put(filters, :location_ids, restrict(filters[:location_ids], ids))
-      end
+  def list(context, filters \\ %{}), do: Shop.list_orders(context, scoped(context, filters))
 
-    Shop.list_orders(context, filters)
+  @doc """
+  The console's orders: one page (`limit`, at most 500) of the filter and
+  the count of every status under the same branch, buyer and `paid` filters.
+  """
+  def list_view(context, filters) do
+    filters = scoped(context, filters)
+    counts = Shop.order_counts(context, filters)
+
+    %{
+      orders: Shop.list_orders(context, filters),
+      counts: Map.new(Shop.order_statuses(), &{&1, Map.get(counts, &1, 0)})
+    }
+  end
+
+  defp scoped(context, filters) do
+    case Organizations.location_scope(context) do
+      :all -> filters
+      ids -> Map.put(filters, :location_ids, restrict(filters[:location_ids], ids))
+    end
   end
 
   defp restrict(nil, scope), do: scope

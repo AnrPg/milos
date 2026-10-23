@@ -11,7 +11,7 @@ defmodule PaleeWeb.MyShopController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.PublicBox
-  alias Palee.Application.Shop.{Checkout, Fulfilment, MemberShop}
+  alias Palee.Application.Shop.{Checkout, Fulfilment, MemberShop, ProductMedia}
   alias PaleeWeb.Schemas.Shop, as: S
   alias PaleeWeb.ShopJSON
   alias OpenApiSpex.{Parameter, Schema}
@@ -34,8 +34,9 @@ defmodule PaleeWeb.MyShopController do
   )
 
   def products(conn, params) do
-    products = MemberShop.catalog(conn.assigns.tenant_context, %{category: params[:category]})
-    json(conn, %{products: products})
+    context = conn.assigns.tenant_context
+    products = MemberShop.catalog(context, %{category: params[:category]})
+    json(conn, %{products: ProductMedia.attach(context, products)})
   end
 
   operation(:product,
@@ -45,8 +46,10 @@ defmodule PaleeWeb.MyShopController do
   )
 
   def product(conn, %{id: id}) do
-    with {:ok, product} <- MemberShop.product(conn.assigns.tenant_context, id) do
-      json(conn, %{product: product})
+    context = conn.assigns.tenant_context
+
+    with {:ok, product} <- MemberShop.product(context, id) do
+      json(conn, %{product: ProductMedia.attach(context, product)})
     end
   end
 
@@ -154,7 +157,8 @@ defmodule PaleeWeb.MyShopController do
 
   def public_products(conn, %{slug: slug}) do
     with {:ok, _box, %{organization_id: organization_id}} <- PublicBox.resolve(slug) do
-      json(conn, %{products: MemberShop.public_catalog(organization_id)})
+      products = MemberShop.public_catalog(organization_id)
+      json(conn, %{products: ProductMedia.attach(%{organization_id: organization_id}, products)})
     end
   end
 end

@@ -38,6 +38,8 @@ defmodule Palee.Shop.Ports.ShopStore do
   @callback update_order(context(), id(), map()) :: result(map())
   @callback update_order_line(context(), id(), map()) :: result(map())
   @callback list_orders(context(), map()) :: [map()]
+  @doc "Orders per `status` under the same filters as `list_orders/2` (its `statuses` ignored)."
+  @callback order_counts(context(), map()) :: %{optional(atom()) => non_neg_integer()}
   @callback units_held(context(), id(), [id()]) :: %{optional(id()) => non_neg_integer()}
 
   # Promotion codes («Προώθηση»). `get_promotion_code/3` finds a code by its

@@ -52,6 +52,8 @@ defmodule Palee.Shop.ShopStore do
   @impl true
   def list_orders(context, filters), do: tenant_call(context, :list_orders, [filters])
   @impl true
+  def order_counts(context, filters), do: tenant_call(context, :order_counts, [filters])
+  @impl true
   def units_held(context, user_id, product_ids),
     do: tenant_call(context, :units_held, [user_id, product_ids])
 
