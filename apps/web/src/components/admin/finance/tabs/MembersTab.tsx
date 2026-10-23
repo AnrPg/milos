@@ -124,7 +124,8 @@ function MultiCheck({
 
 // ── MembersTab ────────────────────────────────────────────────────────────────
 
-export function MembersTab() {
+/** `locationIds`: the page branch filter (ADR-186 §7); members show at their home branch. */
+export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   const shareExport = useShareExport();
@@ -150,10 +151,11 @@ export function MembersTab() {
     [router, searchParams],
   );
 
+  const membersKey = ["admin", "finance", "members", ...(locationIds ? [locationIds] : [])];
   const membersQuery = useQuery({
-    queryKey: ["admin", "finance", "members"],
+    queryKey: membersKey,
     enabled: Boolean(token),
-    queryFn: () => fetchFinanceMembers(token),
+    queryFn: () => fetchFinanceMembers(token, locationIds ? { location_ids: locationIds } : {}),
   });
 
   const referralProgramsQuery = useQuery({
@@ -184,14 +186,10 @@ export function MembersTab() {
     onMutate: async ({ userId, body }) => {
       await queryClient.cancelQueries({ queryKey: ["admin", "finance", "members"] });
 
-      const previous = queryClient.getQueryData<{ members: FinanceRecord[]; meta: FinanceRecord }>([
-        "admin",
-        "finance",
-        "members",
-      ]);
+      const previous = queryClient.getQueryData<{ members: FinanceRecord[]; meta: FinanceRecord }>(membersKey);
 
       queryClient.setQueryData<{ members: FinanceRecord[]; meta: FinanceRecord }>(
-        ["admin", "finance", "members"],
+        membersKey,
         (current) => {
           if (!current) return current;
 
@@ -217,7 +215,7 @@ export function MembersTab() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["admin", "finance", "members"], context.previous);
+        queryClient.setQueryData(membersKey, context.previous);
       }
     },
     onSuccess: async () => {

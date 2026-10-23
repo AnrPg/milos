@@ -1657,6 +1657,7 @@ defmodule PaleeWeb.Router do
     post("/around/search/:kind", AroundController, :kind)
     post("/around/pins", AroundController, :pins)
     get("/places/neighbourhoods", PlacesController, :neighbourhoods)
+    post("/places/neighbourhoods/import", PlacesController, :import)
     get("/me/around/area", PlacesController, :area)
     put("/me/around/area", PlacesController, :update_area)
   end

@@ -26,7 +26,8 @@ gemini_req_options =
 
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
-# ADR-141: point at a self-hosted Photon in production.
+# ADR-141, ADR-188: point at the in-cluster Photon in production
+# (docs/operations/self-hosted-photon.md).
 config :palee, :photon, base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
 
 config :palee, :gemini,

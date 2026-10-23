@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { listAdminLocations, type FacilityLocation } from "@/api/facility";
 import { Popover } from "@/components/ui/Popover";
 import { useSession } from "@/components/session-provider";
+import type { LocationScope } from "@/lib/location-scope";
 
 /** Above this many branches the checklist gets a search field. */
 const SEARCH_FROM = 8;
@@ -195,7 +196,54 @@ export function BranchFilterControl({ filter }: { filter: BranchFilterState }) {
   );
 }
 
-export type BranchSplit = { location_id: string; name: string; people?: number } & Record<string, unknown>;
+/**
+ * Where a covering item (package, promotion) is valid (ADR-186 §8):
+ * «Όλα τα καταστήματα» or its branch names. Hidden for staff who see fewer
+ * than two active branches.
+ */
+export function BranchCoverageBadge({
+  target,
+  locations,
+}: {
+  target: LocationScope;
+  locations: FacilityLocation[] | null | undefined;
+}) {
+  const t = useTranslations("BranchScope");
+  const all = locations ?? [];
+  if (all.filter((location) => !location.archived_at).length < 2) return null;
+
+  const names =
+    target === "all"
+      ? []
+      : all.filter((location) => target.includes(location.id)).map((location) => location.name);
+  const label =
+    target === "all" || names.length === 0
+      ? t("allBranches")
+      : names.length <= 2
+        ? names.join(", ")
+        : `${names[0]} +${names.length - 1}`;
+
+  return (
+    <span
+      className="max-w-[14rem] truncate rounded-full px-3 py-1 text-xs font-semibold"
+      title={target === "all" ? t("allBranches") : names.join(", ")}
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+    >
+      {label}
+    </span>
+  );
+}
+
+/** A one-line note under a filtered page's tabs on how the branch filter applies there. */
+export function BranchFilterNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs" role="note" style={{ color: "var(--dim)" }}>
+      {children}
+    </p>
+  );
+}
+
+export type BranchSplit ={ location_id: string; name: string; people?: number } & Record<string, unknown>;
 
 /**
  * The per-branch rows a report returns when two or more branches are shown.

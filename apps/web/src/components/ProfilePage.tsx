@@ -78,7 +78,8 @@ export function ProfilePage() {
   const [avatarPending, setAvatarPending] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar_url ?? null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  // A picked file, or the current avatar's URL when re-editing it.
+  const [avatarSource, setAvatarSource] = useState<File | string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
@@ -128,7 +129,7 @@ export function ProfilePage() {
       const result = await updateAvatar(tokens.access_token, key);
       broadcastUserUpdate(result.user);
       setAvatarPreview(result.user.avatar_url);
-      setAvatarFile(null);
+      setAvatarSource(null);
     } catch (err) {
       setAvatarError(err instanceof Error ? localizeError(err, i18n) : i18n("avatarUploadFailed8d620ac"));
     } finally {
@@ -142,7 +143,7 @@ export function ProfilePage() {
       setAvatarError(tProfile("avatarUnsupportedType"));
       return;
     }
-    setAvatarFile(file);
+    setAvatarSource(file);
   }
 
   async function handleLanguageChange(nextLocale: AppLocale) {
@@ -337,19 +338,35 @@ export function ProfilePage() {
               {tProfile("avatarFormatHelp")}
             </p>
 
-            <button
-              type="button"
-              disabled={avatarPending}
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
-              style={{
-                background: "var(--panel-muted)",
-                border: "1px solid var(--border)",
-                color: "var(--text)",
-              }}
-            >
-              {avatarPending ? i18n("uploadingd921a79") : avatarPreview ? i18n("changeAvatar60f2e98") : i18n("uploadAvatareb634e9")}
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                disabled={avatarPending}
+                onClick={() => fileInputRef.current?.click()}
+                className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
+                style={{
+                  background: "var(--panel-muted)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text)",
+                }}
+              >
+                {avatarPending ? i18n("uploadingd921a79") : avatarPreview ? i18n("changeAvatar60f2e98") : i18n("uploadAvatareb634e9")}
+              </button>
+              {avatarPreview ? (
+                <button
+                  type="button"
+                  disabled={avatarPending}
+                  onClick={() => {
+                    setAvatarError(null);
+                    setAvatarSource(avatarPreview);
+                  }}
+                  className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
+                  style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+                >
+                  {tProfile("avatarEdit")}
+                </button>
+              ) : null}
+            </div>
 
             {avatarError && (
               <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
@@ -359,12 +376,12 @@ export function ProfilePage() {
           </div>
         </CollapsibleSection>
 
-        {avatarFile ? (
+        {avatarSource ? (
           <AvatarEditorModal
-            file={avatarFile}
+            source={avatarSource}
             pending={avatarPending}
             uploadError={avatarError}
-            onCancel={() => setAvatarFile(null)}
+            onCancel={() => setAvatarSource(null)}
             onSave={handleAvatarFile}
           />
         ) : null}

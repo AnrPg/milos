@@ -1325,6 +1325,15 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "context": {
+                  "description": "What tells it apart: its city, or region and country",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "context_en": {
+                  "nullable": true,
+                  "type": "string"
+                },
                 "id": {
                   "format": "uuid",
                   "type": "string"
@@ -1359,6 +1368,8 @@
                 "name",
                 "name_en",
                 "city_slug",
+                "context",
+                "context_en",
                 "latitude",
                 "longitude"
               ],
@@ -37140,6 +37151,26 @@
       },
       "FinanceRefundReceiptCollection": {
         "properties": {
+          "branch_filter": {
+            "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+            "properties": {
+              "all_locations": {
+                "type": "boolean"
+              },
+              "location_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "all_locations",
+              "location_ids"
+            ],
+            "type": "object"
+          },
           "refund_receipts": {
             "items": {
               "properties": {
@@ -44370,6 +44401,15 @@
             "nullable": true,
             "type": "string"
           },
+          "context": {
+            "description": "What tells it apart: its city, or region and country",
+            "nullable": true,
+            "type": "string"
+          },
+          "context_en": {
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -44404,6 +44444,8 @@
           "name",
           "name_en",
           "city_slug",
+          "context",
+          "context_en",
           "latitude",
           "longitude"
         ],
@@ -44419,14 +44461,24 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "context": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "context_en": {
+                  "nullable": true,
+                  "type": "string"
+                },
                 "id": {
+                  "description": "The gazetteer id, also of a suggested place once stored",
                   "format": "uuid",
                   "type": "string"
                 },
                 "kind": {
                   "enum": [
                     "neighbourhood",
-                    "city"
+                    "city",
+                    "address"
                   ],
                   "type": "string"
                 },
@@ -44442,6 +44494,11 @@
                 "name_en": {
                   "type": "string"
                 },
+                "ref": {
+                  "description": "Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "slug": {
                   "type": "string"
                 }
@@ -44453,17 +44510,29 @@
                 "name",
                 "name_en",
                 "city_slug",
+                "context",
+                "context_en",
                 "latitude",
                 "longitude"
               ],
-              "title": "Neighbourhood",
+              "title": "PlaceSuggestion",
               "type": "object"
             },
             "type": "array"
+          },
+          "remote": {
+            "description": "Whether the worldwide geocoder answered, was down, or was not needed",
+            "enum": [
+              "ok",
+              "unavailable",
+              "skipped"
+            ],
+            "type": "string"
           }
         },
         "required": [
-          "neighbourhoods"
+          "neighbourhoods",
+          "remote"
         ],
         "title": "NeighbourhoodsResponse",
         "type": "object"
@@ -48528,6 +48597,148 @@
           "kg"
         ],
         "title": "PhoneHealthWeight",
+        "type": "object"
+      },
+      "PlaceImportRequest": {
+        "properties": {
+          "ref": {
+            "maxLength": 4000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "PlaceImportRequest",
+        "type": "object"
+      },
+      "PlaceImportResponse": {
+        "properties": {
+          "neighbourhood": {
+            "properties": {
+              "city_slug": {
+                "nullable": true,
+                "type": "string"
+              },
+              "context": {
+                "description": "What tells it apart: its city, or region and country",
+                "nullable": true,
+                "type": "string"
+              },
+              "context_en": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "neighbourhood",
+                  "city"
+                ],
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "name_en": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug",
+              "kind",
+              "name",
+              "name_en",
+              "city_slug",
+              "context",
+              "context_en",
+              "latitude",
+              "longitude"
+            ],
+            "title": "Neighbourhood",
+            "type": "object"
+          }
+        },
+        "required": [
+          "neighbourhood"
+        ],
+        "title": "PlaceImportResponse",
+        "type": "object"
+      },
+      "PlaceSuggestion": {
+        "properties": {
+          "city_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "context": {
+            "nullable": true,
+            "type": "string"
+          },
+          "context_en": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The gazetteer id, also of a suggested place once stored",
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "neighbourhood",
+              "city",
+              "address"
+            ],
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "name_en": {
+            "type": "string"
+          },
+          "ref": {
+            "description": "Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id",
+            "nullable": true,
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "kind",
+          "name",
+          "name_en",
+          "city_slug",
+          "context",
+          "context_en",
+          "latitude",
+          "longitude"
+        ],
+        "title": "PlaceSuggestion",
         "type": "object"
       },
       "PlatformPlan": {
@@ -78782,6 +78993,15 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "context": {
+                            "description": "What tells it apart: its city, or region and country",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "context_en": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -78816,6 +79036,8 @@
                           "name",
                           "name_en",
                           "city_slug",
+                          "context",
+                          "context_en",
                           "latitude",
                           "longitude"
                         ],
@@ -78888,6 +79110,15 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "context": {
+                            "description": "What tells it apart: its city, or region and country",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "context_en": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -78922,6 +79153,8 @@
                           "name",
                           "name_en",
                           "city_slug",
+                          "context",
+                          "context_en",
                           "latitude",
                           "longitude"
                         ],
@@ -139448,7 +139681,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.members",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -140821,7 +141065,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.packages",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -142170,7 +142425,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.promotions",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144029,7 +144295,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.referral_rewards",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144108,7 +144385,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.referrals",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -144372,6 +144660,16 @@
               "minimum": 1,
               "type": "integer"
             }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -144380,6 +144678,26 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "branch_filter": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "refund_receipts": {
                       "items": {
                         "properties": {
@@ -186480,6 +186798,26 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "branch_filter": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "refund_receipts": {
                       "items": {
                         "properties": {
@@ -207696,14 +208034,24 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "context": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "context_en": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
+                            "description": "The gazetteer id, also of a suggested place once stored",
                             "format": "uuid",
                             "type": "string"
                           },
                           "kind": {
                             "enum": [
                               "neighbourhood",
-                              "city"
+                              "city",
+                              "address"
                             ],
                             "type": "string"
                           },
@@ -207719,6 +208067,11 @@
                           "name_en": {
                             "type": "string"
                           },
+                          "ref": {
+                            "description": "Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "slug": {
                             "type": "string"
                           }
@@ -207730,17 +208083,29 @@
                           "name",
                           "name_en",
                           "city_slug",
+                          "context",
+                          "context_en",
                           "latitude",
                           "longitude"
                         ],
-                        "title": "Neighbourhood",
+                        "title": "PlaceSuggestion",
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "remote": {
+                      "description": "Whether the worldwide geocoder answered, was down, or was not needed",
+                      "enum": [
+                        "ok",
+                        "unavailable",
+                        "skipped"
+                      ],
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "neighbourhoods"
+                    "neighbourhoods",
+                    "remote"
                   ],
                   "title": "NeighbourhoodsResponse",
                   "type": "object"
@@ -207755,7 +208120,129 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Neighbourhoods and cities matching a name (case and accents ignored)",
+        "summary": "Stored places matching a name (case and accents ignored), then places and addresses anywhere from the geocoder (ADR-188)",
+        "tags": [
+          "Around"
+        ]
+      }
+    },
+    "/api/places/neighbourhoods/import": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlacesController.import",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "ref": {
+                    "maxLength": 4000,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "ref"
+                ],
+                "title": "PlaceImportRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "neighbourhood": {
+                      "properties": {
+                        "city_slug": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "context": {
+                          "description": "What tells it apart: its city, or region and country",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "context_en": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "neighbourhood",
+                            "city"
+                          ],
+                          "type": "string"
+                        },
+                        "latitude": {
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "name_en": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "kind",
+                        "name",
+                        "name_en",
+                        "city_slug",
+                        "context",
+                        "context_en",
+                        "latitude",
+                        "longitude"
+                      ],
+                      "title": "Neighbourhood",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "neighbourhood"
+                  ],
+                  "title": "PlaceImportResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Place"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired or forged ref"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Store a place a search suggested and get its gazetteer id (an address becomes its neighbourhood)",
         "tags": [
           "Around"
         ]

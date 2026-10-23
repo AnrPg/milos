@@ -1,5 +1,5 @@
 defmodule PaleeWeb.PlacesController do
-  @moduledoc "The neighbourhood gazetteer and «Η περιοχή μου» (ADR-154)."
+  @moduledoc "The neighbourhood gazetteer, worldwide place search and «Η περιοχή μου» (ADR-154, ADR-188)."
 
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -14,7 +14,8 @@ defmodule PaleeWeb.PlacesController do
   security([%{"bearerAuth" => []}])
 
   operation(:neighbourhoods,
-    summary: "Neighbourhoods and cities matching a name (case and accents ignored)",
+    summary:
+      "Stored places matching a name (case and accents ignored), then places and addresses anywhere from the geocoder (ADR-188)",
     parameters: [
       %Parameter{
         name: :q,
@@ -28,6 +29,20 @@ defmodule PaleeWeb.PlacesController do
 
   def neighbourhoods(conn, params) do
     with {:ok, result} <- AroundArea.neighbourhoods(params["q"]), do: json(conn, result)
+  end
+
+  operation(:import,
+    summary:
+      "Store a place a search suggested and get its gazetteer id (an address becomes its neighbourhood)",
+    request_body: S.body(S.place_import_request()),
+    responses: [
+      ok: {"Place", "application/json", S.place_import_response()},
+      unprocessable_entity: {"Expired or forged ref", "application/json", S.error()}
+    ]
+  )
+
+  def import(conn, _params) do
+    with {:ok, result} <- AroundArea.import_place(conn.body_params["ref"]), do: json(conn, result)
   end
 
   operation(:area,

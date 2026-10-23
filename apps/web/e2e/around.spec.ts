@@ -29,8 +29,11 @@ const token = `stub.${Buffer.from(
   JSON.stringify({ sub: user.id, role: "member", memberships: [{ organization_slug: "kypseli" }], exp: Math.floor(Date.now() / 1000) + 3600 }),
 ).toString("base64url")}.signature`;
 
-const kypseli = { id: "11111111-1111-4111-8111-111111111111", slug: "kypseli", kind: "neighbourhood", name: "Κυψέλη", name_en: "Kypseli", city_slug: "athens", latitude: 38.003, longitude: 23.738 };
-const patisia = { id: "22222222-2222-4222-8222-222222222222", slug: "patisia", kind: "neighbourhood", name: "Πατήσια", name_en: "Patisia", city_slug: "athens", latitude: 38.02, longitude: 23.73 };
+const kypseli = { id: "11111111-1111-4111-8111-111111111111", slug: "kypseli", kind: "neighbourhood", name: "Κυψέλη", name_en: "Kypseli", city_slug: "athens", context: "Αθήνα", context_en: "Athens", latitude: 38.003, longitude: 23.738 };
+const patisia = { id: "22222222-2222-4222-8222-222222222222", slug: "patisia", kind: "neighbourhood", name: "Πατήσια", name_en: "Patisia", city_slug: "athens", context: "Αθήνα", context_en: "Athens", latitude: 38.02, longitude: 23.73 };
+// ADR-188: a geocoder suggestion carries a signed ref; importing it stores the place under the same id.
+const munich = { id: "33333333-3333-5333-8333-333333333333", slug: "osm-r62428", kind: "city", name: "München", name_en: "Munich", city_slug: null, context: "Bayern, Deutschland", context_en: "Bavaria, Germany", latitude: 48.137, longitude: 11.575 };
+const munichSuggestion = { ...munich, ref: "signed-ref-munich" };
 
 const DEFAULT_FILTER = {
   v: 1,
@@ -113,6 +116,7 @@ type Calls = {
   kinds: Array<Record<string, unknown>>;
   pins: Array<Record<string, unknown>>;
   areaSaves: unknown[];
+  imports: string[];
   savedFilters: unknown[];
   alerts: unknown[];
   scopes: unknown[];
@@ -130,7 +134,7 @@ function sections(filter: Filter, thin: boolean) {
 }
 
 async function stub(page: Page, { area = [kypseli] as unknown[], thin = false, visible = false, hasArea = true } = {}) {
-  const calls: Calls = { searches: [], kinds: [], pins: [], areaSaves: [], savedFilters: [], alerts: [], scopes: [], visibility: [] };
+  const calls: Calls = { searches: [], kinds: [], pins: [], areaSaves: [], imports: [], savedFilters: [], alerts: [], scopes: [], visibility: [] };
   let currentArea = area;
   let saved: Array<Record<string, unknown>> = [];
   let aroundVisibility = { visible, has_area: hasArea };
@@ -199,13 +203,19 @@ async function stub(page: Page, { area = [kypseli] as unknown[], thin = false, v
     if (route.request().method() === "PUT") {
       const ids = route.request().postDataJSON().neighbourhood_ids as string[];
       calls.areaSaves.push(ids);
-      currentArea = [kypseli, patisia].filter((place) => ids.includes(place.id));
+      currentArea = [kypseli, patisia, munich].filter((place) => ids.includes(place.id));
     }
     return route.fulfill(json({ neighbourhoods: currentArea }));
   });
   await page.route("**/api/places/neighbourhoods?**", (route) => {
     const q = new URL(route.request().url()).searchParams.get("q") ?? "";
-    return route.fulfill(json({ neighbourhoods: [kypseli, patisia].filter((place) => place.name.startsWith(q.slice(0, 3))) }));
+    const local = [kypseli, patisia].filter((place) => place.name.startsWith(q.slice(0, 3)));
+    const remote = munichSuggestion.name.startsWith(q.slice(0, 3)) ? [munichSuggestion] : [];
+    return route.fulfill(json({ neighbourhoods: [...local, ...remote], remote: q.length >= 3 ? "ok" : "skipped" }));
+  });
+  await page.route("**/api/places/neighbourhoods/import", (route) => {
+    calls.imports.push(route.request().postDataJSON().ref);
+    return route.fulfill(json({ neighbourhood: munich }));
   });
 
   await page.route("**/api/around/search", (route) => {
@@ -288,10 +298,10 @@ test.describe("Γύρω μου", () => {
     await page.goto("/around");
 
     await expect(page.getByRole("heading", { name: "Πού να ψάξουμε;" })).toBeVisible();
-    await page.getByLabel("Γειτονιά ή πόλη").fill("Κυψ");
+    await page.getByLabel("Γειτονιά, πόλη ή διεύθυνση").fill("Κυψ");
     await page.getByRole("button", { name: /Κυψέλη/ }).click();
     await expect(page.getByRole("list", { name: "Οι περιοχές σου" })).toContainText("Κυψέλη");
-    await page.getByLabel("Γειτονιά ή πόλη").fill("Πατ");
+    await page.getByLabel("Γειτονιά, πόλη ή διεύθυνση").fill("Πατ");
     await page.getByRole("button", { name: /Πατήσια/ }).click();
     await page.getByRole("button", { name: "Κάνε κύρια: Πατήσια" }).click();
     await page.getByRole("button", { name: "Συνέχεια" }).click();
@@ -300,6 +310,21 @@ test.describe("Γύρω μου", () => {
     await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
     // The map also labels the event, so check the list entry.
     await expect(page.getByRole("link", { name: /Open WOD για όλους/ })).toBeVisible();
+  });
+
+  test("an area anywhere: a geocoder suggestion is stored, then saved by its id", async ({ page }) => {
+    const calls = await stub(page, { area: [] });
+    await page.goto("/around");
+
+    await page.getByLabel("Γειτονιά, πόλη ή διεύθυνση").fill("Mün");
+    const option = page.getByRole("button", { name: /München/ });
+    await expect(option).toContainText("Bayern, Deutschland");
+    await option.click();
+    await expect(page.getByRole("list", { name: "Οι περιοχές σου" })).toContainText("München");
+    await page.getByRole("button", { name: "Συνέχεια" }).click();
+
+    expect(calls.imports).toEqual(["signed-ref-munich"]);
+    await expect.poll(() => calls.areaSaves).toEqual([[munich.id]]);
   });
 
   test("«Χρήση τοποθεσίας τώρα» searches from the rounded position without saving it", async ({ page, context, baseURL }) => {
