@@ -18,8 +18,8 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next/link", () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: ({ href, prefetch: _prefetch, children, ...rest }: any) => (
-    <a href={href} {...rest}>
+  default: ({ href, children, ...rest }: any) => (
+    <a href={href} {...{ ...rest, prefetch: undefined }}>
       {children}
     </a>
   ),
