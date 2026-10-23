@@ -153,6 +153,20 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def transaction(_context, fun) do
+    if Repo.in_transaction?() do
+      fun.()
+    else
+      Repo.transaction(fn ->
+        case fun.() do
+          {:ok, value} -> value
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end)
+    end
+  end
+
+  @impl true
   def create_slot(%{organization_id: organization_id}, params) do
     params = Map.put(params, :organization_id, organization_id)
 

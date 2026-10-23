@@ -2,6 +2,8 @@ defmodule Palee.Appointments.Ports.AppointmentStore do
   @moduledoc "Persistence port of the Appointments context (ADR-098)."
 
   @callback create_slot(map(), map()) :: {:ok, map()} | {:error, term()}
+  @callback transaction(map(), (-> {:ok, term()} | {:error, term()})) ::
+              {:ok, term()} | {:error, term()}
   @callback get_slot(map(), binary()) :: map() | nil
   @callback list_slots(map(), map()) :: [map()]
   @callback cancel_slot(map(), binary()) :: {:ok, map()} | {:error, term()}

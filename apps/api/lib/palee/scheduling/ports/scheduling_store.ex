@@ -15,6 +15,8 @@ defmodule Palee.Scheduling.Ports.SchedulingStore do
   @callback list_class_types(TenantContext.t(), keyword()) :: [map()]
   @callback get_class_type(TenantContext.t(), Ecto.UUID.t(), keyword()) :: map() | nil
   @callback create_slot(TenantContext.t(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback transaction(TenantContext.t(), (-> {:ok, term()} | {:error, term()})) ::
+              {:ok, term()} | {:error, term()}
   @callback create_class_series(TenantContext.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback extend_class_series(TenantContext.t(), Ecto.UUID.t(), Date.t()) ::
               {:ok, map()} | {:error, term()}

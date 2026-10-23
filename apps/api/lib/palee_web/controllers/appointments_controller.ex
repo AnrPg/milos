@@ -166,9 +166,13 @@ defmodule PaleeWeb.AppointmentsController do
     coach_id = Map.get(conn.body_params, :coach_id)
 
     with :ok <- own_coach(conn.assigns.tenant_context, coach_id || staff.id),
-         {:ok, slot} <-
-           CreateAppointmentSlot.call(conn.assigns.tenant_context, staff, conn.body_params) do
-      conn |> put_status(:created) |> json(%{slot: slot})
+         {:ok, [slot | _] = slots} <-
+           CreateAppointmentSlot.call_at_branches(
+             conn.assigns.tenant_context,
+             staff,
+             conn.body_params
+           ) do
+      conn |> put_status(:created) |> json(%{slot: slot, slots: slots})
     end
   end
 

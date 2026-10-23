@@ -8,6 +8,9 @@ defmodule Palee.Appointments do
   alias Palee.Appointments.AppointmentStore
 
   def create_slot(context, attrs), do: AppointmentStore.create_slot(context, attrs)
+
+  @doc "Runs `fun` in one transaction: all of its writes or none (ADR-186 §8)."
+  def transaction(context, fun), do: AppointmentStore.transaction(context, fun)
   def get_slot(context, id), do: AppointmentStore.get_slot(context, id)
   def list_slots(context, filters \\ %{}), do: AppointmentStore.list_slots(context, filters)
   def cancel_slot(context, id), do: AppointmentStore.cancel_slot(context, id)

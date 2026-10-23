@@ -55,6 +55,17 @@ defmodule PaleeWeb.AdminScheduleController do
     ]
   }
 
+  # ADR-186 §8: «Ισχύει για» — one class per listed branch, all or none.
+  @slot_create_schema %{
+    @slot_body_schema
+    | properties:
+        Map.put(
+          @slot_body_schema.properties,
+          :location_ids,
+          PaleeWeb.Schemas.LocationScope.targets_schema()
+        )
+  }
+
   @message_schema %Schema{
     type: :object,
     properties: %{
@@ -84,18 +95,25 @@ defmodule PaleeWeb.AdminScheduleController do
   }
 
   operation(:create_slot,
-    summary: "Create a scheduled class slot",
+    summary: "Create a scheduled class slot (one per branch of location_ids)",
     request_body: %RequestBody{
       required: true,
-      content: %{"application/json" => %MediaType{schema: @slot_body_schema}}
+      content: %{"application/json" => %MediaType{schema: @slot_create_schema}}
     },
     responses: [
       created:
         {"Slot", "application/json",
          %Schema{
            type: :object,
-           properties: %{slot: %Schema{type: :object, additionalProperties: true}},
-           required: [:slot]
+           properties: %{
+             slot: %Schema{type: :object, additionalProperties: true},
+             slots: %Schema{
+               type: :array,
+               description: "ADR-186: every class created, one per branch",
+               items: %Schema{type: :object, additionalProperties: true}
+             }
+           },
+           required: [:slot, :slots]
          }}
     ]
   )
@@ -112,6 +130,7 @@ defmodule PaleeWeb.AdminScheduleController do
             properties: %{
               class_type_id: %Schema{type: :string, format: :uuid},
               location_id: %Schema{type: :string, format: :uuid, nullable: true},
+              location_ids: PaleeWeb.Schemas.LocationScope.targets_schema(),
               coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
               master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
               name: %Schema{type: :string, minLength: 1, maxLength: 120},
@@ -272,10 +291,11 @@ defmodule PaleeWeb.AdminScheduleController do
     body = normalize_body_params(conn, params)
 
     with :ok <- valid_coach(conn.assigns.tenant_context, body),
-         {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
+         {:ok, [slot | _] = slots} <-
+           CreateScheduledSlot.call_at_branches(conn.assigns.tenant_context, body) do
       conn
       |> put_status(:created)
-      |> json(%{slot: slot})
+      |> json(%{slot: slot, slots: slots})
     end
   end
 
@@ -283,8 +303,9 @@ defmodule PaleeWeb.AdminScheduleController do
     body = normalize_body_params(conn, params)
 
     with :ok <- valid_coach(conn.assigns.tenant_context, body),
-         {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
-      conn |> put_status(:created) |> json(%{series: series})
+         {:ok, [series | _] = all} <-
+           CreateRecurringClassSeries.call_at_branches(conn.assigns.tenant_context, body) do
+      conn |> put_status(:created) |> json(%{series: series, series_list: all})
     end
   end
 
