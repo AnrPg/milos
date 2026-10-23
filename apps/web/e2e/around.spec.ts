@@ -362,7 +362,7 @@ test.describe("Γύρω μου", () => {
   test("the scope toggle opens Γύρω μου; sections link to «Δες όλα» with cursor paging", async ({ page }) => {
     const calls = await stub(page);
     await page.goto("/");
-    await page.getByRole("navigation", { name: "Τι δείχνει η Αρχική" }).getByRole("link", { name: "Γύρω μου" }).click();
+    await page.getByRole("navigation", { name: "Τι δείχνει το Feed" }).getByRole("link", { name: "Γύρω μου" }).click();
     await expect(page).toHaveURL(/\/around$/);
     await expect.poll(() => calls.scopes).toContainEqual({ scope: "around" });
 
@@ -407,10 +407,15 @@ test.describe("Γύρω μου", () => {
     await sheet.getByRole("button", { name: /Δείξε 14/ }).click();
     await expect(sheet).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Φίλτρα (3)" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "ΣΚ κοντά", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("heading", { name: "Αναρτήσεις" })).toBeVisible();
+    // Saved combinations live in the sheet, so the chip row fits a phone.
+    const row = page.getByRole("toolbar", { name: "Φίλτρα Γύρω μου" });
+    await expect(row.getByRole("button", { name: "ΣΚ κοντά", exact: true })).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Επιλογές για «ΣΚ κοντά»" }).click();
+    await page.getByRole("button", { name: "Φίλτρα (3)" }).click();
+    const saved = sheet.getByRole("group", { name: "Αποθηκευμένα" });
+    await expect(saved.getByRole("button", { name: "ΣΚ κοντά", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await saved.getByRole("button", { name: "Επιλογές για «ΣΚ κοντά»" }).click();
     const manage = page.getByRole("dialog", { name: "ΣΚ κοντά" });
     const alert = manage.getByRole("switch", { name: "Ειδοποίησέ με" });
     await expect(alert).toHaveAttribute("aria-checked", "false");
@@ -421,9 +426,13 @@ test.describe("Γύρω μου", () => {
     await expect(manage).toHaveCount(0);
 
     // Clearing everything and tapping the saved chip brings the combination back.
+    // (The row's ✕, not the sheet's footer: the dev-mode indicator covers the footer on a phone.)
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
     await page.getByRole("button", { name: "Καθαρισμός όλων των φίλτρων" }).click();
+    await page.getByRole("button", { name: "Φίλτρα", exact: true }).click();
     // With the alert on, the chip says so to screen readers too.
-    const chip = page.getByRole("button", { name: "ΣΚ κοντά (ειδοποιήσεις ενεργές)" });
+    const chip = saved.getByRole("button", { name: "ΣΚ κοντά (ειδοποιήσεις ενεργές)" });
     await expect(chip).toHaveAttribute("aria-pressed", "false");
     await chip.click();
     await expect.poll(() => lastSearch(calls).filter).toMatchObject({ cost: ["free"], when: "weekend" });
@@ -494,6 +503,54 @@ test.describe("Γύρω μου", () => {
     expect(lastSearch(calls).remember).toBe(true);
     await expect(page.getByRole("heading", { name: "Τίποτα έως 3 km" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "≤ 10 km" })).toBeVisible();
+  });
+
+  test("the chip row fits a 320 px phone without scrolling sideways, in the longest languages", async ({ page }) => {
+    await stub(page);
+    // «Τα αθλήματά μου» shows only for someone with interests (ADR-183): the widest row.
+    await page.route("**/api/me/interests", (route) => route.fulfill(json({ interests: { disciplines: ["hyrox", "running"], level: null } })));
+
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto("/around");
+    const row = page.getByRole("toolbar", { name: "Φίλτρα Γύρω μου" });
+    await expect(row.getByRole("button")).toHaveCount(4);
+    for (const name of ["Φίλτρα", "Τα αθλήματά μου", "Πότε", "Δωρεάν"]) {
+      await expect(row.getByRole("button", { name, exact: true })).toBeVisible();
+    }
+    // «≤ 3 km» moved next to «Αλλαγή περιοχής», on its left.
+    const radius = page.getByRole("button", { name: "≤ 3 km" });
+    const changeArea = page.getByRole("button", { name: "Αλλαγή περιοχής" });
+    const [radiusBox, changeBox] = [await radius.boundingBox(), await changeArea.boundingBox()];
+    expect(radiusBox && changeBox && radiusBox.x < changeBox.x && Math.abs(radiusBox.y - changeBox.y) < 8).toBe(true);
+
+    for (const locale of ["el", "de", "ru", "bg"]) {
+      await page.context().addCookies([{ name: "palee_locale", value: locale, url: "http://127.0.0.1" }]);
+      await page.route("**/api/auth/me", (route) => route.fulfill(json({ ...user, preferred_locale: locale })));
+      for (const width of [320, 390]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto("/around");
+        const chips = page.locator("[data-chip-row]");
+        await expect(chips.getByRole("button")).toHaveCount(4);
+        await expect(page.locator("[data-origin-actions]")).toBeVisible();
+        const fit = await page.evaluate(() => {
+          const rowEl = document.querySelector<HTMLElement>("[data-chip-row]")!;
+          const truncated = Array.from(rowEl.querySelectorAll<HTMLElement>("button > span")).filter(
+            (span) => span.scrollWidth > span.clientWidth + 1,
+          );
+          return {
+            page: document.documentElement.scrollWidth <= window.innerWidth,
+            row: rowEl.scrollWidth <= rowEl.clientWidth,
+            lines: rowEl.children.length,
+            truncated: truncated.map((span) => span.textContent),
+          };
+        });
+        expect(fit, `${locale} at ${width}px`).toMatchObject({ page: true, row: true, truncated: [] });
+        expect(fit.lines, `${locale} at ${width}px`).toBeLessThanOrEqual(2);
+        if (locale === "el" || locale === "ru") {
+          await page.screenshot({ path: test.info().outputPath(`around-${locale}-${width}.png`) });
+        }
+      }
+    }
   });
 
   test("«Φαίνομαι στο Γύρω μου» in Κοινοποίηση & ορατότητα", async ({ page }) => {

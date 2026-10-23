@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useTranslations } from "next-intl";
 
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 import { canvasToAvatarFile, drawAvatar, loadAvatarImage, type AvatarImage } from "@/components/profile/avatar-crop";
 import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import {
@@ -28,6 +29,8 @@ type Props = {
 };
 
 export function AvatarEditorModal({ source, pending, uploadError, onCancel, onSave }: Props) {
+  // A focused flow: the member app's bottom bar steps aside (ui/Dialog does too).
+  useHideBottomNav();
   const tCommon = useTranslations("Common");
   const tProfile = useTranslations("Profile");
   const canvasRef = useRef<HTMLCanvasElement>(null);

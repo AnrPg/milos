@@ -18,6 +18,7 @@
     "dashboard": "لوحة التحكم",
     "platform": "منصة",
     "home": "الرئيسية",
+    "feed": "الموجز",
     "users": "المستخدمون",
     "finance": "المالية",
     "classes": "الحصص",
@@ -70,7 +71,11 @@
     "memberTabs": "الأقسام الرئيسية",
     "trials": "حصص تجريبية",
     "community": "المجتمع",
-    "body": "الجسم"
+    "body": "الجسم",
+    "notificationsShort": "الإشعارات",
+    "messages": "الرسائل",
+    "messagesUnread": "الرسائل (غير المقروءة: {count})",
+    "socialApp": "اجتماعي"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -5131,7 +5136,7 @@
       "support": "رسالة سريعة إلى رفيقك",
       "voice": "قل ما قمت به"
     },
-    "homeTitle": "الرئيسية",
+    "homeTitle": "الموجز",
     "wodToday": "تمرين اليوم في النادي",
     "wodTodayEmpty": "لا يوجد تمرين حصة اليوم.",
     "feedPosts": "من ناديك",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "لست عضوًا في أي نادٍ بعد.",
     "notifyLabel": "الإشعارات",
     "myPostsTitle": "منشوراتي",
-    "myPostsEmpty": "لم تنشر بعد. اضغط ⊕ في الرئيسية.",
+    "myPostsEmpty": "لم تنشر بعد. اضغط ⊕ في الموجز.",
     "channel": {
       "announcements": "الإعلانات",
       "wod": "تمرين-اليوم",
@@ -6773,7 +6778,7 @@
     "conversionLine": "التحويل: {rate}%"
   },
   "Around": {
-    "scopeLabel": "ما تعرضه الرئيسية",
+    "scopeLabel": "ما يعرضه الموجز",
     "scopeClubs": "أنديتي",
     "scopeAround": "حولي",
     "loading": "جارٍ التحميل…",
@@ -6849,6 +6854,7 @@
     "kind_clubs": "أندية",
     "kind_posts": "منشورات",
     "sectionWhere": "أين",
+    "sectionSaved": "المحفوظة",
     "whereFromPlaces": "من الأحياء",
     "radius": "النطاق",
     "neighbourhoods": "الأحياء",

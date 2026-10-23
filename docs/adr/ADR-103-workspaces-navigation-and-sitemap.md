@@ -84,3 +84,23 @@ Implemented in `aa4ec6d`, `a37ab33` and `4a44f1e`.
 - Inventory (ADR-104): an overflow item in the front desk bar, a tile on the
   admin dashboard, and a link from the coach and janitor homes.
 - Only English strings were added; other locales follow.
+
+## Amendment (2026-10-23): every staff member can open the social app
+
+Owner's decision after the redesign deploy.
+
+- Staff and owners still land on the console by default (`lib/view-mode.ts`
+  defaults to `"staff"`, remembered per device as before).
+- The switch is for **every** staff member, not only those who also hold a
+  client role. A staff member without one gets the full social app as a
+  member: Feed, the floating bottom bar, Box in its empty or staff-aware
+  state (`surfaceRole(membership, "client")` returns `"member"`).
+- In the console, the top bar carries a visible **«Social»** button (also in
+  the account menu) that switches to the social app and opens the Feed.
+  From the social app, **Εγώ › Διαχείριση** switches back to the console.
+- A console URL (`/admin…`, `/org/:slug/admin…`, the kiosk, door and poster
+  screens) always opens the console and remembers that choice.
+- The former *My training* / *Staff view* items of the account menu are
+  replaced by «Social» (console) and «Διαχείριση» (Εγώ).
+- People without a staff role always get the social app with the bar, with
+  or without a gym membership.

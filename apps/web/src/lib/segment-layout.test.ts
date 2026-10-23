@@ -1,6 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { chooseSegmentLayout, fittingColumns } from "./segment-layout";
+import { balancedLineBreak, chooseSegmentLayout, fittingColumns } from "./segment-layout";
+
+describe("balancedLineBreak", () => {
+  it("keeps one line when every chip fits", () => {
+    expect(balancedLineBreak([80, 120, 60, 70], 400, 8)).toBeNull();
+    expect(balancedLineBreak([500], 300, 8)).toBeNull();
+    expect(balancedLineBreak([80, 120], 0, 8)).toBeNull();
+  });
+
+  it("splits into two lines whose wider one is as narrow as possible", () => {
+    // 80+8+150 = 238 | 60+8+70 = 138 beats 80 | 150+8+60+8+70.
+    expect(balancedLineBreak([80, 150, 60, 70], 288, 8)).toBe(2);
+    expect(balancedLineBreak([100, 100, 100], 250, 8)).toBe(2);
+    expect(balancedLineBreak([200, 40, 40], 250, 8)).toBe(1);
+  });
+});
 
 describe("fittingColumns", () => {
   it("counts equal columns including the gaps between them", () => {

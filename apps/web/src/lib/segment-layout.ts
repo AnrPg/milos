@@ -45,3 +45,26 @@ export function chooseSegmentLayout({
   }
   return { kind: "select" };
 }
+
+/**
+ * A chip row that must never scroll sideways (Γύρω μου): `null` when the chips
+ * fit on one line at their natural widths, otherwise where the second of two
+ * order-keeping lines starts, chosen so the wider line is as narrow as
+ * possible (balanced lines).
+ */
+export function balancedLineBreak(widths: readonly number[], containerWidth: number, gap: number): number | null {
+  const lineWidth = (from: number, to: number) =>
+    widths.slice(from, to).reduce((sum, width) => sum + width, 0) + gap * Math.max(0, to - from - 1);
+  if (widths.length <= 1 || containerWidth <= 0 || lineWidth(0, widths.length) <= containerWidth) return null;
+  let best = Math.ceil(widths.length / 2);
+  let bestWidth = Infinity;
+  for (let split = 1; split < widths.length; split += 1) {
+    const wider = Math.max(lineWidth(0, split), lineWidth(split, widths.length));
+    // Ties go to the fuller first line, like reading order.
+    if (wider < bestWidth || (wider === bestWidth && split > best)) {
+      best = split;
+      bestWidth = wider;
+    }
+  }
+  return best;
+}

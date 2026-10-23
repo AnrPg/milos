@@ -23,7 +23,6 @@ import { selectedMembership, surfaceRoleForMembership, useOrganizationMembership
 import {
   activeItemId,
   can,
-  clientRole,
   hasStaffRole,
   sectionGroupFor,
   staffNavItems,
@@ -32,6 +31,8 @@ import { setView, useView } from "@/lib/view-mode";
 import { PriorityNav } from "@/components/nav/PriorityNav";
 import { SectionTabs } from "@/components/nav/SectionTabs";
 import { MobileNavMenu } from "@/components/nav/MobileNavMenu";
+import { useMemberShell } from "@/components/nav/BottomNav";
+import { NavIcon } from "@/components/nav/NavIcons";
 import { openNotifications } from "@/components/notifications/NotificationBell";
 import { SemanticLabel } from "@/components/semantic-label";
 import { entitledFeatures } from "@/components/client/entitlement";
@@ -115,14 +116,17 @@ export function TopNav() {
   const avatarUrl = currentUser?.avatar_url ?? null;
 
   const membershipsQuery = useOrganizationMemberships();
+  const memberShell = useMemberShell();
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const selectedOrganizationSlug = useOrganizationSlug();
   const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
   const role = surfaceRoleForMembership(currentMembership, view);
-  const canSwitchView =
-    hasStaffRole(currentMembership) &&
-    clientRole(currentMembership) !== null &&
-    surfaceRoleForMembership(currentMembership, "staff") === "admin";
+  // ADR-103 (amended): every staff member can switch the console to the social app.
+  const canSwitchView = role === "admin" && hasStaffRole(currentMembership);
+  const openSocialApp = () => {
+    setView("client");
+    router.push("/");
+  };
   const showSelfServiceSurfaces =
     role !== "admin" && Boolean(currentUser) && showsTenantSelfServiceSurfaces(currentUser);
   const financeQuery = useQuery({
@@ -202,6 +206,26 @@ export function TopNav() {
 
   if (!currentUser) return null;
 
+  // Members and athletes navigate with the floating bottom bar instead
+  // (components/nav/BottomNav.tsx): no top bar, only the inbox it opens and
+  // the page group's tab strip. Messages sit in the Feed header, the account
+  // menu's links in Εγώ. Vendors keep the top bar for the platform console.
+  if ((memberShell && !isVendor) || membershipsQuery.isLoading) {
+    return (
+      <>
+        <NotificationBell onUnreadChange={setUnreadNotifications} hideTrigger />
+        {memberShell && sectionGroup ? (
+          <div
+            className="sticky z-(--z-nav) overflow-x-clip pt-2"
+            style={{ top: "var(--safe-top, 0px)", background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
+          >
+            <SectionTabs group={sectionGroup} pathname={pathname} hrefFor={hrefFor} labelFor={(key) => t(key)} />
+          </div>
+        ) : null}
+      </>
+    );
+  }
+
   return (
     <header
       className="sticky top-0 z-(--z-nav) flex flex-col overflow-x-clip"
@@ -258,6 +282,19 @@ export function TopNav() {
         </nav>
 
         <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {/* «Social»: from the console to the social app, always in sight. */}
+          {canSwitchView ? (
+            <button
+              type="button"
+              onClick={openSocialApp}
+              className="flex min-h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-xs font-bold outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] sm:px-3 sm:text-sm"
+              style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", color: "var(--primary-strong)" }}
+              aria-label={t("socialApp")}
+            >
+              <NavIcon name="feed" size={16} strokeWidth={2} />
+              <span className="hidden min-[400px]:inline">{t("socialApp")}</span>
+            </button>
+          ) : null}
           {/* Phones open notifications from the avatar menu (ADR-103). */}
           {/* Mounted for every signed-in account: ♡ in the Feed opens it too (ADR-142). */}
           <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName={`hidden ${showTenantShell ? "sm:flex" : ""}`} />
@@ -275,7 +312,7 @@ export function TopNav() {
                 aria-label={t("chat")}
                 title={t("chat")}
               >
-                <span aria-hidden="true" className="sm:hidden">✉</span>
+                <NavIcon name="messages" size={16} strokeWidth={2} className="sm:hidden" />
                 <span className="hidden sm:inline">{t("chat")}</span>
                 {unreadCount > 0 ? (
                   <span
@@ -453,13 +490,11 @@ export function TopNav() {
                         className="block w-full px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                         style={{ color: "var(--text-soft)" }}
                         onClick={() => {
-                          const next = role === "admin" ? "client" : "staff";
-                          setView(next);
                           setMenuOpen(false);
-                          router.push(next === "client" ? "/" : adminHref("/admin", selectedOrganizationSlug));
+                          openSocialApp();
                         }}
                       >
-                        {role === "admin" ? t("myTraining") : t("staffView")}
+                        {t("socialApp")}
                       </button>
                     ) : null}
                     {role !== "admin" && showSelfServiceSurfaces ? (

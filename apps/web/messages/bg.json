@@ -18,6 +18,7 @@
     "dashboard": "Табло",
     "platform": "Платформа",
     "home": "Начало",
+    "feed": "Лента",
     "users": "Потребители",
     "finance": "Финанси",
     "classes": "Класове",
@@ -70,7 +71,11 @@
     "memberTabs": "Основни раздели",
     "trials": "Пробни тренировки",
     "community": "Общност",
-    "body": "Тяло"
+    "body": "Тяло",
+    "notificationsShort": "Известия",
+    "messages": "Съобщения",
+    "messagesUnread": "Съобщения (непрочетени: {count})",
+    "socialApp": "Социално"
   },
   "Profile": {
     "eyebrow": "Профил",
@@ -5131,7 +5136,7 @@
       "support": "Кратко съобщение до твоето бъди",
       "voice": "Кажи какво направи"
     },
-    "homeTitle": "Начало",
+    "homeTitle": "Лента",
     "wodToday": "Тренировката на деня в залата",
     "wodTodayEmpty": "Днес няма тренировка в часовете.",
     "feedPosts": "От вашия клуб",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "Все още не си член на клуб.",
     "notifyLabel": "Известия",
     "myPostsTitle": "Моите публикации",
-    "myPostsEmpty": "Все още не си публикувал. Докосни ⊕ в Начало.",
+    "myPostsEmpty": "Все още не си публикувал. Докосни ⊕ в Лентата.",
     "channel": {
       "announcements": "съобщения",
       "wod": "wod-днес",
@@ -6773,7 +6778,7 @@
     "conversionLine": "Конверсия: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Какво показва Начало",
+    "scopeLabel": "Какво показва Лентата",
     "scopeClubs": "Моите клубове",
     "scopeAround": "Около мен",
     "loading": "Зареждане…",
@@ -6849,6 +6854,7 @@
     "kind_clubs": "Клубове",
     "kind_posts": "Публикации",
     "sectionWhere": "Къде",
+    "sectionSaved": "Запазени",
     "whereFromPlaces": "От кварталите",
     "radius": "Радиус",
     "neighbourhoods": "Квартали",

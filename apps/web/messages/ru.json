@@ -18,6 +18,7 @@
     "dashboard": "Панель управления",
     "platform": "Платформа",
     "home": "Главная",
+    "feed": "Лента",
     "users": "Пользователи",
     "finance": "Финансы",
     "classes": "Занятия",
@@ -70,7 +71,11 @@
     "memberTabs": "Основные разделы",
     "trials": "Пробные занятия",
     "community": "Сообщество",
-    "body": "Тело"
+    "body": "Тело",
+    "notificationsShort": "Уведомления",
+    "messages": "Сообщения",
+    "messagesUnread": "Сообщения (непрочитанных: {count})",
+    "socialApp": "Соцсеть"
   },
   "Profile": {
     "eyebrow": "Профиль",
@@ -5131,7 +5136,7 @@
       "support": "Короткое сообщение твоему бадди",
       "voice": "Расскажи, что сделал"
     },
-    "homeTitle": "Главная",
+    "homeTitle": "Лента",
     "wodToday": "Тренировка дня в зале",
     "wodTodayEmpty": "Сегодня нет тренировки на занятиях.",
     "feedPosts": "Из вашего клуба",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "Вы пока не состоите ни в одном клубе.",
     "notifyLabel": "Уведомления",
     "myPostsTitle": "Мои публикации",
-    "myPostsEmpty": "Вы ещё ничего не публиковали. Нажмите ⊕ на Главной.",
+    "myPostsEmpty": "Вы ещё ничего не публиковали. Нажмите ⊕ в Ленте.",
     "channel": {
       "announcements": "объявления",
       "wod": "wod-сегодня",
@@ -6773,7 +6778,7 @@
     "conversionLine": "Конверсия: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Что показывает Главная",
+    "scopeLabel": "Что показывает Лента",
     "scopeClubs": "Мои клубы",
     "scopeAround": "Рядом",
     "loading": "Загрузка…",
@@ -6849,6 +6854,7 @@
     "kind_clubs": "Клубы",
     "kind_posts": "Публикации",
     "sectionWhere": "Где",
+    "sectionSaved": "Сохранённые",
     "whereFromPlaces": "От выбранных районов",
     "radius": "Радиус",
     "neighbourhoods": "Районы",
