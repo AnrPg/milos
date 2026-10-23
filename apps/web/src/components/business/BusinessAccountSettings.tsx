@@ -5,10 +5,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormatter, useTranslations } from "next-intl";
 
 import {
+  MY_ARCHIVED_DEMOS_KEY,
   MY_BUSINESS_REQUESTS_KEY,
   cancelBusinessRequest,
+  fetchArchivedDemos,
   fetchMyBusinessRequests,
+  reopenArchivedDemo,
   requestConversion,
+  type BusinessArchivedDemo,
   type BusinessKind,
   type BusinessRequest,
 } from "@/api/business-accounts";
@@ -24,7 +28,8 @@ const inputStyle = { background: "var(--bg)", border: "1px solid var(--border)",
 /**
  * ADR-184, Εγώ › Ρυθμίσεις › Επαγγελματικός λογαριασμός: ask the Palee team
  * to turn this account into a gym or an independent coach's practice, and
- * follow the requests already sent.
+ * follow the requests already sent. A demo archived because nobody used it
+ * (ADR-184 follow-up) is listed here and reopens empty.
  */
 export function BusinessAccountSettings() {
   const t = useTranslations("Business");
@@ -35,12 +40,25 @@ export function BusinessAccountSettings() {
     enabled: Boolean(token),
     queryFn: () => fetchMyBusinessRequests(token!),
   });
+  const archived = useQuery({
+    queryKey: MY_ARCHIVED_DEMOS_KEY,
+    enabled: Boolean(token),
+    queryFn: () => fetchArchivedDemos(token!),
+  });
   const list = requests.data?.requests ?? [];
+  const archivedDemos = archived.data?.businesses ?? [];
   const pendingConversion = list.find((request) => request.kind === "conversion" && request.status === "pending");
 
   return (
     <CollapsibleSection id="business" title={t("settings.title")} description={t("settings.description")}>
       <div className="space-y-5">
+        {archivedDemos.length > 0 ? (
+          <ul className="space-y-2">
+            {archivedDemos.map((demo) => (
+              <ArchivedDemoRow key={demo.id} token={token!} demo={demo} />
+            ))}
+          </ul>
+        ) : null}
         {list.length > 0 ? (
           <ul className="space-y-2">
             {list.map((request) => (
@@ -51,6 +69,47 @@ export function BusinessAccountSettings() {
         {token && !pendingConversion ? <ConversionForm token={token} /> : null}
       </div>
     </CollapsibleSection>
+  );
+}
+
+function ArchivedDemoRow({ token, demo }: { token: string; demo: BusinessArchivedDemo }) {
+  const t = useTranslations("Business");
+  const i18n = useUiTranslations();
+  const format = useFormatter();
+  const queryClient = useQueryClient();
+  const reopen = useMutation({
+    mutationFn: () => reopenArchivedDemo(token, demo.id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MY_ARCHIVED_DEMOS_KEY });
+      void queryClient.invalidateQueries({ queryKey: MY_BUSINESS_REQUESTS_KEY });
+      void queryClient.invalidateQueries({ queryKey: ["organization-memberships"] });
+    },
+  });
+
+  return (
+    <li className="rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+      <p className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{demo.name}</p>
+      <p className="text-xs" style={{ color: "var(--text-soft)" }}>
+        {t("settings.archivedTitle")} · {t(`kind.${demo.provider_kind}`)}
+      </p>
+      <p className="mt-2 text-sm" style={{ color: "var(--text-soft)" }}>
+        {t("settings.archivedBody", { date: format.dateTime(new Date(demo.demo_archived_at), { dateStyle: "medium" }) })}
+      </p>
+      {reopen.isSuccess ? (
+        <p role="status" className="mt-2 text-sm" style={{ color: "var(--success)" }}>{t("settings.reopened")}</p>
+      ) : (
+        <button
+          type="button"
+          disabled={reopen.isPending}
+          onClick={() => reopen.mutate()}
+          className="mt-2 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50"
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+        >
+          {reopen.isPending ? t("settings.reopening") : t("settings.reopen")}
+        </button>
+      )}
+      {reopen.error ? <p role="alert" className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{localizeError(reopen.error, i18n)}</p> : null}
+    </li>
   );
 }
 
@@ -120,6 +179,8 @@ function ConversionForm({ token }: { token: string }) {
       setName("");
       setMessage("");
       void queryClient.invalidateQueries({ queryKey: MY_BUSINESS_REQUESTS_KEY });
+      // An archived demo of the same kind reopens instead of a new request.
+      void queryClient.invalidateQueries({ queryKey: MY_ARCHIVED_DEMOS_KEY });
     },
   });
 
