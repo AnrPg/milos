@@ -42,6 +42,14 @@ export function PasswordResetLogPage() {
         </Link>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("logTitle")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("logSubtitle")}</p>
+        <p className="mt-2 text-sm text-[var(--dim)]">{t("logHint")}</p>
+        <Link
+          href="/password-resets"
+          className="mt-3 self-start rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+        >
+          {t("logOpenRequests")}
+        </Link>
       </header>
 
       {forbidden ? <p className="mt-6 text-[var(--text-soft)]">{t("logForbidden")}</p> : null}

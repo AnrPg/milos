@@ -9486,7 +9486,9 @@
     "notifRequestedTitle": "Pedido de reposição da palavra-passe",
     "notifRequestedBody": "{name} (@{handle}) não consegue iniciar sessão e pediu para repor a palavra-passe.",
     "notifCompletedTitle": "A tua palavra-passe foi reposta",
-    "notifCompletedBody": "A tua palavra-passe foi alterada com uma ligação de reposição ou um código de recuperação, e a sessão foi terminada em todos os dispositivos. Se não foste tu, contacta o teu ginásio ou o apoio do Palee."
+    "notifCompletedBody": "A tua palavra-passe foi alterada com uma ligação de reposição ou um código de recuperação, e a sessão foi terminada em todos os dispositivos. Se não foste tu, contacta o teu ginásio ou o apoio do Palee.",
+    "logOpenRequests": "Pedidos em aberto",
+    "logHint": "Os pedidos são tratados na página de reposição de palavras-passe. Ninguém pode tratar um pedido da sua própria conta: vai para as outras pessoas que o podem fazer."
   },
   "FirstRun": {
     "progress": "Passo {step} de {total}",
