@@ -12,7 +12,7 @@ import type { ProviderKind } from "@/api/settings";
 
 export type BoxLayout = "gym" | "coach";
 
-export function boxLayoutFor(kind: ProviderKind | null | undefined): BoxLayout {
+export function boxLayoutFor(kind: ProviderKind | "organiser" | null | undefined): BoxLayout {
   return kind === "coach" ? "coach" : "gym";
 }
 

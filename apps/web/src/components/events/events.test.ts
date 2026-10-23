@@ -53,6 +53,9 @@ function event(overrides: Partial<CommunityEvent> = {}): CommunityEvent {
     can_rsvp: true,
     can_manage: false,
     my: null,
+    audience: "club",
+    host: { kind: "business", organization_id: "org-1", name: "Box Kypseli", slug: "kypseli", logo_url: null, person: null },
+    cohosts: [],
     ...overrides,
   };
 }
