@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** A titled settings card that opens in place (Εγώ › Ρυθμίσεις, Κοινοποίηση & ορατότητα). */
 export function CollapsibleSection({
@@ -17,11 +17,26 @@ export function CollapsibleSection({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // A link to /…#<id> (e.g. /me/settings#recovery-codes) opens this card and
+  // brings it into view, also when the hash changes on the same page.
+  useEffect(() => {
+    function openFromHash() {
+      if (window.location.hash !== `#${id}`) return;
+      setOpen(true);
+      window.requestAnimationFrame(() => sectionRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
+    }
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [id]);
 
   return (
     <section
+      ref={sectionRef}
       id={id}
-      className="overflow-hidden rounded-[2.4rem]"
+      className="scroll-mt-24 overflow-hidden rounded-[2.4rem]"
       style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
     >
       <button

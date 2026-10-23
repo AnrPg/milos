@@ -32,7 +32,7 @@ defmodule PaleeWeb.MeController do
         name: :audience,
         in: :path,
         required: true,
-        schema: %Schema{type: :string, enum: ~w(admin member athlete)}
+        schema: %Schema{type: :string, enum: Palee.Identity.tour_audiences()}
       }
     ],
     responses: [
@@ -98,8 +98,16 @@ defmodule PaleeWeb.MeController do
           schema: %Schema{
             type: :object,
             properties: %{
-              nickname: %Schema{type: :string, minLength: 3, maxLength: 30},
-              current_password: %Schema{type: :string},
+              handle: %Schema{
+                type: :string,
+                description: "ADR-187: the unique @handle (once per 14 days)"
+              },
+              display_name: %Schema{type: :string, minLength: 1, maxLength: 50},
+              nickname: %Schema{type: :string, description: "Deprecated alias of display_name"},
+              current_password: %Schema{
+                type: :string,
+                description: "Required to change the login's email or password"
+              },
               password: %Schema{type: :string, minLength: 4},
               email: %Schema{type: :string, format: :email, nullable: true},
               preferred_locale: %Schema{
@@ -128,6 +136,9 @@ defmodule PaleeWeb.MeController do
                properties: %{
                  id: %Schema{type: :string, format: :uuid},
                  nickname: %Schema{type: :string},
+                 display_name: %Schema{type: :string},
+                 handle: %Schema{type: :string},
+                 email: %Schema{type: :string},
                  role: %Schema{type: :string},
                  avatar_url: %Schema{type: :string, nullable: true},
                  preferred_locale: %Schema{type: :string},
@@ -219,7 +230,7 @@ defmodule PaleeWeb.MeController do
   )
 
   operation(:search_users,
-    summary: "Search visible users by nickname",
+    summary: "Search visible users by @handle or display name (any script)",
     parameters: [
       %Parameter{
         name: :q,
@@ -241,6 +252,8 @@ defmodule PaleeWeb.MeController do
                  properties: %{
                    id: %Schema{type: :string, format: :uuid},
                    nickname: %Schema{type: :string},
+                   handle: %Schema{type: :string},
+                   avatar_url: %Schema{type: :string, nullable: true},
                    role: %Schema{type: :string}
                  }
                }
@@ -259,6 +272,9 @@ defmodule PaleeWeb.MeController do
         user: %{
           id: updated_user.id,
           nickname: updated_user.nickname,
+          display_name: updated_user.nickname,
+          handle: updated_user.handle,
+          email: updated_user.email,
           role: to_string(updated_user.role),
           avatar_url: updated_user.avatar_url,
           preferred_locale: updated_user.preferred_locale,
@@ -303,7 +319,13 @@ defmodule PaleeWeb.MeController do
       json(conn, %{
         users:
           Enum.map(users, fn u ->
-            %{id: u.id, nickname: u.nickname, role: to_string(u.role)}
+            %{
+              id: u.id,
+              nickname: u.nickname,
+              handle: Map.get(u, :handle),
+              avatar_url: Map.get(u, :avatar_url),
+              role: to_string(u.role)
+            }
           end)
       })
     end

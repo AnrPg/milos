@@ -1,7 +1,11 @@
 defmodule Palee.Identity.Domain.ProductTours do
-  @moduledoc "Product tour audiences an account can complete (ADR-107)."
+  @moduledoc """
+  Product tour audiences an account can complete (ADR-107). `first_run` is
+  the member first-run after sign-up (ADR-183): finished or skipped, it
+  never shows again on any device.
+  """
 
-  @audiences ~w(admin member athlete)
+  @audiences ~w(admin member athlete first_run)
 
   def audiences, do: @audiences
 

@@ -320,6 +320,8 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :auth_rate_limited])
 
     get("/nickname-available", AuthController, :nickname_available)
+    get("/handle-available", AuthController, :handle_available)
+    get("/handle-suggestion", AuthController, :handle_suggestion)
     post("/register", AuthController, :register)
     post("/register-member", AuthController, :register_member)
     post("/register-admin", AuthController, :register_admin)
@@ -328,6 +330,10 @@ defmodule PaleeWeb.Router do
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
+    # ADR-187: password recovery without a mail service.
+    post("/password-reset-requests", PasswordRecoveryController, :request)
+    post("/password-reset", PasswordRecoveryController, :complete)
+    post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -335,6 +341,26 @@ defmodule PaleeWeb.Router do
 
     get("/me", AuthController, :me)
     post("/sign-out-all", AuthController, :sign_out_all)
+    # ADR-187: the login's up to three profiles.
+    get("/profiles", AccountProfilesController, :index)
+    post("/profiles", AccountProfilesController, :create)
+    post("/switch-profile", AccountProfilesController, :switch)
+    get("/recovery-codes", PasswordRecoveryController, :codes_status)
+    post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+  end
+
+  # ADR-187: the password reset requests the signed-in person can handle
+  # (vendor, box owner/admin/front desk, the person's coach).
+  scope "/api/password-resets", PaleeWeb do
+    pipe_through([:api, :authenticated, :authenticated_rate_limited])
+
+    get("/", PasswordRecoveryController, :inbox)
+    post("/:id/claim", PasswordRecoveryController, :claim)
+    post("/:id/release", PasswordRecoveryController, :release)
+    post("/:id/link", PasswordRecoveryController, :issue_link)
+    post("/:id/reject", PasswordRecoveryController, :reject)
+    post("/:id/dismiss", PasswordRecoveryController, :dismiss)
+    post("/:id/hide", PasswordRecoveryController, :hide)
   end
 
   scope "/api", PaleeWeb do
@@ -1103,6 +1129,8 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    # ADR-187: the password reset security log.
+    get("/password-reset-log", PasswordRecoveryController, :log)
     # ADR-170: platform plans, prices and each organization's plan.
     get("/plans", PlatformPlanController, :index)
     post("/plans", PlatformPlanController, :create)
@@ -1272,6 +1300,9 @@ defmodule PaleeWeb.Router do
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    # ADR-183: «Τι κάνεις», asked by the first-run.
+    get("/me/interests", MyInterestsController, :show)
+    put("/me/interests", MyInterestsController, :update)
     get("/me/wellness", WellnessController, :show)
     post("/me/wellness/entries", WellnessController, :create_entry)
     patch("/me/wellness/entries/:id", WellnessController, :update_entry)

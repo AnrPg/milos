@@ -87,7 +87,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments goal_feedback wellbeing_check_ins wellbeing_check_in_answers
     wellness_entries craving_entries wellness_preferences
-    media_account_objects saved_filters user_home_areas
+    media_account_objects saved_filters user_home_areas account_interests
     body_snapshots body_snapshot_photos user_health_consents body_settings
     buddy_links buddy_settings support_requests support_request_deliveries support_replies
     buddy_messages

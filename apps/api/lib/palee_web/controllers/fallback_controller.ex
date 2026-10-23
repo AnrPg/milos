@@ -194,6 +194,61 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_password", error: "Password is incorrect"})
   end
 
+  # ADR-187: password recovery.
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_reset_link,
+             :expired_reset_link,
+             :invalid_recovery_code,
+             :weak_password,
+             :claimed_by_other,
+             :not_claimed
+           ] do
+    {status, message} =
+      case reason do
+        :invalid_reset_link -> {:unprocessable_entity, "This reset link is not valid"}
+        :expired_reset_link -> {:gone, "This reset link has expired"}
+        :invalid_recovery_code -> {:unprocessable_entity, "The account or recovery code is wrong"}
+        :weak_password -> {:unprocessable_entity, "Password must be at least 4 characters"}
+        :claimed_by_other -> {:conflict, "Someone else is handling this request"}
+        :not_claimed -> {:conflict, "You are not handling this request"}
+      end
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-187: the email already holds profiles and the password is not theirs.
+  # Only the count is disclosed, never which profiles.
+  def call(conn, {:error, {:email_in_use, %{profile_count: count, profile_limit: limit}}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "email_in_use",
+      error: "This email already has accounts",
+      profile_count: count,
+      profile_limit: limit,
+      errors: %{"email" => ["already has accounts"]}
+    })
+  end
+
+  def call(conn, {:error, {:profile_limit, %{profile_limit: limit}}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "profile_limit",
+      error: "This email already has the most accounts allowed",
+      profile_limit: limit
+    })
+  end
+
+  def call(conn, {:error, :email_taken}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "email_in_use", error: "This email already has accounts"})
+  end
+
   def call(conn, {:error, :invalid_credentials}) do
     emit_auth_anomaly(:invalid_credentials)
 

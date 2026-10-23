@@ -893,6 +893,33 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-187: a person asked for a password reset.
+  def build("password_reset_requested", payload, localize) do
+    name = payload["person_name"] || payload["person_handle"] || ""
+
+    %{
+      title: localize.("Password reset request", %{}),
+      body:
+        localize.("%{name} (@%{handle}) can't sign in and asked for a password reset.", %{
+          name: name,
+          handle: payload["person_handle"] || ""
+        }),
+      url: payload["url"] || "/password-resets"
+    }
+  end
+
+  def build("password_reset_completed", payload, localize) do
+    %{
+      title: localize.("Your password was reset", %{}),
+      body:
+        localize.(
+          "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
+          %{}
+        ),
+      url: payload["url"] || "/me/settings"
+    }
+  end
+
   # ADR-176: a class still without its WOD on its day.
   def build("class_workout_missing", payload, localize) do
     values = %{class: payload["class_name"] || "", when: payload["class_when"] || ""}

@@ -1,11 +1,10 @@
 defmodule Palee.Application.NicknameAvailability do
-  alias Palee.{Identity, Identity.RegistrationPolicy}
+  @moduledoc "Kept for the original endpoint; the @handle is the unique name (ADR-187)."
+  alias Palee.Application.AccountProfiles
 
   def call(nickname) when is_binary(nickname) do
-    if RegistrationPolicy.valid_nickname?(nickname) do
-      {:ok, is_nil(Identity.find_by_nickname(RegistrationPolicy.normalize_nickname(nickname)))}
-    else
-      {:error, :bad_request}
+    with {:ok, %{available: available}} <- AccountProfiles.handle_availability(nickname) do
+      {:ok, available}
     end
   end
 

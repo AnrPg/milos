@@ -186,6 +186,69 @@
         "title": "AccountHistoryPage",
         "type": "object"
       },
+      "AccountInterests": {
+        "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+        "properties": {
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "disciplines",
+          "level"
+        ],
+        "title": "AccountInterests",
+        "type": "object"
+      },
+      "AccountInterestsResponse": {
+        "properties": {
+          "interests": {
+            "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+            "properties": {
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "level": {
+                "enum": [
+                  "beginner",
+                  "intermediate",
+                  "advanced"
+                ],
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "disciplines",
+              "level"
+            ],
+            "title": "AccountInterests",
+            "type": "object"
+          }
+        },
+        "required": [
+          "interests"
+        ],
+        "title": "AccountInterestsResponse",
+        "type": "object"
+      },
       "AccountProgress": {
         "properties": {
           "active_filter_count": {
@@ -66143,6 +66206,108 @@
         ]
       }
     },
+    "/api/auth/handle-available": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AuthController.handle_available",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "handle",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "handle": {
+                      "type": "string"
+                    },
+                    "suggestions": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "handle",
+                    "suggestions"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Availability result"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a valid handle"
+          }
+        },
+        "summary": "ADR-187: whether a typed @handle is free, its stored form, and alternatives",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/handle-suggestion": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AuthController.handle_suggestion",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "display_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "handle"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestion"
+          }
+        },
+        "summary": "ADR-187: a free @handle suggested from a display name (null when it has no Latin form)",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/auth/invitations/inspect": {
       "post": {
         "callbacks": {},
@@ -66364,7 +66529,12 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "identifier": {
+                    "description": "ADR-187: the login's email or a profile's @handle",
+                    "type": "string"
+                  },
                   "nickname": {
+                    "description": "Deprecated alias of identifier",
                     "type": "string"
                   },
                   "password": {
@@ -66373,7 +66543,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password"
                 ],
                 "type": "object"
@@ -66403,17 +66572,30 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "description": "The login's email, shared by its profiles",
+                          "type": "string"
+                        },
+                        "handle": {
+                          "description": "ADR-187: the unique @handle",
+                          "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
                         "nickname": {
+                          "description": "ADR-187: the display name (free, not unique); same as display_name",
                           "type": "string"
                         },
                         "preferred_locale": {
@@ -66443,6 +66625,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "profile_count": {
+                          "type": "integer"
+                        },
+                        "profile_limit": {
+                          "type": "integer"
+                        },
                         "role": {
                           "type": "string"
                         },
@@ -66458,6 +66646,8 @@
                       "required": [
                         "id",
                         "nickname",
+                        "display_name",
+                        "handle",
                         "role",
                         "vendor",
                         "preferred_locale",
@@ -66593,17 +66783,30 @@
                         "enum": [
                           "admin",
                           "member",
-                          "athlete"
+                          "athlete",
+                          "first_run"
                         ],
                         "type": "string"
                       },
                       "type": "array"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "The login's email, shared by its profiles",
+                      "type": "string"
+                    },
+                    "handle": {
+                      "description": "ADR-187: the unique @handle",
+                      "type": "string"
                     },
                     "id": {
                       "format": "uuid",
                       "type": "string"
                     },
                     "nickname": {
+                      "description": "ADR-187: the display name (free, not unique); same as display_name",
                       "type": "string"
                     },
                     "preferred_locale": {
@@ -66633,6 +66836,12 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
                     "role": {
                       "type": "string"
                     },
@@ -66648,6 +66857,8 @@
                   "required": [
                     "id",
                     "nickname",
+                    "display_name",
+                    "handle",
                     "role",
                     "vendor",
                     "preferred_locale",
@@ -66729,6 +66940,451 @@
         ]
       }
     },
+    "/api/auth/password-reset": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.complete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid link or password"
+          }
+        },
+        "summary": "Set a new password with a reset link's token",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset-requests": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.request",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "identifier": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request sent"
+          }
+        },
+        "summary": "Ask for a password reset (always answered the same way)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset/recovery-code": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.redeem_code",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "identifier": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier",
+                  "code",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong account or code"
+          }
+        },
+        "summary": "Set a new password with a recovery code",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/profiles": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
+                    "profiles": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          },
+                          "display_name": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "handle",
+                          "display_name",
+                          "role",
+                          "current"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "profile_limit",
+                    "profiles"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profiles"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The profiles of the signed-in login",
+        "tags": [
+          "Authentication"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "handle": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "handle",
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
+                    "profiles": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          },
+                          "display_name": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "handle",
+                          "display_name",
+                          "role",
+                          "current"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "profile_limit",
+                    "profiles"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profiles"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Validation or limit"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a profile to the signed-in login (at most three)",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/recovery-codes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.codes_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "unused": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "unused"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recovery codes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How many recovery codes the login has left",
+        "tags": [
+          "Password recovery"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.generate_codes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "current_password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "current_password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "codes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "codes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recovery codes"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong password"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "New recovery codes (the old ones stop working)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
     "/api/auth/refresh": {
       "post": {
         "callbacks": {},
@@ -66754,17 +67410,30 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "description": "The login's email, shared by its profiles",
+                          "type": "string"
+                        },
+                        "handle": {
+                          "description": "ADR-187: the unique @handle",
+                          "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
                         "nickname": {
+                          "description": "ADR-187: the display name (free, not unique); same as display_name",
                           "type": "string"
                         },
                         "preferred_locale": {
@@ -66794,6 +67463,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "profile_count": {
+                          "type": "integer"
+                        },
+                        "profile_limit": {
+                          "type": "integer"
+                        },
                         "role": {
                           "type": "string"
                         },
@@ -66809,6 +67484,8 @@
                       "required": [
                         "id",
                         "nickname",
+                        "display_name",
+                        "handle",
                         "role",
                         "vendor",
                         "preferred_locale",
@@ -66915,11 +67592,20 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "description": "Free display name; defaults to the handle",
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
                     "type": "string"
                   },
+                  "handle": {
+                    "description": "ADR-187: the unique @handle",
+                    "type": "string"
+                  },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -66935,7 +67621,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "role",
                   "email"
@@ -66966,11 +67651,42 @@
             },
             "description": "Access session"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email already has accounts"
+          },
           "422": {
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
+                    "code": {
+                      "type": "string"
+                    },
                     "errors": {
                       "additionalProperties": {
                         "items": {
@@ -66979,6 +67695,9 @@
                         "type": "array"
                       },
                       "type": "object"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -67061,8 +67780,14 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
+                    "type": "string"
+                  },
+                  "handle": {
                     "type": "string"
                   },
                   "invitation_token": {
@@ -67071,6 +67796,7 @@
                     "type": "string"
                   },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -67079,7 +67805,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "invitation_token",
                   "email"
@@ -67191,8 +67916,14 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
+                    "type": "string"
+                  },
+                  "handle": {
                     "type": "string"
                   },
                   "invitation_token": {
@@ -67201,6 +67932,7 @@
                     "type": "string"
                   },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -67209,7 +67941,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "invitation_token",
                   "email"
@@ -67272,6 +68003,75 @@
           }
         ],
         "summary": "Invalidate every session for the authenticated user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/switch-profile": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.switch",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "access_token",
+                    "user"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access session"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a profile of this login"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a session for another profile of the same login",
         "tags": [
           "Authentication"
         ]
@@ -95395,6 +96195,160 @@
         ]
       }
     },
+    "/api/me/interests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your disciplines and level (empty until you say)",
+        "tags": [
+          "Interests"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                "properties": {
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "level": {
+                    "enum": [
+                      "beginner",
+                      "intermediate",
+                      "advanced"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "disciplines",
+                  "level"
+                ],
+                "title": "AccountInterests",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace your disciplines and level",
+        "tags": [
+          "Interests"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -99375,6 +100329,12 @@
               "schema": {
                 "properties": {
                   "current_password": {
+                    "description": "Required to change the login's email or password",
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "maxLength": 50,
+                    "minLength": 1,
                     "type": "string"
                   },
                   "email": {
@@ -99382,9 +100342,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "handle": {
+                    "description": "ADR-187: the unique @handle (once per 14 days)",
+                    "type": "string"
+                  },
                   "nickname": {
-                    "maxLength": 30,
-                    "minLength": 3,
+                    "description": "Deprecated alias of display_name",
                     "type": "string"
                   },
                   "password": {
@@ -99435,6 +100398,15 @@
                       "properties": {
                         "avatar_url": {
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "handle": {
                           "type": "string"
                         },
                         "id": {
@@ -100564,6 +101536,13 @@
                     "users": {
                       "items": {
                         "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -100592,7 +101571,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Search visible users by nickname",
+        "summary": "Search visible users by @handle or display name (any script)",
         "tags": [
           "Me"
         ]
@@ -102545,7 +103524,8 @@
               "enum": [
                 "admin",
                 "member",
-                "athlete"
+                "athlete",
+                "first_run"
               ],
               "type": "string"
             }
@@ -174638,6 +175618,13 @@
                     "users": {
                       "items": {
                         "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -174666,7 +175653,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Search visible users by nickname",
+        "summary": "Search visible users by @handle or display name (any script)",
         "tags": [
           "Me"
         ]
@@ -193386,6 +194373,695 @@
         ]
       }
     },
+    "/api/password-resets": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.inbox",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "claimed_by": {
+                            "nullable": true,
+                            "properties": {
+                              "display_name": {
+                                "type": "string"
+                              },
+                              "handle": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "link_expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "link_issued_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organizations": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_name": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "user_id",
+                              "handle",
+                              "display_name"
+                            ],
+                            "type": "object"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "state": {
+                            "enum": [
+                              "open",
+                              "mine",
+                              "taken",
+                              "link_sent",
+                              "expired"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "state",
+                          "person",
+                          "sources",
+                          "organizations",
+                          "requested_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The password reset requests the signed-in person can handle",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/claim": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.claim",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Someone else holds it"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a request and claim it",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/dismiss": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.dismiss",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Clear an expired request",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/hide": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.hide",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Hide a request from your own list",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/link": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.issue_link",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "email",
+                    "expires_at",
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reset link"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Someone else holds it"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue the one-time reset link (24 hours) to mail to the person",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/reject": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.reject",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Close a request that could not be confirmed",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/release": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.release",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not yours"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Let go of a claimed request",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
     "/api/people/{id}": {
       "get": {
         "callbacks": {},
@@ -197529,6 +199205,71 @@
         "summary": "Summarize what renaming an organization's path slug affects (ADR-122)",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/password-reset-log": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.log",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "event": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handler_handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "event",
+                          "inserted_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Log"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The password reset security log (vendor only)",
+        "tags": [
+          "Password recovery"
         ]
       }
     },

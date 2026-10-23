@@ -1,7 +1,28 @@
 defmodule Palee.Identity.Ports.UserStore do
   alias Palee.Identity.Account
 
-  @callback create_user(map()) :: {:ok, Account.t()} | {:error, Ecto.Changeset.t()}
+  # ADR-187: logins (one per email) hold up to three profiles.
+  @callback create_login_with_profile(map()) ::
+              {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  @callback add_profile(Ecto.UUID.t(), map()) ::
+              {:ok, Account.t()} | {:error, :not_found | :profile_limit | Ecto.Changeset.t()}
+  @callback get_login_by_email(String.t() | nil) ::
+              %{
+                id: Ecto.UUID.t(),
+                email: String.t(),
+                password_hash: String.t(),
+                last_used_user_id: Ecto.UUID.t() | nil,
+                profile_count: non_neg_integer()
+              }
+              | nil
+  @callback get_by_email(String.t() | nil) :: Account.t() | nil
+  @callback list_profiles(Ecto.UUID.t()) :: [Account.t()]
+  @callback touch_last_used(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok
+  @callback handle_available?(String.t(), Ecto.UUID.t() | nil) :: boolean()
+  @callback update_credentials(Ecto.UUID.t(), map()) ::
+              {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback reset_login_password(Ecto.UUID.t(), String.t()) ::
+              :ok | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_user(Account.t()) :: :ok | {:error, term()}
   @callback delete_tenant_scoped_user(Account.t()) :: :ok | {:error, term()}
   @callback update_user_role(Account.t() | Ecto.UUID.t(), atom() | String.t()) ::

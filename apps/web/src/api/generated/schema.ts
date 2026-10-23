@@ -75,6 +75,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/handle-available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-187: whether a typed @handle is free, its stored form, and alternatives */
+        get: operations["PaleeWeb.AuthController.handle_available"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/handle-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-187: a free @handle suggested from a display name (null when it has no Latin form) */
+        get: operations["PaleeWeb.AuthController.handle_suggestion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/invitations/inspect": {
         parameters: {
             query?: never;
@@ -177,6 +211,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set a new password with a reset link's token */
+        post: operations["PaleeWeb.PasswordRecoveryController.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password-reset-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask for a password reset (always answered the same way) */
+        post: operations["PaleeWeb.PasswordRecoveryController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password-reset/recovery-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set a new password with a recovery code */
+        post: operations["PaleeWeb.PasswordRecoveryController.redeem_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The profiles of the signed-in login */
+        get: operations["PaleeWeb.AccountProfilesController.index"];
+        put?: never;
+        /** Add a profile to the signed-in login (at most three) */
+        post: operations["PaleeWeb.AccountProfilesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/recovery-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How many recovery codes the login has left */
+        get: operations["PaleeWeb.PasswordRecoveryController.codes_status"];
+        put?: never;
+        /** New recovery codes (the old ones stop working) */
+        post: operations["PaleeWeb.PasswordRecoveryController.generate_codes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/refresh": {
         parameters: {
             query?: never;
@@ -256,6 +377,23 @@ export interface paths {
         put?: never;
         /** Invalidate every session for the authenticated user */
         post: operations["PaleeWeb.AuthController.sign_out_all"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/switch-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open a session for another profile of the same login */
+        post: operations["PaleeWeb.AccountProfilesController.switch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2353,6 +2491,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/interests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your disciplines and level (empty until you say) */
+        get: operations["PaleeWeb.MyInterestsController.show"];
+        /** Replace your disciplines and level */
+        put: operations["PaleeWeb.MyInterestsController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -2880,7 +3036,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search visible users by nickname */
+        /** Search visible users by @handle or display name (any script) */
         get: operations["PaleeWeb.MeController.search_users (2)"];
         put?: never;
         post?: never;
@@ -8369,7 +8525,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search visible users by nickname */
+        /** Search visible users by @handle or display name (any script) */
         get: operations["PaleeWeb.MeController.search_users"];
         put?: never;
         post?: never;
@@ -9620,6 +9776,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/password-resets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The password reset requests the signed-in person can handle */
+        get: operations["PaleeWeb.PasswordRecoveryController.inbox"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open a request and claim it */
+        post: operations["PaleeWeb.PasswordRecoveryController.claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear an expired request */
+        post: operations["PaleeWeb.PasswordRecoveryController.dismiss"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide a request from your own list */
+        post: operations["PaleeWeb.PasswordRecoveryController.hide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the one-time reset link (24 hours) to mail to the person */
+        post: operations["PaleeWeb.PasswordRecoveryController.issue_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a request that could not be confirmed */
+        post: operations["PaleeWeb.PasswordRecoveryController.reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/password-resets/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Let go of a claimed request */
+        post: operations["PaleeWeb.PasswordRecoveryController.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/people/{id}": {
         parameters: {
             query?: never;
@@ -10063,6 +10338,23 @@ export interface paths {
         };
         /** Summarize what renaming an organization's path slug affects (ADR-122) */
         get: operations["PaleeWeb.PlatformOrganizationController.slug_impact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/password-reset-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The password reset security log (vendor only) */
+        get: operations["PaleeWeb.PasswordRecoveryController.log"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10734,6 +11026,27 @@ export interface components {
             next_offset: number | null;
             offset: number;
             total: number;
+        };
+        /**
+         * AccountInterests
+         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+         */
+        AccountInterests: {
+            disciplines: string[];
+            /** @enum {string|null} */
+            level: "beginner" | "intermediate" | "advanced" | null;
+        };
+        /** AccountInterestsResponse */
+        AccountInterestsResponse: {
+            /**
+             * AccountInterests
+             * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+             */
+            interests: {
+                disciplines: string[];
+                /** @enum {string|null} */
+                level: "beginner" | "intermediate" | "advanced" | null;
+            };
         };
         /** AccountProgress */
         AccountProgress: {
@@ -31221,6 +31534,65 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AuthController.handle_available": {
+        parameters: {
+            query: {
+                handle: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        handle: string;
+                        suggestions: string[];
+                    };
+                };
+            };
+            /** @description Not a valid handle */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AuthController.handle_suggestion": {
+        parameters: {
+            query: {
+                display_name: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        handle: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.OrganizationAccessController.inspect": {
         parameters: {
             query?: never;
@@ -31328,7 +31700,10 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    nickname: string;
+                    /** @description ADR-187: the login's email or a profile's @handle */
+                    identifier?: string;
+                    /** @description Deprecated alias of identifier */
+                    nickname?: string;
                     password: string;
                 };
             };
@@ -31344,9 +31719,15 @@ export interface operations {
                         access_token: string;
                         user?: {
                             avatar_url?: string | null;
-                            completed_tours: ("admin" | "member" | "athlete")[];
+                            completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
+                            display_name: string;
+                            /** @description The login's email, shared by its profiles */
+                            email?: string;
+                            /** @description ADR-187: the unique @handle */
+                            handle: string;
                             /** Format: uuid */
                             id: string;
+                            /** @description ADR-187: the display name (free, not unique); same as display_name */
                             nickname: string;
                             /** @enum {string} */
                             preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
@@ -31355,6 +31736,8 @@ export interface operations {
                              * @enum {string|null}
                              */
                             preferred_theme_slug?: "frost" | "graphite" | null;
+                            profile_count?: number;
+                            profile_limit?: number;
                             role: string;
                             /** @description ADR-179: the zone this account's device last reported */
                             time_zone?: string | null;
@@ -31451,9 +31834,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
-                        completed_tours: ("admin" | "member" | "athlete")[];
+                        completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
+                        display_name: string;
+                        /** @description The login's email, shared by its profiles */
+                        email?: string;
+                        /** @description ADR-187: the unique @handle */
+                        handle: string;
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-187: the display name (free, not unique); same as display_name */
                         nickname: string;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
@@ -31462,6 +31851,8 @@ export interface operations {
                          * @enum {string|null}
                          */
                         preferred_theme_slug?: "frost" | "graphite" | null;
+                        profile_count?: number;
+                        profile_limit?: number;
                         role: string;
                         /** @description ADR-179: the zone this account's device last reported */
                         time_zone?: string | null;
@@ -31506,6 +31897,252 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PasswordRecoveryController.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    password: string;
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Password changed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid link or password */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    identifier: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Request sent */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.redeem_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                    identifier: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Password changed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Wrong account or code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountProfilesController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profiles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: string;
+                        profile_limit: number;
+                        profiles: {
+                            avatar_url?: string | null;
+                            current: boolean;
+                            display_name: string;
+                            handle: string;
+                            /** Format: uuid */
+                            id: string;
+                            role: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountProfilesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    display_name?: string;
+                    handle: string;
+                    /** @enum {string} */
+                    role: "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Profiles */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: string;
+                        profile_limit: number;
+                        profiles: {
+                            avatar_url?: string | null;
+                            current: boolean;
+                            display_name: string;
+                            handle: string;
+                            /** Format: uuid */
+                            id: string;
+                            role: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Validation or limit */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.codes_status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recovery codes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                        unused: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.generate_codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    current_password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Recovery codes */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        codes: string[];
+                    };
+                };
+            };
+            /** @description Wrong password */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PaleeWeb.AuthController.refresh": {
         parameters: {
             query?: never;
@@ -31525,9 +32162,15 @@ export interface operations {
                         access_token: string;
                         user?: {
                             avatar_url?: string | null;
-                            completed_tours: ("admin" | "member" | "athlete")[];
+                            completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
+                            display_name: string;
+                            /** @description The login's email, shared by its profiles */
+                            email?: string;
+                            /** @description ADR-187: the unique @handle */
+                            handle: string;
                             /** Format: uuid */
                             id: string;
+                            /** @description ADR-187: the display name (free, not unique); same as display_name */
                             nickname: string;
                             /** @enum {string} */
                             preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
@@ -31536,6 +32179,8 @@ export interface operations {
                              * @enum {string|null}
                              */
                             preferred_theme_slug?: "frost" | "graphite" | null;
+                            profile_count?: number;
+                            profile_limit?: number;
                             role: string;
                             /** @description ADR-179: the zone this account's device last reported */
                             time_zone?: string | null;
@@ -31601,9 +32246,14 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Free display name; defaults to the handle */
+                    display_name?: string;
                     /** Format: email */
                     email: string;
-                    nickname: string;
+                    /** @description ADR-187: the unique @handle */
+                    handle?: string;
+                    /** @description Deprecated alias of handle */
+                    nickname?: string;
                     password: string;
                     /** @enum {string} */
                     role: "member" | "athlete";
@@ -31622,6 +32272,20 @@ export interface operations {
                     };
                 };
             };
+            /** @description Email already has accounts */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                        profile_count?: number;
+                        profile_limit?: number;
+                    };
+                };
+            };
             /** @description Validation errors */
             422: {
                 headers: {
@@ -31629,9 +32293,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        code?: string;
                         errors: {
                             [key: string]: string[];
                         };
+                        profile_limit?: number;
                     };
                 };
             };
@@ -31681,10 +32347,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    display_name?: string;
                     /** Format: email */
                     email: string;
+                    handle?: string;
                     invitation_token: string;
-                    nickname: string;
+                    /** @description Deprecated alias of handle */
+                    nickname?: string;
                     password: string;
                 };
             };
@@ -31749,10 +32418,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    display_name?: string;
                     /** Format: email */
                     email: string;
+                    handle?: string;
                     invitation_token: string;
-                    nickname: string;
+                    /** @description Deprecated alias of handle */
+                    nickname?: string;
                     password: string;
                 };
             };
@@ -31795,6 +32467,45 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "PaleeWeb.AccountProfilesController.switch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Access session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string;
+                        user: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Not a profile of this login */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
             };
         };
     };
@@ -42422,6 +43133,74 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyInterestsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Interests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * AccountInterests
+                         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+                         */
+                        interests: {
+                            disciplines: string[];
+                            /** @enum {string|null} */
+                            level: "beginner" | "intermediate" | "advanced" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyInterestsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    disciplines: string[];
+                    /** @enum {string|null} */
+                    level: "beginner" | "intermediate" | "advanced" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Interests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * AccountInterests
+                         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+                         */
+                        interests: {
+                            disciplines: string[];
+                            /** @enum {string|null} */
+                            level: "beginner" | "intermediate" | "advanced" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.JournalController.index": {
         parameters: {
             query?: {
@@ -43937,9 +44716,14 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Required to change the login's email or password */
                     current_password?: string;
+                    display_name?: string;
                     /** Format: email */
                     email?: string | null;
+                    /** @description ADR-187: the unique @handle (once per 14 days) */
+                    handle?: string;
+                    /** @description Deprecated alias of display_name */
                     nickname?: string;
                     password?: string;
                     /** @enum {string} */
@@ -43962,6 +44746,9 @@ export interface operations {
                     "application/json": {
                         user?: {
                             avatar_url?: string | null;
+                            display_name?: string;
+                            email?: string;
+                            handle?: string;
                             /** Format: uuid */
                             id?: string;
                             nickname?: string;
@@ -44367,6 +45154,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         users?: {
+                            avatar_url?: string | null;
+                            handle?: string;
                             /** Format: uuid */
                             id?: string;
                             nickname?: string;
@@ -45099,7 +45888,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                audience: "admin" | "member" | "athlete";
+                audience: "admin" | "member" | "athlete" | "first_run";
             };
             cookie?: never;
         };
@@ -71861,6 +72650,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         users?: {
+                            avatar_url?: string | null;
+                            handle?: string;
                             /** Format: uuid */
                             id?: string;
                             nickname?: string;
@@ -78466,6 +79257,299 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PasswordRecoveryController.inbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            claimed_by?: {
+                                display_name?: string;
+                                handle?: string;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            link_expires_at?: string | null;
+                            /** Format: date-time */
+                            link_issued_at?: string | null;
+                            organizations: string[];
+                            person: {
+                                avatar_url?: string | null;
+                                display_name: string;
+                                email?: string | null;
+                                handle: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            sources: string[];
+                            /** @enum {string} */
+                            state: "open" | "mine" | "taken" | "link_sent" | "expired";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            claimed_by?: {
+                                display_name?: string;
+                                handle?: string;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            link_expires_at?: string | null;
+                            /** Format: date-time */
+                            link_issued_at?: string | null;
+                            organizations: string[];
+                            person: {
+                                avatar_url?: string | null;
+                                display_name: string;
+                                email?: string | null;
+                                handle: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            sources: string[];
+                            /** @enum {string} */
+                            state: "open" | "mine" | "taken" | "link_sent" | "expired";
+                        };
+                    };
+                };
+            };
+            /** @description Someone else holds it */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.issue_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reset link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: string;
+                        /** Format: date-time */
+                        expires_at: string;
+                        request: {
+                            claimed_by?: {
+                                display_name?: string;
+                                handle?: string;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            link_expires_at?: string | null;
+                            /** Format: date-time */
+                            link_issued_at?: string | null;
+                            organizations: string[];
+                            person: {
+                                avatar_url?: string | null;
+                                display_name: string;
+                                email?: string | null;
+                                handle: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            sources: string[];
+                            /** @enum {string} */
+                            state: "open" | "mine" | "taken" | "link_sent" | "expired";
+                        };
+                        token: string;
+                    };
+                };
+            };
+            /** @description Someone else holds it */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            claimed_by?: {
+                                display_name?: string;
+                                handle?: string;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            link_expires_at?: string | null;
+                            /** Format: date-time */
+                            link_issued_at?: string | null;
+                            organizations: string[];
+                            person: {
+                                avatar_url?: string | null;
+                                display_name: string;
+                                email?: string | null;
+                                handle: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            sources: string[];
+                            /** @enum {string} */
+                            state: "open" | "mine" | "taken" | "link_sent" | "expired";
+                        };
+                    };
+                };
+            };
+            /** @description Not yours */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PaleeWeb.PeopleController.show": {
         parameters: {
             query?: never;
@@ -80063,6 +81147,36 @@ export interface operations {
                             slug: string;
                         }[];
                         purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Log */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            event: string;
+                            handle?: string | null;
+                            handler_handle?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                        }[];
                     };
                 };
             };
