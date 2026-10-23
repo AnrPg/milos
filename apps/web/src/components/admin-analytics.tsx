@@ -10,6 +10,7 @@ import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { fetchAdminAnalyticsSummary } from "@/api/analytics";
@@ -19,6 +20,7 @@ import { HelpTooltip } from "@/components/HelpTooltip";
 import { ExecutionKpiDashboard } from "@/components/admin/ExecutionKpiDashboard";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -128,6 +130,7 @@ type AnalyticsSection = "overview" | "training" | "coaching" | "engagement" | "h
 export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSection }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const branchT = useTranslations("BranchScope");
   const SECTION_COPY: Record<AnalyticsSection, { eyebrow: string; title: string; body: string }> = {
     overview: {
       eyebrow: i18n("analyticsMarketinga05588a"),
@@ -158,10 +161,14 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
   const { tokens } = useSession();
   const organizationSlug = useOrganizationSlug();
 
+  // ADR-186 §7: every figure on the page follows the branch filter.
+  const branchFilter = useBranchFilter(`analytics-${section}`);
+  const locationIds = branchFilter.param;
+
   const summaryQuery = useQuery({
-    queryKey: ["admin", "analytics", "summary"],
+    queryKey: ["admin", "analytics", "summary", locationIds ?? "all"],
     enabled: Boolean(tokens?.access_token),
-    queryFn: async () => fetchAdminAnalyticsSummary(tokens!.access_token, 30),
+    queryFn: async () => fetchAdminAnalyticsSummary(tokens!.access_token, 30, locationIds),
   });
 
   const payload = asRecord(summaryQuery.data);
@@ -192,10 +199,23 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
         <PageHeader
           title={copy.title}
           actions={
-            <Link href={adminHref("/admin/metrics", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-              {i18n("analyticsMarketing0ecf7f0")}
-            </Link>
+            <>
+              <BranchFilterControl filter={branchFilter} />
+              <Link href={adminHref("/admin/metrics", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+                {i18n("analyticsMarketing0ecf7f0")}
+              </Link>
+            </>
           }
+        />
+
+        <BranchSplits
+          rows={payload.branches as BranchSplit[] | undefined}
+          columns={[
+            { key: "check_ins", label: branchT("checkIns"), format: (value) => formatCount(uiLocale, Number(value ?? 0)) },
+            { key: "attended", label: branchT("attended"), format: (value) => formatCount(uiLocale, Number(value ?? 0)) },
+            { key: "active_memberships", label: branchT("activeMemberships"), format: (value) => formatCount(uiLocale, Number(value ?? 0)) },
+            { key: "paid_revenue_cents", label: i18n("paidRevenue64c34e5"), format: (value) => formatMoney(uiLocale, Number(value ?? 0)) },
+          ]}
         />
 
         {summaryQuery.error instanceof Error ? (

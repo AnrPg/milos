@@ -14,4 +14,7 @@ defmodule Palee.Analytics.Ports.AnalyticsStore do
   @callback get_attendance_for_user_class(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
   @callback upsert_exercise_catalog_entry(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback analytics_summary(map()) :: map()
+  @callback branch_activity(DateTime.t()) :: [
+              {String.t(), String.t(), non_neg_integer(), non_neg_integer()}
+            ]
 end

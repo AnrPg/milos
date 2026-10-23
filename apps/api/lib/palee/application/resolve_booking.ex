@@ -1,6 +1,7 @@
 defmodule Palee.Application.ResolveBooking do
   alias Palee.Application.{
     BookingEntitlement,
+    ClassLocation,
     PromoteClassWaitlist,
     ScheduleRealtime,
     TrackAnalyticsEvent
@@ -26,6 +27,8 @@ defmodule Palee.Application.ResolveBooking do
       Map.get(params, :client_operation_id) || Map.get(params, "client_operation_id")
 
     with {:ok, status} <- requested_status(action),
+         # ADR-186: staff resolve bookings of classes at their own branches.
+         :ok <- ClassLocation.authorize_booking(context, booking_id),
          {:ok, operation_id} <- BookingOperationPolicy.normalize_operation_id(operation_id),
          booking when is_map(booking) <- Scheduling.get_booking(context, booking_id),
          {:ok, updated_booking, outcome} <-

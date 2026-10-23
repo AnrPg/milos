@@ -14,6 +14,10 @@ defmodule Palee.Appointments.AppointmentStore do
   def create_slot(context, attrs), do: tenant_call(context, :create_slot, [attrs])
 
   @impl true
+  def transaction(context, fun) when is_function(fun, 0),
+    do: tenant_call(context, :transaction, [fun])
+
+  @impl true
   def get_slot(context, id), do: tenant_call(context, :get_slot, [id])
 
   @impl true

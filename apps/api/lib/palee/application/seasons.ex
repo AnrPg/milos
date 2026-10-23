@@ -62,7 +62,9 @@ defmodule Palee.Application.Seasons do
     status = requested_status(attrs, "draft")
     attrs = editable(attrs)
 
-    with :ok <- valid_status(status, nil),
+    # ADR-186 §8: a season runs for the whole business, so all-branch staff only.
+    with :ok <- Organizations.authorize_covering(context, :all),
+         :ok <- valid_status(status, nil),
          {:ok, attrs} <- check_references(context, attrs) do
       context
       |> Seasons.create_offering(
@@ -80,7 +82,8 @@ defmodule Palee.Application.Seasons do
   end
 
   def update(context, id, attrs) do
-    with {:ok, offering} <- fetch(context, id) do
+    with :ok <- Organizations.authorize_covering(context, :all),
+         {:ok, offering} <- fetch(context, id) do
       Seasons.with_offering_lock(context, offering.id, fn ->
         offering = Seasons.get_offering(context, offering.id)
         do_update(context, offering, attrs)

@@ -20,6 +20,9 @@ defmodule Palee.Organizations.OrganizationMembership do
     field :invited_by_user_id, :binary_id
     # The location this person's gym opens on (Phase 2); nil = no default.
     field :home_location_id, :binary_id
+    # ADR-186: false when the person works only at the branches listed in
+    # membership_location_scopes («Όλα τα καταστήματα» when true).
+    field :all_locations, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -51,6 +54,10 @@ defmodule Palee.Organizations.OrganizationMembership do
       name: :organization_memberships_home_location_fkey
     )
   end
+
+  @doc "ADR-186: the «Όλα τα καταστήματα» flag; the branches live in their own table."
+  def location_scope_changeset(membership, all_locations?) when is_boolean(all_locations?),
+    do: change(membership, all_locations: all_locations?)
 
   # `roles` is the role set; `role` mirrors its primary role. A caller that
   # sets only `role` (legacy single-role writes) replaces the set with it.

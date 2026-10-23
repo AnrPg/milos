@@ -11,6 +11,11 @@ defmodule Palee.Scheduling.SchedulingStore do
     end)
   end
 
+  @doc "Runs `fun` in one transaction: all of its writes or none (ADR-186 §8)."
+  @impl true
+  def transaction(context, fun) when is_function(fun, 0),
+    do: tenant_call(context, :transaction, [fun])
+
   @impl true
   def create_class_type(context, params), do: tenant_call(context, :create_class_type, [params])
 

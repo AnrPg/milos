@@ -11,6 +11,20 @@ defmodule Palee.Infrastructure.Appointments.EctoAppointmentStore do
   @active "booked"
 
   @impl true
+  def transaction(_context, fun) do
+    if Repo.in_transaction?() do
+      fun.()
+    else
+      Repo.transaction(fn ->
+        case fun.() do
+          {:ok, value} -> value
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end)
+    end
+  end
+
+  @impl true
   def create_slot(%{organization_id: organization_id}, attrs) do
     attrs
     |> Map.new(fn {key, value} -> {to_string(key), value} end)

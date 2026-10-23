@@ -10,6 +10,7 @@ defmodule PaleeWeb.AppointmentsController do
     BookAppointment,
     CancelAppointment,
     CancelAppointmentSlot,
+    ClassLocation,
     CreateAppointmentSlot,
     ListOfferedAppointmentSlots,
     RecordAppointmentAttendance
@@ -99,7 +100,8 @@ defmodule PaleeWeb.AppointmentsController do
   def cancel(conn, %{id: id}) do
     actor = GuardianPlug.current_resource(conn)
 
-    with {:ok, booking} <- CancelAppointment.call(conn.assigns.tenant_context, actor, id) do
+    with :ok <- staff_cancel_in_scope(conn, actor, id),
+         {:ok, booking} <- CancelAppointment.call(conn.assigns.tenant_context, actor, id) do
       json(conn, %{appointment: booking})
     end
   end
@@ -141,7 +143,13 @@ defmodule PaleeWeb.AppointmentsController do
         if(own_slots_only?(context), do: context.user_id, else: Map.get(params, :coach_id))
     }
 
-    json(conn, %{slots: Appointments.list_slots(context, filters)})
+    # ADR-186: the slots of the staff member's own branches.
+    slots =
+      context
+      |> Appointments.list_slots(filters)
+      |> Enum.filter(&(ClassLocation.authorize_appointment_slot(context, &1) == :ok))
+
+    json(conn, %{slots: slots})
   end
 
   operation(:create_slot,
@@ -158,9 +166,13 @@ defmodule PaleeWeb.AppointmentsController do
     coach_id = Map.get(conn.body_params, :coach_id)
 
     with :ok <- own_coach(conn.assigns.tenant_context, coach_id || staff.id),
-         {:ok, slot} <-
-           CreateAppointmentSlot.call(conn.assigns.tenant_context, staff, conn.body_params) do
-      conn |> put_status(:created) |> json(%{slot: slot})
+         {:ok, [slot | _] = slots} <-
+           CreateAppointmentSlot.call_at_branches(
+             conn.assigns.tenant_context,
+             staff,
+             conn.body_params
+           ) do
+      conn |> put_status(:created) |> json(%{slot: slot, slots: slots})
     end
   end
 
@@ -231,6 +243,20 @@ defmodule PaleeWeb.AppointmentsController do
     end
   end
 
+  # ADR-186: staff cancel others' appointments only at their own branches; a
+  # client always cancels their own.
+  defp staff_cancel_in_scope(conn, actor, booking_id) do
+    context = conn.assigns.tenant_context
+
+    case Organizations.location_scope(context) == :all ||
+           Appointments.get_booking(context, booking_id) do
+      true -> :ok
+      %{user_id: user_id} when user_id == actor.id -> :ok
+      %{slot: slot} -> ClassLocation.authorize_appointment_slot(context, slot)
+      _missing -> :ok
+    end
+  end
+
   # A coach with scope `:own` manages only their own slots (ADR-100); front
   # desk and managers reach every slot.
   defp own_slots_only?(context) do
@@ -244,11 +270,12 @@ defmodule PaleeWeb.AppointmentsController do
       else: :ok
   end
 
+  # ADR-186: and only the slots of their own branches.
   defp own_slot(context, slot_id) do
-    if own_slots_only?(context) do
+    if own_slots_only?(context) or Organizations.location_scope(context) != :all do
       case Appointments.get_slot(context, slot_id) do
         nil -> {:error, :not_found}
-        slot -> own_coach(context, slot.coach_id)
+        slot -> own_slot_in_scope(context, slot)
       end
     else
       :ok
@@ -256,13 +283,18 @@ defmodule PaleeWeb.AppointmentsController do
   end
 
   defp own_booking(context, booking_id) do
-    if own_slots_only?(context) do
+    if own_slots_only?(context) or Organizations.location_scope(context) != :all do
       case Appointments.get_booking(context, booking_id) do
         nil -> {:error, :not_found}
-        booking -> own_coach(context, booking.slot.coach_id)
+        booking -> own_slot_in_scope(context, booking.slot)
       end
     else
       :ok
     end
+  end
+
+  defp own_slot_in_scope(context, slot) do
+    with :ok <- own_coach(context, slot.coach_id),
+         do: ClassLocation.authorize_appointment_slot(context, slot)
   end
 end

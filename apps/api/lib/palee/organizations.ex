@@ -887,6 +887,137 @@ defmodule Palee.Organizations do
     to: Palee.Organizations.Domain.BoxProfilePolicy,
     as: :publishable?
 
+  # -- ADR-186: branch-scoped staff --------------------------------------
+
+  @doc """
+  Capabilities of a role set in a gym, narrowed to a branch scope (ADR-186):
+  branch-scoped staff lose the capabilities over the whole business.
+  """
+  def capabilities_for(roles, coach_scope, role_grants, location_scope),
+    do:
+      roles
+      |> capabilities_for(coach_scope, role_grants)
+      |> Palee.Organizations.Domain.LocationScopePolicy.narrow_capabilities(location_scope)
+
+  @doc "`:all` or the location ids the acting staff member works at."
+  defdelegate location_scope(context),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :scope
+
+  @doc "Whether a location (nil = none) is one the acting staff member works at."
+  defdelegate location_in_scope?(context, location_id),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :covers?
+
+  @doc "`:ok` or `{:error, :location_out_of_scope}`."
+  defdelegate authorize_location(context, location_id),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :authorize
+
+  @doc "Keeps the located items (`:location_id`, or `location_of`) in the acting scope."
+  defdelegate filter_by_location_scope(context, items),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :filter
+
+  defdelegate filter_by_location_scope(context, items, location_of),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :filter
+
+  @doc "Narrows a requested location filter (nil = any) to the acting scope."
+  defdelegate restrict_location_filter(context, requested),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :restrict
+
+  @doc "The location a desk action happens at, defaulting to a one-branch scope."
+  defdelegate desk_location(context, location_id),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :desk_location
+
+  @doc "Parses a requested scope against the gym's active location ids."
+  defdelegate parse_location_scope(params, known_location_ids),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :parse
+
+  defdelegate location_scope_requested?(params),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :requested?
+
+  defdelegate location_scope_payload(scope),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :to_payload
+
+  @doc "The branches a report shows: requested ones inside the scope (ADR-186 §7)."
+  defdelegate report_filter(context, requested_ids),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
+  @doc "The `location_ids` a request names (list or comma-separated)."
+  defdelegate requested_location_ids(params),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :requested_ids
+
+  @doc "The branches a one-place item is created at, one item each (ADR-186 §8)."
+  defdelegate location_creation_targets(context, requested_ids, single_location_id),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :creation_targets
+
+  @doc "Whether an item valid at `target` (`:all` or ids) shows for a scope or filter."
+  defdelegate covering_visible?(scope_or_filter, target),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
+  @doc "`:ok` when an item valid at `target` lies inside the acting scope (ADR-186 §8)."
+  defdelegate authorize_covering(context, target),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
+  @doc "Sets the branches someone works at (`:all` or parsed ids)."
+  def set_membership_location_scope(context, user_id, scope),
+    do: Palee.Organizations.Commands.SetMembershipLocationScope.call(context, user_id, scope)
+
+  @doc """
+  The effective scopes of a gym's memberships, `%{membership_id => scope}`,
+  for directory and profile payloads. Memberships missing from `memberships`
+  work everywhere.
+  """
+  def membership_location_scopes(context, memberships) do
+    scoped = Enum.filter(memberships, &(Map.get(&1, :all_locations) == false))
+
+    ids =
+      Palee.Organizations.LocationScopeStore.location_ids_by_membership(
+        context,
+        Enum.map(scoped, & &1.id)
+      )
+
+    Map.new(memberships, fn membership ->
+      {membership.id,
+       Palee.Organizations.Domain.LocationScopePolicy.effective(
+         membership.roles || [membership.role],
+         Map.get(membership, :all_locations, true),
+         Map.get(ids, membership.id, [])
+       )}
+    end)
+  end
+
+  @doc """
+  The scope stored on one membership of the context's gym, whatever its roles
+  (`:all` or active location ids; nil when there is no membership), for the
+  editor in Admin › Χρήστες.
+  """
+  def stored_location_scope(context, user_id) when is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(context.organization_id, user_id) do
+        %{} = membership ->
+          Palee.Organizations.Commands.SetMembershipLocationScope.stored_scope(
+            context,
+            membership
+          )
+
+        _missing ->
+          nil
+      end
+    end)
+  end
+
+  def stored_location_scope(_context, _user_id), do: nil
+
   # ADR-184: business accounts stay in demo mode until the platform team
   # activates them. `GoLivePolicy` is the one gate; these are its entry points.
 

@@ -1,9 +1,10 @@
 defmodule Palee.Application.DeleteScheduledSlot do
-  alias Palee.Application.{ScheduleRealtime, TrackAnalyticsEvent}
+  alias Palee.Application.{ClassLocation, ScheduleRealtime, TrackAnalyticsEvent}
   alias Palee.Scheduling
 
   def call(context, id) do
-    with :ok <- Scheduling.delete_slot(context, id) do
+    with :ok <- ClassLocation.authorize_class(context, id),
+         :ok <- Scheduling.delete_slot(context, id) do
       broadcast_slot_deleted(context.organization_id, id)
 
       Palee.DomainEvents.publish(:class_cancelled, %{

@@ -20,6 +20,11 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SemanticLabel } from "@/components/semantic-label";
 import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { DateInput } from "@/components/ui/DateInput";
+import { useQuery } from "@tanstack/react-query";
+import { listAdminLocations } from "@/api/facility";
+import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
+import { membershipLocationScope, type LocationScope } from "@/lib/location-scope";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 type AssignWorkoutFormProps = {
   workoutId: string;
@@ -37,6 +42,17 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
   const [selectedNames, setSelectedNames] = useState<Record<string, string>>({});
   const [scheduledFor, setScheduledFor] = useState(() => formatLocalDate(new Date()));
   const [instructions, setInstructions] = useState("");
+  // ADR-186 §8: «Ισχύει για» — the programme is valid at the chosen branches.
+  const { membership } = useSelectedMembershipRole();
+  const everywhere = membershipLocationScope(membership) === "all";
+  const locationsQuery = useQuery({
+    queryKey: ["admin", "locations"],
+    enabled: Boolean(tokens?.access_token),
+    queryFn: () => listAdminLocations(tokens!.access_token),
+  });
+  const manyBranches = showsAppliesTo(locationsQuery.data);
+  const [branchDraft, setBranchDraft] = useState<LocationScope | null>(null);
+  const branches: LocationScope = branchDraft ?? (everywhere ? "all" : defaultAppliesTo(locationsQuery.data));
   const [loading, setLoading] = useState(true);
   const [athletesLoading, setAthletesLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -122,6 +138,11 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         athlete_ids: selectedIds,
         scheduled_for: scheduledFor,
         instructions: instructions.trim() || undefined,
+        ...(manyBranches
+          ? branches === "all"
+            ? { all_locations: true }
+            : { all_locations: false, location_ids: branches }
+          : {}),
       });
 
       router.push("/box/workouts");
@@ -297,6 +318,10 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
               />
             </label>
 
+            <div className="mt-5">
+              <AppliesToBranches kind="covering" locations={locationsQuery.data} value={branches} onChange={setBranchDraft} />
+            </div>
+
             {/* ADR-124: informational injury warnings for the selection; never blocks assigning. */}
             {tokens?.access_token && workout?.status === "published" && selectedIds.length > 0 ? (
               <div className="mt-5">
@@ -314,7 +339,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
               <button
                 className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
-                disabled={saving || selectedIds.length === 0 || loading || Boolean(workout?.status && workout.status !== "published")}
+                disabled={saving || selectedIds.length === 0 || loading || Boolean(workout?.status && workout.status !== "published") || (manyBranches && branches !== "all" && branches.length === 0)}
                 onClick={() => void submitAssignment()}
                 type="button"
               >

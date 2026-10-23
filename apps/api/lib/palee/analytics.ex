@@ -57,6 +57,13 @@ defmodule Palee.Analytics do
   defdelegate upsert_exercise_catalog_entry(params), to: UpsertExerciseCatalogEntry, as: :call
   defdelegate analytics_summary(params \\ %{}), to: AnalyticsSummary, as: :call
 
+  @doc """
+  Check-ins and attended classes per person and branch since `since`, as
+  `{user_id, location_id, check_ins, attended}` (ADR-186 §7).
+  """
+  def branch_activity(context, %DateTime{} = since),
+    do: with_tenant_context(context, fn -> AnalyticsStore.branch_activity(since) end)
+
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.

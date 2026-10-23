@@ -23,7 +23,12 @@ export type AdminUserProfileShell = {
   identity: Pick<AdminUserDirectoryEntry, "id" | "nickname" | "avatar_url" | "role" | "joined_at">;
   account_status: string;
   /** Roles held together in this gym and the coach scope (ADR-099, ADR-100). */
-  membership?: { roles: string[]; coach_scope: string } | null;
+  membership?: {
+    roles: string[];
+    coach_scope: string;
+    /** ADR-186: the branches this person works at. */
+    location_scope?: { all_locations: boolean; location_ids: string[] } | null;
+  } | null;
   available_sections: string[];
   attention: Array<Record<string, unknown>>;
   operational_links: Record<string, string>;

@@ -19,6 +19,8 @@ defmodule Palee.Organizations.TenantContext do
     roles: [],
     capabilities: %{},
     coach_scope: :own,
+    # ADR-186: the branches this person works at as staff, or :all.
+    location_scope: :all,
     request_metadata: %{}
   ]
 
@@ -33,6 +35,7 @@ defmodule Palee.Organizations.TenantContext do
           roles: [atom()],
           capabilities: %{atom() => :all | :own | :status},
           coach_scope: :own | :all,
+          location_scope: :all | [Ecto.UUID.t()],
           request_metadata: map()
         }
 end

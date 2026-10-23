@@ -12,7 +12,9 @@ defmodule Palee.Application.ListClassSlotInjuryWarnings do
 
   def call(%{organization_id: organization_id} = context, slot_id)
       when is_binary(organization_id) do
-    with {:ok, slot} <- fetch_slot(context, slot_id) do
+    with {:ok, slot} <- fetch_slot(context, slot_id),
+         # ADR-186: the roster of a class at the staff member's own branch.
+         :ok <- Palee.Organizations.authorize_location(context, Map.get(slot, :location_id)) do
       evaluate(context, slot)
     end
   end

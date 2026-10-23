@@ -25,7 +25,15 @@ const orgPath = (slug: string, path: string) => `/org/${encodeURIComponent(slug)
 export function issueClientInvitation(
   token: string,
   slug: string,
-  body: { role: ClientRole; lifetime_seconds: number; intended_email?: string },
+  body: {
+    role: string;
+    lifetime_seconds: number;
+    intended_email?: string;
+    /** ADR-186: several roles and the branches of a staff invitation. */
+    roles?: string[];
+    all_locations?: boolean;
+    location_ids?: string[];
+  },
 ) {
   return apiRequest<IssuedInvitation>(orgPath(slug, "/invitations"), { method: "POST", token, body });
 }
@@ -57,8 +65,9 @@ export function joinOrganization(token: string, slug: string) {
   });
 }
 
-export function invitationUrl(origin: string, invitation: { role: string; token?: string | null }) {
-  const route = invitation.role === "owner" || invitation.role === "admin" ? "/set-admin" : "/register";
+export function invitationUrl(origin: string, invitation: { role: string; roles?: string[] | null; token?: string | null }) {
+  const roles = invitation.roles?.length ? invitation.roles : [invitation.role];
+  const route = roles.includes("owner") || roles.includes("admin") ? "/set-admin" : "/register";
   return `${origin}${route}?token=${encodeURIComponent(invitation.token ?? "")}`;
 }
 

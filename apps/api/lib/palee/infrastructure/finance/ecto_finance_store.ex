@@ -2971,11 +2971,14 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
-  def list_expiring_memberships(days) do
+  def list_expiring_memberships(days), do: list_expiring_memberships(days, nil)
+
+  defp list_expiring_memberships(days, users) do
     today = GymClock.today()
     cutoff = Date.add(GymClock.today(), parse_integer(days, 30))
 
     Membership
+    |> for_users(users)
     |> where([membership], not is_nil(membership.expires_on))
     |> where([membership], membership.expires_on >= ^today)
     |> where([membership], membership.expires_on <= ^cutoff)
@@ -2990,14 +2993,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     params = string_key_map(params)
     limit = parse_integer(params["limit"], 25)
     expiring_within_days = parse_integer(params["expires_within_days"], 30)
+    # ADR-186 §7: a branch filter arrives as the users whose home branch it is.
+    users = branch_users(params)
 
     %{
-      expiring_memberships: Enum.take(list_expiring_memberships(expiring_within_days), limit),
-      pending_payments: list_pending_payments(limit),
-      overdue_invoices: list_overdue_invoices(limit),
-      pending_referral_events: list_pending_referral_events(limit),
-      pending_referral_rewards: list_pending_referral_rewards(limit),
-      promotion_redemptions: list_recent_redemptions(limit)
+      expiring_memberships:
+        Enum.take(list_expiring_memberships(expiring_within_days, users), limit),
+      pending_payments: list_pending_payments(limit, users),
+      overdue_invoices: list_overdue_invoices(limit, users),
+      pending_referral_events: list_pending_referral_events(limit, users),
+      pending_referral_rewards: list_pending_referral_rewards(limit, users),
+      promotion_redemptions: list_recent_redemptions(limit, users)
     }
   end
 
@@ -3007,11 +3013,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   def financial_summary(params) do
     params = string_key_map(params || %{})
     since = summary_since(params["days"])
-    renewal_metrics = renewal_invoice_metrics()
+    users = branch_users(params)
+    renewal_metrics = renewal_invoice_metrics(users)
     first_month = GymClock.today() |> Date.beginning_of_month() |> Date.shift(month: -23)
 
     {aggregate_status, aggregate_error, aggregate_rows} =
       case RepoContext.current_setting("app.organization_id") do
+        # The aggregate view is per package, not per person, so a branch
+        # filter reads the payments themselves (ADR-186 §7).
+        _organization_id when is_list(users) ->
+          {"available", nil, []}
+
         organization_id when is_binary(organization_id) ->
           case Repo.query(
                  """
@@ -3044,18 +3056,22 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
     %{
       aggregates: aggregate_rows,
-      monthly_revenue: monthly_revenue(aggregate_rows, first_month),
+      monthly_revenue:
+        if(is_list(users),
+          do: monthly_payment_revenue(users, first_month),
+          else: monthly_revenue(aggregate_rows, first_month)
+        ),
       aggregate_status: aggregate_status,
       aggregate_error: aggregate_error,
       period: %{since: since, days: parse_integer(params["days"], 30)},
       totals: %{
-        active_memberships: active_membership_count(),
-        expiring_memberships: length(list_expiring_memberships(30)),
-        paid_revenue_cents: total_paid_revenue_cents(since),
-        credit_balance_cents: total_credit_balance_cents(),
-        outstanding_invoice_balance_cents: total_outstanding_invoice_balance_cents(),
-        overdue_invoice_balance_cents: total_overdue_invoice_balance_cents(),
-        invoice_credit_offset_cents: total_invoice_credit_offset_cents(),
+        active_memberships: active_membership_count(users),
+        expiring_memberships: length(list_expiring_memberships(30, users)),
+        paid_revenue_cents: total_paid_revenue_cents(since, users),
+        credit_balance_cents: total_credit_balance_cents(users),
+        outstanding_invoice_balance_cents: total_outstanding_invoice_balance_cents(users),
+        overdue_invoice_balance_cents: total_overdue_invoice_balance_cents(users),
+        invoice_credit_offset_cents: total_invoice_credit_offset_cents(users),
         renewal_invoices_issued_count: renewal_metrics.issued_count,
         renewal_invoices_paid_count: renewal_metrics.paid_count,
         renewal_conversion_percent: renewal_metrics.conversion_percent
@@ -4653,48 +4669,85 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&normalize_promotion_redemption/1)
   end
 
+  # ADR-186 §8: a promotion valid at some branches applies to a subscription
+  # whose package is valid at one of them (or everywhere).
+  defp validate_campaign_branches(campaign_id, _params) when not is_binary(campaign_id), do: :ok
+
+  defp validate_campaign_branches(campaign_id, params) do
+    with %PromotionCampaign{all_locations: false, location_ids: ids} <-
+           PromotionCampaign |> tenant_scope() |> Repo.get(campaign_id),
+         subscription_id when is_binary(subscription_id) <-
+           params["membership_package_subscription_id"],
+         %MembershipPackageSubscription{params_snapshot: snapshot} <-
+           Repo.get(MembershipPackageSubscription, subscription_id) do
+      case PackageContract.fields_from_params(snapshot || %{})["facility.location_ids"] do
+        package_ids when is_list(package_ids) and package_ids != [] ->
+          if Enum.any?(package_ids, &(&1 in ids)),
+            do: :ok,
+            else: {:error, :promotion_location_not_included}
+
+        _everywhere ->
+          :ok
+      end
+    else
+      _not_limited -> :ok
+    end
+  end
+
   defp build_redemption_params(membership, params) do
     case find_promotion_code(params) do
       {:ok, %PromotionCode{} = code} ->
-        {:ok,
-         params
-         |> Map.merge(%{
-           "promotion_campaign_id" => code.promotion_campaign_id,
-           "promotion_code_id" => code.id,
-           "membership_id" => membership.id,
-           "discount_type_snapshot" => code.discount_type,
-           "discount_value_snapshot" => code.discount_value
-         })
-         |> Map.put_new("redeemed_at", utc_now())}
+        with :ok <- validate_campaign_branches(code.promotion_campaign_id, params) do
+          redemption_from_code(membership, params, code)
+        end
 
       {:error, reason} ->
         {:error, reason}
 
       :not_requested ->
-        if is_binary(params["promotion_campaign_id"]) do
-          with %PromotionCampaign{} = campaign <-
-                 PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"]),
-               :ok <- validate_campaign_active(campaign),
-               :ok <- validate_campaign_window(campaign, GymClock.today()),
-               {:ok, {discount_type, discount_value}} <-
-                 PromotionRedemptionPolicy.validate_manual_discount(
-                   params["discount_type_snapshot"],
-                   params["discount_value_snapshot"]
-                 ) do
-            {:ok,
-             params
-             |> Map.put("promotion_campaign_id", campaign.id)
-             |> Map.put("membership_id", membership.id)
-             |> Map.put("discount_type_snapshot", discount_type)
-             |> Map.put("discount_value_snapshot", discount_value)
-             |> Map.put_new("redeemed_at", utc_now())}
-          else
-            nil -> {:error, :not_found}
-            {:error, reason} -> {:error, reason}
-          end
-        else
-          {:error, :bad_request}
+        with :ok <- validate_campaign_branches(params["promotion_campaign_id"], params) do
+          manual_redemption(membership, params)
         end
+    end
+  end
+
+  defp redemption_from_code(membership, params, code) do
+    {:ok,
+     params
+     |> Map.merge(%{
+       "promotion_campaign_id" => code.promotion_campaign_id,
+       "promotion_code_id" => code.id,
+       "membership_id" => membership.id,
+       "discount_type_snapshot" => code.discount_type,
+       "discount_value_snapshot" => code.discount_value
+     })
+     |> Map.put_new("redeemed_at", utc_now())}
+  end
+
+  defp manual_redemption(membership, params) do
+    if is_binary(params["promotion_campaign_id"]) do
+      with %PromotionCampaign{} = campaign <-
+             PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"]),
+           :ok <- validate_campaign_active(campaign),
+           :ok <- validate_campaign_window(campaign, GymClock.today()),
+           {:ok, {discount_type, discount_value}} <-
+             PromotionRedemptionPolicy.validate_manual_discount(
+               params["discount_type_snapshot"],
+               params["discount_value_snapshot"]
+             ) do
+        {:ok,
+         params
+         |> Map.put("promotion_campaign_id", campaign.id)
+         |> Map.put("membership_id", membership.id)
+         |> Map.put("discount_type_snapshot", discount_type)
+         |> Map.put("discount_value_snapshot", discount_value)
+         |> Map.put_new("redeemed_at", utc_now())}
+      else
+        nil -> {:error, :not_found}
+        {:error, reason} -> {:error, reason}
+      end
+    else
+      {:error, :bad_request}
     end
   end
 
@@ -4842,10 +4895,86 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     )
   end
 
-  defp active_membership_count do
+  @impl true
+  def package_location_scopes do
+    today = GymClock.today()
+
+    MembershipPackageSubscription
+    |> join(:inner, [subscription], membership in Membership,
+      on: membership.id == subscription.membership_id
+    )
+    |> where([subscription], subscription.status in ["active", "paused"])
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^today)
+    |> select([subscription, membership], {membership.user_id, subscription.params_snapshot})
+    |> Repo.all()
+    |> Enum.reduce(%{}, fn {user_id, snapshot}, acc ->
+      scope =
+        case PackageContract.fields_from_params(snapshot || %{})["facility.location_ids"] do
+          ids when is_list(ids) and ids != [] -> ids
+          _all -> :all
+        end
+
+      Map.update(acc, user_id, scope, &union_scope(&1, scope))
+    end)
+  end
+
+  defp union_scope(:all, _scope), do: :all
+  defp union_scope(_scope, :all), do: :all
+  defp union_scope(left, right), do: Enum.uniq(left ++ right)
+
+  # ADR-186 §7: `user_ids` (a list) restricts a report to people; absent, the
+  # report covers the whole business.
+  defp branch_users(%{"user_ids" => users}) when is_list(users), do: users
+  defp branch_users(_params), do: nil
+
+  defp for_users(query, nil), do: query
+  defp for_users(query, users), do: where(query, [record], record.user_id in ^users)
+
+  defp for_user_memberships(query, nil), do: query
+
+  defp for_user_memberships(query, users) do
+    memberships =
+      from(membership in Membership, where: membership.user_id in ^users, select: membership.id)
+
+    where(query, [record], record.membership_id in subquery(memberships))
+  end
+
+  defp monthly_payment_revenue(users, first_month) do
+    rows =
+      MembershipPayment
+      |> for_user_memberships(users)
+      |> where([payment], is_nil(payment.deleted_at) and payment.paid_on >= ^first_month)
+      |> where([payment], payment.payment_status in ["paid", "pending"])
+      |> select([payment], {payment.paid_on, payment.payment_status, payment.amount_cents})
+      |> Repo.all()
+
+    totals =
+      Enum.reduce(rows, %{}, fn {paid_on, status, amount}, acc ->
+        key = if status == "paid", do: :paid_revenue_cents, else: :pending_revenue_cents
+
+        Map.update(
+          acc,
+          Date.beginning_of_month(paid_on),
+          Map.put(%{paid_revenue_cents: 0, pending_revenue_cents: 0}, key, amount),
+          &Map.update!(&1, key, fn total -> total + amount end)
+        )
+      end)
+
+    Enum.map(0..23, fn offset ->
+      month = Date.shift(first_month, month: offset)
+
+      Map.merge(
+        %{period_start: month},
+        Map.get(totals, month, %{paid_revenue_cents: 0, pending_revenue_cents: 0})
+      )
+    end)
+  end
+
+  defp active_membership_count(users) do
     today = GymClock.today()
 
     Membership
+    |> for_users(users)
     |> where([membership], membership.status in ["active", "trial", "expiring", "comped"])
     |> where([membership], is_nil(membership.expires_on) or membership.expires_on >= ^today)
     |> Repo.aggregate(:count)
@@ -4960,7 +5089,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.one()
   end
 
-  defp total_paid_revenue_cents(since) do
+  defp total_paid_revenue_cents(since, users) do
     payment_reversals =
       from(reversal in FinancePaymentReversal,
         where: is_nil(reversal.deleted_at),
@@ -4972,6 +5101,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       )
 
     MembershipPayment
+    |> for_user_memberships(users)
     |> where([payment], payment.payment_status == "paid")
     |> where([payment], payment.paid_on >= ^since)
     |> where([payment], is_nil(payment.deleted_at))
@@ -4995,8 +5125,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
-  defp total_credit_balance_cents do
+  defp total_credit_balance_cents(users) do
     FinanceCreditLedgerEntry
+    |> for_users(users)
     |> where([entry], is_nil(entry.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
@@ -5005,8 +5136,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
-  defp total_invoice_credit_offset_cents do
+  defp total_invoice_credit_offset_cents(users) do
     FinanceCreditLedgerEntry
+    |> for_users(users)
     |> where([entry], not is_nil(entry.finance_invoice_id))
     |> where([entry], entry.source_type in ["invoice_offset", "reversal"])
     |> where([entry], is_nil(entry.deleted_at))
@@ -5028,9 +5160,10 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
-  defp renewal_invoice_metrics do
+  defp renewal_invoice_metrics(users) do
     issued_count =
       FinanceInvoice
+      |> for_users(users)
       |> where([invoice], invoice.invoice_type == "renewal")
       |> where([invoice], invoice.status in ["issued", "partially_paid", "paid", "overdue"])
       |> where([invoice], is_nil(invoice.deleted_at))
@@ -5038,6 +5171,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
     paid_count =
       FinanceInvoice
+      |> for_users(users)
       |> where([invoice], invoice.invoice_type == "renewal")
       |> where([invoice], invoice.status == "paid")
       |> where([invoice], is_nil(invoice.deleted_at))
@@ -5057,16 +5191,18 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     }
   end
 
-  defp total_outstanding_invoice_balance_cents do
+  defp total_outstanding_invoice_balance_cents(users) do
     FinanceInvoice
+    |> for_users(users)
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
     |> where([invoice], is_nil(invoice.deleted_at))
     |> Repo.all()
     |> Enum.reduce(0, fn invoice, acc -> acc + invoice_balance_due(invoice.id) end)
   end
 
-  defp total_overdue_invoice_balance_cents do
+  defp total_overdue_invoice_balance_cents(users) do
     FinanceInvoice
+    |> for_users(users)
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
     |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^GymClock.today())
     |> where([invoice], is_nil(invoice.deleted_at))
@@ -5074,8 +5210,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.reduce(0, fn invoice, acc -> acc + invoice_balance_due(invoice.id) end)
   end
 
-  defp list_pending_payments(limit) do
+  defp list_pending_payments(limit, users) do
     MembershipPayment
+    |> for_user_memberships(users)
     |> where([payment], payment.payment_status in ["pending", "failed"])
     |> where([payment], is_nil(payment.deleted_at))
     |> order_by([payment], desc: payment.paid_on, desc: payment.inserted_at)
@@ -5084,8 +5221,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&normalize_payment/1)
   end
 
-  defp list_overdue_invoices(limit) do
+  defp list_overdue_invoices(limit, users) do
     FinanceInvoice
+    |> for_users(users)
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
     |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^GymClock.today())
     |> where([invoice], is_nil(invoice.deleted_at))
@@ -5096,26 +5234,42 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.filter(&(&1.balance_due_cents > 0))
   end
 
-  defp list_pending_referral_events(limit) do
+  defp list_pending_referral_events(limit, users) do
     ReferralEvent
     |> where([event], event.status in ["pending", "approved"])
+    |> then(fn query ->
+      if is_list(users),
+        do:
+          where(
+            query,
+            [event],
+            event.referrer_user_id in ^users or event.referred_user_id in ^users
+          ),
+        else: query
+    end)
     |> order_by([event], asc: event.inserted_at)
     |> limit(^limit)
     |> Repo.all()
     |> Enum.map(&normalize_referral_event/1)
   end
 
-  defp list_pending_referral_rewards(limit) do
+  defp list_pending_referral_rewards(limit, users) do
     ReferralReward
     |> where([reward], reward.status in ["pending", "approved"])
+    |> then(fn query ->
+      if is_list(users),
+        do: where(query, [reward], reward.recipient_user_id in ^users),
+        else: query
+    end)
     |> order_by([reward], asc: reward.inserted_at)
     |> limit(^limit)
     |> Repo.all()
     |> Enum.map(&normalize_referral_reward/1)
   end
 
-  defp list_recent_redemptions(limit) do
+  defp list_recent_redemptions(limit, users) do
     PromotionRedemption
+    |> for_user_memberships(users)
     |> order_by([redemption], desc: redemption.redeemed_at)
     |> limit(^limit)
     |> Repo.all()
@@ -5392,6 +5546,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       ends_on: campaign.ends_on,
       active: campaign.active,
       params: campaign.params || %{},
+      location_scope: %{
+        all_locations: campaign.all_locations != false,
+        location_ids:
+          if(campaign.all_locations == false, do: campaign.location_ids || [], else: [])
+      },
       inserted_at: campaign.inserted_at,
       updated_at: campaign.updated_at
     }

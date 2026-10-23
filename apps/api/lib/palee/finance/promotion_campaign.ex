@@ -12,15 +12,28 @@ defmodule Palee.Finance.PromotionCampaign do
     field :ends_on, :date
     field :active, :boolean, default: true
     field :params, :map, default: %{}
+    # ADR-186 §8: «Ισχύει για» — every branch (future ones too) or these.
+    field :all_locations, :boolean, default: true
+    field :location_ids, {:array, :binary_id}, default: []
 
     timestamps(type: :utc_datetime_usec)
   end
 
   def changeset(campaign \\ %__MODULE__{}, params) do
     campaign
-    |> cast(params, [:name, :description, :starts_on, :ends_on, :active, :params])
+    |> cast(params, [
+      :name,
+      :description,
+      :starts_on,
+      :ends_on,
+      :active,
+      :params,
+      :all_locations,
+      :location_ids
+    ])
     |> validate_required([:name])
     |> validate_date_window()
+    |> check_constraint(:location_ids, name: :promotion_campaigns_location_scope_check)
   end
 
   defp validate_date_window(changeset) do

@@ -53,6 +53,7 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback list_expiring_memberships(non_neg_integer()) :: [map()]
   @callback operational_queues(map()) :: map()
   @callback financial_summary(map()) :: map()
+  @callback package_location_scopes() :: %{optional(String.t()) => :all | [String.t()]}
   @callback create_promotion_campaign(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback list_promotion_campaigns() :: [map()]
   @callback create_promotion_code(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}

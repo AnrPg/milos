@@ -22,8 +22,17 @@ defmodule PaleeWeb.CleaningController do
     responses: [ok: {"Areas", "application/json", S.many(:areas, S.area())}]
   )
 
-  def areas(conn, _params),
-    do: json(conn, %{areas: Housekeeping.list_areas(conn.assigns.tenant_context)})
+  # ADR-186: branch-scoped staff clean and review the areas of their branches.
+  def areas(conn, _params) do
+    context = conn.assigns.tenant_context
+
+    json(conn, %{
+      areas:
+        context
+        |> Housekeeping.list_areas()
+        |> then(&Organizations.filter_by_location_scope(context, &1))
+    })
+  end
 
   operation(:create_area,
     summary: "Add a cleaning area",
@@ -32,7 +41,11 @@ defmodule PaleeWeb.CleaningController do
   )
 
   def create_area(conn, _params) do
-    with {:ok, area} <- Housekeeping.save_area(conn.assigns.tenant_context, nil, conn.body_params) do
+    context = conn.assigns.tenant_context
+
+    with :ok <-
+           Organizations.authorize_location(context, Map.get(conn.body_params, :location_id)),
+         {:ok, area} <- Housekeeping.save_area(context, nil, conn.body_params) do
       conn |> put_status(:created) |> json(%{area: area})
     end
   end
@@ -45,7 +58,11 @@ defmodule PaleeWeb.CleaningController do
   )
 
   def update_area(conn, %{id: id}) do
-    with {:ok, area} <- Housekeeping.save_area(conn.assigns.tenant_context, id, conn.body_params) do
+    context = conn.assigns.tenant_context
+
+    with :ok <- area_in_scope(context, id),
+         :ok <- moved_in_scope(context, conn.body_params),
+         {:ok, area} <- Housekeeping.save_area(context, id, conn.body_params) do
       json(conn, %{area: area})
     end
   end
@@ -57,7 +74,8 @@ defmodule PaleeWeb.CleaningController do
   )
 
   def archive_area(conn, %{id: id}) do
-    with {:ok, area} <- Housekeeping.archive_area(conn.assigns.tenant_context, id) do
+    with :ok <- area_in_scope(conn.assigns.tenant_context, id),
+         {:ok, area} <- Housekeeping.archive_area(conn.assigns.tenant_context, id) do
       json(conn, %{area: area})
     end
   end
@@ -79,7 +97,13 @@ defmodule PaleeWeb.CleaningController do
           else: Map.put(filters, :user_id, context.user_id)
       end)
 
-    json(conn, %{entries: context |> Housekeeping.list_entries(filters) |> with_nicknames()})
+    entries =
+      case scoped_area_ids(context) do
+        :all -> Housekeeping.list_entries(context, filters)
+        ids -> context |> Housekeeping.list_entries(filters) |> Enum.filter(&(&1.area_id in ids))
+      end
+
+    json(conn, %{entries: with_nicknames(entries)})
   end
 
   operation(:start,
@@ -92,8 +116,10 @@ defmodule PaleeWeb.CleaningController do
   def start(conn, _params) do
     context = conn.assigns.tenant_context
 
-    with {:ok, entry} <-
-           Housekeeping.start(context, context.user_id, Map.get(conn.body_params, :area_id)) do
+    area_id = Map.get(conn.body_params, :area_id)
+
+    with :ok <- area_in_scope(context, area_id),
+         {:ok, entry} <- Housekeeping.start(context, context.user_id, area_id) do
       conn |> put_status(:created) |> json(%{entry: entry})
     end
   end
@@ -118,6 +144,32 @@ defmodule PaleeWeb.CleaningController do
     with {:ok, entry} <- Housekeeping.finish(context, context.user_id, id, conn.body_params) do
       json(conn, %{entry: entry})
     end
+  end
+
+  defp scoped_area_ids(context) do
+    case Organizations.location_scope(context) do
+      :all ->
+        :all
+
+      _scoped ->
+        context
+        |> Housekeeping.list_areas(%{include_archived: true})
+        |> then(&Organizations.filter_by_location_scope(context, &1))
+        |> Enum.map(& &1.id)
+    end
+  end
+
+  defp area_in_scope(context, area_id) do
+    case scoped_area_ids(context) do
+      :all -> :ok
+      ids -> if area_id in ids, do: :ok, else: {:error, :location_out_of_scope}
+    end
+  end
+
+  defp moved_in_scope(context, params) do
+    if Map.has_key?(params, :location_id),
+      do: Organizations.authorize_location(context, params.location_id),
+      else: :ok
   end
 
   defp with_nicknames(entries) do

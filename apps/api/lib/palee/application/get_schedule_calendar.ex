@@ -19,6 +19,7 @@ defmodule Palee.Application.GetScheduleCalendar do
           # ADR-176: only staff see draft classes (no WOD yet).
           include_drafts: admin_role?(context, actor)
         })
+        |> scope_located(context, actor)
         |> enrich_slots(context, actor)
         |> put_workout_status(context)
         |> put_package_coverage(context, actor)
@@ -33,7 +34,10 @@ defmodule Palee.Application.GetScheduleCalendar do
          end_date: ZonedTime.local_date(DateTime.add(end_at, -1, :second), zone),
          days: days,
          class_types: class_types,
-         locations: Facility.list_locations(context, include_archived: true),
+         locations:
+           context
+           |> Facility.list_locations(include_archived: true)
+           |> scope_located(context, actor, & &1.id),
          coaches: schedule_coaches(slots),
          slots: slots
        }}
@@ -45,6 +49,19 @@ defmodule Palee.Application.GetScheduleCalendar do
   def call(_actor, _params), do: {:error, :organization_context_required}
 
   defp get_calendar_week(context, params), do: Scheduling.get_calendar_week(context, params)
+
+  # ADR-186: branch-scoped staff plan and run the classes of their own
+  # branches. Someone who also trains keeps the whole schedule in the client
+  # view (no rosters), because their package decides where they may book.
+  defp scope_located(items, context, actor, location_of \\ &Map.get(&1, :location_id)) do
+    if Organizations.location_scope(context) != :all and
+         (admin_role?(context, actor) or not trains_here?(context)),
+       do: Organizations.filter_by_location_scope(context, items, location_of),
+       else: items
+  end
+
+  defp trains_here?(context),
+    do: Enum.any?(Map.get(context, :roles) || [], &(&1 in [:member, :athlete]))
 
   # ADR-176: `published` and `workout_status` (linked | awaiting | missing,
   # the incomplete badge), with days read in the gym's time zone.

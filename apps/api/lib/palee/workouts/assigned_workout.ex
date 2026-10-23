@@ -17,6 +17,9 @@ defmodule Palee.Workouts.AssignedWorkout do
     # ADR-167: set when the assignment is part of a season's programme (loose
     # reference to a Seasons-owned offering); members see the season's name.
     field :season_offering_id, :binary_id
+    # ADR-186 §8: «Ισχύει για» — every branch (future ones too) or these.
+    field :all_locations, :boolean, default: true
+    field :location_ids, {:array, :binary_id}, default: []
 
     belongs_to :master_workout, MasterWorkout
     has_many :athlete_links, AssignedWorkoutAthlete
@@ -32,11 +35,14 @@ defmodule Palee.Workouts.AssignedWorkout do
       :scheduled_for,
       :instructions,
       :source_scheduled_class_id,
-      :season_offering_id
+      :season_offering_id,
+      :all_locations,
+      :location_ids
     ])
     |> update_change(:instructions, &normalize_instructions/1)
     |> validate_required([:organization_id, :master_workout_id, :scheduled_for])
     |> foreign_key_constraint(:master_workout_id)
+    |> check_constraint(:location_ids, name: :assigned_workouts_location_scope_check)
     |> unique_constraint([:master_workout_id, :scheduled_for, :instructions],
       name: :assigned_workouts_workout_date_notes_index
     )
@@ -44,9 +50,10 @@ defmodule Palee.Workouts.AssignedWorkout do
 
   def update_changeset(assignment, params) do
     assignment
-    |> cast(params, [:scheduled_for, :instructions])
+    |> cast(params, [:scheduled_for, :instructions, :all_locations, :location_ids])
     |> update_change(:instructions, &normalize_instructions/1)
     |> validate_required([:scheduled_for])
+    |> check_constraint(:location_ids, name: :assigned_workouts_location_scope_check)
     |> unique_constraint([:master_workout_id, :scheduled_for, :instructions],
       name: :assigned_workouts_workout_date_notes_index
     )

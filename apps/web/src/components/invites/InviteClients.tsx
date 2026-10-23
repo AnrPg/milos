@@ -17,10 +17,16 @@ import {
 } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { localizeError } from "@/i18n/presentation";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import {
+  StaffInviteFields,
+  staffInvitationBody,
+  useInvitableStaffRoles,
+  type StaffInvite,
+} from "@/components/invites/StaffInviteFields";
 
 type Tab = "link" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -169,6 +175,14 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
   const locale = useUiLocale();
   const queryClient = useQueryClient();
   const [role, setRole] = useState<ClientRole>("member");
+  // ADR-186: staff links carry a role set and branches.
+  const invitableStaff = useInvitableStaffRoles();
+  const branchT = useTranslations("BranchScope");
+  const [kind, setKind] = useState<"client" | "staff">("client");
+  const [staff, setStaff] = useState<StaffInvite>({ roles: [], scope: null });
+  const staffInvite = kind === "staff" && invitableStaff.length > 0;
+  const staffIncomplete =
+    staffInvite && (staff.roles.length === 0 || (Array.isArray(staff.scope) && staff.scope.length === 0));
   const [email, setEmail] = useState("");
   const [days, setDays] = useState<(typeof LIFETIMES)[number]>(7);
   const [issued, setIssued] = useState<IssuedInvitation | null>(null);
@@ -177,7 +191,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
   const issue = useMutation({
     mutationFn: () =>
       issueClientInvitation(token, slug, {
-        role,
+        ...(staffInvite ? staffInvitationBody(staff) : { role }),
         lifetime_seconds: days * 86_400,
         intended_email: email.trim() || undefined,
       }),
@@ -189,10 +203,14 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
 
   if (issued) {
     const url = invitationUrl(window.location.origin, issued);
+    const issuedRoles = issued.roles?.length ? issued.roles : [issued.role];
+    const clientLink = issuedRoles.every((item) => item === "member" || item === "athlete");
     return (
       <div className="space-y-3">
         <p className="text-sm font-semibold" style={{ color: "var(--success, var(--primary))" }}>
-          {t("linkReady", { role: t(`roles.${issued.role === "athlete" ? "athlete" : "member"}`) })}
+          {clientLink
+            ? t("linkReady", { role: t(`roles.${issued.role === "athlete" ? "athlete" : "member"}`) })
+            : branchT("staffLinkReady", { roles: issuedRoles.map((item) => semanticLabel(item, uiT)).join(", ") })}
         </p>
         <ShareBox t={t} url={url} message={t("inviteMessage", { organization: issued.organization.name, url })} subject={t("inviteSubject", { organization: issued.organization.name })} />
         <p className="text-xs" style={{ color: "var(--muted)" }}>
@@ -213,7 +231,28 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
         issue.mutate();
       }}
     >
-      <RolePicker t={t} value={role} onChange={setRole} />
+      {invitableStaff.length > 0 ? (
+        <div role="radiogroup" aria-label={t("joinsAs")} className="grid grid-cols-2 gap-1 rounded-xl p-1" style={{ background: "var(--panel-muted, var(--bg))" }}>
+          {(["client", "staff"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={kind === option}
+              onClick={() => setKind(option)}
+              className="rounded-lg px-3 py-2 text-sm font-semibold"
+              style={kind === option ? { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" } : { color: "var(--muted)" }}
+            >
+              {option === "client" ? branchT("kindClient") : branchT("kindStaff")}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {staffInvite ? (
+        <StaffInviteFields token={token} value={staff} onChange={setStaff} />
+      ) : (
+        <RolePicker t={t} value={role} onChange={setRole} />
+      )}
       <label className="block text-sm" style={{ color: "var(--text)" }}>
         <span className="font-semibold">{t("emailOptional")}</span>
         <input
@@ -240,7 +279,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
         </Select>
       </label>
       {issue.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(issue.error, uiT)}</p> : null}
-      <button type="submit" disabled={issue.isPending} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
+      <button type="submit" disabled={issue.isPending || staffIncomplete} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
         {issue.isPending ? t("creating") : t("createLink")}
       </button>
     </form>
@@ -304,6 +343,7 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
   const locale = useUiLocale();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<string | null>(null);
+  const uiT = useTranslations("Ui");
   const pending = useQuery({ queryKey: ["pending-invitations", slug], queryFn: () => listPendingInvitations(token, slug) });
   const revoke = useMutation({
     mutationFn: (id: string) => revokeInvitation(token, slug, id),
@@ -322,7 +362,9 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
         <li key={invitation.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
           <div>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              {invitation.role === "athlete" || invitation.role === "member" ? t(`roles.${invitation.role}`) : invitation.role}
+              {invitation.role === "athlete" || invitation.role === "member"
+                ? t(`roles.${invitation.role}`)
+                : (invitation.roles?.length ? invitation.roles : [invitation.role]).map((item) => semanticLabel(item, uiT)).join(", ")}
               {invitation.email_bound ? (
                 <span className="ms-2 rounded-full px-2 py-0.5 text-[11px]" style={{ background: "var(--panel-muted, var(--bg))", color: "var(--muted)" }}>{t("emailBound")}</span>
               ) : null}

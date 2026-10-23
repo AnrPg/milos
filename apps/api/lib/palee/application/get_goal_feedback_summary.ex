@@ -29,7 +29,9 @@ defmodule Palee.Application.GetGoalFeedbackSummary do
 
   def for_scheduled_class(context, slot_id) do
     with {:ok, slot_id} <- cast_id(slot_id),
-         %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found} do
+         %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found},
+         # ADR-186: a class at the staff member's own branch.
+         :ok <- Palee.Organizations.authorize_location(context, Map.get(slot, :location_id)) do
       rows = Journal.list_goal_feedback_for(context, {:scheduled_class, slot_id})
 
       {:ok,

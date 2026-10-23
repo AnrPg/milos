@@ -24,6 +24,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
 
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -58,17 +59,21 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
   const organizationSlug = useOrganizationSlug();
   const token = tokens?.access_token;
   const enabled = Boolean(token);
+  // ADR-186 §7: every figure and list below follows the branch filter.
+  const branchFilter = useBranchFilter(analyticsMode ? "finance-analytics" : "finance-dashboard");
+  const locationIds = branchFilter.param;
 
   const summaryQuery = useQuery({
-    queryKey: ["admin", "finance", "summary"],
+    queryKey: ["admin", "finance", "summary", locationIds ?? "all"],
     enabled,
-    queryFn: () => fetchFinanceSummary(token!),
+    queryFn: () => fetchFinanceSummary(token!, locationIds),
   });
 
   const queuesQuery = useQuery({
-    queryKey: ["admin", "finance", "queues"],
+    queryKey: ["admin", "finance", "queues", locationIds ?? "all"],
     enabled,
-    queryFn: () => fetchFinanceQueues(token!, { expires_within_days: "30" }),
+    queryFn: () =>
+      fetchFinanceQueues(token!, { expires_within_days: "30", ...(locationIds ? { location_ids: locationIds } : {}) }),
   });
 
   const totals = (summaryQuery.data?.totals ?? {}) as FinanceRecord;
@@ -97,6 +102,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
           title={analyticsMode ? i18n("financeAnalytics107dfa1") : i18n("membershipRevenueOverview8e92aee")}
           actions={
             <>
+              <BranchFilterControl filter={branchFilter} />
               <Link href={adminHref("/admin/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {i18n("openFinanceOperationscffd9ab")}
               </Link>
@@ -118,6 +124,15 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             </Link>
           ))}
         </section>
+
+        <BranchSplits
+          rows={summaryQuery.data?.branches as BranchSplit[] | undefined}
+          columns={[
+            { key: "active_memberships", label: i18n("activeMemberships0d117fb") },
+            { key: "paid_revenue_cents", label: i18n("revenueMtd3ffc292"), format: (value) => money(uiLocale, value) },
+            { key: "outstanding_invoice_balance_cents", label: i18n("pendingInvoices12d9ca8"), format: (value) => money(uiLocale, value) },
+          ]}
+        />
 
         {/* Chart */}
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

@@ -18,6 +18,8 @@ defmodule Palee.Application.PlaceMemberInClass do
     from_booking_id = value(params, :from_booking_id)
 
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
+         # ADR-186: staff place members in classes of their own branches.
+         :ok <- Palee.Application.ClassLocation.authorize_class(context, slot_id),
          :ok <- require_member(context, user.id),
          {:ok, previous} <- previous_booking(context, user.id, from_booking_id),
          {:ok, booking} <- SubmitBooking.call(context, user, slot_id),

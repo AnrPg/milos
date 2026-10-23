@@ -37,6 +37,9 @@ import { useStaffCoaches, type CoachOption } from "./use-package-authoring";
 import { Select } from "@/components/ui/Select";
 import { TimeInput } from "@/components/ui/DateInput";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { AppliesToBranches, offeredBranches } from "@/components/admin/AppliesToBranches";
+import { membershipLocationScope } from "@/lib/location-scope";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 export type FieldContext = {
   classTypes: ClassTypeRecord[];
@@ -334,6 +337,21 @@ export function LocationScope({
   locations: FacilityLocation[];
 }) {
   const t = useT();
+  const { membership } = useSelectedMembershipRole();
+  // ADR-186 §8: branch staff make packages valid at their own branches only,
+  // never «every branch» (the server re-checks).
+  if (membershipLocationScope(membership) !== "all") {
+    const offered = offeredBranches(locations).map((location) => location.id).sort();
+    const current = Array.isArray(value) ? value.map(String) : offered;
+    return (
+      <AppliesToBranches
+        kind="covering"
+        locations={locations}
+        value={current}
+        onChange={(next) => onChange(next === "all" ? offered : next)}
+      />
+    );
+  }
   return (
     <IdScope
       value={value}

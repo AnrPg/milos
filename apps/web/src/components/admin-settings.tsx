@@ -1257,6 +1257,24 @@ export function AdminSettingsHub() {
   const token = tokens?.access_token;
   const { membership, selectedOrganizationSlug } = useSelectedMembershipRole();
 
+  // ADR-186: a branch manager edits their own branches, not the business.
+  if (membership && !can(membership, "manage_settings") && can(membership, "manage_locations")) {
+    return (
+      <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+        <div className="mx-auto max-w-5xl space-y-6">
+          <PageHeader title={i18n("appConfigurationse0effaa")} />
+          {token ? (
+            <CollapsibleSection id="locations" title={i18n("admLocationsTitle")} description={i18n("admLocationsDescription")}>
+              <LocationSettings token={token} />
+            </CollapsibleSection>
+          ) : (
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+          )}
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">

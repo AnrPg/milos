@@ -13,7 +13,7 @@ defmodule Palee.Organizations.Domain.TenantDataPolicy do
             purge_order: 1000,
             disposition: :purge,
             basis:
-              "Memberships, invitations, settings, the public profile and its tag suggestions, retired slug aliases, provisioning events, members' remembered provider selections (ADR-162) and the platform plan subscription (ADR-170) are removed with the organization row; the platform purge record replaces them as the audit trail.",
+              "Memberships and their branch scopes (ADR-186), invitations, settings, the public profile and its tag suggestions, retired slug aliases, provisioning events, members' remembered provider selections (ADR-162) and the platform plan subscription (ADR-170) are removed with the organization row; the platform purge record replaces them as the audit trail.",
             excluded_columns: ["token_digest", "intended_email_digest"],
             tables: [
               # ADR-184: removed with the organization row, like the rest.
@@ -29,6 +29,7 @@ defmodule Palee.Organizations.Domain.TenantDataPolicy do
               %{table: "organization_provisioning_events"},
               %{table: "organization_platform_subscriptions"},
               %{table: "account_provider_selections", rls: :user},
+              %{table: "membership_location_scopes"},
               %{table: "organization_memberships"}
             ]
           })

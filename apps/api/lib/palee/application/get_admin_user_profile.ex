@@ -19,8 +19,7 @@ defmodule Palee.Application.GetAdminUserProfile do
                joined_at: timestamp(user.inserted_at)
              },
              account_status: "active",
-             membership:
-               Organizations.membership_summary(tenant_context.organization_id, user.id),
+             membership: membership(tenant_context, user.id),
              available_sections: AdminProfilePolicy.sections(user.role),
              attention: [],
              operational_links: AdminProfilePolicy.operational_links(user, organization_slug)
@@ -29,6 +28,18 @@ defmodule Palee.Application.GetAdminUserProfile do
 
       error ->
         error
+    end
+  end
+
+  # ADR-186: where the person works as staff, for the roles editor.
+  defp membership(tenant_context, user_id) do
+    case Organizations.membership_summary(tenant_context.organization_id, user_id) do
+      %{} = summary ->
+        scope = Organizations.stored_location_scope(tenant_context, user_id) || :all
+        Map.put(summary, :location_scope, Organizations.location_scope_payload(scope))
+
+      nil ->
+        nil
     end
   end
 

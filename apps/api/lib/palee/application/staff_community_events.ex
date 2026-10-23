@@ -38,10 +38,11 @@ defmodule Palee.Application.StaffCommunityEvents do
         end
 
       events =
-        Community.list_events(
-          context,
+        context
+        |> Community.list_events(
           Map.merge(filter, %{organization_ids: [organization_id], include_cancelled: true})
         )
+        |> Enum.filter(&CommunityEvents.in_staff_scope?(context, &1))
 
       stats = stats(context, events, now)
 

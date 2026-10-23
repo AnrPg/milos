@@ -11,6 +11,8 @@ defmodule Palee.Application.LinkClassWorkout do
 
   def call(%{organization_id: _} = context, slot_id, workout_id) do
     with {:ok, slot} <- fetch_slot(context, slot_id),
+         # ADR-186: a class at the staff member's own branch.
+         :ok <- Palee.Organizations.authorize_location(context, Map.get(slot, :location_id)),
          {:ok, _workout} <- fetch_workout(context, workout_id),
          {:ok, _linked} <-
            ClassWorkoutFiling.with_filed_workout(

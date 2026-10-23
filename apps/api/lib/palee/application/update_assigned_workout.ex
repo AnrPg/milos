@@ -10,6 +10,7 @@ defmodule Palee.Application.UpdateAssignedWorkout do
   alias Palee.Application.{
     AuthorizeMemberProgramming,
     BroadcastUserSync,
+    CoveringBranches,
     TenantAssigneeRoles
   }
 
@@ -34,7 +35,9 @@ defmodule Palee.Application.UpdateAssignedWorkout do
     source_slot_id = previous_assignment && Map.get(previous_assignment, :source_slot_id)
     previous_ids = (previous_assignment && Map.get(previous_assignment, :athlete_ids)) || []
 
-    with :ok <- reject_workout_reassignment(params),
+    with :ok <- authorize_branches(context, previous_assignment),
+         {:ok, params} <- branch_params(context, params),
+         :ok <- reject_workout_reassignment(params),
          {:ok, roles} <- TenantAssigneeRoles.call(context, athlete_ids),
          {:ok, classified} <- AssignmentAudiencePolicy.classify(athlete_ids, roles),
          :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
@@ -54,6 +57,24 @@ defmodule Palee.Application.UpdateAssignedWorkout do
   end
 
   defp update(_context, _id, _params), do: {:error, :organization_context_required}
+
+  # ADR-186 §8: a coach changes only programmes inside their branches, and
+  # moves them only between those.
+  defp authorize_branches(_context, nil), do: :ok
+
+  defp authorize_branches(context, assignment),
+    do: CoveringBranches.authorize(context, CoveringBranches.of_row(assignment))
+
+  defp branch_params(context, params) do
+    case CoveringBranches.requested(params) do
+      nil ->
+        {:ok, params}
+
+      requested ->
+        with {:ok, target} <- CoveringBranches.for_new(context, requested),
+             do: {:ok, CoveringBranches.put_columns(params, target)}
+    end
+  end
 
   defp reject_workout_reassignment(params) do
     if Map.has_key?(params, :master_workout_id) or Map.has_key?(params, "master_workout_id") do

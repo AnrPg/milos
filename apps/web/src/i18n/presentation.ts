@@ -368,6 +368,15 @@ const API_ERROR_KEYS: Record<string, string> = {
   invalid_guest_name: "mbErrInvalidGuestName",
   guest_already_booked: "mbErrGuestAlreadyBooked",
   location_archived: "mbErrLocationArchived",
+  // ADR-186 branch scope
+  location_out_of_scope: "apiErrorLocationOutOfScope",
+  location_required: "apiErrorLocationRequired",
+  location_scope_exceeded: "apiErrorLocationScopeExceeded",
+  invalid_location_scope: "apiErrorInvalidLocationScope",
+  owner_location_scope: "apiErrorOwnerLocationScope",
+  cannot_change_own_membership: "apiErrorCannotChangeOwnMembership",
+  role_ceiling_exceeded: "apiErrorRoleCeilingExceeded",
+  promotion_location_not_included: "apiErrorPromotionLocationNotIncluded",
   location_not_found: "mbErrLocationNotFound",
   // ADR-097 admin codes
   invalid_freeze_dates: "admErrInvalidFreezeDates",

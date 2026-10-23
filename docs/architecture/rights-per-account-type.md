@@ -39,6 +39,21 @@ A coach has scope **own** by default. An owner or admin can switch a coach to
 **head coach** (`coach_scope = all`), which gives the coaching rights with scope
 **all**. It changes nothing outside coaching.
 
+**Branch scope (ADR-186).** Independently of the data scope, a staff
+membership works at **every branch** («Όλα τα καταστήματα», the default) or
+at a list of the business's locations. Branch-scoped staff act only on
+located things at their branches (classes, bookings, attendance, check-ins,
+doors, location settings, appointment slots, events, cleaning areas,
+machines) and lose the capabilities over the whole business
+(`LocationScopePolicy.organization_wide/0`: gym settings, finance settings,
+clubs, lifecycle, platform subscription, granting admin). Reports follow a
+page branch filter, and packages, promotions and programme assignments are
+valid at chosen branches, edited only inside one's own (ADR-186 §7/§8).
+Seasons and referral programmes stay with all-branch staff. An
+admin with a branch scope is a **branch manager** («Υπεύθυνος
+καταστήματος»). Owners always work everywhere; members and athletes are not
+affected.
+
 ## 3. Capability matrix
 
 Legend: ✔ full · 👁 read · **own** / **status** = scoped (see §2) · — none.
@@ -57,6 +72,8 @@ Owner has every right of an admin.
 | Suspend or remove a person | ✔ | ✔ | — | — | — | — | — |
 | Invite clients (member / athlete) | ✔ | ✔ | ✔ (become their coach) | ✔ | — | — | — |
 | Gym settings, modules, branding, locations, class types | ✔ | ✔ | — | — | — | — | — |
+| A branch's own settings (address, hours, door codes) — `manage_locations` | ✔ | ✔ | — | — | — | — | — |
+| Branches someone works at (within your own) | ✔ | ✔ | — | — | — | — | — |
 | People directory | ✔ | ✔ | own | ✔ contact + status | billing contacts | — | — |
 | Client profile: training, PRs, history | ✔ | ✔ | own | — | — | — | own |
 | Health and injuries | ✔ | ✔ | own (safety) | — | — | — | own |
@@ -145,6 +162,10 @@ the attendee list any of the three (ADR-153).
    coach are filtered by `CoachScope`, not only hidden in the UI.
 7. Multi-role accounts get the **union** of rights; the UI groups them by
    *workspace* instead of showing every surface at once (ADR-103).
+8. A branch scope narrows every staff role of the membership (ADR-186). A
+   branch manager grants only staff roles below admin, only inside their
+   branches, and cannot touch staff who also work elsewhere; only owners
+   appoint branch managers.
 
 ## 5. Changing this document
 
