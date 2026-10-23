@@ -941,17 +941,27 @@ defmodule Palee.Organizations do
     end)
   end
 
-  @doc "The effective scope of one membership of the context's gym (nil = none)."
-  def membership_location_scope(context, user_id) when is_binary(user_id) do
-    case RepoContext.run(context, fn ->
-           OrganizationStore.get_membership(context.organization_id, user_id)
-         end) do
-      %{} = membership -> context |> membership_location_scopes([membership]) |> Map.values() |> hd()
-      _missing -> nil
-    end
+  @doc """
+  The scope stored on one membership of the context's gym, whatever its roles
+  (`:all` or active location ids; nil when there is no membership), for the
+  editor in Admin › Χρήστες.
+  """
+  def stored_location_scope(context, user_id) when is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(context.organization_id, user_id) do
+        %{} = membership ->
+          Palee.Organizations.Commands.SetMembershipLocationScope.stored_scope(
+            context,
+            membership
+          )
+
+        _missing ->
+          nil
+      end
+    end)
   end
 
-  def membership_location_scope(_context, _user_id), do: nil
+  def stored_location_scope(_context, _user_id), do: nil
 
   defp legacy_membership_role(:admin), do: :owner
   defp legacy_membership_role(:athlete), do: :athlete

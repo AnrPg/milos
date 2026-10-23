@@ -167,7 +167,11 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
           end
         end
 
-      active = if target == :all, do: [], else: EctoLocationScopeStore.location_ids(context, membership.id)
+      active =
+        if target == :all,
+          do: [],
+          else: EctoLocationScopeStore.location_ids(context, membership.id)
+
       {membership, LocationScopePolicy.effective(membership.roles, target == :all, active)}
     end)
   end

@@ -73,6 +73,7 @@ defmodule Palee.Repo.Migrations.MembershipLocationScopes do
 
   def down do
     drop table(:membership_location_scopes)
+
     drop index(:organization_memberships, [:id, :organization_id],
            name: :organization_memberships_id_organization_index
          )

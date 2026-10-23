@@ -20,7 +20,9 @@ defmodule Palee.Organizations.Queries.InspectInvitation do
          role: invitation.role,
          roles: RegistrationInvitation.granted_roles(invitation),
          location_scope:
-           invitation |> RegistrationInvitation.granted_scope() |> LocationScopePolicy.to_payload(),
+           invitation
+           |> RegistrationInvitation.granted_scope()
+           |> LocationScopePolicy.to_payload(),
          expires_at: invitation.expires_at
        }}
     else

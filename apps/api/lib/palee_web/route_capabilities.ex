@@ -73,6 +73,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminUserController, :update_role} => [:grant_staff_roles],
     {W.AdminUserController, :update_roles} => [:grant_staff_roles],
     {W.AdminUserController, :update_coach_scope} => [:set_head_coach],
+    {W.StaffLocationScopeController, :update} => [:grant_staff_roles],
     {W.AdminUserController, :membership_status} => [:view_membership_status],
 
     # Gym settings and facility

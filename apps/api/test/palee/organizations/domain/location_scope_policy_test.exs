@@ -16,7 +16,11 @@ defmodule Palee.Organizations.Domain.LocationScopePolicyTest do
     end
 
     test "branch-scoped staff work at their sorted, unique branches" do
-      assert LocationScopePolicy.effective([:coach, :member], false, [@marousi, @kifisia, @kifisia]) ==
+      assert LocationScopePolicy.effective([:coach, :member], false, [
+               @marousi,
+               @kifisia,
+               @kifisia
+             ]) ==
                [@kifisia, @marousi]
 
       # Every branch archived: nothing located, never everything.

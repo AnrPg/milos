@@ -80,9 +80,14 @@ defmodule Palee.Organizations.Commands.IssueInvitation do
       end
 
     cond do
-      :owner in roles or not LocationScopePolicy.staff?(roles) -> {:ok, :all}
-      scope != :all and not is_list(scope) -> {:error, :invalid_location_scope}
-      true -> with :ok <- LocationScopePolicy.authorize_grant(issuer_scope, scope), do: {:ok, scope}
+      :owner in roles or not LocationScopePolicy.staff?(roles) ->
+        {:ok, :all}
+
+      scope != :all and not is_list(scope) ->
+        {:error, :invalid_location_scope}
+
+      true ->
+        with :ok <- LocationScopePolicy.authorize_grant(issuer_scope, scope), do: {:ok, scope}
     end
   end
 

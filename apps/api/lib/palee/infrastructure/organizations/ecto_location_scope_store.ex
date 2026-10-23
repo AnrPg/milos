@@ -57,7 +57,11 @@ defmodule Palee.Infrastructure.Organizations.EctoLocationScopeStore do
       ids = if scope == :all, do: [], else: scope
 
       Enum.each(ids, fn location_id ->
-        %{organization_id: organization_id, membership_id: membership_id, location_id: location_id}
+        %{
+          organization_id: organization_id,
+          membership_id: membership_id,
+          location_id: location_id
+        }
         |> MembershipLocationScope.changeset()
         |> Repo.insert()
         |> case do

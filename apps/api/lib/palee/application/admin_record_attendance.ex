@@ -4,7 +4,8 @@ defmodule Palee.Application.AdminRecordAttendance do
   alias Palee.Scheduling
 
   def call(context, slot_id, user_id, admin_id, params) do
-    with {:ok, approved_booking} <- approved_booking(context, slot_id, user_id),
+    with :ok <- authorize_class(context, slot_id),
+         {:ok, approved_booking} <- approved_booking(context, slot_id, user_id),
          :ok <- AttendancePolicy.can_record_admin_attendance?(approved_booking) do
       attendance_params =
         params
@@ -91,6 +92,12 @@ defmodule Palee.Application.AdminRecordAttendance do
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
+
+  # ADR-186: attendance of classes at the staff member's own branches.
+  defp authorize_class(nil, _slot_id), do: :ok
+
+  defp authorize_class(context, slot_id),
+    do: Palee.Application.ClassLocation.authorize_class(context, slot_id)
 
   defp approved_booking(nil, _slot_id, _user_id), do: {:error, :organization_context_required}
 

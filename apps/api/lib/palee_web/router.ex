@@ -740,6 +740,8 @@ defmodule PaleeWeb.Router do
     post("/organization/transfer", OwnerOrganizationController, :transfer)
     post("/organization/archive", OwnerOrganizationController, :archive)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    # ADR-186: the branches a staff member works at.
+    put("/users/:id/location-scope", StaffLocationScopeController, :update)
     put("/users/:id/home-location", HomeLocationController, :update_member)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)

@@ -233,6 +233,7 @@ defmodule Palee.Application.Trials do
         from: DateTime.add(now, -@joined_days, :day),
         limit: 500
       })
+      |> in_location_scope(context)
 
     staged = Enum.group_by(all, &stage_of(&1, now, history))
 
@@ -253,6 +254,7 @@ defmodule Palee.Application.Trials do
         with %TrialRequest{status: "requested"} = request <-
                Trials.get_request(context, trial_id) || {:error, :not_found},
              %{} = slot <- Scheduling.get_slot(context, request.scheduled_class_id) || gone(),
+             :ok <- Organizations.authorize_location(context, Map.get(slot, :location_id)),
              policy = %{Trials.policy(context) | enabled: true},
              :ok <- Trials.class_check(policy, accept_facts(context, policy, slot, request, now)),
              {:ok, booking} <- book_seat(context, request.user_id, slot, nil),
@@ -281,6 +283,7 @@ defmodule Palee.Application.Trials do
 
     with %TrialRequest{} = request <-
            Trials.get_request(context, trial_id) || {:error, :not_found},
+         :ok <- class_in_scope(context, request.scheduled_class_id),
          {:ok, declined} <-
            Trials.transition(context, request, :decline, now, by: actor_id, reason: reason) do
       slot = Scheduling.get_slot(context, declined.scheduled_class_id)
@@ -740,6 +743,29 @@ defmodule Palee.Application.Trials do
     request.status == "attended" and is_nil(request.join_interest_at) and
       is_nil(request.follow_up_dismissed_at) and
       DateTime.compare(request.class_starts_at, DateTime.add(now, -@follow_up_days, :day)) == :gt
+  end
+
+  # ADR-186: branch-scoped staff work the trials of their own branches' classes.
+  defp in_location_scope(requests, context) do
+    if Organizations.location_scope(context) == :all do
+      requests
+    else
+      slots = slots_by_id(context, requests)
+
+      Enum.filter(requests, fn request ->
+        slot = Map.get(slots, request.scheduled_class_id) || %{}
+        Organizations.location_in_scope?(context, Map.get(slot, :location_id))
+      end)
+    end
+  end
+
+  defp class_in_scope(context, class_id) do
+    if Organizations.location_scope(context) == :all do
+      :ok
+    else
+      slot = Scheduling.get_slot(context, class_id) || %{}
+      Organizations.authorize_location(context, Map.get(slot, :location_id))
+    end
   end
 
   defp slots_by_id(context, requests) do

@@ -13,7 +13,7 @@ defmodule Palee.Application.DoorDisplay do
   """
 
   alias Palee.Application.{CheckInActions, CheckInFacts, CheckInKeys, PublicURL}
-  alias Palee.{Facility, Scheduling}
+  alias Palee.{Facility, Organizations, Scheduling}
   alias Palee.Facility.Domain.DoorCode
 
   @recent_minutes 30
@@ -144,11 +144,14 @@ defmodule Palee.Application.DoorDisplay do
   @doc "The path the phone camera opens: `/c/<location>/<code>`."
   def deep_link(location_id, code), do: PublicURL.base_url() <> "/c/#{location_id}/#{code}"
 
+  # ADR-186: staff open the doors of their own branches only.
   defp location(context, location_id) do
-    case Facility.get_location(context, location_id) do
-      %{archived_at: nil} = location -> {:ok, location}
-      %{} -> {:error, :location_archived}
-      nil -> {:error, :location_not_found}
+    with :ok <- Organizations.authorize_location(context, location_id) do
+      case Facility.get_location(context, location_id) do
+        %{archived_at: nil} = location -> {:ok, location}
+        %{} -> {:error, :location_archived}
+        nil -> {:error, :location_not_found}
+      end
     end
   end
 

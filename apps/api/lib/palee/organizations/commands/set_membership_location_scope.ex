@@ -66,7 +66,11 @@ defmodule Palee.Organizations.Commands.SetMembershipLocationScope do
       granter_scope == :all ->
         :ok
 
-      LocationScopePolicy.can_manage?(granter_scope, membership.roles, stored(context, membership)) and
+      LocationScopePolicy.can_manage?(
+        granter_scope,
+        membership.roles,
+        stored(context, membership)
+      ) and
           LocationScopePolicy.can_manage?(granter_scope, roles, stored(context, membership)) ->
         :ok
 

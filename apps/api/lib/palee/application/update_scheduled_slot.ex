@@ -15,7 +15,8 @@ defmodule Palee.Application.UpdateScheduledSlot do
 
     with {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
-         :ok <- ClassLocation.check(context, params),
+         :ok <-
+           ClassLocation.check_change(context, params, ClassLocation.class_location(context, id)),
          {:ok, slot} <-
            ClassWorkoutFiling.with_filed_workout(
              context,

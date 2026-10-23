@@ -6,7 +6,7 @@ defmodule PaleeWeb.AdminFacilityController do
 
   alias Guardian.Plug, as: GuardianPlug
   alias Palee.Application.CheckInOpenGym
-  alias Palee.Facility
+  alias Palee.{Facility, Organizations}
   alias PaleeWeb.Schemas.Facility, as: FacilitySchemas
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -52,8 +52,17 @@ defmodule PaleeWeb.AdminFacilityController do
     ]
   )
 
+  # ADR-186: branch-scoped staff see and edit their own branches only.
   def index_locations(conn, _params) do
-    locations = Facility.list_locations(conn.assigns.tenant_context, include_archived: true)
+    context = conn.assigns.tenant_context
+
+    locations =
+      context
+      |> Facility.list_locations(include_archived: true)
+      |> then(
+        &Organizations.filter_by_location_scope(context, &1, fn location -> location.id end)
+      )
+
     json(conn, %{locations: locations})
   end
 
@@ -87,7 +96,8 @@ defmodule PaleeWeb.AdminFacilityController do
   )
 
   def update_location(conn, %{id: id}) do
-    with {:ok, location} <-
+    with :ok <- Organizations.authorize_location(conn.assigns.tenant_context, id),
+         {:ok, location} <-
            Facility.update_location(conn.assigns.tenant_context, id, conn.body_params) do
       json(conn, %{location: location})
     end
@@ -103,7 +113,8 @@ defmodule PaleeWeb.AdminFacilityController do
   )
 
   def archive_location(conn, %{id: id}) do
-    with {:ok, location} <- Facility.archive_location(conn.assigns.tenant_context, id) do
+    with :ok <- Organizations.authorize_location(conn.assigns.tenant_context, id),
+         {:ok, location} <- Facility.archive_location(conn.assigns.tenant_context, id) do
       json(conn, %{location: location})
     end
   end
@@ -234,8 +245,15 @@ defmodule PaleeWeb.AdminFacilityController do
   )
 
   def index_check_ins(conn, params) do
+    context = conn.assigns.tenant_context
     filters = %{date: Map.get(params, :date), user_id: Map.get(params, :user_id)}
-    json(conn, %{check_ins: Facility.list_check_ins(conn.assigns.tenant_context, filters)})
+
+    check_ins =
+      context
+      |> Facility.list_check_ins(filters)
+      |> then(&Organizations.filter_by_location_scope(context, &1))
+
+    json(conn, %{check_ins: check_ins})
   end
 
   operation(:create_check_in,
@@ -270,10 +288,13 @@ defmodule PaleeWeb.AdminFacilityController do
   def create_check_in(conn, _params) do
     staff = GuardianPlug.current_resource(conn)
     user_id = Map.get(conn.body_params, :user_id)
-    params = %{"location_id" => Map.get(conn.body_params, :location_id)}
+    context = conn.assigns.tenant_context
 
-    with {:ok, check_in} <-
-           CheckInOpenGym.call(conn.assigns.tenant_context, staff, user_id, params) do
+    # ADR-186: the desk checks people in at its own branches.
+    with {:ok, location_id} <-
+           Organizations.desk_location(context, Map.get(conn.body_params, :location_id)),
+         {:ok, check_in} <-
+           CheckInOpenGym.call(context, staff, user_id, %{"location_id" => location_id}) do
       conn
       |> put_status(:created)
       |> json(%{check_in: check_in})

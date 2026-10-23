@@ -9,7 +9,9 @@ defmodule Palee.Application.IssueRegistrationInvitation do
   alias Palee.{Facility, Organizations}
 
   def call(context, params) do
-    role = Map.get(params, :roles, Map.get(params, "roles")) || Map.get(params, :role, Map.get(params, "role"))
+    role =
+      Map.get(params, :roles, Map.get(params, "roles")) ||
+        Map.get(params, :role, Map.get(params, "role"))
 
     with :ok <- OrganizationPlan.check_invitation(context, role),
          {:ok, params} <- with_location_scope(context, params) do

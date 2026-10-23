@@ -2200,6 +2200,7 @@ defmodule PaleeWeb.FallbackController do
     location_scope_exceeded: {:forbidden, "You can only give access to your own branches"},
     invalid_location_scope: {:unprocessable_entity, "Choose every branch or at least one branch"},
     owner_location_scope: {:unprocessable_entity, "Owners work at every branch"},
+    cannot_change_own_membership: {:forbidden, "Someone else changes your own access"},
     # ADR-098
     form_review_closed: {:conflict, "The form review is already closed"},
     appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},
