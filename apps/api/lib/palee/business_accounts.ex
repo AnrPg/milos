@@ -19,7 +19,14 @@ defmodule Palee.BusinessAccounts do
 
   alias Palee.BusinessAccounts.BusinessAccountStore
   alias Palee.BusinessAccounts.BusinessRequest
-  alias Palee.BusinessAccounts.Domain.{ActivationLinkPolicy, BusinessRequestPolicy}
+
+  alias Palee.BusinessAccounts.Domain.{
+    ActivationLinkPolicy,
+    BusinessRequestPolicy,
+    DemoLifecyclePolicy
+  }
+
+  alias Palee.Organizations
 
   ## Activation links
 
@@ -216,6 +223,97 @@ defmodule Palee.BusinessAccounts do
   """
   def notification_suppressed?(organization_id, user_id),
     do: BusinessAccountStore.notification_suppressed?(organization_id, user_id)
+
+  ## Abandoned demos (`Domain.DemoLifecyclePolicy`)
+
+  @doc "The thresholds of the abandoned-demo sweep (`config :palee, :abandoned_demos`)."
+  def demo_lifecycle_thresholds,
+    do: DemoLifecyclePolicy.thresholds(Application.get_env(:palee, :abandoned_demos, []))
+
+  defdelegate demo_lifecycle_stage(candidate, now, thresholds),
+    to: DemoLifecyclePolicy,
+    as: :stage
+
+  defdelegate demo_reminder_cutoff(now, thresholds), to: DemoLifecyclePolicy, as: :reminder_cutoff
+  defdelegate demo_archive_cutoff(now, thresholds), to: DemoLifecyclePolicy, as: :archive_cutoff
+  defdelegate demo_reminded_cutoff(now, thresholds), to: DemoLifecyclePolicy, as: :reminded_cutoff
+  defdelegate demo_notice_days(thresholds), to: DemoLifecyclePolicy, as: :notice_days
+
+  defdelegate demo_archive_on(last_active_at, thresholds),
+    to: DemoLifecyclePolicy,
+    as: :archive_on
+
+  defdelegate demo_reminder_dedupe_key(organization_id, last_active_at),
+    to: DemoLifecyclePolicy,
+    as: :reminder_dedupe_key
+
+  @doc """
+  The owner or an admin of a demo business is active in it (a console
+  request): its clock restarts and a claimed reminder is withdrawn. Free
+  for active businesses and for other staff; never fails the request.
+  """
+  def touch_demo_activity(context, now \\ DateTime.utc_now())
+
+  def touch_demo_activity(%{organization_id: organization_id, user_id: user_id} = context, now)
+      when is_binary(organization_id) and is_binary(user_id) do
+    if Organizations.business_gated?(context) and
+         Organizations.any_role?(context, [:owner, :admin]) do
+      touch(%{user_id: user_id}, organization_id, now)
+    else
+      0
+    end
+  end
+
+  def touch_demo_activity(_context, _now), do: 0
+
+  @doc "The account signed in: every demo business it runs restarts its clock."
+  def touch_demo_activity_on_sign_in(user_id, now \\ DateTime.utc_now())
+
+  def touch_demo_activity_on_sign_in(user_id, now) when is_binary(user_id),
+    do: touch(%{user_id: user_id}, nil, now)
+
+  def touch_demo_activity_on_sign_in(_user_id, _now), do: 0
+
+  defp touch(scope, organization_id, now) do
+    BusinessAccountStore.touch_demo_activity(
+      scope,
+      organization_id,
+      now,
+      demo_lifecycle_thresholds().touch_interval_seconds
+    )
+  rescue
+    # Activity tracking must never break a request or a sign-in.
+    _error in [DBConnection.ConnectionError, Postgrex.Error] -> 0
+  end
+
+  @doc "System: demo businesses idle since before `before`, with their owners."
+  def idle_demo_organizations(before), do: BusinessAccountStore.idle_demo_organizations(before)
+
+  @doc "System: claims the one-time reminder; `{:ok, last_active_at}` or `:not_claimed`."
+  def claim_demo_reminder(organization_id, before, now),
+    do: BusinessAccountStore.claim_demo_reminder(%{organization_id: organization_id}, before, now)
+
+  @doc "System: archives a demo still idle and reminded long enough ago. True when it did."
+  def mark_demo_archived(organization_id, before, reminded_before, now),
+    do:
+      BusinessAccountStore.mark_demo_archived(
+        %{organization_id: organization_id},
+        before,
+        reminded_before,
+        now
+      )
+
+  @doc "System: withdraws the pending activation request and the live link of a demo."
+  def close_demo_activation(organization_id, now),
+    do: BusinessAccountStore.close_demo_activation(%{organization_id: organization_id}, now)
+
+  @doc "The account's demo businesses the sweep archived."
+  def list_archived_demos(%{id: user_id}),
+    do: BusinessAccountStore.list_archived_demos(%{user_id: user_id})
+
+  @doc "The owner reopens an archived demo: active, empty, with a fresh clock."
+  def reopen_demo_business(%{id: user_id}, organization_id, now \\ DateTime.utc_now()),
+    do: BusinessAccountStore.reopen_demo_business(%{user_id: user_id}, organization_id, now)
 
   defp tenant_scope(%{organization_id: organization_id, user_id: user_id}),
     do: %{organization_id: organization_id, user_id: user_id}

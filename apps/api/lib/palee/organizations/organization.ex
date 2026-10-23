@@ -21,6 +21,11 @@ defmodule Palee.Organizations.Organization do
     field :demo_started_at, :utc_datetime_usec
     field :activated_at, :utc_datetime_usec
     field :activated_by_id, :binary_id
+    # ADR-184 follow-up: the abandoned-demo lifecycle, written only by its
+    # SECURITY DEFINER functions (and set at creation).
+    field :demo_last_active_at, :utc_datetime_usec
+    field :demo_reminder_sent_at, :utc_datetime_usec
+    field :demo_archived_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -56,9 +61,12 @@ defmodule Palee.Organizations.Organization do
   demo mode; vendor-provisioned and pre-existing organizations are active.
   """
   def put_initial_activation(changeset, "demo") do
+    now = DateTime.utc_now()
+
     changeset
     |> put_change(:activation, "demo")
-    |> put_change(:demo_started_at, DateTime.utc_now())
+    |> put_change(:demo_started_at, now)
+    |> put_change(:demo_last_active_at, now)
   end
 
   def put_initial_activation(changeset, _activation), do: changeset

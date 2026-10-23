@@ -614,6 +614,20 @@ defmodule Palee.Notifications do
   def process_event("password_reset_completed", payload),
     do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings"})
 
+  # ADR-184 follow-up: a demo business nobody used for a while will be
+  # archived; once per idle spell, to each owner.
+  def process_event("business_demo_idle", payload),
+    do:
+      enqueue_simple(:business_demo_idle, payload, %{
+        organization_id: field(payload, :organization_id),
+        business_name: field(payload, :business_name),
+        business_kind: field(payload, :business_kind),
+        days_left: field(payload, :days_left),
+        archive_on: field(payload, :archive_on),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/admin"
+      })
+
   def process_event("coaching_reply_overdue", payload),
     do:
       enqueue_simple(:coaching_reply_overdue, payload, %{

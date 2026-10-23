@@ -636,3 +636,9 @@ msgstr "A tua palavra-passe foi reposta"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "A tua palavra-passe foi alterada com uma ligação de reposição ou um código de recuperação, e a sessão foi terminada em todos os dispositivos. Se não foste tu, contacta o teu ginásio ou o apoio do Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "O teu negócio de demonstração está à tua espera"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "Ninguém usa %{business} há algum tempo. Se ninguém o abrir nos próximos %{days} dias, os dados de demonstração serão removidos e será arquivado. Podes reabri-lo quando quiseres."
