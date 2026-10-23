@@ -85,7 +85,9 @@ defmodule PaleeWeb.BranchScopedStaffTest do
 
       {:ok, manager_context} = Organizations.resolve_tenant_context(ctx.manager, ctx.slug)
       refute Organizations.can?(manager_context, :manage_settings)
-      refute Organizations.can?(manager_context, :view_finance_reports)
+      # ADR-186 §7: reports follow the branches instead of being withheld.
+      assert Organizations.can?(manager_context, :view_finance_reports)
+      refute Organizations.can?(manager_context, :manage_finance_settings)
       assert Organizations.can?(manager_context, :manage_schedule)
       assert Organizations.can?(manager_context, :manage_locations)
 

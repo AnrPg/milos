@@ -102,7 +102,12 @@ defmodule Palee.Organizations.Domain.LocationScopePolicyTest do
             :take_payments,
             :manage_appointments,
             :manage_cleaning_areas,
-            :manage_inventory
+            :manage_inventory,
+            # ADR-186 §7/§8: reports and covering items follow the branches.
+            :view_finance_reports,
+            :view_business_analytics,
+            :manage_packages,
+            :manage_promotions
           ] do
         assert Map.has_key?(branch_manager, capability), inspect(capability)
       end
@@ -153,6 +158,65 @@ defmodule Palee.Organizations.Domain.LocationScopePolicyTest do
       assert LocationScopePolicy.requested?(%{"location_ids" => [@kifisia]})
       assert LocationScopePolicy.requested?(%{all_locations: true})
       refute LocationScopePolicy.requested?(%{"role" => "coach"})
+    end
+  end
+
+  describe "report_filter/2 and requested_ids/1 (ADR-186 §7)" do
+    test "a report shows the requested branches inside the scope, else the scope" do
+      assert LocationScopePolicy.report_filter(:all, []) == :all
+      assert LocationScopePolicy.report_filter(:all, [@marousi, @kifisia]) == [@kifisia, @marousi]
+      assert LocationScopePolicy.report_filter([@kifisia], []) == [@kifisia]
+
+      assert LocationScopePolicy.report_filter([@kifisia, @marousi], [@marousi, @glyfada]) ==
+               [@marousi]
+
+      assert LocationScopePolicy.report_filter([@kifisia], [@glyfada]) == []
+    end
+
+    test "reads a list or one comma-separated string" do
+      assert LocationScopePolicy.requested_ids(%{"location_ids" => "#{@marousi},#{@kifisia}"}) ==
+               [@kifisia, @marousi]
+
+      assert LocationScopePolicy.requested_ids(%{location_ids: [@kifisia, @kifisia]}) == [
+               @kifisia
+             ]
+
+      assert LocationScopePolicy.requested_ids(%{"location_ids[]" => [@glyfada]}) == [@glyfada]
+      assert LocationScopePolicy.requested_ids(%{}) == []
+      assert LocationScopePolicy.requested_ids(nil) == []
+    end
+  end
+
+  describe "creation_targets/3 (ADR-186 §8)" do
+    test "one item per requested branch, each inside the scope" do
+      assert LocationScopePolicy.creation_targets([@kifisia, @marousi], [@marousi, @kifisia], nil) ==
+               {:ok, [@kifisia, @marousi]}
+
+      assert LocationScopePolicy.creation_targets([@kifisia], [@kifisia, @marousi], nil) ==
+               {:error, :location_out_of_scope}
+
+      assert LocationScopePolicy.creation_targets(:all, [], @glyfada) == {:ok, [@glyfada]}
+      assert LocationScopePolicy.creation_targets(:all, nil, "") == {:ok, [nil]}
+    end
+  end
+
+  describe "covering items (ADR-186 §8)" do
+    test "show when valid everywhere or at one of the branches" do
+      assert LocationScopePolicy.covering_visible?([@kifisia], :all)
+      assert LocationScopePolicy.covering_visible?([@kifisia], [@marousi, @kifisia])
+      refute LocationScopePolicy.covering_visible?([@kifisia], [@marousi])
+      assert LocationScopePolicy.covering_visible?(:all, [@marousi])
+    end
+
+    test "change only inside the scope; «all branches» needs an all-branch scope" do
+      assert LocationScopePolicy.authorize_covering(:all, :all) == :ok
+      assert LocationScopePolicy.authorize_covering([@kifisia, @marousi], [@kifisia]) == :ok
+
+      assert LocationScopePolicy.authorize_covering([@kifisia], :all) ==
+               {:error, :location_scope_exceeded}
+
+      assert LocationScopePolicy.authorize_covering([@kifisia], [@kifisia, @marousi]) ==
+               {:error, :location_scope_exceeded}
     end
   end
 
