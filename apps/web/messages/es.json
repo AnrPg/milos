@@ -75,7 +75,8 @@
     "notificationsShort": "Avisos",
     "messages": "Mensajes",
     "messagesUnread": "Mensajes ({count} sin leer)",
-    "socialApp": "Social"
+    "socialApp": "Social",
+    "shop": "Tienda"
   },
   "Profile": {
     "eyebrow": "Perfil",
@@ -6817,7 +6818,6 @@
     "placeAddress": "Zona alrededor de esta dirección",
     "placeAdding": "Añadiendo…",
     "worldwideUnavailable": "La búsqueda mundial no está disponible ahora, así que solo se muestran lugares que ya conocemos.",
-    "placesAttribution": "Lugares: © colaboradores de OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Zona",
     "from": "Desde: {place}",
     "searchingFrom": "Buscando desde: {place}",
@@ -6945,7 +6945,8 @@
     "visibilityNeedsArea": "Solo aparecen cuando hayas definido «Mi zona».",
     "notifTitle": "Novedades cerca de ti",
     "notifBody": "Novedades para «{name}»: {count}",
-    "myDisciplines": "Mis deportes"
+    "myDisciplines": "Mis deportes",
+    "placesAttribution": "Lugares: © colaboradores de OpenStreetMap, GeoNames (CC BY 4.0)"
   },
   "CheckIn": {
     "loading": "Cargando…",
@@ -10264,6 +10265,476 @@
     "groupsHint": "Lo obtienen los miembros de al menos un grupo elegido. Si también eliges paquetes, necesitan ambos.",
     "sum_groups": "{count, plural, one {# grupo} other {# grupos}}",
     "problem_groups": "Elige al menos un grupo."
+  },
+  "ShopConsole": {
+    "title": "Tienda",
+    "loading": "Cargando…",
+    "noAccess": "No tienes acceso a la tienda.",
+    "openState": "Abierta · {count, plural, one {# producto} other {# productos}}",
+    "closedState": "Cerrada para los socios",
+    "pos": {
+      "loading": "Cargando…",
+      "noAccess": "La caja necesita el permiso de cobrar pagos.",
+      "back": "Tienda",
+      "title": "Caja",
+      "branch": "Sede",
+      "products": "Productos",
+      "search": "Producto, código o código de barras",
+      "noProducts": "Ningún producto activo se vende en caja.",
+      "left": "quedan {count}",
+      "pickVariant": "Elige una variante de {product}",
+      "sale": "Venta",
+      "walkIn": "Cliente sin cuenta",
+      "walkInName": "Nombre (opcional)",
+      "member": "Socio",
+      "unpaid": "Saldo pendiente {amount}",
+      "noUnpaid": "Nada pendiente",
+      "packageDiscount": "−{percent} % del paquete",
+      "emptyCart": "Toca un producto para añadirlo.",
+      "charged": "Cobrado · {order}. La venta aparece en las Transacciones del socio.",
+      "quantityOf": "Cantidad de {item}",
+      "short": "Solo {count} en stock",
+      "discount": "Descuento del paquete −{percent} %",
+      "total": "Total",
+      "payment": "Pago",
+      "methods": {
+        "cash": "Efectivo",
+        "card_manual": "Tarjeta en el datáfono"
+      },
+      "manualNote": "Los pagos con tarjeta pasan por tu datáfono; aquí los registras.",
+      "manualNoteOnlineLater": "Los pagos con tarjeta pasan por tu datáfono; aquí los registras. El pago en línea con tarjeta llegará más adelante.",
+      "charge": "Cobrar {amount}",
+      "charging": "Cobrando…",
+      "pickMember": "Elige al socio o cambia a cliente sin cuenta.",
+      "receiptNote": "Con el pago se emite una factura, como cualquier venta en Finanzas."
+    },
+    "newProduct": "Nuevo producto",
+    "branchNote": "Pedidos, stock e informes muestran solo las sedes elegidas.",
+    "tabs": {
+      "products": "Productos",
+      "orders": "Pedidos",
+      "stock": "Stock",
+      "analytics": "Analítica"
+    },
+    "empty": {
+      "title": "Vende a tus socios desde la app",
+      "body": "Los socios piden desde Box y recogen en recepción. Tú ves qué preparar y cuánto queda. Recepción también vende desde la caja.",
+      "steps": {
+        "product": {
+          "title": "Añade tu primer producto",
+          "body": "Foto, precio y tallas. Empieza como borrador."
+        },
+        "pickup": {
+          "title": "Revisa el punto de recogida",
+          "body": "Los socios recogen en la recepción de su sede."
+        },
+        "publish": {
+          "title": "Publica para abrir la tienda",
+          "body": "La tarjeta Tienda aparece en el Box de los socios en cuanto publicas un producto."
+        }
+      },
+      "addProduct": "Nuevo producto",
+      "pickupSettings": "Ajustes de recogida",
+      "membersNote": "Hasta que publiques, los socios no ven ninguna tarjeta Tienda en Box. Una vez abierta, ocupa un lugar fijo bajo la suscripción."
+    },
+    "products": {
+      "title": "Productos",
+      "filter": "Mostrar productos",
+      "filters": {
+        "all": "Todos",
+        "published": "Activos",
+        "draft": "Borradores",
+        "low_stock": "Stock bajo",
+        "archived": "Archivados"
+      },
+      "search": "Buscar productos",
+      "loading": "Cargando productos…",
+      "none": "No hay productos aquí.",
+      "from": "desde {price}",
+      "variants": "{count, plural, one {# variante} other {# variantes}}",
+      "stockMeter": "{count} en stock",
+      "stockUnits": "{count, plural, one {# unidad} other {# unidades}}",
+      "stockWeakest": "{count, plural, one {# unidad} other {# unidades}} · {variant}: quedan {left}",
+      "status": {
+        "draft": "Borrador",
+        "published": "Activo",
+        "archived": "Archivado"
+      }
+    },
+    "editor": {
+      "loading": "Cargando producto…",
+      "noAccess": "No puedes editar productos de la tienda.",
+      "back": "Productos",
+      "newTitle": "Nuevo producto",
+      "promote": "Promocionar",
+      "status": {
+        "draft": "Borrador",
+        "published": "Activo",
+        "archived": "Archivado"
+      },
+      "photos": {
+        "title": "Fotos",
+        "hint": "Las fotos cuadradas se ven mejor. La primera aparece en la lista.",
+        "alt": "Foto del producto {index}",
+        "uploading": "Subiendo…",
+        "failed": "Error al subir",
+        "cover": "Portada",
+        "makeCover": "Usar de portada",
+        "remove": "Quitar",
+        "add": "Añadir fotos"
+      },
+      "basics": {
+        "title": "Datos",
+        "name": "Nombre",
+        "description": "Descripción",
+        "category": "Categoría",
+        "categoryHint": "p. ej. Ropa"
+      },
+      "price": {
+        "title": "Precio",
+        "price": "Precio con IVA (€)",
+        "compareAt": "Precio anterior (€)",
+        "cost": "Coste de compra (€, solo para ti)",
+        "hint": "El precio anterior se muestra tachado. El coste de compra alimenta el margen en Analítica y nunca se muestra a los socios."
+      },
+      "variants": {
+        "title": "Opciones y stock",
+        "hint": "Hasta dos opciones, como talla y color. El stock se cuenta por combinación y sede.",
+        "addSize": "Añadir una opción (p. ej. talla)",
+        "addColour": "Añadir una segunda opción (p. ej. color)",
+        "optionName": "Opción",
+        "optionNameHint": "p. ej. Talla",
+        "removeOption": "Quitar opción",
+        "values": "Valores",
+        "removeValue": "Quitar {value}",
+        "newValue": "Nuevo valor",
+        "newValueHint": "p. ej. M",
+        "addValue": "Añadir",
+        "list": "Variantes",
+        "single": "Un solo modelo",
+        "price": "Precio (€)",
+        "priceOf": "Precio de {variant}",
+        "same": "Igual ({price})",
+        "stock": "Stock",
+        "onHand": "{count} disponibles · {reserved} reservados",
+        "openingOf": "Stock inicial de {variant} en {branch}",
+        "ledgerNote": "El stock de las variantes guardadas cambia desde la pestaña Stock, para que cada cambio tenga un motivo."
+      },
+      "selling": {
+        "title": "Venta",
+        "channel": "Dónde se vende",
+        "channels": {
+          "both": "App y caja",
+          "app": "Solo app",
+          "desk": "Solo caja"
+        },
+        "visibility": "Quién puede comprar",
+        "visibilities": {
+          "members_only": "Solo socios",
+          "anyone": "También visitantes"
+        },
+        "visibilityHint": "También visitantes: aparece también en la página pública del box, para cualquiera con cuenta de Palee.",
+        "memberDiscount": "Descuento de socio del paquete",
+        "memberDiscountHint": "El porcentaje del paquete del socio se aplica a este producto.",
+        "status": "Estado",
+        "newIsDraft": "Los productos nuevos empiezan como borrador. Publica después de guardar."
+      },
+      "errors": {
+        "title": "Ponle un nombre al producto.",
+        "price": "Escribe un precio mayor que cero.",
+        "compareAt": "El precio anterior no es un importe válido.",
+        "cost": "El coste de compra no es un importe válido.",
+        "variantPrice": "El precio de {variant} no es un importe válido."
+      },
+      "save": "Guardar",
+      "create": "Crear borrador",
+      "saving": "Guardando…",
+      "saved": "Guardado."
+    },
+    "promote": {
+      "eyebrow": "Promocionar",
+      "where": "Dónde publicar",
+      "targets": {
+        "announcements": "Anuncios",
+        "channel": "Grupo de socios",
+        "feed": "Inicio"
+      },
+      "targetHints": {
+        "announcements": "Una publicación del club en el canal de anuncios, con la tarjeta del producto adjunta.",
+        "channel": "Solo los socios de un grupo ven la publicación.",
+        "feed": "Una publicación de tu box en el Inicio de tus socios y seguidores."
+      },
+      "group": "Grupo",
+      "groupPick": "Elige un grupo",
+      "text": "Texto de la publicación",
+      "defaultBody": "Nuevo en la tienda: {product}. Pídelo desde la app y recógelo en recepción.",
+      "preview": "Vista previa",
+      "cardCta": "Ver",
+      "code": "Código de descuento",
+      "codeHint": "Un código solo para este producto, en Finanzas › Ofertas.",
+      "codeValue": "Código",
+      "percent": "Descuento (%)",
+      "endsOn": "Válido hasta",
+      "newLabel": "La tienda muestra sola la etiqueta Nuevo durante 14 días desde la publicación.",
+      "errors": {
+        "body": "Escribe el texto de la publicación.",
+        "group": "Elige un grupo.",
+        "code": "Escribe un código y un descuento entre 1 y 100 %."
+      },
+      "cancel": "Cancelar",
+      "post": "Publicar",
+      "posting": "Publicando…"
+    },
+    "orders": {
+      "title": "Pedidos",
+      "filter": "Mostrar pedidos",
+      "status": {
+        "placed": "Por preparar",
+        "ready_for_pickup": "Listos",
+        "picked_up": "Recogidos",
+        "cancelled": "Cancelados"
+      },
+      "none": {
+        "placed": "Nada que preparar.",
+        "ready_for_pickup": "Ningún pedido espera recogida.",
+        "picked_up": "Aún no hay pedidos recogidos.",
+        "cancelled": "No hay pedidos cancelados."
+      },
+      "loading": "Cargando pedidos…",
+      "walkIn": "Cliente sin cuenta",
+      "channel": {
+        "online": "desde la app",
+        "pos": "en caja"
+      },
+      "payment": {
+        "pending_payment": "Por pagar",
+        "paid": "Pagado",
+        "partially_refunded": "Reembolsado en parte",
+        "refunded": "Reembolsado",
+        "void": "Anulado"
+      },
+      "mode": {
+        "at_pickup": "Al recoger",
+        "on_account": "A cuenta",
+        "online": "En línea",
+        "cash": "Efectivo",
+        "card_manual": "Tarjeta en el datáfono",
+        "bank_transfer": "Transferencia",
+        "other": "Otro"
+      },
+      "reserveNote": "Los pedidos reservan su stock hasta la recogida o la cancelación. Si no se recogen en 7 días se cancelan solos, con un recordatorio al socio el 3.er día.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} reembolsados",
+      "discount": "Descuento",
+      "total": "Total",
+      "totalWithInvoice": "Total · factura {invoice}",
+      "paid": "Pagado",
+      "refunded": "Reembolsado",
+      "paymentMode": "Pago",
+      "code": "Código",
+      "timeline": "Historial",
+      "timelinePlaced": "Realizado {channel} · {when}",
+      "timelineReady": "Listo para recoger · {when}",
+      "timelinePickedUp": "Recogido · {when}",
+      "timelineCancelled": "Cancelado · {when}",
+      "timelineExpires": "Recoger antes de {when}",
+      "markReady": "Listo para recoger",
+      "readyHint": "Listo envía al socio una notificación con dónde y cuándo recogerlo.",
+      "markPickedUp": "Recogido",
+      "collect": "Cobrar {amount}",
+      "method": "Forma de pago",
+      "collectHint": "El pago se registra en la factura del pedido. El socio lo ve en Transacciones.",
+      "confirmPickup": "Confirmar recogida",
+      "cancel": "Cancelar pedido",
+      "cancelReason": "Motivo (opcional)",
+      "cancelHint": "Cancelar libera el stock reservado.",
+      "confirmCancel": "Cancelar pedido",
+      "refund": "Reembolsar",
+      "refundWhat": "¿Qué se devuelve?",
+      "refundQty": "Cantidad de {item} a reembolsar",
+      "restock": "Volver al stock",
+      "refundHint": "Un reembolso emite el recibo de devolución. Deja Volver al stock desactivado para artículos dañados.",
+      "confirmRefund": "Reembolsar",
+      "back": "Atrás"
+    },
+    "stock": {
+      "title": "Stock",
+      "filter": "Mostrar stock",
+      "views": {
+        "attention": "Hay que reponer",
+        "all": "Todas las variantes"
+      },
+      "none": {
+        "attention": "No hay nada que reponer.",
+        "all": "Aún no hay variantes."
+      },
+      "loading": "Cargando stock…",
+      "units": "{count, plural, one {# unidad} other {# unidades}}",
+      "daysLeft": "~{count, plural, one {# día} other {# días}}",
+      "reserved": "{count} reservados",
+      "history": "Movimientos",
+      "adjust": "Ajustar",
+      "policyNote": "El estado sale de los días de stock que quedan al ritmo actual: crítico por debajo de 7 días, bajo por debajo de 21. Los avisos solo saltan cuando empeora, y el stock entra en el resumen diario.",
+      "recent": "Movimientos recientes",
+      "allMovements": "Todos los movimientos",
+      "historyOf": "Movimientos · {item}",
+      "noMovements": "Aún no hay movimientos.",
+      "kinds": {
+        "receive": "Recepción",
+        "sale": "Venta",
+        "refund_restock": "Vuelta al stock",
+        "adjustment": "Ajuste",
+        "transfer": "Traspaso",
+        "reserve": "Reservado para un pedido",
+        "release": "Liberado"
+      },
+      "reasons": {
+        "recount": "Recuento",
+        "damage": "Daño",
+        "loss": "Pérdida",
+        "return": "Devolución",
+        "other": "Otro"
+      },
+      "adjustEyebrow": "Movimiento de stock",
+      "reason": "Qué ha pasado",
+      "form": {
+        "receive": "Recepción",
+        "recount": "Recuento",
+        "damage": "Daño",
+        "loss": "Pérdida",
+        "return": "Devolución"
+      },
+      "quantity": "Cantidad",
+      "counted": "Contados en la estantería",
+      "unitCost": "Coste por unidad (€)",
+      "note": "Nota",
+      "noteHint": "p. ej. factura del proveedor 0891",
+      "now": "Ahora {count} disponibles",
+      "after": "{from} → {to} disponibles",
+      "errors": {
+        "amount": "Escribe una cantidad que cambie el stock."
+      },
+      "cancel": "Cancelar",
+      "record": "Registrar"
+    },
+    "analytics": {
+      "title": "Analítica",
+      "loading": "Cargando informes…",
+      "unavailable": "Los informes de la tienda aún no están disponibles.",
+      "range": "Periodo",
+      "ranges": {
+        "28": "4 semanas",
+        "84": "12 semanas",
+        "365": "12 meses"
+      },
+      "kpi": {
+        "sales": "Ventas netas",
+        "salesChange": "Ventas netas · {change, number} % frente al periodo anterior",
+        "margin": "Margen bruto (donde se conoce el coste · {costed}/{total} productos)",
+        "units": "Unidades · {orders, plural, one {# pedido} other {# pedidos}}",
+        "stockValue": "Valor del stock a coste · {count} bajos"
+      },
+      "weekly": "Ventas por semana",
+      "weeklyHint": "Netas de descuentos y reembolsos. La semana en curso aparece más clara.",
+      "weekOf": "Semana del {date}",
+      "net": "Neto",
+      "noSales": "No hay ventas en este periodo.",
+      "top": "Productos principales",
+      "product": "Producto",
+      "units": "Unidades",
+      "revenue": "Ingresos",
+      "marginCol": "Margen",
+      "marginHint": "«—»: falta el coste de compra, así que queda fuera del margen en vez de contar como 100 %.",
+      "channels": "App o caja",
+      "channel": {
+        "online": "App (recogida)",
+        "pos": "Caja"
+      },
+      "branches": "Por sede",
+      "noBranch": "Sin sede",
+      "attribution": "De dónde vinieron las ventas",
+      "attributionHint": "Un pedido se atribuye al código usado; si no, a la publicación u oferta desde la que se abrió el producto en 7 días; si no, a la tarjeta Tienda de Box.",
+      "source": {
+        "club_post": "Publicación",
+        "promotion_code": "Código",
+        "public_page": "Página pública",
+        "direct": "Tarjeta Tienda en Box",
+        "desk": "Caja",
+        "other": "Otro"
+      },
+      "codeRow": "Código {code}",
+      "ordersMoney": "{count, plural, one {# pedido} other {# pedidos}} · {amount}",
+      "unattributed": "Sin atribución: {count, plural, one {# pedido} other {# pedidos}} · {amount}",
+      "lowStock": "Stock bajo",
+      "noLowStock": "No se está agotando nada.",
+      "left": "quedan {count}",
+      "openStock": "Abrir Stock",
+      "pricing": {
+        "title": "Indicadores de precio",
+        "hint": "Por variante, en el periodo elegido. El rango sugerido es orientativo: tú fijas tus precios.",
+        "none": "Aún no hay variantes con ventas o stock.",
+        "marginShort": "margen {margin} %",
+        "noCost": "sin coste de compra",
+        "perWeek": "{value}/semana",
+        "margin": "Margen",
+        "markup": "Recargo",
+        "sellThrough": "Tasa de venta",
+        "daysOfStock": "Días de stock",
+        "velocity": "Vendidos por semana",
+        "sold": "Vendidos",
+        "discountEffect": "Efecto del descuento",
+        "lift": "{change, number} % unidades por pedido · {share} % de las unidades",
+        "priceChange": "Último cambio de precio",
+        "velocityChange": "{from} → {to}: {before} → {after}/semana",
+        "position": {
+          "below": "Por debajo del rango",
+          "within": "Dentro del rango",
+          "above": "Por encima del rango"
+        },
+        "suggested": "Rango de precio sugerido",
+        "advisory": "Orientativo",
+        "range": "{low} – {high}",
+        "noRange": "Sin coste de compra no hay rango.",
+        "inputs": "Cómo se calcula",
+        "inputCostPlus": "Coste {cost} con un margen objetivo del {margin} % ({source}).",
+        "sourceCategory": "el objetivo de la categoría",
+        "sourceDefault": "el objetivo por defecto",
+        "inputNoCost": "Añade el coste de compra para obtener un rango.",
+        "pace": {
+          "fast": "Se venden {velocity}/semana, al menos 1,5× la mediana de su categoría ({median}/semana), así que el rango sube por encima del coste más margen.",
+          "slow": "Se venden {velocity}/semana, como mucho la mitad de la mediana de su categoría ({median}/semana), así que el rango baja del coste más margen, nunca del coste.",
+          "normal": "Se venden {velocity}/semana, más o menos al ritmo de su categoría ({median}/semana).",
+          "unknown": "Aún no hay ventas suficientes para comparar su ritmo con su categoría."
+        },
+        "priceSensitive": "La demanda parece sensible al precio, así que el margen al alza se reduce a la mitad.",
+        "yourCall": "Solo orientativo: el box fija sus precios."
+      }
+    },
+    "finance": {
+      "eyebrow": "Ingresos por fuente",
+      "title": "De dónde viene el dinero",
+      "streams": {
+        "membership": "Suscripciones",
+        "package": "Paquetes PT y servicios",
+        "event": "Eventos y temporadas",
+        "shop": "Tienda",
+        "other": "Otros"
+      },
+      "hint": "Cada pago toma su fuente de su origen, nunca de su texto. Los reembolsos se descuentan dentro de la misma fuente.",
+      "recent": "Últimas ventas de la tienda",
+      "desk": "Caja"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "En stock",
+      "low": "Bajo",
+      "critical": "Crítico",
+      "out": "Agotado"
+    },
+    "compareAt": "Antes {price}",
+    "less": "Uno menos",
+    "more": "Uno más"
   },
   "EventWizard": {
     "step_host": "Organizador",

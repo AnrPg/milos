@@ -25,7 +25,8 @@ export type IconName =
   | "leaf"
   | "plus"
   | "card"
-  | "file";
+  | "file"
+  | "bag";
 
 const ICON_PATHS: Record<IconName, ReactNode> = {
   users: (
@@ -110,6 +111,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     <>
       <path d="M7 3.5h7l4 4v13H7z" />
       <path d="M14 3.5v4h4M10 12h5M10 15.5h5" />
+    </>
+  ),
+  bag: (
+    <>
+      <path d="M5 8h14l-1 13H6z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
     </>
   ),
 };

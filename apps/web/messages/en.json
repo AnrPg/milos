@@ -75,7 +75,8 @@
     "notificationsShort": "Alerts",
     "messages": "Messages",
     "messagesUnread": "Messages ({count} unread)",
-    "socialApp": "Social"
+    "socialApp": "Social",
+    "shop": "Shop"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -6817,7 +6818,6 @@
     "placeAddress": "Area around this address",
     "placeAdding": "Adding…",
     "worldwideUnavailable": "Worldwide search is unavailable right now, so only places we already know are shown.",
-    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)",
     "placeUnknown": "Area",
     "from": "From: {place}",
     "searchingFrom": "Searching from: {place}",
@@ -6945,7 +6945,8 @@
     "visibilityNeedsArea": "They only show once you've set “My area”.",
     "notifTitle": "New near you",
     "notifBody": "New for “{name}”: {count}",
-    "myDisciplines": "My sports"
+    "myDisciplines": "My sports",
+    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)"
   },
   "CheckIn": {
     "loading": "Loading…",
@@ -10264,6 +10265,476 @@
     "groupsHint": "Members of at least one chosen group can claim it. With packages too, they need both.",
     "sum_groups": "{count, plural, one {# group} other {# groups}}",
     "problem_groups": "Choose at least one group."
+  },
+  "ShopConsole": {
+    "title": "Shop",
+    "loading": "Loading…",
+    "noAccess": "You do not have access to the shop.",
+    "openState": "Open · {count, plural, one {# product} other {# products}}",
+    "closedState": "Closed to members",
+    "pos": {
+      "loading": "Loading…",
+      "noAccess": "The till needs the right to take payments.",
+      "back": "Shop",
+      "title": "Till",
+      "branch": "Branch",
+      "products": "Products",
+      "search": "Product, code or barcode",
+      "noProducts": "No active products sell at the till.",
+      "left": "{count} left",
+      "pickVariant": "Choose a variant of {product}",
+      "sale": "Sale",
+      "walkIn": "Customer without an account",
+      "walkInName": "Name (optional)",
+      "member": "Member",
+      "unpaid": "Unpaid balance {amount}",
+      "noUnpaid": "Nothing unpaid",
+      "packageDiscount": "−{percent}% from the package",
+      "emptyCart": "Tap a product to add it.",
+      "charged": "Charged · {order}. The sale shows in the member's Transactions.",
+      "quantityOf": "Quantity of {item}",
+      "short": "Only {count} in stock",
+      "discount": "Package discount −{percent}%",
+      "total": "Total",
+      "payment": "Payment",
+      "methods": {
+        "cash": "Cash",
+        "card_manual": "Card at the terminal"
+      },
+      "manualNote": "Card payments run on your terminal; here you record them.",
+      "manualNoteOnlineLater": "Card payments run on your terminal; here you record them. Online card payment comes later.",
+      "charge": "Charge {amount}",
+      "charging": "Charging…",
+      "pickMember": "Choose the member, or switch to a customer without an account.",
+      "receiptNote": "An invoice is issued with the payment, like any other sale in Finance."
+    },
+    "newProduct": "New product",
+    "branchNote": "Orders, stock and reports show the chosen branches only.",
+    "tabs": {
+      "products": "Products",
+      "orders": "Orders",
+      "stock": "Stock",
+      "analytics": "Analytics"
+    },
+    "empty": {
+      "title": "Sell to your members from the app",
+      "body": "Members order from Box and collect at the front desk. You see what to prepare and how much is left. The front desk can also sell from the till.",
+      "steps": {
+        "product": {
+          "title": "Add your first product",
+          "body": "Photo, price and sizes. It starts as a draft."
+        },
+        "pickup": {
+          "title": "Check the pickup point",
+          "body": "Members collect at the front desk of their branch."
+        },
+        "publish": {
+          "title": "Publish to open the shop",
+          "body": "The Shop card appears in members' Box once a product is published."
+        }
+      },
+      "addProduct": "New product",
+      "pickupSettings": "Pickup settings",
+      "membersNote": "Until you publish, members see no shop card in Box. Once open, it keeps a fixed place under the membership."
+    },
+    "products": {
+      "title": "Products",
+      "filter": "Show products",
+      "filters": {
+        "all": "All",
+        "published": "Active",
+        "draft": "Drafts",
+        "low_stock": "Low stock",
+        "archived": "Archived"
+      },
+      "search": "Search products",
+      "loading": "Loading products…",
+      "none": "No products here.",
+      "from": "from {price}",
+      "variants": "{count, plural, one {# variant} other {# variants}}",
+      "stockMeter": "{count} in stock",
+      "stockUnits": "{count, plural, one {# unit} other {# units}}",
+      "stockWeakest": "{count, plural, one {# unit} other {# units}} · {variant}: {left} left",
+      "status": {
+        "draft": "Draft",
+        "published": "Active",
+        "archived": "Archived"
+      }
+    },
+    "editor": {
+      "loading": "Loading product…",
+      "noAccess": "You cannot edit shop products.",
+      "back": "Products",
+      "newTitle": "New product",
+      "promote": "Promote",
+      "status": {
+        "draft": "Draft",
+        "published": "Active",
+        "archived": "Archived"
+      },
+      "photos": {
+        "title": "Photos",
+        "hint": "Square photos look best. The first one shows in the list.",
+        "alt": "Product photo {index}",
+        "uploading": "Uploading…",
+        "failed": "Upload failed",
+        "cover": "Cover",
+        "makeCover": "Make cover",
+        "remove": "Remove",
+        "add": "Add photos"
+      },
+      "basics": {
+        "title": "Details",
+        "name": "Name",
+        "description": "Description",
+        "category": "Category",
+        "categoryHint": "e.g. Apparel"
+      },
+      "price": {
+        "title": "Price",
+        "price": "Price incl. VAT (€)",
+        "compareAt": "Compare-at price (€)",
+        "cost": "Cost price (€, only for you)",
+        "hint": "The compare-at price shows struck through. The cost price feeds the margin in Analytics and is never shown to members."
+      },
+      "variants": {
+        "title": "Options and stock",
+        "hint": "Up to two options, such as size and colour. Stock is counted per combination and branch.",
+        "addSize": "Add an option (e.g. size)",
+        "addColour": "Add a second option (e.g. colour)",
+        "optionName": "Option",
+        "optionNameHint": "e.g. Size",
+        "removeOption": "Remove option",
+        "values": "Values",
+        "removeValue": "Remove {value}",
+        "newValue": "New value",
+        "newValueHint": "e.g. M",
+        "addValue": "Add",
+        "list": "Variants",
+        "single": "One kind",
+        "price": "Price (€)",
+        "priceOf": "Price of {variant}",
+        "same": "Same ({price})",
+        "stock": "Stock",
+        "onHand": "{count} on hand · {reserved} reserved",
+        "openingOf": "Opening stock of {variant} at {branch}",
+        "ledgerNote": "Stock of saved variants changes from the Stock tab, so every change has a reason."
+      },
+      "selling": {
+        "title": "Selling",
+        "channel": "Where it sells",
+        "channels": {
+          "both": "App and till",
+          "app": "App only",
+          "desk": "Till only"
+        },
+        "visibility": "Who can buy",
+        "visibilities": {
+          "members_only": "Members only",
+          "anyone": "Visitors too"
+        },
+        "visibilityHint": "Visitors too: it also shows on the box's public page, for anyone with a Palee account.",
+        "memberDiscount": "Package member discount",
+        "memberDiscountHint": "The member's package percentage applies to this product.",
+        "status": "Status",
+        "newIsDraft": "New products start as drafts. Publish after saving."
+      },
+      "errors": {
+        "title": "Give the product a name.",
+        "price": "Enter a price above zero.",
+        "compareAt": "The compare-at price is not a valid amount.",
+        "cost": "The cost price is not a valid amount.",
+        "variantPrice": "The price of {variant} is not a valid amount."
+      },
+      "save": "Save",
+      "create": "Create draft",
+      "saving": "Saving…",
+      "saved": "Saved."
+    },
+    "promote": {
+      "eyebrow": "Promote",
+      "where": "Where to post",
+      "targets": {
+        "announcements": "Announcements",
+        "channel": "Member group",
+        "feed": "Feed"
+      },
+      "targetHints": {
+        "announcements": "A club post in the announcements channel, with the product card attached.",
+        "channel": "Only the members of one group see the post.",
+        "feed": "Your box's post in the Feed of your members and followers."
+      },
+      "group": "Group",
+      "groupPick": "Choose a group",
+      "text": "Post text",
+      "defaultBody": "New in the shop: {product}. Order it from the app and collect it at the front desk.",
+      "preview": "Preview",
+      "cardCta": "View",
+      "code": "Discount code",
+      "codeHint": "A code for this product only, in Finance › Offers.",
+      "codeValue": "Code",
+      "percent": "Discount (%)",
+      "endsOn": "Valid until",
+      "newLabel": "The shop shows a New label on its own for 14 days after publishing.",
+      "errors": {
+        "body": "Write the post text.",
+        "group": "Choose a group.",
+        "code": "Enter a code and a discount between 1 and 100%."
+      },
+      "cancel": "Cancel",
+      "post": "Post",
+      "posting": "Posting…"
+    },
+    "orders": {
+      "title": "Orders",
+      "filter": "Show orders",
+      "status": {
+        "placed": "To prepare",
+        "ready_for_pickup": "Ready",
+        "picked_up": "Picked up",
+        "cancelled": "Cancelled"
+      },
+      "none": {
+        "placed": "Nothing to prepare.",
+        "ready_for_pickup": "No orders waiting for pickup.",
+        "picked_up": "No picked-up orders yet.",
+        "cancelled": "No cancelled orders."
+      },
+      "loading": "Loading orders…",
+      "walkIn": "Walk-in customer",
+      "channel": {
+        "online": "from the app",
+        "pos": "at the till"
+      },
+      "payment": {
+        "pending_payment": "To pay",
+        "paid": "Paid",
+        "partially_refunded": "Partly refunded",
+        "refunded": "Refunded",
+        "void": "Void"
+      },
+      "mode": {
+        "at_pickup": "At pickup",
+        "on_account": "On account",
+        "online": "Online",
+        "cash": "Cash",
+        "card_manual": "Card at the terminal",
+        "bank_transfer": "Bank transfer",
+        "other": "Other"
+      },
+      "reserveNote": "Orders hold their stock until pickup or cancellation. Orders not picked up in 7 days cancel on their own, with a reminder to the member on day 3.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} refunded",
+      "discount": "Discount",
+      "total": "Total",
+      "totalWithInvoice": "Total · invoice {invoice}",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "paymentMode": "Payment",
+      "code": "Code",
+      "timeline": "History",
+      "timelinePlaced": "Placed {channel} · {when}",
+      "timelineReady": "Ready for pickup · {when}",
+      "timelinePickedUp": "Picked up · {when}",
+      "timelineCancelled": "Cancelled · {when}",
+      "timelineExpires": "Pickup by {when}",
+      "markReady": "Ready for pickup",
+      "readyHint": "Ready sends the member a notification with where and when to collect.",
+      "markPickedUp": "Picked up",
+      "collect": "Collect {amount}",
+      "method": "Payment method",
+      "collectHint": "The payment is recorded on the order's invoice. The member sees it in Transactions.",
+      "confirmPickup": "Confirm pickup",
+      "cancel": "Cancel order",
+      "cancelReason": "Reason (optional)",
+      "cancelHint": "Cancelling releases the reserved stock.",
+      "confirmCancel": "Cancel order",
+      "refund": "Refund",
+      "refundWhat": "What comes back?",
+      "refundQty": "Quantity of {item} to refund",
+      "restock": "Back to stock",
+      "refundHint": "A refund issues the refund receipt. Leave Back to stock off for damaged items.",
+      "confirmRefund": "Refund",
+      "back": "Back"
+    },
+    "stock": {
+      "title": "Stock",
+      "filter": "Show stock",
+      "views": {
+        "attention": "Needs reordering",
+        "all": "All variants"
+      },
+      "none": {
+        "attention": "Nothing needs reordering.",
+        "all": "No variants yet."
+      },
+      "loading": "Loading stock…",
+      "units": "{count, plural, one {# unit} other {# units}}",
+      "daysLeft": "~{count, plural, one {# day} other {# days}}",
+      "reserved": "{count} reserved",
+      "history": "Movements",
+      "adjust": "Adjust",
+      "policyNote": "The state comes from the days of stock left at the current pace: critical under 7 days, low under 21. Alerts fire only when it gets worse, and stock joins the daily digest.",
+      "recent": "Recent movements",
+      "allMovements": "All movements",
+      "historyOf": "Movements · {item}",
+      "noMovements": "No movements yet.",
+      "kinds": {
+        "receive": "Delivery",
+        "sale": "Sale",
+        "refund_restock": "Return to stock",
+        "adjustment": "Adjustment",
+        "transfer": "Transfer",
+        "reserve": "Reserved for an order",
+        "release": "Released"
+      },
+      "reasons": {
+        "recount": "Recount",
+        "damage": "Damage",
+        "loss": "Loss",
+        "return": "Return",
+        "other": "Other"
+      },
+      "adjustEyebrow": "Stock movement",
+      "reason": "What happened",
+      "form": {
+        "receive": "Delivery",
+        "recount": "Recount",
+        "damage": "Damage",
+        "loss": "Loss",
+        "return": "Return"
+      },
+      "quantity": "Quantity",
+      "counted": "Counted on the shelf",
+      "unitCost": "Cost per unit (€)",
+      "note": "Note",
+      "noteHint": "e.g. supplier invoice 0891",
+      "now": "Now {count} on hand",
+      "after": "{from} → {to} on hand",
+      "errors": {
+        "amount": "Enter a quantity that changes the stock."
+      },
+      "cancel": "Cancel",
+      "record": "Record"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "loading": "Loading reports…",
+      "unavailable": "The shop reports are not available yet.",
+      "range": "Period",
+      "ranges": {
+        "28": "4 weeks",
+        "84": "12 weeks",
+        "365": "12 months"
+      },
+      "kpi": {
+        "sales": "Net sales",
+        "salesChange": "Net sales · {change, number}% vs the previous period",
+        "margin": "Gross margin (where cost is known · {costed}/{total} products)",
+        "units": "Units · {orders, plural, one {# order} other {# orders}}",
+        "stockValue": "Stock value at cost · {count} low"
+      },
+      "weekly": "Sales per week",
+      "weeklyHint": "Net of discounts and refunds. The current week, still running, is lighter.",
+      "weekOf": "Week of {date}",
+      "net": "Net",
+      "noSales": "No sales in this period.",
+      "top": "Top products",
+      "product": "Product",
+      "units": "Units",
+      "revenue": "Revenue",
+      "marginCol": "Margin",
+      "marginHint": "“—”: the cost price is missing, so it stays out of the margin rather than counting as 100%.",
+      "channels": "App or till",
+      "channel": {
+        "online": "App (pickup)",
+        "pos": "Till"
+      },
+      "branches": "By branch",
+      "noBranch": "No branch",
+      "attribution": "Where sales came from",
+      "attributionHint": "An order goes to the code it used, else to the post or offer the product was opened from within 7 days, else to the Shop card in Box.",
+      "source": {
+        "club_post": "Post",
+        "promotion_code": "Code",
+        "public_page": "Public page",
+        "direct": "Shop card in Box",
+        "desk": "Till",
+        "other": "Other"
+      },
+      "codeRow": "Code {code}",
+      "ordersMoney": "{count, plural, one {# order} other {# orders}} · {amount}",
+      "unattributed": "Without attribution: {count, plural, one {# order} other {# orders}} · {amount}",
+      "lowStock": "Low stock",
+      "noLowStock": "Nothing is running low.",
+      "left": "{count} left",
+      "openStock": "Open Stock",
+      "pricing": {
+        "title": "Pricing indicators",
+        "hint": "Per variant, over the chosen period. The suggested range is advisory: you set your prices.",
+        "none": "No variants with sales or stock yet.",
+        "marginShort": "margin {margin}%",
+        "noCost": "no cost price",
+        "perWeek": "{value}/week",
+        "margin": "Margin",
+        "markup": "Markup",
+        "sellThrough": "Sell-through",
+        "daysOfStock": "Days of stock",
+        "velocity": "Sold per week",
+        "sold": "Sold",
+        "discountEffect": "Discount effect",
+        "lift": "{change, number}% units per order · {share}% of units",
+        "priceChange": "Last price change",
+        "velocityChange": "{from} → {to}: {before} → {after}/week",
+        "position": {
+          "below": "Below the range",
+          "within": "Within the range",
+          "above": "Above the range"
+        },
+        "suggested": "Suggested price range",
+        "advisory": "Advisory",
+        "range": "{low} – {high}",
+        "noRange": "No range without a cost price.",
+        "inputs": "How it is worked out",
+        "inputCostPlus": "Cost {cost} at a {margin}% target margin ({source}).",
+        "sourceCategory": "the category's target",
+        "sourceDefault": "the default target",
+        "inputNoCost": "Add the cost price to get a range.",
+        "pace": {
+          "fast": "It sells {velocity}/week, at least 1.5× its category's median ({median}/week), so the range reaches above cost-plus.",
+          "slow": "It sells {velocity}/week, at most half its category's median ({median}/week), so the range reaches below cost-plus, never below cost.",
+          "normal": "It sells {velocity}/week, about its category's pace ({median}/week).",
+          "unknown": "Not enough sales yet to compare its pace with its category."
+        },
+        "priceSensitive": "Demand looks price-sensitive, so the upward room is halved.",
+        "yourCall": "Advisory only: the box sets its prices."
+      }
+    },
+    "finance": {
+      "eyebrow": "Revenue by stream",
+      "title": "Where the money comes from",
+      "streams": {
+        "membership": "Memberships",
+        "package": "PT packages and services",
+        "event": "Events and seasons",
+        "shop": "Shop",
+        "other": "Other"
+      },
+      "hint": "Each payment gets its stream from its source, never from its text. Refunds net out within the same stream.",
+      "recent": "Latest shop sales",
+      "desk": "Till"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "In stock",
+      "low": "Low",
+      "critical": "Critical",
+      "out": "Sold out"
+    },
+    "compareAt": "Was {price}",
+    "less": "One less",
+    "more": "One more"
   },
   "EventWizard": {
     "step_host": "Host",
