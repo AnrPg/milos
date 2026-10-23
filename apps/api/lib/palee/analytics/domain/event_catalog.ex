@@ -51,6 +51,26 @@ defmodule Palee.Analytics.Domain.EventCatalog do
   #           :user_subject_day - once per actor, subject and UTC day
   #           :explicit      - the caller supplies `dedupe_key` (namespaced)
   @instrumented_events %{
+    # E-shop (ADR-190): the audit trail of orders, money, stock and catalog.
+    # Orders are recorded once per subject and transition (retries collapse).
+    "shop_order_placed" =>
+      {"shop_order", [:number, :channel, :payment_mode, :source, :total_cents, :currency],
+       :subject},
+    "shop_order_paid" =>
+      {"shop_order", [:number, :channel, :payment_mode, :total_cents, :currency], :subject},
+    "shop_order_ready" => {"shop_order", [:number, :channel], :subject},
+    "shop_order_picked_up" => {"shop_order", [:number, :channel], :subject},
+    "shop_order_cancelled" => {"shop_order", [:number, :channel], :subject},
+    "shop_order_refunded" => {"shop_order", [:number, :channel, :currency], nil},
+    "shop_stock_moved" =>
+      {"shop_stock_movement", [:variant_id, :location_id, :kind, :quantity, :reason], nil},
+    "shop_stock_status_changed" => {"shop_variant", [:product_id, :stock_status], nil},
+    "shop_product_created" => {"shop_product", [:status, :visibility], nil},
+    "shop_product_status_changed" => {"shop_product", [:status, :visibility], nil},
+    "shop_variant_price_changed" =>
+      {"shop_variant",
+       [:product_id, :price_cents, :currency, :compare_at_price_cents, :cost_price_cents], nil},
+    "shop_product_promoted" => {"shop_product", [], nil},
     # Workouts
     "workout_created" => {"workout", [:status, :type, :authoring_mode], nil},
     "workout_published" =>

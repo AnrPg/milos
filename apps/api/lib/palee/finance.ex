@@ -643,4 +643,57 @@ defmodule Palee.Finance do
 
   def subscriptions_due_for_expiry_reminder(context, today),
     do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
+
+  # ── Revenue streams (ADR-190) ───────────────────────────────────────────
+  # Money rows of streams other than memberships (the shop), tagged with
+  # their `revenue_stream` and source, in the same tables and numbering.
+
+  alias Palee.Finance.Domain.RevenueStream
+  alias Palee.Finance.RevenueStreamStore
+
+  defdelegate revenue_streams(), to: RevenueStream, as: :keys
+
+  @doc """
+  The buyer's membership id and package member discount on products
+  (ADR-097), or nil when the person has no membership here.
+  """
+  def member_shop_terms(context, user_id),
+    do: scoped(context, fn -> FinanceStore.member_shop_terms(user_id) end)
+
+  @doc "An issued invoice with lines, each naming its source row (`source_type`, `source_id`)."
+  def record_stream_invoice(context, attrs), do: RevenueStreamStore.record_invoice(context, attrs)
+
+  @doc "The payment of a stream invoice; idempotent per `source_type` / `source_id`."
+  def record_stream_payment(context, attrs), do: RevenueStreamStore.record_payment(context, attrs)
+
+  @doc "A refund of a stream payment; the reversal keeps the payment's stream and source."
+  def reverse_stream_payment(context, attrs),
+    do: RevenueStreamStore.reverse_payment(context, attrs)
+
+  def void_stream_invoice(context, invoice_id, attrs \\ %{}),
+    do: RevenueStreamStore.void_invoice(context, invoice_id, attrs)
+
+  @doc "Records the legal receipt reference (myDATA MARK, register receipt) of an invoice."
+  def set_fiscal_receipt_ref(context, invoice_id, ref),
+    do: RevenueStreamStore.set_fiscal_receipt_ref(context, invoice_id, ref)
+
+  @doc """
+  Paid, refunded and net revenue per stream and currency between two dates
+  (inclusive). `filters[:user_ids]` narrows to people (ADR-186 §7 branch
+  filter).
+  """
+  def revenue_by_stream(context, %Date{} = from, %Date{} = to, filters \\ %{}) do
+    %{payments: payments, reversals: reversals} =
+      RevenueStreamStore.stream_rows(context, from, to, filters)
+
+    RevenueStream.totals(payments, reversals)
+  end
+
+  @doc "The Finance rows of one source row (lineage drill-down)."
+  def revenue_lineage(context, source_type, source_id),
+    do: RevenueStreamStore.lineage(context, source_type, source_id)
+
+  @doc "A person's invoices of `stream` with their payments and reversals."
+  def stream_invoices_for_user(context, stream, user_id),
+    do: RevenueStreamStore.list_for_user(context, stream, user_id)
 end

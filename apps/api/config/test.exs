@@ -1,5 +1,8 @@
 import Config
 
+# ADR-190: the mock card provider simulates success and failure in tests.
+config :palee, Palee.Infrastructure.Shop.MockPaymentProvider, mode: :simulate
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used

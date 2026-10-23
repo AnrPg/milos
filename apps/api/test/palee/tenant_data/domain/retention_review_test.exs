@@ -96,7 +96,7 @@ defmodule Palee.TenantData.Domain.RetentionReviewTest do
              Enum.find_index(order, &(&1 == "notifications"))
   end
 
-  test "only finance retains records in full; analytics retains anonymized events" do
+  test "only finance and its shop source documents retain records in full; analytics retains anonymized events" do
     by_context = Map.new(TenantDataContexts.policies(), &{&1.context, &1})
 
     assert by_context["finance"].disposition == :retain
@@ -105,8 +105,12 @@ defmodule Palee.TenantData.Domain.RetentionReviewTest do
     assert by_context["analytics"].disposition == :retain_anonymized
     assert "user_id" in by_context["analytics"].anonymized_columns
 
+    # ADR-190: shop orders are the source rows of Finance's shop revenue.
+    assert by_context["shop"].disposition == :retain
+    assert by_context["shop"].retain_years == by_context["finance"].retain_years
+
     assert by_context
-           |> Map.drop(["finance", "analytics"])
+           |> Map.drop(["finance", "shop", "analytics"])
            |> Map.values()
            |> Enum.all?(&(&1.disposition == :purge))
   end
