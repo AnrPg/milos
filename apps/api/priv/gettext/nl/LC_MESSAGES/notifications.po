@@ -642,3 +642,36 @@ msgstr "Je demobedrijf wacht op je"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "%{business} is al een tijd niet gebruikt. Als niemand het in de komende %{days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen."
+
+msgid "Shop stock running low"
+msgstr "Winkelvoorraad raakt op"
+
+msgid "New shop order"
+msgstr "Nieuwe winkelbestelling"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "Bestelling #%{number} wacht om klaargemaakt te worden."
+
+msgid "Your order is ready"
+msgstr "Je bestelling is klaar"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "Bestelling #%{number} ligt klaar om op te halen."
+
+msgid "Your order is waiting for you"
+msgstr "Je bestelling wacht op je"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "Bestelling #%{number} ligt klaar om op te halen. Je code: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "Je bestelling is geannuleerd"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "Bestelling #%{number} is geannuleerd en er is niets afgeschreven."
+
+msgid "Back in stock"
+msgstr "Weer op voorraad"
+
+msgid "%{item} is available again."
+msgstr "%{item} is weer beschikbaar."

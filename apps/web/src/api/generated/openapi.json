@@ -60786,11 +60786,11 @@
         },
         "required": [
           "window",
-          "by_source",
-          "unattributed",
           "attributed",
+          "by_campaign",
           "by_promotion_code",
-          "by_campaign"
+          "by_source",
+          "unattributed"
         ],
         "title": "ShopAttributionReport",
         "type": "object"
@@ -61478,8 +61478,8 @@
         "required": [
           "window",
           "items",
-          "totals",
-          "low_stock"
+          "low_stock",
+          "totals"
         ],
         "title": "ShopInventoryReport",
         "type": "object"
@@ -61819,8 +61819,8 @@
         },
         "required": [
           "window",
-          "totals",
-          "products"
+          "products",
+          "totals"
         ],
         "title": "ShopMarginReport",
         "type": "object"
@@ -63378,9 +63378,9 @@
         },
         "required": [
           "window",
+          "categories",
           "variants",
-          "window_days",
-          "categories"
+          "window_days"
         ],
         "title": "ShopPricingIndicators",
         "type": "object"
@@ -65413,8 +65413,8 @@
         },
         "required": [
           "window",
-          "totals",
-          "series"
+          "series",
+          "totals"
         ],
         "title": "ShopSalesReport",
         "type": "object"
@@ -173331,11 +173331,11 @@
                   },
                   "required": [
                     "window",
-                    "by_source",
-                    "unattributed",
                     "attributed",
+                    "by_campaign",
                     "by_promotion_code",
-                    "by_campaign"
+                    "by_source",
+                    "unattributed"
                   ],
                   "title": "ShopAttributionReport",
                   "type": "object"
@@ -173784,8 +173784,8 @@
                   "required": [
                     "window",
                     "items",
-                    "totals",
-                    "low_stock"
+                    "low_stock",
+                    "totals"
                   ],
                   "title": "ShopInventoryReport",
                   "type": "object"
@@ -173970,8 +173970,8 @@
                   },
                   "required": [
                     "window",
-                    "totals",
-                    "products"
+                    "products",
+                    "totals"
                   ],
                   "title": "ShopMarginReport",
                   "type": "object"
@@ -174395,9 +174395,9 @@
                   },
                   "required": [
                     "window",
+                    "categories",
                     "variants",
-                    "window_days",
-                    "categories"
+                    "window_days"
                   ],
                   "title": "ShopPricingIndicators",
                   "type": "object"
@@ -175053,8 +175053,8 @@
                   },
                   "required": [
                     "window",
-                    "totals",
-                    "series"
+                    "series",
+                    "totals"
                   ],
                   "title": "ShopSalesReport",
                   "type": "object"

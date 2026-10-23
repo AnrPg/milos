@@ -642,3 +642,36 @@ msgstr "Votre entreprise de démonstration vous attend"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "Personne n'a utilisé %{business} depuis un moment. Si personne ne l'ouvre dans les %{days} prochains jours, ses données de démonstration seront supprimées et elle sera archivée. Vous pourrez la rouvrir à tout moment."
+
+msgid "Shop stock running low"
+msgstr "Stock de la boutique bientôt épuisé"
+
+msgid "New shop order"
+msgstr "Nouvelle commande en boutique"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "La commande #%{number} attend d'être préparée."
+
+msgid "Your order is ready"
+msgstr "Ta commande est prête"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "La commande #%{number} est prête à être retirée."
+
+msgid "Your order is waiting for you"
+msgstr "Ta commande t'attend"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "La commande #%{number} est prête à être retirée. Ton code : %{code}."
+
+msgid "Your order was cancelled"
+msgstr "Ta commande a été annulée"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "La commande #%{number} a été annulée et rien n'a été facturé."
+
+msgid "Back in stock"
+msgstr "De nouveau disponible"
+
+msgid "%{item} is available again."
+msgstr "%{item} est de nouveau disponible."

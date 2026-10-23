@@ -642,3 +642,36 @@ msgstr "Dein Demo-Unternehmen wartet auf dich"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "%{business} wurde seit einer Weile nicht genutzt. Wenn es in den nächsten %{days} Tagen niemand öffnet, werden die Demodaten entfernt und es wird archiviert. Du kannst es jederzeit wieder öffnen."
+
+msgid "Shop stock running low"
+msgstr "Shop-Bestand wird knapp"
+
+msgid "New shop order"
+msgstr "Neue Shop-Bestellung"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "Bestellung #%{number} wartet darauf, vorbereitet zu werden."
+
+msgid "Your order is ready"
+msgstr "Deine Bestellung ist fertig"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "Bestellung #%{number} ist abholbereit."
+
+msgid "Your order is waiting for you"
+msgstr "Deine Bestellung wartet auf dich"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "Bestellung #%{number} ist abholbereit. Dein Code: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "Deine Bestellung wurde storniert"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "Bestellung #%{number} wurde storniert, es wurde nichts berechnet."
+
+msgid "Back in stock"
+msgstr "Wieder verfügbar"
+
+msgid "%{item} is available again."
+msgstr "%{item} ist wieder verfügbar."
