@@ -81,7 +81,8 @@ defmodule PaleeWeb.FallbackController do
     promotion_code_not_applicable: {:unprocessable_entity, "This code is for another product"},
     promotion_code_changed: {:conflict, "This code changed; check the basket again"},
     product_not_promotable: {:conflict, "Publish the product in the app before promoting it"},
-    invalid_promotion_target: {:unprocessable_entity, "Choose where the post goes"}
+    invalid_promotion_target: {:unprocessable_entity, "Choose where the post goes"},
+    buyer_required: {:unprocessable_entity, "Name the member or their pickup code"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@shop_errors, reason) do

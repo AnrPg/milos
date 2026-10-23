@@ -20,6 +20,7 @@ defmodule Palee.Shop.Domain.TenantDataPolicy do
               %{table: "shop_order_lines"},
               %{table: "shop_orders"},
               %{table: "shop_promotion_codes"},
+              %{table: "shop_stock_alerts"},
               %{table: "shop_stock_movements"},
               %{table: "shop_stock_levels"},
               %{table: "shop_variants"},

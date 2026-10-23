@@ -25,6 +25,50 @@ defmodule PaleeWeb.MyShopController do
 
   @id S.id_param()
 
+  operation(:storefront,
+    summary:
+      "The box's shop for the member: open or not, products, categories, pickup branches, member discount and online payment",
+    responses: [ok: {"Storefront", "application/json", S.storefront()}]
+  )
+
+  def storefront(conn, _params) do
+    context = conn.assigns.tenant_context
+    front = MemberShop.storefront(context)
+    json(conn, %{front | products: ProductMedia.attach(context, front.products)})
+  end
+
+  operation(:stock_alerts,
+    summary: "The member's «Ειδοποίησέ με» requests",
+    responses: [ok: {"Alerts", "application/json", S.many(:stock_alerts, S.stock_alert())}]
+  )
+
+  def stock_alerts(conn, _params),
+    do: json(conn, %{stock_alerts: MemberShop.back_in_stock_alerts(conn.assigns.tenant_context)})
+
+  operation(:subscribe_stock_alert,
+    summary: "«Ειδοποίησέ με»: be told when this variant is back in stock",
+    parameters: [@id],
+    responses: [ok: {"Alert", "application/json", S.one(:stock_alert, S.stock_alert())}]
+  )
+
+  def subscribe_stock_alert(conn, %{id: id}) do
+    with {:ok, alert} <- MemberShop.subscribe_back_in_stock(conn.assigns.tenant_context, id) do
+      json(conn, %{stock_alert: alert})
+    end
+  end
+
+  operation(:unsubscribe_stock_alert,
+    summary: "Stop waiting for this variant",
+    parameters: [@id],
+    responses: [no_content: "Removed"]
+  )
+
+  def unsubscribe_stock_alert(conn, %{id: id}) do
+    with :ok <- MemberShop.unsubscribe_back_in_stock(conn.assigns.tenant_context, id) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
   operation(:products,
     summary: "The box's shop: published products sold in the app",
     parameters: [

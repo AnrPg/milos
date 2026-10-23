@@ -337,6 +337,11 @@ defmodule PaleeWeb.Schemas.Shop do
       properties: %{
         id: @uuid,
         number: %Schema{type: :integer},
+        pickup_code: %Schema{
+          type: :string,
+          nullable: true,
+          description: "The short code the buyer shows at the desk"
+        },
         state: %Schema{type: :string, enum: @states},
         status: %Schema{type: :string, enum: ~w(placed ready_for_pickup picked_up cancelled)},
         payment_status: %Schema{
@@ -429,6 +434,7 @@ defmodule PaleeWeb.Schemas.Shop do
         },
         online_payment: online_payment(),
         promotion_code_id: @nullable_uuid,
+        member_discount: member_discount(),
         promotion_code: %Schema{
           type: :object,
           nullable: true,
@@ -910,6 +916,68 @@ defmodule PaleeWeb.Schemas.Shop do
         provider: @text
       },
       required: [:id, :channel, :available]
+    }
+  end
+
+  # ── Member storefront ────────────────────────────────────────────────────
+
+  def member_discount do
+    %Schema{
+      title: "ShopMemberDiscount",
+      type: :object,
+      nullable: true,
+      description:
+        "The member's package discount: on products marked member_discount_applies, never stacked with a promotion code",
+      properties: %{
+        percent: %Schema{type: :integer},
+        source: %Schema{type: :string, enum: ["membership_package"]},
+        applies_to: %Schema{type: :string, enum: ["marked_products"]}
+      },
+      required: [:percent]
+    }
+  end
+
+  def storefront do
+    %Schema{
+      title: "ShopStorefront",
+      type: :object,
+      properties: %{
+        open: %Schema{type: :boolean},
+        closed_reason: %Schema{
+          type: :string,
+          nullable: true,
+          enum: ["no_products", "business_not_activated", nil]
+        },
+        products: %Schema{type: :array, items: member_product()},
+        categories: %Schema{type: :array, items: %Schema{type: :string}},
+        pickup_locations: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            properties: %{id: @uuid, name: @text, address: @text},
+            required: [:id]
+          }
+        },
+        member_discount: member_discount(),
+        online_payment: online_payment()
+      },
+      required: [:open, :products, :pickup_locations, :online_payment]
+    }
+  end
+
+  def stock_alert do
+    %Schema{
+      title: "ShopStockAlert",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        variant_id: @uuid,
+        product_id: @nullable_uuid,
+        notified_at: @time,
+        inserted_at: @time,
+        available: %Schema{type: :boolean, nullable: true}
+      },
+      required: [:id, :variant_id]
     }
   end
 end

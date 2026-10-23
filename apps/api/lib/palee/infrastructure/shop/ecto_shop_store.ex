@@ -17,13 +17,14 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
 
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Repo
-  alias Palee.Shop.Domain.StockLedger
+  alias Palee.Shop.Domain.{PickupCode, StockLedger}
 
   alias Palee.Shop.{
     Order,
     OrderLine,
     Product,
     PromotionCode,
+    StockAlert,
     StockLevel,
     StockMovement,
     Variant
@@ -469,9 +470,11 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     Repo.transaction(fn ->
       number = next_order_number(context)
 
+      # Drawn under the order-number lock, so a fresh code cannot race.
       order =
         attrs
         |> Map.put(:number, number)
+        |> Map.put(:pickup_code, free_pickup_code())
         |> Order.create_changeset()
         |> Ecto.Changeset.put_change(:organization_id, context.organization_id)
         |> Repo.insert()
@@ -568,6 +571,15 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
       {:number, number}, query when is_integer(number) ->
         where(query, [order], order.number == ^number)
 
+      {:pickup_code, code}, query when is_binary(code) ->
+        where(query, [order], order.pickup_code == ^code)
+
+      {:ready_before, %DateTime{} = at}, query ->
+        where(query, [order], order.ready_at <= ^at)
+
+      {:not_reminded, true}, query ->
+        where(query, [order], is_nil(order.reminded_at))
+
       # Money kept: paid in full or in part, not refunded in full.
       {:paid, true}, query ->
         where(query, [order], order.payment_status in [:paid, :partially_refunded])
@@ -601,6 +613,70 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     |> tenant_scope_join()
     |> Repo.all()
     |> Map.new(fn {id, units} -> {id, to_integer(units)} end)
+  end
+
+  defp free_pickup_code(attempts \\ 8) do
+    code = PickupCode.generate()
+
+    taken? =
+      Order |> tenant_scope() |> where([order], order.pickup_code == ^code) |> Repo.exists?()
+
+    cond do
+      not taken? -> code
+      attempts > 1 -> free_pickup_code(attempts - 1)
+      true -> nil
+    end
+  end
+
+  # ── Stock alerts («Ειδοποίησέ με») ───────────────────────────────────────
+
+  @impl true
+  def subscribe_stock_alert(context, variant_id, user_id) do
+    %StockAlert{}
+    |> StockAlert.changeset(%{variant_id: variant_id, user_id: user_id})
+    |> Ecto.Changeset.put_change(:organization_id, context.organization_id)
+    |> Repo.insert(
+      on_conflict: [set: [notified_at: nil, updated_at: DateTime.utc_now()]],
+      conflict_target: [:variant_id, :user_id],
+      returning: true
+    )
+  end
+
+  @impl true
+  def unsubscribe_stock_alert(_context, variant_id, user_id) do
+    StockAlert
+    |> tenant_scope()
+    |> where([alert], alert.variant_id == ^variant_id and alert.user_id == ^user_id)
+    |> Repo.delete_all()
+
+    :ok
+  end
+
+  @impl true
+  def list_stock_alerts(_context, filters) do
+    StockAlert
+    |> tenant_scope()
+    |> then(fn query ->
+      Enum.reduce(filters, query, fn
+        {:user_id, id}, query when is_binary(id) -> where(query, [a], a.user_id == ^id)
+        {:variant_ids, ids}, query when is_list(ids) -> where(query, [a], a.variant_id in ^ids)
+        {:pending, true}, query -> where(query, [a], is_nil(a.notified_at))
+        _other, query -> query
+      end)
+    end)
+    |> order_by([alert], desc: alert.inserted_at)
+    |> Repo.all()
+  end
+
+  @impl true
+  def mark_stock_alerts_notified(_context, ids, at) do
+    {count, _rows} =
+      StockAlert
+      |> tenant_scope()
+      |> where([alert], alert.id in ^ids and is_nil(alert.notified_at))
+      |> Repo.update_all(set: [notified_at: at, updated_at: at])
+
+    {:ok, count}
   end
 
   # ── Promotion codes ──────────────────────────────────────────────────────

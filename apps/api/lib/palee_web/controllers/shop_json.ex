@@ -6,6 +6,7 @@ defmodule PaleeWeb.ShopJSON do
   @order_fields [
     :id,
     :number,
+    :pickup_code,
     :status,
     :payment_status,
     :channel,

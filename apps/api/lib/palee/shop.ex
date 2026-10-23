@@ -112,6 +112,21 @@ defmodule Palee.Shop do
   def units_held(context, user_id, product_ids),
     do: ShopStore.units_held(context, user_id, product_ids)
 
+  # ── Stock alerts and pickup codes ──────────────────────────────────────
+
+  def subscribe_stock_alert(context, variant_id, user_id),
+    do: ShopStore.subscribe_stock_alert(context, variant_id, user_id)
+
+  def unsubscribe_stock_alert(context, variant_id, user_id),
+    do: ShopStore.unsubscribe_stock_alert(context, variant_id, user_id)
+
+  def list_stock_alerts(context, filters), do: ShopStore.list_stock_alerts(context, filters)
+
+  def mark_stock_alerts_notified(context, ids, at \\ DateTime.utc_now()),
+    do: ShopStore.mark_stock_alerts_notified(context, ids, at)
+
+  defdelegate normalize_pickup_code(code), to: Palee.Shop.Domain.PickupCode, as: :normalize
+
   # ── Promotion codes («Προώθηση») ───────────────────────────────────────
 
   defdelegate normalize_promotion_code(code), to: PromotionPolicy, as: :normalize_code

@@ -453,6 +453,12 @@ defmodule PaleeWeb.ShopController do
         schema: %Schema{type: :string, description: "Comma-separated branch ids"}
       },
       %Parameter{
+        name: :pickup_code,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, maxLength: 16}
+      },
+      %Parameter{
         name: :paid,
         in: :query,
         required: false,
@@ -477,6 +483,10 @@ defmodule PaleeWeb.ShopController do
       |> maybe_put(:statuses, params[:status] && [String.to_existing_atom(params[:status])])
       |> maybe_put(:location_ids, location_ids(params))
       |> maybe_put(:paid, if(params[:paid] == true, do: true))
+      |> maybe_put(
+        :pickup_code,
+        params[:pickup_code] && Shop.normalize_pickup_code(params[:pickup_code])
+      )
 
     %{orders: orders, counts: counts} = Fulfilment.list_view(conn.assigns.tenant_context, filters)
     json(conn, %{orders: Enum.map(orders, &ShopJSON.staff_order/1), counts: counts})
@@ -650,19 +660,35 @@ defmodule PaleeWeb.ShopController do
   end
 
   operation(:ready_orders,
-    summary: "A member's orders ready for pickup (the check-in desk's «παραγγελία έτοιμη»)",
+    summary:
+      "Orders ready for pickup for a member, or for the pickup code they show (the check-in desk's «παραγγελία έτοιμη»)",
     parameters: [
-      %Parameter{name: :user_id, in: :query, required: true, schema: S.uuid()},
+      %Parameter{name: :user_id, in: :query, required: false, schema: S.uuid()},
+      %Parameter{
+        name: :pickup_code,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, maxLength: 16}
+      },
       %Parameter{name: :location_id, in: :query, required: false, schema: S.uuid()}
     ],
     responses: [ok: {"Orders", "application/json", S.many(:orders, S.order())}]
   )
 
-  def ready_orders(conn, %{user_id: user_id} = params) do
-    orders =
-      Fulfilment.ready_for_member(conn.assigns.tenant_context, user_id, params[:location_id])
+  def ready_orders(conn, params) do
+    who =
+      case params do
+        %{pickup_code: code} when is_binary(code) -> {:pickup_code, code}
+        %{user_id: user_id} when is_binary(user_id) -> user_id
+        _neither -> nil
+      end
 
-    json(conn, %{orders: Enum.map(orders, &ShopJSON.staff_order/1)})
+    if who do
+      orders = Fulfilment.ready_for_member(conn.assigns.tenant_context, who, params[:location_id])
+      json(conn, %{orders: Enum.map(orders, &ShopJSON.staff_order/1)})
+    else
+      {:error, :buyer_required}
+    end
   end
 
   # ── Finance ──────────────────────────────────────────────────────────────

@@ -518,10 +518,15 @@ defmodule Palee.Application.Shop.ManageCatalog do
   defp price_changed?(before, saved),
     do: Enum.any?(@price_fields, &(Map.get(before, &1) != Map.get(saved, &1)))
 
-  @doc "Sends low-stock alerts for status changes that got worse."
+  @doc """
+  Sends low-stock alerts for status changes that got worse, and tells the
+  members who asked («Ειδοποίησέ με») when a sold-out variant is back.
+  """
   def alert_stock(context, changes) do
     Enum.each(changes, fn %{variant: variant, previous: previous, assessment: assessment} = change ->
       Observability.stock_status_changed(context, change)
+
+      if previous == :out and assessment.status != :out, do: back_in_stock(context, variant)
 
       if Shop.stock_alert?(previous, assessment.status) do
         product = Shop.get_product(context, variant.product_id)
@@ -537,6 +542,30 @@ defmodule Palee.Application.Shop.ManageCatalog do
         })
       end
     end)
+  end
+
+  # Each pending alert is marked sent in the same statement that claims it,
+  # so two restocks in a row notify a member once.
+  defp back_in_stock(context, variant) do
+    product = Shop.get_product(context, variant.product_id)
+
+    with %{} <- product,
+         true <- Shop.sellable?(product, :online),
+         [_ | _] = alerts <-
+           Shop.list_stock_alerts(context, %{variant_ids: [variant.id], pending: true}),
+         {:ok, _count} <- Shop.mark_stock_alerts_notified(context, Enum.map(alerts, & &1.id)) do
+      Enum.each(alerts, fn alert ->
+        Shop.notifier().back_in_stock(context, %{
+          user_id: alert.user_id,
+          product_id: product.id,
+          variant_id: variant.id,
+          product_title: product.title,
+          variant_title: variant.title
+        })
+      end)
+    end
+
+    :ok
   end
 
   defp visible(context, product) do

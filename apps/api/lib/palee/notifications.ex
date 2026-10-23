@@ -746,6 +746,35 @@ defmodule Palee.Notifications do
         url: "/box/shop/orders/#{field(payload, :order_id)}"
       })
 
+  def process_event("shop_order_reminder", payload),
+    do:
+      enqueue_simple(:shop_order_reminder, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        pickup_code: field(payload, :pickup_code),
+        pickup_location_id: field(payload, :pickup_location_id),
+        url: "/box/shop/orders/#{field(payload, :order_id)}"
+      })
+
+  def process_event("shop_order_cancelled", payload),
+    do:
+      enqueue_simple(:shop_order_cancelled, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        reason: field(payload, :reason),
+        url: "/box/shop/orders/#{field(payload, :order_id)}"
+      })
+
+  def process_event("shop_back_in_stock", payload),
+    do:
+      enqueue_simple(:shop_back_in_stock, payload, %{
+        product_id: field(payload, :product_id),
+        variant_id: field(payload, :variant_id),
+        product_title: field(payload, :product_title),
+        variant_title: field(payload, :variant_title),
+        url: "/box/shop/products/#{field(payload, :product_id)}"
+      })
+
   def process_event("inventory_digest", payload),
     do:
       enqueue_simple(:inventory_digest, payload, %{

@@ -448,6 +448,10 @@ defmodule PaleeWeb.Router do
     get("/referrals", ReferralController, :mine)
     post("/referrals/code", ReferralController, :rotate_code)
     # ADR-190: Box › Κατάστημα.
+    get("/shop/storefront", MyShopController, :storefront)
+    get("/shop/stock-alerts", MyShopController, :stock_alerts)
+    put("/shop/variants/:id/stock-alert", MyShopController, :subscribe_stock_alert)
+    delete("/shop/variants/:id/stock-alert", MyShopController, :unsubscribe_stock_alert)
     get("/shop/products", MyShopController, :products)
     get("/shop/products/:id", MyShopController, :product)
     post("/shop/cart/preview", MyShopController, :preview)
