@@ -776,6 +776,12 @@ defmodule PaleeWeb.PerksControllerTest do
 
       assert id == perk["id"]
 
+      # `GET /api/me/billing` carries them in the provider's `perks`.
+      assert %{"providers" => [%{"perks" => [billing], "partial" => false}]} =
+               ctx.as.(ctx.first) |> get("/api/me/billing") |> json_response(200)
+
+      assert %{"id" => ^id, "store" => "SupplementsX", "code" => "COACH-NIKOS"} = billing
+
       # Not a client: nothing.
       assert MemberPerks.for_member_provider(user_context(ctx.coach), ctx.organization.id) == []
     end

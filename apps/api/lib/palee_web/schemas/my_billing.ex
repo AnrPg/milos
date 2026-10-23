@@ -171,7 +171,7 @@ defmodule PaleeWeb.Schemas.MyBilling do
       title: "BillingPerk",
       type: :object,
       description:
-        "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+        "A partner perk (ADR-191) the person claimed at this provider and can still use, read from the version they agreed to: `discount` is the benefit in one line, `code` what to give the partner (the claim's reference for a show-your-membership perk), `url` the store link with the code applied, else the partner's site. Perks not claimed yet are listed by `GET /api/me/perks`.",
       required: [:id, :store, :code],
       properties: %{
         id: @uuid,
