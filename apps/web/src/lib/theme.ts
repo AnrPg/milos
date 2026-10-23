@@ -153,6 +153,10 @@ const BLACK = "#000000";
 const DOJO = "#2F5BFF";
 const DOJO_GLOW = "#5B7CFF";
 const SPARK = "#E4FF6E";
+// Spark's deeper tone for light pages: Sun Lime fades to cream next to Frost
+// and on lower-gamut laptop panels, so Frost uses a greener, denser lime
+// (still 15:1 with Graphite text). Graphite keeps Sun Lime, which glows there.
+const SPARK_DEEP = "#C8FF4D";
 const HEAT = "#E0203F";
 const HEAT_GLOW = "#FF4D6A";
 
@@ -178,7 +182,7 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       primary: DOJO,
       primaryStrong: "#1F45E0",
       primaryContrast: WHITE,
-      spark: SPARK,
+      spark: SPARK_DEEP,
       sparkContrast: GRAPHITE,
       heat: HEAT,
       heatContrast: WHITE,
@@ -195,7 +199,7 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       focusRing: DOJO,
       selection: "#C9D5FF",
       selectionText: GRAPHITE,
-      highlight: SPARK,
+      highlight: SPARK_DEEP,
       highlightText: GRAPHITE,
       controlBg: "#ECEEF2",
       controlBorder: "#A2A8B3",

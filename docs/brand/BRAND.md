@@ -286,7 +286,9 @@ Energy comes from three saturated colours; luxury comes only from the finish
   head. Glow tone on dark: `#5B7CFF`.
 - **Spark** (Sun Lime) `#E4FF6E`. What is alive right now: LIVE, new, challenges,
   palee counts. Always with Graphite text, or on Graphite. Chosen to sit clearly
-  away from Nike Volt.
+  away from Nike Volt. Deeper tone on light pages (the Frost theme): `#C8FF4D`, a greener,
+  denser lime, because Sun Lime fades to cream next to Frost and on laptop
+  panels with a smaller gamut. The mark and Graphite keep `#E4FF6E`.
 - **Heat** `#E0203F`. Emotion: palee! (kudos), PR, Comeback, the wordmark's dot,
   support moments. Glow tone on dark: `#FF4D6A`.
 - **Plum** `#2A0F2E` (optional). Marketing, merch and the member card only;

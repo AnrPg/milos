@@ -35,6 +35,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { workoutPublishedHref } from "@/lib/workout-return";
 import {
   COMMON_WORKOUT_WORDS,
   DEFAULT_WORKOUT_DSL_SOURCE,
@@ -500,7 +501,7 @@ export function QuickTextWorkoutEditor({
         expected_source_revision: revision,
         acknowledge_warnings: warningsAcknowledged,
       });
-      router.push(adminHref("/admin/workouts", organizationSlug));
+      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
     } catch (error) {
       if (
         error instanceof ApiError &&

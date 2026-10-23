@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { publishWorkoutDraft, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { workoutPublishedHref } from "@/lib/workout-return";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
 import { Select } from "@/components/ui/Select";
@@ -151,7 +152,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
       if (onPublished) {
         onPublished(workout);
       } else {
-        router.push(adminHref("/admin/workouts", organizationSlug));
+        router.push(workoutPublishedHref(new URLSearchParams(window.location.search), workout.id, adminHref("/admin/workouts", organizationSlug)));
       }
     } catch (error: unknown) {
       setPublishError(error instanceof Error ? localizeError(error, i18n) : i18n("publishFailed0b74ccb"));

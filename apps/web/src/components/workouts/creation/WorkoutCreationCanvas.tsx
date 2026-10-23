@@ -280,7 +280,10 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
           initDraft(draft.id, draft.dsl_source_revision ?? 0);
           draftLoadedRef.current = true;
           if (!embedded) {
-            router.replace(adminHref(`/admin/workouts/new?draft=${draft.id}`, organizationSlug));
+            // Keep the rest of the address (e.g. the class form's return_to).
+            const params = new URLSearchParams(window.location.search);
+            params.set("draft", draft.id);
+            router.replace(adminHref(`/admin/workouts/new?${params.toString()}`, organizationSlug));
           }
         })
         .catch(() => {

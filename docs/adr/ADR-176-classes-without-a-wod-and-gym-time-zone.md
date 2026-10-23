@@ -88,3 +88,15 @@ edge provides it.
   partial index) and `20261130110000_organization_timezone_source`.
 * Staff see the "Draft · no WOD" / "No WOD" badge on calendar cards and a
   notice with an inline WOD picker in the class sheet.
+* 2026-10-23: a gym with no active class type no longer hits a dead end
+  ("Create a published workout and an active class type…", stale since the WOD
+  became optional). "+ Slot" and "Create series" open a small dialog that
+  creates the first class type and continues to the form.
+* 2026-10-23: the class and series forms pick the WOD with
+  `schedule/WodPicker`: a searchable list (newest first, accent-insensitive),
+  a popover from 640px up and a bottom sheet on phones, "No WOD yet" as a real
+  choice. "+ New WOD" on the field's label row opens the usual WOD editor with
+  `?return_to=`; the form is kept in sessionStorage
+  (`class-draft-handoff.ts`) and publishing returns with `?wod=<id>`, which
+  reopens the form with that WOD chosen (`lib/workout-return.ts`, internal
+  paths only).

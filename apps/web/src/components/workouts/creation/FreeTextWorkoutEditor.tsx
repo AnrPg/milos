@@ -44,6 +44,7 @@ import {
   type ReviewState,
 } from "@/lib/free-text-analysis";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { workoutPublishedHref } from "@/lib/workout-return";
 import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
 import {
   FREE_TEXT_TIMER_METADATA_KEY,
@@ -403,7 +404,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
         ...payload,
         expected_source_revision: revisionRef.current,
       });
-      router.push(adminHref("/admin/workouts", organizationSlug));
+      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
     } catch {
       setSaveStatus("error");
       setNotice(assistantT("publishFailed"));
