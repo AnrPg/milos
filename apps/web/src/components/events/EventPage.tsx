@@ -29,7 +29,8 @@ import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "
 import { can } from "@/lib/role-navigation";
 
 import { eventHostMode, formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from "./events";
-import { EventEditorSheet, ScopePicker, useEventLocations } from "./EventEditorSheet";
+import { ScopePicker, useEventLocations } from "./EventFormParts";
+import { EventWizard } from "./wizard/EventWizard";
 import { DateBlock, Goers, RsvpButton, useEventError } from "./EventParts";
 import { invalidateEvents } from "./use-events";
 import { useEventReferral } from "@/components/referrals/use-referral-link";
@@ -479,7 +480,7 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
         ) : null}
       </div>
       {editing ? (
-        <EventEditorSheet
+        <EventWizard
           title={t("edit")}
           eyebrow={event.title}
           initial={formFromEvent(event)}
@@ -490,7 +491,9 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
           locations={locations.data ?? []}
           coverSlug={!own && can(membership, "manage_settings") ? event.box.slug : null}
           gymSlug={own ? null : event.box.slug}
-          onSubmit={async (body, scope) => saved(await updateEvent(tokens!.access_token, event.id, { ...body, scope }))}
+          onSubmit={async (body, scope) => {
+            await saved(await updateEvent(tokens!.access_token, event.id, { ...body, scope }));
+          }}
           onClose={() => setEditing(false)}
         />
       ) : null}

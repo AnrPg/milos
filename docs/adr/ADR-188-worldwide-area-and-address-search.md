@@ -1,4 +1,4 @@
-# ADR-188: Worldwide area and address search through a self-hostable OpenStreetMap geocoder
+# ADR-188: Worldwide area and address search: GeoNames towns, our own Photon, the public Photon
 Date: 2026-10-23
 Status: Accepted
 
@@ -20,9 +20,24 @@ Options weighed:
   `Geocoder` port and `PHOTON_BASE_URL`.
 
 ## Decision
-- **Photon is the worldwide source**, self-hosted in the cluster (docs/operations/self-hosted-photon.md,
-  ops/photon/photon.yaml); `PHOTON_BASE_URL` points at it. The public komoot instance remains the
-  default only until that is deployed.
+Amended the same day: a planet Photon (~95 GB disk, 64 GB RAM recommended) and even a Europe index
+(32 GB download) are beyond the cluster, so the world is covered in three tiers:
+
+1. **GeoNames towns in Postgres.** Every town of 500+ people and their sections (`cities500`, ~200k
+   places, CC BY 4.0) is imported by `WorldGazetteerJob` (hourly check, monthly refresh, curated
+   places win over their twins) as `geonames` rows with a population. Most searches never leave
+   our database.
+2. **Our own Photon for Greece, Cyprus and France** (official JSON dumps combined into one index,
+   with Greek translations; ops/photon/photon.yaml, docs/operations/self-hosted-photon.md),
+   uncapped, for neighbourhoods and addresses there.
+3. **The public Photon** for the rest of the world, capped app-wide (60 calls/min across pods
+   through the Redis rate limiter) as its fair use asks.
+
+`GovernedGeocoder` wraps the Photon adapter: tiers in order (an empty answer or an outage moves on),
+a shared Redis cache of answers for a day, and the per-tier cap; over the cap a tier answers
+"unavailable" at once. Local search is typo-tolerant (pg_trgm word similarity) and ranks a
+place's own name first, then curated places, then population. A query with a number is treated
+as an address and always reaches the geocoder. Lists credit OpenStreetMap and GeoNames.
 - **The gazetteer stays the single model of an area.** `places_neighbourhoods` gains `source`
   (`curated` | `osm`) and `context` / `context_en` (what tells namesakes apart: city, or region and
   country). Home areas, filters, saved searches and post centroids keep pointing at gazetteer ids, so
@@ -47,7 +62,8 @@ Options weighed:
 
 ## Consequences
 - Coverage is the world's OpenStreetMap data; quality of neighbourhood names varies by country.
-- A planet Photon needs ~100 GB of disk and generous memory (see the ops guide); a continent index is a
-  cheaper start. Until it is deployed, searches go to photon.komoot.io under its fair-use terms.
+- Until our Photon is deployed, addresses and small neighbourhoods everywhere come from the public
+  Photon within the cap; towns always answer from Postgres.
 - Imported rows accumulate slowly (only picked places); they are reference data and can be refreshed.
-- Follow-ups: a server-side cache of Photon answers if traffic grows; pruning `osm` rows nobody uses.
+- Follow-ups: more countries in our Photon as disk allows (one line in its ConfigMap); pruning
+  `osm` rows nobody uses.

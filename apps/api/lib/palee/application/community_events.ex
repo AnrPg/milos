@@ -30,6 +30,7 @@ defmodule Palee.Application.CommunityEvents do
     ClassLocation,
     ClubScope,
     CommunityPeople,
+    EventCohosts,
     EventInvites,
     EventNotices,
     EventPresenter,
@@ -290,9 +291,9 @@ defmodule Palee.Application.CommunityEvents do
     with {:ok, clubs} <- ClubScope.call(context),
          {:ok, club} <- find_club(clubs, club_id),
          {:ok, manager} <- event_manager(context, club.organization_id),
-         {:ok, [first | _] = events} <- manage_create(manager, club, params) do
+         {:ok, [first | _] = events, cohosts} <- manage_create(manager, club, params) do
       [shown] = present(context, [first], clubs)
-      {:ok, %{event: shown, occurrences: length(events)}}
+      {:ok, %{event: shown, occurrences: length(events), cohost_failures: cohosts.failures}}
     end
   end
 
@@ -319,6 +320,15 @@ defmodule Palee.Application.CommunityEvents do
   @doc """
   Creates an event (or a weekly run of them) in `club` from a tenant context
   holding `manage_events`, and posts its card in the club's announcements.
+
+  ADR-185: `cohost_slugs` asks those businesses to co-host as it is created,
+  under `EventCohosts.invite`'s rules (ADR-185): only whoever runs events
+  at the host may ask, never the host itself, none twice, at most the
+  limit, and not for a group-only event; any of these refuses the whole
+  request. The event and every request are written in one transaction.
+  An address with no published box behind it is not asked and comes back
+  in `failures` (`%{slug, code}`) while the event is still created.
+  `{:ok, events, %{cohosts: rows, failures: failures}}`.
   """
   def manage_create(%{organization_id: organization_id} = manager, club, params) do
     attrs = editable(params)
@@ -326,22 +336,43 @@ defmodule Palee.Application.CommunityEvents do
     zone =
       Community.event_time_zone(attrs, Organizations.organization_timezone(organization_id))
 
-    with {:ok, channel} <- group_channel(manager, club, params[:channel_id]),
+    opts = [repeat_until: params[:repeat_until], zone: zone]
+
+    with {:ok, slugs} <- Community.cohost_create_slugs(params[:cohost_slugs]),
+         :ok <- EventCohosts.authorize_create(manager, slugs),
+         {:ok, channel} <- group_channel(manager, club, params[:channel_id]),
          :ok <- authorize_event(manager, channel),
          :ok <- ClassLocation.check(manager, attrs),
          :ok <- BoxPhotoCovers.ready(manager, attrs[:cover_media_id]),
-         {:ok, events} <-
-           Community.create_event(manager, club, attrs,
-             repeat_until: params[:repeat_until],
-             zone: zone,
-             channel_id: channel && channel.id
+         {boxes, failures} = EventCohosts.resolve_boxes(slugs),
+         {:ok, events, rows} <-
+           insert(
+             manager,
+             club,
+             attrs,
+             boxes,
+             Keyword.put(opts, :channel_id, channel && channel.id)
            ),
          {:ok, events} <- publish_card(manager, club, channel, events) do
       [first | _] = events
       BoxPhotoCovers.settle(manager, nil, first.cover_media_id)
       announce(first)
-      {:ok, events}
+      EventCohosts.notify_created(manager, first, boxes, rows)
+      {:ok, events, %{cohosts: rows, failures: failures}}
     end
+  end
+
+  defp insert(manager, club, attrs, [], opts) do
+    with {:ok, events} <- Community.create_event(manager, club, attrs, opts),
+         do: {:ok, events, []}
+  end
+
+  defp insert(manager, club, attrs, boxes, opts) do
+    ids = Enum.map(boxes, & &1.organization_id)
+
+    with {:ok, %{events: events, cohosts: rows}} <-
+           Community.create_event_with_cohosts(manager, club, attrs, ids, opts),
+         do: {:ok, events, rows}
   end
 
   @doc """

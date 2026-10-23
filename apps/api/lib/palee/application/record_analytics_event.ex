@@ -4,6 +4,18 @@ defmodule Palee.Application.RecordAnalyticsEvent do
   @telemetry_events %{
     "payment_recorded" => [:palee, :payment, :recorded],
     "promotion_redeemed" => [:palee, :promotion, :redeemed],
+    # ADR-191 partner perks.
+    "perk_created" => [:palee, :perk, :created],
+    "perk_versioned" => [:palee, :perk, :versioned],
+    "perk_codes_added" => [:palee, :perk, :codes_added],
+    "perk_claims_exported" => [:palee, :perk, :claims_exported],
+    "perk_pool_low" => [:palee, :perk, :pool_low],
+    "perk_published" => [:palee, :perk, :published],
+    "perk_paused" => [:palee, :perk, :paused],
+    "perk_expired" => [:palee, :perk, :expired],
+    "perk_claimed" => [:palee, :perk, :claimed],
+    "perk_redeemed" => [:palee, :perk, :redeemed],
+    "perk_claim_revoked" => [:palee, :perk, :claim_revoked],
     "referral_event_created" => [:palee, :referral, :created],
     "referral_status_changed" => [:palee, :referral, :status_changed],
     "referral_reward_created" => [:palee, :referral, :reward_created],

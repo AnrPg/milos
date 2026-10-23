@@ -6,10 +6,10 @@ import {
   clientNavItems,
   likelyScreens,
   sectionGroupFor,
-  showsBottomBar,
   staffNavItems,
   surfaceRole,
 } from "@/lib/role-navigation";
+import { routeShowsBottomNav } from "@/lib/bottom-nav";
 
 const caps = (...names: string[]) => Object.fromEntries(names.map((name) => [name, "all"]));
 const ADMIN = caps("grant_staff_roles", "manage_settings", "manage_coaching", "manage_workouts", "check_in", "run_classes", "take_payments", "view_directory", "view_finance_reports", "record_cleaning", "manage_cleaning_areas", "manage_inventory");
@@ -63,7 +63,9 @@ describe("surfaceRole", () => {
     const coachAthlete = { role: "coach", roles: ["coach", "athlete"] };
     expect(surfaceRole(coachAthlete)).toBe("admin");
     expect(surfaceRole(coachAthlete, "client")).toBe("athlete");
-    expect(surfaceRole({ role: "coach", roles: ["coach"] }, "client")).toBe("admin");
+    // Every staff member can open the member app; without a client role they use it as a member.
+    expect(surfaceRole({ role: "coach", roles: ["coach"] }, "client")).toBe("member");
+    expect(surfaceRole({ role: "owner", roles: ["owner"] }, "staff")).toBe("admin");
     expect(surfaceRole({ role: "member" })).toBe("member");
     expect(surfaceRole({ role: "janitor", roles: ["janitor", "member"] })).toBe("member");
   });
@@ -98,11 +100,11 @@ describe("client navigation", () => {
   });
 
   it("hides the bar on full-screen workout and class-timer pages only", () => {
-    expect(showsBottomBar("/workouts/w1/execute")).toBe(false);
-    expect(showsBottomBar("/workouts/free-text/execute")).toBe(false);
-    expect(showsBottomBar("/org/kypseli/class-timer/s1/display")).toBe(false);
-    expect(showsBottomBar("/workouts")).toBe(true);
-    expect(showsBottomBar("/box")).toBe(true);
+    expect(routeShowsBottomNav("/workouts/w1/execute")).toBe(false);
+    expect(routeShowsBottomNav("/workouts/free-text/execute")).toBe(false);
+    expect(routeShowsBottomNav("/org/kypseli/class-timer/s1/display")).toBe(false);
+    expect(routeShowsBottomNav("/workouts")).toBe(true);
+    expect(routeShowsBottomNav("/box")).toBe(true);
   });
 });
 

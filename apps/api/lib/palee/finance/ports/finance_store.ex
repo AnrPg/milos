@@ -60,6 +60,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback list_promotion_campaigns() :: [map()]
   @callback create_promotion_code(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_promotion_codes(Ecto.UUID.t() | nil) :: [map()]
+  @doc "Active campaigns flagged `params.member_visible`, with their active codes (two reads)."
+  @callback list_member_visible_promotions() :: {campaigns :: [map()], codes :: [map()]}
   @callback redeem_promotion(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback create_referral_program(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_referral_program(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}

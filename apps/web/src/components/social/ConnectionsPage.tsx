@@ -18,6 +18,7 @@ import {
 import { clientErrorMessage } from "@/components/client/errors";
 import { useMyClubs } from "@/components/community/use-community";
 import { HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { FollowButton } from "@/components/social/FollowButton";
@@ -60,7 +61,7 @@ export function ConnectionsPage() {
   };
 
   return (
-    <HubPage title={t("connectionsTitle")}>
+    <HubPage back={<BackToMe />} title={t("connectionsTitle")}>
       <SegmentPicker
         ariaLabel={t("connectionsTitle")}
         idPrefix="connections"

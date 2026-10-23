@@ -125,13 +125,16 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 
 ## 6. Information architecture
 
-### 6.1 Bottom bar (4 tabs, fixed)
+### 6.1 Bottom bar (4 tabs + notifications, fixed)
+> **2026-10-23 (owner):** the tabs are named **Feed** (was Αρχική) and **Journal** (was Ημερολόγιο) in every locale's own word, routes unchanged; the bar floats (side margins, rounded, see-through) and holds **Feed · Box · Journal · 🔔 Ειδοποιήσεις · avatar (Εγώ)**, so the bell moved from the Feed header into the bar, next to the avatar.
+
 | Tab | Answers | Landing content |
 |---|---|---|
-| **Αρχική** (Feed) *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · ♡ notifications · ✈ messages. Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Τα clubs μου \| Γύρω μου**. Feed. |
+| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · ✈ messages (notifications: the bar's bell). Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Τα clubs μου \| Γύρω μου**. Feed. |
 | **Box** | "Where and with whom do I train?" | Today's workout card (**Καταγραφή / Έναρξη ▶**), next booking (+ QR check-in), actions (Πρόγραμμα · Ραντεβού · Βίντεο · Coach), membership, announcements. |
-| **Ημερολόγιο** (Journal) | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
-| **Εγώ** (Me) | "How others see me + my settings" | Public profile (Αναρτήσεις · PRs · Clubs) + a list: Φέρε φίλο, Buddy, Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
+| **Journal** | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
+| 🔔 **Ειδοποιήσεις** | "What needs me?" | Not a tab: opens the inbox over the current screen; unread badge. |
+| **Εγώ** (Me, the avatar) | "How others see me + my settings" | Public profile (Αναρτήσεις · PRs · Clubs) + a list: Φέρε φίλο, Buddy, Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
 
 Messages live top-right in the Feed. `Box › Coach` opens the same inbox filtered to the coach. Alternatives considered: 3 tabs with an avatar; 5 tabs with Clubs; 5 tabs with Messages. Revisit **5 tabs with Clubs** only if the average member is in ≥3 clubs and events become a core use.
 
@@ -320,6 +323,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Κοινοποίηση & ορατότητα:** what the coach sees, leaderboards/PR celebrations/challenges/partners opt-ins, PR share grants, default visibility for new entries.
 - **Συνδεδεμένες συσκευές:** Garmin; Apple Health and Health Connect marked as coming with native; Wallet pass; ICS feed.
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
+  - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
 - **Βοήθεια & ξενάγηση:** product tours; staff entry to admin.
 

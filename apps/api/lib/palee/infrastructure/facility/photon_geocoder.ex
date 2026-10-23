@@ -9,8 +9,9 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
 
   require Logger
 
-  # Photon translates names only into these; anything else gets local names.
-  @languages ~w(en de fr it)
+  # Photon translates names into the languages its index was built with
+  # (public: en de fr it; ours adds el); anything else gets local names.
+  @default_languages ~w(en de fr it)
   @default_base_url "https://photon.komoot.io"
 
   @impl true
@@ -20,7 +21,7 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
       |> put_near(Keyword.get(opts, :near))
       |> put_layers(Keyword.get(opts, :layers, []))
 
-    with {:ok, features} <- get("/api/", params) do
+    with {:ok, features} <- get(opts, "/api/", params) do
       {:ok, features |> Enum.map(&to_place/1) |> Enum.reject(&is_nil/1)}
     end
   end
@@ -31,7 +32,7 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
       [lat: latitude, lon: longitude, limit: 1, lang: language(opts)]
       |> put_layers(Keyword.get(opts, :layers, ~w(house street)))
 
-    with {:ok, features} <- get("/reverse", params) do
+    with {:ok, features} <- get(opts, "/reverse", params) do
       place = features |> Enum.map(&to_place/1) |> Enum.find(& &1)
       {:ok, place && pinned(place, latitude, longitude, opts)}
     end
@@ -45,8 +46,9 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
       else: %{place | latitude: latitude, longitude: longitude}
   end
 
-  defp get(path, params) do
-    (base_url() <> path)
+  defp get(opts, path, params) do
+    (Keyword.get(opts, :base_url) || base_url())
+    |> Kernel.<>(path)
     |> Req.get(
       params: params,
       headers: [{"user-agent", "Palee/1.0 (+https://palee.com)"}],
@@ -122,9 +124,16 @@ defmodule Palee.Infrastructure.Facility.PhotonGeocoder do
 
   defp language(opts) do
     case Keyword.get(opts, :language) do
-      language when language in @languages -> language
-      _other -> "default"
+      language when is_binary(language) and language != "" ->
+        if language in languages(), do: language, else: "default"
+
+      _other ->
+        "default"
     end
+  end
+
+  defp languages do
+    :palee |> Application.get_env(:photon, []) |> Keyword.get(:languages, @default_languages)
   end
 
   defp base_url do

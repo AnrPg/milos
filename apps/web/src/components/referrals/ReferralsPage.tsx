@@ -17,6 +17,7 @@ import {
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { formatPrice, formatWhen } from "@/components/events/events";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { localizeError } from "@/i18n/presentation";
@@ -69,7 +70,7 @@ export function ReferralsPage() {
   }
 
   return (
-    <HubPage title={t("title")}>
+    <HubPage back={<BackToMe />} title={t("title")}>
       {boxes.length > 1 ? (
         <SegmentPicker
           ariaLabel={t("pickBox")}

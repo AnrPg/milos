@@ -29,7 +29,8 @@ import { Badge } from "@/components/community/MembersTab";
 import { MoreMenu } from "@/components/community/PostCard";
 import { Field, inputStyle } from "@/components/community/ProposeGroupSheet";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
-import { EventEditorSheet, useEventLocations } from "@/components/events/EventEditorSheet";
+import { useEventLocations } from "@/components/events/EventFormParts";
+import { EventWizard } from "@/components/events/wizard/EventWizard";
 import { CancelEventSheet } from "@/components/events/EventPage";
 import { useEventError, usePriceLabel } from "@/components/events/EventParts";
 import { eventHostMode, formFromEvent, formatWhen, hasEnded, placeName } from "@/components/events/events";
@@ -269,7 +270,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
       </Panel>
 
       {sheet === "edit" ? (
-        <EventEditorSheet
+        <EventWizard
           title={tEvents("edit")}
           eyebrow={event.title}
           initial={formFromEvent(event)}
@@ -280,7 +281,9 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           locations={locations.data ?? []}
           coverSlug={!own && scope.settings ? event.box.slug : null}
           gymSlug={own ? null : event.box.slug}
-          onSubmit={async (body, which) => applied(await updateStaffEvent(token, event.id, { ...body, scope: which }, scope.slug))}
+          onSubmit={async (body, which) => {
+            applied(await updateStaffEvent(token, event.id, { ...body, scope: which }, scope.slug));
+          }}
           onClose={() => setSheet(null)}
         />
       ) : null}

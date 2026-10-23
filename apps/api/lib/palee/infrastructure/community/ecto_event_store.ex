@@ -23,6 +23,37 @@ defmodule Palee.Infrastructure.Community.EctoEventStore do
   end
 
   @impl true
+  def insert_events_with_cohosts(_context, attrs_list, %{
+        cohost_organization_ids: cohost_ids,
+        invited_by_id: invited_by_id
+      }) do
+    Repo.transaction(fn ->
+      events = Enum.map(attrs_list, &insert_or_rollback(Event.create_changeset(&1)))
+
+      cohosts =
+        for event <- events, cohost_id <- cohost_ids do
+          %{
+            organization_id: event.organization_id,
+            event_id: event.id,
+            cohost_organization_id: cohost_id,
+            invited_by_id: invited_by_id
+          }
+          |> EventCohost.create_changeset()
+          |> insert_or_rollback()
+        end
+
+      %{events: events, cohosts: cohosts}
+    end)
+  end
+
+  defp insert_or_rollback(changeset) do
+    case Repo.insert(changeset) do
+      {:ok, row} -> row
+      {:error, changeset} -> Repo.rollback(changeset)
+    end
+  end
+
+  @impl true
   def get_event(_context, id) do
     case Ecto.UUID.cast(id) do
       {:ok, id} -> Repo.get(Event, id)

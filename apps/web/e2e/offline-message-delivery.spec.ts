@@ -49,8 +49,8 @@ test("an offline message survives page close and synchronizes exactly once", asy
   const deliveredMessages: Array<Record<string, unknown>> = [];
   await mockAuthenticatedApi(page, deliveredMessages);
 
-  await page.goto("/about");
-  await page.getByRole("button", { name: "Chat", exact: true }).click();
+  await page.goto("/");
+  await page.getByRole("button", { name: "Messages", exact: true }).click();
   await page.getByRole("button", { name: new RegExp(recipient.nickname, "i") }).click();
 
   await context.setOffline(true);
@@ -69,10 +69,10 @@ test("an offline message survives page close and synchronizes exactly once", asy
 
   const reopened = await context.newPage();
   await mockAuthenticatedApi(reopened, deliveredMessages);
-  await reopened.goto("/about");
+  await reopened.goto("/");
   await expect.poll(() => deliveredMessages.length).toBe(1);
 
-  await reopened.getByRole("button", { name: "Chat", exact: true }).click();
+  await reopened.getByRole("button", { name: "Messages", exact: true }).click();
   await reopened.getByRole("button", { name: new RegExp(recipient.nickname, "i") }).click();
   await expect(reopened.getByText("Queued while offline")).toBeVisible();
   await expect(reopened.getByText(/Sending/)).toHaveCount(0);

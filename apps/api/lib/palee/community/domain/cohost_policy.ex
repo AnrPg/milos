@@ -42,6 +42,74 @@ defmodule Palee.Community.Domain.CohostPolicy do
     end
   end
 
+  @doc """
+  The page addresses a new event asks to co-host as it is created (ADR-185):
+  each trimmed, a leading `/` and `b/` dropped (as `EventCohosts.invite`
+  reads one). None given is none asked. Not a list of addresses is
+  `:invalid_cohosts`, one twice `:duplicate_cohost`, more than
+  #{@max_cohosts} `:cohost_limit_reached`.
+  """
+  def create_slugs(nil), do: {:ok, []}
+
+  def create_slugs(slugs) when is_list(slugs) do
+    normalized = Enum.map(slugs, &normalize_slug/1)
+
+    cond do
+      Enum.any?(normalized, &is_nil/1) -> {:error, :invalid_cohosts}
+      length(Enum.uniq(normalized)) != length(normalized) -> {:error, :duplicate_cohost}
+      length(normalized) > @max_cohosts -> {:error, :cohost_limit_reached}
+      true -> {:ok, normalized}
+    end
+  end
+
+  def create_slugs(_slugs), do: {:error, :invalid_cohosts}
+
+  @doc "A page address as typed → its slug, or nil when it cannot be one."
+  def normalize_slug(slug) when is_binary(slug) do
+    slug
+    |> String.trim()
+    |> String.trim_leading("/")
+    |> String.replace_prefix("b/", "")
+    |> String.trim_trailing("/")
+    |> case do
+      "" -> nil
+      value -> if String.match?(value, ~r/^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/), do: value
+    end
+  end
+
+  def normalize_slug(_slug), do: nil
+
+  @doc """
+  Whether a new event can be created with these co-host organisations,
+  checked on its first occurrence before anything is written: none is the
+  host, none twice (two addresses of one box), within the limit, and each
+  passes `invite_check/5` as if asked one after the other.
+  """
+  def create_check(_event, [], _now), do: :ok
+
+  def create_check(event, cohost_organization_ids, now) when is_list(cohost_organization_ids) do
+    cond do
+      event.organization_id in cohost_organization_ids ->
+        {:error, :cannot_cohost_own_event}
+
+      length(Enum.uniq(cohost_organization_ids)) != length(cohost_organization_ids) ->
+        {:error, :duplicate_cohost}
+
+      length(cohost_organization_ids) > @max_cohosts ->
+        {:error, :cohost_limit_reached}
+
+      true ->
+        cohost_organization_ids
+        |> Enum.with_index()
+        |> Enum.reduce_while(:ok, fn {id, taken}, :ok ->
+          case invite_check(event, id, taken, nil, now) do
+            :ok -> {:cont, :ok}
+            error -> {:halt, error}
+          end
+        end)
+    end
+  end
+
   @doc "Whether a request can be answered: pending, or accepted for a withdrawal."
   def answer_check("pending", answer) when answer in @answers, do: :ok
   def answer_check("accepted", "removed"), do: :ok

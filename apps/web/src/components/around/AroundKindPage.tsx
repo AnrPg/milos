@@ -8,7 +8,7 @@ import { ErrorLine } from "@/components/community/Sheet";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 
 import { useAroundError } from "./AreaPicker";
-import { AroundChipRow, useKm } from "./AroundFilters";
+import { AroundChipRow, RadiusChip, useKm } from "./AroundFilters";
 import { AroundRow, itemPinId } from "./AroundSections";
 import { needsOrigin, useAround, useAroundKind } from "./use-around";
 
@@ -25,9 +25,12 @@ export function AroundKindPage({ kind }: { kind: AroundKind }) {
 
   return (
     <HubPage title={t(["section", kind].join("_"))}>
-      <Link href="/around" className="-mt-2 flex min-h-10 items-center gap-1 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-        <span aria-hidden="true">‹</span> {t("backToAround")}
-      </Link>
+      <div className="-mt-2 flex flex-wrap items-center justify-between gap-2">
+        <Link href="/around" className="flex min-h-10 items-center gap-1 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
+          <span aria-hidden="true">‹</span> {t("backToAround")}
+        </Link>
+        <RadiusChip />
+      </div>
       <AroundChipRow resultCount={total} />
       {list.isPending || !ready ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>

@@ -148,6 +148,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_promotion_codes(campaign_id), do: adapter().list_promotion_codes(campaign_id)
   @impl true
+  def list_member_visible_promotions, do: adapter().list_member_visible_promotions()
+  @impl true
   def redeem_promotion(membership_id, params),
     do: adapter().redeem_promotion(membership_id, params)
 

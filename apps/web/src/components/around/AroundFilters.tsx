@@ -10,7 +10,7 @@ import { getBoxVocabulary } from "@/api/public-profile";
 import type { SavedFilter } from "@/api/saved-filters";
 import { COMMON_LANGUAGES, languageNames } from "@/components/admin/public-page/languages";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
-import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
+import { FilterChipRow, FilterMenuChip, type FilterChip } from "@/components/filters/FilterChipRow";
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useDebounced } from "@/hooks/useDebounced";
 
@@ -19,6 +19,7 @@ import {
   CHIP_DISCIPLINES,
   DAY_TIMES,
   DEFAULT_FILTER,
+  DEFAULT_RADIUS_KM,
   KIND_ORDER,
   MAX_NEIGHBOURHOODS,
   PRICE_CAP_CENTS,
@@ -27,20 +28,22 @@ import {
   activeFilterCount,
   applyChip,
   chipModel,
+  isMine,
+  radiusChip,
   sameFilter,
   toggleKind,
+  toggleMine,
   toggleValue,
   withWhen,
   parseFilter,
   type AroundFilter,
-  type ChipKey,
   type Cost,
   type DayTime,
   type When,
 } from "./around";
 import { useMyInterests } from "@/components/interests/InterestsEditor";
 
-import { PlaceOption, useAroundError, useNeighbourhoodName } from "./AreaPicker";
+import { PlaceOption, PlacesAttribution, useAroundError, useNeighbourhoodName } from "./AreaPicker";
 import { useAround, useAroundArea, useNeighbourhoodSearch, useResolvePlace, useSavedFilterActions } from "./use-around";
 
 /** «2,5 km» in the reader's numbers. */
@@ -51,13 +54,14 @@ export function useKm() {
 }
 
 /**
- * The Γύρω μου chip row (vision §7.2, mockup `near`): «Φίλτρα (n)», then the
- * saved combinations, then the quick chips. «Φίλτρα (n)» opens the sheet.
+ * The Γύρω μου chip row (vision §7.2, mockup `near`): «Φίλτρα (n)», «Τα
+ * αθλήματά μου», «Πότε» and «Δωρεάν», and nothing else, so it fits a 320 px
+ * phone in every language without scrolling sideways (two balanced lines when
+ * one is too narrow). Everything else, saved combinations included, is in the
+ * sheet «Φίλτρα (n)» opens, and counts in its (n).
  */
 export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number; onShowMap?: () => void }) {
   const t = useTranslations("Around");
-  const tags = useTranslations("BoxTags");
-  const km = useKm();
   const { filter, setFilter, saved } = useAround();
   const [sheet, setSheet] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -66,41 +70,25 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
   // ADR-183: what the person does is one tap away, never applied on its own.
   const mine = useMyInterests().data?.disciplines ?? [];
 
-  const label = (key: ChipKey, value: string) => {
-    switch (key) {
-      case "radius":
-        return t("radiusChip", { distance: km(Number(value)) });
-      case "when":
-        return t(["when", value].join("_"));
-      case "discipline":
-        return tags(["discipline", value].join("."));
-      default:
-        return value;
-    }
-  };
-  const toggleLabels: Partial<Record<ChipKey, string>> = { free: t("costFree"), trial: t("costTrial"), posts: t("kind_posts") };
-  const menuLabels: Partial<Record<ChipKey, string>> = { radius: t("chipRadius"), when: t("chipWhen"), discipline: t("chipDiscipline") };
-
-  const modelChips: FilterChip[] = chipModel(filter, mine).map((chip) =>
+  const modelChips: FilterChip[] = chipModel(filter).map((chip) =>
     chip.kind === "toggle"
       ? {
           key: chip.key,
           kind: "toggle",
-          label: toggleLabels[chip.key] ?? chip.key,
+          label: t("costFree"),
           active: chip.active,
           onToggle: () => setFilter(applyChip(filter, chip.key)),
         }
       : {
           key: chip.key,
           kind: "menu",
-          label: menuLabels[chip.key] ?? chip.key,
-          options: chip.options.map((value) => ({ value, label: label(chip.key, value) })),
+          label: t("chipWhen"),
+          options: chip.options.map((value) => ({ value, label: t(["when", value].join("_")) })),
           selected: chip.selected,
           multiple: chip.multiple,
           onChange: (values: string[]) => setFilter(applyChip(filter, chip.key, values)),
         },
   );
-  const mineActive = mine.length > 0 && sameDisciplines(filter.disciplines, mine);
   const chips: FilterChip[] =
     mine.length > 0
       ? [
@@ -108,8 +96,8 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
             key: "mine",
             kind: "toggle",
             label: t("myDisciplines"),
-            active: mineActive,
-            onToggle: () => setFilter({ ...filter, disciplines: mineActive ? [] : mine }),
+            active: isMine(filter, mine),
+            onToggle: () => setFilter(toggleMine(filter, mine)),
           },
           ...modelChips,
         ]
@@ -118,25 +106,27 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
   return (
     <>
       <FilterChipRow
+        fit
         ariaLabel={t("filtersLabel")}
         activeCount={count}
         onOpenFilters={() => setSheet(true)}
         onClear={() => setFilter(DEFAULT_FILTER)}
         chips={chips}
-        leading={saved.map((entry) => (
-          <SavedChip
-            key={entry.id}
-            entry={entry}
-            active={sameFilter(parseFilter(entry.params), filter)}
-            onApply={() => setFilter(parseFilter(entry.params))}
-            onManage={() => setManaging(entry)}
-          />
-        ))}
       />
       {sheet
         ? createPortal(
             <AroundFilterSheet
               resultCount={resultCount}
+              mine={mine}
+              saved={saved.map((entry) => (
+                <SavedChip
+                  key={entry.id}
+                  entry={entry}
+                  active={sameFilter(parseFilter(entry.params), filter)}
+                  onApply={() => setFilter(parseFilter(entry.params))}
+                  onManage={() => setManaging(entry)}
+                />
+              ))}
               onClose={() => setSheet(false)}
               onSave={() => setSaving(true)}
               onShowMap={
@@ -162,7 +152,30 @@ export function AroundChipRow({ resultCount, onShowMap }: { resultCount: number;
   );
 }
 
-const chipClass = "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap px-3 text-sm font-semibold";
+/** «≤ 3 km ▾», on the line of «Αλλαγή περιοχής» (and «Δες όλα»'s back link); also in the sheet as the slider. */
+export function RadiusChip() {
+  const t = useTranslations("Around");
+  const km = useKm();
+  const { filter, setFilter } = useAround();
+  const chip = radiusChip(filter);
+  return (
+    <FilterMenuChip
+      // The radius always has a value: it reads as a filter in use only when it is not the default.
+      active={filter.radius_km !== DEFAULT_RADIUS_KM}
+      chip={{
+        key: chip.key,
+        kind: "menu",
+        label: t("chipRadius"),
+        options: chip.options.map((value) => ({ value, label: t("radiusChip", { distance: km(Number(value)) }) })),
+        selected: chip.selected,
+        multiple: false,
+        onChange: (values) => setFilter(applyChip(filter, "radius", values)),
+      }}
+    />
+  );
+}
+
+const chipClass = "flex h-9 items-center gap-1.5 whitespace-nowrap px-3 text-sm font-semibold";
 
 /** A saved combination: tap applies it; ⋯ (or a long press) opens rename, alert and delete. */
 function SavedChip({ entry, active, onApply, onManage }: { entry: SavedFilter; active: boolean; onApply: () => void; onManage: () => void }) {
@@ -177,7 +190,7 @@ function SavedChip({ entry, active, onApply, onManage }: { entry: SavedFilter; a
   };
 
   return (
-    <span className="flex shrink-0">
+    <span className="flex min-w-0 max-w-full">
       <button
         type="button"
         aria-pressed={active}
@@ -200,11 +213,11 @@ function SavedChip({ entry, active, onApply, onManage }: { entry: SavedFilter; a
           if (longPressed.current) return;
           onApply();
         }}
-        className={`${chipClass} rounded-l-full pl-3.5`}
+        className={`${chipClass} min-w-0 rounded-l-full pl-3.5`}
         style={{ background, border, borderRight: "none", color: active ? "var(--text)" : "var(--text-soft)" }}
       >
         {entry.alert ? <span aria-hidden="true">🔔</span> : null}
-        {entry.name}
+        <span className="truncate">{entry.name}</span>
         {entry.alert ? <span className="sr-only">{t("alertOnShort")}</span> : null}
       </button>
       <button
@@ -212,7 +225,7 @@ function SavedChip({ entry, active, onApply, onManage }: { entry: SavedFilter; a
         onClick={onManage}
         aria-label={t("savedOptions", { name: entry.name })}
         aria-haspopup="dialog"
-        className={`${chipClass} rounded-r-full pl-1.5 pr-2.5`}
+        className={`${chipClass} shrink-0 rounded-r-full pl-1.5 pr-2.5`}
         style={{ background, border, borderLeft: "none", color: "var(--dim)" }}
       >
         <span aria-hidden="true">⋯</span>
@@ -367,11 +380,17 @@ function ManageFilterSheet({ entry, onClose }: { entry: SavedFilter; onClose: ()
 /** Every Γύρω μου filter (mockup `filters`), applied as you tap; «Δείξε N» closes. */
 function AroundFilterSheet({
   resultCount,
+  mine,
+  saved,
   onClose,
   onSave,
   onShowMap,
 }: {
   resultCount: number;
+  /** The person's disciplines (ADR-183): offered first. */
+  mine: string[];
+  /** The saved combinations («ΣΚ κοντά»), tap to apply. */
+  saved: React.ReactNode[];
   onClose: () => void;
   onSave: () => void;
   onShowMap?: () => void;
@@ -405,11 +424,19 @@ function AroundFilterSheet({
   );
   const disciplineKeys = allDisciplines
     ? (vocabulary.data?.discipline_groups ?? []).flatMap((group) => group.items)
-    : Array.from(new Set([...CHIP_DISCIPLINES, ...filter.disciplines]));
+    : Array.from(new Set([...mine, ...CHIP_DISCIPLINES, ...filter.disciplines]));
   const accessible = filter.amenities.includes(ACCESSIBLE_AMENITY);
 
   return (
     <FilterPage title={t("filtersTitle")} resultCount={resultCount} onClose={onClose} onClear={() => setFilter(DEFAULT_FILTER)}>
+      {saved.length > 0 ? (
+        <FilterSection label={t("sectionSaved")}>
+          <div role="group" aria-label={t("sectionSaved")} className="flex flex-wrap gap-2">
+            {saved}
+          </div>
+        </FilterSection>
+      ) : null}
+
       <FilterSection label={t("sectionWhere")} hint={filter.neighbourhood_ids.length > 0 ? t("whereFromPlaces") : km(filter.radius_km)}>
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("radius")}</span>
@@ -502,6 +529,7 @@ function AroundFilterSheet({
           </ul>
         ) : null}
         <ErrorLine message={aroundError(resolvePlace.error)} />
+        {placeQuery.trim().length >= 2 ? <PlacesAttribution /> : null}
       </FilterSection>
 
       <FilterSection label={t("sectionWhat")}>
@@ -636,8 +664,4 @@ function ToggleChip({ on, onClick, children }: { on: boolean; onClick: () => voi
       {children}
     </button>
   );
-}
-
-function sameDisciplines(a: string[], b: string[]) {
-  return a.length === b.length && a.every((key) => b.includes(key));
 }

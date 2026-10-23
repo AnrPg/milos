@@ -4,6 +4,7 @@ import { useId, useRef, type CSSProperties, type FormEvent, type ReactNode } fro
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "full";
@@ -14,8 +15,10 @@ export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "fu
  * - "sheet": a bottom sheet on phones, a centred card from `sm` up.
  * - "drawer": a full-height panel on the end edge (full screen on phones).
  * - "panel": a bottom sheet on phones, a full-height end drawer from `md` up.
+ * - "screen": the whole screen on phones (a flow with its own steps), a
+ *   centred card from `sm` up.
  */
-export type DialogVariant = "center" | "sheet" | "drawer" | "panel";
+export type DialogVariant = "center" | "sheet" | "drawer" | "panel" | "screen";
 
 export type DialogLayer = "drawer" | "modal" | "fullscreen" | "toast";
 
@@ -129,12 +132,17 @@ export function Dialog({
     if (dismissible) onClose();
   });
   const pressStartedOnBackdrop = useRef(false);
+  // The member app's floating bottom bar steps aside while a dialog is open.
+  useHideBottomNav();
 
   if (typeof document === "undefined") return null;
 
   const isDrawer = variant === "drawer";
+  const isScreen = variant === "screen";
   const rootLayout = isDrawer
     ? "items-stretch justify-end"
+    : isScreen
+      ? "items-stretch justify-center sm:items-center sm:p-6"
     : variant === "panel"
       ? "items-end justify-center pt-[max(0.75rem,env(safe-area-inset-top))] md:items-stretch md:justify-end md:pt-0"
       : variant === "sheet"
@@ -142,6 +150,8 @@ export function Dialog({
       : "items-center justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-6";
   const panelShape = isDrawer
     ? `h-full ${DRAWER_SIZE[size]} border-s`
+    : isScreen
+      ? `h-full sm:h-auto sm:max-h-full sm:rounded-[1.75rem] sm:border ${SIZE[size]}`
     : variant === "panel"
       ? `max-h-full rounded-t-[1.75rem] border md:h-full md:rounded-none md:border-0 md:border-s ${DRAWER_SIZE[size]}`
       : variant === "sheet"
@@ -187,7 +197,9 @@ export function Dialog({
           ) : null}
           {hasHeader ? (
             <header
-              className={`flex shrink-0 items-start justify-between gap-3 px-5 pb-3 sm:px-6 ${isDrawer ? "pt-[max(1rem,env(safe-area-inset-top))]" : "pt-4 sm:pt-5"}`}
+              className={`flex shrink-0 items-start justify-between gap-3 px-5 pb-3 sm:px-6 ${
+                isDrawer ? "pt-[max(1rem,env(safe-area-inset-top))]" : isScreen ? "pt-[max(1rem,env(safe-area-inset-top))] sm:pt-5" : "pt-4 sm:pt-5"
+              }`}
             >
               <div className="min-w-0 flex-1">
                 {eyebrow ? (

@@ -3159,6 +3159,32 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def list_member_visible_promotions do
+    campaigns =
+      PromotionCampaign
+      |> where([campaign], campaign.active == true)
+      |> where([campaign], fragment("(?->>'member_visible') = 'true'", campaign.params))
+      |> order_by([campaign], desc: campaign.inserted_at)
+      |> Repo.all()
+      |> Enum.map(&normalize_promotion_campaign/1)
+
+    codes =
+      case Enum.map(campaigns, & &1.id) do
+        [] ->
+          []
+
+        ids ->
+          PromotionCode
+          |> where([code], code.promotion_campaign_id in ^ids and code.active == true)
+          |> order_by([code], asc: code.code)
+          |> Repo.all()
+          |> Enum.map(&normalize_promotion_code/1)
+      end
+
+    {campaigns, codes}
+  end
+
+  @impl true
   def redeem_promotion(membership_id, params) do
     params = string_key_map(params)
 

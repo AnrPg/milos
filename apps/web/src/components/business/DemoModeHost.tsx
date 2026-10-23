@@ -128,7 +128,7 @@ function DemoButton({
           setConfirmRemove(false);
           setOpen((value) => !value);
         }}
-        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] end-4 z-(--z-sticky) flex min-h-12 items-center gap-2 rounded-full px-5 text-sm font-bold shadow-lg"
+        className="fixed bottom-[calc(var(--bottom-float-inset)+1rem)] end-4 z-(--z-sticky) flex min-h-12 items-center gap-2 rounded-full px-5 text-sm font-bold shadow-lg"
         style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         data-testid="demo-mode-button"
       >
