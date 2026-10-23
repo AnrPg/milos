@@ -262,7 +262,8 @@ defmodule PaleeWeb.Schemas.MyBilling do
     )
   end
 
-  @transaction_kinds ~w(invoice payment refund credit event_payment event_refund)
+  # `shop_order` is reserved for shop purchases (post-MVP, TD-189).
+  @transaction_kinds ~w(invoice payment refund credit event_payment event_refund shop_order)
 
   def transaction_kinds, do: @transaction_kinds
 
@@ -282,6 +283,11 @@ defmodule PaleeWeb.Schemas.MyBilling do
             slug: @nullable_string
           }),
         title: @nullable_string,
+        source_url: %Schema{
+          type: :string,
+          nullable: true,
+          description: "In-app path of the source's own page when it has one (e.g. a shop order)."
+        },
         amount_cents: %Schema{type: :integer, description: "Negative for money back."},
         currency: @string,
         status: @nullable_string,

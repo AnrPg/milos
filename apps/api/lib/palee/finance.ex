@@ -53,6 +53,7 @@ defmodule Palee.Finance do
     GetPackage,
     GetPackageCatalog,
     ListExpiringMemberships,
+    ListMemberOffers,
     ListPackages,
     ListPromotionCampaigns,
     ListPromotionCodes,
@@ -310,6 +311,10 @@ defmodule Palee.Finance do
 
   def list_promotion_codes(context, campaign_id),
     do: scoped(context, fn -> list_promotion_codes(campaign_id) end)
+
+  @doc "Codes the box shows its members on `today`, for Εγώ › Πληρωμές › Προσφορές."
+  def list_member_offers(context, %Date{} = today \\ Date.utc_today()),
+    do: scoped(context, fn -> ListMemberOffers.call(today) end)
 
   defdelegate redeem_promotion(membership_id, params), to: RedeemPromotion, as: :call
 

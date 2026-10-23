@@ -12294,11 +12294,17 @@
               "refund",
               "credit",
               "event_payment",
-              "event_refund"
+              "event_refund",
+              "shop_order"
             ],
             "type": "string"
           },
           "source_id": {
+            "type": "string"
+          },
+          "source_url": {
+            "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+            "nullable": true,
             "type": "string"
           },
           "status": {
@@ -44327,7 +44333,8 @@
                 "refund",
                 "credit",
                 "event_payment",
-                "event_refund"
+                "event_refund",
+                "shop_order"
               ],
               "type": "string"
             },
@@ -44405,11 +44412,17 @@
                     "refund",
                     "credit",
                     "event_payment",
-                    "event_refund"
+                    "event_refund",
+                    "shop_order"
                   ],
                   "type": "string"
                 },
                 "source_id": {
+                  "type": "string"
+                },
+                "source_url": {
+                  "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+                  "nullable": true,
                   "type": "string"
                 },
                 "status": {
@@ -82145,7 +82158,8 @@
                 "refund",
                 "credit",
                 "event_payment",
-                "event_refund"
+                "event_refund",
+                "shop_order"
               ],
               "type": "string"
             }
@@ -82183,7 +82197,8 @@
                           "refund",
                           "credit",
                           "event_payment",
-                          "event_refund"
+                          "event_refund",
+                          "shop_order"
                         ],
                         "type": "string"
                       },
@@ -82261,11 +82276,17 @@
                               "refund",
                               "credit",
                               "event_payment",
-                              "event_refund"
+                              "event_refund",
+                              "shop_order"
                             ],
                             "type": "string"
                           },
                           "source_id": {
+                            "type": "string"
+                          },
+                          "source_url": {
+                            "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+                            "nullable": true,
                             "type": "string"
                           },
                           "status": {

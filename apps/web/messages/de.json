@@ -9844,6 +9844,7 @@
     "loadMore": "Mehr anzeigen",
     "noTransactions": "Noch keine Umsätze.",
     "shownTotal": "Angezeigt: {amounts}",
-    "tabTransactions": "Umsätze"
+    "tabTransactions": "Umsätze",
+    "shopOrder": "Produktkauf"
   }
 }

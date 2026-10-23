@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -199,6 +200,15 @@ function TransactionDialog({ entry, onClose }: { entry: BillingTransaction; onCl
       footer={
         <>
           <DialogButton onClick={onClose}>{t("close")}</DialogButton>
+          {entry.source_url?.startsWith("/") ? (
+            <Link
+              href={entry.source_url}
+              className="inline-flex min-h-11 items-center px-3 text-sm font-semibold"
+              style={{ color: "var(--primary-strong)" }}
+            >
+              {t("view")} ›
+            </Link>
+          ) : null}
           {canDownload ? (
             <DialogButton tone="primary" onClick={() => void download()} disabled={busy}>
               {entry.kind === "refund" ? t("view") : t("download")}
@@ -260,6 +270,8 @@ export function kindLabel(t: T, kind: BillingTransactionKind) {
       return t("eventPayment");
     case "event_refund":
       return t("eventRefund");
+    case "shop_order":
+      return t("shopOrder");
   }
 }
 
@@ -270,7 +282,7 @@ function entryTitle(t: T, entry: BillingTransaction) {
 }
 
 function KindIcon({ kind }: { kind: BillingTransactionKind }) {
-  const glyph = { invoice: "🧾", payment: "€", refund: "↩", credit: "+", event_payment: "🎟", event_refund: "↩" }[kind];
+  const glyph = { invoice: "🧾", payment: "€", refund: "↩", credit: "+", event_payment: "🎟", event_refund: "↩", shop_order: "🛍" }[kind];
   return (
     <span
       aria-hidden="true"

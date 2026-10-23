@@ -9844,6 +9844,7 @@
     "loadMore": "Voir plus",
     "noTransactions": "Pas encore d'opérations.",
     "shownTotal": "Affiché : {amounts}",
-    "tabTransactions": "Opérations"
+    "tabTransactions": "Opérations",
+    "shopOrder": "Achat de produits"
   }
 }

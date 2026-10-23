@@ -9844,6 +9844,7 @@
     "loadMore": "Περισσότερα",
     "noTransactions": "Δεν υπάρχουν ακόμη συναλλαγές.",
     "shownTotal": "Σύνολο εμφανιζόμενων: {amounts}",
-    "tabTransactions": "Συναλλαγές"
+    "tabTransactions": "Συναλλαγές",
+    "shopOrder": "Αγορά προϊόντων"
   }
 }

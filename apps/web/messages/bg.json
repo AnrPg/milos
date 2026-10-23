@@ -9844,6 +9844,7 @@
     "loadMore": "Покажи още",
     "noTransactions": "Все още няма транзакции.",
     "shownTotal": "Показани: {amounts}",
-    "tabTransactions": "Транзакции"
+    "tabTransactions": "Транзакции",
+    "shopOrder": "Покупка на продукти"
   }
 }

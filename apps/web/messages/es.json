@@ -9844,6 +9844,7 @@
     "loadMore": "Ver más",
     "noTransactions": "Aún no hay movimientos.",
     "shownTotal": "Mostrado: {amounts}",
-    "tabTransactions": "Movimientos"
+    "tabTransactions": "Movimientos",
+    "shopOrder": "Compra de productos"
   }
 }

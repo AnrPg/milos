@@ -9844,6 +9844,7 @@
     "loadMore": "הצג עוד",
     "noTransactions": "עדיין אין תנועות.",
     "shownTotal": "מוצג: {amounts}",
-    "tabTransactions": "תנועות"
+    "tabTransactions": "תנועות",
+    "shopOrder": "רכישת מוצרים"
   }
 }

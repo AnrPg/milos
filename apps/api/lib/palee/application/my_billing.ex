@@ -292,39 +292,9 @@ defmodule Palee.Application.MyBilling do
     end)
   end
 
-  # Codes of the box's running campaigns that it shows to members
-  # (`params.member_visible`), to use at the desk or when renewing.
-  defp available_offers(tenant) do
-    today = Date.utc_today()
-
-    campaigns =
-      tenant
-      |> Finance.list_promotion_campaigns()
-      |> Enum.filter(&offer_running?(&1, today))
-
-    Enum.flat_map(campaigns, fn campaign ->
-      tenant
-      |> Finance.list_promotion_codes(campaign.id)
-      |> Enum.filter(&(&1.active != false))
-      |> Enum.map(fn code ->
-        %{
-          id: code.id,
-          code: code.code,
-          campaign_name: campaign.name,
-          description: campaign.description,
-          discount_type: code.discount_type,
-          discount_value: code.discount_value,
-          ends_on: campaign.ends_on
-        }
-      end)
-    end)
-  end
-
-  defp offer_running?(campaign, today) do
-    campaign.active != false and (campaign.params || %{})["member_visible"] == true and
-      (is_nil(campaign.starts_on) or Date.compare(campaign.starts_on, today) != :gt) and
-      (is_nil(campaign.ends_on) or Date.compare(campaign.ends_on, today) != :lt)
-  end
+  # Codes the box shows its members (`Finance.Domain.MemberOffers`), read
+  # in two queries whatever the number of campaigns.
+  defp available_offers(tenant), do: Finance.list_member_offers(tenant)
 
   # ── other contexts ─────────────────────────────────────────────────────────
 

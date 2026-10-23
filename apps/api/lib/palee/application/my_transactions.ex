@@ -1,7 +1,8 @@
 defmodule Palee.Application.MyTransactions do
   @moduledoc """
   Εγώ › Πληρωμές › Συναλλαγές: the person's complete money history as one
-  chronological feed, newest first, with cursor pagination.
+  chronological feed, newest first, with cursor pagination
+  (`Finance.Domain.TransactionFeed` owns the shape, order and pages).
 
   Sources:
 
@@ -19,103 +20,76 @@ defmodule Palee.Application.MyTransactions do
   Corporate plan charges are invoiced to the company (ADR-098); a seat the
   person pays for themselves arrives as an ordinary invoice.
 
-  `organization_id` narrows the feed to one provider, but always keeps the
-  event entries of hosts that are not providers, so no paid event is ever
-  missing. Every entry: `id`, `kind`, `counterparty`, `title`,
-  `amount_cents` (negative for money back), `currency`, `status`, `date` and
-  `details` for the detail sheet.
+  Reads are bounded, never per row: one member profile and one refund
+  receipt list per provider (in its own tenant context, as RLS needs), one
+  attendee read for the person, one event read per event host (in that
+  host's context) and one batch each for host names.
   """
 
   require Logger
 
   alias Palee.Application.{CommunityPeople, MyBilling}
   alias Palee.{Community, Finance, Organizations}
+  alias Palee.Finance.Domain.TransactionFeed
 
-  @kinds ~w(invoice payment refund credit event_payment event_refund)
-  @default_limit 30
-  @max_limit 100
   @non_draft_statuses ~w(issued partially_paid paid overdue void refunded)
 
-  def kinds, do: @kinds
+  def kinds, do: TransactionFeed.kinds()
 
   @doc "`GET /api/me/billing/transactions`."
   def call(context, params \\ %{})
 
   def call(%{user_id: user_id} = context, params) when is_binary(user_id) do
-    with {:ok, cursor} <- decode_cursor(params["cursor"] || params[:cursor]),
-         {:ok, kind} <- kind_filter(params["kind"] || params[:kind]) do
-      scope = params["organization_id"] || params[:organization_id]
-      limit = limit(params["limit"] || params[:limit])
-
+    with {:ok, cursor} <- TransactionFeed.decode_cursor(param(params, :cursor)),
+         {:ok, kind} <- TransactionFeed.kind_filter(param(params, :kind)) do
       clients = MyBilling.client_tenants(context)
       provider_ids = MapSet.new(clients, fn {provider, _} -> provider.organization_id end)
 
-      {finance_entries, linked_payment_ids, partial?} = finance_entries(clients)
-      event_entries = event_entries(user_id, clients, linked_payment_ids)
+      {attendees, events, events_ok?} = event_facts(user_id)
+      tickets = tickets_by_payment(attendees, events)
 
-      scoped =
-        (finance_entries ++ event_entries)
-        |> Enum.filter(&in_scope?(&1, scope, provider_ids))
-        |> Enum.sort_by(&sort_key/1, :desc)
+      {finance_entries, linked_payment_ids, finance_ok?} = finance_entries(clients, tickets)
+      event_entries = event_entries(clients, attendees, events, linked_payment_ids)
 
-      kinds = scoped |> Enum.map(& &1.kind) |> Enum.uniq()
-      filtered = if kind, do: Enum.filter(scoped, &(&1.kind == kind)), else: scoped
+      feed =
+        TransactionFeed.page(finance_entries ++ event_entries, %{
+          scope: param(params, :organization_id),
+          provider_ids: provider_ids,
+          kind: kind,
+          cursor: cursor,
+          limit: TransactionFeed.limit(param(params, :limit))
+        })
 
-      page =
-        filtered
-        |> Enum.drop_while(&(cursor && sort_key(&1) >= cursor))
-        |> Enum.take(limit + 1)
-
-      {items, more} = Enum.split(page, limit)
-
-      {:ok,
-       %{
-         transactions: Enum.map(items, &Map.delete(&1, :sort)),
-         next_cursor: if(more != [], do: encode_cursor(sort_key(List.last(items)))),
-         total: length(scoped),
-         kinds: Enum.filter(@kinds, &(&1 in kinds)),
-         partial: partial?
-       }}
+      {:ok, Map.put(feed, :partial, not (finance_ok? and events_ok?))}
     end
   end
 
   def call(_context, _params), do: {:error, :account_required}
 
-  defp in_scope?(_entry, nil, _provider_ids), do: true
-  defp in_scope?(_entry, "", _provider_ids), do: true
-
-  defp in_scope?(entry, organization_id, provider_ids) do
-    entry.counterparty.organization_id == organization_id or
-      (entry.kind in ~w(event_payment event_refund) and
-         not MapSet.member?(provider_ids, entry.counterparty.organization_id))
-  end
+  defp param(params, key), do: Map.get(params, Atom.to_string(key)) || Map.get(params, key)
 
   # ── Finance, per provider ───────────────────────────────────────────────
 
-  defp finance_entries(clients) do
-    Enum.reduce(clients, {[], MapSet.new(), false}, fn
-      {provider, {:ok, tenant}}, {entries, linked, partial?} ->
-        case provider_finance(tenant, provider) do
-          {:ok, more, more_linked} ->
-            {more ++ entries, MapSet.union(linked, more_linked), partial?}
-
-          :error ->
-            {entries, linked, true}
+  defp finance_entries(clients, tickets) do
+    Enum.reduce(clients, {[], MapSet.new(), true}, fn
+      {provider, {:ok, tenant}}, {entries, linked, ok?} ->
+        case provider_finance(tenant, provider, tickets) do
+          {:ok, more, more_linked} -> {more ++ entries, MapSet.union(linked, more_linked), ok?}
+          :error -> {entries, linked, false}
         end
 
-      _unresolved, {entries, linked, _partial?} ->
-        {entries, linked, true}
+      _unresolved, {entries, linked, _ok?} ->
+        {entries, linked, false}
     end)
   end
 
-  defp provider_finance(tenant, provider) do
+  defp provider_finance(tenant, provider, tickets) do
     case Finance.get_member_profile(tenant, tenant.user_id) do
       nil ->
         {:ok, [], MapSet.new()}
 
       profile ->
         party = counterparty(provider)
-        tickets = event_tickets(tenant)
         receipts = receipts_by_reversal(tenant)
 
         entries =
@@ -144,7 +118,7 @@ defmodule Palee.Application.MyTransactions do
     params = invoice.params || %{}
     receipt? = params["document_kind"] == "receipt"
 
-    entry(
+    TransactionFeed.entry(
       "invoice",
       invoice.id,
       party,
@@ -177,7 +151,7 @@ defmodule Palee.Application.MyTransactions do
   defp payment(payment, party, tickets) do
     event = Map.get(tickets, payment.id)
 
-    entry(
+    TransactionFeed.entry(
       if(event, do: "event_payment", else: "payment"),
       payment.id,
       party,
@@ -197,7 +171,7 @@ defmodule Palee.Application.MyTransactions do
   defp refund(reversal, party, receipts) do
     receipt = Map.get(receipts, reversal.id)
 
-    entry(
+    TransactionFeed.entry(
       "refund",
       reversal.id,
       party,
@@ -216,7 +190,7 @@ defmodule Palee.Application.MyTransactions do
   end
 
   defp credit(entry, party) do
-    entry(
+    TransactionFeed.entry(
       "credit",
       entry.id,
       party,
@@ -235,31 +209,47 @@ defmodule Palee.Application.MyTransactions do
     |> Map.new(&{&1.finance_payment_reversal_id, &1})
   end
 
-  # Finance payments that record an event ticket at this provider.
-  defp event_tickets(tenant) do
-    attendees =
-      tenant
-      |> Community.attendances_of(tenant.user_id, Community.attendee_statuses())
-      |> Enum.filter(&(&1.finance_payment_id && &1.organization_id == tenant.organization_id))
-
-    titles =
-      event_titles(tenant.organization_id, tenant.user_id, Enum.map(attendees, & &1.event_id))
-
-    Map.new(attendees, fn attendee ->
-      {attendee.finance_payment_id,
-       %{id: attendee.event_id, title: Map.get(titles, attendee.event_id)}}
+  # Finance payments that record an event ticket, by payment id.
+  defp tickets_by_payment(attendees, events) do
+    attendees
+    |> Enum.filter(& &1.finance_payment_id)
+    |> Map.new(fn attendee ->
+      event = Map.get(events, attendee.event_id)
+      {attendee.finance_payment_id, %{id: attendee.event_id, title: event && event.title}}
     end)
   end
 
   # ── events at any host ──────────────────────────────────────────────────
 
-  defp event_entries(user_id, clients, linked_payment_ids) do
+  # The person's own attendee rows (one read, their session) and the events
+  # behind them (one read per host, in that host's context).
+  defp event_facts(user_id) do
     attendees =
       %{user_id: user_id}
       |> Community.attendances_of(user_id, Community.attendee_statuses())
-      |> Enum.filter(&(&1.paid_at || &1.refunded_at))
+      |> Enum.filter(&(&1.paid_at || &1.refunded_at || &1.finance_payment_id))
 
-    events = events_by_id(user_id, attendees)
+    {attendees, events_by_id(user_id, attendees), true}
+  rescue
+    error ->
+      Logger.warning("event transactions failed error=#{inspect(error)}")
+      {[], %{}, false}
+  end
+
+  defp events_by_id(user_id, attendees) do
+    attendees
+    |> Enum.group_by(& &1.organization_id, & &1.event_id)
+    |> Enum.flat_map(fn {organization_id, ids} ->
+      Community.list_events(%{organization_id: organization_id, user_id: user_id}, %{
+        organization_ids: [organization_id],
+        ids: Enum.uniq(ids),
+        include_cancelled: true
+      })
+    end)
+    |> Map.new(&{&1.id, &1})
+  end
+
+  defp event_entries(clients, attendees, events, linked_payment_ids) do
     parties = event_parties(clients, Map.values(events))
 
     Enum.flat_map(attendees, fn attendee ->
@@ -274,7 +264,7 @@ defmodule Palee.Application.MyTransactions do
       paid =
         if attendee.paid_at && not MapSet.member?(linked_payment_ids, attendee.finance_payment_id) do
           [
-            entry(
+            TransactionFeed.entry(
               "event_payment",
               attendee.id,
               party,
@@ -293,7 +283,7 @@ defmodule Palee.Application.MyTransactions do
       refunded =
         if attendee.refunded_at do
           [
-            entry(
+            TransactionFeed.entry(
               "event_refund",
               "refund-" <> attendee.id,
               party,
@@ -317,31 +307,6 @@ defmodule Palee.Application.MyTransactions do
       []
   end
 
-  defp events_by_id(user_id, attendees) do
-    attendees
-    |> Enum.group_by(& &1.organization_id, & &1.event_id)
-    |> Enum.flat_map(fn {organization_id, ids} ->
-      Community.list_events(%{organization_id: organization_id, user_id: user_id}, %{
-        organization_ids: [organization_id],
-        ids: Enum.uniq(ids),
-        include_cancelled: true
-      })
-    end)
-    |> Map.new(&{&1.id, &1})
-  end
-
-  defp event_titles(_organization_id, _user_id, []), do: %{}
-
-  defp event_titles(organization_id, user_id, ids) do
-    %{organization_id: organization_id, user_id: user_id}
-    |> Community.list_events(%{
-      organization_ids: [organization_id],
-      ids: Enum.uniq(ids),
-      include_cancelled: true
-    })
-    |> Map.new(&{&1.id, &1.title})
-  end
-
   # Who to name for each host: a provider by its name; an organiser by the
   # person who runs it (ADR-185); another box by its public page.
   defp event_parties(clients, events) do
@@ -354,6 +319,12 @@ defmodule Palee.Application.MyTransactions do
       |> Enum.uniq()
       |> Enum.reject(&Map.has_key?(known, &1))
 
+    parties_of_others(known, others, events)
+  end
+
+  defp parties_of_others(known, [], _events), do: known
+
+  defp parties_of_others(known, others, events) do
     kinds = Organizations.provider_kinds(others)
 
     organisers =
@@ -412,67 +383,4 @@ defmodule Palee.Application.MyTransactions do
   defp kind_of("coach"), do: "coach"
   defp kind_of("organiser"), do: "organiser"
   defp kind_of(_gym), do: "gym"
-
-  # ── entries, order and cursor ───────────────────────────────────────────
-
-  defp entry(kind, source_id, party, title, amount_cents, currency, status, at, details) do
-    date = to_datetime(at)
-
-    %{
-      id: "#{kind}:#{source_id}",
-      kind: kind,
-      source_id: source_id,
-      counterparty: party,
-      title: title,
-      amount_cents: amount_cents,
-      currency: currency || "EUR",
-      status: status && to_string(status),
-      date: date,
-      details: details,
-      sort: {date && DateTime.to_unix(date, :microsecond), "#{kind}:#{source_id}"}
-    }
-  end
-
-  defp sort_key(%{sort: {nil, id}}), do: "0000000000000000000|" <> id
-
-  defp sort_key(%{sort: {unix, id}}),
-    do: (unix |> Integer.to_string() |> String.pad_leading(19, "0")) <> "|" <> id
-
-  defp sort_key(key) when is_binary(key), do: key
-
-  defp to_datetime(nil), do: nil
-  defp to_datetime(%DateTime{} = at), do: at
-  defp to_datetime(%NaiveDateTime{} = at), do: DateTime.from_naive!(at, "Etc/UTC")
-  defp to_datetime(%Date{} = day), do: DateTime.new!(day, ~T[00:00:00], "Etc/UTC")
-
-  defp encode_cursor(key), do: Base.url_encode64(key, padding: false)
-
-  defp decode_cursor(nil), do: {:ok, nil}
-  defp decode_cursor(""), do: {:ok, nil}
-
-  defp decode_cursor(cursor) when is_binary(cursor) do
-    case Base.url_decode64(cursor, padding: false) do
-      {:ok, key} -> if String.contains?(key, "|"), do: {:ok, key}, else: {:error, :invalid_cursor}
-      :error -> {:error, :invalid_cursor}
-    end
-  end
-
-  defp decode_cursor(_cursor), do: {:error, :invalid_cursor}
-
-  defp kind_filter(nil), do: {:ok, nil}
-  defp kind_filter(""), do: {:ok, nil}
-  defp kind_filter(kind) when kind in @kinds, do: {:ok, kind}
-  defp kind_filter(_kind), do: {:error, :invalid_kind}
-
-  defp limit(nil), do: @default_limit
-  defp limit(value) when is_integer(value), do: value |> max(1) |> min(@max_limit)
-
-  defp limit(value) when is_binary(value) do
-    case Integer.parse(value) do
-      {number, ""} -> limit(number)
-      _other -> @default_limit
-    end
-  end
-
-  defp limit(_value), do: @default_limit
 end

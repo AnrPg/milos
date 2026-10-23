@@ -9844,6 +9844,7 @@
     "loadMore": "Meer tonen",
     "noTransactions": "Nog geen transacties.",
     "shownTotal": "Getoond: {amounts}",
-    "tabTransactions": "Transacties"
+    "tabTransactions": "Transacties",
+    "shopOrder": "Productaankoop"
   }
 }

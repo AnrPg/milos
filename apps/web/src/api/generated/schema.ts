@@ -15137,8 +15137,10 @@ export interface components {
             /** @description `kind:source_id`, stable across pages. */
             id: string;
             /** @enum {string} */
-            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order";
             source_id: string;
+            /** @description In-app path of the source's own page when it has one (e.g. a shop order). */
+            source_url?: string | null;
             status?: string | null;
             title?: string | null;
         };
@@ -25093,7 +25095,7 @@ export interface components {
         };
         /** MyBillingTransactions */
         MyBillingTransactions: {
-            kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund")[];
+            kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order")[];
             next_cursor: string | null;
             partial: boolean;
             /** @description Entries in scope, before the kind filter. */
@@ -25120,8 +25122,10 @@ export interface components {
                 /** @description `kind:source_id`, stable across pages. */
                 id: string;
                 /** @enum {string} */
-                kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order";
                 source_id: string;
+                /** @description In-app path of the source's own page when it has one (e.g. a shop order). */
+                source_url?: string | null;
                 status?: string | null;
                 title?: string | null;
             }[];
@@ -37930,7 +37934,7 @@ export interface operations {
             query?: {
                 /** @description One provider; event entries of hosts that are not providers always stay. */
                 organization_id?: string;
-                kind?: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                kind?: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order";
                 cursor?: string;
                 limit?: number;
             };
@@ -37947,7 +37951,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund")[];
+                        kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order")[];
                         next_cursor: string | null;
                         partial: boolean;
                         /** @description Entries in scope, before the kind filter. */
@@ -37974,8 +37978,10 @@ export interface operations {
                             /** @description `kind:source_id`, stable across pages. */
                             id: string;
                             /** @enum {string} */
-                            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund" | "shop_order";
                             source_id: string;
+                            /** @description In-app path of the source's own page when it has one (e.g. a shop order). */
+                            source_url?: string | null;
                             status?: string | null;
                             title?: string | null;
                         }[];
