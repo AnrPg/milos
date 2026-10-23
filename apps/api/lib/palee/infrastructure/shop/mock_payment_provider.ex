@@ -25,6 +25,26 @@ defmodule Palee.Infrastructure.Shop.MockPaymentProvider do
     end
   end
 
+  # Desk methods are recorded by staff (the terminal is not integrated), so
+  # they are always on offer; the online card follows `availability/1`.
+  @impl true
+  def payment_methods(context) do
+    online = availability(context)
+
+    Enum.map(Palee.Shop.Domain.OrderLifecycle.desk_methods(), fn method ->
+      %{method: method, channel: :pos, available: true, reason: nil, provider: nil}
+    end) ++
+      [
+        %{
+          method: :card_online,
+          channel: :online,
+          available: online.available,
+          reason: online.reason,
+          provider: online.provider
+        }
+      ]
+  end
+
   @impl true
   def capture(_context, %{idempotency_key: key} = charge) when is_binary(key) do
     case {mode(), Map.get(charge, :payment_token)} do

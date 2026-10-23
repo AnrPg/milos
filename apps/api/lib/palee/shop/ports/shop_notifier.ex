@@ -16,4 +16,13 @@ defmodule Palee.Shop.Ports.ShopNotifier do
 
   @doc "An order is ready for pickup (to the buyer)."
   @callback order_ready(context(), map()) :: :ok
+
+  @doc "A ready order is still waiting to be collected (to the buyer)."
+  @callback order_reminder(context(), map()) :: :ok
+
+  @doc "The buyer's order was cancelled by staff or because its hold ran out (to the buyer)."
+  @callback order_cancelled(context(), map()) :: :ok
+
+  @doc "A variant the member asked about («Ειδοποίησέ με») is back in stock (to them)."
+  @callback back_in_stock(context(), map()) :: :ok
 end

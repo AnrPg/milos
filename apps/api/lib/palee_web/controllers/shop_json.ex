@@ -6,6 +6,7 @@ defmodule PaleeWeb.ShopJSON do
   @order_fields [
     :id,
     :number,
+    :pickup_code,
     :status,
     :payment_status,
     :channel,
@@ -97,4 +98,30 @@ defmodule PaleeWeb.ShopJSON do
   def variant(variant), do: Map.drop(variant, [:__meta__, :organization_id])
 
   def movement(movement), do: Map.take(movement, @movement_fields)
+
+  @ledger_fields @movement_fields ++
+                   [:product_id, :product_title, :variant_title, :sku, :order_number, :actor_name]
+
+  def ledger_movement(movement), do: Map.take(movement, @ledger_fields)
+
+  @promotion_code_fields [
+    :id,
+    :product_id,
+    :code,
+    :discount_percent,
+    :discount_cents,
+    :max_redemptions,
+    :redemptions,
+    :starts_at,
+    :ends_at,
+    :active,
+    :post_id,
+    :inserted_at
+  ]
+
+  def promotion_code(code) do
+    code
+    |> Map.take(@promotion_code_fields)
+    |> Map.put(:status, Map.get(code, :status) || Shop.promotion_status(code, DateTime.utc_now()))
+  end
 end

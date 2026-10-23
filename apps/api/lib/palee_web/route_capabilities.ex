@@ -343,6 +343,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.ShopController, :pick_up} => [:manage_shop, :sell_shop],
     {W.ShopController, :cancel} => [:manage_shop, :sell_shop],
     {W.ShopController, :desk_sale} => [:manage_shop, :sell_shop],
+    {W.ShopController, :payment_methods} => [:manage_shop, :sell_shop],
     {W.ShopController, :ready_orders} => [:manage_shop, :sell_shop, :check_in],
     {W.ShopController, :set_fiscal_receipt} => [:manage_shop, :sell_shop],
     {W.ShopController, :lineage} => [:manage_shop, :view_finance_reports],

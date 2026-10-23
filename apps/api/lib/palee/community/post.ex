@@ -7,9 +7,10 @@ defmodule Palee.Community.Post do
   alias Palee.Community.Domain.PostMediaPolicy
 
   @audiences ~w(club_channel followers public)
-  # Journal entries a member shares, and the card of a club event (ADR-153).
+  # Journal entries a member shares, the card of a club event (ADR-153) and
+  # of a promoted shop product (ADR-190 «Προώθηση»).
   @shareable_attachment_types ~w(training_log_entry workout_execution pr)
-  @attachment_types @shareable_attachment_types ++ ["event"]
+  @attachment_types @shareable_attachment_types ++ ["event", "product"]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

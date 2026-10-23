@@ -15,6 +15,8 @@ defmodule Palee.Application.AroundMe do
   at their neighbourhood's centroid, never closer.
   """
 
+  alias Palee.Application.Shop.ProductCards
+
   alias Palee.Application.{
     BoxPhotoCovers,
     CommunityEvents,
@@ -241,6 +243,7 @@ defmodule Palee.Application.AroundMe do
           limit: length(club_rows)
         })
         |> PostPresenter.public_box_posts(PublicBox.boxes(organization_ids))
+        |> ProductCards.attach(fn -> ProductCards.member_organization_ids(user_id) end)
       end
 
     person_posts =

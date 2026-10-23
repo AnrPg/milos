@@ -14,6 +14,7 @@ defmodule Palee.Shop do
     OrderLifecycle,
     OrderPricing,
     ProductPolicy,
+    PromotionPolicy,
     RevenueLineage,
     StockLedger,
     StockStatus
@@ -45,6 +46,7 @@ defmodule Palee.Shop do
 
   defdelegate order_state(order), to: OrderLifecycle, as: :state
   defdelegate order_states(), to: OrderLifecycle, as: :states
+  defdelegate order_statuses(), to: OrderLifecycle, as: :statuses
   defdelegate order_transition(order, event, facts), to: OrderLifecycle, as: :transition
   defdelegate checkout_mode(mode, facts), to: OrderLifecycle
   defdelegate desk_method(method), to: OrderLifecycle
@@ -75,6 +77,9 @@ defmodule Palee.Shop do
   @doc "`%{available, reason, provider}`: whether online card payment can be offered."
   def online_payment(context), do: payment_provider().availability(context)
 
+  @doc "Every way to pay, with whether it is on offer (the payment port's answer)."
+  def payment_methods(context), do: payment_provider().payment_methods(context)
+
   # ── Store ───────────────────────────────────────────────────────────────
 
   @doc "Runs `fun` in one tenant transaction (all or nothing)."
@@ -102,9 +107,40 @@ defmodule Palee.Shop do
   def update_order(context, id, attrs), do: ShopStore.update_order(context, id, attrs)
   def update_order_line(context, id, attrs), do: ShopStore.update_order_line(context, id, attrs)
   def list_orders(context, filters \\ %{}), do: ShopStore.list_orders(context, filters)
+  def order_counts(context, filters \\ %{}), do: ShopStore.order_counts(context, filters)
 
   def units_held(context, user_id, product_ids),
     do: ShopStore.units_held(context, user_id, product_ids)
+
+  # ── Stock alerts and pickup codes ──────────────────────────────────────
+
+  def subscribe_stock_alert(context, variant_id, user_id),
+    do: ShopStore.subscribe_stock_alert(context, variant_id, user_id)
+
+  def unsubscribe_stock_alert(context, variant_id, user_id),
+    do: ShopStore.unsubscribe_stock_alert(context, variant_id, user_id)
+
+  def list_stock_alerts(context, filters), do: ShopStore.list_stock_alerts(context, filters)
+
+  def mark_stock_alerts_notified(context, ids, at \\ DateTime.utc_now()),
+    do: ShopStore.mark_stock_alerts_notified(context, ids, at)
+
+  defdelegate normalize_pickup_code(code), to: Palee.Shop.Domain.PickupCode, as: :normalize
+
+  # ── Promotion codes («Προώθηση») ───────────────────────────────────────
+
+  defdelegate normalize_promotion_code(code), to: PromotionPolicy, as: :normalize_code
+  defdelegate promotion_redeemable(code, now), to: PromotionPolicy, as: :redeemable
+  defdelegate promotion_status(code, now), to: PromotionPolicy, as: :status
+
+  def get_promotion_code(context, code, opts \\ []),
+    do: ShopStore.get_promotion_code(context, code, opts)
+
+  def list_promotion_codes(context, filters \\ %{}),
+    do: ShopStore.list_promotion_codes(context, filters)
+
+  def save_promotion_code(context, id, attrs),
+    do: ShopStore.save_promotion_code(context, id, attrs)
 
   @doc """
   The stock status of variants from their levels and recent sales; returns

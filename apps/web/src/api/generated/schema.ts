@@ -9120,6 +9120,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/shop/stock-alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The member's «Ειδοποίησέ με» requests */
+        get: operations["PaleeWeb.MyShopController.stock_alerts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/storefront": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's shop for the member: open or not, products, categories, pickup branches, member discount and online payment */
+        get: operations["PaleeWeb.MyShopController.storefront"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/shop/transactions": {
         parameters: {
             query?: never;
@@ -9132,6 +9166,24 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/variants/{id}/stock-alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** «Ειδοποίησέ με»: be told when this variant is back in stock */
+        put: operations["PaleeWeb.MyShopController.subscribe_stock_alert"];
+        post?: never;
+        /** Stop waiting for this variant */
+        delete: operations["PaleeWeb.MyShopController.unsubscribe_stock_alert"];
         options?: never;
         head?: never;
         patch?: never;
@@ -10253,6 +10305,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/shop/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The stock ledger across every variant, newest first, one page at a time */
+        get: operations["PaleeWeb.ShopController.ledger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/shop/orders": {
         parameters: {
             query?: never;
@@ -10260,7 +10329,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Orders collected at the acting staff member's branches, newest first */
+        /** Orders collected at the acting staff member's branches, newest first, with the count of every status */
         get: operations["PaleeWeb.ShopController.orders"];
         put?: never;
         post?: never;
@@ -10406,6 +10475,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/shop/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ways to pay, from the payment port: desk methods staff record, and the online card (available: false until Palee has a card vendor) */
+        get: operations["PaleeWeb.ShopController.payment_methods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a product photo (shop_product_photo) and get a presigned upload for it */
+        post: operations["PaleeWeb.ShopController.photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/photos/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded product photo (type, size, no metadata) and mark it ready */
+        post: operations["PaleeWeb.ShopController.complete_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/shop/products": {
         parameters: {
             query?: never;
@@ -10413,7 +10533,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Products with their variants and stock (drafts and published; archived on request) */
+        /** The console's catalog: one filter's products and the counts of every filter */
         get: operations["PaleeWeb.ShopController.products"];
         put?: never;
         /** Create a draft product with its variants (and optional opening stock) */
@@ -10438,8 +10558,25 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Edit a product's details, photos, options, channels and branches */
+        /** Edit a product's details, photos, options, channels and branches, and optionally its status and its variants, in one transaction */
         patch: operations["PaleeWeb.ShopController.update_product"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Promote a product with a club post (#ανακοινώσεις, a group or squad, or the public feed), optionally with a promotion code */
+        post: operations["PaleeWeb.ShopController.promote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/shop/products/{id}/status": {
@@ -10513,6 +10650,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/shop/promotion-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Promotion codes, with their redemptions and status */
+        get: operations["PaleeWeb.ShopController.promotion_codes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/promotion-codes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a promotion code's discount, window or cap, or switch it off */
+        patch: operations["PaleeWeb.ShopController.update_promotion_code"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/shop/ready-orders": {
         parameters: {
             query?: never;
@@ -10520,7 +10691,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A member's orders ready for pickup (the check-in desk's «παραγγελία έτοιμη») */
+        /** Orders ready for pickup for a member, or for the pickup code they show (the check-in desk's «παραγγελία έτοιμη») */
         get: operations["PaleeWeb.ShopController.ready_orders"];
         put?: never;
         post?: never;
@@ -13185,7 +13356,7 @@ export interface components {
                     /** Format: uuid */
                     attachment_id?: string | null;
                     /** @enum {string|null} */
-                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                     /** @enum {string} */
                     audience: "club_channel" | "followers" | "public";
                     /** CommunityAuthor */
@@ -13418,6 +13589,44 @@ export interface components {
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
+                    /**
+                     * ShopProductCard
+                     * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                     */
+                    product?: {
+                        /** @enum {string|null} */
+                        availability?: "in_stock" | "low" | null;
+                        /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                        buy_link?: {
+                            params?: {
+                                promotion_code?: string;
+                                source?: string;
+                                /** Format: uuid */
+                                source_ref_id?: string;
+                            };
+                            path?: string;
+                            /** Format: uuid */
+                            product_id?: string;
+                            url?: string;
+                        } | null;
+                        currency?: string | null;
+                        max_price_cents?: number | null;
+                        media_ids?: string[];
+                        price_cents?: number | null;
+                        /** Format: uuid */
+                        product_id: string;
+                        promotion?: {
+                            code?: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                        } | null;
+                        promotion_price_cents?: number | null;
+                        /** @enum {string} */
+                        status: "available" | "sold_out" | "members_only" | "unavailable";
+                        title?: string | null;
+                    } | null;
                 };
             })[];
             /** @enum {string} */
@@ -13580,7 +13789,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -13813,6 +14022,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             };
         };
         /** AroundPostsSection */
@@ -13832,7 +14079,7 @@ export interface components {
                     /** Format: uuid */
                     attachment_id?: string | null;
                     /** @enum {string|null} */
-                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                     /** @enum {string} */
                     audience: "club_channel" | "followers" | "public";
                     /** CommunityAuthor */
@@ -14065,6 +14312,44 @@ export interface components {
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
+                    /**
+                     * ShopProductCard
+                     * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                     */
+                    product?: {
+                        /** @enum {string|null} */
+                        availability?: "in_stock" | "low" | null;
+                        /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                        buy_link?: {
+                            params?: {
+                                promotion_code?: string;
+                                source?: string;
+                                /** Format: uuid */
+                                source_ref_id?: string;
+                            };
+                            path?: string;
+                            /** Format: uuid */
+                            product_id?: string;
+                            url?: string;
+                        } | null;
+                        currency?: string | null;
+                        max_price_cents?: number | null;
+                        media_ids?: string[];
+                        price_cents?: number | null;
+                        /** Format: uuid */
+                        product_id: string;
+                        promotion?: {
+                            code?: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                        } | null;
+                        promotion_price_cents?: number | null;
+                        /** @enum {string} */
+                        status: "available" | "sold_out" | "members_only" | "unavailable";
+                        title?: string | null;
+                    } | null;
                 };
             }[];
             next_cursor: string | null;
@@ -14454,7 +14739,7 @@ export interface components {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -14687,6 +14972,44 @@ export interface components {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     }[];
                     next_cursor: string | null;
@@ -14994,7 +15317,7 @@ export interface components {
                         /** Format: uuid */
                         attachment_id?: string | null;
                         /** @enum {string|null} */
-                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                         /** @enum {string} */
                         audience: "club_channel" | "followers" | "public";
                         /** CommunityAuthor */
@@ -15227,6 +15550,44 @@ export interface components {
                         /** @enum {string} */
                         origin: "club" | "profile";
                         pinned: boolean;
+                        /**
+                         * ShopProductCard
+                         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                         */
+                        product?: {
+                            /** @enum {string|null} */
+                            availability?: "in_stock" | "low" | null;
+                            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                            buy_link?: {
+                                params?: {
+                                    promotion_code?: string;
+                                    source?: string;
+                                    /** Format: uuid */
+                                    source_ref_id?: string;
+                                };
+                                path?: string;
+                                /** Format: uuid */
+                                product_id?: string;
+                                url?: string;
+                            } | null;
+                            currency?: string | null;
+                            max_price_cents?: number | null;
+                            media_ids?: string[];
+                            price_cents?: number | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            promotion?: {
+                                code?: string;
+                                discount_cents?: number | null;
+                                discount_percent?: number | null;
+                                /** Format: date-time */
+                                ends_at?: string | null;
+                            } | null;
+                            promotion_price_cents?: number | null;
+                            /** @enum {string} */
+                            status: "available" | "sold_out" | "members_only" | "unavailable";
+                            title?: string | null;
+                        } | null;
                     };
                 }[];
                 next_cursor: string | null;
@@ -16305,7 +16666,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16337,7 +16698,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16407,7 +16768,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16439,7 +16800,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -20121,7 +20482,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -20354,6 +20715,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
             posts: {
                 /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
@@ -20363,7 +20762,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -20596,6 +20995,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /** CommunityGroup */
@@ -21105,7 +21542,7 @@ export interface components {
             /** Format: uuid */
             attachment_id?: string | null;
             /** @enum {string|null} */
-            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
             /** @enum {string} */
             audience: "club_channel" | "followers" | "public";
             /** CommunityAuthor */
@@ -21338,6 +21775,44 @@ export interface components {
             /** @enum {string} */
             origin: "club" | "profile";
             pinned: boolean;
+            /**
+             * ShopProductCard
+             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+             */
+            product?: {
+                /** @enum {string|null} */
+                availability?: "in_stock" | "low" | null;
+                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                buy_link?: {
+                    params?: {
+                        promotion_code?: string;
+                        source?: string;
+                        /** Format: uuid */
+                        source_ref_id?: string;
+                    };
+                    path?: string;
+                    /** Format: uuid */
+                    product_id?: string;
+                    url?: string;
+                } | null;
+                currency?: string | null;
+                max_price_cents?: number | null;
+                media_ids?: string[];
+                price_cents?: number | null;
+                /** Format: uuid */
+                product_id: string;
+                promotion?: {
+                    code?: string;
+                    discount_cents?: number | null;
+                    discount_percent?: number | null;
+                    /** Format: date-time */
+                    ends_at?: string | null;
+                } | null;
+                promotion_price_cents?: number | null;
+                /** @enum {string} */
+                status: "available" | "sold_out" | "members_only" | "unavailable";
+                title?: string | null;
+            } | null;
         };
         /** CommunityPostCreateRequest */
         CommunityPostCreateRequest: {
@@ -21552,7 +22027,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -21785,6 +22260,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             };
         };
         /** CommunityReportActionRequest */
@@ -24876,7 +25389,7 @@ export interface components {
             /** @description A tiny blurred WebP data URI to show while the image loads */
             placeholder?: string | null;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
             rejection_reason?: string | null;
             /**
              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -24920,7 +25433,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -26446,7 +26959,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -26679,6 +27192,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /** PersonProfile */
@@ -27614,7 +28165,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -27847,6 +28398,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /**
@@ -29144,6 +29733,7 @@ export interface components {
             }[];
             /** Format: uuid */
             pickup_location_id?: string | null;
+            promotion_code?: string | null;
         };
         /** ShopCartItem */
         ShopCartItem: {
@@ -29159,6 +29749,17 @@ export interface components {
                 [key: string]: unknown;
             }[];
             /**
+             * ShopMemberDiscount
+             * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+             */
+            member_discount?: {
+                /** @enum {string} */
+                applies_to?: "marked_products";
+                percent: number;
+                /** @enum {string} */
+                source?: "membership_package";
+            } | null;
+            /**
              * ShopOnlinePayment
              * @description Whether online card payment can be offered; false greys out «Πληρωμή».
              */
@@ -29172,6 +29773,15 @@ export interface components {
             /** Format: uuid */
             pickup_location_id?: string | null;
             pickup_location_ids?: string[];
+            /** @description The promotion code that applied (never stacked with the member discount) */
+            promotion_code?: {
+                applied?: boolean;
+                code?: string;
+                /** Format: uuid */
+                id?: string;
+            } | null;
+            /** Format: uuid */
+            promotion_code_id?: string | null;
             subtotal_cents?: number;
             total_cents: number;
         };
@@ -29320,6 +29930,73 @@ export interface components {
                 to: string;
             };
         };
+        /** ShopLedgerMovement */
+        ShopLedgerMovement: {
+            actor_name?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            /** Format: uuid */
+            order_id?: string | null;
+            /** Format: uuid */
+            order_line_id?: string | null;
+            order_number?: number | null;
+            /** Format: uuid */
+            product_id?: string | null;
+            product_title?: string | null;
+            quantity: number;
+            reason?: string | null;
+            sku?: string | null;
+            /** Format: uuid */
+            transfer_id?: string | null;
+            unit_cost_cents?: number | null;
+            /** Format: uuid */
+            user_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+            variant_title?: string | null;
+        };
+        /** ShopLedgerPage */
+        ShopLedgerPage: {
+            movements: {
+                actor_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                /** Format: uuid */
+                location_id?: string | null;
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at?: string | null;
+                /** Format: uuid */
+                order_id?: string | null;
+                /** Format: uuid */
+                order_line_id?: string | null;
+                order_number?: number | null;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_title?: string | null;
+                quantity: number;
+                reason?: string | null;
+                sku?: string | null;
+                /** Format: uuid */
+                transfer_id?: string | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                user_id?: string | null;
+                /** Format: uuid */
+                variant_id: string;
+                variant_title?: string | null;
+            }[];
+            next_cursor?: string | null;
+        };
         /** ShopMarginReport */
         ShopMarginReport: {
             products: {
@@ -29363,6 +30040,17 @@ export interface components {
                 to: string;
             };
         };
+        /**
+         * ShopMemberDiscount
+         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+         */
+        ShopMemberDiscount: {
+            /** @enum {string} */
+            applies_to?: "marked_products";
+            percent: number;
+            /** @enum {string} */
+            source?: "membership_package";
+        } | null;
         /** ShopMemberProduct */
         ShopMemberProduct: {
             all_locations?: boolean;
@@ -29371,6 +30059,16 @@ export interface components {
             /** Format: uuid */
             id: string;
             location_ids?: string[];
+            media?: {
+                alt_text?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                thumb_url?: string | null;
+                url?: string | null;
+                width?: number | null;
+            }[];
             media_ids?: string[];
             options?: {
                 [key: string]: unknown;
@@ -29415,6 +30113,22 @@ export interface components {
             sku?: string | null;
             title?: string | null;
         };
+        /**
+         * ShopNewPromotionCode
+         * @description A code of the promoted product: a percent off, or an amount off each unit
+         */
+        ShopNewPromotionCode: {
+            /** @description Letters, digits, - or _ (stored upper case) */
+            code: string;
+            /** @description Off each unit */
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: date-time */
+            starts_at?: string | null;
+        } | null;
         /**
          * ShopOnlinePayment
          * @description Whether online card payment can be offered; false greys out «Πληρωμή».
@@ -29477,6 +30191,8 @@ export interface components {
             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
             /** Format: date-time */
             picked_up_at?: string | null;
+            /** @description The short code the buyer shows at the desk */
+            pickup_code?: string | null;
             /** Format: uuid */
             pickup_location_id?: string | null;
             /** Format: date-time */
@@ -29604,6 +30320,8 @@ export interface components {
                 payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                 /** Format: date-time */
                 picked_up_at?: string | null;
+                /** @description The short code the buyer shows at the desk */
+                pickup_code?: string | null;
                 /** Format: uuid */
                 pickup_location_id?: string | null;
                 /** Format: date-time */
@@ -29633,6 +30351,86 @@ export interface components {
                 [key: string]: unknown;
             }[];
         };
+        /** ShopOrderList */
+        ShopOrderList: {
+            /** @description Orders per status, within the branch, buyer and paid filters */
+            counts: {
+                cancelled: number;
+                picked_up: number;
+                placed: number;
+                ready_for_pickup: number;
+            };
+            orders: {
+                cancel_reason?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @enum {string} */
+                channel: "online" | "pos";
+                currency?: string;
+                customer_name?: string | null;
+                discount_cents?: number;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                fiscal_receipt_ref?: string | null;
+                /** Format: uuid */
+                id: string;
+                lines: {
+                    discount_cents?: number;
+                    /** Format: uuid */
+                    finance_invoice_line_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    product_id?: string;
+                    product_title: string;
+                    quantity: number;
+                    refunded_cents?: number;
+                    refunded_quantity?: number;
+                    sku?: string | null;
+                    total_cents: number;
+                    unit_price_cents?: number;
+                    /** Format: uuid */
+                    variant_id: string;
+                    variant_title?: string | null;
+                }[];
+                number: number;
+                /** Format: date-time */
+                paid_at?: string | null;
+                paid_cents?: number;
+                payment_mode?: string;
+                /** @enum {string} */
+                payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                /** Format: date-time */
+                picked_up_at?: string | null;
+                /** @description The short code the buyer shows at the desk */
+                pickup_code?: string | null;
+                /** Format: uuid */
+                pickup_location_id?: string | null;
+                /** Format: date-time */
+                placed_at?: string | null;
+                promotion_code?: string | null;
+                /** Format: date-time */
+                ready_at?: string | null;
+                refunded_cents?: number;
+                /** @enum {string} */
+                revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+                /** @enum {string} */
+                state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                /** @enum {string} */
+                status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                subtotal_cents?: number;
+                total_cents: number;
+                /** Format: uuid */
+                user_id?: string | null;
+            }[];
+        };
         /** ShopOrderPaymentBody */
         ShopOrderPaymentBody: {
             /** @enum {string} */
@@ -29646,6 +30444,16 @@ export interface components {
         /** ShopPayBody */
         ShopPayBody: {
             payment_token: string;
+        };
+        /** ShopPaymentMethod */
+        ShopPaymentMethod: {
+            available: boolean;
+            /** @enum {string} */
+            channel: "pos" | "online";
+            /** @description cash, card_manual (card at the terminal), bank_transfer, other, card_online */
+            id: string;
+            provider?: string | null;
+            reason?: string | null;
         };
         /** ShopPricingIndicators */
         ShopPricingIndicators: {
@@ -29743,6 +30551,17 @@ export interface components {
             /** Format: uuid */
             id: string;
             location_ids?: string[];
+            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+            media?: {
+                alt_text?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                thumb_url?: string | null;
+                url?: string | null;
+                width?: number | null;
+            }[];
             media_ids?: string[];
             member_discount_applies?: boolean;
             options?: {
@@ -29817,6 +30636,11 @@ export interface components {
             price_cents?: number;
             sell_at_desk?: boolean;
             sell_in_app?: boolean;
+            /**
+             * @description Created as a draft unless given; published runs the publish checks in the same transaction
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "archived";
             title: string;
             variants?: {
                 barcode?: string | null;
@@ -29841,6 +30665,143 @@ export interface components {
             /** @enum {string} */
             visibility?: "members_only" | "anyone";
         };
+        /**
+         * ShopProductCard
+         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+         */
+        ShopProductCard: {
+            /** @enum {string|null} */
+            availability?: "in_stock" | "low" | null;
+            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+            buy_link?: {
+                params?: {
+                    promotion_code?: string;
+                    source?: string;
+                    /** Format: uuid */
+                    source_ref_id?: string;
+                };
+                path?: string;
+                /** Format: uuid */
+                product_id?: string;
+                url?: string;
+            } | null;
+            currency?: string | null;
+            max_price_cents?: number | null;
+            media_ids?: string[];
+            price_cents?: number | null;
+            /** Format: uuid */
+            product_id: string;
+            promotion?: {
+                code?: string;
+                discount_cents?: number | null;
+                discount_percent?: number | null;
+                /** Format: date-time */
+                ends_at?: string | null;
+            } | null;
+            promotion_price_cents?: number | null;
+            /** @enum {string} */
+            status: "available" | "sold_out" | "members_only" | "unavailable";
+            title?: string | null;
+        } | null;
+        /** ShopProductList */
+        ShopProductList: {
+            /** @description Products per filter, within the branch and search filters */
+            counts: {
+                all: number;
+                archived: number;
+                draft: number;
+                low_stock: number;
+                published: number;
+            };
+            products: {
+                all_locations?: boolean;
+                /** Format: date-time */
+                archived_at?: string | null;
+                category?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                location_ids?: string[];
+                /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                media?: {
+                    alt_text?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    thumb_url?: string | null;
+                    url?: string | null;
+                    width?: number | null;
+                }[];
+                media_ids?: string[];
+                member_discount_applies?: boolean;
+                options?: {
+                    axes?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                };
+                per_person_limit?: number | null;
+                position?: number;
+                /** Format: date-time */
+                published_at?: string | null;
+                sell_at_desk?: boolean;
+                sell_in_app?: boolean;
+                /** @enum {string} */
+                status: "draft" | "published" | "archived";
+                title: string;
+                variants: {
+                    /** Format: date-time */
+                    archived_at?: string | null;
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency: string;
+                    /** Format: uuid */
+                    id: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents: number;
+                    /** Format: uuid */
+                    product_id: string;
+                    sku?: string | null;
+                    /** ShopVariantStock */
+                    stock?: {
+                        available: number;
+                        by_location?: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            on_hand?: number;
+                            reserved?: number;
+                        }[];
+                        on_hand: number;
+                        reserved: number;
+                    };
+                    /** @enum {string} */
+                    stock_status: "ok" | "low" | "critical" | "out";
+                    tax_class?: string | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                }[];
+                /** @enum {string} */
+                visibility: "members_only" | "anyone";
+            }[];
+        };
+        /** ShopProductPhoto */
+        ShopProductPhoto: {
+            alt_text?: string | null;
+            full_url?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            thumb_url?: string | null;
+            url?: string | null;
+            width?: number | null;
+        };
         /** ShopProductStatusBody */
         ShopProductStatusBody: {
             /** @enum {string} */
@@ -29862,7 +30823,32 @@ export interface components {
             position?: number;
             sell_at_desk?: boolean;
             sell_in_app?: boolean;
+            /** @enum {string} */
+            status?: "draft" | "published" | "archived";
             title?: string;
+            /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
+            variants?: {
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency?: string;
+                /** Format: uuid */
+                id?: string | null;
+                initial_quantity?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents?: number;
+                sku?: string | null;
+                /** @enum {string|null} */
+                tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
             /** @enum {string} */
             visibility?: "members_only" | "anyone";
         };
@@ -29945,6 +30931,74 @@ export interface components {
                 /** Format: date */
                 to: string;
             };
+        };
+        /** ShopPromoteBody */
+        ShopPromoteBody: {
+            body?: string | null;
+            /** Format: uuid */
+            channel_id?: string | null;
+            /**
+             * ShopNewPromotionCode
+             * @description A code of the promoted product: a percent off, or an amount off each unit
+             */
+            promotion_code?: {
+                /** @description Letters, digits, - or _ (stored upper case) */
+                code: string;
+                /** @description Off each unit */
+                discount_cents?: number | null;
+                discount_percent?: number | null;
+                /** Format: date-time */
+                ends_at?: string | null;
+                max_redemptions?: number | null;
+                /** Format: date-time */
+                starts_at?: string | null;
+            } | null;
+            /**
+             * Format: uuid
+             * @description An existing code of this product
+             */
+            promotion_code_id?: string | null;
+            /**
+             * @description announcements (club #ανακοινώσεις, default), channel (a member group or PT squad: channel_id) or feed (public: box page and followers)
+             * @enum {string}
+             */
+            target?: "announcements" | "channel" | "feed";
+        };
+        /** ShopPromotionCode */
+        ShopPromotionCode: {
+            active: boolean;
+            code: string;
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: uuid */
+            post_id?: string | null;
+            /** Format: uuid */
+            product_id: string;
+            /** @description Orders (not cancelled) that used it */
+            redemptions: number;
+            /** Format: date-time */
+            starts_at?: string | null;
+            /** @enum {string} */
+            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+        } | null;
+        /** ShopPromotionCodeUpdateBody */
+        ShopPromotionCodeUpdateBody: {
+            active?: boolean;
+            /** @description Off each unit */
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: date-time */
+            starts_at?: string | null;
         };
         /** ShopRefundBody */
         ShopRefundBody: {
@@ -30075,6 +31129,20 @@ export interface components {
                 to: string;
             };
         };
+        /** ShopStockAlert */
+        ShopStockAlert: {
+            available?: boolean | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string | null;
+            /** Format: date-time */
+            notified_at?: string | null;
+            /** Format: uuid */
+            product_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+        };
         /** ShopStockMovement */
         ShopStockMovement: {
             /** Format: uuid */
@@ -30114,6 +31182,84 @@ export interface components {
             /** Format: uuid */
             to_location_id?: string | null;
             unit_cost_cents?: number | null;
+        };
+        /** ShopStorefront */
+        ShopStorefront: {
+            categories?: string[];
+            /** @enum {string|null} */
+            closed_reason?: "no_products" | "business_not_activated" | null;
+            /**
+             * ShopMemberDiscount
+             * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+             */
+            member_discount?: {
+                /** @enum {string} */
+                applies_to?: "marked_products";
+                percent: number;
+                /** @enum {string} */
+                source?: "membership_package";
+            } | null;
+            /**
+             * ShopOnlinePayment
+             * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+             */
+            online_payment: {
+                available: boolean;
+                provider?: string;
+                /** @description e.g. no_provider */
+                reason?: string | null;
+            };
+            open: boolean;
+            pickup_locations: {
+                address?: string | null;
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            }[];
+            products: {
+                all_locations?: boolean;
+                category?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                location_ids?: string[];
+                media?: {
+                    alt_text?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    thumb_url?: string | null;
+                    url?: string | null;
+                    width?: number | null;
+                }[];
+                media_ids?: string[];
+                options?: {
+                    [key: string]: unknown;
+                };
+                per_person_limit?: number | null;
+                /** Format: date-time */
+                published_at?: string | null;
+                title: string;
+                variants: {
+                    /** @enum {string} */
+                    available: "in_stock" | "low" | "sold_out";
+                    compare_at_price_cents?: number | null;
+                    currency: string;
+                    /** Format: uuid */
+                    id: string;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    price_cents: number;
+                    /** Format: uuid */
+                    product_id?: string;
+                    sku?: string | null;
+                    title?: string | null;
+                }[];
+                /** @enum {string} */
+                visibility?: "members_only" | "anyone";
+            }[];
         };
         /** ShopTransaction */
         ShopTransaction: {
@@ -34529,7 +35675,7 @@ export interface operations {
                                         /** Format: uuid */
                                         attachment_id?: string | null;
                                         /** @enum {string|null} */
-                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                                         /** @enum {string} */
                                         audience: "club_channel" | "followers" | "public";
                                         /** CommunityAuthor */
@@ -34762,6 +35908,44 @@ export interface operations {
                                         /** @enum {string} */
                                         origin: "club" | "profile";
                                         pinned: boolean;
+                                        /**
+                                         * ShopProductCard
+                                         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                                         */
+                                        product?: {
+                                            /** @enum {string|null} */
+                                            availability?: "in_stock" | "low" | null;
+                                            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                            buy_link?: {
+                                                params?: {
+                                                    promotion_code?: string;
+                                                    source?: string;
+                                                    /** Format: uuid */
+                                                    source_ref_id?: string;
+                                                };
+                                                path?: string;
+                                                /** Format: uuid */
+                                                product_id?: string;
+                                                url?: string;
+                                            } | null;
+                                            currency?: string | null;
+                                            max_price_cents?: number | null;
+                                            media_ids?: string[];
+                                            price_cents?: number | null;
+                                            /** Format: uuid */
+                                            product_id: string;
+                                            promotion?: {
+                                                code?: string;
+                                                discount_cents?: number | null;
+                                                discount_percent?: number | null;
+                                                /** Format: date-time */
+                                                ends_at?: string | null;
+                                            } | null;
+                                            promotion_price_cents?: number | null;
+                                            /** @enum {string} */
+                                            status: "available" | "sold_out" | "members_only" | "unavailable";
+                                            title?: string | null;
+                                        } | null;
                                     };
                                 }[];
                                 next_cursor: string | null;
@@ -35114,7 +36298,7 @@ export interface operations {
                                 /** Format: uuid */
                                 attachment_id?: string | null;
                                 /** @enum {string|null} */
-                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                                 /** @enum {string} */
                                 audience: "club_channel" | "followers" | "public";
                                 /** CommunityAuthor */
@@ -35347,6 +36531,44 @@ export interface operations {
                                 /** @enum {string} */
                                 origin: "club" | "profile";
                                 pinned: boolean;
+                                /**
+                                 * ShopProductCard
+                                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                                 */
+                                product?: {
+                                    /** @enum {string|null} */
+                                    availability?: "in_stock" | "low" | null;
+                                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                    buy_link?: {
+                                        params?: {
+                                            promotion_code?: string;
+                                            source?: string;
+                                            /** Format: uuid */
+                                            source_ref_id?: string;
+                                        };
+                                        path?: string;
+                                        /** Format: uuid */
+                                        product_id?: string;
+                                        url?: string;
+                                    } | null;
+                                    currency?: string | null;
+                                    max_price_cents?: number | null;
+                                    media_ids?: string[];
+                                    price_cents?: number | null;
+                                    /** Format: uuid */
+                                    product_id: string;
+                                    promotion?: {
+                                        code?: string;
+                                        discount_cents?: number | null;
+                                        discount_percent?: number | null;
+                                        /** Format: date-time */
+                                        ends_at?: string | null;
+                                    } | null;
+                                    promotion_price_cents?: number | null;
+                                    /** @enum {string} */
+                                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                                    title?: string | null;
+                                } | null;
                             };
                         })[];
                         /** @enum {string} */
@@ -36880,7 +38102,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -37113,6 +38335,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -37238,6 +38498,16 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             options?: {
                                 [key: string]: unknown;
@@ -39740,7 +41010,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -39973,6 +41243,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -42725,7 +44033,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -42958,6 +44266,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43115,7 +44461,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43348,6 +44694,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43390,7 +44774,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43623,6 +45007,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43665,7 +45087,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43898,6 +45320,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -46723,7 +48183,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -46956,6 +48416,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                         posts: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
@@ -46965,7 +48463,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -47198,6 +48696,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -48755,7 +50291,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -48834,7 +50370,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -48917,7 +50453,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64546,7 +66082,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64578,7 +66114,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64674,7 +66210,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64706,7 +66242,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64824,7 +66360,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64899,7 +66435,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -64931,7 +66467,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -65076,7 +66612,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -65108,7 +66644,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -76085,7 +77621,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -76318,6 +77854,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -76475,7 +78049,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -76708,6 +78282,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -76750,7 +78362,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -76983,6 +78595,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -77025,7 +78675,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -77258,6 +78908,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -80160,6 +81848,7 @@ export interface operations {
                     }[];
                     /** Format: uuid */
                     pickup_location_id?: string | null;
+                    promotion_code?: string | null;
                 };
             };
         };
@@ -80177,6 +81866,17 @@ export interface operations {
                             [key: string]: unknown;
                         }[];
                         /**
+                         * ShopMemberDiscount
+                         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+                         */
+                        member_discount?: {
+                            /** @enum {string} */
+                            applies_to?: "marked_products";
+                            percent: number;
+                            /** @enum {string} */
+                            source?: "membership_package";
+                        } | null;
+                        /**
                          * ShopOnlinePayment
                          * @description Whether online card payment can be offered; false greys out «Πληρωμή».
                          */
@@ -80190,6 +81890,15 @@ export interface operations {
                         /** Format: uuid */
                         pickup_location_id?: string | null;
                         pickup_location_ids?: string[];
+                        /** @description The promotion code that applied (never stacked with the member discount) */
+                        promotion_code?: {
+                            applied?: boolean;
+                            code?: string;
+                            /** Format: uuid */
+                            id?: string;
+                        } | null;
+                        /** Format: uuid */
+                        promotion_code_id?: string | null;
                         subtotal_cents?: number;
                         total_cents: number;
                     };
@@ -80259,6 +81968,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80371,6 +82082,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80450,6 +82163,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80542,6 +82257,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80640,6 +82357,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80738,6 +82457,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -80790,6 +82511,16 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             options?: {
                                 [key: string]: unknown;
@@ -80848,6 +82579,16 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             options?: {
                                 [key: string]: unknown;
@@ -80875,6 +82616,136 @@ export interface operations {
                             /** @enum {string} */
                             visibility?: "members_only" | "anyone";
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.stock_alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alerts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        stock_alerts: {
+                            available?: boolean | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            notified_at?: string | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.storefront": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Storefront */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories?: string[];
+                        /** @enum {string|null} */
+                        closed_reason?: "no_products" | "business_not_activated" | null;
+                        /**
+                         * ShopMemberDiscount
+                         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+                         */
+                        member_discount?: {
+                            /** @enum {string} */
+                            applies_to?: "marked_products";
+                            percent: number;
+                            /** @enum {string} */
+                            source?: "membership_package";
+                        } | null;
+                        /**
+                         * ShopOnlinePayment
+                         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+                         */
+                        online_payment: {
+                            available: boolean;
+                            provider?: string;
+                            /** @description e.g. no_provider */
+                            reason?: string | null;
+                        };
+                        open: boolean;
+                        pickup_locations: {
+                            address?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        }[];
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
                     };
                 };
             };
@@ -80930,6 +82801,63 @@ export interface operations {
                         }[];
                     };
                 };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.subscribe_stock_alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alert */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopStockAlert */
+                        stock_alert: {
+                            available?: boolean | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            notified_at?: string | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.unsubscribe_stock_alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -85552,6 +87480,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -85631,6 +87561,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -85658,12 +87590,77 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShopController.ledger": {
+        parameters: {
+            query?: {
+                location_ids?: string;
+                kind?: string;
+                variant_id?: string;
+                product_id?: string;
+                from?: string;
+                to?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ledger */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            actor_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            order_number?: number | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_title?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            sku?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                            variant_title?: string | null;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.ShopController.orders": {
         parameters: {
             query?: {
                 status?: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                 user_id?: string;
                 location_ids?: string;
+                pickup_code?: string;
+                paid?: boolean;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -85678,6 +87675,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Orders per status, within the branch, buyer and paid filters */
+                        counts: {
+                            cancelled: number;
+                            picked_up: number;
+                            placed: number;
+                            ready_for_pickup: number;
+                        };
                         orders: {
                             cancel_reason?: string | null;
                             /** Format: date-time */
@@ -85724,6 +87728,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -85816,6 +87822,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -85914,6 +87922,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86012,6 +88022,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86131,6 +88143,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86236,6 +88250,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86335,6 +88351,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86427,6 +88445,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86532,6 +88552,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -86562,12 +88584,134 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShopController.payment_methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Methods */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment_methods: {
+                            available: boolean;
+                            /** @enum {string} */
+                            channel: "pos" | "online";
+                            /** @description cash, card_manual (card at the terminal), bank_transfer, other, card_online */
+                            id: string;
+                            provider?: string | null;
+                            reason?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.complete_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.ShopController.products": {
         parameters: {
             query?: {
-                status?: "draft" | "published" | "archived";
+                status?: "draft" | "published" | "archived" | "low_stock";
                 q?: string;
                 category?: string;
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -86582,6 +88726,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Products per filter, within the branch and search filters */
+                        counts: {
+                            all: number;
+                            archived: number;
+                            draft: number;
+                            low_stock: number;
+                            published: number;
+                        };
                         products: {
                             all_locations?: boolean;
                             /** Format: date-time */
@@ -86591,6 +88743,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             member_discount_applies?: boolean;
                             options?: {
@@ -86678,6 +88841,11 @@ export interface operations {
                     price_cents?: number;
                     sell_at_desk?: boolean;
                     sell_in_app?: boolean;
+                    /**
+                     * @description Created as a draft unless given; published runs the publish checks in the same transaction
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "archived";
                     title: string;
                     variants?: {
                         barcode?: string | null;
@@ -86722,6 +88890,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             member_discount_applies?: boolean;
                             options?: {
@@ -86812,6 +88991,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             member_discount_applies?: boolean;
                             options?: {
@@ -86900,7 +89090,32 @@ export interface operations {
                     position?: number;
                     sell_at_desk?: boolean;
                     sell_in_app?: boolean;
+                    /** @enum {string} */
+                    status?: "draft" | "published" | "archived";
                     title?: string;
+                    /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
+                    variants?: {
+                        barcode?: string | null;
+                        compare_at_price_cents?: number | null;
+                        cost_price_cents?: number | null;
+                        currency?: string;
+                        /** Format: uuid */
+                        id?: string | null;
+                        initial_quantity?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        low_stock_threshold?: number | null;
+                        option_values?: {
+                            [key: string]: string;
+                        };
+                        position?: number;
+                        price_cents?: number;
+                        sku?: string | null;
+                        /** @enum {string|null} */
+                        tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                        title?: string | null;
+                        track_inventory?: boolean;
+                    }[];
                     /** @enum {string} */
                     visibility?: "members_only" | "anyone";
                 };
@@ -86924,6 +89139,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             member_discount_applies?: boolean;
                             options?: {
@@ -86986,6 +89212,375 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShopController.promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string | null;
+                    /** Format: uuid */
+                    channel_id?: string | null;
+                    /**
+                     * ShopNewPromotionCode
+                     * @description A code of the promoted product: a percent off, or an amount off each unit
+                     */
+                    promotion_code?: {
+                        /** @description Letters, digits, - or _ (stored upper case) */
+                        code: string;
+                        /** @description Off each unit */
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                        max_redemptions?: number | null;
+                        /** Format: date-time */
+                        starts_at?: string | null;
+                    } | null;
+                    /**
+                     * Format: uuid
+                     * @description An existing code of this product
+                     */
+                    promotion_code_id?: string | null;
+                    /**
+                     * @description announcements (club #ανακοινώσεις, default), channel (a member group or PT squad: channel_id) or feed (public: box page and followers)
+                     * @enum {string}
+                     */
+                    target?: "announcements" | "channel" | "feed";
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
+                        };
+                        /** Format: uuid */
+                        post_id: string;
+                        /** ShopPromotionCode */
+                        promotion_code?: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        } | null;
+                        /** Format: uuid */
+                        promotion_code_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.ShopController.set_product_status": {
         parameters: {
             query?: never;
@@ -87021,6 +89616,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             media_ids?: string[];
                             member_discount_applies?: boolean;
                             options?: {
@@ -87308,10 +89914,118 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShopController.promotion_codes": {
+        parameters: {
+            query?: {
+                product_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Codes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        promotion_codes: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_promotion_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    /** @description Off each unit */
+                    discount_cents?: number | null;
+                    discount_percent?: number | null;
+                    /** Format: date-time */
+                    ends_at?: string | null;
+                    max_redemptions?: number | null;
+                    /** Format: date-time */
+                    starts_at?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopPromotionCode */
+                        promotion_code: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.ShopController.ready_orders": {
         parameters: {
-            query: {
-                user_id: string;
+            query?: {
+                user_id?: string;
+                pickup_code?: string;
                 location_id?: string;
             };
             header?: never;
@@ -87373,6 +90087,8 @@ export interface operations {
                             payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
                             /** Format: date-time */
                             picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
                             /** Format: uuid */
                             pickup_location_id?: string | null;
                             /** Format: date-time */
@@ -89774,7 +92490,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -90007,6 +92723,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -92109,7 +94863,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -92342,6 +95096,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -92499,7 +95291,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -92732,6 +95524,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };

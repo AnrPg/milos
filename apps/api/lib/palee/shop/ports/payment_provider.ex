@@ -23,6 +23,21 @@ defmodule Palee.Shop.Ports.PaymentProvider do
   @doc "Whether online payment can be offered for the business (`available: false` greys out «Πληρωμή»)."
   @callback availability(map()) :: availability()
 
+  @type method :: %{
+          method: atom(),
+          channel: :pos | :online,
+          available: boolean(),
+          reason: atom() | nil,
+          provider: String.t() | nil
+        }
+
+  @doc """
+  The ways staff and members can pay: the desk methods recorded by staff
+  (cash, card at the terminal, transfer, other) and the online card, each
+  with whether it can be offered now.
+  """
+  @callback payment_methods(map()) :: [method()]
+
   @doc "Captures the amount of an order."
   @callback capture(map(), charge()) :: {:ok, receipt()} | {:error, atom()}
 

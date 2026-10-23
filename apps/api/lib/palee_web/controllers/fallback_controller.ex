@@ -74,7 +74,15 @@ defmodule PaleeWeb.FallbackController do
     payment_not_refundable: {:conflict, "This payment can't be refunded"},
     invoice_has_payments: {:conflict, "The invoice has payments"},
     invoice_not_found: {:not_found, "Invoice not found"},
-    invalid_revenue_stream: {:unprocessable_entity, "Unknown revenue stream"}
+    invalid_revenue_stream: {:unprocessable_entity, "Unknown revenue stream"},
+    promotion_code_invalid: {:unprocessable_entity, "This code isn't valid"},
+    promotion_code_expired: {:conflict, "This code has expired"},
+    promotion_code_exhausted: {:conflict, "This code has been used up"},
+    promotion_code_not_applicable: {:unprocessable_entity, "This code is for another product"},
+    promotion_code_changed: {:conflict, "This code changed; check the basket again"},
+    product_not_promotable: {:conflict, "Publish the product in the app before promoting it"},
+    invalid_promotion_target: {:unprocessable_entity, "Choose where the post goes"},
+    buyer_required: {:unprocessable_entity, "Name the member or their pickup code"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@shop_errors, reason) do
