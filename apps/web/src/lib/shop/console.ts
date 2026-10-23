@@ -7,7 +7,9 @@ import type {
   PricingRow,
   ShopOption,
   ShopOrder,
+  ShopMovementInput,
   ShopProduct,
+  ShopStockItem,
   ShopStockStatus,
   ShopVariant,
   ShopVariantInput,
@@ -122,6 +124,32 @@ export function priceRange(variants: Pick<ShopVariant, "price_cents" | "archived
   const prices = variants.filter((variant) => !variant.archived_at).map((variant) => variant.price_cents);
   if (prices.length === 0) return null;
   return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/** What happened to the stock, which is also the ledger reason: a delivery, or an adjustment and why. */
+export type StockFormKind = "receive" | "recount" | "damage" | "loss" | "return";
+
+/**
+ * The ledger entry for the stock form's answer: a delivery adds, a recount
+ * records the difference from what is on hand, damage and loss take away, a
+ * return adds back. Null when nothing would change.
+ */
+export function movementFor(
+  item: Pick<ShopStockItem, "variant_id" | "location_id" | "on_hand">,
+  kind: StockFormKind,
+  amount: number,
+  unitCostCents: number | null,
+  note: string,
+): ShopMovementInput | null {
+  if (!Number.isInteger(amount) || amount < 0) return null;
+  const base = { variant_id: item.variant_id, location_id: item.location_id, note: note.trim() || null };
+  if (kind === "receive") return amount > 0 ? { ...base, kind: "receive", quantity: amount, unit_cost_cents: unitCostCents } : null;
+  if (kind === "recount") {
+    const delta = amount - item.on_hand;
+    return delta !== 0 ? { ...base, kind: "adjustment", reason: "recount", quantity: delta } : null;
+  }
+  if (amount === 0) return null;
+  return { ...base, kind: "adjustment", reason: kind, quantity: kind === "return" ? amount : -amount };
 }
 
 // ---- orders ----

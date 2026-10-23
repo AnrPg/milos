@@ -75,7 +75,8 @@
     "notificationsShort": "Meldingen",
     "messages": "Berichten",
     "messagesUnread": "Berichten ({count} ongelezen)",
-    "socialApp": "Social"
+    "socialApp": "Social",
+    "shop": "Winkel"
   },
   "Profile": {
     "eyebrow": "Profiel",
@@ -9852,5 +9853,475 @@
     "shownTotal": "Getoond: {amounts}",
     "tabTransactions": "Transacties",
     "shopOrder": "Productaankoop"
+  },
+  "ShopConsole": {
+    "title": "Winkel",
+    "loading": "Laden…",
+    "noAccess": "Je hebt geen toegang tot de winkel.",
+    "openState": "Open · {count, plural, one {# product} other {# producten}}",
+    "closedState": "Gesloten voor leden",
+    "pos": {
+      "loading": "Laden…",
+      "noAccess": "De kassa vraagt het recht om betalingen te ontvangen.",
+      "back": "Winkel",
+      "title": "Kassa",
+      "branch": "Vestiging",
+      "products": "Producten",
+      "search": "Product, code of barcode",
+      "noProducts": "Geen actieve producten worden aan de kassa verkocht.",
+      "left": "nog {count}",
+      "pickVariant": "Kies een variant van {product}",
+      "sale": "Verkoop",
+      "walkIn": "Klant zonder account",
+      "walkInName": "Naam (optioneel)",
+      "member": "Lid",
+      "unpaid": "Openstaand saldo {amount}",
+      "noUnpaid": "Niets openstaand",
+      "packageDiscount": "−{percent}% uit het pakket",
+      "emptyCart": "Tik op een product om het toe te voegen.",
+      "charged": "Afgerekend · {order}. De verkoop staat bij de Transacties van het lid.",
+      "quantityOf": "Aantal van {item}",
+      "short": "Nog maar {count} op voorraad",
+      "discount": "Pakketkorting −{percent}%",
+      "total": "Totaal",
+      "payment": "Betaling",
+      "methods": {
+        "cash": "Contant",
+        "card_manual": "Pin op de terminal"
+      },
+      "manualNote": "Kaartbetalingen lopen via je terminal; hier leg je ze vast.",
+      "manualNoteOnlineLater": "Kaartbetalingen lopen via je terminal; hier leg je ze vast. Online met kaart betalen komt later.",
+      "charge": "{amount} afrekenen",
+      "charging": "Afrekenen…",
+      "pickMember": "Kies het lid of schakel naar een klant zonder account.",
+      "receiptNote": "Bij de betaling wordt een bon gemaakt, zoals bij elke verkoop in Financiën."
+    },
+    "newProduct": "Nieuw product",
+    "branchNote": "Bestellingen, voorraad en rapporten tonen alleen de gekozen vestigingen.",
+    "tabs": {
+      "products": "Producten",
+      "orders": "Bestellingen",
+      "stock": "Voorraad",
+      "analytics": "Analyse"
+    },
+    "empty": {
+      "title": "Verkoop via de app aan je leden",
+      "body": "Leden bestellen in Box en halen op bij de balie. Jij ziet wat je moet klaarzetten en hoeveel er over is. De balie verkoopt ook aan de kassa.",
+      "steps": {
+        "product": {
+          "title": "Voeg je eerste product toe",
+          "body": "Foto, prijs en maten. Het begint als concept."
+        },
+        "pickup": {
+          "title": "Controleer het afhaalpunt",
+          "body": "Leden halen op bij de balie van hun vestiging."
+        },
+        "publish": {
+          "title": "Publiceer om de winkel te openen",
+          "body": "De Winkel-kaart verschijnt in de Box van leden zodra een product gepubliceerd is."
+        }
+      },
+      "addProduct": "Nieuw product",
+      "pickupSettings": "Afhaalinstellingen",
+      "membersNote": "Tot je publiceert, zien leden geen Winkel-kaart in Box. Daarna heeft die een vaste plek onder het lidmaatschap."
+    },
+    "products": {
+      "title": "Producten",
+      "filter": "Producten tonen",
+      "filters": {
+        "all": "Alle",
+        "published": "Actief",
+        "draft": "Concepten",
+        "low_stock": "Lage voorraad",
+        "archived": "Gearchiveerd"
+      },
+      "search": "Producten zoeken",
+      "loading": "Producten laden…",
+      "none": "Hier staan geen producten.",
+      "from": "vanaf {price}",
+      "variants": "{count, plural, one {# variant} other {# varianten}}",
+      "stockMeter": "{count} op voorraad",
+      "stockUnits": "{count, plural, one {# stuk} other {# stuks}}",
+      "stockWeakest": "{count, plural, one {# stuk} other {# stuks}} · {variant}: nog {left}",
+      "status": {
+        "draft": "Concept",
+        "published": "Actief",
+        "archived": "Gearchiveerd"
+      }
+    },
+    "editor": {
+      "loading": "Product laden…",
+      "noAccess": "Je kunt geen winkelproducten bewerken.",
+      "back": "Producten",
+      "newTitle": "Nieuw product",
+      "promote": "Promoten",
+      "status": {
+        "draft": "Concept",
+        "published": "Actief",
+        "archived": "Gearchiveerd"
+      },
+      "photos": {
+        "title": "Foto's",
+        "hint": "Vierkante foto's ogen het best. De eerste staat in de lijst.",
+        "alt": "Productfoto {index}",
+        "uploading": "Uploaden…",
+        "failed": "Uploaden mislukt",
+        "cover": "Omslag",
+        "makeCover": "Als omslag",
+        "remove": "Verwijderen",
+        "add": "Foto's toevoegen"
+      },
+      "basics": {
+        "title": "Gegevens",
+        "name": "Naam",
+        "description": "Beschrijving",
+        "category": "Categorie",
+        "categoryHint": "bijv. Kleding"
+      },
+      "price": {
+        "title": "Prijs",
+        "price": "Prijs incl. btw (€)",
+        "compareAt": "Vergelijkprijs (€)",
+        "cost": "Inkoopprijs (€, alleen voor jou)",
+        "hint": "De vergelijkprijs staat doorgestreept. De inkoopprijs voedt de marge in Analyse en wordt nooit aan leden getoond."
+      },
+      "variants": {
+        "title": "Opties en voorraad",
+        "hint": "Tot twee opties, zoals maat en kleur. Voorraad telt per combinatie en vestiging.",
+        "addSize": "Optie toevoegen (bijv. maat)",
+        "addColour": "Tweede optie toevoegen (bijv. kleur)",
+        "optionName": "Optie",
+        "optionNameHint": "bijv. Maat",
+        "removeOption": "Optie verwijderen",
+        "values": "Waarden",
+        "removeValue": "{value} verwijderen",
+        "newValue": "Nieuwe waarde",
+        "newValueHint": "bijv. M",
+        "addValue": "Toevoegen",
+        "list": "Varianten",
+        "single": "Eén uitvoering",
+        "price": "Prijs (€)",
+        "priceOf": "Prijs van {variant}",
+        "same": "Zelfde ({price})",
+        "stock": "Voorraad",
+        "onHand": "{count} aanwezig · {reserved} gereserveerd",
+        "openingOf": "Beginvoorraad van {variant} in {branch}",
+        "ledgerNote": "De voorraad van opgeslagen varianten wijzig je in het tabblad Voorraad, zodat elke wijziging een reden heeft."
+      },
+      "selling": {
+        "title": "Verkoop",
+        "channel": "Waar het verkocht wordt",
+        "channels": {
+          "both": "App en kassa",
+          "app": "Alleen app",
+          "desk": "Alleen kassa"
+        },
+        "visibility": "Wie mag kopen",
+        "visibilities": {
+          "members_only": "Alleen leden",
+          "anyone": "Ook bezoekers"
+        },
+        "visibilityHint": "Ook bezoekers: het staat ook op de openbare pagina van de box, voor iedereen met een Palee-account.",
+        "memberDiscount": "Ledenkorting uit het pakket",
+        "memberDiscountHint": "Het percentage uit het pakket van het lid geldt voor dit product.",
+        "status": "Status",
+        "newIsDraft": "Nieuwe producten beginnen als concept. Publiceer na het opslaan."
+      },
+      "errors": {
+        "title": "Geef het product een naam.",
+        "price": "Vul een prijs boven nul in.",
+        "compareAt": "De vergelijkprijs is geen geldig bedrag.",
+        "cost": "De inkoopprijs is geen geldig bedrag.",
+        "variantPrice": "De prijs van {variant} is geen geldig bedrag."
+      },
+      "save": "Opslaan",
+      "create": "Concept maken",
+      "saving": "Opslaan…",
+      "saved": "Opgeslagen."
+    },
+    "promote": {
+      "eyebrow": "Promoten",
+      "where": "Waar plaatsen",
+      "targets": {
+        "announcements": "Aankondigingen",
+        "group": "Ledengroep",
+        "feed": "Feed"
+      },
+      "targetHints": {
+        "announcements": "Een clubbericht in het aankondigingskanaal, met de productkaart erbij.",
+        "group": "Alleen de leden van één groep zien het bericht.",
+        "feed": "Een bericht van je box in de Feed van je leden en volgers."
+      },
+      "group": "Groep",
+      "groupPick": "Kies een groep",
+      "text": "Berichttekst",
+      "defaultBody": "Nieuw in de winkel: {product}. Bestel het in de app en haal het op bij de balie.",
+      "preview": "Voorbeeld",
+      "cardCta": "Bekijken",
+      "code": "Kortingscode",
+      "codeHint": "Een code alleen voor dit product, in Financiën › Aanbiedingen.",
+      "codeValue": "Code",
+      "percent": "Korting (%)",
+      "endsOn": "Geldig tot",
+      "newLabel": "De winkel toont vanzelf 14 dagen na publicatie het label Nieuw.",
+      "errors": {
+        "body": "Schrijf de berichttekst.",
+        "group": "Kies een groep.",
+        "code": "Vul een code en een korting tussen 1 en 100% in."
+      },
+      "cancel": "Annuleren",
+      "post": "Plaatsen",
+      "posting": "Plaatsen…"
+    },
+    "orders": {
+      "title": "Bestellingen",
+      "filter": "Bestellingen tonen",
+      "status": {
+        "placed": "Klaar te zetten",
+        "ready_for_pickup": "Klaar",
+        "picked_up": "Opgehaald",
+        "cancelled": "Geannuleerd"
+      },
+      "none": {
+        "placed": "Niets klaar te zetten.",
+        "ready_for_pickup": "Geen bestellingen die op ophalen wachten.",
+        "picked_up": "Nog geen opgehaalde bestellingen.",
+        "cancelled": "Geen geannuleerde bestellingen."
+      },
+      "loading": "Bestellingen laden…",
+      "walkIn": "Klant zonder account",
+      "channel": {
+        "online": "via de app",
+        "pos": "aan de kassa"
+      },
+      "payment": {
+        "pending_payment": "Te betalen",
+        "paid": "Betaald",
+        "partially_refunded": "Deels terugbetaald",
+        "refunded": "Terugbetaald",
+        "void": "Ongeldig"
+      },
+      "mode": {
+        "at_pickup": "Bij ophalen",
+        "on_account": "Op rekening",
+        "online": "Online",
+        "cash": "Contant",
+        "card_manual": "Pin op de terminal",
+        "bank_transfer": "Overschrijving",
+        "other": "Anders"
+      },
+      "reserveNote": "Bestellingen houden hun voorraad vast tot ophalen of annuleren. Niet opgehaald na 7 dagen annuleert vanzelf, met een herinnering aan het lid op dag 3.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} terugbetaald",
+      "discount": "Korting",
+      "total": "Totaal",
+      "totalWithInvoice": "Totaal · bon {invoice}",
+      "paid": "Betaald",
+      "refunded": "Terugbetaald",
+      "paymentMode": "Betaling",
+      "code": "Code",
+      "timeline": "Geschiedenis",
+      "timelinePlaced": "Geplaatst {channel} · {when}",
+      "timelineReady": "Klaar om op te halen · {when}",
+      "timelinePickedUp": "Opgehaald · {when}",
+      "timelineCancelled": "Geannuleerd · {when}",
+      "timelineExpires": "Ophalen vóór {when}",
+      "markReady": "Klaar om op te halen",
+      "readyHint": "Klaar stuurt het lid een melding met waar en wanneer het kan ophalen.",
+      "markPickedUp": "Opgehaald",
+      "collect": "{amount} ontvangen",
+      "method": "Betaalwijze",
+      "collectHint": "De betaling komt op de bon van de bestelling. Het lid ziet die bij Transacties.",
+      "confirmPickup": "Ophalen bevestigen",
+      "cancel": "Bestelling annuleren",
+      "cancelReason": "Reden (optioneel)",
+      "cancelHint": "Annuleren geeft de gereserveerde voorraad vrij.",
+      "confirmCancel": "Bestelling annuleren",
+      "refund": "Terugbetalen",
+      "refundWhat": "Wat komt er terug?",
+      "refundQty": "Aantal van {item} om terug te betalen",
+      "restock": "Terug in voorraad",
+      "refundHint": "Een terugbetaling maakt het terugbetalingsbewijs aan. Laat Terug in voorraad uit voor beschadigde artikelen.",
+      "confirmRefund": "Terugbetalen",
+      "back": "Terug"
+    },
+    "stock": {
+      "title": "Voorraad",
+      "filter": "Voorraad tonen",
+      "views": {
+        "attention": "Bijbestellen",
+        "all": "Alle varianten"
+      },
+      "none": {
+        "attention": "Niets hoeft bijbesteld te worden.",
+        "all": "Nog geen varianten."
+      },
+      "loading": "Voorraad laden…",
+      "units": "{count, plural, one {# stuk} other {# stuks}}",
+      "daysLeft": "~{count, plural, one {# dag} other {# dagen}}",
+      "reserved": "{count} gereserveerd",
+      "history": "Mutaties",
+      "adjust": "Boeken",
+      "policyNote": "De status volgt uit de dagen voorraad die over zijn bij het huidige tempo: kritiek onder 7 dagen, laag onder 21. Meldingen komen alleen als het slechter wordt, en voorraad staat in het dagelijkse overzicht.",
+      "recent": "Recente mutaties",
+      "historyOf": "Mutaties · {item}",
+      "allMovements": "Alle mutaties",
+      "noMovements": "Nog geen mutaties.",
+      "kinds": {
+        "receive": "Levering",
+        "sale": "Verkoop",
+        "refund_restock": "Terug in voorraad",
+        "adjustment": "Correctie",
+        "transfer": "Overboeking",
+        "reserve": "Gereserveerd voor bestelling",
+        "release": "Vrijgegeven"
+      },
+      "reasons": {
+        "recount": "Telling",
+        "damage": "Schade",
+        "loss": "Verlies",
+        "return": "Retour",
+        "other": "Anders"
+      },
+      "adjustEyebrow": "Voorraadmutatie",
+      "reason": "Wat er gebeurde",
+      "form": {
+        "receive": "Levering",
+        "recount": "Telling",
+        "damage": "Schade",
+        "loss": "Verlies",
+        "return": "Retour"
+      },
+      "quantity": "Aantal",
+      "counted": "Geteld in het schap",
+      "unitCost": "Kosten per stuk (€)",
+      "note": "Notitie",
+      "noteHint": "bijv. leveranciersfactuur 0891",
+      "now": "Nu {count} aanwezig",
+      "after": "{from} → {to} aanwezig",
+      "errors": {
+        "amount": "Vul een aantal in dat de voorraad verandert."
+      },
+      "cancel": "Annuleren",
+      "record": "Boeken"
+    },
+    "analytics": {
+      "title": "Analyse",
+      "loading": "Rapporten laden…",
+      "unavailable": "De winkelrapporten zijn nog niet beschikbaar.",
+      "range": "Periode",
+      "ranges": {
+        "28": "4 weken",
+        "84": "12 weken",
+        "365": "12 maanden"
+      },
+      "kpi": {
+        "sales": "Netto-omzet",
+        "salesChange": "Netto-omzet · {change, number}% t.o.v. de vorige periode",
+        "margin": "Brutomarge (waar kosten bekend zijn · {costed}/{total} producten)",
+        "units": "Stuks · {orders, plural, one {# bestelling} other {# bestellingen}}",
+        "stockValue": "Voorraadwaarde tegen kostprijs · {count} laag"
+      },
+      "weekly": "Omzet per week",
+      "weeklyHint": "Na kortingen en terugbetalingen. De lopende week is lichter.",
+      "weekOf": "Week van {date}",
+      "net": "Netto",
+      "noSales": "Geen verkopen in deze periode.",
+      "top": "Topproducten",
+      "product": "Product",
+      "units": "Stuks",
+      "revenue": "Omzet",
+      "marginCol": "Marge",
+      "marginHint": "‘—’: de inkoopprijs ontbreekt, dus het telt niet mee in de marge in plaats van als 100%.",
+      "channels": "App of kassa",
+      "channel": {
+        "online": "App (afhalen)",
+        "pos": "Kassa"
+      },
+      "branches": "Per vestiging",
+      "noBranch": "Zonder vestiging",
+      "attribution": "Waar de verkopen vandaan kwamen",
+      "attributionHint": "Een bestelling telt voor de gebruikte code, anders voor het bericht of de aanbieding waaruit het product binnen 7 dagen geopend werd, anders voor de Winkel-kaart in Box.",
+      "source": {
+        "club_post": "Bericht",
+        "promotion_code": "Code",
+        "public_page": "Openbare pagina",
+        "direct": "Winkel-kaart in Box",
+        "desk": "Kassa",
+        "other": "Anders"
+      },
+      "codeRow": "Code {code}",
+      "ordersMoney": "{count, plural, one {# bestelling} other {# bestellingen}} · {amount}",
+      "unattributed": "Zonder toewijzing: {count, plural, one {# bestelling} other {# bestellingen}} · {amount}",
+      "lowStock": "Lage voorraad",
+      "noLowStock": "Er raakt niets op.",
+      "left": "nog {count}",
+      "openStock": "Voorraad openen",
+      "pricing": {
+        "title": "Prijsindicatoren",
+        "hint": "Per variant, over de gekozen periode. De voorgestelde bandbreedte is een advies: jij bepaalt je prijzen.",
+        "none": "Nog geen varianten met verkopen of voorraad.",
+        "marginShort": "marge {margin}%",
+        "noCost": "geen inkoopprijs",
+        "perWeek": "{value}/week",
+        "margin": "Marge",
+        "markup": "Opslag",
+        "sellThrough": "Doorverkoop",
+        "daysOfStock": "Dagen voorraad",
+        "velocity": "Verkocht per week",
+        "sold": "Verkocht",
+        "discountEffect": "Effect van korting",
+        "lift": "{change, number}% stuks per bestelling · {share}% van de stuks",
+        "priceChange": "Laatste prijswijziging",
+        "velocityChange": "{from} → {to}: {before} → {after}/week",
+        "position": {
+          "below": "Onder de bandbreedte",
+          "within": "Binnen de bandbreedte",
+          "above": "Boven de bandbreedte"
+        },
+        "suggested": "Voorgestelde prijsbandbreedte",
+        "advisory": "Advies",
+        "range": "{low} – {high}",
+        "noRange": "Zonder inkoopprijs geen bandbreedte.",
+        "inputs": "Zo wordt het berekend",
+        "inputCostPlus": "Kostprijs {cost} bij een doelmarge van {margin}% ({source}).",
+        "sourceCategory": "het doel van de categorie",
+        "sourceDefault": "het standaarddoel",
+        "inputNoCost": "Vul de inkoopprijs in voor een bandbreedte.",
+        "pace": {
+          "fast": "Het verkoopt {velocity}/week, minstens 1,5× de mediaan van de categorie ({median}/week), dus de bandbreedte reikt boven kostprijs plus marge.",
+          "slow": "Het verkoopt {velocity}/week, hooguit de helft van de mediaan van de categorie ({median}/week), dus de bandbreedte reikt onder kostprijs plus marge, nooit onder de kostprijs.",
+          "normal": "Het verkoopt {velocity}/week, ongeveer in het tempo van de categorie ({median}/week).",
+          "unknown": "Nog te weinig verkopen om het tempo met de categorie te vergelijken."
+        },
+        "priceSensitive": "De vraag lijkt prijsgevoelig, dus de ruimte naar boven wordt gehalveerd.",
+        "yourCall": "Alleen advies: de box bepaalt zijn prijzen."
+      }
+    },
+    "finance": {
+      "eyebrow": "Inkomsten per stroom",
+      "title": "Waar het geld vandaan komt",
+      "streams": {
+        "membership": "Lidmaatschappen",
+        "package": "PT-pakketten en diensten",
+        "event": "Events en seizoenen",
+        "shop": "Winkel",
+        "other": "Overig"
+      },
+      "hint": "Elke betaling krijgt haar stroom uit haar bron, nooit uit haar tekst. Terugbetalingen worden binnen dezelfde stroom verrekend.",
+      "recent": "Laatste winkelverkopen",
+      "desk": "Kassa"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "Op voorraad",
+      "low": "Laag",
+      "critical": "Kritiek",
+      "out": "Uitverkocht"
+    },
+    "compareAt": "Was {price}",
+    "less": "Eén minder",
+    "more": "Eén meer"
   }
 }

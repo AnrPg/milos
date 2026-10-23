@@ -75,7 +75,8 @@
     "notificationsShort": "התראות",
     "messages": "הודעות",
     "messagesUnread": "הודעות (לא נקראו: {count})",
-    "socialApp": "חברתי"
+    "socialApp": "חברתי",
+    "shop": "חנות"
   },
   "Profile": {
     "eyebrow": "פרופיל",
@@ -9852,5 +9853,475 @@
     "shownTotal": "מוצג: {amounts}",
     "tabTransactions": "תנועות",
     "shopOrder": "רכישת מוצרים"
+  },
+  "ShopConsole": {
+    "title": "חנות",
+    "loading": "טוען…",
+    "noAccess": "אין לך גישה לחנות.",
+    "openState": "פתוחה · {count, plural, one {מוצר אחד} other {# מוצרים}}",
+    "closedState": "סגורה לחברים",
+    "pos": {
+      "loading": "טוען…",
+      "noAccess": "הקופה דורשת הרשאה לגביית תשלומים.",
+      "back": "חנות",
+      "title": "קופה",
+      "branch": "סניף",
+      "products": "מוצרים",
+      "search": "מוצר, קוד או ברקוד",
+      "noProducts": "אין מוצרים פעילים שנמכרים בקופה.",
+      "left": "נשארו {count}",
+      "pickVariant": "בחרו גרסה של {product}",
+      "sale": "מכירה",
+      "walkIn": "לקוח ללא חשבון",
+      "walkInName": "שם (לא חובה)",
+      "member": "חבר",
+      "unpaid": "יתרה שלא שולמה {amount}",
+      "noUnpaid": "אין חוב פתוח",
+      "packageDiscount": "−{percent}% מהחבילה",
+      "emptyCart": "הקישו על מוצר כדי להוסיף אותו.",
+      "charged": "נגבה · {order}. המכירה מופיעה בתנועות של החבר.",
+      "quantityOf": "כמות {item}",
+      "short": "רק {count} במלאי",
+      "discount": "הנחת חבילה −{percent}%",
+      "total": "סה״כ",
+      "payment": "תשלום",
+      "methods": {
+        "cash": "מזומן",
+        "card_manual": "כרטיס במסוף"
+      },
+      "manualNote": "תשלומי כרטיס מתבצעים במסוף שלכם; כאן אתם רושמים אותם.",
+      "manualNoteOnlineLater": "תשלומי כרטיס מתבצעים במסוף שלכם; כאן אתם רושמים אותם. תשלום בכרטיס אונליין יגיע בהמשך.",
+      "charge": "גביית {amount}",
+      "charging": "גובה…",
+      "pickMember": "בחרו את החבר, או עברו ללקוח ללא חשבון.",
+      "receiptNote": "עם התשלום מונפקת חשבונית, כמו בכל מכירה אחרת בכספים."
+    },
+    "newProduct": "מוצר חדש",
+    "branchNote": "הזמנות, מלאי ודוחות מוצגים לסניפים שנבחרו בלבד.",
+    "tabs": {
+      "products": "מוצרים",
+      "orders": "הזמנות",
+      "stock": "מלאי",
+      "analytics": "ניתוח"
+    },
+    "empty": {
+      "title": "מכרו לחברים שלכם מהאפליקציה",
+      "body": "החברים מזמינים מ-Box ואוספים בדלפק הקבלה. אתם רואים מה להכין וכמה נשאר. הקבלה יכולה גם למכור מהקופה.",
+      "steps": {
+        "product": {
+          "title": "הוסיפו את המוצר הראשון",
+          "body": "תמונה, מחיר ומידות. הוא מתחיל כטיוטה."
+        },
+        "pickup": {
+          "title": "בדקו את נקודת האיסוף",
+          "body": "החברים אוספים בדלפק הקבלה של הסניף שלהם."
+        },
+        "publish": {
+          "title": "פרסמו כדי לפתוח את החנות",
+          "body": "כרטיס החנות מופיע ב-Box של החברים ברגע שמוצר מתפרסם."
+        }
+      },
+      "addProduct": "מוצר חדש",
+      "pickupSettings": "הגדרות איסוף",
+      "membersNote": "עד שתפרסמו, החברים לא רואים כרטיס חנות ב-Box. אחרי הפתיחה יש לו מקום קבוע מתחת למנוי."
+    },
+    "products": {
+      "title": "מוצרים",
+      "filter": "הצגת מוצרים",
+      "filters": {
+        "all": "הכול",
+        "published": "פעילים",
+        "draft": "טיוטות",
+        "low_stock": "מלאי נמוך",
+        "archived": "בארכיון"
+      },
+      "search": "חיפוש מוצרים",
+      "loading": "טוען מוצרים…",
+      "none": "אין כאן מוצרים.",
+      "from": "החל מ-{price}",
+      "variants": "{count, plural, one {גרסה אחת} other {# גרסאות}}",
+      "stockMeter": "{count} במלאי",
+      "stockUnits": "{count, plural, one {יחידה אחת} other {# יחידות}}",
+      "stockWeakest": "{count, plural, one {יחידה אחת} other {# יחידות}} · {variant}: נשארו {left}",
+      "status": {
+        "draft": "טיוטה",
+        "published": "פעיל",
+        "archived": "בארכיון"
+      }
+    },
+    "editor": {
+      "loading": "טוען מוצר…",
+      "noAccess": "אין באפשרותך לערוך מוצרים בחנות.",
+      "back": "מוצרים",
+      "newTitle": "מוצר חדש",
+      "promote": "קידום",
+      "status": {
+        "draft": "טיוטה",
+        "published": "פעיל",
+        "archived": "בארכיון"
+      },
+      "photos": {
+        "title": "תמונות",
+        "hint": "תמונות מרובעות נראות הכי טוב. הראשונה מוצגת ברשימה.",
+        "alt": "תמונת מוצר {index}",
+        "uploading": "מעלה…",
+        "failed": "ההעלאה נכשלה",
+        "cover": "תמונה ראשית",
+        "makeCover": "הגדר כראשית",
+        "remove": "הסרה",
+        "add": "הוספת תמונות"
+      },
+      "basics": {
+        "title": "פרטים",
+        "name": "שם",
+        "description": "תיאור",
+        "category": "קטגוריה",
+        "categoryHint": "למשל: ביגוד"
+      },
+      "price": {
+        "title": "מחיר",
+        "price": "מחיר כולל מע״מ (€)",
+        "compareAt": "מחיר לפני הנחה (€)",
+        "cost": "מחיר עלות (€, רק בשבילך)",
+        "hint": "המחיר לפני הנחה מוצג מחוק. מחיר העלות משמש לרווח הגולמי בניתוח ולעולם אינו מוצג לחברים."
+      },
+      "variants": {
+        "title": "אפשרויות ומלאי",
+        "hint": "עד שתי אפשרויות, כמו מידה וצבע. המלאי נספר לכל שילוב ולכל סניף.",
+        "addSize": "הוספת אפשרות (למשל מידה)",
+        "addColour": "הוספת אפשרות שנייה (למשל צבע)",
+        "optionName": "אפשרות",
+        "optionNameHint": "למשל: מידה",
+        "removeOption": "הסרת האפשרות",
+        "values": "ערכים",
+        "removeValue": "הסרת {value}",
+        "newValue": "ערך חדש",
+        "newValueHint": "למשל: M",
+        "addValue": "הוספה",
+        "list": "גרסאות",
+        "single": "סוג אחד",
+        "price": "מחיר (€)",
+        "priceOf": "מחיר {variant}",
+        "same": "אותו מחיר ({price})",
+        "stock": "מלאי",
+        "onHand": "{count} במלאי · {reserved} שמורים",
+        "openingOf": "מלאי פתיחה של {variant} ב-{branch}",
+        "ledgerNote": "המלאי של גרסאות שמורות משתנה מלשונית המלאי, כך שלכל שינוי יש סיבה."
+      },
+      "selling": {
+        "title": "מכירה",
+        "channel": "היכן נמכר",
+        "channels": {
+          "both": "אפליקציה וקופה",
+          "app": "אפליקציה בלבד",
+          "desk": "קופה בלבד"
+        },
+        "visibility": "מי יכול לקנות",
+        "visibilities": {
+          "members_only": "חברים בלבד",
+          "anyone": "גם מבקרים"
+        },
+        "visibilityHint": "גם מבקרים: המוצר מופיע גם בדף הציבורי של המועדון, לכל מי שיש לו חשבון Palee.",
+        "memberDiscount": "הנחת חבילת החבר",
+        "memberDiscountHint": "אחוז ההנחה מחבילת החבר חל על מוצר זה.",
+        "status": "סטטוס",
+        "newIsDraft": "מוצרים חדשים מתחילים כטיוטות. פרסמו אחרי השמירה."
+      },
+      "errors": {
+        "title": "תנו שם למוצר.",
+        "price": "הזינו מחיר גדול מאפס.",
+        "compareAt": "המחיר לפני הנחה אינו סכום תקין.",
+        "cost": "מחיר העלות אינו סכום תקין.",
+        "variantPrice": "המחיר של {variant} אינו סכום תקין."
+      },
+      "save": "שמירה",
+      "create": "יצירת טיוטה",
+      "saving": "שומר…",
+      "saved": "נשמר."
+    },
+    "promote": {
+      "eyebrow": "קידום",
+      "where": "היכן לפרסם",
+      "targets": {
+        "announcements": "הודעות",
+        "group": "קבוצת חברים",
+        "feed": "פיד"
+      },
+      "targetHints": {
+        "announcements": "פוסט של המועדון בערוץ ההודעות, עם כרטיס המוצר מצורף.",
+        "group": "רק חברי קבוצה אחת רואים את הפוסט.",
+        "feed": "פוסט של המועדון שלך בפיד של החברים והעוקבים שלך."
+      },
+      "group": "קבוצה",
+      "groupPick": "בחרו קבוצה",
+      "text": "טקסט הפוסט",
+      "defaultBody": "חדש בחנות: {product}. הזמינו מהאפליקציה ואספו בדלפק הקבלה.",
+      "preview": "תצוגה מקדימה",
+      "cardCta": "צפייה",
+      "code": "קוד הנחה",
+      "codeHint": "קוד למוצר הזה בלבד, בכספים › מבצעים.",
+      "codeValue": "קוד",
+      "percent": "הנחה (%)",
+      "endsOn": "בתוקף עד",
+      "newLabel": "החנות מציגה תווית חדש מעצמה במשך 14 יום אחרי הפרסום.",
+      "errors": {
+        "body": "כתבו את טקסט הפוסט.",
+        "group": "בחרו קבוצה.",
+        "code": "הזינו קוד והנחה בין 1 ל-100%."
+      },
+      "cancel": "ביטול",
+      "post": "פרסום",
+      "posting": "מפרסם…"
+    },
+    "orders": {
+      "title": "הזמנות",
+      "filter": "הצגת הזמנות",
+      "status": {
+        "placed": "להכנה",
+        "ready_for_pickup": "מוכנות",
+        "picked_up": "נאספו",
+        "cancelled": "בוטלו"
+      },
+      "none": {
+        "placed": "אין מה להכין.",
+        "ready_for_pickup": "אין הזמנות שממתינות לאיסוף.",
+        "picked_up": "עדיין אין הזמנות שנאספו.",
+        "cancelled": "אין הזמנות שבוטלו."
+      },
+      "loading": "טוען הזמנות…",
+      "walkIn": "לקוח ללא חשבון",
+      "channel": {
+        "online": "מהאפליקציה",
+        "pos": "בקופה"
+      },
+      "payment": {
+        "pending_payment": "לתשלום",
+        "paid": "שולם",
+        "partially_refunded": "הוחזר חלקית",
+        "refunded": "הוחזר",
+        "void": "מבוטל"
+      },
+      "mode": {
+        "at_pickup": "באיסוף",
+        "on_account": "לחשבון",
+        "online": "אונליין",
+        "cash": "מזומן",
+        "card_manual": "כרטיס במסוף",
+        "bank_transfer": "העברה בנקאית",
+        "other": "אחר"
+      },
+      "reserveNote": "הזמנות שומרות את המלאי שלהן עד האיסוף או הביטול. הזמנות שלא נאספו תוך 7 ימים מתבטלות מעצמן, עם תזכורת לחבר ביום השלישי.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} הוחזרו",
+      "discount": "הנחה",
+      "total": "סה״כ",
+      "totalWithInvoice": "סה״כ · חשבונית {invoice}",
+      "paid": "שולם",
+      "refunded": "הוחזר",
+      "paymentMode": "תשלום",
+      "code": "קוד",
+      "timeline": "היסטוריה",
+      "timelinePlaced": "הוזמנה {channel} · {when}",
+      "timelineReady": "מוכנה לאיסוף · {when}",
+      "timelinePickedUp": "נאספה · {when}",
+      "timelineCancelled": "בוטלה · {when}",
+      "timelineExpires": "איסוף עד {when}",
+      "markReady": "מוכנה לאיסוף",
+      "readyHint": "סימון מוכנה שולח לחבר התראה היכן ומתי לאסוף.",
+      "markPickedUp": "נאספה",
+      "collect": "גביית {amount}",
+      "method": "אמצעי תשלום",
+      "collectHint": "התשלום נרשם בחשבונית של ההזמנה. החבר רואה אותו בתנועות.",
+      "confirmPickup": "אישור איסוף",
+      "cancel": "ביטול ההזמנה",
+      "cancelReason": "סיבה (לא חובה)",
+      "cancelHint": "הביטול משחרר את המלאי השמור.",
+      "confirmCancel": "ביטול ההזמנה",
+      "refund": "החזר",
+      "refundWhat": "מה מוחזר?",
+      "refundQty": "כמות {item} להחזר",
+      "restock": "חזרה למלאי",
+      "refundHint": "ההחזר מנפיק קבלת החזר. השאירו את חזרה למלאי כבוי לפריטים פגומים.",
+      "confirmRefund": "ביצוע החזר",
+      "back": "חזרה"
+    },
+    "stock": {
+      "title": "מלאי",
+      "filter": "הצגת מלאי",
+      "views": {
+        "attention": "צריך להזמין שוב",
+        "all": "כל הגרסאות"
+      },
+      "none": {
+        "attention": "אין מה להזמין שוב.",
+        "all": "עדיין אין גרסאות."
+      },
+      "loading": "טוען מלאי…",
+      "units": "{count, plural, one {יחידה אחת} other {# יחידות}}",
+      "daysLeft": "~{count, plural, one {יום אחד} other {# ימים}}",
+      "reserved": "{count} שמורים",
+      "history": "תנועות",
+      "adjust": "תיקון",
+      "policyNote": "המצב נקבע לפי ימי המלאי שנותרו בקצב הנוכחי: קריטי מתחת ל-7 ימים, נמוך מתחת ל-21. התראות נשלחות רק כשהמצב מחמיר, והמלאי נכלל בסיכום היומי.",
+      "recent": "תנועות אחרונות",
+      "historyOf": "תנועות · {item}",
+      "allMovements": "כל התנועות",
+      "noMovements": "עדיין אין תנועות.",
+      "kinds": {
+        "receive": "משלוח",
+        "sale": "מכירה",
+        "refund_restock": "חזרה למלאי",
+        "adjustment": "תיקון",
+        "transfer": "העברה",
+        "reserve": "שמור להזמנה",
+        "release": "שוחרר"
+      },
+      "reasons": {
+        "recount": "ספירה מחדש",
+        "damage": "נזק",
+        "loss": "אובדן",
+        "return": "החזרה",
+        "other": "אחר"
+      },
+      "adjustEyebrow": "תנועת מלאי",
+      "reason": "מה קרה",
+      "form": {
+        "receive": "משלוח",
+        "recount": "ספירה מחדש",
+        "damage": "נזק",
+        "loss": "אובדן",
+        "return": "החזרה"
+      },
+      "quantity": "כמות",
+      "counted": "נספר על המדף",
+      "unitCost": "עלות ליחידה (€)",
+      "note": "הערה",
+      "noteHint": "למשל: חשבונית ספק 0891",
+      "now": "כעת {count} במלאי",
+      "after": "{from} → {to} במלאי",
+      "errors": {
+        "amount": "הזינו כמות שמשנה את המלאי."
+      },
+      "cancel": "ביטול",
+      "record": "רישום"
+    },
+    "analytics": {
+      "title": "ניתוח",
+      "loading": "טוען דוחות…",
+      "unavailable": "דוחות החנות עדיין לא זמינים.",
+      "range": "תקופה",
+      "ranges": {
+        "28": "4 שבועות",
+        "84": "12 שבועות",
+        "365": "12 חודשים"
+      },
+      "kpi": {
+        "sales": "מכירות נטו",
+        "salesChange": "מכירות נטו · {change, number}% לעומת התקופה הקודמת",
+        "margin": "רווח גולמי (היכן שהעלות ידועה · {costed}/{total} מוצרים)",
+        "units": "יחידות · {orders, plural, one {הזמנה אחת} other {# הזמנות}}",
+        "stockValue": "שווי מלאי לפי עלות · {count} נמוכים"
+      },
+      "weekly": "מכירות לפי שבוע",
+      "weeklyHint": "נטו אחרי הנחות והחזרים. השבוע הנוכחי, שעוד לא הסתיים, בהיר יותר.",
+      "weekOf": "שבוע {date}",
+      "net": "נטו",
+      "noSales": "אין מכירות בתקופה הזו.",
+      "top": "המוצרים המובילים",
+      "product": "מוצר",
+      "units": "יחידות",
+      "revenue": "הכנסה",
+      "marginCol": "רווח",
+      "marginHint": "״—״: מחיר העלות חסר, ולכן המוצר נשאר מחוץ לרווח במקום להיחשב כ-100%.",
+      "channels": "אפליקציה או קופה",
+      "channel": {
+        "online": "אפליקציה (איסוף)",
+        "pos": "קופה"
+      },
+      "branches": "לפי סניף",
+      "noBranch": "ללא סניף",
+      "attribution": "מאיפה הגיעו המכירות",
+      "attributionHint": "הזמנה משויכת לקוד שבו השתמשה, אחרת לפוסט או למבצע שממנו נפתח המוצר תוך 7 ימים, אחרת לכרטיס החנות ב-Box.",
+      "source": {
+        "club_post": "פוסט",
+        "promotion_code": "קוד",
+        "public_page": "דף ציבורי",
+        "direct": "כרטיס החנות ב-Box",
+        "desk": "קופה",
+        "other": "אחר"
+      },
+      "codeRow": "קוד {code}",
+      "ordersMoney": "{count, plural, one {הזמנה אחת} other {# הזמנות}} · {amount}",
+      "unattributed": "ללא שיוך: {count, plural, one {הזמנה אחת} other {# הזמנות}} · {amount}",
+      "lowStock": "מלאי נמוך",
+      "noLowStock": "שום דבר לא עומד להיגמר.",
+      "left": "נשארו {count}",
+      "openStock": "פתיחת המלאי",
+      "pricing": {
+        "title": "מדדי תמחור",
+        "hint": "לכל גרסה, בתקופה שנבחרה. הטווח המוצע הוא המלצה בלבד: אתם קובעים את המחירים.",
+        "none": "עדיין אין גרסאות עם מכירות או מלאי.",
+        "marginShort": "רווח {margin}%",
+        "noCost": "אין מחיר עלות",
+        "perWeek": "{value}/שבוע",
+        "margin": "רווח",
+        "markup": "תוספת על העלות",
+        "sellThrough": "שיעור מכירה",
+        "daysOfStock": "ימי מלאי",
+        "velocity": "נמכר בשבוע",
+        "sold": "נמכרו",
+        "discountEffect": "השפעת ההנחה",
+        "lift": "{change, number}% יחידות להזמנה · {share}% מהיחידות",
+        "priceChange": "שינוי המחיר האחרון",
+        "velocityChange": "{from} → {to}: {before} → {after}/שבוע",
+        "position": {
+          "below": "מתחת לטווח",
+          "within": "בתוך הטווח",
+          "above": "מעל הטווח"
+        },
+        "suggested": "טווח מחיר מוצע",
+        "advisory": "המלצה",
+        "range": "{low} – {high}",
+        "noRange": "אין טווח ללא מחיר עלות.",
+        "inputs": "איך זה מחושב",
+        "inputCostPlus": "עלות {cost} ביעד רווח של {margin}% ({source}).",
+        "sourceCategory": "היעד של הקטגוריה",
+        "sourceDefault": "יעד ברירת המחדל",
+        "inputNoCost": "הוסיפו מחיר עלות כדי לקבל טווח.",
+        "pace": {
+          "fast": "נמכר {velocity}/שבוע, לפחות פי 1.5 מהחציון של הקטגוריה ({median}/שבוע), ולכן הטווח מגיע מעל עלות ועוד רווח.",
+          "slow": "נמכר {velocity}/שבוע, לכל היותר חצי מהחציון של הקטגוריה ({median}/שבוע), ולכן הטווח יורד מתחת לעלות ועוד רווח, אך לעולם לא מתחת לעלות.",
+          "normal": "נמכר {velocity}/שבוע, בערך בקצב הקטגוריה ({median}/שבוע).",
+          "unknown": "עדיין אין מספיק מכירות כדי להשוות את הקצב לקטגוריה."
+        },
+        "priceSensitive": "הביקוש נראה רגיש למחיר, ולכן המרווח כלפי מעלה מצומצם בחצי.",
+        "yourCall": "המלצה בלבד: המועדון קובע את המחירים."
+      }
+    },
+    "finance": {
+      "eyebrow": "הכנסות לפי מקור",
+      "title": "מאיפה מגיע הכסף",
+      "streams": {
+        "membership": "מנויים",
+        "package": "חבילות PT ושירותים",
+        "event": "אירועים ועונות",
+        "shop": "חנות",
+        "other": "אחר"
+      },
+      "hint": "כל תשלום מקבל את המקור שלו לפי המקור בפועל, לעולם לא לפי הטקסט. החזרים מקוזזים באותו מקור.",
+      "recent": "מכירות אחרונות בחנות",
+      "desk": "קופה"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "במלאי",
+      "low": "נמוך",
+      "critical": "קריטי",
+      "out": "אזל"
+    },
+    "compareAt": "היה {price}",
+    "less": "אחד פחות",
+    "more": "אחד יותר"
   }
 }

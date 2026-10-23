@@ -75,7 +75,8 @@
     "notificationsShort": "Alertes",
     "messages": "Messages",
     "messagesUnread": "Messages ({count} non lus)",
-    "socialApp": "Social"
+    "socialApp": "Social",
+    "shop": "Boutique"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -9852,5 +9853,475 @@
     "shownTotal": "Affiché : {amounts}",
     "tabTransactions": "Opérations",
     "shopOrder": "Achat de produits"
+  },
+  "ShopConsole": {
+    "title": "Boutique",
+    "loading": "Chargement…",
+    "noAccess": "Tu n'as pas accès à la boutique.",
+    "openState": "Ouverte · {count, plural, one {# produit} other {# produits}}",
+    "closedState": "Fermée aux membres",
+    "pos": {
+      "loading": "Chargement…",
+      "noAccess": "La caisse demande le droit d'encaisser des paiements.",
+      "back": "Boutique",
+      "title": "Caisse",
+      "branch": "Site",
+      "products": "Produits",
+      "search": "Produit, code ou code-barres",
+      "noProducts": "Aucun produit actif n'est vendu à la caisse.",
+      "left": "reste {count}",
+      "pickVariant": "Choisis une variante de {product}",
+      "sale": "Vente",
+      "walkIn": "Client sans compte",
+      "walkInName": "Nom (facultatif)",
+      "member": "Membre",
+      "unpaid": "Solde impayé {amount}",
+      "noUnpaid": "Rien d'impayé",
+      "packageDiscount": "−{percent} % du forfait",
+      "emptyCart": "Touche un produit pour l'ajouter.",
+      "charged": "Encaissé · {order}. La vente apparaît dans les Transactions du membre.",
+      "quantityOf": "Quantité de {item}",
+      "short": "Seulement {count} en stock",
+      "discount": "Remise forfait −{percent} %",
+      "total": "Total",
+      "payment": "Paiement",
+      "methods": {
+        "cash": "Espèces",
+        "card_manual": "Carte au terminal"
+      },
+      "manualNote": "Les paiements par carte passent par ton terminal ; ici tu les enregistres.",
+      "manualNoteOnlineLater": "Les paiements par carte passent par ton terminal ; ici tu les enregistres. Le paiement en ligne par carte arrive plus tard.",
+      "charge": "Encaisser {amount}",
+      "charging": "Encaissement…",
+      "pickMember": "Choisis le membre, ou passe à un client sans compte.",
+      "receiptNote": "Une facture est émise avec le paiement, comme toute vente dans Finances."
+    },
+    "newProduct": "Nouveau produit",
+    "branchNote": "Commandes, stock et rapports ne montrent que les sites choisis.",
+    "tabs": {
+      "products": "Produits",
+      "orders": "Commandes",
+      "stock": "Stock",
+      "analytics": "Analyses"
+    },
+    "empty": {
+      "title": "Vends à tes membres depuis l'app",
+      "body": "Les membres commandent depuis Box et récupèrent à l'accueil. Tu vois quoi préparer et combien il en reste. L'accueil vend aussi à la caisse.",
+      "steps": {
+        "product": {
+          "title": "Ajoute ton premier produit",
+          "body": "Photo, prix et tailles. Il commence en brouillon."
+        },
+        "pickup": {
+          "title": "Vérifie le point de retrait",
+          "body": "Les membres récupèrent à l'accueil de leur site."
+        },
+        "publish": {
+          "title": "Publie pour ouvrir la boutique",
+          "body": "La carte Boutique apparaît dans la Box des membres dès qu'un produit est publié."
+        }
+      },
+      "addProduct": "Nouveau produit",
+      "pickupSettings": "Réglages du retrait",
+      "membersNote": "Tant que tu ne publies pas, les membres ne voient aucune carte Boutique dans Box. Une fois ouverte, elle garde une place fixe sous l'abonnement."
+    },
+    "products": {
+      "title": "Produits",
+      "filter": "Afficher les produits",
+      "filters": {
+        "all": "Tous",
+        "published": "Actifs",
+        "draft": "Brouillons",
+        "low_stock": "Stock bas",
+        "archived": "Archivés"
+      },
+      "search": "Rechercher des produits",
+      "loading": "Chargement des produits…",
+      "none": "Aucun produit ici.",
+      "from": "dès {price}",
+      "variants": "{count, plural, one {# variante} other {# variantes}}",
+      "stockMeter": "{count} en stock",
+      "stockUnits": "{count, plural, one {# unité} other {# unités}}",
+      "stockWeakest": "{count, plural, one {# unité} other {# unités}} · {variant} : reste {left}",
+      "status": {
+        "draft": "Brouillon",
+        "published": "Actif",
+        "archived": "Archivé"
+      }
+    },
+    "editor": {
+      "loading": "Chargement du produit…",
+      "noAccess": "Tu ne peux pas modifier les produits de la boutique.",
+      "back": "Produits",
+      "newTitle": "Nouveau produit",
+      "promote": "Promouvoir",
+      "status": {
+        "draft": "Brouillon",
+        "published": "Actif",
+        "archived": "Archivé"
+      },
+      "photos": {
+        "title": "Photos",
+        "hint": "Les photos carrées rendent mieux. La première apparaît dans la liste.",
+        "alt": "Photo du produit {index}",
+        "uploading": "Envoi…",
+        "failed": "Échec de l'envoi",
+        "cover": "Couverture",
+        "makeCover": "En couverture",
+        "remove": "Retirer",
+        "add": "Ajouter des photos"
+      },
+      "basics": {
+        "title": "Détails",
+        "name": "Nom",
+        "description": "Description",
+        "category": "Catégorie",
+        "categoryHint": "ex. Vêtements"
+      },
+      "price": {
+        "title": "Prix",
+        "price": "Prix TTC (€)",
+        "compareAt": "Prix barré (€)",
+        "cost": "Prix d'achat (€, pour toi seul)",
+        "hint": "Le prix barré s'affiche rayé. Le prix d'achat alimente la marge dans Analyses et n'est jamais montré aux membres."
+      },
+      "variants": {
+        "title": "Options et stock",
+        "hint": "Jusqu'à deux options, comme la taille et la couleur. Le stock se compte par combinaison et par site.",
+        "addSize": "Ajouter une option (ex. taille)",
+        "addColour": "Ajouter une deuxième option (ex. couleur)",
+        "optionName": "Option",
+        "optionNameHint": "ex. Taille",
+        "removeOption": "Retirer l'option",
+        "values": "Valeurs",
+        "removeValue": "Retirer {value}",
+        "newValue": "Nouvelle valeur",
+        "newValueHint": "ex. M",
+        "addValue": "Ajouter",
+        "list": "Variantes",
+        "single": "Un seul modèle",
+        "price": "Prix (€)",
+        "priceOf": "Prix de {variant}",
+        "same": "Identique ({price})",
+        "stock": "Stock",
+        "onHand": "{count} en stock · {reserved} réservés",
+        "openingOf": "Stock initial de {variant} à {branch}",
+        "ledgerNote": "Le stock des variantes enregistrées change depuis l'onglet Stock, pour que chaque changement ait un motif."
+      },
+      "selling": {
+        "title": "Vente",
+        "channel": "Où il se vend",
+        "channels": {
+          "both": "App et caisse",
+          "app": "App seulement",
+          "desk": "Caisse seulement"
+        },
+        "visibility": "Qui peut acheter",
+        "visibilities": {
+          "members_only": "Membres seulement",
+          "anyone": "Visiteurs aussi"
+        },
+        "visibilityHint": "Visiteurs aussi : il apparaît aussi sur la page publique de la box, pour toute personne ayant un compte Palee.",
+        "memberDiscount": "Remise membre du forfait",
+        "memberDiscountHint": "Le pourcentage du forfait du membre s'applique à ce produit.",
+        "status": "Statut",
+        "newIsDraft": "Les nouveaux produits commencent en brouillon. Publie après l'enregistrement."
+      },
+      "errors": {
+        "title": "Donne un nom au produit.",
+        "price": "Indique un prix supérieur à zéro.",
+        "compareAt": "Le prix barré n'est pas un montant valide.",
+        "cost": "Le prix d'achat n'est pas un montant valide.",
+        "variantPrice": "Le prix de {variant} n'est pas un montant valide."
+      },
+      "save": "Enregistrer",
+      "create": "Créer le brouillon",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré."
+    },
+    "promote": {
+      "eyebrow": "Promouvoir",
+      "where": "Où publier",
+      "targets": {
+        "announcements": "Annonces",
+        "group": "Groupe de membres",
+        "feed": "Fil"
+      },
+      "targetHints": {
+        "announcements": "Une publication du club dans le canal des annonces, avec la carte du produit jointe.",
+        "group": "Seuls les membres d'un groupe voient la publication.",
+        "feed": "Une publication de ta box dans le Fil de tes membres et abonnés."
+      },
+      "group": "Groupe",
+      "groupPick": "Choisis un groupe",
+      "text": "Texte de la publication",
+      "defaultBody": "Nouveau dans la boutique : {product}. Commande-le dans l'app et récupère-le à l'accueil.",
+      "preview": "Aperçu",
+      "cardCta": "Voir",
+      "code": "Code de réduction",
+      "codeHint": "Un code pour ce produit seulement, dans Finances › Offres.",
+      "codeValue": "Code",
+      "percent": "Réduction (%)",
+      "endsOn": "Valable jusqu'au",
+      "newLabel": "La boutique affiche d'elle-même l'étiquette Nouveau pendant 14 jours après la publication.",
+      "errors": {
+        "body": "Écris le texte de la publication.",
+        "group": "Choisis un groupe.",
+        "code": "Indique un code et une réduction entre 1 et 100 %."
+      },
+      "cancel": "Annuler",
+      "post": "Publier",
+      "posting": "Publication…"
+    },
+    "orders": {
+      "title": "Commandes",
+      "filter": "Afficher les commandes",
+      "status": {
+        "placed": "À préparer",
+        "ready_for_pickup": "Prêtes",
+        "picked_up": "Retirées",
+        "cancelled": "Annulées"
+      },
+      "none": {
+        "placed": "Rien à préparer.",
+        "ready_for_pickup": "Aucune commande n'attend son retrait.",
+        "picked_up": "Aucune commande retirée pour l'instant.",
+        "cancelled": "Aucune commande annulée."
+      },
+      "loading": "Chargement des commandes…",
+      "walkIn": "Client sans compte",
+      "channel": {
+        "online": "depuis l'app",
+        "pos": "à la caisse"
+      },
+      "payment": {
+        "pending_payment": "À payer",
+        "paid": "Payée",
+        "partially_refunded": "Partiellement remboursée",
+        "refunded": "Remboursée",
+        "void": "Annulée"
+      },
+      "mode": {
+        "at_pickup": "Au retrait",
+        "on_account": "Sur le compte",
+        "online": "En ligne",
+        "cash": "Espèces",
+        "card_manual": "Carte au terminal",
+        "bank_transfer": "Virement",
+        "other": "Autre"
+      },
+      "reserveNote": "Les commandes gardent leur stock jusqu'au retrait ou à l'annulation. Sans retrait sous 7 jours, elles s'annulent d'elles-mêmes, avec un rappel au membre le 3e jour.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} remboursés",
+      "discount": "Remise",
+      "total": "Total",
+      "totalWithInvoice": "Total · facture {invoice}",
+      "paid": "Payé",
+      "refunded": "Remboursé",
+      "paymentMode": "Paiement",
+      "code": "Code",
+      "timeline": "Historique",
+      "timelinePlaced": "Passée {channel} · {when}",
+      "timelineReady": "Prête au retrait · {when}",
+      "timelinePickedUp": "Retirée · {when}",
+      "timelineCancelled": "Annulée · {when}",
+      "timelineExpires": "Retrait avant le {when}",
+      "markReady": "Prête au retrait",
+      "readyHint": "Prête envoie au membre une notification indiquant où et quand récupérer.",
+      "markPickedUp": "Retirée",
+      "collect": "Encaisser {amount}",
+      "method": "Moyen de paiement",
+      "collectHint": "Le paiement est enregistré sur la facture de la commande. Le membre le voit dans Transactions.",
+      "confirmPickup": "Confirmer le retrait",
+      "cancel": "Annuler la commande",
+      "cancelReason": "Motif (facultatif)",
+      "cancelHint": "L'annulation libère le stock réservé.",
+      "confirmCancel": "Annuler la commande",
+      "refund": "Rembourser",
+      "refundWhat": "Qu'est-ce qui revient ?",
+      "refundQty": "Quantité de {item} à rembourser",
+      "restock": "Remettre en stock",
+      "refundHint": "Un remboursement émet le reçu de remboursement. Laisse Remettre en stock désactivé pour les articles abîmés.",
+      "confirmRefund": "Rembourser",
+      "back": "Retour"
+    },
+    "stock": {
+      "title": "Stock",
+      "filter": "Afficher le stock",
+      "views": {
+        "attention": "À recommander",
+        "all": "Toutes les variantes"
+      },
+      "none": {
+        "attention": "Rien à recommander.",
+        "all": "Pas encore de variantes."
+      },
+      "loading": "Chargement du stock…",
+      "units": "{count, plural, one {# unité} other {# unités}}",
+      "daysLeft": "~{count, plural, one {# jour} other {# jours}}",
+      "reserved": "{count} réservés",
+      "history": "Mouvements",
+      "adjust": "Ajuster",
+      "policyNote": "L'état vient des jours de stock restants au rythme actuel : critique sous 7 jours, bas sous 21. Les alertes ne partent que quand il empire, et le stock entre dans le résumé quotidien.",
+      "recent": "Mouvements récents",
+      "historyOf": "Mouvements · {item}",
+      "allMovements": "Tous les mouvements",
+      "noMovements": "Aucun mouvement pour l'instant.",
+      "kinds": {
+        "receive": "Réception",
+        "sale": "Vente",
+        "refund_restock": "Retour en stock",
+        "adjustment": "Ajustement",
+        "transfer": "Transfert",
+        "reserve": "Réservé pour une commande",
+        "release": "Libéré"
+      },
+      "reasons": {
+        "recount": "Inventaire",
+        "damage": "Casse",
+        "loss": "Perte",
+        "return": "Retour",
+        "other": "Autre"
+      },
+      "adjustEyebrow": "Mouvement de stock",
+      "reason": "Ce qui s'est passé",
+      "form": {
+        "receive": "Réception",
+        "recount": "Inventaire",
+        "damage": "Casse",
+        "loss": "Perte",
+        "return": "Retour"
+      },
+      "quantity": "Quantité",
+      "counted": "Compté en rayon",
+      "unitCost": "Coût unitaire (€)",
+      "note": "Note",
+      "noteHint": "ex. facture fournisseur 0891",
+      "now": "Actuellement {count} en stock",
+      "after": "{from} → {to} en stock",
+      "errors": {
+        "amount": "Indique une quantité qui change le stock."
+      },
+      "cancel": "Annuler",
+      "record": "Enregistrer"
+    },
+    "analytics": {
+      "title": "Analyses",
+      "loading": "Chargement des rapports…",
+      "unavailable": "Les rapports de la boutique ne sont pas encore disponibles.",
+      "range": "Période",
+      "ranges": {
+        "28": "4 semaines",
+        "84": "12 semaines",
+        "365": "12 mois"
+      },
+      "kpi": {
+        "sales": "Ventes nettes",
+        "salesChange": "Ventes nettes · {change, number} % par rapport à la période précédente",
+        "margin": "Marge brute (là où le coût est connu · {costed}/{total} produits)",
+        "units": "Unités · {orders, plural, one {# commande} other {# commandes}}",
+        "stockValue": "Valeur du stock au coût · {count} bas"
+      },
+      "weekly": "Ventes par semaine",
+      "weeklyHint": "Nettes des remises et remboursements. La semaine en cours est plus claire.",
+      "weekOf": "Semaine du {date}",
+      "net": "Net",
+      "noSales": "Aucune vente sur cette période.",
+      "top": "Meilleurs produits",
+      "product": "Produit",
+      "units": "Unités",
+      "revenue": "Chiffre d'affaires",
+      "marginCol": "Marge",
+      "marginHint": "« — » : le prix d'achat manque, donc il reste hors de la marge au lieu de compter pour 100 %.",
+      "channels": "App ou caisse",
+      "channel": {
+        "online": "App (retrait)",
+        "pos": "Caisse"
+      },
+      "branches": "Par site",
+      "noBranch": "Sans site",
+      "attribution": "D'où viennent les ventes",
+      "attributionHint": "Une commande revient au code utilisé, sinon à la publication ou à l'offre depuis laquelle le produit a été ouvert dans les 7 jours, sinon à la carte Boutique dans Box.",
+      "source": {
+        "club_post": "Publication",
+        "promotion_code": "Code",
+        "public_page": "Page publique",
+        "direct": "Carte Boutique dans Box",
+        "desk": "Caisse",
+        "other": "Autre"
+      },
+      "codeRow": "Code {code}",
+      "ordersMoney": "{count, plural, one {# commande} other {# commandes}} · {amount}",
+      "unattributed": "Sans attribution : {count, plural, one {# commande} other {# commandes}} · {amount}",
+      "lowStock": "Stock bas",
+      "noLowStock": "Rien ne s'épuise.",
+      "left": "reste {count}",
+      "openStock": "Ouvrir le stock",
+      "pricing": {
+        "title": "Indicateurs de prix",
+        "hint": "Par variante, sur la période choisie. La fourchette suggérée est indicative : c'est toi qui fixes tes prix.",
+        "none": "Pas encore de variantes avec ventes ou stock.",
+        "marginShort": "marge {margin} %",
+        "noCost": "sans prix d'achat",
+        "perWeek": "{value}/semaine",
+        "margin": "Marge",
+        "markup": "Taux de marque",
+        "sellThrough": "Taux d'écoulement",
+        "daysOfStock": "Jours de stock",
+        "velocity": "Vendus par semaine",
+        "sold": "Vendus",
+        "discountEffect": "Effet des remises",
+        "lift": "{change, number} % d'unités par commande · {share} % des unités",
+        "priceChange": "Dernier changement de prix",
+        "velocityChange": "{from} → {to} : {before} → {after}/semaine",
+        "position": {
+          "below": "Sous la fourchette",
+          "within": "Dans la fourchette",
+          "above": "Au-dessus de la fourchette"
+        },
+        "suggested": "Fourchette de prix suggérée",
+        "advisory": "Indicatif",
+        "range": "{low} – {high}",
+        "noRange": "Pas de fourchette sans prix d'achat.",
+        "inputs": "Comment c'est calculé",
+        "inputCostPlus": "Coût {cost} avec une marge cible de {margin} % ({source}).",
+        "sourceCategory": "la cible de la catégorie",
+        "sourceDefault": "la cible par défaut",
+        "inputNoCost": "Ajoute le prix d'achat pour obtenir une fourchette.",
+        "pace": {
+          "fast": "Il se vend {velocity}/semaine, au moins 1,5× la médiane de sa catégorie ({median}/semaine), donc la fourchette dépasse le coût plus marge.",
+          "slow": "Il se vend {velocity}/semaine, au plus la moitié de la médiane de sa catégorie ({median}/semaine), donc la fourchette descend sous le coût plus marge, jamais sous le coût.",
+          "normal": "Il se vend {velocity}/semaine, à peu près au rythme de sa catégorie ({median}/semaine).",
+          "unknown": "Pas encore assez de ventes pour comparer son rythme à sa catégorie."
+        },
+        "priceSensitive": "La demande semble sensible au prix, donc la marge de hausse est divisée par deux.",
+        "yourCall": "Indicatif seulement : la box fixe ses prix."
+      }
+    },
+    "finance": {
+      "eyebrow": "Revenus par flux",
+      "title": "D'où vient l'argent",
+      "streams": {
+        "membership": "Abonnements",
+        "package": "Forfaits PT et services",
+        "event": "Événements et saisons",
+        "shop": "Boutique",
+        "other": "Autres"
+      },
+      "hint": "Chaque paiement tire son flux de sa source, jamais de son texte. Les remboursements se déduisent dans le même flux.",
+      "recent": "Dernières ventes de la boutique",
+      "desk": "Caisse"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "En stock",
+      "low": "Bas",
+      "critical": "Critique",
+      "out": "Épuisé"
+    },
+    "compareAt": "Avant {price}",
+    "less": "Un de moins",
+    "more": "Un de plus"
   }
 }

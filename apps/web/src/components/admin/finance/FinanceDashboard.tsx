@@ -25,6 +25,7 @@ import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
+import { RevenueStreamsCard } from "@/components/admin/finance/RevenueStreamsCard";
 
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -133,6 +134,8 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             { key: "outstanding_invoice_balance_cents", label: i18n("pendingInvoices12d9ca8"), format: (value) => money(uiLocale, value) },
           ]}
         />
+
+        <RevenueStreamsCard summary={summaryQuery.data} locationIds={locationIds} />
 
         {/* Chart */}
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

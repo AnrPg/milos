@@ -175,6 +175,8 @@ export function AdminDashboard({
         { label: nav("trials"), href: "/admin/trials", icon: "users", show: has("run_classes", "manage_memberships", "manage_settings") },
         { label: nav("community"), href: "/admin/community", icon: "users", show: has("moderate_community") },
         { label: i18n("finance1b48d3f"), href: "/admin/finance", icon: "wallet", show: canFinancePage },
+        // Shop proposal §2 (A): «Κατάστημα» is its own section; TODO(ADR-190) `manage_shop`.
+        { label: nav("shop"), href: "/admin/shop", icon: "bag", show: has("manage_shop") },
         { label: i18n("classesed1846a"), href: "/admin/class-schedule", icon: "calendar", show: has("run_classes", "manage_schedule", "manage_coaching") },
         { label: nav("wodsVault"), href: "/admin/workouts", icon: "dumbbell", show: has("manage_workouts") },
         { label: i18n("admCheckInTitle"), href: "/admin/check-in", icon: "check", show: has("check_in") },

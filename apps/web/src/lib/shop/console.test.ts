@@ -11,6 +11,7 @@ import {
   daysOfStockTone,
   lastComparablePriceChange,
   memberDiscountPercent,
+  movementFor,
   orderActions,
   paceOf,
   pickupNeedsPayment,
@@ -119,6 +120,30 @@ describe("stock", () => {
   it("gives the price range of live variants", () => {
     expect(priceRange([])).toBeNull();
     expect(priceRange([{ price_cents: 2500 }, { price_cents: 2900 }, { price_cents: 100, archived_at: "x" }])).toEqual({ min: 2500, max: 2900 });
+  });
+});
+
+describe("stock form", () => {
+  const item = { variant_id: "v1", location_id: "loc-1", on_hand: 4 };
+
+  it("records deliveries, recounts and write-offs", () => {
+    expect(movementFor(item, "receive", 10, 1100, " Τιμολόγιο 0891 ")).toEqual({
+      variant_id: "v1",
+      location_id: "loc-1",
+      note: "Τιμολόγιο 0891",
+      kind: "receive",
+      quantity: 10,
+      unit_cost_cents: 1100,
+    });
+    expect(movementFor(item, "recount", 3, null, "")).toMatchObject({ kind: "adjustment", reason: "recount", quantity: -1, note: null });
+    expect(movementFor(item, "damage", 2, null, "")).toMatchObject({ reason: "damage", quantity: -2 });
+    expect(movementFor(item, "return", 1, null, "")).toMatchObject({ reason: "return", quantity: 1 });
+  });
+
+  it("refuses an entry that changes nothing", () => {
+    expect(movementFor(item, "recount", 4, null, "")).toBeNull();
+    expect(movementFor(item, "receive", 0, null, "")).toBeNull();
+    expect(movementFor(item, "loss", -1, null, "")).toBeNull();
   });
 });
 
