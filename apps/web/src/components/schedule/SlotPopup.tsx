@@ -22,7 +22,6 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
-import type { WorkoutRecord } from "@/api/workouts";
 import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
@@ -95,8 +94,8 @@ type SlotPopupProps = {
   locations?: ScheduleLocation[];
   /** The member's package includes guest passes (ADR-097). */
   guestsIncluded?: boolean;
-  /** ADR-176: WODs staff may link to a class that has none. */
-  linkableWorkouts?: WorkoutRecord[];
+  /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
+  onCreateWorkout?: () => void;
 };
 
 export function SlotPopup({
@@ -114,7 +113,7 @@ export function SlotPopup({
   onSlotChanged,
   locations,
   guestsIncluded = false,
-  linkableWorkouts = [],
+  onCreateWorkout,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -316,7 +315,7 @@ export function SlotPopup({
           </div>
 
           {isAdmin ? (
-            <ClassWorkoutNotice slot={slot} accessToken={accessToken} workouts={linkableWorkouts} onLinked={onSlotChanged} />
+            <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} onCreateNew={onCreateWorkout} />
           ) : null}
 
           {/* Compact info strip (admin sees full detail; members get a summary) */}

@@ -105,7 +105,7 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Date and time pickers (`ui/DateInput`, `TimeInput`, `DateTimeInput`, ADR-182): field / icon / placeholder | `--control-bg`, `--control-border`, `--text` / `--muted` / `--placeholder` |
 | Calendar: panel / weekday header / other-month days / today ring / chosen day / Today button / Clear | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--dim` / `--spark` / `--primary` with `--primary-contrast` / `--spark` with `--spark-contrast` / `--muted` |
 | Time columns: column track / chosen hour or minute | `--panel-muted` / `--primary` with `--primary-contrast` |
-| WOD picker (class form, `schedule/WodPicker`): field / search / active row / chosen ✓ / "+ New WOD" | `--panel-muted`, `--border`, `--text` / `--panel-muted`, `--border` / `--panel-muted` / `--primary` / `--spark` with `--spark-contrast` |
+| WOD picker (class form, `schedule/WodPicker`): field / one-tap suggestion chip / group heading / active row / chosen ✓ / "+ New WOD" | `--panel-muted`, `--border`, `--text` / `--panel`, `--border-strong` / `--dim` / `--panel-muted` / `--primary` / `--spark` with `--spark-contrast` |
 | Checkbox, radio, range, progress, meter | `accent-color: --primary` |
 | Custom switches: track on / off / knob | `--primary` / `--border` / `--control-knob` |
 | Two-thumb range slider thumbs | `--text` |

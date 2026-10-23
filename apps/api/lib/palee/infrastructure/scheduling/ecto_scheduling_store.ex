@@ -432,6 +432,25 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Enum.map(&normalize_slot/1)
   end
 
+  # The WODs classes in [from, to) use, most recently scheduled first, for the
+  # WOD picker's suggestions (the day's WOD, recent ones for a class type).
+  @impl true
+  def class_workout_usage(%{organization_id: organization_id}, from, to, opts) do
+    ScheduledClass
+    |> where([slot], not is_nil(slot.master_workout_id))
+    |> where([slot], slot.scheduled_at >= ^from and slot.scheduled_at < ^to)
+    |> for_organization(organization_id)
+    |> maybe_filter_class_types(List.wrap(opts[:class_type_id]))
+    |> group_by([slot], slot.master_workout_id)
+    |> order_by([slot], desc: max(slot.scheduled_at))
+    |> limit(^min(opts[:limit] || 10, 50))
+    |> select([slot], %{
+      workout_id: slot.master_workout_id,
+      last_scheduled_at: max(slot.scheduled_at)
+    })
+    |> Repo.all()
+  end
+
   # ADR-176: classes still without a WOD that start in [from, to), for the
   # missing-WOD alerts (served by the partial index on master_workout_id).
   @impl true

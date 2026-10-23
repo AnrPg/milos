@@ -6799,6 +6799,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/choices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search published library WODs for the class form, a page at a time */
+        get: operations["PaleeWeb.AdminWorkoutChoiceController.search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/workouts/choices/suggested": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The WODs a coach most likely wants for a class on a gym day */
+        get: operations["PaleeWeb.AdminWorkoutChoiceController.suggested"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/dsl/manual": {
         parameters: {
             query?: never;
@@ -29233,6 +29267,19 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+        };
+        /** WorkoutChoice */
+        WorkoutChoice: {
+            /** Format: uuid */
+            folder_id?: string | null;
+            icon?: string | null;
+            icon_source?: string | null;
+            /** Format: uuid */
+            id: string;
+            title: string;
+            type: string;
+            /** Format: date-time */
+            updated_at?: string | null;
         };
         /** WorkoutDslAuthoringResponse */
         WorkoutDslAuthoringResponse: {
@@ -62228,6 +62275,116 @@ export interface operations {
                     "application/json": {
                         /** @description Off: no assistant; workouts are written in text sections with a timer each */
                         wod_assistant_enabled: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminWorkoutChoiceController.search": {
+        parameters: {
+            query?: {
+                /** @description Words of the title */
+                q?: string;
+                /** @description Workout type */
+                type?: string;
+                /** @description Library folder */
+                folder_id?: string;
+                /** @description Page size (default 20) */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description WOD choices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        has_more: boolean;
+                        next_offset: number | null;
+                        workouts: {
+                            /** Format: uuid */
+                            folder_id?: string | null;
+                            icon?: string | null;
+                            icon_source?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminWorkoutChoiceController.suggested": {
+        parameters: {
+            query?: {
+                /** @description The class's gym-local day (default today) */
+                date?: string;
+                /** @description The class's type */
+                class_type_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggested WODs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date */
+                        date: string;
+                        newest: {
+                            /** Format: uuid */
+                            folder_id?: string | null;
+                            icon?: string | null;
+                            icon_source?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        }[];
+                        recent: {
+                            /** Format: uuid */
+                            folder_id?: string | null;
+                            icon?: string | null;
+                            icon_source?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        }[];
+                        same_day: {
+                            /** Format: uuid */
+                            folder_id?: string | null;
+                            icon?: string | null;
+                            icon_source?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        }[];
                     };
                 };
             };

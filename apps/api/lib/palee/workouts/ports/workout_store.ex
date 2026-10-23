@@ -24,6 +24,8 @@ defmodule Palee.Workouts.Ports.WorkoutStore do
   @callback list_class_variants([Ecto.UUID.t()], Ecto.UUID.t() | nil) :: [map()]
   @callback list_workouts() :: [map()]
   @callback list_folders() :: [map()]
+  @callback search_workout_choices(keyword()) :: %{workouts: [map()], has_more: boolean()}
+  @callback workout_choices_by_ids([Ecto.UUID.t()]) :: [map()]
   @callback create_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback update_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback find_filed_copy(binary(), binary()) :: binary() | nil

@@ -97,6 +97,15 @@ defmodule Palee.Workouts do
     do: ListClassVariants.call(context, slot_ids, assignee_id)
 
   defdelegate list_workouts(context), to: ListAdminWorkouts, as: :all
+
+  @doc "The WOD picker: published library WODs as summaries, searched and paged."
+  def search_workout_choices(context, opts),
+    do: Palee.Workouts.WorkoutStore.search_workout_choices(context, opts)
+
+  @doc "Summaries of published library WODs, in the order of `ids`."
+  def workout_choices_by_ids(context, ids),
+    do: Palee.Workouts.WorkoutStore.workout_choices_by_ids(context, ids)
+
   defdelegate list_scale_levels(context), to: ListScaleLevels, as: :all
   defdelegate replace_scale_levels(context, levels), to: ReplaceScaleLevels, as: :call
   defdelegate seed_default_scale_levels(context), to: SeedDefaultScaleLevels, as: :call

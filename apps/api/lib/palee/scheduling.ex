@@ -263,6 +263,10 @@ defmodule Palee.Scheduling do
   def list_member_slots(user_id, start_at, end_at),
     do: Palee.Scheduling.SchedulingStore.list_member_slots(user_id, start_at, end_at)
 
+  @doc "WODs classes in [from, to) use, most recently scheduled first."
+  def class_workout_usage(%{organization_id: _} = context, from, to, opts \\ []),
+    do: Palee.Scheduling.SchedulingStore.class_workout_usage(context, from, to, opts)
+
   @doc "ADR-176: classes still without a WOD that start in [from, to)."
   def list_slots_missing_workout(%{organization_id: _} = context, from, to),
     do: Palee.Scheduling.SchedulingStore.list_slots_missing_workout(context, from, to)
