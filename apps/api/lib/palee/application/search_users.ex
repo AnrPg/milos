@@ -1,5 +1,5 @@
 defmodule Palee.Application.SearchUsers do
-  alias Palee.{Identity, Identity.RegistrationPolicy, Organizations}
+  alias Palee.{Identity, Identity.Domain.NameSearch, Organizations}
 
   def call(query) do
     Identity.search_users(query)
@@ -17,12 +17,5 @@ defmodule Palee.Application.SearchUsers do
   defp filter_query(users, nil), do: users
   defp filter_query(users, ""), do: users
 
-  defp filter_query(users, query) do
-    normalized_query = RegistrationPolicy.normalize_nickname(query)
-
-    Enum.filter(users, fn user ->
-      String.contains?(String.downcase(user.nickname), normalized_query) or
-        String.contains?(user.normalized_nickname || "", normalized_query)
-    end)
-  end
+  defp filter_query(users, query), do: Enum.filter(users, &NameSearch.matches?(&1, query))
 end

@@ -33,6 +33,14 @@ function preferredUrl(notification: LinkableNotification) {
   if (notification.type === "class_workout_missing" && typeof slotId === "string" && slotId) {
     return `/admin/schedule?open_slot=${encodeURIComponent(slotId)}`;
   }
+  // ADR-187: a password reset request opens that request; the reset itself opens Settings.
+  if (notification.type === "password_reset_requested") {
+    const requestId = notification.payload.request_id;
+    return typeof requestId === "string" && requestId
+      ? `/password-resets?request=${encodeURIComponent(requestId)}`
+      : "/password-resets";
+  }
+  if (notification.type === "password_reset_completed") return "/me/settings";
   // ADR-155: a visitor at the door opens the desk on that visitor.
   if (notification.type === "check_in_visitor") {
     const scanId = notification.payload.scan_id;

@@ -32,7 +32,7 @@ defmodule PaleeWeb.AuthControllerTest do
       assert conn.resp_cookies["milos_refresh"].same_site == "Strict"
     end
 
-    test "returns 422 on duplicate nickname", %{conn: conn} do
+    test "returns 422 on a duplicate handle", %{conn: conn} do
       params = %{
         nickname: "zeus",
         password: "S3cur3P@ss!42",
@@ -48,9 +48,12 @@ defmodule PaleeWeb.AuthControllerTest do
       conn =
         build_conn()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/register", Jason.encode!(params))
+        |> post(
+          "/api/auth/register",
+          Jason.encode!(%{params | email: "other@placeholder.invalid"})
+        )
 
-      assert json_response(conn, 422)["errors"]["nickname"] != []
+      assert ["has already been taken"] = json_response(conn, 422)["errors"]["handle"]
     end
 
     test "returns 500 when token issuance fails", %{conn: conn} do

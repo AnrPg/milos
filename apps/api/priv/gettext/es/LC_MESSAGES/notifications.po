@@ -603,3 +603,17 @@ msgstr "%{class} (%{when}) aún no tiene WOD. Vincula uno antes de que empiece."
 # ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} tu hora"
+
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "Solicitud de restablecimiento de contraseña"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "%{name} (@%{handle}) no puede iniciar sesión y ha pedido restablecer su contraseña."
+
+msgid "Your password was reset"
+msgstr "Tu contraseña se ha restablecido"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "Tu contraseña se cambió con un enlace de restablecimiento o un código de recuperación, y se cerró la sesión en todos los dispositivos. Si no fuiste tú, contacta con tu gimnasio o con el soporte de Palee."

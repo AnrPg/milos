@@ -603,3 +603,17 @@ msgstr "لا يوجد WOD لحصة %{class} (%{when}) بعد. اربط WOD قب�
 # ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} بتوقيتك"
+
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "طلب إعادة تعيين كلمة المرور"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "لا يستطيع %{name} (@%{handle}) تسجيل الدخول وطلب إعادة تعيين كلمة المرور."
+
+msgid "Your password was reset"
+msgstr "تمت إعادة تعيين كلمة مرورك"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "تم تغيير كلمة مرورك عبر رابط إعادة تعيين أو رمز استرداد، وتم تسجيل الخروج من جميع الأجهزة. إن لم تكن أنت من فعل ذلك، فتواصل مع ناديك الرياضي أو مع دعم Palee."
