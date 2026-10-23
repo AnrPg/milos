@@ -6799,7 +6799,8 @@
     "visibilityOff": "I tuoi post pubblici non compaiono in Intorno a me. Se lo attivi, compariranno al centro della tua zona principale, mai più vicino.",
     "visibilityNeedsArea": "Compaiono solo dopo aver impostato «La mia zona».",
     "notifTitle": "Novità intorno a te",
-    "notifBody": "Novità per «{name}»: {count}"
+    "notifBody": "Novità per «{name}»: {count}",
+    "myDisciplines": "I miei sport"
   },
   "CheckIn": {
     "loading": "Caricamento…",
@@ -9385,6 +9386,10 @@
     "codeLabel": "Codice di invito",
     "codeSubmit": "Entra",
     "codeFailed": "Il codice non ha funzionato. Verificalo con il tuo box.",
-    "laterNote": "Nessun problema. Puoi entrare in un box quando vuoi da Intorno a me."
+    "laterNote": "Nessun problema. Puoi entrare in un box quando vuoi da Intorno a me.",
+    "backToMe": "Torna a Io",
+    "saveInterests": "Salva",
+    "interestsSaved": "Salvato.",
+    "interestsHubHint": "Sport e livello, per i suggerimenti"
   }
 }
