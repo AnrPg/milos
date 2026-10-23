@@ -12,6 +12,7 @@ import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollment
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { AccessNotice, EntitlementCard, formatDate, StatusBadge } from "@/components/finance/MembershipEntitlement";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { Select } from "@/components/ui/Select";
@@ -80,14 +81,14 @@ export function BillingPage() {
 
   if (status !== "authenticated" || isLoading || !hasBillingProviders) {
     return (
-      <HubPage title={t("title")}>
+      <HubPage back={<BackToMe />} title={t("title")}>
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       </HubPage>
     );
   }
 
   return (
-    <HubPage title={t("title")}>
+    <HubPage back={<BackToMe />} title={t("title")}>
       {providers.length > 1 && current ? (
         <Select
           aria-label={t("pickProvider")}
