@@ -27,6 +27,7 @@ defmodule Palee.Application.CommunityEvents do
     EventInvites,
     EventNotices,
     EventPresenter,
+    GoLive,
     PublicBox,
     RealtimePublisher
   }
@@ -141,16 +142,18 @@ defmodule Palee.Application.CommunityEvents do
 
       result =
         if params[:going] do
-          Community.rsvp_event(
-            gym,
-            event.id,
-            user_id,
-            %{
-              club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
-              invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
-            },
-            now
-          )
+          rsvp_live(event, user_id, fn ->
+            Community.rsvp_event(
+              gym,
+              event.id,
+              user_id,
+              %{
+                club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
+                invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
+              },
+              now
+            )
+          end)
         else
           Community.withdraw_from_event(gym, event.id, user_id, user_id, now)
         end
@@ -160,6 +163,14 @@ defmodule Palee.Application.CommunityEvents do
         announce(event)
         show(context, event.id, params[:invite_token])
       end
+    end
+  end
+
+  # ADR-184: a business in demo mode takes no places from real people.
+  defp rsvp_live(event, user_id, rsvp) do
+    case GoLive.check_booking_at(event.organization_id, user_id) do
+      :ok -> rsvp.()
+      error -> error
     end
   end
 
@@ -178,6 +189,8 @@ defmodule Palee.Application.CommunityEvents do
     now = DateTime.utc_now()
 
     with {:ok, event, _clubs, _invite} <- locate(context, event_id, nil),
+         # ADR-184: no guest links out of a business in demo mode.
+         :ok <- GoLive.check_at(event.organization_id, :invite_people),
          gym = gym(event.organization_id, context),
          :ok <- Community.event_open_for_rsvp(event, now),
          status = attendee_status(gym, event.id, user_id),

@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "On your clock ({zone})",
     "zonedTimeGymClock": "Times are on the gym's clock ({zone}).",
     "scoreFieldLabel": "Score {number}",
-    "removeScoreField": "Remove score {number}"
+    "removeScoreField": "Remove score {number}",
+    "apiErrorBusinessNotActivated": "The Palee team activates this business before it can go live.",
+    "apiErrorBusinessAccountExists": "You already have a business waiting for activation.",
+    "apiErrorBusinessSignupClosed": "Ask the Palee team to turn your account into a business account.",
+    "apiErrorInvalidBusinessKind": "Choose a gym or an independent coach.",
+    "apiErrorInvalidBusinessRequest": "Check the details of the request.",
+    "apiErrorBusinessRequestPending": "You already have a request of this kind waiting.",
+    "apiErrorBusinessRequestClosed": "This request was already answered.",
+    "apiErrorInvalidActivationLink": "This activation link isn’t valid for the account you’re signed in with.",
+    "apiErrorBusinessAlreadyActive": "This business is already active.",
+    "apiErrorInvalidActivationRole": "Choose owner or admin.",
+    "apiErrorInvalidActivationLifetime": "A link lasts between one hour and 30 days.",
+    "apiErrorAccountNotFound": "No account matches.",
+    "apiErrorUnknownDemoSection": "There is no demo data for this screen."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -6799,7 +6812,8 @@
     "visibilityOff": "Your public posts don't show in Around me. Turn it on and they show at the centre of your main area, never closer.",
     "visibilityNeedsArea": "They only show once you've set “My area”.",
     "notifTitle": "New near you",
-    "notifBody": "New for “{name}”: {count}"
+    "notifBody": "New for “{name}”: {count}",
+    "myDisciplines": "My sports"
   },
   "CheckIn": {
     "loading": "Loading…",
@@ -9385,6 +9399,152 @@
     "codeLabel": "Invite code",
     "codeSubmit": "Join",
     "codeFailed": "That code didn't work. Check it with your box.",
-    "laterNote": "No problem. You can join a box any time from Around me."
+    "laterNote": "No problem. You can join a box any time from Around me.",
+    "backToMe": "Back to Me",
+    "saveInterests": "Save",
+    "interestsSaved": "Saved.",
+    "interestsHubHint": "Disciplines and level, for suggestions"
+  },
+  "Business": {
+    "common": {
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "demo": {
+      "button": "Demo data",
+      "working": "Working…",
+      "eyebrow": "Demo mode",
+      "title": "Try it with demo data",
+      "intro": "Fill this screen with made-up members, classes and payments. Nothing reaches real people until the Palee team activates your business.",
+      "fill": {
+        "all": "Fill every screen",
+        "members": "Add demo members",
+        "schedule": "Fill the week with classes",
+        "finance": "Add demo packages and payments",
+        "workouts": "Add demo workouts"
+      },
+      "filled": "This screen has demo data",
+      "remove": "Remove demo data",
+      "removeConfirm": "Remove every demo member, class and payment? What you set up yourself stays.",
+      "removeYes": "Remove"
+    },
+    "activation": {
+      "request": "Ask the Palee team to activate",
+      "pending": "Your activation request is with the Palee team. They will send you an activation link."
+    },
+    "notice": {
+      "eyebrow": "Demo mode",
+      "title": "Activation by the Palee team",
+      "body": "Your business is in demo mode: everything works with demo data, but nothing goes live yet. Until the Palee team activates it:",
+      "locked": {
+        "people": "no real members or staff can join",
+        "public": "your public page stays hidden from Around me and search",
+        "bookings": "nobody outside your team can book",
+        "payments": "no real payments are taken",
+        "messages": "no emails, notifications or messages go to anyone outside your account"
+      },
+      "howOwner": "Ask the Palee team below. Once they have spoken with you, they send you an activation link: open it signed in with this account.",
+      "howStaff": "The owner of this business can ask the Palee team for activation from the demo button on the admin screens."
+    },
+    "signUp": {
+      "link": "Business account",
+      "title": "Business account",
+      "intro": "For gyms, boxes and independent coaches. You start in demo mode and the Palee team activates you once you have spoken.",
+      "account": "Your account",
+      "demoNote": "Until activation your business is visible only to you: demo data, no real members, bookings, payments or messages.",
+      "submit": "Open my business",
+      "creating": "Opening…",
+      "personal": "Personal account instead",
+      "nameRule": "Between 2 and 120 characters.",
+      "createdTitle": "Your business is open",
+      "created": "It is in demo mode. Try every screen with the demo button; the Palee team will contact you about activation.",
+      "openConsole": "Go to my console",
+      "closed": "This account was created a while ago, so the Palee team opens its business for you. Send them a request from Settings.",
+      "closedAction": "Open Settings"
+    },
+    "form": {
+      "kind": "Kind of business",
+      "gymName": "Name of the gym or box",
+      "coachName": "Your name as a coach",
+      "city": "City",
+      "phone": "Phone",
+      "phoneHint": "So the Palee team can reach you about activation.",
+      "message": "Anything the Palee team should know"
+    },
+    "kind": {
+      "gym": "Gym or box",
+      "gymHint": "Classes, members, a team",
+      "coach": "Independent coach",
+      "coachHint": "Your clients, sessions and Team"
+    },
+    "role": {
+      "owner": "Owner",
+      "admin": "Admin"
+    },
+    "activate": {
+      "title": "Activate your business",
+      "loading": "Checking the link…",
+      "invalid": "This activation link is not valid for the account you are signed in with. It may have expired or been used: ask the Palee team for a new one.",
+      "signedInAs": "Signed in as {name}.",
+      "removes": "The demo data is removed ({rows} records, including {people} demo people).",
+      "nothingToRemove": "There is no demo data to remove.",
+      "keeps": "Everything you set up yourself stays: settings, branding, classes, packages and your public page draft.",
+      "goesLive": "Then you can invite real people, publish your page, take bookings and payments.",
+      "confirm": "Activate",
+      "working": "Activating…",
+      "doneTitle": "You are live",
+      "done": "{name} is active. The demo data is gone and everything you set up is waiting for you."
+    },
+    "settings": {
+      "title": "Business account",
+      "description": "Run a gym, a box or your own coaching on Palee",
+      "intro": "Ask the Palee team to turn this account into a business. They open it in demo mode for you and get in touch about activation.",
+      "send": "Send request",
+      "sending": "Sending…",
+      "sent": "Request sent. The Palee team will get back to you.",
+      "cancel": "Withdraw request"
+    },
+    "requestKind": {
+      "conversion": "Business account",
+      "activation": "Activation"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined",
+      "cancelled": "Withdrawn",
+      "completed": "Activated"
+    },
+    "me": {
+      "row": "Business account",
+      "rowHint": "A gym, a box or your coaching"
+    },
+    "console": {
+      "back": "Organizations",
+      "title": "Business accounts",
+      "subtitle": "Requests to open or activate a business, and every business still in demo mode.",
+      "forbidden": "Only the Palee team can open this page.",
+      "requests": "Requests",
+      "noRequests": "No requests are waiting.",
+      "demoBusinesses": "In demo mode",
+      "noDemoBusinesses": "No business is in demo mode.",
+      "role": "Role it grants",
+      "note": "Note to the requester",
+      "approveConversion": "Open the business",
+      "approveActivation": "Issue activation link",
+      "decline": "Decline",
+      "demoSince": "demo since {date}",
+      "liveLink": "Live link for {name} ({role}), until {date}",
+      "revoke": "Revoke",
+      "account": "Account",
+      "pickAccount": "Pick an account",
+      "issueLink": "Issue activation link",
+      "replaceLink": "Replace the link",
+      "issued": "Activation link ({role}). Send it to the owner: it works only signed in with their account.",
+      "linkLabel": "Activation link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "linkHint": "Shown only now. Issuing a new link replaces this one."
+    }
   }
 }

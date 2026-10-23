@@ -1190,6 +1190,51 @@ defmodule PaleeWeb.Router do
     post("/organizations/:id/purge/resume", PlatformOrganizationPurgeController, :resume)
   end
 
+  # ADR-184: business accounts in demo mode until the platform team activates
+  # them: the business step of sign-up, requests and the activation link.
+  scope "/api", PaleeWeb do
+    pipe_through([:api, :authenticated, :authenticated_rate_limited, :tenant_write_rate_limited])
+
+    post("/business-accounts", BusinessAccountController, :sign_up)
+    get("/me/business-requests", BusinessAccountController, :my_requests)
+    post("/me/business-requests", BusinessAccountController, :request_conversion)
+    post("/me/business-requests/:id/cancel", BusinessAccountController, :cancel_request)
+    post("/business-activation/inspect", BusinessAccountController, :inspect_activation)
+    post("/business-activation/redeem", BusinessAccountController, :redeem_activation)
+  end
+
+  # ADR-184: the floating demo-data button and the activation request.
+  scope "/api/org/:organization_slug/admin", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited
+    ])
+
+    get("/business", AdminBusinessController, :show)
+    post("/business/demo-data", AdminBusinessController, :seed)
+    delete("/business/demo-data", AdminBusinessController, :remove)
+    post("/business/activation-request", AdminBusinessController, :request_activation)
+  end
+
+  # ADR-184: the vendors' queue and activation links.
+  scope "/api/platform", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
+
+    get("/business-accounts", PlatformBusinessAccountController, :queue)
+    post("/business-requests/:id/decision", PlatformBusinessAccountController, :decide)
+    post("/organizations/:id/activation-links", PlatformBusinessAccountController, :issue_link)
+    delete("/activation-links/:id", PlatformBusinessAccountController, :revoke_link)
+  end
+
   scope "/api/me", PaleeWeb do
     pipe_through([
       :api,

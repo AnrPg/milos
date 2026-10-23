@@ -107,6 +107,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     places/home_area_store
     interests/interests_store
     wallet/wallet_store
+    business_accounts/business_account_store
   )
 
   defp tenant_scope_violations do

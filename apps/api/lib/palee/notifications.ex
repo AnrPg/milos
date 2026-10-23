@@ -1432,7 +1432,7 @@ defmodule Palee.Notifications do
          end) do
       {:ok, notification} = ok ->
         case notification do
-          :duplicate ->
+          skipped when skipped in [:duplicate, :suppressed] ->
             :ok
 
           _notification ->

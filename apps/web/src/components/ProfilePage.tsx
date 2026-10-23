@@ -17,6 +17,7 @@ import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { IdentitySettings, IDENTITY_FORM_ID } from "@/components/account/IdentitySettings";
 import { ProfilesSection } from "@/components/account/ProfilesSection";
 import { RecoveryCodesSection } from "@/components/account/RecoveryCodesSection";
+import { BusinessAccountSettings } from "@/components/business/BusinessAccountSettings";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { AroundAreaSetting } from "@/components/around/AroundSettings";
@@ -291,6 +292,8 @@ export function ProfilePage() {
         </CollapsibleSection>
 
         <RecoveryCodesSection />
+
+        <BusinessAccountSettings />
 
         <CollapsibleSection
           id="personal"

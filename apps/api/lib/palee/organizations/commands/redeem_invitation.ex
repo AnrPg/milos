@@ -1,12 +1,13 @@
 defmodule Palee.Organizations.Commands.RedeemInvitation do
   alias Palee.Identity
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.{InvitationEmail, InvitationToken}
+  alias Palee.Organizations.Domain.{GoLivePolicy, InvitationEmail, InvitationToken}
   alias Palee.Organizations.OrganizationStore
 
   def call(token, user_id, redeemed_at) do
     with {:ok, digest} <- InvitationToken.decode(token),
-         :ok <- authorize_intended_email(digest, user_id) do
+         :ok <- authorize_intended_email(digest, user_id),
+         :ok <- authorize_live_organization(digest) do
       # The redeemer is not yet a member of the organization they are joining,
       # so this runs under the invitation carve-out (F-16).
       RepoContext.run(%{invitation_redemption: true, user_id: user_id}, fn ->
@@ -41,6 +42,24 @@ defmodule Palee.Organizations.Commands.RedeemInvitation do
         else
           {:error, :invitation_email_mismatch}
         end
+    end
+  end
+
+  # ADR-184: an invitation of a business still in demo mode cannot be
+  # redeemed; it answers like any invalid invitation, so the business stays
+  # invisible to outsiders.
+  defp authorize_live_organization(digest) do
+    case RepoContext.run(%{invitation_redemption: true}, fn ->
+           OrganizationStore.get_invitation_with_organization(digest)
+         end) do
+      %{organization: organization} ->
+        case GoLivePolicy.check(organization, :join) do
+          :ok -> :ok
+          {:error, :business_not_activated} -> {:error, :invalid_invitation}
+        end
+
+      _none ->
+        :ok
     end
   end
 

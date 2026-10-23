@@ -5,13 +5,15 @@ defmodule Palee.Application.PublishBoxPublicProfile do
   once and keeps the draft. The first publication time is kept.
   """
 
-  alias Palee.Application.{BoxPublicProfile, UpdateBoxPublicProfile}
+  alias Palee.Application.{BoxPublicProfile, GoLive, UpdateBoxPublicProfile}
   alias Palee.Organizations
 
   def publish(context, params \\ %{}) do
     current = Organizations.get_public_profile(context)
 
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
+         # ADR-184: a business in demo mode keeps its page as a draft.
+         :ok <- GoLive.check(context, :publish_profile),
          :ok <- fresh(params, current),
          %{} <- current || {:error, :public_profile_empty},
          [] <- Organizations.box_profile_missing(current) do

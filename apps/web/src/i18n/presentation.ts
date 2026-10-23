@@ -237,6 +237,20 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-184: business accounts, demo mode and activation.
+  business_not_activated: "apiErrorBusinessNotActivated",
+  business_account_exists: "apiErrorBusinessAccountExists",
+  business_signup_closed: "apiErrorBusinessSignupClosed",
+  invalid_business_kind: "apiErrorInvalidBusinessKind",
+  invalid_business_request: "apiErrorInvalidBusinessRequest",
+  business_request_pending: "apiErrorBusinessRequestPending",
+  business_request_closed: "apiErrorBusinessRequestClosed",
+  invalid_activation_link: "apiErrorInvalidActivationLink",
+  business_already_active: "apiErrorBusinessAlreadyActive",
+  invalid_activation_role: "apiErrorInvalidActivationRole",
+  invalid_activation_lifetime: "apiErrorInvalidActivationLifetime",
+  account_not_found: "apiErrorAccountNotFound",
+  unknown_demo_section: "apiErrorUnknownDemoSection",
   // ADR-170: platform plans and the solo-coach tier.
   coach_practice_exists: "apiErrorCoachPracticeExists",
   plan_limit_reached: "apiErrorPlanLimitReached",
