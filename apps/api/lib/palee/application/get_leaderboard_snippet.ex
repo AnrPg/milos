@@ -1,5 +1,5 @@
 defmodule Palee.Application.GetLeaderboardSnippet do
-  alias Palee.Gamification
+  alias Palee.{Gamification, Identity}
 
   @doc """
   Leaderboard visibility for the requesting account.
@@ -22,8 +22,22 @@ defmodule Palee.Application.GetLeaderboardSnippet do
     %{
       visible: visible,
       opted_in: opted_in,
-      weekly: if(visible, do: Gamification.get_leaderboard("weekly", 5), else: []),
-      monthly: if(visible, do: Gamification.get_leaderboard("monthly", 5), else: [])
+      weekly: if(visible, do: board("weekly", user.id), else: []),
+      monthly: if(visible, do: board("monthly", user.id), else: [])
     }
+  end
+
+  # ADR-184: mock people only ever reach their demo business's staff; the
+  # ranks close up around anyone left out.
+  defp board(period, viewer_id) do
+    rows = Gamification.get_leaderboard(period, 5)
+
+    visible =
+      rows |> Enum.map(& &1.user_id) |> Identity.visible_user_ids(viewer_id) |> MapSet.new()
+
+    rows
+    |> Enum.filter(&MapSet.member?(visible, &1.user_id))
+    |> Enum.with_index(1)
+    |> Enum.map(fn {row, rank} -> %{row | rank: rank} end)
   end
 end

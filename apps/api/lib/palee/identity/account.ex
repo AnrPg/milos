@@ -29,6 +29,8 @@ defmodule Palee.Identity.Account do
     # without reaching for the Ecto schema.
     :email,
     :inserted_at,
+    # ADR-184: the demo business a mock person belongs to; nil for real people.
+    :demo_organization_id,
     completed_tours: []
   ]
 
@@ -48,6 +50,7 @@ defmodule Palee.Identity.Account do
           preferred_theme_slug: String.t() | nil,
           time_zone: String.t() | nil,
           email: String.t() | nil,
-          inserted_at: DateTime.t() | NaiveDateTime.t() | nil
+          inserted_at: DateTime.t() | NaiveDateTime.t() | nil,
+          demo_organization_id: Ecto.UUID.t() | nil
         }
 end

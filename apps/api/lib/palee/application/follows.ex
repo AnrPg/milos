@@ -12,7 +12,7 @@ defmodule Palee.Application.Follows do
   def follow(%{user_id: user_id} = context, type, target_id) do
     with {:ok, target_id} <- uuid(target_id),
          {:ok, follow, outcome} <-
-           Community.follow(context, type, target_id, target(type, target_id)) do
+           Community.follow(context, type, target_id, target(type, target_id, user_id)) do
       if outcome == :created and follow.status == "requested", do: notify_request(user_id, follow)
       {:ok, %{status: follow.status}}
     end
@@ -80,14 +80,15 @@ defmodule Palee.Application.Follows do
     end
   end
 
-  defp target("user", id) do
+  # ADR-184: a mock person cannot be followed from outside its demo business.
+  defp target("user", id, follower_id) do
     case Identity.find_by_id(id) do
-      %{id: id} -> %{id: id}
+      %{id: id} -> if Identity.visible_to?(id, follower_id), do: %{id: id}
       _missing -> nil
     end
   end
 
-  defp target("organization", id) do
+  defp target("organization", id, _follower_id) do
     case Organizations.public_boxes([id]) do
       [box] -> box
       _missing -> nil
@@ -95,7 +96,7 @@ defmodule Palee.Application.Follows do
   end
 
   # Open clubs are followable from P2-M4.
-  defp target(_type, _id), do: nil
+  defp target(_type, _id, _follower_id), do: nil
 
   defp page(params, fetch), do: page(params, nil, nil, fetch)
 

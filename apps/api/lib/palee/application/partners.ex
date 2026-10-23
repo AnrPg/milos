@@ -19,7 +19,7 @@ defmodule Palee.Application.Partners do
     PartnerRealtime
   }
 
-  alias Palee.{Community, Notifications, Partners}
+  alias Palee.{Community, Identity, Notifications, Partners}
 
   # ------------------------------------------------------------- the club
 
@@ -67,7 +67,8 @@ defmodule Palee.Application.Partners do
     with {:ok, club, scope} <- club(context, club_id),
          :ok <- offered(club, scope),
          {:ok, viewer} <- live_profile(scope, club, user_id) do
-      members = eligible_ids(scope, club) -- [user_id]
+      # ADR-184: mock people only ever reach their demo business's staff.
+      members = Identity.visible_user_ids(eligible_ids(scope, club) -- [user_id], user_id)
       excluded = excluded_ids(scope, club, user_id, now)
       candidates = Partners.list_live_profiles(scope, club.id, members)
       cards = Partners.deck(viewer, candidates, excluded, Partners.deck_filters(params))
@@ -328,6 +329,7 @@ defmodule Palee.Application.Partners do
     blocked = MapSet.new(Community.blocked_user_ids(%{user_id: viewer.user_id}))
 
     with true <- target_id in eligible_ids(scope, club) || {:error, :not_found},
+         true <- Identity.visible_to?(target_id, viewer.user_id) || {:error, :not_found},
          %{} = target <- Partners.get_profile(scope, club.id, target_id) || {:error, :not_found},
          true <- Partners.swipeable?(viewer, target, blocked) || {:error, :not_found} do
       {:ok, target}
