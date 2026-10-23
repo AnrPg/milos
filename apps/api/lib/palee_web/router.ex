@@ -1225,6 +1225,9 @@ defmodule PaleeWeb.Router do
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    # ADR-183: «Τι κάνεις», asked by the first-run.
+    get("/me/interests", MyInterestsController, :show)
+    put("/me/interests", MyInterestsController, :update)
     get("/me/wellness", WellnessController, :show)
     post("/me/wellness/entries", WellnessController, :create_entry)
     patch("/me/wellness/entries/:id", WellnessController, :update_entry)

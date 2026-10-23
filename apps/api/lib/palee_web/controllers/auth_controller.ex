@@ -45,7 +45,7 @@ defmodule PaleeWeb.AuthController do
       },
       completed_tours: %Schema{
         type: :array,
-        items: %Schema{type: :string, enum: ~w(admin member athlete)}
+        items: %Schema{type: :string, enum: Palee.Identity.tour_audiences()}
       }
     },
     required: [:id, :nickname, :role, :vendor, :preferred_locale, :completed_tours]
