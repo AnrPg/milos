@@ -255,5 +255,11 @@ defmodule Palee.Organizations.OrganizationStore do
   def put_provider_kind(organization_id, kind),
     do: impl().put_provider_kind(organization_id, kind)
 
+  @impl true
+  def lock_for_creation(key), do: impl().lock_for_creation(key)
+
+  @impl true
+  def provider_kinds(organization_ids), do: impl().provider_kinds(organization_ids)
+
   defp impl, do: Application.fetch_env!(:palee, :organization_store)
 end

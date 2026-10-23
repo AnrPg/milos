@@ -38,7 +38,7 @@ defmodule Palee.Application.AroundMe do
 
   def search(%{user_id: user_id} = context, body, now \\ DateTime.utc_now()) do
     body = stringify(body)
-    memberships = Organizations.list_memberships(user_id)
+    memberships = user_id |> Organizations.list_memberships() |> Organizations.provider_memberships()
 
     with {:ok, filter} <- Places.parse_filter(body["filter"], vocabulary()),
          {:ok, origin} <- origin(context, body["origin"], filter) do
@@ -117,7 +117,9 @@ defmodule Palee.Application.AroundMe do
 
   @doc "The gyms the person actively belongs to, as the plan needs them."
   def viewer(user_id, memberships \\ nil) do
-    memberships = memberships || Organizations.list_memberships(user_id)
+    memberships =
+      memberships ||
+        user_id |> Organizations.list_memberships() |> Organizations.provider_memberships()
     %{user_id: user_id, organization_ids: Enum.map(memberships, & &1.organization.id)}
   end
 

@@ -26,7 +26,6 @@ defmodule Palee.Community.Commands.Events do
     attrs =
       attrs
       |> Map.take(Event.editable_fields())
-      |> group_terms(channel_id)
       |> Map.merge(%{
         organization_id: organization_id,
         club_id: club.id,
@@ -50,9 +49,22 @@ defmodule Palee.Community.Commands.Events do
     end
   end
 
-  # A member group's events are free and for the group only, whatever was asked.
-  defp group_terms(attrs, nil), do: attrs
-  defp group_terms(attrs, _channel_id), do: EventPolicy.group_terms(attrs)
+
+  @doc """
+  ADR-185: whether the attributes make a valid event, before there is a
+  club for it (a person's first own event creates their organisation only
+  once this passes).
+  """
+  def check(attrs) do
+    attrs
+    |> Map.take(Event.editable_fields())
+    |> Map.put(:club_id, Ecto.UUID.generate())
+    |> Event.create_changeset()
+    |> case do
+      %Ecto.Changeset{valid?: true} -> :ok
+      invalid -> {:error, invalid}
+    end
+  end
 
   defp occurrences(changeset, opts) do
     starts_at = Ecto.Changeset.get_field(changeset, :starts_at)
@@ -83,7 +95,7 @@ defmodule Palee.Community.Commands.Events do
   Returns `{:ok, [%{before: event, after: event, promoted: [attendee]}]}`.
   """
   def update(context, event, attrs, scope, opts) do
-    attrs = attrs |> Map.take(Event.editable_fields()) |> group_terms(event.channel_id)
+    attrs = Map.take(attrs, Event.editable_fields())
     zone = Keyword.fetch!(opts, :zone)
     now = Keyword.fetch!(opts, :now)
 
@@ -185,20 +197,20 @@ defmodule Palee.Community.Commands.Events do
             {:ok, %{attendee: attendee, joined: false, event: event}}
 
           existing ->
-            join(context, event, existing, user_id, source, now)
+            join(context, event, existing, user_id, source, facts, now)
         end
       end
     end)
   end
 
-  defp join(context, event, existing, user_id, source, now) do
+  defp join(context, event, existing, user_id, source, facts, now) do
     {source, inviter_id} =
       case source do
         {"guest", inviter_id} -> {"guest", inviter_id}
         source -> {source, nil}
       end
 
-    with :ok <- guest_allowed(context, event, inviter_id) do
+    with :ok <- guest_allowed(context, event, inviter_id, Map.get(facts, :host_invite?, false)) do
       going = going_count(context, event.id)
 
       attrs = %{
@@ -232,9 +244,13 @@ defmodule Palee.Community.Commands.Events do
     end
   end
 
-  defp guest_allowed(_context, _event, nil), do: :ok
+  defp guest_allowed(_context, _event, nil, _host?), do: :ok
 
-  defp guest_allowed(context, event, inviter_id) do
+  # ADR-185: the host's own link is not a guest pass.
+  defp guest_allowed(_context, event, _inviter_id, true),
+    do: EventPolicy.invite_check(event, :host, nil, 0)
+
+  defp guest_allowed(context, event, inviter_id, false) do
     inviter_status =
       case EventStore.get_attendee(context, event.id, inviter_id) do
         %{status: status} -> status
@@ -340,6 +356,25 @@ defmodule Palee.Community.Commands.Events do
           amount_cents: event.price_cents,
           finance_invoice_id: finance[:finance_invoice_id],
           finance_payment_id: finance[:finance_payment_id]
+        })
+      end
+    end)
+  end
+
+  @doc """
+  ADR-185: records a refund of a recorded payment once (all of it unless
+  `amount_cents` says less), with the event locked.
+  """
+  def record_refund(%{user_id: actor_id} = context, event_id, user_id, amount_cents, now) do
+    EventStore.with_event_lock(context, event_id, fn event ->
+      with %{} = attendee <-
+             EventStore.get_attendee(context, event.id, user_id) || {:error, :not_found},
+           amount = EventPolicy.refund_amount(attendee, amount_cents),
+           :ok <- EventPolicy.refund_check(attendee, amount) do
+        EventStore.update_attendee(context, attendee, %{
+          refunded_at: now,
+          refund_cents: amount,
+          refunded_by_id: actor_id
         })
       end
     end)

@@ -12,6 +12,13 @@ defmodule Palee.Organizations.Domain.Provider do
 
   def kinds, do: @kinds
 
+  @doc """
+  ADR-185: a person's own organiser organisation (the one behind «Ως εγώ»)
+  provides nobody's training, so it is never a provider.
+  """
+  def provider_row?(%{provider_kind: "organiser"}), do: false
+  def provider_row?(_row), do: true
+
   @doc "One provider from a `palee_my_providers()` row."
   def from_row(row) do
     %{

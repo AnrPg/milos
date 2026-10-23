@@ -67,4 +67,55 @@ defmodule Palee.Community.EventStore do
   @impl true
   def mark_converted(context, user_id, window, at),
     do: call(context, :mark_converted, [user_id, window, at])
+
+  # ADR-185 ------------------------------------------------------------------
+
+  @impl true
+  def creation_counts(context, since, now), do: call(context, :creation_counts, [since, now])
+
+  @impl true
+  def list_cohosts(context, event_ids), do: call(context, :list_cohosts, [event_ids])
+  @impl true
+  def get_cohost(context, id), do: call(context, :get_cohost, [id])
+  @impl true
+  def insert_cohost(context, attrs), do: call(context, :insert_cohost, [attrs])
+
+  @impl true
+  def update_cohost(context, cohost, attrs),
+    do: call(context, :update_cohost, [cohost, attrs])
+
+  @impl true
+  def cohost_requests(context, organization_id),
+    do: call(context, :cohost_requests, [organization_id])
+
+  @impl true
+  def respond_cohost(context, id, status, now),
+    do: call(context, :respond_cohost, [id, status, now])
+
+  @impl true
+  def accepted_cohosts(context, event_ids, cohost_ids),
+    do: call(context, :accepted_cohosts, [event_ids, cohost_ids])
+
+  @impl true
+  def cohosted_by?(context, event_id, organization_id),
+    do: call(context, :cohosted_by?, [event_id, organization_id])
+
+  @impl true
+  def cohost_trial_offer_facts(context, id), do: call(context, :cohost_trial_offer_facts, [id])
+
+  @impl true
+  def claim_cohost_trial_offer(context, id, now),
+    do: call(context, :claim_cohost_trial_offer, [id, now])
+
+  @impl true
+  def record_view(context, event_id, day, viewer_key),
+    do: call(context, :record_view, [event_id, day, viewer_key])
+
+  @impl true
+  def view_totals(context, event_ids), do: call(context, :view_totals, [event_ids])
+
+  # A system sweep (ADR-131 §2): the definer answers ids only, outside any scope.
+  @impl true
+  def empty_organiser_organization_ids(context, before),
+    do: adapter().empty_organiser_organization_ids(context, before)
 end

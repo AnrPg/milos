@@ -40,6 +40,10 @@ defmodule Palee.Community.EventAttendee do
     field :removed_by_id, :binary_id
     field :trial_offered_at, :utc_datetime_usec
     field :converted_at, :utc_datetime_usec
+    # ADR-185: a refund of the ticket, recorded by the host (Οικονομικά).
+    field :refunded_at, :utc_datetime_usec
+    field :refund_cents, :integer
+    field :refunded_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -87,7 +91,10 @@ defmodule Palee.Community.EventAttendee do
       :late_cancel,
       :removed_by_id,
       :trial_offered_at,
-      :converted_at
+      :converted_at,
+      :refunded_at,
+      :refund_cents,
+      :refunded_by_id
     ])
     |> validate()
   end
@@ -100,5 +107,6 @@ defmodule Palee.Community.EventAttendee do
     |> check_constraint(:status, name: :community_event_attendees_cancel_check)
     |> check_constraint(:source, name: :community_event_attendees_source_check)
     |> check_constraint(:payment_method, name: :community_event_attendees_payment_check)
+    |> check_constraint(:refund_cents, name: :community_event_attendees_refund_check)
   end
 end

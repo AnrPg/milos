@@ -135,4 +135,13 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
   @callback put_provider_selection(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok | {:error, term()}
   @callback get_provider_kind(Ecto.UUID.t()) :: String.t() | nil
   @callback put_provider_kind(Ecto.UUID.t(), String.t()) :: :ok | {:error, term()}
+
+  @doc """
+  ADR-185: serialises a one-off creation for an account inside the current
+  transaction (a transaction-scoped advisory lock on `key`).
+  """
+  @callback lock_for_creation(String.t()) :: :ok
+
+  @doc "ADR-185: the provider kind of each organisation (gym, coach, organiser)."
+  @callback provider_kinds([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => String.t()}
 end

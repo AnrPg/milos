@@ -50,7 +50,9 @@ defmodule Palee.Community.ProfilePost do
     |> validate_inclusion(:audience, @audiences)
     |> validate_inclusion(
       :attachment_type,
-      Palee.Community.Post.shareable_attachment_types()
+      # ADR-185: `event` is the card of the author's own event, posted by
+      # the app when they publish it (compose never offers it).
+      Palee.Community.Post.shareable_attachment_types() ++ ["event"]
     )
     |> validate_length(:body, max: 5_000)
     |> validate_length(:client_operation_id, max: 120)

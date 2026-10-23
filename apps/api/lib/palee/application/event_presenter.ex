@@ -9,6 +9,10 @@ defmodule Palee.Application.EventPresenter do
   `viewer` is `%{user_id, club_ids, manage_organization_ids, clubs}`:
   the clubs the viewer can see (ids and their `ClubScope` faces) and the
   boxes where they run events.
+
+  ADR-185: every event also says who hosts it (`host`: a person for their
+  own events, else the business), its accepted co-hosts and its audience;
+  members of a co-host belong to its audience like the host's own.
   """
 
   alias Palee.Application.{BoxPhotoCovers, CommunityPeople}
@@ -29,15 +33,34 @@ defmodule Palee.Application.EventPresenter do
       groups: Map.new(groups, &{&1.id, &1}),
       group_ids: groups |> Enum.filter(& &1.participant) |> MapSet.new(& &1.id),
       admin_group_ids: groups |> Enum.filter(& &1.admin) |> MapSet.new(& &1.id),
-      manage_organization_ids: MapSet.new(manage_organization_ids)
+      manage_organization_ids: MapSet.new(manage_organization_ids),
+      cohosted_event_ids: cohosted_event_ids(user_id, clubs)
     }
   end
 
-  @doc "Whether the viewer is in the event's audience: its club, or its group."
+  # ADR-185: events co-hosted by the boxes whose club the viewer is in.
+  defp cohosted_event_ids(user_id, clubs) do
+    case clubs |> Enum.filter(&(&1.kind == "gym")) |> Enum.map(& &1.organization_id) do
+      [] ->
+        MapSet.new()
+
+      ids ->
+        %{user_id: user_id}
+        |> Community.accepted_event_cohosts(nil, Enum.uniq(ids))
+        |> MapSet.new(& &1.event_id)
+    end
+  end
+
+  @doc """
+  Whether the viewer is in the event's audience: its club (or a co-host's),
+  or its group for a group-only event.
+  """
   def belongs?(event, viewer) do
     Community.event_belongs?(event, %{
       club_member?: MapSet.member?(viewer.club_ids, event.club_id),
-      group_member?: MapSet.member?(viewer.group_ids, event.channel_id)
+      group_member?: MapSet.member?(viewer.group_ids, event.channel_id),
+      cohost_member?:
+        MapSet.member?(Map.get(viewer, :cohosted_event_ids, MapSet.new()), event.id)
     })
   end
 
@@ -94,6 +117,8 @@ defmodule Palee.Application.EventPresenter do
     boxes = boxes(Map.keys(by_org), viewer)
     covers = BoxPhotoCovers.urls(events)
     zones = Organizations.timezone_statuses(Map.keys(by_org))
+    hosts = hosts(events, by_org, boxes)
+    cohosts = cohosts(events, viewer)
 
     Enum.map(events, fn event ->
       count = Map.get(counts, event.id, %{})
@@ -123,6 +148,9 @@ defmodule Palee.Application.EventPresenter do
         price_cents: event.price_cents,
         currency: event.currency,
         open_to_non_members: event.open_to_non_members,
+        audience: Community.event_audience(event),
+        host: Map.fetch!(hosts, event.id),
+        cohosts: Map.get(cohosts, event.id, []),
         guest_pass_allowed: event.guest_pass_allowed,
         guests_per_member: event.guests_per_member,
         good_for_friends: event.good_for_friends,
@@ -139,6 +167,79 @@ defmodule Palee.Application.EventPresenter do
         can_manage: manages?(event, viewer)
       }
     end)
+  end
+
+  # ADR-185: a person's own event shows the person; any other the business.
+  defp hosts(events, by_org, boxes) do
+    kinds = Organizations.provider_kinds(Map.keys(by_org))
+
+    people =
+      events
+      |> Enum.filter(&Community.organiser?(Map.get(kinds, &1.organization_id)))
+      |> Enum.map(& &1.created_by_id)
+      |> CommunityPeople.by_ids()
+
+    Map.new(events, fn event ->
+      kind = Map.get(kinds, event.organization_id)
+
+      host =
+        if Community.organiser?(kind) do
+          person = CommunityPeople.person(people, event.created_by_id)
+
+          %{
+            kind: "person",
+            organization_id: event.organization_id,
+            name: person.nickname,
+            slug: nil,
+            logo_url: person.avatar_url,
+            person: person
+          }
+        else
+          box = Map.get(boxes, event.organization_id, %{name: nil, slug: nil, logo_url: nil})
+
+          %{
+            kind: "business",
+            organization_id: event.organization_id,
+            name: box.name,
+            slug: box.slug,
+            logo_url: box.logo_url,
+            person: nil
+          }
+        end
+
+      {event.id, host}
+    end)
+  end
+
+  # Accepted co-hosts, as their public box pages show them.
+  defp cohosts(events, viewer) do
+    rows = Community.accepted_event_cohosts(%{user_id: viewer.user_id}, Enum.map(events, & &1.id), nil)
+
+    faces =
+      case rows |> Enum.map(& &1.cohost_organization_id) |> Enum.uniq() do
+        [] -> %{}
+        ids -> ids |> Organizations.public_boxes() |> Map.new(&{&1.organization_id, &1})
+      end
+
+    rows
+    |> Enum.flat_map(fn row ->
+      case Map.get(faces, row.cohost_organization_id) do
+        nil ->
+          []
+
+        box ->
+          [
+            {row.event_id,
+             %{
+               organization_id: box.organization_id,
+               name: box.name,
+               slug: box.slug,
+               logo_url: box.logo_url
+             }}
+          ]
+      end
+    end)
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
   end
 
   defp time_zone(event, zones),

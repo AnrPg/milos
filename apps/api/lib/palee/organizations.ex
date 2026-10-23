@@ -83,9 +83,38 @@ defmodule Palee.Organizations do
   """
   def list_my_providers(%{user_id: user_id}) when is_binary(user_id) do
     RepoContext.run(%{user_id: user_id}, fn ->
-      Enum.map(OrganizationStore.list_my_providers(), &Provider.from_row/1)
+      OrganizationStore.list_my_providers()
+      |> Enum.filter(&Provider.provider_row?/1)
+      |> Enum.map(&Provider.from_row/1)
     end)
   end
+
+  @doc """
+  ADR-185: a person's memberships without their own organiser
+  organisation (the one behind «Ως εγώ»), which is never a gym, a provider
+  or a club to them: lists of gyms, Box ▾ and the club bar use this.
+  """
+  def provider_memberships(memberships) when is_list(memberships),
+    do: Enum.reject(memberships, &hosting_only?/1)
+
+  @doc "ADR-185: whether a membership entry is of an organiser organisation."
+  def hosting_only?(%{organization: %{provider_kind: kind}}), do: kind == "organiser"
+  def hosting_only?(_entry), do: false
+
+  @doc "ADR-185: the person's own organiser organisation, or nil."
+  def organiser_organization(user_id),
+    do: Palee.Organizations.Commands.EnsureOrganiserOrganization.find(user_id)
+
+  @doc """
+  ADR-185: the person's organiser organisation, created on first use with
+  `opts[:seed_defaults]` inside the creation transaction. Returns
+  `{:ok, organization, created?}`.
+  """
+  def ensure_organiser_organization(account, params, opts \\ []),
+    do: Palee.Organizations.Commands.EnsureOrganiserOrganization.call(account, params, opts)
+
+  @doc "ADR-185: the provider kind of each organisation (any session)."
+  def provider_kinds(organization_ids), do: OrganizationStore.provider_kinds(organization_ids)
 
   @doc """
   ADR-162: the coaches of the member's active providers, as

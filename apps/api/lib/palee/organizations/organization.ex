@@ -41,7 +41,7 @@ defmodule Palee.Organizations.Organization do
   def put_initial_provider_kind(changeset, kind) do
     changeset
     |> put_change(:provider_kind, kind)
-    |> validate_inclusion(:provider_kind, ["gym", "coach"])
+    |> validate_inclusion(:provider_kind, ["gym", "coach", "organiser"])
   end
 
   defp derive_slug(changeset) do

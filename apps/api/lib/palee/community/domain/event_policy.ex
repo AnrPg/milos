@@ -12,9 +12,13 @@ defmodule Palee.Community.Domain.EventPolicy do
   * **Late cancels.** Giving up a place less than #{120} minutes before the
     start is a late cancel.
   * **Member groups.** An admin of an active member group runs events for
-    the group: always free, never open to non-members, no guest passes. Only
-    the group's members see them and come; staff who run events manage
-    them like any other.
+    the group and picks price, audience (the group, the whole club, or
+    everyone) and guest passes like any host (ADR-185 lifted ADR-153 §13's
+    forced terms). A group-only event is seen and joined by the group's
+    members; staff who run events manage them like any other.
+  * **Co-hosts.** Members of a box that accepted to co-host an event
+    (ADR-185) belong to its audience like the host's own members, unless it
+    is for a member group only.
   * **After.** One trial offer, once the event ended, to the people who came
     and are not members of the box. Coming and then joining the box within
     #{30} days counts as a conversion.
@@ -25,12 +29,6 @@ defmodule Palee.Community.Domain.EventPolicy do
   @conversion_days 30
   @scopes ~w(this following)
   @late_cancel_window_days 90
-  @group_terms %{
-    price_cents: 0,
-    open_to_non_members: false,
-    guest_pass_allowed: false,
-    good_for_friends: false
-  }
 
   def late_cancel_minutes, do: @late_cancel_minutes
   def reminder_minutes, do: @reminder_minutes
@@ -42,9 +40,6 @@ defmodule Palee.Community.Domain.EventPolicy do
   def capability, do: :manage_events
 
   # Member groups ---------------------------------------------------------------
-
-  @doc "A group event's terms win over whatever was asked: free, the group only."
-  def group_terms(attrs), do: Map.merge(attrs, @group_terms)
 
   @doc "An event can go in an active, live member group of the same club."
   def group_channel_check(
@@ -75,30 +70,45 @@ defmodule Palee.Community.Domain.EventPolicy do
   def manage_check(_actor, _channel_id), do: {:error, :forbidden}
 
   @doc """
-  Whether the person belongs to the event's audience: the club's members
-  for a club event, the group's members for a group event.
+  Who the event is for: `group` (a member group only), `club` (the club's
+  members, and an accepted co-host's) or `open` (everyone signed in).
   """
-  def belongs?(%{channel_id: nil}, %{club_member?: club_member?}), do: club_member? == true
-  def belongs?(_group_event, facts), do: Map.get(facts, :group_member?) == true
+  def audience(%{audience: audience}) when audience in ~w(group club open), do: audience
+  def audience(%{open_to_non_members: true}), do: "open"
+  def audience(%{channel_id: channel_id}) when is_binary(channel_id), do: "group"
+  def audience(_event), do: "club"
+
+  @doc "Whether the event is for a member group's members only."
+  def group_only?(event), do: audience(event) == "group"
+
+  @doc """
+  Whether the person belongs to the event's audience: the club's members
+  (or a co-host's, `cohost_member?`) unless it is for a member group only,
+  then the group's members.
+  """
+  def belongs?(event, facts) do
+    if group_only?(event),
+      do: Map.get(facts, :group_member?) == true,
+      else: Map.get(facts, :club_member?) == true or Map.get(facts, :cohost_member?) == true
+  end
 
   @doc """
   Whether the person may see the event: they belong, it is open (or they
-  were invited) when it isn't a group's, they run it, or they are on it.
+  were invited) unless it is for a group only, they run it, or they are on it.
   """
   def visible?(event, %{belongs?: belongs?} = facts) do
     belongs? or Map.get(facts, :manager?) == true or Map.get(facts, :attendee?) == true or
-      (is_nil(event.channel_id) and
+      (not group_only?(event) and
          (event.open_to_non_members or Map.get(facts, :invited?) == true))
   end
 
   @doc """
   Whether «Θα έρθω» / «Δεν θα έρθω» shows: still open, and the person
-  belongs, it is open to everyone (not a group's), or they hold a row.
+  belongs, it is open to everyone, or they hold a row.
   """
   def can_rsvp?(event, belongs?, my_status, now) do
     open_for_rsvp(event, now) == :ok and
-      (belongs? or (is_nil(event.channel_id) and event.open_to_non_members) or
-         my_status in ~w(going waitlisted))
+      (belongs? or event.open_to_non_members or my_status in ~w(going waitlisted))
   end
 
   @doc """
@@ -145,6 +155,18 @@ defmodule Palee.Community.Domain.EventPolicy do
     do: {:error, :guest_limit_reached}
 
   def guest_check(_event, _inviter_status, _guests), do: :ok
+
+  @doc """
+  ADR-185: an invitation from someone who runs the event (`:host`) needs no
+  guest pass and has no limit (a person's invite-only event works this
+  way); anyone else's is a guest pass.
+  """
+  def invite_check(event, :host, _inviter_status, _guests) do
+    if group_only?(event), do: {:error, :guests_not_allowed}, else: :ok
+  end
+
+  def invite_check(event, _guest_pass, inviter_status, guests),
+    do: guest_check(event, inviter_status, guests)
 
   @doc "Giving up a held place close to the start is a late cancel."
   def late_cancel?("going", %{starts_at: starts_at}, now),
@@ -220,6 +242,25 @@ defmodule Palee.Community.Domain.EventPolicy do
 
   def payment_check(_event, %{status: "going"}), do: :ok
   def payment_check(_event, _attendee), do: {:error, :not_going}
+
+  @doc """
+  ADR-185: a refund is recorded once, on a recorded payment, for at most
+  what was paid.
+  """
+  def refund_check(%{paid_at: nil}, _amount), do: {:error, :not_paid}
+
+  def refund_check(%{refunded_at: refunded}, _amount) when not is_nil(refunded),
+    do: {:error, :already_refunded}
+
+  def refund_check(%{amount_cents: paid}, amount)
+      when is_integer(amount) and amount > 0 and is_integer(paid) and amount <= paid,
+      do: :ok
+
+  def refund_check(_attendee, _amount), do: {:error, :invalid_refund}
+
+  @doc "What a refund gives back: the amount asked, else all that was paid."
+  def refund_amount(%{amount_cents: paid}, nil), do: paid
+  def refund_amount(_attendee, amount), do: amount
 
   @doc "Ήρθε is for people holding a place."
   def check_in_check(%{cancelled_at: cancelled_at}, _attendee) when not is_nil(cancelled_at),
