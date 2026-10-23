@@ -2,35 +2,43 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
   @moduledoc """
   ADR-191: partner perks. A gym or an independent coach publishes deals its
   clients use at partner businesses («10% στο SupplementsX με τον κωδικό
-  COACHNIKOS», a QR shown at the counter).
+  COACHNIKOS», a personal QR shown at the counter). The model is an open
+  policy, not a fixed form:
 
-  - `perks`: the deal, its benefit, how it is redeemed, its window, caps,
-    audience (every client or holders of some packages) and branches
-    (ADR-186 §8 covering item). `claims_count` / `uses_count` are kept in
-    the same transaction as the claim or use, under a lock on the perk row,
-    so the caps hold under concurrency and the business list costs no
-    aggregate query.
-  - `perk_codes`: the pool of single-use codes a partner handed over, for
-    perks redeemed with a unique code per member.
-  - `perk_claims`: a member claimed a perk (the code or QR is revealed); a
-    use is stamped once (`used_at IS NULL` in the update itself), from the
-    partner's verification link or by staff. `token_hash` is the SHA-256 of
-    the claim's secret nonce, which the signed verification link carries.
+  - `perks`: the partner, the redemption method (a strategy, ADR-191 §2),
+    the branches it is valid at (ADR-186 §8 covering item), the lifecycle
+    and the counters. `valid_from` / `valid_until` mirror the current
+    version's window so lists filter without reading JSON.
+    `claims_count` / `uses_count` move in the same transaction as a claim
+    or a use, under a lock on the perk row, so caps hold under concurrency.
+  - `perk_versions`: what members agree to when they claim: the benefit,
+    the rules (windows, recurring windows, limits, eligibility, channel,
+    stacking notes), the method's settings and the terms, each a
+    validated structured document carrying its own `schema_version`. A
+    change after the first claim is a new version; claims keep theirs.
+  - `perk_codes`: the pool of single-use codes a partner handed over.
+  - `perk_claims`: a member claimed a perk (its code, link or QR is
+    revealed) under one version; a use is stamped once. `token_hash` is
+    the SHA-256 of a personal QR's secret nonce, which the partner's signed
+    link carries.
 
   Every table is tenant scoped: RLS forced, the tenant trigger, composite
-  foreign keys that keep codes and claims inside the perk's organization.
+  foreign keys that keep versions, codes and claims inside the perk's
+  organization.
   """
 
   use Ecto.Migration
 
   @org "organization_id = NULLIF(current_setting('app.organization_id', true), '')::uuid"
+  @methods ~w(shared_code code_pool personal_qr partner_link show_membership)
 
   def up do
     perks()
+    perk_versions()
     perk_codes()
     perk_claims()
 
-    for table <- ~w(perks perk_codes perk_claims) do
+    for table <- ~w(perks perk_versions perk_codes perk_claims) do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
@@ -50,6 +58,7 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
   def down do
     drop table(:perk_claims)
     drop table(:perk_codes)
+    drop table(:perk_versions)
     drop table(:perks)
   end
 
@@ -67,19 +76,10 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
       # A ready `box_photo` of the business (ADR-148); plain id, released
       # through the media lifecycle like club covers.
       add :logo_media_id, :binary_id
-      add :benefit_type, :string, null: false
-      add :benefit_value, :integer
-      add :benefit_text, :text
-      add :currency, :string, null: false, default: "EUR"
       add :redemption_method, :string, null: false
-      add :shared_code, :text
-      add :terms, :text
+      add :current_version, :integer, null: false, default: 1
       add :valid_from, :date
       add :valid_until, :date
-      add :max_claims, :integer
-      add :max_claims_per_member, :integer, null: false, default: 1
-      add :audience, :string, null: false, default: "all_clients"
-      add :package_ids, {:array, :binary_id}, null: false, default: []
       add :all_locations, :boolean, null: false, default: true
       add :location_ids, {:array, :binary_id}, null: false, default: []
       add :status, :string, null: false, default: "draft"
@@ -98,28 +98,53 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
     create index(:perks, [:organization_id, :status])
 
     checks = [
-      benefit:
-        "(benefit_type = 'percent' AND benefit_value BETWEEN 1 AND 100) OR " <>
-          "(benefit_type = 'fixed_amount' AND benefit_value > 0) OR " <>
-          "(benefit_type = 'free_text' AND benefit_text IS NOT NULL AND btrim(benefit_text) <> '')",
-      redemption_method:
-        "(redemption_method = 'shared_code' AND shared_code IS NOT NULL AND btrim(shared_code) <> '') OR " <>
-          "(redemption_method IN ('unique_code', 'qr') AND shared_code IS NULL)",
+      redemption_method: "redemption_method IN (#{in_list(@methods)})",
       status: "status IN ('draft', 'published', 'paused', 'expired')",
-      audience:
-        "(audience = 'all_clients' AND cardinality(package_ids) = 0) OR " <>
-          "(audience = 'packages' AND cardinality(package_ids) > 0)",
       window: "valid_from IS NULL OR valid_until IS NULL OR valid_until >= valid_from",
-      caps:
-        "(max_claims IS NULL OR max_claims > 0) AND max_claims_per_member BETWEEN 1 AND 1000",
       counts: "claims_count >= 0 AND uses_count >= 0 AND uses_count <= claims_count",
-      claims_cap: "max_claims IS NULL OR claims_count <= max_claims",
+      version: "current_version >= 1",
       location_scope: "all_locations OR cardinality(location_ids) > 0"
     ]
 
     for {name, check} <- checks do
       create constraint(:perks, :"perks_#{name}_check", check: check)
     end
+  end
+
+  defp perk_versions do
+    create table(:perk_versions, primary_key: false) do
+      add :id, :binary_id, primary_key: true
+
+      add :organization_id,
+          references(:organizations, type: :binary_id, on_delete: :delete_all),
+          null: false
+
+      add :perk_id, :binary_id, null: false
+      add :version, :integer, null: false
+      # Validated documents (embedded schemas), each with `schema_version`.
+      add :benefit, :map, null: false
+      add :rules, :map, null: false
+      add :redemption, :map, null: false
+      add :terms, :text
+      add :created_by_id, references(:users, type: :binary_id, on_delete: :nilify_all)
+
+      timestamps(type: :utc_datetime_usec)
+    end
+
+    execute("""
+    ALTER TABLE perk_versions ADD CONSTRAINT perk_versions_perk_id_fkey
+    FOREIGN KEY (perk_id, organization_id) REFERENCES perks (id, organization_id) ON DELETE CASCADE
+    """)
+
+    create unique_index(:perk_versions, [:perk_id, :version])
+    create index(:perk_versions, [:organization_id])
+
+    create constraint(:perk_versions, :perk_versions_documents_check,
+             check:
+               "version >= 1 AND jsonb_typeof(benefit) = 'object' AND jsonb_typeof(rules) = 'object' " <>
+                 "AND jsonb_typeof(redemption) = 'object' AND benefit ? 'schema_version' " <>
+                 "AND rules ? 'schema_version' AND redemption ? 'schema_version'"
+           )
   end
 
   defp perk_codes do
@@ -167,9 +192,11 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
           null: false
 
       add :perk_id, :binary_id, null: false
+      # The version the member agreed to.
+      add :perk_version, :integer, null: false
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
       # What the member shows: the shared code, their pool code, or the short
-      # code printed under their QR.
+      # reference under their QR or membership card.
       add :code, :text, null: false
       add :token_hash, :text
       add :status, :string, null: false, default: "claimed"
@@ -189,7 +216,7 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
     """)
 
     create index(:perk_claims, [:organization_id, :perk_id, :claimed_at])
-    create index(:perk_claims, [:perk_id, :user_id, :status])
+    create index(:perk_claims, [:perk_id, :user_id, :claimed_at])
     create index(:perk_claims, [:user_id])
 
     create constraint(:perk_claims, :perk_claims_status_check,
@@ -203,4 +230,6 @@ defmodule Palee.Repo.Migrations.PartnerPerks do
              check: "used_via IS NULL OR used_via IN ('partner_link', 'staff')"
            )
   end
+
+  defp in_list(values), do: Enum.map_join(values, ", ", &"'#{&1}'")
 end

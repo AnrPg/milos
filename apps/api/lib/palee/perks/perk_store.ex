@@ -11,10 +11,12 @@ defmodule Palee.Perks.PerkStore do
     do: RepoContext.run(context, fn -> apply(adapter(), function, [context | args]) end)
 
   @impl true
-  def create_perk(context, attrs), do: call(context, :create_perk, [attrs])
+  def create_perk(context, attrs, version_attrs),
+    do: call(context, :create_perk, [attrs, version_attrs])
 
   @impl true
-  def update_perk(context, perk, attrs), do: call(context, :update_perk, [perk, attrs])
+  def revise_perk(context, perk, attrs, version_attrs),
+    do: call(context, :revise_perk, [perk, attrs, version_attrs])
 
   @impl true
   def set_status(context, perk, changes), do: call(context, :set_status, [perk, changes])
@@ -27,6 +29,12 @@ defmodule Palee.Perks.PerkStore do
 
   @impl true
   def list_perks(context, filters), do: call(context, :list_perks, [filters])
+
+  @impl true
+  def list_versions(context, perk_id), do: call(context, :list_versions, [perk_id])
+
+  @impl true
+  def get_versions(context, keys), do: call(context, :get_versions, [keys])
 
   @impl true
   def add_codes(context, perk_id, codes), do: call(context, :add_codes, [perk_id, codes])
@@ -62,4 +70,13 @@ defmodule Palee.Perks.PerkStore do
   @impl true
   def member_package_ids(context, user_id, today),
     do: call(context, :member_package_ids, [user_id, today])
+
+  @impl true
+  def group_ids(context), do: call(context, :group_ids, [])
+
+  @impl true
+  def member_group_ids(context, user_id), do: call(context, :member_group_ids, [user_id])
+
+  @impl true
+  def member_first_name(context, user_id), do: call(context, :member_first_name, [user_id])
 end

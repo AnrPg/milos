@@ -96,10 +96,14 @@ defmodule Palee.Analytics.Domain.EventCatalog do
     "trial_status_changed" => {"trial", [:scheduled_class_id, :status], nil},
     # ADR-191 partner perks: the business's actions on a perk and the
     # members' claims and uses (the audit trail; subject ids only).
-    "perk_created" => {"perk", [:redemption_method, :benefit_type, :audience], nil},
-    "perk_published" => {"perk", [:redemption_method, :benefit_type, :audience], nil},
+    "perk_created" => {"perk", [:redemption_method, :current_version], nil},
+    "perk_versioned" => {"perk", [:redemption_method, :current_version], nil},
+    "perk_published" => {"perk", [:redemption_method, :current_version], nil},
     "perk_paused" => {"perk", [:redemption_method], nil},
     "perk_expired" => {"perk", [:redemption_method], nil},
+    "perk_codes_added" => {"perk", [:redemption_method], nil},
+    "perk_claims_exported" => {"perk", [:redemption_method], nil},
+    "perk_pool_low" => {"perk_claim", [:perk_id], nil},
     "perk_claimed" => {"perk_claim", [:perk_id, :status], :subject},
     "perk_redeemed" => {"perk_claim", [:perk_id, :used_via], :subject},
     "perk_claim_revoked" => {"perk_claim", [:perk_id], :subject},

@@ -2308,6 +2308,34 @@ defmodule PaleeWeb.FallbackController do
     cannot_change_own_membership: {:forbidden, "Someone else changes your own access"},
     promotion_location_not_included:
       {:unprocessable_entity, "This promotion is not valid at the branches of this package"},
+    # ADR-191: partner perks.
+    perk_transition_invalid: {:conflict, "The perk can't take this step now"},
+    perk_ended: {:unprocessable_entity, "The perk's last day has passed"},
+    perk_read_only: {:conflict, "An ended perk can't be changed"},
+    perk_locked_after_claims:
+      {:conflict, "Members already claimed this perk: its benefit and code stay as they saw them"},
+    perk_cap_below_claims:
+      {:unprocessable_entity, "The limit can't be lower than the claims already made"},
+    perk_has_claims: {:conflict, "Members claimed this perk; end it instead"},
+    perk_codes_required: {:unprocessable_entity, "Add the partner's codes before publishing"},
+    perk_codes_not_used: {:unprocessable_entity, "Only a perk with a unique code per member has codes"},
+    invalid_perk_codes: {:unprocessable_entity, "Each code needs 1 to 64 letters or digits"},
+    invalid_perk_packages: {:unprocessable_entity, "Choose packages of this business"},
+    perk_not_available: {:conflict, "This perk isn't available now"},
+    perk_sold_out: {:conflict, "This perk has run out"},
+    perk_member_limit: {:conflict, "You've already used this perk as often as it allows"},
+    perk_codes_exhausted: {:conflict, "This perk has run out of codes"},
+    perk_claim_already_used: {:conflict, "This perk was already used"},
+    perk_claim_not_open: {:conflict, "This claim is no longer open"},
+    perk_not_qr: {:unprocessable_entity, "This perk isn't redeemed with a QR"},
+    perk_outside_hours: {:conflict, "This perk works only at its set days and hours"},
+    perk_period_sold_out: {:conflict, "This perk has run out for now; it opens again next period"},
+    perk_member_period_limit:
+      {:conflict, "You've used this perk as often as it allows this period"},
+    invalid_perk_groups: {:unprocessable_entity, "Choose groups of this business"},
+    invalid_redemption_method: {:unprocessable_entity, "Choose how members redeem the perk"},
+    invalid_verification_link: {:not_found, "This link isn't valid"},
+    verification_link_expired: {:gone, "This link expired; ask for the QR again"},
     # ADR-098
     form_review_closed: {:conflict, "The form review is already closed"},
     appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},

@@ -17,6 +17,7 @@ defmodule Palee.Perks.PerkClaim do
   schema "perk_claims" do
     field :organization_id, :binary_id, read_after_writes: true
     field :perk_id, :binary_id
+    field :perk_version, :integer
     field :user_id, :binary_id
     field :code, :string
     field :token_hash, :string, redact: true
@@ -33,8 +34,17 @@ defmodule Palee.Perks.PerkClaim do
 
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:id, :organization_id, :perk_id, :user_id, :code, :token_hash, :claimed_at])
-    |> validate_required([:organization_id, :perk_id, :user_id, :code, :claimed_at])
+    |> cast(attrs, [
+      :id,
+      :organization_id,
+      :perk_id,
+      :perk_version,
+      :user_id,
+      :code,
+      :token_hash,
+      :claimed_at
+    ])
+    |> validate_required([:organization_id, :perk_id, :perk_version, :user_id, :code, :claimed_at])
     |> check_constraint(:status, name: :perk_claims_status_check)
     |> foreign_key_constraint(:perk_id, name: :perk_claims_perk_id_fkey)
   end

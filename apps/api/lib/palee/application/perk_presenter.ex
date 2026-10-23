@@ -1,8 +1,8 @@
 defmodule Palee.Application.PerkPresenter do
   @moduledoc """
   How partner perks and claims read (ADR-191): to staff (everything, with
-  counts and the code pool), to members (never the code before a claim) and
-  in the claims export (JSON rows or CSV).
+  counts, the code pool and the version), to members (never a code before a
+  claim) and in the claims export (JSON rows or CSV).
   """
 
   alias Palee.Application.BoxPhotoCovers
@@ -16,26 +16,21 @@ defmodule Palee.Application.PerkPresenter do
 
   def staff_all(context, perks, today) do
     logos = logos(perks)
-    pools = Perks.code_stats(context, for(%{redemption_method: "unique_code", id: id} <- perks, do: id))
+    pools = Perks.code_stats(context, for(%{redemption_method: "code_pool", id: id} <- perks, do: id))
 
     Enum.map(perks, fn perk ->
+      redemption = documents(perk.version).redemption
+
       perk
-      |> common(logos, today)
+      |> common(perk.version, logos, today)
       |> Map.merge(%{
-        shared_code: perk.shared_code,
-        max_claims: perk.max_claims,
-        max_claims_per_member: perk.max_claims_per_member,
-        audience: perk.audience,
-        package_ids: perk.package_ids,
+        redemption: redemption,
         all_locations: perk.all_locations,
         location_ids: perk.location_ids,
         claims_count: perk.claims_count,
         uses_count: perk.uses_count,
         remaining: Perks.remaining(perk),
-        codes:
-          if(perk.redemption_method == "unique_code",
-            do: Map.get(pools, perk.id, %{total: 0, free: 0})
-          ),
+        codes: pool(perk, pools, redemption),
         published_at: perk.published_at,
         paused_at: perk.paused_at,
         expired_at: perk.expired_at,
@@ -45,8 +40,21 @@ defmodule Palee.Application.PerkPresenter do
     end)
   end
 
-  @doc "What anyone shown the perk reads: partner, benefit, method, terms, window."
-  def common(perk, logos, today) do
+  defp pool(%{redemption_method: "code_pool", id: id}, pools, redemption) do
+    stats = Map.get(pools, id, %{total: 0, free: 0})
+    Map.put(stats, :low, Perks.pool_low?(redemption, stats.free))
+  end
+
+  defp pool(_perk, _pools, _redemption), do: nil
+
+  @doc """
+  What anyone shown the perk reads: partner, method, the version's
+  benefit, rules and terms, the window and status. `version` is the
+  version to show (a claim shows the one it agreed to).
+  """
+  def common(perk, version, logos, today) do
+    docs = documents(version)
+
     %{
       id: perk.id,
       organization_id: perk.organization_id,
@@ -55,18 +63,49 @@ defmodule Palee.Application.PerkPresenter do
       partner_address: perk.partner_address,
       logo_media_id: perk.logo_media_id,
       logo_url: perk.logo_media_id && Map.get(logos, perk.logo_media_id),
-      benefit_type: perk.benefit_type,
-      benefit_value: perk.benefit_value,
-      benefit_text: perk.benefit_text,
-      benefit_label: Perks.benefit_label(perk),
-      currency: perk.currency,
       redemption_method: perk.redemption_method,
-      terms: perk.terms,
+      version: version.version,
+      benefit: docs.benefit,
+      benefit_label: Perks.benefit_label(version.benefit),
+      rules: docs.rules,
+      terms: version.terms,
+      instructions: version.redemption.instructions,
       valid_from: perk.valid_from,
       valid_until: perk.valid_until,
       status: Perks.effective_status(perk, today)
     }
   end
+
+  @doc "A version for the staff history."
+  def version(version) do
+    docs = documents(version)
+
+    %{
+      version: version.version,
+      benefit: docs.benefit,
+      benefit_label: Perks.benefit_label(version.benefit),
+      rules: docs.rules,
+      redemption: docs.redemption,
+      terms: version.terms,
+      created_by_id: version.created_by_id,
+      inserted_at: version.inserted_at
+    }
+  end
+
+  # The documents as plain maps (embedded structs carry no JSON encoder).
+  defp documents(version) do
+    %{
+      benefit: plain(version.benefit),
+      rules: plain(version.rules),
+      redemption: plain(version.redemption)
+    }
+  end
+
+  defp plain(%module{} = value) when module in [Date, Time, DateTime, NaiveDateTime], do: value
+  defp plain(%{__struct__: _} = struct), do: struct |> Map.from_struct() |> Map.delete(:__meta__) |> plain()
+  defp plain(map) when is_map(map) and not is_struct(map), do: Map.new(map, fn {k, v} -> {k, plain(v)} end)
+  defp plain(list) when is_list(list), do: Enum.map(list, &plain/1)
+  defp plain(value), do: value
 
   @doc "Logo URLs by media id."
   def logos(perks) do
@@ -80,6 +119,7 @@ defmodule Palee.Application.PerkPresenter do
     %{
       id: claim.id,
       perk_id: claim.perk_id,
+      perk_version: claim.perk_version,
       user_id: claim.user_id,
       code: claim.code,
       status: claim.status,
@@ -90,23 +130,11 @@ defmodule Palee.Application.PerkPresenter do
     }
   end
 
-  @doc "One row of the claims export."
-  def export_row(row),
-    do:
-      Map.take(row, [
-        :id,
-        :user_id,
-        :display_name,
-        :handle,
-        :code,
-        :status,
-        :claimed_at,
-        :used_at,
-        :used_via,
-        :revoked_at
-      ])
+  @csv_columns ~w(id user_id display_name handle perk_version code status claimed_at used_at used_via
+                  revoked_at)a
 
-  @csv_columns ~w(id user_id display_name handle code status claimed_at used_at used_via revoked_at)a
+  @doc "One row of the claims export."
+  def export_row(row), do: Map.take(row, @csv_columns)
 
   @doc """
   The export as CSV (RFC 4180, CRLF). Cells that a spreadsheet would read
@@ -114,12 +142,7 @@ defmodule Palee.Application.PerkPresenter do
   """
   def csv(rows) do
     header = Enum.map_join(@csv_columns, ",", &Atom.to_string/1)
-
-    lines =
-      Enum.map(rows, fn row ->
-        Enum.map_join(@csv_columns, ",", &cell(Map.get(row, &1)))
-      end)
-
+    lines = Enum.map(rows, fn row -> Enum.map_join(@csv_columns, ",", &cell(Map.get(row, &1))) end)
     Enum.join([header | lines], "\r\n") <> "\r\n"
   end
 

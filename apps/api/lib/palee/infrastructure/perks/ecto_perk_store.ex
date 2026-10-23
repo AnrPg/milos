@@ -1,43 +1,120 @@
 defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   @moduledoc """
-  Ecto adapter of partner perks, code pools and claims (ADR-191).
+  Ecto adapter of partner perks, versions, code pools and claims (ADR-191).
 
   Every query names the organization in scope as well as relying on RLS.
-  Claims and uses lock the perk row (`FOR UPDATE`) for the whole decision,
-  and move `claims_count` / `uses_count` in the same transaction, so caps
-  and the single use hold under concurrency; the table's check constraints
-  are the last line (`claims_count <= max_claims`, `uses_count <=
-  claims_count`).
+  Revisions, claims, uses and revocations lock the perk row (`FOR
+  UPDATE`) for the whole decision and move `current_version`,
+  `claims_count` / `uses_count` in the same transaction, so versioning,
+  caps and the single use hold under concurrency; the tables' check
+  constraints are the last line (`uses_count <= claims_count`).
   """
 
   @behaviour Palee.Perks.Ports.PerkStore
 
   import Ecto.Query
 
-  alias Palee.Perks.{Perk, PerkClaim, PerkCode}
+  alias Palee.Perks.{Perk, PerkClaim, PerkCode, PerkVersion}
+  alias Palee.Perks.Domain.PerkRules
   alias Palee.Repo
 
   @export_limit 1_000
 
+  # -- perks and versions ------------------------------------------------------
+
   @impl true
-  def create_perk(%{organization_id: organization_id}, attrs) do
-    attrs
-    |> Map.put(:organization_id, organization_id)
-    |> Perk.create_changeset()
-    |> Repo.insert()
+  def create_perk(%{organization_id: organization_id}, attrs, version_attrs) do
+    transaction(fn ->
+      perk =
+        attrs
+        |> Map.put(:organization_id, organization_id)
+        |> Perk.create_changeset()
+        |> Repo.insert()
+        |> or_rollback()
+
+      version = insert_version(perk, %PerkVersion{}, version_attrs, 1)
+      perk |> mirror(version) |> Map.put(:version, version)
+    end)
   end
 
   @impl true
-  def update_perk(_context, %Perk{} = perk, attrs),
-    do: perk |> Perk.update_changeset(attrs) |> Repo.update()
+  def revise_perk(%{organization_id: organization_id}, %Perk{id: id}, attrs, version_attrs) do
+    transaction(fn ->
+      perk = lock_perk(organization_id, id) || Repo.rollback(:not_found)
+      current = current_version(perk)
+
+      {version, number} =
+        case {version_attrs, PerkRules.version_mode(perk)} do
+          {nil, _mode} ->
+            {current, perk.current_version}
+
+          {version_attrs, :amend} ->
+            {current
+             |> PerkVersion.changeset(version_attrs, Map.get(attrs, :redemption_method, perk.redemption_method))
+             |> Repo.update()
+             |> or_rollback(), perk.current_version}
+
+          {version_attrs, :new} ->
+            next = perk.current_version + 1
+            {insert_version(perk, PerkVersion.next_base(current), version_attrs, next), next}
+        end
+
+      perk
+      |> Perk.update_changeset(
+        Map.merge(attrs, %{
+          current_version: number,
+          valid_from: version.rules.valid_from,
+          valid_until: version.rules.valid_until
+        })
+      )
+      |> Repo.update()
+      |> or_rollback()
+      |> Map.put(:version, version)
+    end)
+  end
+
+  defp insert_version(perk, base, version_attrs, number) do
+    base
+    |> PerkVersion.changeset(version_attrs, perk.redemption_method)
+    |> Ecto.Changeset.change(%{
+      organization_id: perk.organization_id,
+      perk_id: perk.id,
+      version: number
+    })
+    |> Repo.insert()
+    |> or_rollback()
+  end
+
+  # The perk's window columns follow its current version.
+  defp mirror(perk, version) do
+    perk
+    |> Ecto.Changeset.change(
+      valid_from: version.rules.valid_from,
+      valid_until: version.rules.valid_until
+    )
+    |> Ecto.Changeset.check_constraint(:valid_until, name: :perks_window_check)
+    |> Repo.update()
+    |> or_rollback()
+  end
+
+  defp current_version(perk) do
+    Repo.one!(
+      from v in PerkVersion,
+        where:
+          v.organization_id == ^perk.organization_id and v.perk_id == ^perk.id and
+            v.version == ^perk.current_version
+    )
+  end
 
   @impl true
-  def set_status(_context, %Perk{} = perk, changes),
-    do: perk |> Perk.status_changeset(changes) |> Repo.update()
+  def set_status(_context, %Perk{} = perk, changes) do
+    with {:ok, updated} <- perk |> Perk.status_changeset(changes) |> Repo.update(),
+         do: {:ok, Map.put(updated, :version, perk.version)}
+  end
 
   @impl true
   def delete_perk(%{organization_id: organization_id}, %Perk{id: id}) do
-    Repo.transaction(fn ->
+    transaction(fn ->
       perk = lock_perk(organization_id, id)
 
       cond do
@@ -48,7 +125,7 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
           Repo.rollback(:perk_has_claims)
 
         true ->
-          {_count, _} =
+          {1, _} =
             Repo.delete_all(
               from p in Perk, where: p.id == ^id and p.organization_id == ^organization_id
             )
@@ -58,7 +135,7 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     end)
     |> case do
       {:ok, :ok} -> :ok
-      {:error, reason} -> {:error, reason}
+      error -> error
     end
   end
 
@@ -72,7 +149,7 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   def get_perk(%{organization_id: organization_id}, id) do
     case Ecto.UUID.cast(id) do
       {:ok, id} ->
-        Repo.one(from p in Perk, where: p.id == ^id and p.organization_id == ^organization_id)
+        organization_id |> with_version() |> where([p], p.id == ^id) |> Repo.one() |> loaded()
 
       :error ->
         nil
@@ -81,14 +158,26 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
 
   @impl true
   def list_perks(%{organization_id: organization_id}, filters) do
-    Perk
-    |> where([p], p.organization_id == ^organization_id)
+    organization_id
+    |> with_version()
     |> statuses(Map.get(filters, :statuses))
     |> ids(Map.get(filters, :ids))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
     |> limit(500)
     |> Repo.all()
+    |> Enum.map(&loaded/1)
   end
+
+  defp with_version(organization_id) do
+    from p in Perk,
+      join: v in PerkVersion,
+      on: v.perk_id == p.id and v.version == p.current_version and v.organization_id == p.organization_id,
+      where: p.organization_id == ^organization_id,
+      select: {p, v}
+  end
+
+  defp loaded(nil), do: nil
+  defp loaded({perk, version}), do: %{perk | version: version}
 
   defp statuses(query, list) when is_list(list), do: where(query, [p], p.status in ^list)
   defp statuses(query, _all), do: query
@@ -97,11 +186,38 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   defp ids(query, _all), do: query
 
   @impl true
+  def list_versions(%{organization_id: organization_id}, perk_id) do
+    Repo.all(
+      from v in PerkVersion,
+        where: v.organization_id == ^organization_id and v.perk_id == ^perk_id,
+        order_by: [desc: v.version]
+    )
+  end
+
+  @impl true
+  def get_versions(_context, []), do: %{}
+
+  def get_versions(%{organization_id: organization_id}, keys) do
+    perk_ids = keys |> Enum.map(&elem(&1, 0)) |> Enum.uniq()
+    wanted = MapSet.new(keys)
+
+    from(v in PerkVersion,
+      where: v.organization_id == ^organization_id and v.perk_id in ^perk_ids
+    )
+    |> Repo.all()
+    |> Enum.filter(&MapSet.member?(wanted, {&1.perk_id, &1.version}))
+    |> Map.new(&{{&1.perk_id, &1.version}, &1})
+  end
+
+  # -- code pool -------------------------------------------------------------
+
+  @impl true
   def add_codes(%{organization_id: organization_id}, perk_id, codes) do
     now = DateTime.utc_now()
 
-    rows =
-      Enum.map(codes, fn code ->
+    added =
+      codes
+      |> Enum.map(fn code ->
         %{
           id: Ecto.UUID.generate(),
           organization_id: organization_id,
@@ -110,18 +226,15 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
           inserted_at: now
         }
       end)
-
-    {added, _} =
-      rows
       |> Enum.chunk_every(1_000)
-      |> Enum.reduce({0, nil}, fn chunk, {total, _} ->
+      |> Enum.reduce(0, fn chunk, total ->
         {count, _} =
           Repo.insert_all(PerkCode, chunk, on_conflict: :nothing, conflict_target: [:perk_id, :code])
 
-        {total + count, nil}
+        total + count
       end)
 
-    {:ok, %{added: added, duplicates: length(codes) - added}}
+    {:ok, %{added: added}}
   end
 
   @impl true
@@ -137,20 +250,24 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     |> Map.new(fn {perk_id, total, free} -> {perk_id, %{total: total, free: free}} end)
   end
 
+  # -- claims ----------------------------------------------------------------
+
   @impl true
   def claim(%{organization_id: organization_id}, perk_id, user_id, decide) do
-    Repo.transaction(fn ->
+    transaction(fn ->
       perk = lock_perk(organization_id, perk_id) || Repo.rollback(:not_found)
+      perk = %{perk | version: current_version(perk)}
       member = member_claims(organization_id, perk.id, user_id)
 
       facts = %{
         member_claims: length(member),
-        open_claim: Enum.find(member, &(&1.status == "claimed"))
+        open_claim: Enum.find(member, &(&1.status == "claimed")),
+        count_since: fn since -> count_since(organization_id, perk.id, user_id, since) end
       }
 
       case decide.(perk, facts) do
         {:existing, %PerkClaim{} = claim} ->
-          %{perk: perk, claim: claim, new?: false}
+          %{perk: perk, claim: claim, new?: false, free_codes: nil}
 
         {:new, attrs} ->
           insert_claim(organization_id, perk, user_id, attrs)
@@ -171,42 +288,52 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     )
   end
 
+  defp count_since(organization_id, perk_id, user_id, %DateTime{} = since) do
+    from(c in PerkClaim,
+      where:
+        c.organization_id == ^organization_id and c.perk_id == ^perk_id and
+          c.status != "revoked" and c.claimed_at >= ^since,
+      select: %{all: count(c.id), member: filter(count(c.id), c.user_id == ^user_id)}
+    )
+    |> Repo.one()
+  end
+
   defp insert_claim(organization_id, perk, user_id, attrs) do
     claim_id = Ecto.UUID.generate()
-    pool_code = if perk.redemption_method == "unique_code", do: take_code(perk, claim_id, attrs)
+
+    {code, free} =
+      if Map.get(attrs, :issue) == :pool,
+        do: take_code(perk, claim_id, attrs.claimed_at),
+        else: {Map.get(attrs, :code), nil}
 
     claim =
       attrs
+      |> Map.drop([:issue])
       |> Map.merge(%{
         id: claim_id,
         organization_id: organization_id,
         perk_id: perk.id,
-        user_id: user_id
+        perk_version: perk.current_version,
+        user_id: user_id,
+        code: code
       })
-      |> then(&if(pool_code, do: Map.put(&1, :code, pool_code), else: &1))
       |> PerkClaim.create_changeset()
       |> Repo.insert()
-      |> case do
-        {:ok, claim} -> claim
-        {:error, changeset} -> Repo.rollback(changeset)
-      end
+      |> or_rollback()
 
-    {1, [perk]} =
+    {1, [counted]} =
       Repo.update_all(
-        from(p in Perk,
-          where: p.id == ^perk.id and p.organization_id == ^organization_id,
-          select: p
-        ),
+        from(p in Perk, where: p.id == ^perk.id and p.organization_id == ^organization_id, select: p),
         inc: [claims_count: 1]
       )
 
-    %{perk: perk, claim: claim, new?: true}
+    %{perk: %{counted | version: perk.version}, claim: claim, new?: true, free_codes: free}
   end
 
   # The perk row is locked, so the oldest free code is taken without racing
-  # another claim of the same perk; SKIP LOCKED keeps a concurrent upload or
-  # staff action on another code from blocking it.
-  defp take_code(perk, claim_id, %{claimed_at: at}) do
+  # another claim of the same perk; SKIP LOCKED keeps a concurrent upload
+  # from blocking it.
+  defp take_code(perk, claim_id, at) do
     free =
       Repo.one(
         from c in PerkCode,
@@ -224,14 +351,24 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
         set: [claim_id: claim_id, assigned_at: at]
       )
 
-    free.code
+    left =
+      Repo.one(
+        from c in PerkCode,
+          where:
+            c.organization_id == ^perk.organization_id and c.perk_id == ^perk.id and
+              is_nil(c.claim_id),
+          select: count(c.id)
+      )
+
+    {free.code, left}
   end
 
   @impl true
   def use_claim(%{organization_id: organization_id}, claim_id, via, actor_id, at, check) do
-    Repo.transaction(fn ->
+    transaction(fn ->
       claim = get_claim_row(organization_id, claim_id) || Repo.rollback(:not_found)
       perk = lock_perk(organization_id, claim.perk_id) || Repo.rollback(:not_found)
+      perk = %{perk | version: current_version(perk)}
       claim = lock_claim(organization_id, claim.id)
 
       with :ok <- check.(perk, claim),
@@ -252,13 +389,13 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
                  updated_at: at
                ]
              ) do
-        {1, [perk]} =
+        {1, [counted]} =
           Repo.update_all(
             from(p in Perk, where: p.id == ^perk.id and p.organization_id == ^organization_id, select: p),
             inc: [uses_count: 1]
           )
 
-        %{perk: perk, claim: used}
+        %{perk: %{counted | version: perk.version}, claim: used}
       else
         {0, _} -> Repo.rollback(:perk_claim_already_used)
         {:error, reason} -> Repo.rollback(reason)
@@ -268,20 +405,16 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
 
   @impl true
   def revoke_claim(%{organization_id: organization_id}, claim_id, actor_id, at) do
-    Repo.transaction(fn ->
+    transaction(fn ->
       claim = get_claim_row(organization_id, claim_id) || Repo.rollback(:not_found)
       perk = lock_perk(organization_id, claim.perk_id) || Repo.rollback(:not_found)
       claim = lock_claim(organization_id, claim.id)
 
       if claim.status != "claimed", do: Repo.rollback(:perk_claim_not_open)
 
-      revoked =
-        case claim |> PerkClaim.revoke_changeset(actor_id, at) |> Repo.update() do
-          {:ok, revoked} -> revoked
-          {:error, changeset} -> Repo.rollback(changeset)
-        end
+      revoked = claim |> PerkClaim.revoke_changeset(actor_id, at) |> Repo.update() |> or_rollback()
 
-      {1, [perk]} =
+      {1, [counted]} =
         Repo.update_all(
           from(p in Perk,
             where: p.id == ^perk.id and p.organization_id == ^organization_id and p.claims_count > 0,
@@ -290,8 +423,23 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
           inc: [claims_count: -1]
         )
 
-      %{perk: perk, claim: revoked}
+      %{perk: counted, claim: revoked}
     end)
+  end
+
+  @impl true
+  def rotate_token(%{organization_id: organization_id}, claim_id, user_id, token_hash) do
+    query =
+      from c in PerkClaim,
+        where:
+          c.id == ^claim_id and c.organization_id == ^organization_id and c.user_id == ^user_id and
+            c.status == "claimed" and not is_nil(c.token_hash),
+        select: c
+
+    case Repo.update_all(query, set: [token_hash: token_hash, updated_at: DateTime.utc_now()]) do
+      {1, [claim]} -> {:ok, claim}
+      {0, _} -> {:error, :perk_claim_not_open}
+    end
   end
 
   defp lock_perk(organization_id, id) do
@@ -319,27 +467,10 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   defp get_claim_row(organization_id, id) do
     case Ecto.UUID.cast(id) do
       {:ok, id} ->
-        Repo.one(
-          from c in PerkClaim, where: c.id == ^id and c.organization_id == ^organization_id
-        )
+        Repo.one(from c in PerkClaim, where: c.id == ^id and c.organization_id == ^organization_id)
 
       :error ->
         nil
-    end
-  end
-
-  @impl true
-  def rotate_token(%{organization_id: organization_id}, claim_id, user_id, token_hash) do
-    query =
-      from c in PerkClaim,
-        where:
-          c.id == ^claim_id and c.organization_id == ^organization_id and c.user_id == ^user_id and
-            c.status == "claimed" and not is_nil(c.token_hash),
-        select: c
-
-    case Repo.update_all(query, set: [token_hash: token_hash, updated_at: DateTime.utc_now()]) do
-      {1, [claim]} -> {:ok, claim}
-      {0, _} -> {:error, :perk_claim_not_open}
     end
   end
 
@@ -371,6 +502,7 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
       user_id: c.user_id,
       display_name: u.display_nickname,
       handle: u.nickname,
+      perk_version: c.perk_version,
       code: c.code,
       status: c.status,
       claimed_at: c.claimed_at,
@@ -385,6 +517,8 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     do: where(query, [c], c.claimed_at > ^at or (c.claimed_at == ^at and c.id > ^id))
 
   defp after_cursor(query, _none), do: query
+
+  # -- member facts ------------------------------------------------------------
 
   @impl true
   def member_package_ids(%{organization_id: organization_id}, user_id, today) do
@@ -401,4 +535,48 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     )
     |> Repo.all()
   end
+
+  @impl true
+  def group_ids(%{organization_id: organization_id}) do
+    from(c in "community_channels",
+      where: c.organization_id == type(^organization_id, :binary_id) and c.status == "active",
+      select: type(c.id, :binary_id)
+    )
+    |> Repo.all()
+  end
+
+  @impl true
+  def member_group_ids(%{organization_id: organization_id}, user_id) do
+    from(m in "community_channel_memberships",
+      where: m.organization_id == type(^organization_id, :binary_id),
+      where: m.user_id == type(^user_id, :binary_id),
+      select: type(m.channel_id, :binary_id)
+    )
+    |> Repo.all()
+  end
+
+  @impl true
+  def member_first_name(_context, user_id) do
+    from(u in "users",
+      where: u.id == type(^user_id, :binary_id),
+      select: {u.display_nickname, u.nickname}
+    )
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      {name, handle} -> (name || handle || "") |> String.split(~r/\s+/u, trim: true) |> List.first()
+    end
+  end
+
+  # -- helpers -----------------------------------------------------------------
+
+  defp transaction(fun) do
+    case Repo.transaction(fun) do
+      {:ok, result} -> {:ok, result}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp or_rollback({:ok, value}), do: value
+  defp or_rollback({:error, reason}), do: Repo.rollback(reason)
 end
