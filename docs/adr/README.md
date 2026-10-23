@@ -188,3 +188,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-186 | Branch-scoped staff and the branch manager | Accepted |
 | ADR-187 | Logins with up to three profiles, @handle + display name, and mail-free password recovery | Accepted |
 | ADR-188 | Worldwide area and address search through a self-hostable OpenStreetMap geocoder | Accepted |
+| ADR-192 | Shop analytics, revenue by stream and revenue lineage reporting | Accepted |
