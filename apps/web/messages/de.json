@@ -9168,7 +9168,7 @@
     "emailInUseAddProfile": "Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",
     "emailInUseUnknown": "Diese E-Mail-Adresse hat schon ein Konto. Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",
     "emailLimitReached": "Diese E-Mail-Adresse hat schon {limit} Konten, mehr sind nicht möglich. Nimm für ein neues Konto eine andere E-Mail-Adresse.",
-    "passwordRule": "Mindestens 4 Zeichen.",
+    "passwordRule": "Mindestens 4 Zeichen (Leerzeichen zählen nicht).",
     "passwordRequired": "Gib dein Passwort ein.",
     "identifierLabel": "E-Mail oder @Benutzername",
     "identifierRequired": "Gib deine E-Mail-Adresse oder deinen @Benutzernamen ein.",

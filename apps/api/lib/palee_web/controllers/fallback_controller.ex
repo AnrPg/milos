@@ -173,12 +173,23 @@ defmodule PaleeWeb.FallbackController do
            ] do
     {status, message} =
       case reason do
-        :invalid_reset_link -> {:unprocessable_entity, "This reset link is not valid"}
-        :expired_reset_link -> {:gone, "This reset link has expired"}
-        :invalid_recovery_code -> {:unprocessable_entity, "The account or recovery code is wrong"}
-        :weak_password -> {:unprocessable_entity, "Password must be at least 4 characters"}
-        :claimed_by_other -> {:conflict, "Someone else is handling this request"}
-        :not_claimed -> {:conflict, "You are not handling this request"}
+        :invalid_reset_link ->
+          {:unprocessable_entity, "This reset link is not valid"}
+
+        :expired_reset_link ->
+          {:gone, "This reset link has expired"}
+
+        :invalid_recovery_code ->
+          {:unprocessable_entity, "The account or recovery code is wrong"}
+
+        :weak_password ->
+          {:unprocessable_entity, "Password must have at least 4 characters besides spaces"}
+
+        :claimed_by_other ->
+          {:conflict, "Someone else is handling this request"}
+
+        :not_claimed ->
+          {:conflict, "You are not handling this request"}
       end
 
     conn

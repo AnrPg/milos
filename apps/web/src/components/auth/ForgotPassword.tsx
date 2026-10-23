@@ -9,7 +9,7 @@ import { ApiError } from "@/api/client";
 import { requestPasswordReset, resetPasswordWithRecoveryCode } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
-import { MIN_PASSWORD_LENGTH, type FieldErrors } from "@/components/auth/auth-errors";
+import { passwordLongEnough, type FieldErrors } from "@/components/auth/auth-errors";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -65,7 +65,7 @@ export function ForgotPassword() {
     const errors: FieldErrors = {};
     if (identifier.trim().length === 0) errors.identifier = [t("identifierRequired")];
     if (code.trim().length === 0) errors.code = [t("recoveryCodeRequired")];
-    if (password.length < MIN_PASSWORD_LENGTH) errors.password = [t("passwordRule")];
+    if (!passwordLongEnough(password)) errors.password = [t("passwordRule")];
     setFieldErrors(errors);
     setError(null);
     if (Object.keys(errors).length > 0) return;

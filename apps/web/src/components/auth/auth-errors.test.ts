@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ApiError } from "@/api/client";
 import {
   handleInput,
+  passwordLongEnough,
   registerFailure,
   resetFailure,
   resetTokenFromHash,
@@ -106,5 +107,15 @@ describe("handleInput", () => {
   it("drops a typed @ and spaces", () => {
     expect(handleInput("@maria k")).toBe("mariak");
     expect(handleInput("@@Μαρία")).toBe("Μαρία");
+  });
+});
+
+describe("passwordLongEnough", () => {
+  it("needs 4 characters that are not whitespace", () => {
+    expect(passwordLongEnough("1537")).toBe(true);
+    expect(passwordLongEnough("a b c d")).toBe(true);
+    expect(passwordLongEnough("καλή")).toBe(true);
+    expect(passwordLongEnough(" 1 2 3 ")).toBe(false);
+    expect(passwordLongEnough("    ")).toBe(false);
   });
 });

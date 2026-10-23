@@ -21,7 +21,7 @@ import { AuthNotice } from "@/components/auth/AuthShell";
 import { RecoveryCodesOffer } from "@/components/auth/RecoveryCodesOffer";
 import { SignupHandleField, useHandleSuggestion } from "@/components/auth/SignupHandleField";
 import {
-  MIN_PASSWORD_LENGTH,
+  passwordLongEnough,
   registerFailure,
   type FieldErrors,
 } from "@/components/auth/auth-errors";
@@ -55,7 +55,7 @@ function invalidRegisterFields(form: RegisterForm, t: (key: string) => string): 
     errors.display_name = [t("displayNameRule")];
   }
   if (form.handle.trim().length < 3) errors.handle = [t("handleRule")];
-  if (form.password.length < MIN_PASSWORD_LENGTH) errors.password = [t("passwordRule")];
+  if (!passwordLongEnough(form.password)) errors.password = [t("passwordRule")];
 
   return errors;
 }
@@ -194,7 +194,6 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
     }
   }
 
-  const roleErrors = fieldErrors.role ?? [];
   const passwordResetDone = searchParams.get("reset") === "done";
 
   function validate(errors: FieldErrors) {
@@ -366,48 +365,6 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   </div>
                 ) : null}
 
-                {/* Role cards */}
-                {!invitationToken.trim() ? <div>
-                  <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("iAmA5191365")}</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(
-                      [
-                        { value: "member", label: i18n("gymMemberfeecab7"), description: i18n("trainWithAStructuredProgrammeeca768c") },
-                        { value: "athlete", label: i18n("autonomousAthlete89280a4"), description: i18n("selfDirectedTraininge36a9cb") },
-                      ] as const
-                    ).map(({ value, label, description }) => {
-                      const selected = registerForm.role === value;
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          className="rounded-2xl p-4 text-start transition-all"
-                          style={{
-                            background: selected
-                              ? "color-mix(in srgb, var(--primary) 12%, transparent)"
-                              : "var(--bg)",
-                            border: selected
-                              ? "1.5px solid var(--primary)"
-                              : "1.5px solid var(--border)",
-                          }}
-                          onClick={() => setRegisterForm((f) => ({ ...f, role: value }))}
-                        >
-                          <p className="text-sm font-semibold" style={{ color: selected ? "var(--primary-strong)" : "var(--text)" }}>
-                            {label}
-                          </p>
-                          <p className="mt-1 text-xs leading-snug" style={{ color: "var(--dim)" }}>
-                            {description}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {roleErrors.length > 0 && (
-                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
-                      {roleErrors.join(", ")}
-                    </span>
-                  )}
-                </div> : null}
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
