@@ -50,8 +50,8 @@ Identity and lets Γύρω μου, Partners and Feed read them through one port.
 - One long sign-up form: lower completion, and it feels like a gym system.
 
 ## Consequences
-- Γύρω μου and Partners can prefill from interests. A follow-up wires the one-tap filter.
-- Editing interests later belongs in Εγώ › Ρυθμίσεις (the same API).
+- Γύρω μου leads its chip row with «Τα αθλήματά μου» (one tap sets the discipline filter to the person's interests, a second clears it) and lists their disciplines first in the discipline chip. Partners may prefill from them later.
+- Εγώ › «Τι κάνεις» (`/me/settings/interests`) edits them any time with the same editor as the first-run (`InterestsEditor`).
 
 ## Implementation Notes
 - `ProductTours` gains `first_run`. The tour path parameter and `completed_tours` enums read

@@ -6799,7 +6799,8 @@
     "visibilityOff": "As tuas publicações públicas não aparecem no Perto de mim. Se ativares, aparecem no centro da tua zona principal, nunca mais perto.",
     "visibilityNeedsArea": "Só aparecem depois de definires «A minha zona».",
     "notifTitle": "Novidades perto de ti",
-    "notifBody": "Novidades para «{name}»: {count}"
+    "notifBody": "Novidades para «{name}»: {count}",
+    "myDisciplines": "Os meus desportos"
   },
   "CheckIn": {
     "loading": "A carregar…",
@@ -9385,6 +9386,10 @@
     "codeLabel": "Código de convite",
     "codeSubmit": "Entrar",
     "codeFailed": "Esse código não funcionou. Confirma-o com a tua box.",
-    "laterNote": "Sem problema. Podes entrar numa box quando quiseres a partir de Perto de mim."
+    "laterNote": "Sem problema. Podes entrar numa box quando quiseres a partir de Perto de mim.",
+    "backToMe": "Voltar a Eu",
+    "saveInterests": "Guardar",
+    "interestsSaved": "Guardado.",
+    "interestsHubHint": "Desportos e nível, para sugestões"
   }
 }

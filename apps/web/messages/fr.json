@@ -6799,7 +6799,8 @@
     "visibilityOff": "Tes publications publiques n’apparaissent pas dans Autour de moi. Si tu l’actives, elles apparaîtront au centre de ta zone principale, jamais plus près.",
     "visibilityNeedsArea": "Elles n’apparaissent qu’une fois « Ma zone » définie.",
     "notifTitle": "Du nouveau autour de toi",
-    "notifBody": "Nouveau pour « {name} » : {count}"
+    "notifBody": "Nouveau pour « {name} » : {count}",
+    "myDisciplines": "Mes sports"
   },
   "CheckIn": {
     "loading": "Chargement…",
@@ -9385,6 +9386,10 @@
     "codeLabel": "Code d'invitation",
     "codeSubmit": "Rejoindre",
     "codeFailed": "Ce code n'a pas fonctionné. Vérifie-le auprès de ta box.",
-    "laterNote": "Pas de souci. Tu peux rejoindre une box à tout moment depuis Autour de moi."
+    "laterNote": "Pas de souci. Tu peux rejoindre une box à tout moment depuis Autour de moi.",
+    "backToMe": "Retour à Moi",
+    "saveInterests": "Enregistrer",
+    "interestsSaved": "Enregistré.",
+    "interestsHubHint": "Sports et niveau, pour les suggestions"
   }
 }

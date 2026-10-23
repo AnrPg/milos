@@ -6799,7 +6799,8 @@
     "visibilityOff": "Deine öffentlichen Beiträge erscheinen nicht in In der Nähe. Schaltest du es ein, erscheinen sie in der Mitte deines Hauptgebiets, nie genauer.",
     "visibilityNeedsArea": "Sie erscheinen erst, wenn du „Mein Gebiet“ festgelegt hast.",
     "notifTitle": "Neu in deiner Nähe",
-    "notifBody": "Neu für „{name}“: {count}"
+    "notifBody": "Neu für „{name}“: {count}",
+    "myDisciplines": "Meine Sportarten"
   },
   "CheckIn": {
     "loading": "Wird geladen…",
@@ -9385,6 +9386,10 @@
     "codeLabel": "Einladungscode",
     "codeSubmit": "Beitreten",
     "codeFailed": "Der Code hat nicht funktioniert. Frag deine Box danach.",
-    "laterNote": "Kein Problem. Du kannst jederzeit über In der Nähe einer Box beitreten."
+    "laterNote": "Kein Problem. Du kannst jederzeit über In der Nähe einer Box beitreten.",
+    "backToMe": "Zurück zu Ich",
+    "saveInterests": "Speichern",
+    "interestsSaved": "Gespeichert.",
+    "interestsHubHint": "Sportarten und Level, für Vorschläge"
   }
 }

@@ -6799,7 +6799,8 @@
     "visibilityOff": "Your public posts don't show in Around me. Turn it on and they show at the centre of your main area, never closer.",
     "visibilityNeedsArea": "They only show once you've set “My area”.",
     "notifTitle": "New near you",
-    "notifBody": "New for “{name}”: {count}"
+    "notifBody": "New for “{name}”: {count}",
+    "myDisciplines": "My sports"
   },
   "CheckIn": {
     "loading": "Loading…",
@@ -9385,6 +9386,10 @@
     "codeLabel": "Invite code",
     "codeSubmit": "Join",
     "codeFailed": "That code didn't work. Check it with your box.",
-    "laterNote": "No problem. You can join a box any time from Around me."
+    "laterNote": "No problem. You can join a box any time from Around me.",
+    "backToMe": "Back to Me",
+    "saveInterests": "Save",
+    "interestsSaved": "Saved.",
+    "interestsHubHint": "Disciplines and level, for suggestions"
   }
 }
