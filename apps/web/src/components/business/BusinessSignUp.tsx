@@ -230,6 +230,7 @@ export function BusinessSignUp() {
               value={account.display_name}
               autoComplete="name"
               placeholder={tAuth("displayNamePlaceholder")}
+              hint={tAuth("displayNameHint")}
               maxLength={MAX_DISPLAY_NAME_LENGTH}
               errors={fieldErrors.display_name}
               onChange={(display_name) => setAccount((form) => ({ ...form, display_name }))}

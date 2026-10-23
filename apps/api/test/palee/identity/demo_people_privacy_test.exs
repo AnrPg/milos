@@ -270,4 +270,12 @@ defmodule Palee.Identity.DemoPeoplePrivacyTest do
       refute ctx.mock.id in authors
     end
   end
+
+  test "a direct thread to a mock person looks like an unknown person outside the business",
+       %{outsider: outsider, mock: mock} do
+    params = %{context_type: :direct, participant_id: mock.id}
+
+    assert {:error, :not_found} =
+             Palee.Application.GetOrCreateMessagingThread.call(outsider, params)
+  end
 end
