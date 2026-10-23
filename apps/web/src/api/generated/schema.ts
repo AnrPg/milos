@@ -3010,6 +3010,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/perks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Perks you can use at every gym or coach you are a client of */
+        get: operations["PaleeWeb.MyPerkController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/perks/claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your claimed perks, newest first */
+        get: operations["PaleeWeb.MyPerkController.claims"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/perks/claims/{id}/verification-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A new short-lived verification link for the QR of an unused claim
+         * @description The previous link stops working.
+         */
+        post: operations["PaleeWeb.MyPerkController.verification_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/perks/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Claim a perk: its code or QR is revealed and the claim recorded
+         * @description Claiming again while your claim is unused returns that claim.
+         */
+        post: operations["PaleeWeb.MyPerkController.claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/places": {
         parameters: {
             query?: never;
@@ -6018,6 +6092,199 @@ export interface paths {
         put?: never;
         /** Hand ownership to an active member; the former owner stays as admin */
         post: operations["PaleeWeb.OwnerOrganizationController.transfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perk-claims/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke an unused claim: its code or QR stops working and its place is freed */
+        post: operations["PaleeWeb.AdminPerkController.revoke_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perk-claims/{id}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a claim used (the partner confirmed it another way) */
+        post: operations["PaleeWeb.AdminPerkController.use_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's perks with claim and use counts */
+        get: operations["PaleeWeb.AdminPerkController.index"];
+        put?: never;
+        /** Create a perk (a draft); the method defaults to shared_code */
+        post: operations["PaleeWeb.AdminPerkController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One perk */
+        get: operations["PaleeWeb.AdminPerkController.show"];
+        put?: never;
+        post?: never;
+        /** Delete a perk nobody has claimed */
+        delete: operations["PaleeWeb.AdminPerkController.delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit a perk
+         * @description Benefit, rules, redemption and terms amend the current version until the first claim, then make a new version: members keep the terms they claimed. Once claimed, the redemption method is fixed; an ended perk is read-only.
+         */
+        patch: operations["PaleeWeb.AdminPerkController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The perk's claims and uses (export), oldest first, a page at a time */
+        get: operations["PaleeWeb.AdminPerkController.claims"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/claims.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The perk's claims and uses as CSV */
+        get: operations["PaleeWeb.AdminPerkController.claims_csv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add the partner's single-use codes to a code_pool perk (paste or CSV; top up any time) */
+        post: operations["PaleeWeb.AdminPerkController.add_codes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/expire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** End now: nothing can be claimed or used any more */
+        post: operations["PaleeWeb.AdminPerkController.expire"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pause: no new claims; claimed codes keep working */
+        post: operations["PaleeWeb.AdminPerkController.pause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish: clients see and claim it (a business in demo mode can't) */
+        post: operations["PaleeWeb.AdminPerkController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/perks/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The perk's versions of its terms, newest first */
+        get: operations["PaleeWeb.AdminPerkController.versions"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -11018,6 +11285,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/perk-verifications/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a perk QR is for and whether it can still be used */
+        get: operations["PaleeWeb.PerkVerificationController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/perk-verifications/{token}/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the perk used (once) */
+        post: operations["PaleeWeb.PerkVerificationController.redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/platform-plans": {
         parameters: {
             query?: never;
@@ -14847,7 +15148,7 @@ export interface components {
         };
         /**
          * BillingPerk
-         * @description Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.
+         * @description A partner perk (ADR-191) the person claimed at this provider and can still use, read from the version they agreed to: `discount` is the benefit in one line, `code` what to give the partner (the claim's reference for a show-your-membership perk), `url` the store link with the code applied, else the partner's site. Perks not claimed yet are listed by `GET /api/me/perks`.
          */
         BillingPerk: {
             code: string;
@@ -24715,6 +25016,128 @@ export interface components {
              */
             content_type: "image/jpeg" | "image/webp";
         };
+        /** MemberPerk */
+        MemberPerk: {
+            benefit: components["schemas"]["PerkBenefit"];
+            /** @description `10%`, `5.00 EUR`, `Free shaker`, `Buy 2 get 1` or the text. */
+            benefit_label: string;
+            /** @description Your unused claim. */
+            claim?: components["schemas"]["MemberPerkClaim"] | null;
+            claimable: boolean;
+            /** Format: uuid */
+            id: string;
+            instructions?: string | null;
+            /** Format: uuid */
+            logo_media_id?: string | null;
+            logo_url?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            partner_address?: string | null;
+            partner_name: string;
+            partner_url?: string | null;
+            /** PerkProvider */
+            provider: {
+                /** @enum {string} */
+                kind?: "gym" | "coach";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            };
+            /**
+             * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+             * @enum {string}
+             */
+            redemption_method: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+            rules: components["schemas"]["PerkRules"];
+            /**
+             * @description A published perk past `valid_until` reads as expired.
+             * @enum {string}
+             */
+            status: "draft" | "published" | "paused" | "expired";
+            terms?: string | null;
+            /** @enum {string|null} */
+            unavailable_reason?: "perk_sold_out" | "perk_period_sold_out" | "perk_member_limit" | "perk_member_period_limit" | "perk_outside_hours" | "perk_not_available" | null;
+            /** Format: date */
+            valid_from?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+            /** @description The version shown. */
+            version: number;
+        };
+        /** MemberPerkClaim */
+        MemberPerkClaim: {
+            benefit_label: string;
+            /** Format: date-time */
+            claimed_at: string;
+            /** @description What to give the partner: the shared code, your pool code, the code under your QR; null for show_membership. */
+            code?: string | null;
+            /** Format: uuid */
+            id: string;
+            instructions?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            partner_name: string;
+            partner_url?: string | null;
+            /** Format: uuid */
+            perk_id: string;
+            /** @description The version you agreed to. */
+            perk_version: number;
+            /** PerkProvider */
+            provider: {
+                /** @enum {string} */
+                kind?: "gym" | "coach";
+                logo_url?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            };
+            /**
+             * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+             * @enum {string}
+             */
+            redemption_method: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+            /** @description The claim's own reference. */
+            reference: string;
+            /** @description Show your membership; there is no code. */
+            show_membership: boolean;
+            /** @enum {string} */
+            status: "claimed" | "used" | "revoked";
+            terms?: string | null;
+            /** @description partner_link: the store link with the code applied. */
+            url?: string | null;
+            usable: boolean;
+            /** Format: date-time */
+            used_at?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+            /**
+             * PerkVerificationLink
+             * @description personal_qr only: the QR encodes the web origin + `path`. Short-lived and single-use; ask for a new one with `POST /api/me/perks/claims/{id}/verification-link`.
+             */
+            verification?: {
+                /** Format: date-time */
+                expires_at: string;
+                path: string;
+                token: string;
+            } | null;
+        };
+        /** MemberPerkClaimList */
+        MemberPerkClaimList: {
+            claims: components["schemas"]["MemberPerkClaim"][];
+        };
+        /** MemberPerkClaimResponse */
+        MemberPerkClaimResponse: {
+            claim: components["schemas"]["MemberPerkClaim"];
+            /** @description False when you had already claimed it. */
+            created?: boolean;
+        };
+        /** MemberPerkList */
+        MemberPerkList: {
+            perks: components["schemas"]["MemberPerk"][];
+        };
         /** MemberSeason */
         MemberSeason: {
             capacity: number;
@@ -26404,6 +26827,519 @@ export interface components {
             swipes_remaining: number;
             /** @enum {string|null} */
             unavailable_reason: "disabled" | "not_offered" | null;
+        };
+        /**
+         * PerkBenefit
+         * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+         */
+        PerkBenefit: {
+            amount_cents?: number | null;
+            buy_quantity?: number | null;
+            currency?: string | null;
+            get_quantity?: number | null;
+            item?: string | null;
+            max_discount_cents?: number | null;
+            min_spend_cents?: number | null;
+            percent?: number | null;
+            readonly schema_version?: number;
+            text?: string | null;
+            /** @enum {string} */
+            type: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+        };
+        /**
+         * PerkBenefitInput
+         * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+         */
+        PerkBenefitInput: {
+            amount_cents?: number | null;
+            buy_quantity?: number | null;
+            currency?: string | null;
+            get_quantity?: number | null;
+            item?: string | null;
+            max_discount_cents?: number | null;
+            min_spend_cents?: number | null;
+            percent?: number | null;
+            readonly schema_version?: number;
+            text?: string | null;
+            /** @enum {string} */
+            type: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+        };
+        /**
+         * PerkBenefitPatch
+         * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+         */
+        PerkBenefitPatch: {
+            amount_cents?: number | null;
+            buy_quantity?: number | null;
+            currency?: string | null;
+            get_quantity?: number | null;
+            item?: string | null;
+            max_discount_cents?: number | null;
+            min_spend_cents?: number | null;
+            percent?: number | null;
+            readonly schema_version?: number;
+            text?: string | null;
+            /** @enum {string} */
+            type?: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+        };
+        /** PerkClaimExportRow */
+        PerkClaimExportRow: {
+            /** Format: date-time */
+            claimed_at: string;
+            code: string;
+            display_name?: string | null;
+            handle?: string | null;
+            /** Format: uuid */
+            id: string;
+            perk_version: number;
+            /** Format: date-time */
+            revoked_at?: string | null;
+            /** @enum {string} */
+            status: "claimed" | "used" | "revoked";
+            /** Format: date-time */
+            used_at?: string | null;
+            /** @enum {string|null} */
+            used_via?: "partner_link" | "staff" | null;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** PerkClaimsExport */
+        PerkClaimsExport: {
+            claims: {
+                /** Format: date-time */
+                claimed_at: string;
+                code: string;
+                display_name?: string | null;
+                handle?: string | null;
+                /** Format: uuid */
+                id: string;
+                perk_version: number;
+                /** Format: date-time */
+                revoked_at?: string | null;
+                /** @enum {string} */
+                status: "claimed" | "used" | "revoked";
+                /** Format: date-time */
+                used_at?: string | null;
+                /** @enum {string|null} */
+                used_via?: "partner_link" | "staff" | null;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            /** @description Cursor of the next page (`after`), null on the last page. */
+            next?: string | null;
+            perk: components["schemas"]["StaffPerk"];
+        };
+        /**
+         * PerkCodePool
+         * @description The pool of a code_pool perk; `low` is the low-pool alert.
+         */
+        PerkCodePool: {
+            free: number;
+            low: boolean;
+            total: number;
+        } | null;
+        /**
+         * PerkCodesInput
+         * @description Either `codes` (pasted) or `csv` (a file's text; the first column is read).
+         */
+        PerkCodesInput: {
+            codes?: string[];
+            csv?: string;
+        };
+        /** PerkCodesResult */
+        PerkCodesResult: {
+            added: number;
+            duplicates: number;
+            free: number;
+            low: boolean;
+            total: number;
+        };
+        /**
+         * PerkCreate
+         * @description Partner fields and branches change the perk; benefit, rules, redemption and terms amend its version until the first claim, then make a new version (claims keep theirs).
+         */
+        PerkCreate: {
+            /** @description «Όλα τα καταστήματα» (all-branch staff only); else `location_ids`. */
+            all_locations?: boolean;
+            /**
+             * PerkBenefitInput
+             * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+             */
+            benefit: {
+                amount_cents?: number | null;
+                buy_quantity?: number | null;
+                currency?: string | null;
+                get_quantity?: number | null;
+                item?: string | null;
+                max_discount_cents?: number | null;
+                min_spend_cents?: number | null;
+                percent?: number | null;
+                readonly schema_version?: number;
+                text?: string | null;
+                /** @enum {string} */
+                type: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+            };
+            location_ids?: string[];
+            /**
+             * Format: uuid
+             * @description A ready box_photo upload of the business.
+             */
+            logo_media_id?: string | null;
+            partner_address?: string | null;
+            partner_name: string;
+            partner_url?: string | null;
+            /**
+             * PerkRedemptionInput
+             * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+             */
+            redemption?: {
+                instructions?: string | null;
+                link_url?: string | null;
+                low_pool_threshold?: number | null;
+                readonly schema_version?: number;
+                shared_code?: string | null;
+            };
+            /**
+             * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+             * @enum {string}
+             */
+            redemption_method?: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+            /** PerkRulesInput */
+            rules?: {
+                /** @enum {string} */
+                channel?: "in_store" | "online" | "both";
+                /**
+                 * PerkEligibility
+                 * @description Empty lists mean everyone. Memberships are packages.
+                 */
+                eligibility?: {
+                    group_ids?: string[];
+                    min_tenure_days?: number | null;
+                    package_ids?: string[];
+                };
+                /** PerkLimits */
+                limits?: {
+                    max_claims?: number | null;
+                    max_per_member?: number;
+                    max_per_member_per_period?: number | null;
+                    max_per_period?: number | null;
+                    /** @enum {string|null} */
+                    period?: "day" | "week" | "month" | null;
+                };
+                /** @description Weekly windows in the business's local time; none means always. */
+                recurring?: {
+                    /** @example 10:00:00 */
+                    ends_at: string;
+                    /** @example 06:00:00 */
+                    starts_at: string;
+                    /** @description ISO weekdays, 1 = Monday. */
+                    weekdays: number[];
+                }[];
+                readonly schema_version?: number;
+                stacking?: string | null;
+                /** Format: date */
+                valid_from?: string | null;
+                /** Format: date */
+                valid_until?: string | null;
+            };
+            terms?: string | null;
+        };
+        /**
+         * PerkEligibility
+         * @description Empty lists mean everyone. Memberships are packages.
+         */
+        PerkEligibility: {
+            group_ids?: string[];
+            min_tenure_days?: number | null;
+            package_ids?: string[];
+        };
+        /** PerkError */
+        PerkError: {
+            code: string;
+            error?: string;
+        };
+        /** PerkLimits */
+        PerkLimits: {
+            max_claims?: number | null;
+            max_per_member?: number;
+            max_per_member_per_period?: number | null;
+            max_per_period?: number | null;
+            /** @enum {string|null} */
+            period?: "day" | "week" | "month" | null;
+        };
+        /** PerkProvider */
+        PerkProvider: {
+            /** @enum {string} */
+            kind?: "gym" | "coach";
+            logo_url?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            slug?: string | null;
+        };
+        /** PerkRecurringWindow */
+        PerkRecurringWindow: {
+            /** @example 10:00:00 */
+            ends_at: string;
+            /** @example 06:00:00 */
+            starts_at: string;
+            /** @description ISO weekdays, 1 = Monday. */
+            weekdays: number[];
+        };
+        /**
+         * PerkRedemptionInput
+         * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+         */
+        PerkRedemptionInput: {
+            instructions?: string | null;
+            link_url?: string | null;
+            low_pool_threshold?: number | null;
+            readonly schema_version?: number;
+            shared_code?: string | null;
+        };
+        /**
+         * PerkRedemptionSettings
+         * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+         */
+        PerkRedemptionSettings: {
+            instructions?: string | null;
+            link_url?: string | null;
+            low_pool_threshold?: number | null;
+            readonly schema_version?: number;
+            shared_code?: string | null;
+        };
+        /** PerkRules */
+        PerkRules: {
+            /** @enum {string} */
+            channel?: "in_store" | "online" | "both";
+            /**
+             * PerkEligibility
+             * @description Empty lists mean everyone. Memberships are packages.
+             */
+            eligibility?: {
+                group_ids?: string[];
+                min_tenure_days?: number | null;
+                package_ids?: string[];
+            };
+            /** PerkLimits */
+            limits?: {
+                max_claims?: number | null;
+                max_per_member?: number;
+                max_per_member_per_period?: number | null;
+                max_per_period?: number | null;
+                /** @enum {string|null} */
+                period?: "day" | "week" | "month" | null;
+            };
+            /** @description Weekly windows in the business's local time; none means always. */
+            recurring?: {
+                /** @example 10:00:00 */
+                ends_at: string;
+                /** @example 06:00:00 */
+                starts_at: string;
+                /** @description ISO weekdays, 1 = Monday. */
+                weekdays: number[];
+            }[];
+            readonly schema_version?: number;
+            stacking?: string | null;
+            /** Format: date */
+            valid_from?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+        };
+        /** PerkRulesInput */
+        PerkRulesInput: {
+            /** @enum {string} */
+            channel?: "in_store" | "online" | "both";
+            /**
+             * PerkEligibility
+             * @description Empty lists mean everyone. Memberships are packages.
+             */
+            eligibility?: {
+                group_ids?: string[];
+                min_tenure_days?: number | null;
+                package_ids?: string[];
+            };
+            /** PerkLimits */
+            limits?: {
+                max_claims?: number | null;
+                max_per_member?: number;
+                max_per_member_per_period?: number | null;
+                max_per_period?: number | null;
+                /** @enum {string|null} */
+                period?: "day" | "week" | "month" | null;
+            };
+            /** @description Weekly windows in the business's local time; none means always. */
+            recurring?: {
+                /** @example 10:00:00 */
+                ends_at: string;
+                /** @example 06:00:00 */
+                starts_at: string;
+                /** @description ISO weekdays, 1 = Monday. */
+                weekdays: number[];
+            }[];
+            readonly schema_version?: number;
+            stacking?: string | null;
+            /** Format: date */
+            valid_from?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+        };
+        /**
+         * PerkUpdate
+         * @description Partner fields and branches change the perk; benefit, rules, redemption and terms amend its version until the first claim, then make a new version (claims keep theirs).
+         */
+        PerkUpdate: {
+            /** @description «Όλα τα καταστήματα» (all-branch staff only); else `location_ids`. */
+            all_locations?: boolean;
+            /**
+             * PerkBenefitPatch
+             * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+             */
+            benefit?: {
+                amount_cents?: number | null;
+                buy_quantity?: number | null;
+                currency?: string | null;
+                get_quantity?: number | null;
+                item?: string | null;
+                max_discount_cents?: number | null;
+                min_spend_cents?: number | null;
+                percent?: number | null;
+                readonly schema_version?: number;
+                text?: string | null;
+                /** @enum {string} */
+                type?: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+            };
+            location_ids?: string[];
+            /**
+             * Format: uuid
+             * @description A ready box_photo upload of the business.
+             */
+            logo_media_id?: string | null;
+            partner_address?: string | null;
+            partner_name?: string;
+            partner_url?: string | null;
+            /**
+             * PerkRedemptionInput
+             * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+             */
+            redemption?: {
+                instructions?: string | null;
+                link_url?: string | null;
+                low_pool_threshold?: number | null;
+                readonly schema_version?: number;
+                shared_code?: string | null;
+            };
+            /**
+             * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+             * @enum {string}
+             */
+            redemption_method?: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+            /** PerkRulesInput */
+            rules?: {
+                /** @enum {string} */
+                channel?: "in_store" | "online" | "both";
+                /**
+                 * PerkEligibility
+                 * @description Empty lists mean everyone. Memberships are packages.
+                 */
+                eligibility?: {
+                    group_ids?: string[];
+                    min_tenure_days?: number | null;
+                    package_ids?: string[];
+                };
+                /** PerkLimits */
+                limits?: {
+                    max_claims?: number | null;
+                    max_per_member?: number;
+                    max_per_member_per_period?: number | null;
+                    max_per_period?: number | null;
+                    /** @enum {string|null} */
+                    period?: "day" | "week" | "month" | null;
+                };
+                /** @description Weekly windows in the business's local time; none means always. */
+                recurring?: {
+                    /** @example 10:00:00 */
+                    ends_at: string;
+                    /** @example 06:00:00 */
+                    starts_at: string;
+                    /** @description ISO weekdays, 1 = Monday. */
+                    weekdays: number[];
+                }[];
+                readonly schema_version?: number;
+                stacking?: string | null;
+                /** Format: date */
+                valid_from?: string | null;
+                /** Format: date */
+                valid_until?: string | null;
+            };
+            terms?: string | null;
+        };
+        /**
+         * PerkVerification
+         * @description What the partner's counter sees: the perk, valid or used, the member's first name.
+         */
+        PerkVerification: {
+            /** PerkVerificationBusiness */
+            business: {
+                logo_url?: string | null;
+                name?: string | null;
+            };
+            /** Format: date-time */
+            claimed_at: string;
+            code: string;
+            member_first_name?: string | null;
+            /** PerkVerificationPerk */
+            perk: {
+                benefit_label: string;
+                partner_name: string;
+                terms?: string | null;
+                /** Format: date */
+                valid_until?: string | null;
+            };
+            /** @enum {string} */
+            status: "valid" | "used" | "revoked" | "expired" | "outside_hours";
+            /** Format: date-time */
+            used_at?: string | null;
+        };
+        /** PerkVerificationBusiness */
+        PerkVerificationBusiness: {
+            logo_url?: string | null;
+            name?: string | null;
+        };
+        /**
+         * PerkVerificationLink
+         * @description personal_qr only: the QR encodes the web origin + `path`. Short-lived and single-use; ask for a new one with `POST /api/me/perks/claims/{id}/verification-link`.
+         */
+        PerkVerificationLink: {
+            /** Format: date-time */
+            expires_at: string;
+            path: string;
+            token: string;
+        } | null;
+        /** PerkVerificationPerk */
+        PerkVerificationPerk: {
+            benefit_label: string;
+            partner_name: string;
+            terms?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+        };
+        /** PerkVersion */
+        PerkVersion: {
+            benefit: components["schemas"]["PerkBenefit"];
+            benefit_label: string;
+            /** Format: uuid */
+            created_by_id?: string | null;
+            /** Format: date-time */
+            inserted_at: string;
+            redemption: components["schemas"]["PerkRedemptionSettings"];
+            rules: components["schemas"]["PerkRules"];
+            terms?: string | null;
+            version: number;
+        };
+        /** PerkVersionList */
+        PerkVersionList: {
+            versions: components["schemas"]["PerkVersion"][];
         };
         /** PersonPostsResponse */
         PersonPostsResponse: {
@@ -30560,6 +31496,118 @@ export interface components {
             role: "owner" | "admin" | "coach";
             /** Format: uuid */
             user_id: string;
+        };
+        /** StaffPerk */
+        StaffPerk: {
+            all_locations: boolean;
+            benefit: components["schemas"]["PerkBenefit"];
+            /** @description `10%`, `5.00 EUR`, `Free shaker`, `Buy 2 get 1` or the text. */
+            benefit_label: string;
+            claims_count: number;
+            /**
+             * PerkCodePool
+             * @description The pool of a code_pool perk; `low` is the low-pool alert.
+             */
+            codes?: {
+                free: number;
+                low: boolean;
+                total: number;
+            } | null;
+            /** Format: date-time */
+            expired_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            instructions?: string | null;
+            location_ids: string[];
+            /** Format: uuid */
+            logo_media_id?: string | null;
+            logo_url?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            partner_address?: string | null;
+            partner_name: string;
+            partner_url?: string | null;
+            /** Format: date-time */
+            paused_at?: string | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            redemption: components["schemas"]["PerkRedemptionSettings"];
+            /**
+             * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+             * @enum {string}
+             */
+            redemption_method: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+            /** @description Claims left under the overall cap; null when uncapped. */
+            remaining?: number | null;
+            rules: components["schemas"]["PerkRules"];
+            /**
+             * @description A published perk past `valid_until` reads as expired.
+             * @enum {string}
+             */
+            status: "draft" | "published" | "paused" | "expired";
+            terms?: string | null;
+            /** Format: date-time */
+            updated_at?: string;
+            uses_count: number;
+            /** Format: date */
+            valid_from?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+            /** @description The version shown. */
+            version: number;
+        };
+        /** StaffPerkClaim */
+        StaffPerkClaim: {
+            /** Format: date-time */
+            claimed_at: string;
+            code: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            perk_id: string;
+            perk_version: number;
+            /** Format: date-time */
+            revoked_at?: string | null;
+            /** @enum {string} */
+            status: "claimed" | "used" | "revoked";
+            /** Format: date-time */
+            used_at?: string | null;
+            used_via?: string | null;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** StaffPerkClaimResponse */
+        StaffPerkClaimResponse: {
+            /** StaffPerkClaim */
+            claim: {
+                /** Format: date-time */
+                claimed_at: string;
+                code: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                perk_id: string;
+                perk_version: number;
+                /** Format: date-time */
+                revoked_at?: string | null;
+                /** @enum {string} */
+                status: "claimed" | "used" | "revoked";
+                /** Format: date-time */
+                used_at?: string | null;
+                used_via?: string | null;
+                /** Format: uuid */
+                user_id: string;
+            };
+        };
+        /** StaffPerkList */
+        StaffPerkList: {
+            perks: components["schemas"]["StaffPerk"][];
+        };
+        /** StaffPerkResponse */
+        StaffPerkResponse: {
+            perk: components["schemas"]["StaffPerk"];
         };
         /** StaffSeason */
         StaffSeason: {
@@ -48562,6 +49610,174 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPerkController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perks */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perks: components["schemas"]["MemberPerk"][];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPerkController.claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claims */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claims: components["schemas"]["MemberPerkClaim"][];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPerkController.verification_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claim */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claim: components["schemas"]["MemberPerkClaim"];
+                        /** @description False when you had already claimed it. */
+                        created?: boolean;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Sold out, your limit reached, or no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPerkController.claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claim */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claim: components["schemas"]["MemberPerkClaim"];
+                        /** @description False when you had already claimed it. */
+                        created?: boolean;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Sold out, your limit reached, or no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPlacesController.index": {
         parameters: {
             query?: {
@@ -63386,6 +64602,1172 @@ export interface operations {
                         slug: string;
                         status: string;
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.revoke_claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claim */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffPerkClaim */
+                        claim: {
+                            /** Format: date-time */
+                            claimed_at: string;
+                            code: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            perk_id: string;
+                            perk_version: number;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                            /** @enum {string} */
+                            status: "claimed" | "used" | "revoked";
+                            /** Format: date-time */
+                            used_at?: string | null;
+                            used_via?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.use_claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claim */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffPerkClaim */
+                        claim: {
+                            /** Format: date-time */
+                            claimed_at: string;
+                            code: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            perk_id: string;
+                            perk_version: number;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                            /** @enum {string} */
+                            status: "claimed" | "used" | "revoked";
+                            /** Format: date-time */
+                            used_at?: string | null;
+                            used_via?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.index": {
+        parameters: {
+            query?: {
+                status?: "draft" | "published" | "paused" | "expired";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perks */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perks: components["schemas"]["StaffPerk"][];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description «Όλα τα καταστήματα» (all-branch staff only); else `location_ids`. */
+                    all_locations?: boolean;
+                    /**
+                     * PerkBenefitInput
+                     * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+                     */
+                    benefit: {
+                        amount_cents?: number | null;
+                        buy_quantity?: number | null;
+                        currency?: string | null;
+                        get_quantity?: number | null;
+                        item?: string | null;
+                        max_discount_cents?: number | null;
+                        min_spend_cents?: number | null;
+                        percent?: number | null;
+                        readonly schema_version?: number;
+                        text?: string | null;
+                        /** @enum {string} */
+                        type: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+                    };
+                    location_ids?: string[];
+                    /**
+                     * Format: uuid
+                     * @description A ready box_photo upload of the business.
+                     */
+                    logo_media_id?: string | null;
+                    partner_address?: string | null;
+                    partner_name: string;
+                    partner_url?: string | null;
+                    /**
+                     * PerkRedemptionInput
+                     * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+                     */
+                    redemption?: {
+                        instructions?: string | null;
+                        link_url?: string | null;
+                        low_pool_threshold?: number | null;
+                        readonly schema_version?: number;
+                        shared_code?: string | null;
+                    };
+                    /**
+                     * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+                     * @enum {string}
+                     */
+                    redemption_method?: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+                    /** PerkRulesInput */
+                    rules?: {
+                        /** @enum {string} */
+                        channel?: "in_store" | "online" | "both";
+                        /**
+                         * PerkEligibility
+                         * @description Empty lists mean everyone. Memberships are packages.
+                         */
+                        eligibility?: {
+                            group_ids?: string[];
+                            min_tenure_days?: number | null;
+                            package_ids?: string[];
+                        };
+                        /** PerkLimits */
+                        limits?: {
+                            max_claims?: number | null;
+                            max_per_member?: number;
+                            max_per_member_per_period?: number | null;
+                            max_per_period?: number | null;
+                            /** @enum {string|null} */
+                            period?: "day" | "week" | "month" | null;
+                        };
+                        /** @description Weekly windows in the business's local time; none means always. */
+                        recurring?: {
+                            /** @example 10:00:00 */
+                            ends_at: string;
+                            /** @example 06:00:00 */
+                            starts_at: string;
+                            /** @description ISO weekdays, 1 = Monday. */
+                            weekdays: number[];
+                        }[];
+                        readonly schema_version?: number;
+                        stacking?: string | null;
+                        /** Format: date */
+                        valid_from?: string | null;
+                        /** Format: date */
+                        valid_until?: string | null;
+                    };
+                    terms?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Perk */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description «Όλα τα καταστήματα» (all-branch staff only); else `location_ids`. */
+                    all_locations?: boolean;
+                    /**
+                     * PerkBenefitPatch
+                     * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
+                     */
+                    benefit?: {
+                        amount_cents?: number | null;
+                        buy_quantity?: number | null;
+                        currency?: string | null;
+                        get_quantity?: number | null;
+                        item?: string | null;
+                        max_discount_cents?: number | null;
+                        min_spend_cents?: number | null;
+                        percent?: number | null;
+                        readonly schema_version?: number;
+                        text?: string | null;
+                        /** @enum {string} */
+                        type?: "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+                    };
+                    location_ids?: string[];
+                    /**
+                     * Format: uuid
+                     * @description A ready box_photo upload of the business.
+                     */
+                    logo_media_id?: string | null;
+                    partner_address?: string | null;
+                    partner_name?: string;
+                    partner_url?: string | null;
+                    /**
+                     * PerkRedemptionInput
+                     * @description What the method needs: shared_code (shared_code, and partner_link with `{code}` in the link), link_url (partner_link, https), low_pool_threshold (code_pool, default 10), instructions (any).
+                     */
+                    redemption?: {
+                        instructions?: string | null;
+                        link_url?: string | null;
+                        low_pool_threshold?: number | null;
+                        readonly schema_version?: number;
+                        shared_code?: string | null;
+                    };
+                    /**
+                     * @description Partner-issued (the partner checks the code in its own system): shared_code (default), code_pool (a batch of single-use codes, one per claim), partner_link (an online store link with the code applied), show_membership (no code). Palee-issued: personal_qr (a single-use QR the partner verifies with a signed link).
+                     * @enum {string}
+                     */
+                    redemption_method?: "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
+                    /** PerkRulesInput */
+                    rules?: {
+                        /** @enum {string} */
+                        channel?: "in_store" | "online" | "both";
+                        /**
+                         * PerkEligibility
+                         * @description Empty lists mean everyone. Memberships are packages.
+                         */
+                        eligibility?: {
+                            group_ids?: string[];
+                            min_tenure_days?: number | null;
+                            package_ids?: string[];
+                        };
+                        /** PerkLimits */
+                        limits?: {
+                            max_claims?: number | null;
+                            max_per_member?: number;
+                            max_per_member_per_period?: number | null;
+                            max_per_period?: number | null;
+                            /** @enum {string|null} */
+                            period?: "day" | "week" | "month" | null;
+                        };
+                        /** @description Weekly windows in the business's local time; none means always. */
+                        recurring?: {
+                            /** @example 10:00:00 */
+                            ends_at: string;
+                            /** @example 06:00:00 */
+                            starts_at: string;
+                            /** @description ISO weekdays, 1 = Monday. */
+                            weekdays: number[];
+                        }[];
+                        readonly schema_version?: number;
+                        stacking?: string | null;
+                        /** Format: date */
+                        valid_from?: string | null;
+                        /** Format: date */
+                        valid_until?: string | null;
+                    };
+                    terms?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Perk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.claims": {
+        parameters: {
+            query?: {
+                /** @description The `next` cursor of the previous page. */
+                after?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claims */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        claims: {
+                            /** Format: date-time */
+                            claimed_at: string;
+                            code: string;
+                            display_name?: string | null;
+                            handle?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            perk_version: number;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                            /** @enum {string} */
+                            status: "claimed" | "used" | "revoked";
+                            /** Format: date-time */
+                            used_at?: string | null;
+                            /** @enum {string|null} */
+                            used_via?: "partner_link" | "staff" | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Cursor of the next page (`after`), null on the last page. */
+                        next?: string | null;
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.claims_csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSV */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.add_codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    codes?: string[];
+                    csv?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pool */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        added: number;
+                        duplicates: number;
+                        free: number;
+                        low: boolean;
+                        total: number;
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.expire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Perk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        perk: components["schemas"]["StaffPerk"];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPerkController.versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Versions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        versions: components["schemas"]["PerkVersion"][];
+                    };
+                };
+            };
+            /** @description Outside your branches, or the business isn't activated */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description No such perk or claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The perk can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid perk */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -88454,6 +90836,166 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PerkVerificationController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PerkVerificationBusiness */
+                        business: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: date-time */
+                        claimed_at: string;
+                        code: string;
+                        member_first_name?: string | null;
+                        /** PerkVerificationPerk */
+                        perk: {
+                            benefit_label: string;
+                            partner_name: string;
+                            terms?: string | null;
+                            /** Format: date */
+                            valid_until?: string | null;
+                        };
+                        /** @enum {string} */
+                        status: "valid" | "used" | "revoked" | "expired" | "outside_hours";
+                        /** Format: date-time */
+                        used_at?: string | null;
+                    };
+                };
+            };
+            /** @description Not a valid link */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Already used, or no longer valid */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The link expired; ask for the QR again */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PerkVerificationController.redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PerkVerificationBusiness */
+                        business: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: date-time */
+                        claimed_at: string;
+                        code: string;
+                        member_first_name?: string | null;
+                        /** PerkVerificationPerk */
+                        perk: {
+                            benefit_label: string;
+                            partner_name: string;
+                            terms?: string | null;
+                            /** Format: date */
+                            valid_until?: string | null;
+                        };
+                        /** @enum {string} */
+                        status: "valid" | "used" | "revoked" | "expired" | "outside_hours";
+                        /** Format: date-time */
+                        used_at?: string | null;
+                    };
+                };
+            };
+            /** @description Not a valid link */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Already used, or no longer valid */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description The link expired; ask for the QR again */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
                 };
             };
         };
