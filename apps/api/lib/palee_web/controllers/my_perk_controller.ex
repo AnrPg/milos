@@ -27,7 +27,8 @@ defmodule PaleeWeb.MyPerkController do
   }
   @refused [
     not_found: {"No such perk or claim", "application/json", S.error()},
-    conflict: {"Sold out, your limit reached, or no longer available", "application/json", S.error()},
+    conflict:
+      {"Sold out, your limit reached, or no longer available", "application/json", S.error()},
     unprocessable_entity: {"Not possible", "application/json", S.error()}
   ]
 

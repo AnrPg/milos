@@ -28,7 +28,8 @@ defmodule PaleeWeb.AdminPerkController do
   }
   @refused [
     not_found: {"No such perk or claim", "application/json", S.error()},
-    forbidden: {"Outside your branches, or the business isn't activated", "application/json", S.error()},
+    forbidden:
+      {"Outside your branches, or the business isn't activated", "application/json", S.error()},
     conflict: {"The perk can't take this step now", "application/json", S.error()},
     unprocessable_entity: {"Invalid perk", "application/json", %Schema{type: :object}}
   ]
@@ -134,7 +135,8 @@ defmodule PaleeWeb.AdminPerkController do
   defp respond_perk(_conn, error), do: error
 
   operation(:add_codes,
-    summary: "Add the partner's single-use codes to a code_pool perk (paste or CSV; top up any time)",
+    summary:
+      "Add the partner's single-use codes to a code_pool perk (paste or CSV; top up any time)",
     parameters: [@id],
     request_body: S.body(S.codes_input()),
     responses: [ok: {"Pool", "application/json", S.codes_response()}] ++ @refused
@@ -173,8 +175,7 @@ defmodule PaleeWeb.AdminPerkController do
   operation(:claims_csv,
     summary: "The perk's claims and uses as CSV",
     parameters: [@id],
-    responses:
-      [ok: {"CSV", "text/csv", %Schema{type: :string, format: :binary}}] ++ @refused
+    responses: [ok: {"CSV", "text/csv", %Schema{type: :string, format: :binary}}] ++ @refused
   )
 
   def claims_csv(conn, %{id: id}) do

@@ -45,7 +45,8 @@ defmodule Palee.Perks.Domain.PerkRules do
   Whether a local moment is inside the recurring weekly windows (always,
   when there are none).
   """
-  def in_recurring?(%{recurring: windows}, %NaiveDateTime{} = local) when is_list(windows) and windows != [] do
+  def in_recurring?(%{recurring: windows}, %NaiveDateTime{} = local)
+      when is_list(windows) and windows != [] do
     day = local |> NaiveDateTime.to_date() |> Date.day_of_week()
     time = NaiveDateTime.to_time(local)
 
@@ -70,8 +71,7 @@ defmodule Palee.Perks.Domain.PerkRules do
         if ended?(perk, today),
           do: {:error, :perk_ended},
           else:
-            {:ok,
-             %{status: "published", published_at: perk.published_at || now, paused_at: nil}}
+            {:ok, %{status: "published", published_at: perk.published_at || now, paused_at: nil}}
 
       {:pause, "published"} ->
         {:ok, %{status: "paused", paused_at: now}}
@@ -98,10 +98,17 @@ defmodule Palee.Perks.Domain.PerkRules do
     cap = rules && rules.limits && rules.limits.max_claims
 
     cond do
-      effective_status(perk, today) == "expired" -> {:error, :perk_read_only}
-      perk.claims_count > 0 and method != perk.redemption_method -> {:error, :perk_locked_after_claims}
-      is_integer(cap) and cap < perk.claims_count -> {:error, :perk_cap_below_claims}
-      true -> :ok
+      effective_status(perk, today) == "expired" ->
+        {:error, :perk_read_only}
+
+      perk.claims_count > 0 and method != perk.redemption_method ->
+        {:error, :perk_locked_after_claims}
+
+      is_integer(cap) and cap < perk.claims_count ->
+        {:error, :perk_cap_below_claims}
+
+      true ->
+        :ok
     end
   end
 
@@ -144,7 +151,8 @@ defmodule Palee.Perks.Domain.PerkRules do
   period limits (`nil` without one): the day's midnight, Monday's or the
   1st of the month's.
   """
-  def period_start(%{limits: %{period: period}}, %NaiveDateTime{} = local) when is_binary(period) do
+  def period_start(%{limits: %{period: period}}, %NaiveDateTime{} = local)
+      when is_binary(period) do
     date = NaiveDateTime.to_date(local)
 
     start =
@@ -203,11 +211,20 @@ defmodule Palee.Perks.Domain.PerkRules do
   """
   def usable(perk, rules, claim, today, local_now) do
     cond do
-      claim.status == "used" -> {:error, :perk_claim_already_used}
-      claim.status == "revoked" -> {:error, :perk_claim_not_open}
-      perk.status not in ["published", "paused"] or not in_window?(perk, today) -> {:error, :perk_not_available}
-      not in_recurring?(rules, local_now) -> {:error, :perk_outside_hours}
-      true -> :ok
+      claim.status == "used" ->
+        {:error, :perk_claim_already_used}
+
+      claim.status == "revoked" ->
+        {:error, :perk_claim_not_open}
+
+      perk.status not in ["published", "paused"] or not in_window?(perk, today) ->
+        {:error, :perk_not_available}
+
+      not in_recurring?(rules, local_now) ->
+        {:error, :perk_outside_hours}
+
+      true ->
+        :ok
     end
   end
 
@@ -229,7 +246,10 @@ defmodule Palee.Perks.Domain.PerkRules do
   `Buy 2 get 1`, or the free text. Clients translate from the fields.
   """
   def benefit_label(%{type: "percent", percent: value}), do: "#{value}%"
-  def benefit_label(%{type: "fixed_amount", amount_cents: cents, currency: currency}), do: money(cents, currency)
+
+  def benefit_label(%{type: "fixed_amount", amount_cents: cents, currency: currency}),
+    do: money(cents, currency)
+
   def benefit_label(%{type: "free_item", item: item}), do: "Free #{item}"
 
   def benefit_label(%{type: "buy_x_get_y", buy_quantity: buy, get_quantity: get} = benefit),

@@ -63,7 +63,8 @@ defmodule Palee.Application.Perks do
   @doc "`GET …/admin/perks/:id/versions`: every version, newest first."
   def versions(context, id) do
     with {:ok, perk} <- fetch(context, id) do
-      {:ok, %{versions: context |> Perks.list_versions(perk.id) |> Enum.map(&PerkPresenter.version/1)}}
+      {:ok,
+       %{versions: context |> Perks.list_versions(perk.id) |> Enum.map(&PerkPresenter.version/1)}}
     end
   end
 
@@ -171,7 +172,8 @@ defmodule Palee.Application.Perks do
     with {:ok, perk} <- fetch(context, id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(perk)),
          :ok <- Organizations.go_live(context, :publish_perk),
-         :ok <- Perks.method_ready(perk.redemption_method, %{free_codes: free_codes(context, perk)}) do
+         :ok <-
+           Perks.method_ready(perk.redemption_method, %{free_codes: free_codes(context, perk)}) do
       step(context, perk, :publish, "perk_published")
     end
   end
@@ -359,7 +361,8 @@ defmodule Palee.Application.Perks do
     end
   end
 
-  defp visible(perks, context), do: CoveringBranches.visible(context, perks, &CoveringBranches.of_row/1)
+  defp visible(perks, context),
+    do: CoveringBranches.visible(context, perks, &CoveringBranches.of_row/1)
 
   defp known_locations(_context, :all), do: :ok
 
@@ -368,9 +371,20 @@ defmodule Palee.Application.Perks do
     if Enum.all?(ids, &MapSet.member?(known, &1)), do: :ok, else: {:error, :location_not_found}
   end
 
-  defp known_eligibility(context, %{rules: %{eligibility: eligibility}}) when is_map(eligibility) do
-    with :ok <- known(Map.get(eligibility, :package_ids), fn -> package_ids(context) end, :invalid_perk_packages),
-         do: known(Map.get(eligibility, :group_ids), fn -> group_ids(context) end, :invalid_perk_groups)
+  defp known_eligibility(context, %{rules: %{eligibility: eligibility}})
+       when is_map(eligibility) do
+    with :ok <-
+           known(
+             Map.get(eligibility, :package_ids),
+             fn -> package_ids(context) end,
+             :invalid_perk_packages
+           ),
+         do:
+           known(
+             Map.get(eligibility, :group_ids),
+             fn -> group_ids(context) end,
+             :invalid_perk_groups
+           )
   end
 
   defp known_eligibility(_context, _version), do: :ok

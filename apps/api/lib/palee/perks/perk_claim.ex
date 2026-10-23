@@ -44,7 +44,14 @@ defmodule Palee.Perks.PerkClaim do
       :token_hash,
       :claimed_at
     ])
-    |> validate_required([:organization_id, :perk_id, :perk_version, :user_id, :code, :claimed_at])
+    |> validate_required([
+      :organization_id,
+      :perk_id,
+      :perk_version,
+      :user_id,
+      :code,
+      :claimed_at
+    ])
     |> check_constraint(:status, name: :perk_claims_status_check)
     |> foreign_key_constraint(:perk_id, name: :perk_claims_perk_id_fkey)
   end

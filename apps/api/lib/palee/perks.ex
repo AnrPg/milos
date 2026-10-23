@@ -15,7 +15,15 @@ defmodule Palee.Perks do
   """
 
   alias Palee.Perks.{Benefit, Perk, PerkCode, PerkStore, Redemption, Rules}
-  alias Palee.Perks.Domain.{CodeImport, PerkRules, RedemptionMethod, TenantDataPolicy, VerificationToken}
+
+  alias Palee.Perks.Domain.{
+    CodeImport,
+    PerkRules,
+    RedemptionMethod,
+    TenantDataPolicy,
+    VerificationToken
+  }
+
   alias Palee.Perks.Domain.Methods.CodePool
 
   defdelegate create_perk(context, attrs, version_attrs), to: PerkStore
@@ -41,7 +49,11 @@ defmodule Palee.Perks do
   @doc "Moves a perk one lifecycle step (`:publish`, `:pause`, `:expire`) and writes it."
   def transition(context, %Perk{} = perk, step, now, today) do
     with {:ok, changes} <- PerkRules.transition(perk, step, now, today) do
-      PerkStore.set_status(context, perk, Map.put(changes, :updated_by_id, Map.get(context, :user_id)))
+      PerkStore.set_status(
+        context,
+        perk,
+        Map.put(changes, :updated_by_id, Map.get(context, :user_id))
+      )
     end
   end
 

@@ -437,8 +437,7 @@ defmodule PaleeWeb.Schemas.Perks do
         used_at: @maybe_datetime,
         verification: verification()
       },
-      required:
-        ~w(id perk_id perk_version organization_id provider partner_name benefit_label
+      required: ~w(id perk_id perk_version organization_id provider partner_name benefit_label
            redemption_method reference show_membership status usable claimed_at)a
     }
   end
@@ -454,8 +453,7 @@ defmodule PaleeWeb.Schemas.Perks do
           unavailable_reason: %Schema{
             type: :string,
             nullable: true,
-            enum:
-              ~w(perk_sold_out perk_period_sold_out perk_member_limit perk_member_period_limit
+            enum: ~w(perk_sold_out perk_period_sold_out perk_member_limit perk_member_period_limit
                  perk_outside_hours perk_not_available)
           },
           claim: %Schema{

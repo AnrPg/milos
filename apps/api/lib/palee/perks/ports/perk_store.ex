@@ -66,7 +66,13 @@ defmodule Palee.Perks.Ports.PerkStore do
   `{:ok, %{perk, claim, new?, free_codes}}` (`free_codes` for a pool, else nil).
   """
   @callback claim(context(), id(), id(), (Perk.t(), map() -> term())) ::
-              {:ok, %{perk: Perk.t(), claim: PerkClaim.t(), new?: boolean(), free_codes: integer() | nil}}
+              {:ok,
+               %{
+                 perk: Perk.t(),
+                 claim: PerkClaim.t(),
+                 new?: boolean(),
+                 free_codes: integer() | nil
+               }}
               | {:error, term()}
 
   @doc """

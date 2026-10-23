@@ -46,7 +46,9 @@ defmodule Palee.Perks.Redemption do
         add_error(changeset, :redemption_method, "is invalid")
 
       errors ->
-        Enum.reduce(errors, changeset, fn {field, message}, acc -> add_error(acc, field, message) end)
+        Enum.reduce(errors, changeset, fn {field, message}, acc ->
+          add_error(acc, field, message)
+        end)
     end
   end
 end

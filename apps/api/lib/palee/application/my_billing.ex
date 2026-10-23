@@ -21,7 +21,7 @@ defmodule Palee.Application.MyBilling do
 
   require Logger
 
-  alias Palee.Application.{EntitlementClassTypeNames, MyProviders}
+  alias Palee.Application.{EntitlementClassTypeNames, MemberPerks, MyProviders}
   alias Palee.{Finance, Organizations, Referrals, Seasons, Trials}
 
   @client_roles ~w(member athlete)
@@ -91,6 +91,7 @@ defmodule Palee.Application.MyBilling do
     {seasons, seasons_ok?} = safe(provider, :seasons, fn -> seasons(tenant, user_id) end)
     {invites, invites_ok?} = safe(provider, :referrals, fn -> invites(tenant, user_id) end)
     {offers, offers_ok?} = safe(provider, :available_offers, fn -> available_offers(tenant) end)
+    {perks, perks_ok?} = safe(provider, :perks, fn -> MemberPerks.for_member_provider(tenant) end)
 
     finance = finance || empty_finance()
 
@@ -103,7 +104,10 @@ defmodule Palee.Application.MyBilling do
       referrals: Map.merge(finance.referral_rewards, invites || empty_invites()),
       trials: Map.get(trials, provider.organization_id, []),
       available_offers: offers || [],
-      partial: not (finance_ok? and receipts_ok? and seasons_ok? and invites_ok? and offers_ok?)
+      perks: perks || [],
+      partial:
+        not (finance_ok? and receipts_ok? and seasons_ok? and invites_ok? and offers_ok? and
+               perks_ok?)
     })
     |> Map.delete(:referral_rewards)
   end
@@ -117,8 +121,8 @@ defmodule Palee.Application.MyBilling do
       self_service_cancel_auto_renew: false,
       download_invoices: true
     })
-    # Partner perks (outside-store deals) are post-MVP (TD): always empty
-    # until their context exists, so clients can already render the slot.
+    # ADR-191: the partner perks the person claimed and can still use there
+    # (`build/4` fills them; a provider that fails to resolve shows none).
     |> Map.put(:perks, [])
   end
 
