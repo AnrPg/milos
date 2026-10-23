@@ -289,6 +289,34 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # ADR-190: what a shop sale needs to know about the buyer's membership:
+  # its id (the invoice's owner) and the package member discount when its
+  # scope covers products (ADR-097).
+  @impl true
+  def member_shop_terms(user_id) do
+    case tenant_scope(Membership)
+         |> where([membership], membership.user_id == ^user_id)
+         |> Repo.one() do
+      nil ->
+        nil
+
+      %Membership{} = membership ->
+        terms =
+          case effective_subscription(membership.id, GymClock.today()) do
+            nil -> %{}
+            subscription -> package_terms(subscription.params_snapshot)
+          end
+
+        scope = terms[:member_discount_scope] || []
+
+        %{
+          membership_id: membership.id,
+          member_discount_percent:
+            if("products" in scope, do: terms[:member_discount_percent], else: nil)
+        }
+    end
+  end
+
   @impl true
   def search_member_summaries(params) do
     params = string_key_map(params || %{})

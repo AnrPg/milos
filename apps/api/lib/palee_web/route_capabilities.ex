@@ -34,6 +34,7 @@ defmodule PaleeWeb.RouteCapabilities do
     W.CoachingRelationshipsController => [:assign_coaches, :manage_coaching],
     W.RoleAccessController => [:manage_settings],
     W.InventoryController => [:manage_inventory],
+    W.ShopController => [:manage_shop],
     W.OwnerOrganizationController => [:manage_organization_lifecycle],
     W.AdminWorkoutTimerPreviewController => [:manage_workouts],
     W.AdminBrandingController => [:manage_settings],
@@ -48,7 +49,9 @@ defmodule PaleeWeb.RouteCapabilities do
     W.StaffScalingController => [:manage_coaching],
     W.AdminAiSettingsController => [:manage_settings],
     # ADR-184: demo data and the activation request (owners and admins).
-    W.AdminBusinessController => [:manage_settings]
+    W.AdminBusinessController => [:manage_settings],
+    # ADR-191: partner perks.
+    W.AdminPerkController => [:manage_perks]
   }
 
   @actions %{
@@ -320,7 +323,23 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.InventoryController, :log_machine_event} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :supplies} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :report_low} => [:manage_inventory, :report_inventory],
-    {W.InventoryController, :supply_reports} => [:manage_inventory, :report_inventory]
+    {W.InventoryController, :supply_reports} => [:manage_inventory, :report_inventory],
+    # ADR-190: the shop. The desk sells (sell_shop); the catalog, stock and
+    # refunds are manage_shop (refunds also need take_payments, checked in
+    # the controller); Finance readers see the per-stream totals and lineage.
+    {W.ShopController, :products} => [:manage_shop, :sell_shop],
+    {W.ShopController, :product} => [:manage_shop, :sell_shop],
+    {W.ShopController, :orders} => [:manage_shop, :sell_shop],
+    {W.ShopController, :order} => [:manage_shop, :sell_shop],
+    {W.ShopController, :mark_ready} => [:manage_shop, :sell_shop],
+    {W.ShopController, :record_payment} => [:manage_shop, :sell_shop],
+    {W.ShopController, :pick_up} => [:manage_shop, :sell_shop],
+    {W.ShopController, :cancel} => [:manage_shop, :sell_shop],
+    {W.ShopController, :desk_sale} => [:manage_shop, :sell_shop],
+    {W.ShopController, :ready_orders} => [:manage_shop, :sell_shop, :check_in],
+    {W.ShopController, :set_fiscal_receipt} => [:manage_shop, :sell_shop],
+    {W.ShopController, :lineage} => [:manage_shop, :view_finance_reports],
+    {W.ShopController, :revenue_streams} => [:view_finance_reports, :manage_shop]
   }
 
   @doc "Capabilities that each grant the route, or nil when unlisted."

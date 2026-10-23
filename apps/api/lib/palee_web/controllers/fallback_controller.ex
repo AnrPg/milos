@@ -34,6 +34,74 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: message})
   end
 
+  # ADR-190: the e-shop.
+  @shop_errors %{
+    insufficient_stock: {:conflict, "Not enough stock"},
+    invalid_product_transition: {:conflict, "The product can't move to that state"},
+    invalid_product_status:
+      {:unprocessable_entity, "Status must be draft, published or archived"},
+    invalid_product_options: {:unprocessable_entity, "Up to two options, each with values"},
+    invalid_option_values: {:unprocessable_entity, "Pick one value for every option"},
+    options_in_use: {:conflict, "A variant still uses an option value you removed"},
+    product_has_no_variants: {:unprocessable_entity, "Add at least one variant"},
+    product_has_no_channel: {:unprocessable_entity, "Sell it in the app, at the desk, or both"},
+    product_not_available: {:conflict, "This product isn't on sale here"},
+    variant_not_found: {:not_found, "Product variant not found"},
+    invalid_cart: {:unprocessable_entity, "The basket is empty or malformed"},
+    invalid_quantity: {:unprocessable_entity, "Check the quantity"},
+    adjustment_reason_required: {:unprocessable_entity, "An adjustment needs a reason"},
+    same_location: {:unprocessable_entity, "A transfer needs two different branches"},
+    currency_mismatch: {:unprocessable_entity, "Every item must be in the same currency"},
+    per_person_limit_exceeded: {:conflict, "You've reached the limit for this product"},
+    pickup_location_required: {:unprocessable_entity, "Choose where you'll pick it up"},
+    pickup_location_not_available:
+      {:unprocessable_entity, "That branch can't hand over this order"},
+    invalid_payment_mode: {:unprocessable_entity, "Choose how you'll pay"},
+    invalid_payment_method: {:unprocessable_entity, "Choose cash, card, transfer or other"},
+    online_payment_unavailable: {:conflict, "Online card payment isn't available yet"},
+    on_account_not_allowed: {:conflict, "Paying on your account isn't available"},
+    idempotency_key_required: {:unprocessable_entity, "Send an idempotency key"},
+    invalid_order_transition: {:conflict, "The order can't move to that state"},
+    order_not_paid: {:conflict, "Record the payment before handing the order over"},
+    order_paid_refund_first: {:conflict, "The order is paid: refund it instead"},
+    order_not_payable: {:conflict, "This order can't be paid"},
+    refund_exceeds_paid: {:unprocessable_entity, "That's more than was paid"},
+    refund_exceeds_quantity: {:unprocessable_entity, "That's more than was bought"},
+    refund_lines_required: {:unprocessable_entity, "Choose what is refunded"},
+    order_line_not_found: {:not_found, "Order line not found"},
+    invalid_refund_amount: {:unprocessable_entity, "Check the refund amount"},
+    payment_not_found: {:conflict, "The order has no payment to refund"},
+    payment_not_refundable: {:conflict, "This payment can't be refunded"},
+    invoice_has_payments: {:conflict, "The invoice has payments"},
+    invoice_not_found: {:not_found, "Invoice not found"},
+    invalid_revenue_stream: {:unprocessable_entity, "Unknown revenue stream"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@shop_errors, reason) do
+    {status, message} = Map.fetch!(@shop_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:insufficient_stock, at}}) when is_map(at) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "insufficient_stock", error: "Not enough stock", variant_id: at[:variant_id]})
+  end
+
+  def call(conn, {:error, {:payment_failed, reason, order}}) do
+    conn
+    |> put_status(:payment_required)
+    |> json(%{
+      code: "payment_failed",
+      reason: to_string(reason),
+      error: "The payment didn't go through; the order is kept unpaid",
+      order_id: order.id
+    })
+  end
+
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -2308,6 +2376,34 @@ defmodule PaleeWeb.FallbackController do
     cannot_change_own_membership: {:forbidden, "Someone else changes your own access"},
     promotion_location_not_included:
       {:unprocessable_entity, "This promotion is not valid at the branches of this package"},
+    # ADR-191: partner perks.
+    perk_transition_invalid: {:conflict, "The perk can't take this step now"},
+    perk_ended: {:unprocessable_entity, "The perk's last day has passed"},
+    perk_read_only: {:conflict, "An ended perk can't be changed"},
+    perk_locked_after_claims:
+      {:conflict, "Members already claimed this perk: its benefit and code stay as they saw them"},
+    perk_cap_below_claims:
+      {:unprocessable_entity, "The limit can't be lower than the claims already made"},
+    perk_has_claims: {:conflict, "Members claimed this perk; end it instead"},
+    perk_codes_required: {:unprocessable_entity, "Add the partner's codes before publishing"},
+    perk_codes_not_used: {:unprocessable_entity, "Only a perk with a unique code per member has codes"},
+    invalid_perk_codes: {:unprocessable_entity, "Each code needs 1 to 64 letters or digits"},
+    invalid_perk_packages: {:unprocessable_entity, "Choose packages of this business"},
+    perk_not_available: {:conflict, "This perk isn't available now"},
+    perk_sold_out: {:conflict, "This perk has run out"},
+    perk_member_limit: {:conflict, "You've already used this perk as often as it allows"},
+    perk_codes_exhausted: {:conflict, "This perk has run out of codes"},
+    perk_claim_already_used: {:conflict, "This perk was already used"},
+    perk_claim_not_open: {:conflict, "This claim is no longer open"},
+    perk_not_qr: {:unprocessable_entity, "This perk isn't redeemed with a QR"},
+    perk_outside_hours: {:conflict, "This perk works only at its set days and hours"},
+    perk_period_sold_out: {:conflict, "This perk has run out for now; it opens again next period"},
+    perk_member_period_limit:
+      {:conflict, "You've used this perk as often as it allows this period"},
+    invalid_perk_groups: {:unprocessable_entity, "Choose groups of this business"},
+    invalid_redemption_method: {:unprocessable_entity, "Choose how members redeem the perk"},
+    invalid_verification_link: {:not_found, "This link isn't valid"},
+    verification_link_expired: {:gone, "This link expired; ask for the QR again"},
     # ADR-098
     form_review_closed: {:conflict, "The form review is already closed"},
     appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},

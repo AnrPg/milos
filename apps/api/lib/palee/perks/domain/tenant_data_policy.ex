@@ -15,10 +15,11 @@ defmodule Palee.Perks.Domain.TenantDataPolicy do
             purge_order: 84,
             disposition: :purge,
             basis:
-              "Partner perks, their code pools and claims are operational data; no payment moves through Palee. They name packages and branches by plain ids, so they purge before Finance and Facility.",
+              "Partner perks, their versions, code pools and claims are operational data; no payment moves through Palee. They name packages and branches by plain ids, so they purge before Finance and Facility.",
             tables: [
               %{table: "perk_claims"},
               %{table: "perk_codes"},
+              %{table: "perk_versions"},
               %{table: "perks"}
             ],
             # The hash behind a verification link is a credential, never exported.

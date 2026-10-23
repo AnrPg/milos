@@ -56,6 +56,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     review_cleaning: :all,
     manage_cleaning_areas: :all,
     manage_inventory: :all,
+    manage_shop: :all,
+    sell_shop: :all,
     moderate_community: :all,
     manage_community: :all,
     manage_events: :all
@@ -109,7 +111,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     message_clients: :all,
     message_from_box: :all,
     review_cleaning: :all,
-    manage_inventory: :all
+    manage_inventory: :all,
+    sell_shop: :all
   }
 
   @accountant %{
@@ -141,7 +144,13 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
   # What a gym may unlock for a role on top of its defaults (ADR-099,
   # docs/architecture/navigation-by-role.md §3).
   @grantable %{
-    front_desk: [:manage_billing, :manage_promotions, :manage_packages, :view_finance_reports]
+    front_desk: [
+      :manage_billing,
+      :manage_promotions,
+      :manage_packages,
+      :view_finance_reports,
+      :manage_shop
+    ]
   }
 
   def grantable, do: @grantable

@@ -69,6 +69,8 @@ defmodule Mix.Tasks.Palee.Architecture do
     gamification/gamification_store
     finance/finance_store
     finance/finance_accounting_store
+    finance/revenue_stream_store
+    shop/shop_store
     execution/execution_store
     execution/training_log_store
     wellbeing/wellbeing_store

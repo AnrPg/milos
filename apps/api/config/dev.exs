@@ -1,5 +1,8 @@
 import Config
 
+# ADR-190: the mock card provider simulates success and failure in dev.
+config :palee, Palee.Infrastructure.Shop.MockPaymentProvider, mode: :simulate
+
 # Configure your database
 config :palee, Palee.Repo,
   username: System.get_env("DB_USER", "postgres"),

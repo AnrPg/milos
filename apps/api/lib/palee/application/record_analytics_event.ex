@@ -6,6 +6,10 @@ defmodule Palee.Application.RecordAnalyticsEvent do
     "promotion_redeemed" => [:palee, :promotion, :redeemed],
     # ADR-191 partner perks.
     "perk_created" => [:palee, :perk, :created],
+    "perk_versioned" => [:palee, :perk, :versioned],
+    "perk_codes_added" => [:palee, :perk, :codes_added],
+    "perk_claims_exported" => [:palee, :perk, :claims_exported],
+    "perk_pool_low" => [:palee, :perk, :pool_low],
     "perk_published" => [:palee, :perk, :published],
     "perk_paused" => [:palee, :perk, :paused],
     "perk_expired" => [:palee, :perk, :expired],

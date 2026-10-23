@@ -1,10 +1,13 @@
 defmodule Palee.Application.Perks do
   @moduledoc """
   Staff run the business's partner perks (ADR-191): the list with claim and
-  use counts, create and edit, publish, pause and end, the pool of unique
-  codes, the claims export, and marking a claim used or revoking it.
+  use counts, create and edit (the open policy: method, benefit, rules,
+  terms), publish, pause and end, the versions, the pool of codes the
+  partner gave (pasted or CSV, topped up later, low-pool alert), the claims
+  export, and marking a claim used or revoking it.
 
-  Rules on top of `Perks` (pure in `Domain.PerkRules`):
+  Rules on top of `Perks` (pure in `Domain.PerkRules` and the method
+  strategies):
 
     * Capability `manage_perks` (route level); branches follow ADR-186 §8:
       a perk is a covering item, visible to branch staff when it is valid
@@ -12,16 +15,19 @@ defmodule Palee.Application.Perks do
       inside their branches.
     * A business in demo mode (ADR-184) drafts perks but can't publish
       them (`business_not_activated`).
-    * A unique-code perk can't go live with an empty pool.
+    * A method may refuse to go live (a code pool with no free code).
+    * Eligibility names this business's packages and club groups only.
     * The partner logo is one of the business's ready `box_photo` uploads,
       released when replaced.
-    * Publishing, pausing, ending, claims, uses and revocations are each
-      recorded as an analytics event (the audit trail) with a
-      `[:palee, :perk, ...]` telemetry event.
+    * Every action on a perk or a claim is recorded as an analytics event
+      (the audit trail) with a `[:palee, :perk, ...]` telemetry event.
   """
 
   alias Palee.Application.{BoxPhotoCovers, CoveringBranches, PerkPresenter, TrackAnalyticsEvent}
   alias Palee.{Facility, Finance, Organizations, Perks}
+  alias Palee.Perks.Rules
+
+  @version_keys [:benefit, :rules, :redemption, :terms]
 
   @doc "`GET …/admin/perks`: the perks the acting staff see, with counts."
   def list(context, params \\ %{}) do
@@ -42,8 +48,6 @@ defmodule Palee.Application.Perks do
     %{perks: PerkPresenter.staff_all(context, perks, today)}
   end
 
-  # A published perk past its window reads as expired, so the filter asks
-  # for both stored statuses and keeps the effective one.
   defp stored_statuses("expired"), do: ["published", "expired"]
   defp stored_statuses(status), do: [status]
 
@@ -56,19 +60,29 @@ defmodule Palee.Application.Perks do
          do: {:ok, PerkPresenter.staff(context, perk, today(context))}
   end
 
-  @doc "`POST …/admin/perks`: a new draft."
+  @doc "`GET …/admin/perks/:id/versions`: every version, newest first."
+  def versions(context, id) do
+    with {:ok, perk} <- fetch(context, id) do
+      {:ok, %{versions: context |> Perks.list_versions(perk.id) |> Enum.map(&PerkPresenter.version/1)}}
+    end
+  end
+
+  @doc "`POST …/admin/perks`: a new draft (version 1)."
   def create(context, params) do
+    attrs = params |> attrs() |> Map.put_new(:redemption_method, Perks.default_method())
+    version = version_attrs(params, true)
+
     with {:ok, target} <- CoveringBranches.for_new(context, CoveringBranches.requested(params)),
          :ok <- known_locations(context, target),
-         :ok <- known_packages(context, params),
+         :ok <- known_eligibility(context, version),
          :ok <- logo_ready(context, Map.get(params, :logo_media_id)),
          {:ok, perk} <-
            Perks.create_perk(
              context,
-             params
-             |> attrs()
+             attrs
              |> CoveringBranches.put_columns(target)
-             |> Map.merge(%{created_by_id: context.user_id, updated_by_id: context.user_id})
+             |> Map.merge(%{created_by_id: context.user_id, updated_by_id: context.user_id}),
+             Map.put(version, :created_by_id, context.user_id)
            ) do
       BoxPhotoCovers.settle(context, nil, perk.logo_media_id)
       track("perk_created", context, perk)
@@ -76,23 +90,50 @@ defmodule Palee.Application.Perks do
     end
   end
 
-  @doc "`PATCH …/admin/perks/:id`."
+  @doc """
+  `PATCH …/admin/perks/:id`. Perk fields change in place; benefit, rules,
+  method settings and terms amend the current version until the first
+  claim, and make a new version after it.
+  """
   def update(context, id, params) do
     today = today(context)
     changes = attrs(params)
+    version = version_attrs(params, false)
 
     with {:ok, perk} <- fetch(context, id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(perk)),
          {:ok, changes} <- branch_changes(context, changes, params),
-         :ok <- Perks.check_update(perk, changes, today),
-         :ok <- known_packages(context, params),
+         {:ok, new_rules} <- preview_rules(perk, version),
+         :ok <- Perks.check_update(perk, changes, new_rules, today),
+         :ok <- known_eligibility(context, version),
          :ok <- logo_change(context, perk, changes),
          {:ok, updated} <-
-           Perks.update_perk(context, perk, Map.put(changes, :updated_by_id, context.user_id)) do
+           Perks.revise_perk(
+             context,
+             perk,
+             Map.put(changes, :updated_by_id, context.user_id),
+             version && Map.put(version, :created_by_id, context.user_id)
+           ) do
       BoxPhotoCovers.settle(context, perk.logo_media_id, updated.logo_media_id)
+
+      if updated.current_version != perk.current_version,
+        do: track("perk_versioned", context, updated)
+
       {:ok, PerkPresenter.staff(context, updated, today)}
     end
   end
+
+  # The rules a change would leave, to check the cap before writing.
+  defp preview_rules(_perk, nil), do: {:ok, nil}
+
+  defp preview_rules(perk, %{rules: rules}) do
+    case Rules.changeset(perk.version.rules, rules) do
+      %{valid?: true} = changeset -> {:ok, Ecto.Changeset.apply_changes(changeset)}
+      changeset -> {:error, changeset}
+    end
+  end
+
+  defp preview_rules(_perk, _version), do: {:ok, nil}
 
   defp branch_changes(context, changes, params) do
     case CoveringBranches.requested(params) do
@@ -130,7 +171,7 @@ defmodule Palee.Application.Perks do
     with {:ok, perk} <- fetch(context, id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(perk)),
          :ok <- Organizations.go_live(context, :publish_perk),
-         :ok <- pool_ready(context, perk) do
+         :ok <- Perks.method_ready(perk.redemption_method, %{free_codes: free_codes(context, perk)}) do
       step(context, perk, :publish, "perk_published")
     end
   end
@@ -156,34 +197,44 @@ defmodule Palee.Application.Perks do
     end
   end
 
-  defp pool_ready(context, %{redemption_method: "unique_code", id: id}) do
-    case Perks.code_stats(context, [id]) do
-      %{^id => %{free: free}} when free > 0 -> :ok
-      _empty -> {:error, :perk_codes_required}
-    end
+  defp free_codes(context, perk) do
+    context |> Perks.code_stats([perk.id]) |> Map.get(perk.id, %{free: 0}) |> Map.fetch!(:free)
   end
 
-  defp pool_ready(_context, _perk), do: :ok
+  @doc """
+  `POST …/admin/perks/:id/codes`: adds the partner's codes to the pool
+  (`codes`, or `csv` read by its first column); any time, to top it up.
+  """
+  def add_codes(context, id, params) do
+    input =
+      case params do
+        %{csv: csv} when is_binary(csv) -> {:csv, csv}
+        %{codes: codes} when is_list(codes) -> codes
+        _neither -> []
+      end
 
-  @doc "`POST …/admin/perks/:id/codes`: adds the partner's single-use codes to the pool."
-  def add_codes(context, id, codes) do
     with {:ok, perk} <- fetch(context, id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(perk)),
-         :ok <- unique_code_perk(perk),
+         :ok <- pool_perk(perk),
          :ok <- not_ended(perk, today(context)),
-         {:ok, result} <- Perks.add_codes(context, perk.id, codes) do
+         {:ok, result} <- Perks.add_codes(context, perk.id, input) do
       stats = Map.get(Perks.code_stats(context, [perk.id]), perk.id, %{total: 0, free: 0})
-      {:ok, Map.merge(result, %{total: stats.total, free: stats.free})}
+      track("perk_codes_added", context, perk)
+
+      {:ok,
+       Map.merge(result, %{
+         total: stats.total,
+         free: stats.free,
+         low: Perks.pool_low?(Map.from_struct(perk.version.redemption), stats.free)
+       })}
     end
   end
 
-  defp unique_code_perk(%{redemption_method: "unique_code"}), do: :ok
-  defp unique_code_perk(_perk), do: {:error, :perk_codes_not_used}
+  defp pool_perk(%{redemption_method: "code_pool"}), do: :ok
+  defp pool_perk(_perk), do: {:error, :perk_codes_not_used}
 
   defp not_ended(perk, today) do
-    if Perks.effective_status(perk, today) == "expired",
-      do: {:error, :perk_read_only},
-      else: :ok
+    if Perks.effective_status(perk, today) == "expired", do: {:error, :perk_read_only}, else: :ok
   end
 
   @doc """
@@ -206,10 +257,11 @@ defmodule Palee.Application.Perks do
     end
   end
 
-  @doc "The whole export as CSV rows (header first), for `…/claims.csv`."
+  @doc "The whole export as CSV, for `…/claims.csv`."
   def claims_csv(context, id) do
     with {:ok, perk} <- fetch(context, id) do
       rows = all_claims(context, perk.id, nil, [])
+      track("perk_claims_exported", context, perk)
       {:ok, %{perk: perk, csv: PerkPresenter.csv(rows)}}
     end
   end
@@ -219,9 +271,6 @@ defmodule Palee.Application.Perks do
 
   defp all_claims(context, perk_id, cursor, acc) do
     case Perks.list_claims(context, perk_id, %{limit: 1_000, after: cursor}) do
-      [] ->
-        acc
-
       rows when length(rows) < 1_000 ->
         acc ++ rows
 
@@ -249,13 +298,12 @@ defmodule Palee.Application.Perks do
 
   @doc "`POST …/admin/perk-claims/:id/use`: staff mark a claim used (the partner confirmed it)."
   def mark_used(context, claim_id) do
-    today = today(context)
     now = DateTime.utc_now()
 
     with {:ok, _perk} <- claim_perk(context, claim_id),
          {:ok, %{perk: perk, claim: claim}} <-
            Perks.use_claim(context, claim_id, "staff", context.user_id, now, fn perk, claim ->
-             usable(perk, claim, today)
+             usable(context, perk, claim)
            end) do
       track_claim("perk_redeemed", context, perk, claim, %{via: "staff"})
       {:ok, PerkPresenter.staff_claim(claim)}
@@ -279,13 +327,24 @@ defmodule Palee.Application.Perks do
          do: {:ok, perk}
   end
 
-  @doc false
-  def usable(perk, claim, today) do
-    cond do
-      claim.status == "used" -> {:error, :perk_claim_already_used}
-      claim.status == "revoked" -> {:error, :perk_claim_not_open}
-      Perks.usable?(perk, claim, today) -> :ok
-      true -> {:error, :perk_not_available}
+  @doc """
+  Whether a claim can be used now, under the rules of the version it was
+  claimed under (the business's local date and time).
+  """
+  def usable(context, perk, claim) do
+    rules = claim_rules(context, perk, claim)
+    Perks.usable(perk, rules, claim, today(context), local_now(context))
+  end
+
+  @doc "The rules of the version a claim agreed to."
+  def claim_rules(context, perk, claim) do
+    if claim.perk_version == perk.current_version do
+      perk.version.rules
+    else
+      context
+      |> Perks.get_versions([{perk.id, claim.perk_version}])
+      |> Map.get({perk.id, claim.perk_version}, perk.version)
+      |> Map.fetch!(:rules)
     end
   end
 
@@ -309,32 +368,48 @@ defmodule Palee.Application.Perks do
     if Enum.all?(ids, &MapSet.member?(known, &1)), do: :ok, else: {:error, :location_not_found}
   end
 
-  defp known_packages(context, params) do
-    case Map.get(params, :package_ids) do
-      ids when is_list(ids) and ids != [] ->
-        known = context |> Finance.list_packages() |> MapSet.new(& &1.id)
-
-        if Enum.all?(ids, &MapSet.member?(known, &1)),
-          do: :ok,
-          else: {:error, :invalid_perk_packages}
-
-      _none ->
-        :ok
-    end
+  defp known_eligibility(context, %{rules: %{eligibility: eligibility}}) when is_map(eligibility) do
+    with :ok <- known(Map.get(eligibility, :package_ids), fn -> package_ids(context) end, :invalid_perk_packages),
+         do: known(Map.get(eligibility, :group_ids), fn -> group_ids(context) end, :invalid_perk_groups)
   end
+
+  defp known_eligibility(_context, _version), do: :ok
+
+  defp known(ids, _known, _error) when ids in [nil, []], do: :ok
+
+  defp known(ids, known, error) when is_list(ids) do
+    set = MapSet.new(known.())
+    if Enum.all?(ids, &MapSet.member?(set, &1)), do: :ok, else: {:error, error}
+  end
+
+  defp known(_ids, _known, error), do: {:error, error}
+
+  defp package_ids(context), do: context |> Finance.list_packages() |> Enum.map(& &1.id)
+  defp group_ids(context), do: Perks.group_ids(context)
 
   defp logo_ready(_context, nil), do: :ok
   defp logo_ready(context, id), do: BoxPhotoCovers.ready(context, id)
 
   defp attrs(params), do: Map.take(params, Perks.editable_fields())
 
+  # Version documents of a request; a create always has all of them.
+  defp version_attrs(params, create?) do
+    taken = Map.take(params, @version_keys)
+
+    cond do
+      create? -> Map.merge(%{rules: %{}, redemption: %{}}, taken)
+      taken == %{} -> nil
+      true -> taken
+    end
+  end
+
   @doc false
   def track(event, context, perk) do
     TrackAnalyticsEvent.call(event, context, perk, %{
       metadata: %{
         redemption_method: perk.redemption_method,
-        benefit_type: perk.benefit_type,
-        audience: perk.audience,
+        benefit_type: perk.version && perk.version.benefit.type,
+        version: perk.current_version,
         status: perk.status
       }
     })
@@ -348,6 +423,7 @@ defmodule Palee.Application.Perks do
       metadata:
         Map.merge(metadata, %{
           perk_id: perk.id,
+          perk_version: claim.perk_version,
           redemption_method: perk.redemption_method,
           claims_count: perk.claims_count,
           uses_count: perk.uses_count
@@ -356,10 +432,25 @@ defmodule Palee.Application.Perks do
   end
 
   @doc "The business's date in its own time zone."
-  def today(%{organization_id: organization_id}) do
+  def today(context), do: context |> local_now() |> NaiveDateTime.to_date()
+
+  @doc "The business's local wall-clock time."
+  def local_now(%{organization_id: organization_id}) do
     organization_id
     |> Organizations.organization_timezone()
     |> DateTime.now!()
-    |> DateTime.to_date()
+    |> DateTime.to_naive()
+  end
+
+  @doc "A local wall-clock time of the business as UTC (DST gaps move forward)."
+  def to_utc(%{organization_id: organization_id}, %NaiveDateTime{} = local) do
+    zone = Organizations.organization_timezone(organization_id)
+
+    case DateTime.from_naive(local, zone) do
+      {:ok, at} -> at
+      {:ambiguous, first, _second} -> first
+      {:gap, _before, after_gap} -> after_gap
+    end
+    |> DateTime.shift_zone!("Etc/UTC")
   end
 end

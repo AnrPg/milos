@@ -94,6 +94,12 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "public-referral")
   end
 
+  # ADR-191: a partner's counter opens a perk QR's link; the signed,
+  # short-lived token makes guessing moot, the budget keeps scanners honest.
+  pipeline :public_perk_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "public-perk")
+  end
+
   pipeline :execution_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit,
       max: 240,
@@ -272,6 +278,13 @@ defmodule PaleeWeb.Router do
     get("/", PlatformPlanController, :index_public)
   end
 
+  scope "/api/public/perk-verifications", PaleeWeb do
+    pipe_through([:api, :public_perk_rate_limited])
+
+    get("/:token", PerkVerificationController, :show)
+    post("/:token/redeem", PerkVerificationController, :redeem)
+  end
+
   scope "/api/public/referrals", PaleeWeb do
     pipe_through([:api, :public_referral_rate_limited])
 
@@ -447,6 +460,16 @@ defmodule PaleeWeb.Router do
     # ADR-156: «Φέρε φίλο».
     get("/referrals", ReferralController, :mine)
     post("/referrals/code", ReferralController, :rotate_code)
+    # ADR-190: Box › Κατάστημα.
+    get("/shop/products", MyShopController, :products)
+    get("/shop/products/:id", MyShopController, :product)
+    post("/shop/cart/preview", MyShopController, :preview)
+    post("/shop/orders", MyShopController, :place_order)
+    get("/shop/orders", MyShopController, :orders)
+    get("/shop/orders/:id", MyShopController, :order)
+    post("/shop/orders/:id/pay", MyShopController, :pay)
+    post("/shop/orders/:id/cancel", MyShopController, :cancel)
+    get("/shop/transactions", MyShopController, :transactions)
 
     get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
@@ -709,6 +732,29 @@ defmodule PaleeWeb.Router do
     get("/inventory/supplies/:id/movements", InventoryController, :movements)
     post("/inventory/supplies/:id/movements", InventoryController, :record_movement)
     get("/inventory/report", InventoryController, :report)
+    # ADR-190: the e-shop.
+    get("/shop/products", ShopController, :products)
+    post("/shop/products", ShopController, :create_product)
+    get("/shop/products/:id", ShopController, :product)
+    patch("/shop/products/:id", ShopController, :update_product)
+    put("/shop/products/:id/status", ShopController, :set_product_status)
+    post("/shop/products/:id/variants", ShopController, :create_variant)
+    patch("/shop/products/:id/variants/:variant_id", ShopController, :update_variant)
+    post("/shop/products/:id/variants/:variant_id/archive", ShopController, :archive_variant)
+    get("/shop/variants/:id/movements", ShopController, :movements)
+    post("/shop/variants/:id/movements", ShopController, :record_movement)
+    get("/shop/orders", ShopController, :orders)
+    get("/shop/orders/:id", ShopController, :order)
+    get("/shop/orders/:id/lineage", ShopController, :lineage)
+    post("/shop/orders/:id/ready", ShopController, :mark_ready)
+    post("/shop/orders/:id/payment", ShopController, :record_payment)
+    post("/shop/orders/:id/pickup", ShopController, :pick_up)
+    post("/shop/orders/:id/cancel", ShopController, :cancel)
+    post("/shop/orders/:id/refund", ShopController, :refund)
+    put("/shop/orders/:id/fiscal-receipt", ShopController, :set_fiscal_receipt)
+    post("/shop/desk-sales", ShopController, :desk_sale)
+    get("/shop/ready-orders", ShopController, :ready_orders)
+    get("/shop/revenue-streams", ShopController, :revenue_streams)
     get("/coaching-relationships", CoachingRelationshipsController, :index)
     post("/coaching-relationships", CoachingRelationshipsController, :create)
     post("/coaching-relationships/:id/end", CoachingRelationshipsController, :finish)
@@ -863,6 +909,21 @@ defmodule PaleeWeb.Router do
     post("/trials/:id/accept", AdminTrialController, :accept)
     post("/trials/:id/decline", AdminTrialController, :decline)
     post("/trials/:id/attendance", AdminTrialController, :attendance)
+    # ADR-191: partner perks.
+    get("/perks", AdminPerkController, :index)
+    post("/perks", AdminPerkController, :create)
+    get("/perks/:id", AdminPerkController, :show)
+    get("/perks/:id/versions", AdminPerkController, :versions)
+    patch("/perks/:id", AdminPerkController, :update)
+    delete("/perks/:id", AdminPerkController, :delete)
+    post("/perks/:id/publish", AdminPerkController, :publish)
+    post("/perks/:id/pause", AdminPerkController, :pause)
+    post("/perks/:id/expire", AdminPerkController, :expire)
+    post("/perks/:id/codes", AdminPerkController, :add_codes)
+    get("/perks/:id/claims", AdminPerkController, :claims)
+    get("/perks/:id/claims.csv", AdminPerkController, :claims_csv)
+    post("/perk-claims/:id/use", AdminPerkController, :use_claim)
+    post("/perk-claims/:id/revoke", AdminPerkController, :revoke_claim)
     # ADR-156: «Φέρε φίλο» invites.
     get("/referrals", AdminReferralController, :index)
     post("/referrals/:id/approve", AdminReferralController, :approve)
@@ -1367,6 +1428,11 @@ defmodule PaleeWeb.Router do
     post("/me/journal/export", JournalController, :export)
     get("/me/journal/exports", JournalController, :exports)
     get("/me/providers", MyProvidersController, :index)
+    # ADR-191: partner perks at every provider the person is a client of.
+    get("/me/perks", MyPerkController, :index)
+    get("/me/perks/claims", MyPerkController, :claims)
+    post("/me/perks/:id/claim", MyPerkController, :claim)
+    post("/me/perks/claims/:id/verification-link", MyPerkController, :verification_link)
     put("/me/providers/selected", MyProvidersController, :select)
     get("/me/today", MyProvidersController, :today)
     # Εγώ › Πληρωμές: billing at every provider the person is a client of.
@@ -1450,6 +1516,8 @@ defmodule PaleeWeb.Router do
     # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
     get("/boxes/:slug/schedule", PublicBoxController, :schedule)
     get("/boxes/:slug/posts", PublicBoxController, :posts)
+    # ADR-190: a published box's shop for anyone (signed in).
+    get("/boxes/:slug/shop/products", MyShopController, :public_products)
     get("/boxes/:slug/events", CommunityEventController, :box_events)
     # ADR-156: the friend's side of an invite.
     post("/referrals/claim", ReferralController, :claim)
