@@ -214,7 +214,8 @@ test.describe("shop console", () => {
     // No till before there is anything to sell.
     await expect(page.getByRole("link", { name: "Till" })).toHaveCount(0);
 
-    await page.getByRole("link", { name: "+ New product" }).click();
+    // The header and the checklist both offer it; the checklist is the first step.
+    await page.getByTestId("shop-empty").getByRole("link", { name: "+ New product" }).click();
     await expect(page).toHaveURL(/\/admin\/shop\/products\/new$/);
     await expect(page.getByText("New products start as drafts. Publish after saving.")).toBeVisible();
     await page.getByLabel("Name", { exact: true }).fill("Box hoodie");

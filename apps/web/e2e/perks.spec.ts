@@ -93,6 +93,12 @@ async function signIn(page: Page, role: "member" | "admin", activation = "active
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
 }
 
+/** The Finance console reads its package catalog and branches before any tab renders; `{}` would crash it. */
+async function stubFinanceConsole(page: Page) {
+  await page.route("**/api/org/kypseli/admin/finance/package-catalog", (route) => route.fulfill(json({ types: [], modules: [] })));
+  await page.route("**/api/org/kypseli/admin/locations", (route) => route.fulfill(json({ locations: [] })));
+}
+
 test.describe("partner perks · member", () => {
   test("Offers lists the perk and its page hands out the code with copy and QR", async ({ page }) => {
     await signIn(page, "member");
@@ -154,6 +160,7 @@ test.describe("partner perks · console", () => {
 
   test("the partner segment lists perks with claim and use counts", async ({ page }) => {
     await signIn(page, "admin");
+    await stubFinanceConsole(page);
     await page.route("**/api/org/kypseli/admin/perks", (route) => route.fulfill(json({ perks: [staff] })));
     await page.goto("/admin/finance?tab=promotions&offers=partners");
     const row = page.getByTestId("perk-row");
@@ -163,6 +170,7 @@ test.describe("partner perks · console", () => {
 
   test("a demo business can draft a perk but not publish it", async ({ page }) => {
     await signIn(page, "admin", "demo");
+    await stubFinanceConsole(page);
     await page.route("**/api/org/kypseli/admin/perks", (route) => route.fulfill(json({ perks: [] })));
     await page.goto("/admin/finance?tab=promotions&offers=partners");
     await page.getByTestId("perk-new").click();

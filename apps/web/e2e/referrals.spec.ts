@@ -273,6 +273,9 @@ test.describe("referrals", () => {
     };
     const approvals: string[] = [];
     await page.route("**/api/org/kypseli/admin/finance/package-catalog", (route) => route.fulfill(json({ types: [], modules: [] })));
+    // The branch filter reads the branches; `{}` there logs an error whose dev
+    // overlay badge sits over the sheet's Approve button on a phone.
+    await page.route("**/api/org/kypseli/admin/locations", (route) => route.fulfill(json({ locations: [] })));
     await page.route(/\/api\/org\/kypseli\/admin\/referrals\?filter=review$/, (route) =>
       route.fulfill(json({ invites: current.reward?.status === "pending" ? [current] : [], stats: { open: 3, qualified: 1 } })),
     );
