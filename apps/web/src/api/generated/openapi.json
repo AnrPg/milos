@@ -106799,6 +106799,16 @@
               "minimum": 1,
               "type": "integer"
             }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -106836,6 +106846,9 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "all_locations": {
+                    "type": "boolean"
+                  },
                   "athlete_ids": {
                     "description": "Assignee user ids (athletes or members).",
                     "items": {
@@ -106846,6 +106859,15 @@
                   },
                   "instructions": {
                     "type": "string"
+                  },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
                   },
                   "master_workout_id": {
                     "format": "uuid",
@@ -106969,6 +106991,9 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "all_locations": {
+                    "type": "boolean"
+                  },
                   "athlete_ids": {
                     "items": {
                       "format": "uuid",
@@ -106978,6 +107003,15 @@
                   },
                   "instructions": {
                     "type": "string"
+                  },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
                   },
                   "scheduled_for": {
                     "format": "date",
@@ -107047,6 +107081,16 @@
             "schema": {
               "default": false,
               "type": "boolean"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
             }
           }
         ],
@@ -127858,6 +127902,9 @@
                   "active": {
                     "type": "boolean"
                   },
+                  "all_locations": {
+                    "type": "boolean"
+                  },
                   "description": {
                     "nullable": true,
                     "type": "string"
@@ -127866,6 +127913,15 @@
                     "format": "date",
                     "nullable": true,
                     "type": "string"
+                  },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
                   },
                   "name": {
                     "type": "string"
@@ -128041,7 +128097,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.operational_queues",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -130662,7 +130729,18 @@
       "get": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminFinanceController.summary",
-        "parameters": [],
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -137818,6 +137896,15 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "master_workout_id": {
                     "format": "uuid",
                     "nullable": true,
@@ -137855,10 +137942,19 @@
                     "slot": {
                       "additionalProperties": true,
                       "type": "object"
+                    },
+                    "slots": {
+                      "description": "ADR-186: every class created, one per branch",
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
                     }
                   },
                   "required": [
-                    "slot"
+                    "slot",
+                    "slots"
                   ],
                   "type": "object"
                 }
@@ -137872,7 +137968,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Create a scheduled class slot",
+        "summary": "Create a scheduled class slot (one per branch of location_ids)",
         "tags": [
           "Admin Schedule"
         ]
@@ -137935,6 +138031,15 @@
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
+                  },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
                   },
                   "master_workout_id": {
                     "format": "uuid",
@@ -175761,6 +175866,16 @@
               "format": "date",
               "type": "string"
             }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -176650,6 +176765,15 @@
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
+                  },
+                  "location_ids": {
+                    "description": "ADR-186: create one item at each of these branches",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
                   },
                   "meeting_url": {
                     "maxLength": 500,
