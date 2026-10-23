@@ -54,4 +54,16 @@ defmodule Palee.Shop.ShopStore do
   @impl true
   def units_held(context, user_id, product_ids),
     do: tenant_call(context, :units_held, [user_id, product_ids])
+
+  @impl true
+  def get_promotion_code(context, code, opts \\ []),
+    do: tenant_call(context, :get_promotion_code, [code, opts])
+
+  @impl true
+  def list_promotion_codes(context, filters),
+    do: tenant_call(context, :list_promotion_codes, [filters])
+
+  @impl true
+  def save_promotion_code(context, id, attrs),
+    do: tenant_call(context, :save_promotion_code, [id, attrs])
 end

@@ -355,7 +355,8 @@ defmodule PaleeWeb.Schemas.Shop do
       additionalProperties: false,
       properties: %{
         lines: %Schema{type: :array, items: cart_item(), minItems: 1, maxItems: 50},
-        pickup_location_id: @nullable_uuid
+        pickup_location_id: @nullable_uuid,
+        promotion_code: %Schema{type: :string, maxLength: 64, nullable: true}
       },
       required: [:lines]
     }
@@ -377,7 +378,14 @@ defmodule PaleeWeb.Schemas.Shop do
           type: :array,
           items: %Schema{type: :string, enum: ["at_pickup", "on_account", "online"]}
         },
-        online_payment: online_payment()
+        online_payment: online_payment(),
+        promotion_code_id: @nullable_uuid,
+        promotion_code: %Schema{
+          type: :object,
+          nullable: true,
+          description: "The promotion code that applied (never stacked with the member discount)",
+          properties: %{id: @uuid, code: %Schema{type: :string}, applied: %Schema{type: :boolean}}
+        }
       },
       required: [:lines, :total_cents, :payment_modes, :online_payment]
     }
@@ -621,6 +629,143 @@ defmodule PaleeWeb.Schemas.Shop do
         refunds: %Schema{type: :array, items: %Schema{type: :object, additionalProperties: true}}
       },
       required: [:kind, :revenue_stream, :order_id, :state, :total_cents]
+    }
+  end
+
+  # ── «Προώθηση» ───────────────────────────────────────────────────────────
+
+  @code_status ~w(active scheduled expired exhausted inactive)
+
+  def promotion_code do
+    %Schema{
+      title: "ShopPromotionCode",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        product_id: @uuid,
+        code: %Schema{type: :string},
+        discount_percent: %Schema{type: :integer, nullable: true},
+        discount_cents: %Schema{type: :integer, nullable: true},
+        max_redemptions: %Schema{type: :integer, nullable: true},
+        redemptions: %Schema{type: :integer, description: "Orders (not cancelled) that used it"},
+        starts_at: @time,
+        ends_at: @time,
+        active: %Schema{type: :boolean},
+        status: %Schema{type: :string, enum: @code_status},
+        post_id: @nullable_uuid,
+        inserted_at: @time
+      },
+      required: [:id, :product_id, :code, :redemptions, :active, :status]
+    }
+  end
+
+  @code_attrs %{
+    discount_percent: %Schema{type: :integer, minimum: 1, maximum: 100, nullable: true},
+    discount_cents: %Schema{
+      type: :integer,
+      minimum: 1,
+      nullable: true,
+      description: "Off each unit"
+    },
+    max_redemptions: %Schema{type: :integer, minimum: 1, nullable: true},
+    starts_at: @time,
+    ends_at: @time
+  }
+
+  def new_promotion_code do
+    %Schema{
+      title: "ShopNewPromotionCode",
+      type: :object,
+      additionalProperties: false,
+      description: "A code of the promoted product: a percent off, or an amount off each unit",
+      properties:
+        Map.put(@code_attrs, :code, %Schema{
+          type: :string,
+          minLength: 3,
+          maxLength: 32,
+          description: "Letters, digits, - or _ (stored upper case)"
+        }),
+      required: [:code]
+    }
+  end
+
+  def promotion_code_update_body do
+    %Schema{
+      title: "ShopPromotionCodeUpdateBody",
+      type: :object,
+      additionalProperties: false,
+      properties: Map.put(@code_attrs, :active, %Schema{type: :boolean})
+    }
+  end
+
+  def promote_body do
+    %Schema{
+      title: "ShopPromoteBody",
+      type: :object,
+      additionalProperties: false,
+      properties: %{
+        target: %Schema{
+          type: :string,
+          enum: Palee.Application.Shop.PromoteProduct.targets(),
+          description:
+            "announcements (club #ανακοινώσεις, default), channel (a member group or PT squad: channel_id) or feed (public: box page and followers)"
+        },
+        channel_id: @nullable_uuid,
+        body: %Schema{type: :string, maxLength: 5000, nullable: true},
+        promotion_code: %{new_promotion_code() | nullable: true},
+        promotion_code_id: %{@nullable_uuid | description: "An existing code of this product"}
+      }
+    }
+  end
+
+  def product_card do
+    %Schema{
+      title: "ShopProductCard",
+      type: :object,
+      nullable: true,
+      description:
+        "The promoted product as the reader can buy it now (attachment_type product, ADR-190)",
+      properties: %{
+        product_id: @uuid,
+        title: @text,
+        media_ids: %Schema{type: :array, items: @uuid},
+        status: %Schema{type: :string, enum: ~w(available sold_out members_only unavailable)},
+        availability: %Schema{type: :string, enum: ~w(in_stock low), nullable: true},
+        price_cents: %Schema{type: :integer, nullable: true},
+        max_price_cents: %Schema{type: :integer, nullable: true},
+        currency: %Schema{type: :string, nullable: true},
+        promotion: %Schema{
+          type: :object,
+          nullable: true,
+          properties: %{
+            code: %Schema{type: :string},
+            discount_percent: %Schema{type: :integer, nullable: true},
+            discount_cents: %Schema{type: :integer, nullable: true},
+            ends_at: @time
+          }
+        },
+        promotion_price_cents: %Schema{type: :integer, nullable: true},
+        buy_link: %Schema{
+          type: :object,
+          nullable: true,
+          description:
+            "The in-app product route; an order placed from it sends these params as its attribution",
+          properties: %{
+            product_id: @uuid,
+            path: %Schema{type: :string},
+            url: %Schema{type: :string},
+            params: %Schema{
+              type: :object,
+              properties: %{
+                source: %Schema{type: :string},
+                source_ref_id: @uuid,
+                promotion_code: %Schema{type: :string}
+              }
+            }
+          }
+        }
+      },
+      required: [:product_id, :status]
     }
   end
 end

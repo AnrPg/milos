@@ -10,6 +10,7 @@ defmodule Palee.Application.GetCommunityFeed do
   """
 
   alias Palee.Application.{ClubScope, EventCards, PostPresenter}
+  alias Palee.Application.Shop.ProductCards
   alias Palee.{Community, Organizations}
 
   @default_limit 20
@@ -46,11 +47,20 @@ defmodule Palee.Application.GetCommunityFeed do
       {shown, rest} = Enum.split(merged, limit)
       more? = rest != [] or not is_nil(page.next_cursor)
 
+      member_of = for club <- clubs, club.kind == "gym", do: club.organization_id
+
       {:ok,
        %{
          pinned:
-           pinned |> PostPresenter.posts(clubs, user_id) |> EventCards.attach(context, clubs),
-         posts: shown |> present(clubs, boxes, user_id) |> EventCards.attach(context, clubs),
+           pinned
+           |> PostPresenter.posts(clubs, user_id)
+           |> EventCards.attach(context, clubs)
+           |> ProductCards.attach(member_of),
+         posts:
+           shown
+           |> present(clubs, boxes, user_id)
+           |> EventCards.attach(context, clubs)
+           |> ProductCards.attach(member_of),
          next_cursor:
            if(more? and shown != [],
              do: shown |> List.last() |> elem(1) |> Community.encode_feed_cursor()

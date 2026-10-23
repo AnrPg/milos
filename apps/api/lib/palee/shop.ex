@@ -14,6 +14,7 @@ defmodule Palee.Shop do
     OrderLifecycle,
     OrderPricing,
     ProductPolicy,
+    PromotionPolicy,
     RevenueLineage,
     StockLedger,
     StockStatus
@@ -105,6 +106,21 @@ defmodule Palee.Shop do
 
   def units_held(context, user_id, product_ids),
     do: ShopStore.units_held(context, user_id, product_ids)
+
+  # ── Promotion codes («Προώθηση») ───────────────────────────────────────
+
+  defdelegate normalize_promotion_code(code), to: PromotionPolicy, as: :normalize_code
+  defdelegate promotion_redeemable(code, now), to: PromotionPolicy, as: :redeemable
+  defdelegate promotion_status(code, now), to: PromotionPolicy, as: :status
+
+  def get_promotion_code(context, code, opts \\ []),
+    do: ShopStore.get_promotion_code(context, code, opts)
+
+  def list_promotion_codes(context, filters \\ %{}),
+    do: ShopStore.list_promotion_codes(context, filters)
+
+  def save_promotion_code(context, id, attrs),
+    do: ShopStore.save_promotion_code(context, id, attrs)
 
   @doc """
   The stock status of variants from their levels and recent sales; returns

@@ -10,9 +10,13 @@ defmodule Palee.Shop.Domain.OrderPricing do
       applies to lines of products with `member_discount_applies`.
     * A product's `per_person_limit` caps what one buyer holds across open
       and paid orders (`already` counts them per product).
+    * A product-scoped promotion code (`:promotion`, see `PromotionPolicy`)
+      discounts its product's lines; it never stacks with the member
+      discount (each line takes the larger), and a cart without its product
+      refuses it.
   """
 
-  alias Palee.Shop.Domain.ProductPolicy
+  alias Palee.Shop.Domain.{ProductPolicy, PromotionPolicy}
 
   @max_quantity 99
   @max_lines 50
@@ -23,7 +27,8 @@ defmodule Palee.Shop.Domain.OrderPricing do
   `{:ok, %{lines, subtotal_cents, discount_cents, total_cents, currency}}`
   or an error. `catalog` maps variant ids to `%{variant, product}`.
   `opts`: `:channel`, `:member_discount_percent`, `:already` (product id =>
-  units the buyer already holds).
+  units the buyer already holds), `:promotion` (a redeemable promotion code).
+  The result's `promotion_code_id` names the code when it applied.
   """
   @spec price([map()], %{optional(String.t()) => map()}, keyword() | map()) ::
           {:ok, map()} | {:error, atom()}
@@ -34,7 +39,8 @@ defmodule Palee.Shop.Domain.OrderPricing do
     with {:ok, merged} <- merge(items),
          {:ok, lines} <- build_lines(merged, catalog, channel, opts),
          {:ok, currency} <- single_currency(lines),
-         :ok <- within_limits(lines, catalog, Map.get(opts, :already, %{})) do
+         :ok <- within_limits(lines, catalog, Map.get(opts, :already, %{})),
+         {:ok, lines, promotion_id} <- apply_promotion(lines, Map.get(opts, :promotion)) do
       subtotal = Enum.sum(Enum.map(lines, &(&1.unit_price_cents * &1.quantity)))
       discount = Enum.sum(Enum.map(lines, & &1.discount_cents))
 
@@ -44,8 +50,35 @@ defmodule Palee.Shop.Domain.OrderPricing do
          currency: currency,
          subtotal_cents: subtotal,
          discount_cents: discount,
-         total_cents: subtotal - discount
+         total_cents: subtotal - discount,
+         promotion_code_id: promotion_id
        }}
+    end
+  end
+
+  defp apply_promotion(lines, nil), do: {:ok, lines, nil}
+
+  defp apply_promotion(lines, %{product_id: product_id} = code) do
+    if Enum.any?(lines, &(&1.product_id == product_id)) do
+      lines =
+        Enum.map(lines, fn
+          %{product_id: ^product_id} = line ->
+            promo = PromotionPolicy.line_discount(code, line.unit_price_cents, line.quantity)
+            discount = max(promo, line.discount_cents)
+
+            %{
+              line
+              | discount_cents: discount,
+                total_cents: line.unit_price_cents * line.quantity - discount
+            }
+
+          line ->
+            line
+        end)
+
+      {:ok, lines, code.id}
+    else
+      {:error, :promotion_code_not_applicable}
     end
   end
 

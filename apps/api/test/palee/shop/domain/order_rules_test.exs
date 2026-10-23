@@ -5,6 +5,7 @@ defmodule Palee.Shop.Domain.OrderRulesTest do
     OrderLifecycle,
     OrderPricing,
     ProductPolicy,
+    PromotionPolicy,
     RevenueLineage,
     StockStatus
   }
@@ -147,6 +148,95 @@ defmodule Palee.Shop.Domain.OrderRulesTest do
 
       assert {:error, :per_person_limit_exceeded} =
                OrderPricing.price(items, limited, channel: :online, already: %{"p1" => 2})
+    end
+  end
+
+  describe "PromotionPolicy" do
+    @now ~U[2026-10-23 12:00:00Z]
+
+    defp code(attrs) do
+      Map.merge(
+        %{
+          id: "c1",
+          product_id: "p1",
+          code: "TEE10",
+          discount_percent: 10,
+          discount_cents: nil,
+          max_redemptions: nil,
+          redemptions: 0,
+          starts_at: nil,
+          ends_at: nil,
+          active: true
+        },
+        attrs
+      )
+    end
+
+    test "redeemable while active, inside its window and under its cap" do
+      assert :ok = PromotionPolicy.redeemable(code(%{}), @now)
+
+      assert {:error, :promotion_code_invalid} =
+               PromotionPolicy.redeemable(code(%{active: false}), @now)
+
+      assert {:error, :promotion_code_expired} =
+               PromotionPolicy.redeemable(code(%{ends_at: @now}), @now)
+
+      assert {:error, :promotion_code_exhausted} =
+               PromotionPolicy.redeemable(code(%{max_redemptions: 2, redemptions: 2}), @now)
+
+      assert PromotionPolicy.status(code(%{starts_at: DateTime.add(@now, 60)}), @now) ==
+               :scheduled
+
+      assert PromotionPolicy.normalize_code("  tee 10 ") == "TEE-10"
+    end
+
+    test "percent off the line, or an amount off each unit never below zero" do
+      assert PromotionPolicy.line_discount(code(%{}), 2_500, 2) == 500
+
+      assert PromotionPolicy.line_discount(
+               code(%{discount_percent: nil, discount_cents: 300}),
+               2_500,
+               2
+             ) == 600
+
+      assert PromotionPolicy.line_discount(
+               code(%{discount_percent: nil, discount_cents: 900}),
+               500,
+               1
+             ) == 500
+    end
+
+    test "pricing: only its product's lines, never stacked with the member discount" do
+      catalog = %{
+        "v1" => %{variant: variant(), product: product(%{member_discount_applies: true})},
+        "v2" => %{variant: variant(%{id: "v2", sku: "BAND"}), product: product(%{id: "p2"})}
+      }
+
+      items = [%{variant_id: "v1", quantity: 1}, %{variant_id: "v2", quantity: 1}]
+
+      # Member 20% beats the code's 10% on p1; p2 gets nothing.
+      assert {:ok, %{lines: [tee, band], promotion_code_id: "c1", discount_cents: 500}} =
+               OrderPricing.price(items, catalog,
+                 channel: :online,
+                 member_discount_percent: 20,
+                 promotion: code(%{})
+               )
+
+      assert tee.discount_cents == 500 and band.discount_cents == 0
+
+      # The code's 30% beats the member's 20%.
+      assert {:ok, %{discount_cents: 750}} =
+               OrderPricing.price(items, catalog,
+                 channel: :online,
+                 member_discount_percent: 20,
+                 promotion: code(%{discount_percent: 30})
+               )
+
+      assert {:error, :promotion_code_not_applicable} =
+               OrderPricing.price([%{variant_id: "v2", quantity: 1}], catalog,
+                 channel: :online,
+                 promotion: code(%{})
+               )
     end
   end
 
