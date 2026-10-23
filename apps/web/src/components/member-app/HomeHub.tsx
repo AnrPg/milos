@@ -11,14 +11,17 @@ import { ClubBar } from "@/components/community/ClubBar";
 import { gymClubFor } from "@/components/community/community";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
-import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
+import {
+  useClubRealtime,
+  useMyClubs,
+} from "@/components/community/use-community";
 import { WodCard } from "@/components/community/WodCard";
 import { SupportInbox } from "@/components/buddy/SupportRequestCard";
 import { MyEventsCard } from "@/components/events/MyEventsCard";
 import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
 import { LeaderboardCard } from "@/components/member-app/home/LeaderboardCard";
-import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { FeedPage, HubCard } from "@/components/member-app/HubParts";
 import { WellnessStrip } from "@/components/member-app/wellness/WellnessStrip";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
@@ -54,18 +57,23 @@ export function HomeHub() {
   }, [openAround, router]);
 
   return (
-    <HubPage
+    <FeedPage
       title={t("homeTitle")}
-      actions={
+      start={<ComposeButton clubs={clubs.data ?? []} />}
+      end={
         <div className="flex items-center gap-2">
           <FeedInboxButtons />
-          <ComposeButton clubs={clubs.data ?? []} />
         </div>
       }
     >
-      {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
+      {clubs.data && clubs.data.length > 0 ? (
+        <ClubBar clubs={clubs.data} />
+      ) : null}
       <ScopeToggle current="clubs" />
-      <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
+      <GreetingCard
+        nickname={currentUser?.nickname ?? ""}
+        quote={landing.data?.quote}
+      />
       <SupportInbox />
       <WellnessStrip />
       <MyTrialsCard />
@@ -73,18 +81,30 @@ export function HomeHub() {
         <WodCard club={gymClub} />
       ) : (
         <HubCard eyebrow={t("wodToday")}>
-          <p className="text-sm" style={{ color: clubs.isPending ? "var(--dim)" : "var(--text-soft)" }}>
+          <p
+            className="text-sm"
+            style={{
+              color: clubs.isPending ? "var(--dim)" : "var(--text-soft)",
+            }}
+          >
             {clubs.isPending ? t("loading") : t("wodTodayEmpty")}
           </p>
         </HubCard>
       )}
       <MyEventsCard />
       <ChallengesCard challenges={gamification?.active_challenges ?? []} />
-      {gamification ? <LeaderboardCard leaderboard={gamification.leaderboard} /> : null}
+      {gamification ? (
+        <LeaderboardCard leaderboard={gamification.leaderboard} />
+      ) : null}
       <section aria-label={t("feedPosts")} className="flex flex-col gap-3">
-        <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("feedPosts")}</p>
+        <p
+          className="text-xs font-bold uppercase tracking-[0.18em]"
+          style={{ color: "var(--dim)" }}
+        >
+          {t("feedPosts")}
+        </p>
         <FeedList filter={{}} empty={t("feedPostsEmpty")} />
       </section>
-    </HubPage>
+    </FeedPage>
   );
 }

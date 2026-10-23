@@ -184,13 +184,14 @@ export type ChipModel =
   | { key: ChipKey; kind: "menu"; options: string[]; selected: string[]; multiple: boolean }
   | { key: ChipKey; kind: "toggle"; active: boolean };
 
-/** The chip row after «Φίλτρα (n)» and the saved filters (mockup `near`). */
-/** `mine` (the person's interests, ADR-183) lead the discipline options. */
-export function chipModel(filter: AroundFilter, mine: string[] = []): ChipModel[] {
-  const radiusOptions = Array.from(new Set([...RADIUS_CHIP_OPTIONS, filter.radius_km])).sort((a, b) => a - b);
-  const disciplines = Array.from(new Set([...mine, ...CHIP_DISCIPLINES, ...filter.disciplines]));
+/**
+ * The shortcut chips after «Φίλτρα (n)» and «Τα αθλήματά μου» (mockup `near`).
+ * Only «Πότε» and «Δωρεάν»: the row must fit a 320 px phone without scrolling
+ * sideways, so every other facet (discipline, trial, posts…) lives in the
+ * filter sheet only, and «≤ X km» sits next to «Αλλαγή περιοχής» (`radiusChip`).
+ */
+export function chipModel(filter: AroundFilter): ChipModel[] {
   return [
-    { key: "radius", kind: "menu", options: radiusOptions.map(String), selected: [String(filter.radius_km)], multiple: false },
     {
       key: "when",
       kind: "menu",
@@ -199,10 +200,23 @@ export function chipModel(filter: AroundFilter, mine: string[] = []): ChipModel[
       multiple: false,
     },
     { key: "free", kind: "toggle", active: filter.cost.includes("free") },
-    { key: "trial", kind: "toggle", active: filter.cost.includes("trial") },
-    { key: "discipline", kind: "menu", options: disciplines, selected: filter.disciplines, multiple: true },
-    { key: "posts", kind: "toggle", active: filter.kinds.includes("posts") },
   ];
+}
+
+/** «≤ 3 km ▾», shown beside «Αλλαγή περιοχής»: the usual radii plus the current one. */
+export function radiusChip(filter: AroundFilter): Extract<ChipModel, { kind: "menu" }> {
+  const options = Array.from(new Set([...RADIUS_CHIP_OPTIONS, filter.radius_km])).sort((a, b) => a - b);
+  return { key: "radius", kind: "menu", options: options.map(String), selected: [String(filter.radius_km)], multiple: false };
+}
+
+/** «Τα αθλήματά μου» is on when the filter's disciplines are exactly the person's (ADR-183). */
+export function isMine(filter: AroundFilter, mine: readonly string[]) {
+  return mine.length > 0 && sameSet(filter.disciplines, mine);
+}
+
+/** «Τα αθλήματά μου» tapped: their disciplines, or none again. */
+export function toggleMine(filter: AroundFilter, mine: readonly string[]): AroundFilter {
+  return { ...filter, disciplines: isMine(filter, mine) ? [] : [...mine] };
 }
 
 /** What a chip does to the filter: a menu chip's new values, or a toggle (values omitted). */

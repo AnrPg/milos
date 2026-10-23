@@ -11,6 +11,7 @@ import { clubInitials } from "@/components/community/community";
 import { MyGymsCard } from "@/components/community/MyGymsCard";
 import { useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
@@ -24,7 +25,7 @@ export function MyClubsPage() {
   const clubs = useMyClubs();
 
   return (
-    <HubPage title={t("myClubsTitle")}>
+    <HubPage back={<BackToMe />} title={t("myClubsTitle")}>
       <MyGymsCard />
       <HubCard eyebrow={t("myClubsNotify")}>
         {clubs.isPending ? (
