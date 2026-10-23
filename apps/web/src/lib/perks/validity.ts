@@ -1,34 +1,28 @@
-import type { PerkOfferKind, PerkStatus, StaffPerkInput } from "@/api/perks";
+import { NO_RULES, type PerkMethod, type PerkStatus, type StaffPerk, type StaffPerkInput } from "@/api/perks";
 
 /**
- * Partner perk rules the screens need (ADR-191), pure: where a perk stands
- * on a given day, whether a member still sees it, and what a staff draft is
- * missing before it can be saved or published. Days are `YYYY-MM-DD` in the
- * box's calendar, compared as strings.
+ * Partner perk rules the screens need (ADR-191, mirroring `PerkRules` on the
+ * API), pure: where a perk stands on a day, what a staff draft is missing,
+ * which «Περισσότεροι όροι» sections are set, and reading a batch of the
+ * partner's unique codes. Days are `YYYY-MM-DD` in the box's calendar,
+ * compared as strings.
  */
 
-export type PerkPhase = "draft" | "paused" | "ended" | "scheduled" | "active" | "expired";
+/** The status a reader sees: a published perk past its window reads as expired, one not started yet as scheduled. */
+export type PerkPhase = PerkStatus | "scheduled";
 
-export function perkPhase(perk: { status: PerkStatus; starts_on: string | null; ends_on: string | null }, today: string): PerkPhase {
-  if (perk.status === "draft") return "draft";
-  if (perk.status === "paused") return "paused";
-  if (perk.status === "ended") return "ended";
-  if (perk.starts_on && today < perk.starts_on) return "scheduled";
-  if (perk.ends_on && today > perk.ends_on) return "expired";
-  return "active";
-}
-
-/** A member sees a perk only while it is live today. */
-export function isPerkLive(perk: { starts_on: string | null; ends_on: string | null }, today: string) {
-  return perkPhase({ ...perk, status: "active" }, today) === "active";
+export function perkPhase(perk: { status: PerkStatus; valid_from: string | null; valid_until: string | null }, today: string): PerkPhase {
+  if (perk.status !== "published") return perk.status;
+  if (perk.valid_until && today > perk.valid_until) return "expired";
+  if (perk.valid_from && today < perk.valid_from) return "scheduled";
+  return "published";
 }
 
 /** Days left until it ends (0 = ends today); null without an end. */
-export function perkDaysLeft(endsOn: string | null, today: string) {
-  if (!endsOn) return null;
-  const end = Date.UTC(Number(endsOn.slice(0, 4)), Number(endsOn.slice(5, 7)) - 1, Number(endsOn.slice(8, 10)));
-  const now = Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 1, Number(today.slice(8, 10)));
-  return Math.round((end - now) / 86_400_000);
+export function perkDaysLeft(validUntil: string | null, today: string) {
+  if (!validUntil) return null;
+  const day = (value: string) => Date.UTC(Number(value.slice(0, 4)), Number(value.slice(5, 7)) - 1, Number(value.slice(8, 10)));
+  return Math.round((day(validUntil) - day(today)) / 86_400_000);
 }
 
 /** Today in the device's calendar, `YYYY-MM-DD`. */
@@ -38,77 +32,153 @@ export function localToday(now: Date = new Date()) {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-export const PERK_CODE_PATTERN = /^[\p{Lu}\p{N}_-]{3,32}$/u;
-
-/** A shared code is upper case, letters (Greek too), digits, `-` and `_`. */
+/** Upper case, no spaces (as `PromotionCode.normalize_code`). Greek upper case drops the accents. */
 export function normalizePerkCode(raw: string) {
   return raw.trim().replace(/\s+/g, "").toLocaleUpperCase("el");
 }
 
+export const PERK_CODE_PATTERN = /^[\p{Lu}\p{N}_.-]{1,64}$/u;
+
+/** Methods where the member is handed a code to show or type. */
+export function methodShowsCode(method: PerkMethod) {
+  return method === "shared_code" || method === "unique_code" || method === "partner_link";
+}
+
+export function emptyPerkDraft(currency = "EUR"): StaffPerkInput {
+  return {
+    partner_name: "",
+    partner_url: null,
+    partner_address: null,
+    logo_media_id: null,
+    benefit_type: "percent",
+    benefit_value: null,
+    benefit_text: null,
+    currency,
+    redemption_method: "shared_code",
+    shared_code: null,
+    terms: null,
+    valid_from: null,
+    valid_until: null,
+    max_claims: null,
+    max_claims_per_member: 1,
+    audience: "all_clients",
+    package_ids: [],
+    all_locations: true,
+    location_ids: [],
+    rules: NO_RULES,
+    box_benefits: false,
+  };
+}
+
+export function draftFromPerk(perk: StaffPerk): StaffPerkInput {
+  return {
+    partner_name: perk.partner_name,
+    partner_url: perk.partner_url,
+    partner_address: perk.partner_address,
+    logo_media_id: perk.logo_media_id,
+    benefit_type: perk.benefit_type,
+    benefit_value: perk.benefit_value,
+    benefit_text: perk.benefit_text,
+    currency: perk.currency,
+    redemption_method: perk.redemption_method,
+    shared_code: perk.shared_code,
+    terms: perk.terms,
+    valid_from: perk.valid_from,
+    valid_until: perk.valid_until,
+    max_claims: perk.max_claims,
+    max_claims_per_member: perk.max_claims_per_member,
+    audience: perk.audience,
+    package_ids: perk.package_ids,
+    all_locations: perk.all_locations,
+    location_ids: perk.location_ids,
+    rules: { ...NO_RULES, ...(perk.rules ?? {}) },
+    box_benefits: perk.box_benefits ?? false,
+  };
+}
+
 export type PerkDraftProblem =
   | "partnerName"
-  | "offerText"
   | "percent"
   | "amount"
+  | "benefitText"
   | "code"
+  | "partnerUrl"
   | "dates"
+  | "hours"
   | "packages"
   | "branches"
-  | "perMemberLimit"
-  | "totalLimit";
+  | "maxClaims"
+  | "perMember"
+  | "minSpend";
 
-function positiveIntegerOrNull(value: number | null) {
-  return value === null || (Number.isInteger(value) && value > 0);
-}
+const positiveInteger = (value: number | null) => value !== null && Number.isInteger(value) && value > 0;
 
-function validOfferValue(kind: PerkOfferKind, value: number | null) {
-  if (kind === "percent") return value !== null && Number.isInteger(value) && value >= 1 && value <= 100;
-  if (kind === "amount") return value !== null && Number.isInteger(value) && value > 0;
-  return true;
-}
-
-/** What the form must fix; empty when the perk can be saved. */
+/** What the form must fix before saving; the API checks the same (`Perk.validate`). */
 export function perkDraftProblems(draft: StaffPerkInput): PerkDraftProblem[] {
   const problems: PerkDraftProblem[] = [];
-  if (!draft.partner.name.trim()) problems.push("partnerName");
-  if (!draft.offer.text.trim()) problems.push("offerText");
-  if (!validOfferValue(draft.offer.kind, draft.offer.value)) problems.push(draft.offer.kind === "percent" ? "percent" : "amount");
-  if (draft.redemption === "partner_codes" && draft.code_mode === "shared" && !PERK_CODE_PATTERN.test(normalizePerkCode(draft.shared_code ?? ""))) problems.push("code");
-  if (draft.starts_on && draft.ends_on && draft.ends_on < draft.starts_on) problems.push("dates");
+  if (!draft.partner_name.trim()) problems.push("partnerName");
+  if (draft.benefit_type === "percent" && !(positiveInteger(draft.benefit_value) && draft.benefit_value! <= 100)) problems.push("percent");
+  if (draft.benefit_type === "fixed_amount" && !positiveInteger(draft.benefit_value)) problems.push("amount");
+  if (draft.benefit_type === "free_text" && !draft.benefit_text?.trim()) problems.push("benefitText");
+  const needsCode = draft.redemption_method === "shared_code" || draft.redemption_method === "partner_link";
+  if (needsCode && !PERK_CODE_PATTERN.test(normalizePerkCode(draft.shared_code ?? ""))) problems.push("code");
+  const url = draft.partner_url?.trim() ?? "";
+  if ((url && !/^https?:\/\/\S+$/i.test(url)) || (draft.redemption_method === "partner_link" && !url)) problems.push("partnerUrl");
+  if (draft.valid_from && draft.valid_until && draft.valid_until < draft.valid_from) problems.push("dates");
+  const { time_from: from, time_until: until } = draft.rules;
+  if (Boolean(from) !== Boolean(until) || (from && until && until <= from)) problems.push("hours");
   if (draft.audience === "packages" && draft.package_ids.length === 0) problems.push("packages");
   if (!draft.all_locations && draft.location_ids.length === 0) problems.push("branches");
-  if (!positiveIntegerOrNull(draft.per_member_limit)) problems.push("perMemberLimit");
-  if (!positiveIntegerOrNull(draft.total_limit)) problems.push("totalLimit");
+  if (draft.max_claims !== null && !positiveInteger(draft.max_claims)) problems.push("maxClaims");
+  if (!positiveInteger(draft.max_claims_per_member) || draft.max_claims_per_member > 1000) problems.push("perMember");
+  if (draft.rules.min_spend_cents !== null && !positiveInteger(draft.rules.min_spend_cents)) problems.push("minSpend");
   return problems;
 }
 
 /**
  * Publishing: a demo business may draft but not go live (ADR-184), and a
- * perk of unique partner codes needs at least one code (`codesAvailable` = what the
- * box holds plus what the form is about to add).
+ * pool of unique codes needs a free code (`freeCodes`: the pool's free codes
+ * plus what the form is about to add).
  */
-export function canPublishPerk(draft: StaffPerkInput, activation: string | null | undefined, codesAvailable = 0) {
+export function canPublishPerk(draft: StaffPerkInput, activation: string | null | undefined, freeCodes = 0) {
   if (activation === "demo" || perkDraftProblems(draft).length > 0) return false;
-  return draft.redemption !== "partner_codes" || draft.code_mode !== "unique" || codesAvailable > 0;
+  return draft.redemption_method !== "unique_code" || freeCodes > 0;
+}
+
+/** The collapsed «Περισσότεροι όροι» sections and whether each holds anything. */
+export type RuleSection = "limits" | "when" | "who" | "where" | "terms";
+
+export function ruleSectionsSet(draft: StaffPerkInput): Record<RuleSection, boolean> {
+  const { rules } = draft;
+  return {
+    limits: draft.max_claims !== null || draft.max_claims_per_member !== 1 || rules.min_spend_cents !== null,
+    when: rules.weekdays.length > 0 || Boolean(rules.time_from),
+    who: draft.audience === "packages" || !draft.all_locations || rules.new_customers_only,
+    where: rules.channel !== null || Boolean(draft.partner_address?.trim()),
+    terms: Boolean(draft.terms?.trim()) || draft.box_benefits,
+  };
 }
 
 export const MAX_CODES_PER_UPLOAD = 5000;
 
 /**
  * Reads the partner's unique codes from pasted text or a CSV/TXT file: one
- * per line, or separated by commas, semicolons or tabs; a header such as
- * «code» is skipped. Repeats are counted once, malformed ones reported.
+ * per line, or separated by commas, semicolons or tabs; a first-line header
+ * such as «code» is skipped. Repeats count once; malformed ones are reported.
  */
 export function parsePerkCodes(text: string) {
   const codes: string[] = [];
   const seen = new Set<string>();
   let duplicates = 0;
   let invalid = 0;
-  const tokens = text.split(/[\r\n,;\t]+/).map((token) => token.replace(/^["']|["']$/g, ""));
-  for (const [index, token] of tokens.entries()) {
+  const tokens = text.split(/[\r\n,;\t]+/).map((token) => token.trim().replace(/^["']|["']$/g, ""));
+  let first = true;
+  for (const token of tokens) {
     const code = normalizePerkCode(token);
     if (!code) continue;
-    if (index === 0 && /^(CODE|CODES|ΚΩΔΙΚΟΣ|ΚΩΔΙΚΟΙ)$/u.test(code)) continue;
+    const header = first && /^(CODE|CODES|ΚΩΔΙΚΟΣ|ΚΩΔΙΚΟΙ)$/u.test(code);
+    first = false;
+    if (header) continue;
     if (!PERK_CODE_PATTERN.test(code)) {
       invalid += 1;
       continue;
@@ -120,11 +190,10 @@ export function parsePerkCodes(text: string) {
     seen.add(code);
     codes.push(code);
   }
-  const tooMany = codes.length > MAX_CODES_PER_UPLOAD;
-  return { codes: codes.slice(0, MAX_CODES_PER_UPLOAD), duplicates, invalid, tooMany };
+  return { codes: codes.slice(0, MAX_CODES_PER_UPLOAD), duplicates, invalid, tooMany: codes.length > MAX_CODES_PER_UPLOAD };
 }
 
-/** What is left of a batch of unique codes. */
-export function codesLeft(perk: { codes_total: number; codes_claimed: number }) {
-  return Math.max(0, perk.codes_total - perk.codes_claimed);
+/** How many of the pool's codes members hold. */
+export function codesHandedOut(codes: { total: number; free: number }) {
+  return Math.max(0, codes.total - codes.free);
 }
