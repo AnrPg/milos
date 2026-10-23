@@ -73,8 +73,8 @@ defmodule Palee.Community.Domain.EventPolicy do
   Who the event is for: `group` (a member group only), `club` (the club's
   members, and an accepted co-host's) or `open` (everyone signed in).
   """
-  def audience(%{audience: audience}) when audience in ~w(group club open), do: audience
   def audience(%{open_to_non_members: true}), do: "open"
+  def audience(%{audience: audience}) when audience in ~w(group club), do: audience
   def audience(%{channel_id: channel_id}) when is_binary(channel_id), do: "group"
   def audience(_event), do: "club"
 

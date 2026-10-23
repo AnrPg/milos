@@ -9,8 +9,9 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
   - `community_events.audience` (`group` | `club` | `open`) says who an event
     is for. A member group's admin now picks price, audience and guest
     passes like any host (ADR-153 §13 lifted): the `community_events_group_check`
-    constraint goes. `open_to_non_members` stays and always equals
-    `audience = 'open'`.
+    constraint goes. `open_to_non_members` stays and wins: an event open to
+    everyone is `open` whatever the column says (the app keeps the two in
+    step); `group` needs a group and is never open.
   - `community_event_cohosts`: one host organisation plus co-host
     organisations per event, by request and accept. Rows live in the host's
     tenant; the co-host's side reads and answers them only through narrow
@@ -236,8 +237,8 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
     create constraint(:community_events, :community_events_audience_check,
              check:
                "audience IN ('group', 'club', 'open') AND " <>
-                 "(audience = 'open') = open_to_non_members AND " <>
-                 "(audience <> 'group' OR channel_id IS NOT NULL)"
+                 "(audience <> 'open' OR open_to_non_members) AND " <>
+                 "(audience <> 'group' OR (channel_id IS NOT NULL AND NOT open_to_non_members))"
            )
 
     # A group event for the whole club (or everyone) reads like a club event;
