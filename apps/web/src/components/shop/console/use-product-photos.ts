@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ShopMedia } from "@/api/shop-admin";
-import { completeMediaUpload, discardMedia, requestMediaUpload, type MediaContentType } from "@/api/media";
+import { discardMedia } from "@/api/media";
+import { completeShopPhoto, requestShopPhotoUpload } from "@/api/shop-admin";
 import { useSession } from "@/components/session-provider";
 import { preparePhoto } from "@/lib/media-files";
 import { putPresigned } from "@/lib/presigned-upload";
@@ -21,9 +22,8 @@ export const MAX_PRODUCT_PHOTOS = 6;
 let sequence = 0;
 
 /**
- * Product photos through the shared media upload (ADR-157): crop to a
- * square, reserve, PUT to storage, complete. TODO(ADR-190): the purpose is
- * `post_photo` until the media API takes a `shop_product_photo` purpose.
+ * Product photos (`shop_product_photo`, ADR-157 upload): crop to a
+ * square, reserve, PUT to storage, complete.
  */
 export function useProductPhotos(initial: ShopMedia[] | undefined) {
   const { tokens } = useSession();
@@ -50,15 +50,11 @@ export function useProductPhotos(initial: ShopMedia[] | undefined) {
       try {
         const prepared = await preparePhoto(file, "1:1");
         patch(key, { previewUrl: URL.createObjectURL(prepared.blob) });
-        const reserved = await requestMediaUpload(token, {
-          purpose: "post_photo",
-          content_type: prepared.contentType as MediaContentType,
-          byte_size: prepared.blob.size,
-        });
+        const reserved = await requestShopPhotoUpload(token, { content_type: prepared.contentType, byte_size: prepared.blob.size });
         patch(key, { mediaId: reserved.media_id });
         added.current.push(reserved.media_id);
         await putPresigned(reserved.upload_url, prepared.blob, reserved.required_headers);
-        await completeMediaUpload(token, reserved.media_id);
+        await completeShopPhoto(token, reserved.media_id);
         patch(key, { state: "ready" });
       } catch {
         patch(key, { state: "failed" });

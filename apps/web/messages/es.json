@@ -10047,12 +10047,12 @@
       "where": "Dónde publicar",
       "targets": {
         "announcements": "Anuncios",
-        "group": "Grupo de socios",
+        "channel": "Grupo de socios",
         "feed": "Inicio"
       },
       "targetHints": {
         "announcements": "Una publicación del club en el canal de anuncios, con la tarjeta del producto adjunta.",
-        "group": "Solo los socios de un grupo ven la publicación.",
+        "channel": "Solo los socios de un grupo ven la publicación.",
         "feed": "Una publicación de tu box en el Inicio de tus socios y seguidores."
       },
       "group": "Grupo",
@@ -10166,6 +10166,8 @@
       "history": "Movimientos",
       "adjust": "Ajustar",
       "policyNote": "El estado sale de los días de stock que quedan al ritmo actual: crítico por debajo de 7 días, bajo por debajo de 21. Los avisos solo saltan cuando empeora, y el stock entra en el resumen diario.",
+      "recent": "Movimientos recientes",
+      "allMovements": "Todos los movimientos",
       "historyOf": "Movimientos · {item}",
       "noMovements": "Aún no hay movimientos.",
       "kinds": {

@@ -16,7 +16,7 @@ import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { priceRange } from "@/lib/shop/console";
+import { endOfDayIso, priceRange } from "@/lib/shop/console";
 
 /**
  * «Προώθηση» (proposal §2, no campaign system): a post with the product card
@@ -31,7 +31,7 @@ export function PromotePanel({ product, onClose }: { product: ShopProduct; onClo
   const gate = useDemoGate();
   const promote = usePromoteProduct(product.id);
   const [target, setTarget] = useState<PromoteTarget>("announcements");
-  const groups = useMemberGroups(target === "group");
+  const groups = useMemberGroups(target === "channel");
   const [groupId, setGroupId] = useState("");
   const [body, setBody] = useState(t("defaultBody", { product: product.title }));
   const [withCode, setWithCode] = useState(false);
@@ -44,16 +44,16 @@ export function PromotePanel({ product, onClose }: { product: ShopProduct; onClo
   const submit = () => {
     setError(null);
     if (!body.trim()) return setError(t("errors.body"));
-    if (target === "group" && !groupId) return setError(t("errors.group"));
+    if (target === "channel" && !groupId) return setError(t("errors.group"));
     const percentOff = Number.parseInt(percent, 10);
     if (withCode && (!code.trim() || !(percentOff > 0 && percentOff <= 100))) return setError(t("errors.code"));
     gate(() =>
       promote.mutate(
         {
           target,
-          group_id: target === "group" ? groupId : null,
+          channel_id: target === "channel" ? groupId : null,
           body: body.trim(),
-          promotion_code: withCode ? { code: code.trim().toUpperCase(), percent_off: percentOff, ends_on: endsOn || null } : null,
+          promotion_code: withCode ? { code: code.trim().toUpperCase(), discount_percent: percentOff, ends_at: endsOn ? endOfDayIso(endsOn) : null } : null,
         },
         { onSuccess: onClose },
       ),
@@ -83,11 +83,11 @@ export function PromotePanel({ product, onClose }: { product: ShopProduct; onClo
             label={t("where")}
             value={target}
             onChange={setTarget}
-            options={(["announcements", "group", "feed"] as const).map((value) => ({ value, label: t(`targets.${value}`) }))}
+            options={(["announcements", "channel", "feed"] as const).map((value) => ({ value, label: t(`targets.${value}`) }))}
           />
           <span className="text-xs" style={{ color: "var(--dim)" }}>{t(`targetHints.${target}`)}</span>
         </div>
-        {target === "group" ? (
+        {target === "channel" ? (
           <Field label={t("group")}>
             <Select className={inputClass} style={inputStyle} value={groupId} onValueChange={setGroupId} placeholder={t("groupPick")}>
               {(groups.data ?? []).map((group) => (

@@ -10047,12 +10047,12 @@
       "where": "Wo gepostet wird",
       "targets": {
         "announcements": "Ankündigungen",
-        "group": "Mitgliedergruppe",
+        "channel": "Mitgliedergruppe",
         "feed": "Feed"
       },
       "targetHints": {
         "announcements": "Ein Club-Beitrag im Ankündigungskanal, mit der Produktkarte im Anhang.",
-        "group": "Nur die Mitglieder einer Gruppe sehen den Beitrag.",
+        "channel": "Nur die Mitglieder einer Gruppe sehen den Beitrag.",
         "feed": "Ein Beitrag deiner Box im Feed deiner Mitglieder und Follower."
       },
       "group": "Gruppe",
@@ -10166,6 +10166,8 @@
       "history": "Bewegungen",
       "adjust": "Buchen",
       "policyNote": "Der Status ergibt sich aus den Tagen Restbestand beim aktuellen Tempo: kritisch unter 7 Tagen, niedrig unter 21. Hinweise kommen nur, wenn es schlechter wird, und der Bestand steht in der täglichen Übersicht.",
+      "recent": "Letzte Bewegungen",
+      "allMovements": "Alle Bewegungen",
       "historyOf": "Bewegungen · {item}",
       "noMovements": "Noch keine Bewegungen.",
       "kinds": {

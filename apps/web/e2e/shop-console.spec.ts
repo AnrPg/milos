@@ -125,17 +125,30 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
   const calls: Calls = { created: [], statusChanges: [], actions: [], sales: [] };
   const products = [...(initial.products ?? [])];
   const orders = [...(initial.orders ?? [])];
+  const productCounts = () => ({
+    all: products.filter((entry) => entry.status !== "archived").length,
+    published: products.filter((entry) => entry.status === "published").length,
+    draft: products.filter((entry) => entry.status === "draft").length,
+    archived: products.filter((entry) => entry.status === "archived").length,
+    low_stock: 0,
+  });
+  const orderCounts = () => ({
+    placed: orders.filter((entry) => entry.status === "placed").length,
+    ready_for_pickup: orders.filter((entry) => entry.status === "ready_for_pickup").length,
+    picked_up: orders.filter((entry) => entry.status === "picked_up").length,
+    cancelled: orders.filter((entry) => entry.status === "cancelled").length,
+  });
 
-  await page.route("**/api/org/kypseli/admin/shop/**", (route: Route) => {
+  await page.route("**/api/org/kypseli/staff/shop/**", (route: Route) => {
     const request = route.request();
     const url = new URL(request.url());
-    const path = url.pathname.replace(/^.*\/admin\/shop/, "");
+    const path = url.pathname.replace(/^.*\/staff\/shop/, "");
     const method = request.method();
 
     if (path === "/products" && method === "GET") {
       // As on the server: archived products only on request.
       const status = url.searchParams.get("status");
-      return route.fulfill(json({ products: products.filter((entry) => (status ? entry.status === status : entry.status !== "archived")) }));
+      return route.fulfill(json({ products: products.filter((entry) => (status ? entry.status === status : entry.status !== "archived")), counts: productCounts() }));
     }
     if (path === "/products" && method === "POST") {
       const body = request.postDataJSON() as Record<string, unknown>;
@@ -153,7 +166,7 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
     }
     if (path === "/orders" && method === "GET") {
       const status = url.searchParams.get("status");
-      return route.fulfill(json({ orders: orders.filter((entry) => !status || entry.status === status) }));
+      return route.fulfill(json({ orders: orders.filter((entry) => !status || entry.status === status), counts: orderCounts() }));
     }
     const orderMatch = path.match(/^\/orders\/([^/]+)(?:\/(ready|pickup|cancel|refund))?$/);
     if (orderMatch) {
@@ -170,6 +183,18 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
       calls.sales.push(body);
       return route.fulfill(json({ order: order({ id: "ord-pos", number: 1043, channel: "pos", status: "picked_up", payment_status: "paid", payment_mode: "cash", paid_cents: 2500, user_id: null, customer_name: null }) }, 201));
     }
+    if (path === "/payment-methods") {
+      return route.fulfill(
+        json({
+          payment_methods: [
+            { id: "cash", channel: "pos", available: true },
+            { id: "card_manual", channel: "pos", available: true },
+            { id: "card_online", channel: "online", available: false, reason: "no_provider" },
+          ],
+        }),
+      );
+    }
+    if (path === "/movements") return route.fulfill(json({ movements: [], next_cursor: null }));
     return route.fulfill(json({}));
   });
   return calls;

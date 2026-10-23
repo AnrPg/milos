@@ -12,6 +12,7 @@ import {
   lastComparablePriceChange,
   memberDiscountPercent,
   movementFor,
+  endOfDayIso,
   stockDelta,
   orderActions,
   paceOf,
@@ -147,6 +148,13 @@ describe("stock form", () => {
     expect(movementFor(item, "recount", 4, null, "")).toBeNull();
     expect(movementFor(item, "receive", 0, null, "")).toBeNull();
     expect(movementFor(item, "loss", -1, null, "")).toBeNull();
+  });
+});
+
+describe("promotion codes", () => {
+  it("ends on the last second of the chosen local day", () => {
+    const end = new Date(endOfDayIso("2026-11-30"));
+    expect([end.getFullYear(), end.getMonth(), end.getDate(), end.getHours(), end.getMinutes()]).toEqual([2026, 10, 30, 23, 59]);
   });
 });
 

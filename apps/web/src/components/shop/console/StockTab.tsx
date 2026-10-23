@@ -94,45 +94,29 @@ export function StockTab({ locationIds, branchFilter }: { locationIds?: string; 
       )}
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("policyNote")}</p>
 
-      {history ? (
-        <MovementList
-          title={t("historyOf", { item: itemName(history) })}
-          variantId={history.variant_id}
-          titles={{ product: history.product_title, variant: history.variant_title }}
-          locationIds={locationIds}
-          onClear={() => setHistory(null)}
-        />
-      ) : null}
+      <MovementList
+        title={history ? t("historyOf", { item: itemName(history) }) : t("recent")}
+        variantId={history?.variant_id ?? null}
+        locationIds={locationIds}
+        onClear={history ? () => setHistory(null) : undefined}
+      />
 
       {adjusting ? <AdjustDialog item={adjusting} onClose={() => setAdjusting(null)} /> : null}
     </section>
   );
 }
 
-function MovementList({
-  title,
-  variantId,
-  titles,
-  locationIds,
-  onClear,
-}: {
-  title: string;
-  variantId: string | null;
-  titles?: { product: string; variant?: string | null };
-  locationIds?: string;
-  onClear?: () => void;
-}) {
+function MovementList({ title, variantId, locationIds, onClear }: { title: string; variantId: string | null; locationIds?: string; onClear?: () => void }) {
   const t = useTranslations("ShopConsole.stock");
   const locale = useUiLocale();
-  const movements = useShopMovements(variantId, locationIds, titles);
-  const common = useTranslations("Common");
+  const movements = useShopMovements(variantId, locationIds);
   return (
     <section className="flex flex-col gap-2 rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} aria-label={title}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{title}</h2>
         {onClear ? (
           <button type="button" className="text-xs font-semibold" style={{ color: "var(--primary)" }} onClick={onClear}>
-            {common("close")}
+            {t("allMovements")}
           </button>
         ) : null}
       </div>

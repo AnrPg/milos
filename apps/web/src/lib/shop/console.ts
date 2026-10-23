@@ -156,6 +156,12 @@ export function stockDelta(movement: Pick<ShopMovementInput, "kind" | "quantity"
   return movement.quantity ?? 0;
 }
 
+/** A date picker's day as the end of that local day, for a promotion code's `ends_at`. */
+export function endOfDayIso(day: string) {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Date(year!, (month ?? 1) - 1, date ?? 1, 23, 59, 59).toISOString();
+}
+
 // ---- orders ----
 
 export type OrderActionName = OrderAction["action"];

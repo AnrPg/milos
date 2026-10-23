@@ -10047,12 +10047,12 @@
       "where": "Où publier",
       "targets": {
         "announcements": "Annonces",
-        "group": "Groupe de membres",
+        "channel": "Groupe de membres",
         "feed": "Fil"
       },
       "targetHints": {
         "announcements": "Une publication du club dans le canal des annonces, avec la carte du produit jointe.",
-        "group": "Seuls les membres d'un groupe voient la publication.",
+        "channel": "Seuls les membres d'un groupe voient la publication.",
         "feed": "Une publication de ta box dans le Fil de tes membres et abonnés."
       },
       "group": "Groupe",
@@ -10166,6 +10166,8 @@
       "history": "Mouvements",
       "adjust": "Ajuster",
       "policyNote": "L'état vient des jours de stock restants au rythme actuel : critique sous 7 jours, bas sous 21. Les alertes ne partent que quand il empire, et le stock entre dans le résumé quotidien.",
+      "recent": "Mouvements récents",
+      "allMovements": "Tous les mouvements",
       "historyOf": "Mouvements · {item}",
       "noMovements": "Aucun mouvement pour l'instant.",
       "kinds": {

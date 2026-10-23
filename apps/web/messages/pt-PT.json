@@ -10047,12 +10047,12 @@
       "where": "Onde publicar",
       "targets": {
         "announcements": "Anúncios",
-        "group": "Grupo de membros",
+        "channel": "Grupo de membros",
         "feed": "Início"
       },
       "targetHints": {
         "announcements": "Uma publicação do clube no canal de anúncios, com o cartão do produto anexado.",
-        "group": "Só os membros de um grupo veem a publicação.",
+        "channel": "Só os membros de um grupo veem a publicação.",
         "feed": "Uma publicação da tua box no Início dos teus membros e seguidores."
       },
       "group": "Grupo",
@@ -10166,6 +10166,8 @@
       "history": "Movimentos",
       "adjust": "Ajustar",
       "policyNote": "O estado vem dos dias de stock que restam ao ritmo atual: crítico abaixo de 7 dias, baixo abaixo de 21. Os alertas só disparam quando piora, e o stock entra no resumo diário.",
+      "recent": "Movimentos recentes",
+      "allMovements": "Todos os movimentos",
       "historyOf": "Movimentos · {item}",
       "noMovements": "Ainda não há movimentos.",
       "kinds": {

@@ -123,7 +123,7 @@ export function useSaveProduct(previous: ShopProduct | null | undefined) {
   const token = useToken();
   const invalidate = useInvalidateShop();
   return useMutation({
-    mutationFn: (input: ShopProductInput) => (previous ? updateShopProduct(token!, previous.id, input, previous) : createShopProduct(token!, input)),
+    mutationFn: (input: ShopProductInput) => (previous ? updateShopProduct(token!, previous.id, input) : createShopProduct(token!, input)),
     onSuccess: () => void invalidate(),
   });
 }
@@ -202,12 +202,12 @@ export function useShopStock(attention: boolean, locationIds?: string) {
   });
 }
 
-export function useShopMovements(variantId: string | null, locationIds?: string, titles?: { product: string; variant?: string | null }) {
+export function useShopMovements(variantId: string | null, locationIds?: string) {
   const token = useToken();
   return useQuery({
     queryKey: shopKeys.movements(variantId, locationIds),
     enabled: Boolean(token),
-    queryFn: () => fetchShopMovements(token!, { variantId: variantId ?? undefined, locationIds, limit: 30, titles }),
+    queryFn: () => fetchShopMovements(token!, { variantId: variantId ?? undefined, locationIds, limit: 30 }),
     select: (data) => data.movements,
   });
 }
@@ -236,7 +236,7 @@ export function useShopPaymentMethods() {
   return useQuery({
     queryKey: [...SHOP_KEY, "payment-methods"],
     enabled: Boolean(token),
-    queryFn: () => fetchShopPaymentMethods(),
+    queryFn: () => fetchShopPaymentMethods(token!),
     staleTime: 5 * 60_000,
     retry: false,
   });

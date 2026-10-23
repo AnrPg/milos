@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogView, orderActionRequest, productFromWire, salesFromWire, stockItemsFromCatalog } from "./shop-admin";
+import { orderActionRequest, productFromWire, salesFromWire, stockItemsFromCatalog } from "./shop-admin";
 
 const wireVariant = (extra: Record<string, unknown> = {}) => ({
   id: "v1",
@@ -53,20 +53,6 @@ describe("wire shapes", () => {
         { location_id: "loc-2", on_hand: 3, reserved: 0 },
       ],
     });
-  });
-
-  it("counts the filters and narrows by status, branch and search", () => {
-    const shirt = productFromWire(wireProduct());
-    const draft = productFromWire(wireProduct({ id: "p2", title: "Hoodie", status: "draft", all_locations: false, location_ids: ["loc-2"] }));
-    const low = productFromWire(wireProduct({ id: "p3", title: "Bottle", category: "Gear", variants: [wireVariant({ id: "v3", stock_status: "low" })] }));
-    const old = productFromWire(wireProduct({ id: "p4", status: "archived" }));
-
-    const all = catalogView([shirt, draft, low], [old]);
-    expect(all.counts).toEqual({ all: 3, published: 2, draft: 1, archived: 1, low_stock: 1 });
-    expect(catalogView([shirt, draft, low], [old], { status: "low_stock" }).products.map((row) => row.id)).toEqual(["p3"]);
-    expect(catalogView([shirt, draft, low], [old], { status: "archived" }).products.map((row) => row.id)).toEqual(["p4"]);
-    expect(catalogView([shirt, draft, low], [old], { locationIds: "loc-1" }).counts.draft).toBe(0);
-    expect(catalogView([shirt, draft, low], [old], { q: "gear" }).products.map((row) => row.id)).toEqual(["p3"]);
   });
 
   it("lists stock rows per variant and branch", () => {

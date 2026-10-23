@@ -10047,12 +10047,12 @@
       "where": "Waar plaatsen",
       "targets": {
         "announcements": "Aankondigingen",
-        "group": "Ledengroep",
+        "channel": "Ledengroep",
         "feed": "Feed"
       },
       "targetHints": {
         "announcements": "Een clubbericht in het aankondigingskanaal, met de productkaart erbij.",
-        "group": "Alleen de leden van één groep zien het bericht.",
+        "channel": "Alleen de leden van één groep zien het bericht.",
         "feed": "Een bericht van je box in de Feed van je leden en volgers."
       },
       "group": "Groep",
@@ -10166,6 +10166,8 @@
       "history": "Mutaties",
       "adjust": "Boeken",
       "policyNote": "De status volgt uit de dagen voorraad die over zijn bij het huidige tempo: kritiek onder 7 dagen, laag onder 21. Meldingen komen alleen als het slechter wordt, en voorraad staat in het dagelijkse overzicht.",
+      "recent": "Recente mutaties",
+      "allMovements": "Alle mutaties",
       "historyOf": "Mutaties · {item}",
       "noMovements": "Nog geen mutaties.",
       "kinds": {

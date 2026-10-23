@@ -10047,12 +10047,12 @@
       "where": "Where to post",
       "targets": {
         "announcements": "Announcements",
-        "group": "Member group",
+        "channel": "Member group",
         "feed": "Feed"
       },
       "targetHints": {
         "announcements": "A club post in the announcements channel, with the product card attached.",
-        "group": "Only the members of one group see the post.",
+        "channel": "Only the members of one group see the post.",
         "feed": "Your box's post in the Feed of your members and followers."
       },
       "group": "Group",
@@ -10166,6 +10166,8 @@
       "history": "Movements",
       "adjust": "Adjust",
       "policyNote": "The state comes from the days of stock left at the current pace: critical under 7 days, low under 21. Alerts fire only when it gets worse, and stock joins the daily digest.",
+      "recent": "Recent movements",
+      "allMovements": "All movements",
       "historyOf": "Movements · {item}",
       "noMovements": "No movements yet.",
       "kinds": {
