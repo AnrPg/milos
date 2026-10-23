@@ -963,6 +963,80 @@ defmodule Palee.Organizations do
 
   def stored_location_scope(_context, _user_id), do: nil
 
+  # ADR-184: business accounts stay in demo mode until the platform team
+  # activates them. `GoLivePolicy` is the one gate; these are its entry points.
+
+  @doc """
+  `:ok` when the organization (or the context's) may take a going-live
+  action, else `{:error, :business_not_activated}` (see `GoLivePolicy`).
+  """
+  def go_live(organization_or_context, action, facts \\ %{}),
+    do:
+      Palee.Organizations.Domain.GoLivePolicy.check(
+        gated_subject(organization_or_context),
+        action,
+        facts
+      )
+
+  @doc "Whether the organization is a gym or coach business still in demo mode."
+  def business_gated?(organization_or_context),
+    do: Palee.Organizations.Domain.GoLivePolicy.gated?(gated_subject(organization_or_context))
+
+  @doc "`%{activation, gated}` for session payloads."
+  def business_status(organization_or_context),
+    do: Palee.Organizations.Domain.GoLivePolicy.status(gated_subject(organization_or_context))
+
+  defdelegate gated_business_kinds(),
+    to: Palee.Organizations.Domain.GoLivePolicy,
+    as: :gated_kinds
+
+  @doc """
+  ADR-184: an account opens a business of `kind` (gym | coach) in demo mode.
+  `opts[:seed_defaults]` as in `create_owned_organization/3`.
+  """
+  def create_business_account(account, kind, params, opts \\ []),
+    do: Palee.Organizations.Commands.CreateBusinessAccount.call(account, kind, params, opts)
+
+  @doc """
+  ADR-184: a mock person's membership in a demo business. Unlike
+  `add_membership/1` it announces nothing (`:membership_activated` would
+  start referral, trial and event reactions for someone who does not exist).
+  """
+  def add_demo_membership(%{organization_id: organization_id, user_id: user_id}, params)
+      when is_binary(organization_id) and is_binary(user_id) do
+    RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
+      params |> Map.put(:organization_id, organization_id) |> AddMembership.call()
+    end)
+  end
+
+  @doc """
+  ADR-184: on activation the account the link names holds `roles` in the
+  business (added to the roles it already has). Runs as that account: a
+  person may write their own membership row.
+  """
+  def grant_activation_roles(organization_id, user_id, roles, now)
+      when is_binary(organization_id) and is_binary(user_id) and is_list(roles) do
+    RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
+      existing = OrganizationStore.get_membership(organization_id, user_id)
+      held = if existing && existing.status == :active, do: existing.roles, else: []
+      wanted = held ++ roles
+      ordered = Enum.filter(Palee.Organizations.Domain.MembershipPolicy.roles(), &(&1 in wanted))
+
+      OrganizationStore.add_membership(%{
+        organization_id: organization_id,
+        user_id: user_id,
+        role: Palee.Organizations.Domain.MembershipPolicy.primary_role(ordered),
+        roles: ordered,
+        coach_scope: if(:coach in ordered, do: :all, else: :own),
+        status: :active,
+        joined_at: (existing && existing.joined_at) || now
+      })
+    end)
+  end
+
+  defp gated_subject(%{organization: %{} = organization}), do: organization
+  defp gated_subject(organization), do: organization
+
   defp legacy_membership_role(:admin), do: :owner
   defp legacy_membership_role(:athlete), do: :athlete
   defp legacy_membership_role(_role), do: :member

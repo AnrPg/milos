@@ -38,6 +38,7 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
       params
       |> Organization.changeset()
       |> Organization.put_initial_provider_kind(value(params, :provider_kind))
+      |> Organization.put_initial_activation(value(params, :activation))
 
     Multi.new()
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)

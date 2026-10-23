@@ -68,6 +68,14 @@ export function usageShare(usage: PlanUsage): number | null {
 }
 
 /** Whether the account already owns an independent coach's practice. */
+/** ADR-184: the account owns a gym or a coach practice (active or in demo mode). */
+export function ownsBusiness(memberships: OrganizationMembership[]) {
+  return memberships.some(
+    (membership) =>
+      String(membership.organization.provider_kind ?? "gym") !== "organiser" && (membership.roles ?? [membership.role]).includes("owner"),
+  );
+}
+
 export function ownsCoachPractice(memberships: OrganizationMembership[]) {
   return memberships.some(
     (membership) =>

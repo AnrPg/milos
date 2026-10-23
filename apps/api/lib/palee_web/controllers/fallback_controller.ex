@@ -1,6 +1,39 @@
 defmodule PaleeWeb.FallbackController do
   use PaleeWeb, :controller
 
+  # ADR-184: business accounts. `business_not_activated` is the one stable code
+  # every going-live action of a demo business answers; the web shows it as
+  # «Ενεργοποίηση από την ομάδα Palee» with the way to ask for it.
+  @business_errors %{
+    business_not_activated:
+      {:forbidden, "The Palee team activates this business before it can go live"},
+    business_account_exists: {:conflict, "You already have a business waiting for activation"},
+    business_signup_closed:
+      {:conflict, "Ask the Palee team to turn your account into a business account"},
+    invalid_business_kind: {:unprocessable_entity, "Choose a gym or an independent coach"},
+    invalid_business_request: {:unprocessable_entity, "Check the details of the request"},
+    business_request_pending: {:conflict, "You already have a pending request of this kind"},
+    business_request_closed: {:conflict, "This request was already answered"},
+    invalid_activation_link:
+      {:not_found, "This activation link isn't valid for the account you're signed in with"},
+    business_already_active: {:conflict, "This business is already active"},
+    invalid_activation_role: {:unprocessable_entity, "Choose owner or admin"},
+    invalid_activation_lifetime:
+      {:unprocessable_entity, "A link lasts between one hour and 30 days"},
+    account_not_found: {:not_found, "No account matches"},
+    unknown_demo_section: {:unprocessable_entity, "There is no demo data for this screen"},
+    demo_source_not_deletable:
+      {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@business_errors, reason) do
+    {status, message} = Map.fetch!(@business_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -159,6 +192,72 @@ defmodule PaleeWeb.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> json(%{code: "invalid_password", error: "Password is incorrect"})
+  end
+
+  # ADR-187: password recovery.
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_reset_link,
+             :expired_reset_link,
+             :invalid_recovery_code,
+             :weak_password,
+             :claimed_by_other,
+             :not_claimed
+           ] do
+    {status, message} =
+      case reason do
+        :invalid_reset_link ->
+          {:unprocessable_entity, "This reset link is not valid"}
+
+        :expired_reset_link ->
+          {:gone, "This reset link has expired"}
+
+        :invalid_recovery_code ->
+          {:unprocessable_entity, "The account or recovery code is wrong"}
+
+        :weak_password ->
+          {:unprocessable_entity, "Password must have at least 4 characters besides spaces"}
+
+        :claimed_by_other ->
+          {:conflict, "Someone else is handling this request"}
+
+        :not_claimed ->
+          {:conflict, "You are not handling this request"}
+      end
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-187: the email already holds profiles and the password is not theirs.
+  # Only the count is disclosed, never which profiles.
+  def call(conn, {:error, {:email_in_use, %{profile_count: count, profile_limit: limit}}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "email_in_use",
+      error: "This email already has accounts",
+      profile_count: count,
+      profile_limit: limit,
+      errors: %{"email" => ["already has accounts"]}
+    })
+  end
+
+  def call(conn, {:error, {:profile_limit, %{profile_limit: limit}}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "profile_limit",
+      error: "This email already has the most accounts allowed",
+      profile_limit: limit
+    })
+  end
+
+  def call(conn, {:error, :email_taken}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "email_in_use", error: "This email already has accounts"})
   end
 
   def call(conn, {:error, :invalid_credentials}) do

@@ -1,21 +1,22 @@
 defmodule Palee.Application.LoginUser do
-  alias Palee.{Identity, Identity.RegistrationPolicy}
+  @moduledoc """
+  Sign-in with an email or an @handle and the login's password (ADR-187).
+  A handle opens that profile; an email opens the profile used last on that
+  login. Either way the profile becomes the login's last used one.
+  """
+  alias Palee.Identity
   alias Palee.Application.PasswordVerifier
   alias Palee.Application.TokenIssuer
 
   def call(params) when is_map(params) do
-    nickname =
-      params
-      |> Map.get("nickname")
-      |> Kernel.||(Map.get(params, :nickname))
-      |> normalize_nickname()
+    identifier = value(params, :identifier) || value(params, :nickname)
+    password = value(params, :password)
 
-    password = Map.get(params, "password") || Map.get(params, :password)
-
-    with true <- is_binary(nickname) and is_binary(password),
-         %{} = user <- Identity.find_by_nickname(nickname),
+    with true <- is_binary(identifier) and is_binary(password),
+         %{} = user <- find(identifier),
          true <- PasswordVerifier.verify(password, user.password_hash),
          {:ok, tokens} <- TokenIssuer.issue_pair(user) do
+      :ok = Identity.touch_last_used(user.login_id, user.id)
       {:ok, Map.put(tokens, :user, user)}
     else
       nil ->
@@ -30,8 +31,13 @@ defmodule Palee.Application.LoginUser do
     end
   end
 
-  defp normalize_nickname(nil), do: nil
+  defp find(identifier) do
+    identifier = String.trim(identifier)
 
-  defp normalize_nickname(nickname) when is_binary(nickname),
-    do: RegistrationPolicy.normalize_nickname(nickname)
+    if String.contains?(identifier, "@") and not String.starts_with?(identifier, "@"),
+      do: Identity.find_by_email(identifier),
+      else: Identity.find_by_handle(identifier)
+  end
+
+  defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
 end

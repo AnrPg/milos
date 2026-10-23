@@ -186,6 +186,69 @@
         "title": "AccountHistoryPage",
         "type": "object"
       },
+      "AccountInterests": {
+        "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+        "properties": {
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "disciplines",
+          "level"
+        ],
+        "title": "AccountInterests",
+        "type": "object"
+      },
+      "AccountInterestsResponse": {
+        "properties": {
+          "interests": {
+            "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+            "properties": {
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "level": {
+                "enum": [
+                  "beginner",
+                  "intermediate",
+                  "advanced"
+                ],
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "disciplines",
+              "level"
+            ],
+            "title": "AccountInterests",
+            "type": "object"
+          }
+        },
+        "required": [
+          "interests"
+        ],
+        "title": "AccountInterestsResponse",
+        "type": "object"
+      },
       "AccountProgress": {
         "properties": {
           "active_filter_count": {
@@ -15255,6 +15318,1022 @@
           "settings"
         ],
         "title": "BuddySettingsResponse",
+        "type": "object"
+      },
+      "BusinessAccountsQueue": {
+        "properties": {
+          "demo_businesses": {
+            "items": {
+              "properties": {
+                "link": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "expires_at": {
+                          "format": "date_time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date_time",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "path": {
+                          "description": "Only when just issued",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "owner",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "state": {
+                          "enum": [
+                            "live",
+                            "expired",
+                            "redeemed",
+                            "revoked"
+                          ],
+                          "type": "string"
+                        },
+                        "token": {
+                          "description": "Only when just issued",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "user_id",
+                        "role",
+                        "state",
+                        "expires_at",
+                        "inserted_at"
+                      ],
+                      "title": "BusinessActivationLink",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "organization": {
+                  "properties": {
+                    "activated_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "activation": {
+                      "enum": [
+                        "demo",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "demo_started_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider_kind": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "provider_kind",
+                    "activation"
+                  ],
+                  "title": "BusinessOrganization",
+                  "type": "object"
+                },
+                "owners": {
+                  "items": {
+                    "properties": {
+                      "nickname": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "user_id"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "organization",
+                "owners"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "requests": {
+            "items": {
+              "properties": {
+                "business_kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "business_name": {
+                  "type": "string"
+                },
+                "city": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "decided_at": {
+                  "format": "date_time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "decision_note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date_time",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "conversion",
+                    "activation"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "phone": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "requested_by": {
+                  "description": "Vendors: nickname",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "declined",
+                    "cancelled",
+                    "completed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "business_kind",
+                "business_name",
+                "status",
+                "inserted_at"
+              ],
+              "title": "BusinessRequest",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "requests",
+          "demo_businesses"
+        ],
+        "title": "BusinessAccountsQueue",
+        "type": "object"
+      },
+      "BusinessActivationLink": {
+        "properties": {
+          "expires_at": {
+            "format": "date_time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date_time",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "path": {
+            "description": "Only when just issued",
+            "nullable": true,
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "admin"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "live",
+              "expired",
+              "redeemed",
+              "revoked"
+            ],
+            "type": "string"
+          },
+          "token": {
+            "description": "Only when just issued",
+            "nullable": true,
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "organization_id",
+          "user_id",
+          "role",
+          "state",
+          "expires_at",
+          "inserted_at"
+        ],
+        "title": "BusinessActivationLink",
+        "type": "object"
+      },
+      "BusinessActivationPreview": {
+        "properties": {
+          "demo": {
+            "properties": {
+              "people": {
+                "type": "integer"
+              },
+              "rows": {
+                "type": "integer"
+              },
+              "sections": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "rows",
+              "people",
+              "sections"
+            ],
+            "type": "object"
+          },
+          "expires_at": {
+            "format": "date_time",
+            "type": "string"
+          },
+          "organization": {
+            "properties": {
+              "activated_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "activation": {
+                "enum": [
+                  "demo",
+                  "active"
+                ],
+                "type": "string"
+              },
+              "demo_started_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "provider_kind": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug",
+              "name",
+              "provider_kind",
+              "activation"
+            ],
+            "title": "BusinessOrganization",
+            "type": "object"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "admin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization",
+          "role",
+          "expires_at",
+          "demo"
+        ],
+        "title": "BusinessActivationPreview",
+        "type": "object"
+      },
+      "BusinessActivationResult": {
+        "properties": {
+          "organization": {
+            "properties": {
+              "activated_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "activation": {
+                "enum": [
+                  "demo",
+                  "active"
+                ],
+                "type": "string"
+              },
+              "demo_started_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "provider_kind": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug",
+              "name",
+              "provider_kind",
+              "activation"
+            ],
+            "title": "BusinessOrganization",
+            "type": "object"
+          },
+          "removed": {
+            "properties": {
+              "people": {
+                "type": "integer"
+              },
+              "rows": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "rows",
+              "people"
+            ],
+            "type": "object"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization",
+          "roles",
+          "removed"
+        ],
+        "title": "BusinessActivationResult",
+        "type": "object"
+      },
+      "BusinessDemoStatus": {
+        "properties": {
+          "activation": {
+            "enum": [
+              "demo",
+              "active"
+            ],
+            "type": "string"
+          },
+          "activation_request": {
+            "allOf": [
+              {
+                "properties": {
+                  "business_kind": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "business_name": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "decided_at": {
+                    "format": "date_time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "decision_note": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "inserted_at": {
+                    "format": "date_time",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "conversion",
+                      "activation"
+                    ],
+                    "type": "string"
+                  },
+                  "message": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "requested_by": {
+                    "description": "Vendors: nickname",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "pending",
+                      "approved",
+                      "declined",
+                      "cancelled",
+                      "completed"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "business_kind",
+                  "business_name",
+                  "status",
+                  "inserted_at"
+                ],
+                "title": "BusinessRequest",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "gated": {
+            "description": "Demo mode applies: going-live actions answer business_not_activated",
+            "type": "boolean"
+          },
+          "sections": {
+            "items": {
+              "properties": {
+                "rows": {
+                  "type": "integer"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "seeded": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "section",
+                "seeded",
+                "rows"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "activation",
+          "gated",
+          "sections"
+        ],
+        "title": "BusinessDemoStatus",
+        "type": "object"
+      },
+      "BusinessOrganization": {
+        "properties": {
+          "activated_at": {
+            "format": "date_time",
+            "nullable": true,
+            "type": "string"
+          },
+          "activation": {
+            "enum": [
+              "demo",
+              "active"
+            ],
+            "type": "string"
+          },
+          "demo_started_at": {
+            "format": "date_time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider_kind": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "provider_kind",
+          "activation"
+        ],
+        "title": "BusinessOrganization",
+        "type": "object"
+      },
+      "BusinessRequest": {
+        "properties": {
+          "business_kind": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "city": {
+            "nullable": true,
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date_time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decision_note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date_time",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "conversion",
+              "activation"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "requested_by": {
+            "description": "Vendors: nickname",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "approved",
+              "declined",
+              "cancelled",
+              "completed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "business_kind",
+          "business_name",
+          "status",
+          "inserted_at"
+        ],
+        "title": "BusinessRequest",
+        "type": "object"
+      },
+      "BusinessRequestDecision": {
+        "properties": {
+          "activation_link": {
+            "allOf": [
+              {
+                "properties": {
+                  "expires_at": {
+                    "format": "date_time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "inserted_at": {
+                    "format": "date_time",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "path": {
+                    "description": "Only when just issued",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin"
+                    ],
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "live",
+                      "expired",
+                      "redeemed",
+                      "revoked"
+                    ],
+                    "type": "string"
+                  },
+                  "token": {
+                    "description": "Only when just issued",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "organization_id",
+                  "user_id",
+                  "role",
+                  "state",
+                  "expires_at",
+                  "inserted_at"
+                ],
+                "title": "BusinessActivationLink",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "organization": {
+            "allOf": [
+              {
+                "properties": {
+                  "activated_at": {
+                    "format": "date_time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "activation": {
+                    "enum": [
+                      "demo",
+                      "active"
+                    ],
+                    "type": "string"
+                  },
+                  "demo_started_at": {
+                    "format": "date_time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "provider_kind": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "slug",
+                  "name",
+                  "provider_kind",
+                  "activation"
+                ],
+                "title": "BusinessOrganization",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "request": {
+            "properties": {
+              "business_kind": {
+                "enum": [
+                  "gym",
+                  "coach"
+                ],
+                "type": "string"
+              },
+              "business_name": {
+                "type": "string"
+              },
+              "city": {
+                "nullable": true,
+                "type": "string"
+              },
+              "decided_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "decision_note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date_time",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "conversion",
+                  "activation"
+                ],
+                "type": "string"
+              },
+              "message": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "phone": {
+                "nullable": true,
+                "type": "string"
+              },
+              "requested_by": {
+                "description": "Vendors: nickname",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "approved",
+                  "declined",
+                  "cancelled",
+                  "completed"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "business_kind",
+              "business_name",
+              "status",
+              "inserted_at"
+            ],
+            "title": "BusinessRequest",
+            "type": "object"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "title": "BusinessRequestDecision",
+        "type": "object"
+      },
+      "BusinessRequests": {
+        "properties": {
+          "requests": {
+            "items": {
+              "properties": {
+                "business_kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "business_name": {
+                  "type": "string"
+                },
+                "city": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "decided_at": {
+                  "format": "date_time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "decision_note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date_time",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "conversion",
+                    "activation"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "phone": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "requested_by": {
+                  "description": "Vendors: nickname",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "declined",
+                    "cancelled",
+                    "completed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "business_kind",
+                "business_name",
+                "status",
+                "inserted_at"
+              ],
+              "title": "BusinessRequest",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "requests"
+        ],
+        "title": "BusinessRequests",
         "type": "object"
       },
       "CheckInBooking": {
@@ -65127,6 +66206,108 @@
         ]
       }
     },
+    "/api/auth/handle-available": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AuthController.handle_available",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "handle",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "handle": {
+                      "type": "string"
+                    },
+                    "suggestions": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "handle",
+                    "suggestions"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Availability result"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a valid handle"
+          }
+        },
+        "summary": "ADR-187: whether a typed @handle is free, its stored form, and alternatives",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/handle-suggestion": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AuthController.handle_suggestion",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "display_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "handle"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestion"
+          }
+        },
+        "summary": "ADR-187: a free @handle suggested from a display name (null when it has no Latin form)",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/auth/invitations/inspect": {
       "post": {
         "callbacks": {},
@@ -65185,6 +66366,14 @@
                     },
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -65273,6 +66462,14 @@
                   "properties": {
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -65359,7 +66556,12 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "identifier": {
+                    "description": "ADR-187: the login's email or a profile's @handle",
+                    "type": "string"
+                  },
                   "nickname": {
+                    "description": "Deprecated alias of identifier",
                     "type": "string"
                   },
                   "password": {
@@ -65368,7 +66570,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password"
                 ],
                 "type": "object"
@@ -65398,17 +66599,30 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "description": "The login's email, shared by its profiles",
+                          "type": "string"
+                        },
+                        "handle": {
+                          "description": "ADR-187: the unique @handle",
+                          "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
                         "nickname": {
+                          "description": "ADR-187: the display name (free, not unique); same as display_name",
                           "type": "string"
                         },
                         "preferred_locale": {
@@ -65438,6 +66652,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "profile_count": {
+                          "type": "integer"
+                        },
+                        "profile_limit": {
+                          "type": "integer"
+                        },
                         "role": {
                           "type": "string"
                         },
@@ -65453,6 +66673,8 @@
                       "required": [
                         "id",
                         "nickname",
+                        "display_name",
+                        "handle",
                         "role",
                         "vendor",
                         "preferred_locale",
@@ -65588,17 +66810,30 @@
                         "enum": [
                           "admin",
                           "member",
-                          "athlete"
+                          "athlete",
+                          "first_run"
                         ],
                         "type": "string"
                       },
                       "type": "array"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "The login's email, shared by its profiles",
+                      "type": "string"
+                    },
+                    "handle": {
+                      "description": "ADR-187: the unique @handle",
+                      "type": "string"
                     },
                     "id": {
                       "format": "uuid",
                       "type": "string"
                     },
                     "nickname": {
+                      "description": "ADR-187: the display name (free, not unique); same as display_name",
                       "type": "string"
                     },
                     "preferred_locale": {
@@ -65628,6 +66863,12 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
                     "role": {
                       "type": "string"
                     },
@@ -65643,6 +66884,8 @@
                   "required": [
                     "id",
                     "nickname",
+                    "display_name",
+                    "handle",
                     "role",
                     "vendor",
                     "preferred_locale",
@@ -65724,6 +66967,451 @@
         ]
       }
     },
+    "/api/auth/password-reset": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.complete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid link or password"
+          }
+        },
+        "summary": "Set a new password with a reset link's token",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset-requests": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.request",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "identifier": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request sent"
+          }
+        },
+        "summary": "Ask for a password reset (always answered the same way)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset/recovery-code": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.redeem_code",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "identifier": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier",
+                  "code",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong account or code"
+          }
+        },
+        "summary": "Set a new password with a recovery code",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/profiles": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
+                    "profiles": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          },
+                          "display_name": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "handle",
+                          "display_name",
+                          "role",
+                          "current"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "profile_limit",
+                    "profiles"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profiles"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The profiles of the signed-in login",
+        "tags": [
+          "Authentication"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "handle": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "handle",
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    },
+                    "profiles": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          },
+                          "display_name": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "handle",
+                          "display_name",
+                          "role",
+                          "current"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "profile_limit",
+                    "profiles"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profiles"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Validation or limit"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a profile to the signed-in login (at most three)",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/recovery-codes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.codes_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "unused": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "unused"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recovery codes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How many recovery codes the login has left",
+        "tags": [
+          "Password recovery"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.generate_codes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "current_password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "current_password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "codes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "codes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recovery codes"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong password"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "New recovery codes (the old ones stop working)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
     "/api/auth/refresh": {
       "post": {
         "callbacks": {},
@@ -65749,17 +67437,30 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "description": "The login's email, shared by its profiles",
+                          "type": "string"
+                        },
+                        "handle": {
+                          "description": "ADR-187: the unique @handle",
+                          "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
                         "nickname": {
+                          "description": "ADR-187: the display name (free, not unique); same as display_name",
                           "type": "string"
                         },
                         "preferred_locale": {
@@ -65789,6 +67490,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "profile_count": {
+                          "type": "integer"
+                        },
+                        "profile_limit": {
+                          "type": "integer"
+                        },
                         "role": {
                           "type": "string"
                         },
@@ -65804,6 +67511,8 @@
                       "required": [
                         "id",
                         "nickname",
+                        "display_name",
+                        "handle",
                         "role",
                         "vendor",
                         "preferred_locale",
@@ -65910,11 +67619,20 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "description": "Free display name; defaults to the handle",
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
                     "type": "string"
                   },
+                  "handle": {
+                    "description": "ADR-187: the unique @handle",
+                    "type": "string"
+                  },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -65930,7 +67648,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "role",
                   "email"
@@ -65961,11 +67678,42 @@
             },
             "description": "Access session"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email already has accounts"
+          },
           "422": {
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
+                    "code": {
+                      "type": "string"
+                    },
                     "errors": {
                       "additionalProperties": {
                         "items": {
@@ -65974,6 +67722,9 @@
                         "type": "array"
                       },
                       "type": "object"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -66056,8 +67807,14 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
+                    "type": "string"
+                  },
+                  "handle": {
                     "type": "string"
                   },
                   "invitation_token": {
@@ -66066,6 +67823,7 @@
                     "type": "string"
                   },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -66074,7 +67832,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "invitation_token",
                   "email"
@@ -66186,8 +67943,14 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "display_name": {
+                    "type": "string"
+                  },
                   "email": {
                     "format": "email",
+                    "type": "string"
+                  },
+                  "handle": {
                     "type": "string"
                   },
                   "invitation_token": {
@@ -66196,6 +67959,7 @@
                     "type": "string"
                   },
                   "nickname": {
+                    "description": "Deprecated alias of handle",
                     "type": "string"
                   },
                   "password": {
@@ -66204,7 +67968,6 @@
                   }
                 },
                 "required": [
-                  "nickname",
                   "password",
                   "invitation_token",
                   "email"
@@ -66267,6 +68030,75 @@
           }
         ],
         "summary": "Invalidate every session for the authenticated user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/switch-profile": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountProfilesController.switch",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "access_token",
+                    "user"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access session"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a profile of this login"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a session for another profile of the same login",
         "tags": [
           "Authentication"
         ]
@@ -68873,6 +70705,379 @@
         "summary": "Preview of a buddy invite link (public)",
         "tags": [
           "Buddies"
+        ]
+      }
+    },
+    "/api/business-accounts": {
+      "post": {
+        "callbacks": {},
+        "description": "Within 30 minutes of registering. Older accounts file a conversion request (`business_signup_closed`).",
+        "operationId": "PaleeWeb.BusinessAccountController.sign_up",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "business_kind": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "business_name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "city": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "default_locale": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "business_kind",
+                  "business_name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activated_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "activation": {
+                      "enum": [
+                        "demo",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "demo_started_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider_kind": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "provider_kind",
+                    "activation"
+                  ],
+                  "title": "BusinessOrganization",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Business"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a gym or independent-coach business in demo mode (sign-up only)",
+        "tags": [
+          "Business accounts"
+        ]
+      }
+    },
+    "/api/business-activation/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.inspect_activation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "demo": {
+                      "properties": {
+                        "people": {
+                          "type": "integer"
+                        },
+                        "rows": {
+                          "type": "integer"
+                        },
+                        "sections": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "rows",
+                        "people",
+                        "sections"
+                      ],
+                      "type": "object"
+                    },
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "activated_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "activation": {
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "demo_started_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "provider_kind",
+                        "activation"
+                      ],
+                      "title": "BusinessOrganization",
+                      "type": "object"
+                    },
+                    "role": {
+                      "enum": [
+                        "owner",
+                        "admin"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role",
+                    "expires_at",
+                    "demo"
+                  ],
+                  "title": "BusinessActivationPreview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Preview"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What an activation link would activate (the account it names only)",
+        "tags": [
+          "Business accounts"
+        ]
+      }
+    },
+    "/api/business-activation/redeem": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.redeem_activation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization": {
+                      "properties": {
+                        "activated_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "activation": {
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "demo_started_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "provider_kind",
+                        "activation"
+                      ],
+                      "title": "BusinessOrganization",
+                      "type": "object"
+                    },
+                    "removed": {
+                      "properties": {
+                        "people": {
+                          "type": "integer"
+                        },
+                        "rows": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "rows",
+                        "people"
+                      ],
+                      "type": "object"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "roles",
+                    "removed"
+                  ],
+                  "title": "BusinessActivationResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Activated"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Activate the business: demo data removed, gates lifted",
+        "tags": [
+          "Business accounts"
         ]
       }
     },
@@ -77986,6 +80191,384 @@
         "summary": "Claim an invite link: you become that person's buddy",
         "tags": [
           "Buddies"
+        ]
+      }
+    },
+    "/api/me/business-requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.my_requests",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "business_kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "business_name": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "decided_at": {
+                            "format": "date_time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "decision_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date_time",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "conversion",
+                              "activation"
+                            ],
+                            "type": "string"
+                          },
+                          "message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "phone": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "requested_by": {
+                            "description": "Vendors: nickname",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "approved",
+                              "declined",
+                              "cancelled",
+                              "completed"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "business_kind",
+                          "business_name",
+                          "status",
+                          "inserted_at"
+                        ],
+                        "title": "BusinessRequest",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "title": "BusinessRequests",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The person's requests to the platform team",
+        "tags": [
+          "Business accounts"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.request_conversion",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "business_kind": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "business_name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "city": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "business_kind",
+                  "business_name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "business_kind": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "business_name": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decided_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decision_note": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "conversion",
+                        "activation"
+                      ],
+                      "type": "string"
+                    },
+                    "message": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "phone": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requested_by": {
+                      "description": "Vendors: nickname",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "declined",
+                        "cancelled",
+                        "completed"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "business_kind",
+                    "business_name",
+                    "status",
+                    "inserted_at"
+                  ],
+                  "title": "BusinessRequest",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask the platform team to turn this account into a business",
+        "tags": [
+          "Business accounts"
+        ]
+      }
+    },
+    "/api/me/business-requests/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.cancel_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "business_kind": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "business_name": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decided_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decision_note": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "conversion",
+                        "activation"
+                      ],
+                      "type": "string"
+                    },
+                    "message": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "phone": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requested_by": {
+                      "description": "Vendors: nickname",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "declined",
+                        "cancelled",
+                        "completed"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "business_kind",
+                    "business_name",
+                    "status",
+                    "inserted_at"
+                  ],
+                  "title": "BusinessRequest",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw a pending request",
+        "tags": [
+          "Business accounts"
         ]
       }
     },
@@ -93639,6 +96222,160 @@
         ]
       }
     },
+    "/api/me/interests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your disciplines and level (empty until you say)",
+        "tags": [
+          "Interests"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                "properties": {
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "level": {
+                    "enum": [
+                      "beginner",
+                      "intermediate",
+                      "advanced"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "disciplines",
+                  "level"
+                ],
+                "title": "AccountInterests",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace your disciplines and level",
+        "tags": [
+          "Interests"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -97619,6 +100356,12 @@
               "schema": {
                 "properties": {
                   "current_password": {
+                    "description": "Required to change the login's email or password",
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "maxLength": 50,
+                    "minLength": 1,
                     "type": "string"
                   },
                   "email": {
@@ -97626,9 +100369,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "handle": {
+                    "description": "ADR-187: the unique @handle (once per 14 days)",
+                    "type": "string"
+                  },
                   "nickname": {
-                    "maxLength": 30,
-                    "minLength": 3,
+                    "description": "Deprecated alias of display_name",
                     "type": "string"
                   },
                   "password": {
@@ -97679,6 +100425,15 @@
                       "properties": {
                         "avatar_url": {
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "display_name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "handle": {
                           "type": "string"
                         },
                         "id": {
@@ -98808,6 +101563,13 @@
                     "users": {
                       "items": {
                         "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -98836,7 +101598,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Search visible users by nickname",
+        "summary": "Search visible users by @handle or display name (any script)",
         "tags": [
           "Me"
         ]
@@ -100789,7 +103551,8 @@
               "enum": [
                 "admin",
                 "member",
-                "athlete"
+                "athlete",
+                "first_run"
               ],
               "type": "string"
             }
@@ -105060,6 +107823,14 @@
                       },
                       "organization": {
                         "properties": {
+                          "activation": {
+                            "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                            "enum": [
+                              "demo",
+                              "active"
+                            ],
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -105218,6 +107989,14 @@
                     },
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -105347,6 +108126,14 @@
                     },
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -105515,6 +108302,14 @@
                     },
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -108048,6 +110843,617 @@
         "summary": "Create a constrained presigned upload for a new organization logo",
         "tags": [
           "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/business": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBusinessController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activation": {
+                      "enum": [
+                        "demo",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "activation_request": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "business_kind": {
+                              "enum": [
+                                "gym",
+                                "coach"
+                              ],
+                              "type": "string"
+                            },
+                            "business_name": {
+                              "type": "string"
+                            },
+                            "city": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decided_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decision_note": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date_time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "conversion",
+                                "activation"
+                              ],
+                              "type": "string"
+                            },
+                            "message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "phone": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "requested_by": {
+                              "description": "Vendors: nickname",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "approved",
+                                "declined",
+                                "cancelled",
+                                "completed"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "kind",
+                            "business_kind",
+                            "business_name",
+                            "status",
+                            "inserted_at"
+                          ],
+                          "title": "BusinessRequest",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "gated": {
+                      "description": "Demo mode applies: going-live actions answer business_not_activated",
+                      "type": "boolean"
+                    },
+                    "sections": {
+                      "items": {
+                        "properties": {
+                          "rows": {
+                            "type": "integer"
+                          },
+                          "section": {
+                            "type": "string"
+                          },
+                          "seeded": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "section",
+                          "seeded",
+                          "rows"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "activation",
+                    "gated",
+                    "sections"
+                  ],
+                  "title": "BusinessDemoStatus",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Activation state and the sections holding demo data",
+        "tags": [
+          "Admin business"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/business/activation-request": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBusinessController.request_activation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "city": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "business_kind": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "business_name": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decided_at": {
+                      "format": "date_time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decision_note": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "conversion",
+                        "activation"
+                      ],
+                      "type": "string"
+                    },
+                    "message": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "phone": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requested_by": {
+                      "description": "Vendors: nickname",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "declined",
+                        "cancelled",
+                        "completed"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "business_kind",
+                    "business_name",
+                    "status",
+                    "inserted_at"
+                  ],
+                  "title": "BusinessRequest",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask the platform team to activate this business (owners)",
+        "tags": [
+          "Admin business"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/business/demo-data": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBusinessController.remove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activation": {
+                      "enum": [
+                        "demo",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "activation_request": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "business_kind": {
+                              "enum": [
+                                "gym",
+                                "coach"
+                              ],
+                              "type": "string"
+                            },
+                            "business_name": {
+                              "type": "string"
+                            },
+                            "city": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decided_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decision_note": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date_time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "conversion",
+                                "activation"
+                              ],
+                              "type": "string"
+                            },
+                            "message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "phone": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "requested_by": {
+                              "description": "Vendors: nickname",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "approved",
+                                "declined",
+                                "cancelled",
+                                "completed"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "kind",
+                            "business_kind",
+                            "business_name",
+                            "status",
+                            "inserted_at"
+                          ],
+                          "title": "BusinessRequest",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "gated": {
+                      "description": "Demo mode applies: going-live actions answer business_not_activated",
+                      "type": "boolean"
+                    },
+                    "sections": {
+                      "items": {
+                        "properties": {
+                          "rows": {
+                            "type": "integer"
+                          },
+                          "section": {
+                            "type": "string"
+                          },
+                          "seeded": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "section",
+                          "seeded",
+                          "rows"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "activation",
+                    "gated",
+                    "sections"
+                  ],
+                  "title": "BusinessDemoStatus",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove every demo row (demo mode only)",
+        "tags": [
+          "Admin business"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBusinessController.seed",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "section": {
+                    "description": "A demo section (members, schedule, finance, workouts) or all",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "section"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activation": {
+                      "enum": [
+                        "demo",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "activation_request": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "business_kind": {
+                              "enum": [
+                                "gym",
+                                "coach"
+                              ],
+                              "type": "string"
+                            },
+                            "business_name": {
+                              "type": "string"
+                            },
+                            "city": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decided_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "decision_note": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date_time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "conversion",
+                                "activation"
+                              ],
+                              "type": "string"
+                            },
+                            "message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "phone": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "requested_by": {
+                              "description": "Vendors: nickname",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "approved",
+                                "declined",
+                                "cancelled",
+                                "completed"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "kind",
+                            "business_kind",
+                            "business_name",
+                            "status",
+                            "inserted_at"
+                          ],
+                          "title": "BusinessRequest",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "gated": {
+                      "description": "Demo mode applies: going-live actions answer business_not_activated",
+                      "type": "boolean"
+                    },
+                    "sections": {
+                      "items": {
+                        "properties": {
+                          "rows": {
+                            "type": "integer"
+                          },
+                          "section": {
+                            "type": "string"
+                          },
+                          "seeded": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "section",
+                          "seeded",
+                          "rows"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "activation",
+                    "gated",
+                    "sections"
+                  ],
+                  "title": "BusinessDemoStatus",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fill a screen's section (or all) with demo data (demo mode only)",
+        "tags": [
+          "Admin business"
         ]
       }
     },
@@ -168124,6 +171530,14 @@
                     },
                     "organization": {
                       "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -172509,6 +175923,13 @@
                     "users": {
                       "items": {
                         "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handle": {
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -172537,7 +175958,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Search visible users by nickname",
+        "summary": "Search visible users by @handle or display name (any script)",
         "tags": [
           "Me"
         ]
@@ -191257,6 +194678,695 @@
         ]
       }
     },
+    "/api/password-resets": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.inbox",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "claimed_by": {
+                            "nullable": true,
+                            "properties": {
+                              "display_name": {
+                                "type": "string"
+                              },
+                              "handle": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "link_expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "link_issued_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organizations": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_name": {
+                                "type": "string"
+                              },
+                              "email": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "user_id",
+                              "handle",
+                              "display_name"
+                            ],
+                            "type": "object"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "state": {
+                            "enum": [
+                              "open",
+                              "mine",
+                              "taken",
+                              "link_sent",
+                              "expired"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "state",
+                          "person",
+                          "sources",
+                          "organizations",
+                          "requested_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The password reset requests the signed-in person can handle",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/claim": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.claim",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Someone else holds it"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a request and claim it",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/dismiss": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.dismiss",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Clear an expired request",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/hide": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.hide",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Hide a request from your own list",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/link": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.issue_link",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "email",
+                    "expires_at",
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reset link"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Someone else holds it"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue the one-time reset link (24 hours) to mail to the person",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/reject": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.reject",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Close a request that could not be confirmed",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/password-resets/{id}/release": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.release",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "claimed_by": {
+                          "nullable": true,
+                          "properties": {
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "link_issued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organizations": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "handle",
+                            "display_name"
+                          ],
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "sources": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "state": {
+                          "enum": [
+                            "open",
+                            "mine",
+                            "taken",
+                            "link_sent",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "state",
+                        "person",
+                        "sources",
+                        "organizations",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not yours"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Let go of a claimed request",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
     "/api/people/{id}": {
       "get": {
         "callbacks": {},
@@ -192114,6 +196224,646 @@
         ]
       }
     },
+    "/api/platform/activation-links/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformBusinessAccountController.revoke_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "path": {
+                      "description": "Only when just issued",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "owner",
+                        "admin"
+                      ],
+                      "type": "string"
+                    },
+                    "state": {
+                      "enum": [
+                        "live",
+                        "expired",
+                        "redeemed",
+                        "revoked"
+                      ],
+                      "type": "string"
+                    },
+                    "token": {
+                      "description": "Only when just issued",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "organization_id",
+                    "user_id",
+                    "role",
+                    "state",
+                    "expires_at",
+                    "inserted_at"
+                  ],
+                  "title": "BusinessActivationLink",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke a live activation link (vendors)",
+        "tags": [
+          "Platform business accounts"
+        ]
+      }
+    },
+    "/api/platform/business-accounts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformBusinessAccountController.queue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "demo_businesses": {
+                      "items": {
+                        "properties": {
+                          "link": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "expires_at": {
+                                    "format": "date_time",
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date_time",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "path": {
+                                    "description": "Only when just issued",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "role": {
+                                    "enum": [
+                                      "owner",
+                                      "admin"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "enum": [
+                                      "live",
+                                      "expired",
+                                      "redeemed",
+                                      "revoked"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "token": {
+                                    "description": "Only when just issued",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "user_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "organization_id",
+                                  "user_id",
+                                  "role",
+                                  "state",
+                                  "expires_at",
+                                  "inserted_at"
+                                ],
+                                "title": "BusinessActivationLink",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "organization": {
+                            "properties": {
+                              "activated_at": {
+                                "format": "date_time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "activation": {
+                                "enum": [
+                                  "demo",
+                                  "active"
+                                ],
+                                "type": "string"
+                              },
+                              "demo_started_at": {
+                                "format": "date_time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "provider_kind": {
+                                "type": "string"
+                              },
+                              "slug": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "slug",
+                              "name",
+                              "provider_kind",
+                              "activation"
+                            ],
+                            "title": "BusinessOrganization",
+                            "type": "object"
+                          },
+                          "owners": {
+                            "items": {
+                              "properties": {
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "user_id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "organization",
+                          "owners"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "business_kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "business_name": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "decided_at": {
+                            "format": "date_time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "decision_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date_time",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "conversion",
+                              "activation"
+                            ],
+                            "type": "string"
+                          },
+                          "message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "phone": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "requested_by": {
+                            "description": "Vendors: nickname",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "approved",
+                              "declined",
+                              "cancelled",
+                              "completed"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "business_kind",
+                          "business_name",
+                          "status",
+                          "inserted_at"
+                        ],
+                        "title": "BusinessRequest",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests",
+                    "demo_businesses"
+                  ],
+                  "title": "BusinessAccountsQueue",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queue"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pending requests and businesses in demo mode (vendors)",
+        "tags": [
+          "Platform business accounts"
+        ]
+      }
+    },
+    "/api/platform/business-requests/{id}/decision": {
+      "post": {
+        "callbacks": {},
+        "description": "Approving a conversion creates the business in demo mode; approving an activation request issues the activation link for the requester.",
+        "operationId": "PaleeWeb.PlatformBusinessAccountController.decide",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "approve",
+                      "decline"
+                    ],
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "role": {
+                    "description": "Activation requests: the role the link grants",
+                    "enum": [
+                      "owner",
+                      "admin"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activation_link": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "expires_at": {
+                              "format": "date_time",
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date_time",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "path": {
+                              "description": "Only when just issued",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "role": {
+                              "enum": [
+                                "owner",
+                                "admin"
+                              ],
+                              "type": "string"
+                            },
+                            "state": {
+                              "enum": [
+                                "live",
+                                "expired",
+                                "redeemed",
+                                "revoked"
+                              ],
+                              "type": "string"
+                            },
+                            "token": {
+                              "description": "Only when just issued",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "organization_id",
+                            "user_id",
+                            "role",
+                            "state",
+                            "expires_at",
+                            "inserted_at"
+                          ],
+                          "title": "BusinessActivationLink",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "organization": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "activated_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "activation": {
+                              "enum": [
+                                "demo",
+                                "active"
+                              ],
+                              "type": "string"
+                            },
+                            "demo_started_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "provider_kind": {
+                              "type": "string"
+                            },
+                            "slug": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "slug",
+                            "name",
+                            "provider_kind",
+                            "activation"
+                          ],
+                          "title": "BusinessOrganization",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "request": {
+                      "properties": {
+                        "business_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        },
+                        "business_name": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date_time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "conversion",
+                            "activation"
+                          ],
+                          "type": "string"
+                        },
+                        "message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_by": {
+                          "description": "Vendors: nickname",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "approved",
+                            "declined",
+                            "cancelled",
+                            "completed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "business_kind",
+                        "business_name",
+                        "status",
+                        "inserted_at"
+                      ],
+                      "title": "BusinessRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "title": "BusinessRequestDecision",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Decision"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Approve or decline a request (vendors)",
+        "tags": [
+          "Platform business accounts"
+        ]
+      }
+    },
     "/api/platform/organization-purges": {
       "get": {
         "callbacks": {},
@@ -192481,6 +197231,142 @@
         "summary": "List tenant memberships for platform access management",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/activation-links": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformBusinessAccountController.issue_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "lifetime_seconds": {
+                    "maximum": 2592000,
+                    "minimum": 3600,
+                    "type": "integer"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin"
+                    ],
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "path": {
+                      "description": "Only when just issued",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "owner",
+                        "admin"
+                      ],
+                      "type": "string"
+                    },
+                    "state": {
+                      "enum": [
+                        "live",
+                        "expired",
+                        "redeemed",
+                        "revoked"
+                      ],
+                      "type": "string"
+                    },
+                    "token": {
+                      "description": "Only when just issued",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "organization_id",
+                    "user_id",
+                    "role",
+                    "state",
+                    "expires_at",
+                    "inserted_at"
+                  ],
+                  "title": "BusinessActivationLink",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue the activation link of a demo business for one account (vendors)",
+        "tags": [
+          "Platform business accounts"
         ]
       }
     },
@@ -194624,6 +199510,71 @@
         "summary": "Summarize what renaming an organization's path slug affects (ADR-122)",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/password-reset-log": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.log",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "event": {
+                            "type": "string"
+                          },
+                          "handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handler_handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "event",
+                          "inserted_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Log"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The password reset security log (vendor only)",
+        "tags": [
+          "Password recovery"
         ]
       }
     },

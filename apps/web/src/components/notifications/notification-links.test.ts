@@ -10,6 +10,23 @@ describe("notificationTargetUrl", () => {
     expect(notificationTargetUrl({ type: "check_in_visitor", payload: {} }, "admin")).toBe("/admin/check-in#visitors");
   });
 
+  it("opens the password reset request a handler was told about", () => {
+    for (const role of ["admin", "coach", "member", null]) {
+      expect(
+        notificationTargetUrl(
+          { type: "password_reset_requested", payload: { request_id: "req-1", url: "/password-resets?request=req-1" } },
+          role,
+        ),
+      ).toBe("/password-resets?request=req-1");
+    }
+    expect(notificationTargetUrl({ type: "password_reset_requested", payload: {} }, "admin")).toBe("/password-resets");
+  });
+
+  it("opens Settings after the person's password was reset", () => {
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings");
+  });
+
   it("opens Γύρω μου with the saved filter of an around alert", () => {
     expect(
       notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),

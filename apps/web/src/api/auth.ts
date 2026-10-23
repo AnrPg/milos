@@ -65,8 +65,43 @@ export function fetchCurrentUser(token: string) {
   return apiRequest<CurrentUser>("/auth/me", { token });
 }
 
-export function checkNicknameAvailable(nickname: string) {
-  return apiRequest<{ available: boolean }>(
-    `/auth/nickname-available?nickname=${encodeURIComponent(nickname)}`,
+export type HandleAvailability =
+  paths["/api/auth/handle-available"]["get"]["responses"]["200"]["content"]["application/json"];
+
+/** ADR-187: whether a typed @handle is free, its stored (folded) form and free alternatives. */
+export function checkHandleAvailable(handle: string, signal?: AbortSignal) {
+  return apiRequest<HandleAvailability>(
+    `/auth/handle-available?handle=${encodeURIComponent(handle)}`,
+    { signal },
   );
+}
+
+/** ADR-187: a free Latin @handle suggested from a display name (null when it has no Latin form). */
+export function suggestHandle(displayName: string, signal?: AbortSignal) {
+  return apiRequest<{ handle: string | null }>(
+    `/auth/handle-suggestion?display_name=${encodeURIComponent(displayName)}`,
+    { signal },
+  );
+}
+
+/** Always answered "sent"; never reveals whether the account exists. */
+export function requestPasswordReset(identifier: string) {
+  return apiRequest<unknown>("/auth/password-reset-requests", {
+    method: "POST",
+    body: { identifier },
+  });
+}
+
+/** Sets a new password with a reset link's token; signs every device out. */
+export function completePasswordReset(token: string, password: string) {
+  return apiRequest<void>("/auth/password-reset", { method: "POST", body: { token, password } });
+}
+
+/** Sets a new password with a one-time recovery code. */
+export function resetPasswordWithRecoveryCode(payload: {
+  identifier: string;
+  code: string;
+  password: string;
+}) {
+  return apiRequest<void>("/auth/password-reset/recovery-code", { method: "POST", body: payload });
 }

@@ -49,7 +49,7 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
              payload: normalized_payload
            }) do
       case notification do
-        :duplicate ->
+        skipped when skipped in [:duplicate, :suppressed] ->
           :ok
 
         _notification ->

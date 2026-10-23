@@ -1,7 +1,7 @@
 defmodule Palee.Application.SubmitBooking do
   require Logger
 
-  alias Palee.Application.{BookingTerms, TrackAnalyticsEvent}
+  alias Palee.Application.{BookingTerms, GoLive, TrackAnalyticsEvent}
   alias Palee.{Finance, Identity, Scheduling}
   alias Palee.Scheduling.Domain.{BookingOperationPolicy, BookingPolicy}
 
@@ -34,6 +34,8 @@ defmodule Palee.Application.SubmitBooking do
     now = DateTime.utc_now()
 
     with {:ok, slot} <- fetch_slot(context, slot_id),
+         # ADR-184: a business in demo mode takes no bookings from real people.
+         :ok <- GoLive.check_booking(context, user_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: now),
          terms = BookingTerms.for_slot(context, user_id, slot),
          :ok <-

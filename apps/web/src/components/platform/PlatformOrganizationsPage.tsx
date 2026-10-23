@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import {
   changePlatformOrganizationLifecycle,
@@ -62,6 +63,8 @@ export function PlatformOrganizationsPage() {
   const copy = platformOrganizationsCopy(locale);
   const purgeCopy = platformOrganizationPurgeCopy(locale);
   const slugCopy = platformOrganizationSlugCopy(locale);
+  const tResets = useTranslations("passwordResets");
+  const tBusiness = useTranslations("Business");
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -234,10 +237,22 @@ export function PlatformOrganizationsPage() {
             {copy.tagSuggestions}
           </Link>
           <Link
+            href="/platform/business-accounts"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tBusiness("console.title")}
+          </Link>
+          <Link
             href="/platform/plans"
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {copy.plans}
+          </Link>
+          <Link
+            href="/platform/password-resets"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tResets("logButton")}
           </Link>
           <button
             type="button"

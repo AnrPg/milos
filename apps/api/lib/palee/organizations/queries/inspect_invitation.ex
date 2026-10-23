@@ -1,6 +1,13 @@
 defmodule Palee.Organizations.Queries.InspectInvitation do
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.{InvitationPolicy, InvitationToken, LocationScopePolicy}
+
+  alias Palee.Organizations.Domain.{
+    GoLivePolicy,
+    InvitationPolicy,
+    InvitationToken,
+    LocationScopePolicy
+  }
+
   alias Palee.Organizations.{OrganizationStore, RegistrationInvitation}
 
   def call(token, now) do
@@ -12,7 +19,9 @@ defmodule Palee.Organizations.Queries.InspectInvitation do
              OrganizationStore.get_invitation_with_organization(digest)
            end),
          true <- InvitationPolicy.redeemable?(invitation, now),
-         :active <- organization.status do
+         :active <- organization.status,
+         # ADR-184: nobody joins a business still in demo mode.
+         :ok <- GoLivePolicy.check(organization, :join) do
       {:ok,
        %{
          invitation_id: invitation.id,

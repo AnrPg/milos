@@ -234,3 +234,10 @@ describe("scope", () => {
     expect(scopeFromParams(null)).toBeNull();
   });
 });
+
+describe("chipModel with the person's interests (ADR-183)", () => {
+  it("puts their disciplines first in the discipline chip", () => {
+    const discipline = chipModel(DEFAULT_FILTER, ["bjj_grappling", "yoga"]).find((chip) => chip.key === "discipline");
+    expect(discipline && discipline.kind === "menu" ? discipline.options.slice(0, 2) : []).toEqual(["bjj_grappling", "yoga"]);
+  });
+});

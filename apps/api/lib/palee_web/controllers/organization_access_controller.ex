@@ -66,6 +66,12 @@ defmodule PaleeWeb.OrganizationAccessController do
         type: :boolean,
         description:
           "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)"
+      },
+      activation: %Schema{
+        type: :string,
+        enum: ["demo", "active"],
+        description:
+          "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it"
       }
     },
     required: [:id, :name, :slug]
@@ -459,7 +465,8 @@ defmodule PaleeWeb.OrganizationAccessController do
         slug: organization.slug,
         provider_kind: Map.get(organization, :provider_kind) || "gym",
         timezone: Palee.Organizations.resolve_timezone(Map.get(entry, :settings)),
-        timezone_confirmed: Palee.Organizations.timezone_confirmed?(Map.get(entry, :settings))
+        timezone_confirmed: Palee.Organizations.timezone_confirmed?(Map.get(entry, :settings)),
+        activation: Map.get(organization, :activation) || "active"
       },
       settings: serialize_settings(Map.get(entry, :settings))
     }

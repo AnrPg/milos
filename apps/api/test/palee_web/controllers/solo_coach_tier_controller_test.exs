@@ -84,8 +84,16 @@ defmodule PaleeWeb.SoloCoachTierControllerTest do
   end
 
   test "a staff seat beyond the plan is refused; clients never are", ctx do
-    %{"slug" => slug} = open_practice(ctx, %{name: "Μαρία Κ.", team_name: "Team Μαρία"})
+    %{"slug" => slug, "id" => org_id} =
+      open_practice(ctx, %{name: "Μαρία Κ.", team_name: "Team Μαρία"})
+
     path = "/api/org/#{slug}/invitations"
+
+    # ADR-184: a self-serve practice starts in demo mode and invites nobody.
+    assert %{"code" => "business_not_activated"} =
+             ctx.coach_conn |> send_json(:post, path, %{role: "coach"}) |> json_response(403)
+
+    activate_business!(org_id)
 
     assert ctx.coach_conn |> send_json(:post, path, %{role: "coach"}) |> json_response(201)
 

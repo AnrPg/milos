@@ -54,6 +54,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     user_pr_history
     training_log_entries
     ai_usage_records organization_ai_settings scaling_suggestions
+    demo_records
   )
 
   @transitional_tenant_tables []
@@ -68,6 +69,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     organization_domains organization_slug_aliases registration_invitations vendors users
     organization_provisioning_events organization_purges
     platform_plans organization_platform_subscriptions
+    business_activation_links business_requests
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS
@@ -86,7 +88,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments goal_feedback wellbeing_check_ins wellbeing_check_in_answers
     wellness_entries craving_entries wellness_preferences
-    media_account_objects saved_filters user_home_areas
+    media_account_objects saved_filters user_home_areas account_interests
     body_snapshots body_snapshot_photos user_health_consents body_settings
     buddy_links buddy_settings support_requests support_request_deliveries support_replies
     buddy_messages

@@ -19,7 +19,7 @@ defmodule Palee.Infrastructure.Maintenance.CleanSlatePurge do
   @finch Palee.MaintenanceFinch
   # scale_levels is tenant data since ADR-128 (and TRUNCATE ... CASCADE on
   # organizations would empty it anyway), so it is no longer preserved.
-  @preserved_tables ~w(schema_migrations users vendors training_quotes)
+  @preserved_tables ~w(schema_migrations users logins vendors training_quotes)
 
   def run_from_env do
     with :ok <- require_confirmation(),
@@ -40,7 +40,7 @@ defmodule Palee.Infrastructure.Maintenance.CleanSlatePurge do
     Repo.transaction(fn ->
       owner =
         User
-        |> where([user], user.nickname == ^normalized_nickname)
+        |> where([user], user.handle == ^normalized_nickname)
         |> lock("FOR UPDATE")
         |> Repo.one()
 
@@ -56,7 +56,7 @@ defmodule Palee.Infrastructure.Maintenance.CleanSlatePurge do
 
         %{
           preserved_owner_id: owner.id,
-          preserved_owner_nickname: owner.nickname,
+          preserved_owner_nickname: owner.handle,
           preserved_owner_vendor_id: owner_vendor.id,
           purged_runtime_tables: purged_tables,
           purged_non_owner_vendors: purged_vendors,
@@ -125,7 +125,17 @@ defmodule Palee.Infrastructure.Maintenance.CleanSlatePurge do
   end
 
   defp purge_non_owner_users(owner_id) do
-    SQL.query!(Repo, "DELETE FROM users WHERE id <> $1", [Ecto.UUID.dump!(owner_id)]).num_rows
+    owner = Ecto.UUID.dump!(owner_id)
+    purged = SQL.query!(Repo, "DELETE FROM users WHERE id <> $1", [owner]).num_rows
+
+    # ADR-187: credentials of the purged profiles go with them.
+    SQL.query!(
+      Repo,
+      "DELETE FROM logins WHERE id NOT IN (SELECT login_id FROM users)",
+      []
+    )
+
+    purged
   end
 
   defp purge_redis do
