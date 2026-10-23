@@ -39,18 +39,29 @@ export function surfaceRoleForMembership(
   return surfaceRole(membership, view);
 }
 
-export function useSelectedMembershipRole() {
-  const { status, tokens } = useSession();
-  const selectedOrganizationSlug = useOrganizationSlug();
-  const view = useView();
-  const authenticated = status === "authenticated" && Boolean(tokens?.access_token);
+/**
+ * The signed-in person's gym memberships, one cache entry per person. The key
+ * is the user, not the access token: a token renewal must not turn the query
+ * back into a first load, or every page gated on it (the schedule, the shell)
+ * unmounts and loses what is open on it. The fetch always uses the current token.
+ */
+export function useOrganizationMemberships() {
+  const { status, tokens, currentUser } = useSession();
+  const token = tokens?.access_token ?? null;
+  const userId = currentUser?.id ?? null;
 
-  const membershipsQuery = useQuery({
-    queryKey: ["organization-memberships", tokens?.access_token],
-    enabled: authenticated,
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
+  return useQuery({
+    queryKey: ["organization-memberships", userId],
+    enabled: status === "authenticated" && Boolean(token && userId),
+    queryFn: () => fetchOrganizationMemberships(token!),
     staleTime: 60_000,
   });
+}
+
+export function useSelectedMembershipRole() {
+  const selectedOrganizationSlug = useOrganizationSlug();
+  const view = useView();
+  const membershipsQuery = useOrganizationMemberships();
 
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const membership = selectedMembership(memberships, selectedOrganizationSlug);

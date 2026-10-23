@@ -80,6 +80,14 @@ jobs:
         working-directory: apps/web
         env:
           PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/google-chrome
+      # The traces of failed e2e tests (what the page showed, step by step),
+      # so a CI-only failure can be read instead of guessed at.
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: apps/web/test-results
+          retention-days: 7
 
   version:
     name: Pick tag

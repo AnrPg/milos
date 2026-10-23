@@ -24,7 +24,7 @@ import {
   type ProvisionOrganizationResult,
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
-import { fetchOrganizationMemberships } from "@/api/organizations";
+import { useOrganizationMemberships } from "@/lib/membership-role";
 import { platformLogoApi } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
@@ -99,11 +99,7 @@ export function PlatformOrganizationsPage() {
   // provisioning/settings here don't substitute for actually using the app
   // as a member. /admin requires a genuine membership row server-side, so
   // this list - not "every active org" - is what's actually openable.
-  const myMembershipsQuery = useQuery({
-    queryKey: ["organization-memberships", accessToken],
-    queryFn: () => fetchOrganizationMemberships(accessToken!),
-    enabled: Boolean(accessToken),
-  });
+  const myMembershipsQuery = useOrganizationMemberships();
   const myMemberships = useMemo(() => myMembershipsQuery.data ?? [], [myMembershipsQuery.data]);
   const myMembershipByOrgId = useMemo(
     () => new Map(myMemberships.map((entry) => [entry.organization.id, entry])),

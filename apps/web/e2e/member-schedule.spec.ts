@@ -244,8 +244,13 @@ test.describe("member schedule", () => {
 
   test("opens a class as a sheet with its facts, the WOD names and Κράτηση at the bottom", async ({ page }) => {
     await page.goto("/box/schedule");
-    await page.getByRole("main").getByRole("button", { name: /CrossFit/ }).first().click();
     const sheet = page.getByRole("dialog", { name: "CrossFit" });
+    // The 07:00 class, the one with the WOD. A tap lost on a busy runner is tapped again.
+    const morning = page.getByRole("main").getByRole("button", { name: /CrossFit/ }).filter({ hasText: "8 θέσεις" });
+    await expect(async () => {
+      await morning.click();
+      await expect(sheet).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
     await expect(sheet.getByText("Thruster · Pull-up")).toBeVisible();
     await expect(sheet.getByText("Δύναμη · Πόδια")).toBeVisible();
     await expect(sheet.getByText(/Χωρίς χρέωση έως/)).toBeVisible();

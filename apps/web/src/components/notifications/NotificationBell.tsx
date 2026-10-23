@@ -10,7 +10,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -32,7 +32,7 @@ import {
   notificationOrigin,
   type NotificationOrigin,
 } from "@/components/notifications/notification-origin";
-import { fetchOrganizationMemberships } from "@/api/organizations";
+import { useOrganizationMemberships } from "@/lib/membership-role";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
@@ -756,12 +756,7 @@ export function NotificationBell({
   // Shares TanStack's cache with TopNav's identical query, so this costs no
   // extra request. Needed to resolve a notification's organization_id into a
   // name and brand colour.
-  const membershipsQuery = useQuery({
-    queryKey: ["organization-memberships", tokens?.access_token],
-    enabled: status === "authenticated" && Boolean(tokens?.access_token),
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-    staleTime: 60_000,
-  });
+  const membershipsQuery = useOrganizationMemberships();
 
   const organizations = useMemo(
     () =>

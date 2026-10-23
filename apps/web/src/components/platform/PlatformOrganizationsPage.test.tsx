@@ -21,7 +21,7 @@ import { fetchOrganizationMemberships } from "@/api/organizations";
 import { chooseValue } from "@/components/ui/select-test-utils";
 
 vi.mock("@/components/session-provider", () => ({
-  useSession: () => ({ tokens: { access_token: "token" } }),
+  useSession: () => ({ status: "authenticated", tokens: { access_token: "token" }, currentUser: { id: "vendor-1" } }),
 }));
 
 vi.mock("@/i18n/use-ui-locale", () => ({

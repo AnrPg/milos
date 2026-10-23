@@ -12,14 +12,13 @@ import { useTranslations } from "next-intl";
 import { BODY_SETTINGS_KEY, fetchBodySettings } from "@/api/body";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
-import { fetchOrganizationMemberships } from "@/api/organizations";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { adminHref, membershipWorkspaceHref, rememberSelectedOrganization, useOrganizationSlug } from "@/lib/organization-slug";
-import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
+import { selectedMembership, surfaceRoleForMembership, useOrganizationMemberships } from "@/lib/membership-role";
 import {
   activeItemId,
   can,
@@ -112,12 +111,7 @@ export function TopNav() {
     : "?";
   const avatarUrl = currentUser?.avatar_url ?? null;
 
-  const membershipsQuery = useQuery({
-    queryKey: ["organization-memberships", tokens?.access_token],
-    enabled: authenticated,
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-    staleTime: 60_000,
-  });
+  const membershipsQuery = useOrganizationMemberships();
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const selectedOrganizationSlug = useOrganizationSlug();
   const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
