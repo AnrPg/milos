@@ -73,8 +73,7 @@ defmodule Palee.Application.DemoSeeders.Finance do
              "membership_package_subscription_id" => subscription.id
            }),
          {:ok, payment_rows} <- payment(context, membership, package, paid?) do
-      {:ok,
-       [{"memberships", membership.id}, {"finance_invoices", invoice.id}] ++ payment_rows}
+      {:ok, [{"memberships", membership.id}, {"finance_invoices", invoice.id}] ++ payment_rows}
     end
   end
 

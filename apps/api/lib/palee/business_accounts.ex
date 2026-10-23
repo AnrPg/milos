@@ -25,7 +25,10 @@ defmodule Palee.BusinessAccounts do
 
   defdelegate activation_roles(), to: ActivationLinkPolicy, as: :roles
   defdelegate activation_link_state(link, now), to: ActivationLinkPolicy, as: :state
-  defdelegate activation_roles_after(existing, role, kind), to: ActivationLinkPolicy, as: :roles_after
+
+  defdelegate activation_roles_after(existing, role, kind),
+    to: ActivationLinkPolicy,
+    as: :roles_after
 
   @doc """
   A vendor issues the link of `organization_id` for `user_id`. Replaces the
@@ -97,7 +100,11 @@ defmodule Palee.BusinessAccounts do
   ## Requests to the platform team
 
   defdelegate normalize_request_details(params), to: BusinessRequestPolicy, as: :normalize_details
-  defdelegate normalize_request_decision(params), to: BusinessRequestPolicy, as: :normalize_decision
+
+  defdelegate normalize_request_decision(params),
+    to: BusinessRequestPolicy,
+    as: :normalize_decision
+
   defdelegate signing_up?(registered_at, now), to: BusinessRequestPolicy
   defdelegate request_open?(request), to: BusinessRequestPolicy, as: :open?
 
@@ -158,7 +165,13 @@ defmodule Palee.BusinessAccounts do
   end
 
   @doc "A vendor closes a pending request (`approved` | `declined` | `completed`)."
-  def close_request(context, %BusinessRequest{} = request, status, attrs, now \\ DateTime.utc_now()) do
+  def close_request(
+        context,
+        %BusinessRequest{} = request,
+        status,
+        attrs,
+        now \\ DateTime.utc_now()
+      ) do
     with {:ok, scope} <- vendor_scope(context),
          true <- BusinessRequestPolicy.open?(request) || {:error, :business_request_closed} do
       changeset =
@@ -177,13 +190,15 @@ defmodule Palee.BusinessAccounts do
   def track_demo_records(context, section, rows),
     do: BusinessAccountStore.track_demo_records(tenant_scope(context), section, rows)
 
-  def list_demo_records(context), do: BusinessAccountStore.list_demo_records(tenant_scope(context))
+  def list_demo_records(context),
+    do: BusinessAccountStore.list_demo_records(tenant_scope(context))
 
   @doc "Deletes the seeded rows of the tables it may touch, newest first."
   def delete_demo_rows(context, records),
     do: BusinessAccountStore.delete_demo_rows(tenant_scope(context), records)
 
-  def clear_demo_records(context), do: BusinessAccountStore.clear_demo_records(tenant_scope(context))
+  def clear_demo_records(context),
+    do: BusinessAccountStore.clear_demo_records(tenant_scope(context))
 
   @doc "Whether `user_id` is one of the business's mock people."
   def demo_person?(context, user_id) when is_binary(user_id),

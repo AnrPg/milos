@@ -47,10 +47,17 @@ defmodule Palee.BusinessAccounts.Domain.ActivationLinkPolicy do
     lifetime = value(params, :lifetime_seconds) || @default_lifetime_seconds
 
     cond do
-      role not in @roles -> {:error, :invalid_activation_role}
-      not is_integer(lifetime) -> {:error, :invalid_activation_lifetime}
-      lifetime < 3600 or lifetime > @max_lifetime_seconds -> {:error, :invalid_activation_lifetime}
-      true -> {:ok, %{role: role, lifetime_seconds: lifetime}}
+      role not in @roles ->
+        {:error, :invalid_activation_role}
+
+      not is_integer(lifetime) ->
+        {:error, :invalid_activation_lifetime}
+
+      lifetime < 3600 or lifetime > @max_lifetime_seconds ->
+        {:error, :invalid_activation_lifetime}
+
+      true ->
+        {:ok, %{role: role, lifetime_seconds: lifetime}}
     end
   end
 
@@ -68,7 +75,10 @@ defmodule Palee.BusinessAccounts.Domain.ActivationLinkPolicy do
   practice is the coach, ADR-170).
   """
   def roles_after(existing_roles, role, provider_kind) do
-    granted = [String.to_existing_atom(role) | if(provider_kind == "coach", do: [:coach], else: [])]
+    granted = [
+      String.to_existing_atom(role) | if(provider_kind == "coach", do: [:coach], else: [])
+    ]
+
     Enum.uniq((existing_roles || []) ++ granted)
   end
 

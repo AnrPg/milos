@@ -54,11 +54,20 @@ defmodule Palee.BusinessAccounts.Domain.BusinessRequestPolicy do
     }
 
     cond do
-      kind not in @business_kinds -> {:error, :invalid_business_kind}
-      is_nil(name) or String.length(name) not in 2..120 -> {:error, :invalid_name}
-      too_long?(attrs.city, 80) or too_long?(attrs.phone, 40) -> {:error, :invalid_business_request}
-      too_long?(attrs.message, 1000) -> {:error, :invalid_business_request}
-      true -> {:ok, attrs}
+      kind not in @business_kinds ->
+        {:error, :invalid_business_kind}
+
+      is_nil(name) or String.length(name) not in 2..120 ->
+        {:error, :invalid_name}
+
+      too_long?(attrs.city, 80) or too_long?(attrs.phone, 40) ->
+        {:error, :invalid_business_request}
+
+      too_long?(attrs.message, 1000) ->
+        {:error, :invalid_business_request}
+
+      true ->
+        {:ok, attrs}
     end
   end
 

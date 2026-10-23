@@ -1,6 +1,39 @@
 defmodule PaleeWeb.FallbackController do
   use PaleeWeb, :controller
 
+  # ADR-184: business accounts. `business_not_activated` is the one stable code
+  # every going-live action of a demo business answers; the web shows it as
+  # «Ενεργοποίηση από την ομάδα Palee» with the way to ask for it.
+  @business_errors %{
+    business_not_activated:
+      {:forbidden, "The Palee team activates this business before it can go live"},
+    business_account_exists: {:conflict, "You already have a business waiting for activation"},
+    business_signup_closed:
+      {:conflict, "Ask the Palee team to turn your account into a business account"},
+    invalid_business_kind: {:unprocessable_entity, "Choose a gym or an independent coach"},
+    invalid_business_request: {:unprocessable_entity, "Check the details of the request"},
+    business_request_pending: {:conflict, "You already have a pending request of this kind"},
+    business_request_closed: {:conflict, "This request was already answered"},
+    invalid_activation_link:
+      {:not_found, "This activation link isn't valid for the account you're signed in with"},
+    business_already_active: {:conflict, "This business is already active"},
+    invalid_activation_role: {:unprocessable_entity, "Choose owner or admin"},
+    invalid_activation_lifetime:
+      {:unprocessable_entity, "A link lasts between one hour and 30 days"},
+    account_not_found: {:not_found, "No account matches"},
+    unknown_demo_section: {:unprocessable_entity, "There is no demo data for this screen"},
+    demo_source_not_deletable:
+      {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@business_errors, reason) do
+    {status, message} = Map.fetch!(@business_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)

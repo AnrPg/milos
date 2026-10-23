@@ -52,6 +52,17 @@ defmodule Palee.Application.BusinessRequests do
 
   def cancel(account, request_id), do: BusinessAccounts.cancel_request(account, request_id)
 
+  @doc "The latest activation request of the context's business by its signed-in owner."
+  def activation_request(%{account: account, organization_id: organization_id}) do
+    {:ok, requests} = BusinessAccounts.list_my_requests(account)
+
+    requests
+    |> Enum.filter(&(&1.kind == "activation" and &1.organization_id == organization_id))
+    |> List.last()
+  end
+
+  def activation_request(_context), do: nil
+
   ## Vendors
 
   @doc "Pending requests and every business still in demo mode."
@@ -59,6 +70,7 @@ defmodule Palee.Application.BusinessRequests do
     with {:ok, requests} <- BusinessAccounts.list_requests(platform_context),
          {:ok, organizations} <- Organizations.list_provisioned_organizations(platform_context) do
       demo = Enum.filter(organizations, &Organizations.business_gated?/1)
+
       {:ok, links} =
         BusinessAccounts.list_activation_links(platform_context, Enum.map(demo, & &1.id))
 

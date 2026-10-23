@@ -105,7 +105,8 @@ defmodule Palee.Application.BusinessActivation do
   end
 
   defp demo_summary(organization_id, user_id) do
-    records = BusinessAccounts.list_demo_records(%{organization_id: organization_id, user_id: user_id})
+    records =
+      BusinessAccounts.list_demo_records(%{organization_id: organization_id, user_id: user_id})
 
     %{
       rows: length(records),

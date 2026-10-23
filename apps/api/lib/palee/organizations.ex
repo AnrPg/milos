@@ -877,7 +877,9 @@ defmodule Palee.Organizations do
   def business_status(organization_or_context),
     do: Palee.Organizations.Domain.GoLivePolicy.status(gated_subject(organization_or_context))
 
-  defdelegate gated_business_kinds(), to: Palee.Organizations.Domain.GoLivePolicy, as: :gated_kinds
+  defdelegate gated_business_kinds(),
+    to: Palee.Organizations.Domain.GoLivePolicy,
+    as: :gated_kinds
 
   @doc """
   ADR-184: an account opens a business of `kind` (gym | coach) in demo mode.

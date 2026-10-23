@@ -144,15 +144,15 @@ defmodule Palee.Application.CommunityEvents do
         if params[:going] do
           rsvp_live(event, user_id, fn ->
             Community.rsvp_event(
-            gym,
-            event.id,
-            user_id,
-            %{
-              club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
-              invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
-            },
-            now
-          )
+              gym,
+              event.id,
+              user_id,
+              %{
+                club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
+                invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
+              },
+              now
+            )
           end)
         else
           Community.withdraw_from_event(gym, event.id, user_id, user_id, now)

@@ -1,5 +1,6 @@
 defmodule Palee.Notifications.Ports.NotificationStore do
-  @callback create_notification(map()) :: {:ok, map() | :duplicate | :suppressed} | {:error, Ecto.Changeset.t()}
+  @callback create_notification(map()) ::
+              {:ok, map() | :duplicate | :suppressed} | {:error, Ecto.Changeset.t()}
   @callback list_for_user(Ecto.UUID.t()) :: [map()]
   @callback list_inbox_page(Ecto.UUID.t(), keyword()) :: %{
               notifications: [map()],
