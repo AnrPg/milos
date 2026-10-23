@@ -79,6 +79,50 @@ defmodule Palee.Application.EventCohosts do
     end
   end
 
+  # ------------------------------------------------------------------ asked as the event is created
+
+  @doc """
+  Whether the host's context may ask co-hosts while creating an event: no
+  addresses needs nothing; any needs `manage_events` there, as `invite/4`.
+  """
+  def authorize_create(_context, []), do: :ok
+  def authorize_create(context, _slugs), do: authorize(context)
+
+  @doc """
+  The published boxes behind the addresses, in order, and the addresses
+  with none (`%{slug, code: "box_not_found"}`), which are not asked.
+  """
+  def resolve_boxes(slugs) do
+    slugs
+    |> Enum.map(&{&1, resolve_box(&1)})
+    |> Enum.reduce({[], []}, fn
+      {_slug, {:ok, box}}, {boxes, failures} ->
+        {[box | boxes], failures}
+
+      {slug, {:error, code}}, {boxes, failures} ->
+        {boxes, [%{slug: slug, code: to_string(code)} | failures]}
+    end)
+    |> then(fn {boxes, failures} -> {Enum.reverse(boxes), Enum.reverse(failures)} end)
+  end
+
+  @doc """
+  After the event and its requests are written: each box's staff hear of
+  the request once, on its first occurrence (as `invite/4` does).
+  """
+  def notify_created(_context, _event, [], _rows), do: :ok
+
+  def notify_created(context, event, boxes, rows) do
+    Enum.each(boxes, fn box ->
+      case Enum.find(
+             rows,
+             &(&1.event_id == event.id and &1.cohost_organization_id == box.organization_id)
+           ) do
+        nil -> :ok
+        request -> notify_request(context, event, box, request)
+      end
+    end)
+  end
+
   # ------------------------------------------------------------------ co-host side
 
   @doc """

@@ -170,6 +170,11 @@ defmodule Palee.Community do
 
   # Events (ADR-153).
   defdelegate create_event(context, club, attrs, opts), to: Events, as: :create
+
+  defdelegate create_event_with_cohosts(context, club, attrs, cohost_ids, opts),
+    to: Events,
+    as: :create_with_cohosts
+
   defdelegate update_event(context, event, attrs, scope, opts), to: Events, as: :update
   defdelegate cancel_event(context, event, scope, reason, now), to: Events, as: :cancel
   defdelegate rsvp_event(context, event_id, user_id, facts, now), to: Events, as: :rsvp
@@ -292,6 +297,8 @@ defmodule Palee.Community do
     as: :invite_check
 
   defdelegate cohost_answer_check(status, answer), to: CohostPolicy, as: :answer_check
+  defdelegate cohost_create_slugs(slugs), to: CohostPolicy, as: :create_slugs
+  defdelegate cohost_create_check(event, cohost_ids, now), to: CohostPolicy, as: :create_check
   defdelegate cohost_trial_offer_check(facts, now), to: CohostPolicy, as: :trial_offer_check
 
   defdelegate cohost_trial_offer_recipients(came_user_ids, member_ids),
@@ -300,6 +307,7 @@ defmodule Palee.Community do
 
   defdelegate cohost_answerable?(request, now), to: CohostPolicy, as: :answerable?
   def cohost_answers, do: CohostPolicy.answers()
+  def cohost_max, do: CohostPolicy.max_cohosts()
   def cohost_statuses, do: Palee.Community.EventCohost.statuses()
 
   defdelegate record_event_view(context, event_id, day, viewer_key),

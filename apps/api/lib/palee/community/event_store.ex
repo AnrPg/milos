@@ -16,6 +16,11 @@ defmodule Palee.Community.EventStore do
 
   @impl true
   def insert_events(context, attrs), do: call(context, :insert_events, [attrs])
+
+  @impl true
+  def insert_events_with_cohosts(context, attrs, cohosts),
+    do: call(context, :insert_events_with_cohosts, [attrs, cohosts])
+
   @impl true
   def get_event(context, id), do: call(context, :get_event, [id])
   @impl true

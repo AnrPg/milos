@@ -2428,6 +2428,9 @@ defmodule PaleeWeb.FallbackController do
     group_event: {:unprocessable_entity, "A member group's own event can't have co-hosts"},
     already_invited: {:conflict, "That box was already asked"},
     cohost_limit_reached: {:unprocessable_entity, "This event has as many co-hosts as it can"},
+    # ADR-185: co-hosts asked as the event is created.
+    invalid_cohosts: {:unprocessable_entity, "cohost_slugs must be a list of page addresses"},
+    duplicate_cohost: {:unprocessable_entity, "The same box is asked twice"},
     not_pending: {:conflict, "This request was already answered"},
     not_paid: {:conflict, "This place isn't paid"},
     already_refunded: {:conflict, "Already refunded"},

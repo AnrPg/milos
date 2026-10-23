@@ -81,15 +81,16 @@ defmodule Palee.Application.EventHosts do
 
     with %{} <- account || {:error, :forbidden},
          :ok <- precheck(params),
+         {:ok, _slugs} <- Community.cohost_create_slugs(params[:cohost_slugs]),
          {:ok, organization, _created?} <- ensure_organiser(account, params),
          {:ok, manager} <- CommunityEvents.manager_context(context, organization.id),
          :ok <- rate_check(manager, params),
          {:ok, club} <- organiser_club(manager),
-         {:ok, [first | _] = events} <-
+         {:ok, [first | _] = events, cohosts} <-
            CommunityEvents.manage_create(manager, club, pin_address(params)),
          {:ok, clubs} <- ClubScope.call(context) do
       [shown] = CommunityEvents.present(context, [first], clubs)
-      {:ok, %{event: shown, occurrences: length(events)}}
+      {:ok, %{event: shown, occurrences: length(events), cohost_failures: cohosts.failures}}
     end
   end
 
