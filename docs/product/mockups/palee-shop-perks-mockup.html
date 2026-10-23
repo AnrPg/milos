@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palee Κατάστημα και Προσφορές</title>
+<meta name="description" content="Clickable mockup: e-shop (products, orders, stock, desk sale, promotion) and partner perks for the gym console and the member app.">
+<style>
+/*
+ * Palee shop + partner perks mockup. Same page language and component names as
+ * palee-ia-mockup.html (phone frame, .c cards, .seg, .chip2, .link, tour buttons),
+ * dressed in today's single Palee theme from apps/web/src/lib/theme.ts:
+ * Frost (light, default) and Graphite (dark). Every colour is a token below;
+ * components only read var(--token). Tints use color-mix on tokens.
+ */
+:root {
+  --bg: #F4F5F7; --panel: #FFFFFF; --panel-raised: #FFFFFF; --panel-muted: #ECEEF2; --card: #FFFFFF;
+  --border: #DFE2E8; --border-strong: #A2A8B3;
+  --text: #17181C; --text-soft: #3A3D45; --muted: #5E6470; --dim: #646A75; --placeholder: #8A909B;
+  --primary: #2F5BFF; --primary-strong: #1F45E0; --primary-contrast: #FFFFFF;
+  --spark: #C8FF4D; --spark-contrast: #17181C;
+  --heat: #E0203F; --heat-contrast: #FFFFFF;
+  --deep: #17181C; --deep-contrast: #F4F5F7;
+  --success: #1B7A43; --warning: #9A5C00; --danger: #E0203F; --info: #0B7FA8;
+  --control-bg: #ECEEF2; --control-knob: #FFFFFF;
+  --paper: #FFFFFF; --on-paper: #000000;
+  --scrim: rgb(23 24 28 / 0.5);
+  --shadow-md: 0 12px 32px rgb(23 24 28 / 0.16);
+  --shadow-lg: 0 30px 90px rgb(23 24 28 / 0.24);
+  --series-1: #2F5BFF; --series-2: #E0203F; --series-3: #1F8A4C; --series-4: #7A5AF8; --series-5: #9A5C00; --series-6: #0B7FA8;
+  --on-series: #FFFFFF;
+  --frame: #17181C;
+  --font: "Commissioner Variable", "Commissioner", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --mono: "SFMono-Regular", Menlo, ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17181C; --panel: #1D1F24; --panel-raised: #22242A; --panel-muted: #131418; --card: #22242A;
+  --border: #2C2F37; --border-strong: #4A4F5A;
+  --text: #F4F5F7; --text-soft: #D2D5DB; --muted: #A2A8B3; --dim: #8A909B; --placeholder: #6B717C;
+  --primary: #5B7CFF; --primary-strong: #8FA4FF; --primary-contrast: #0E0F12;
+  --spark: #E4FF6E; --spark-contrast: #17181C; --heat: #FF4D6A; --heat-contrast: #0E0F12;
+  --deep: #2C2F37; --deep-contrast: #F4F5F7;
+  --success: #4CC27E; --warning: #F0A63A; --danger: #FF4D6A; --info: #6FB8FF;
+  --control-bg: #131418; --control-knob: #F4F5F7;
+  --scrim: rgb(0 0 0 / 0.6); --shadow-md: 0 12px 32px rgb(0 0 0 / 0.5); --shadow-lg: 0 30px 90px rgb(0 0 0 / 0.6);
+  --series-1: #5B7CFF; --series-2: #FF4D6A; --series-3: #4CC27E; --series-4: #A894FF; --series-5: #F0A63A; --series-6: #6FB8FF;
+  --on-series: #0E0F12; --frame: #000000; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #17181C; --panel: #1D1F24; --panel-raised: #22242A; --panel-muted: #131418; --card: #22242A;
+  --border: #2C2F37; --border-strong: #4A4F5A;
+  --text: #F4F5F7; --text-soft: #D2D5DB; --muted: #A2A8B3; --dim: #8A909B; --placeholder: #6B717C;
+  --primary: #5B7CFF; --primary-strong: #8FA4FF; --primary-contrast: #0E0F12;
+  --spark: #E4FF6E; --spark-contrast: #17181C; --heat: #FF4D6A; --heat-contrast: #0E0F12;
+  --deep: #2C2F37; --deep-contrast: #F4F5F7;
+  --success: #4CC27E; --warning: #F0A63A; --danger: #FF4D6A; --info: #6FB8FF;
+  --control-bg: #131418; --control-knob: #F4F5F7;
+  --scrim: rgb(0 0 0 / 0.6); --shadow-md: 0 12px 32px rgb(0 0 0 / 0.5); --shadow-lg: 0 30px 90px rgb(0 0 0 / 0.6);
+  --series-1: #5B7CFF; --series-2: #FF4D6A; --series-3: #4CC27E; --series-4: #A894FF; --series-5: #F0A63A; --series-6: #6FB8FF;
+  --on-series: #0E0F12; --frame: #000000; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.55; overflow-x: hidden; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 16px 80px; }
+h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--primary-strong); }
+button { font-family: inherit; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary); }
+.muted { color: var(--muted); }
+
+/* jump bar: wraps instead of scrolling sideways */
+.jump { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.jump .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.jump a { text-decoration: none; color: var(--text-soft); font-size: 13px; font-weight: 600; padding: 5px 11px; border: 1px solid var(--border); border-radius: 999px; }
+.jump a:hover, .jump a:focus-visible { border-color: var(--primary); color: var(--text); outline: none; }
+.themeBtn { margin-left: auto; font: 600 13px var(--font); color: var(--text-soft); background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+
+.hero { padding-block: 48px 28px; display: grid; gap: 18px; max-width: 860px; }
+.hero h1 { font-size: clamp(32px, 6vw, 56px); font-weight: 900; line-height: 1.04; }
+.hero h1 em { font-style: normal; color: var(--primary); }
+.hero p { font-size: 18px; color: var(--text-soft); max-width: 68ch; }
+.block { border-top: 1px solid var(--border); padding-block: 40px; display: grid; gap: 22px; scroll-margin-top: 60px; }
+.block > h2 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 800; }
+.lede { color: var(--text-soft); max-width: 72ch; }
+.note { background: var(--panel-muted); border-radius: 16px; padding: 14px 18px; color: var(--text-soft); font-size: 15px; max-width: 90ch; }
+.note b { color: var(--text); }
+
+/* decision cards */
+.tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.tree > div { background: var(--panel); border: 1px solid var(--border); border-top: 3px solid var(--primary); border-radius: 16px; padding: 16px 18px; min-width: 0; }
+.tree h3 { font-size: 18px; margin-bottom: 8px; }
+.tree ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14.5px; color: var(--text-soft); }
+.tree ul ul { margin-top: 5px; font-size: 13.5px; color: var(--muted); }
+.homes { display: grid; gap: 8px; }
+.home { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(150px, 1.2fr) minmax(170px, 1.6fr); gap: 4px 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 11px 14px; font-size: 14px; }
+.home b { font-weight: 700; }
+.home span { color: var(--text-soft); }
+.home .ref { color: var(--muted); }
+.homes .hd { background: transparent; border: 0; padding-block: 0; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+@media (max-width: 680px) { .home { grid-template-columns: minmax(0, 1fr); } .homes .hd { display: none; } }
+
+/* tour */
+.stage { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 36px; align-items: start; }
+@media (max-width: 860px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+.phoneCol { display: grid; gap: 10px; justify-items: center; position: sticky; top: 70px; }
+@media (max-width: 860px) { .phoneCol { position: static; } }
+.hint { font-size: 12.5px; color: var(--muted); text-align: center; max-width: 300px; }
+.tour { display: grid; gap: 6px; align-content: start; }
+.tour h4 { margin: 0 0 4px; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.tourGroup { display: grid; gap: 6px; }
+.tourGroup > span { font-size: 12px; font-weight: 700; color: var(--primary); margin-top: 8px; }
+.tour button { text-align: left; font: 500 14.5px var(--font); color: var(--text-soft); background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 9px 12px; cursor: pointer; }
+.tour button:hover, .tour button:focus-visible { border-color: var(--primary); color: var(--text); outline: none; }
+.tour button[aria-current="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--panel)); color: var(--text); }
+.tourRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; }
+
+/* ===== phone (same anatomy as palee-ia-mockup.html) ===== */
+.phone { width: 300px; max-width: 100%; height: 630px; background: var(--frame); border-radius: 46px; padding: 10px; box-shadow: var(--shadow-lg); }
+.screen { position: relative; height: 100%; background: var(--bg); border-radius: 37px; overflow: hidden; display: flex; flex-direction: column; color: var(--text); font-size: 13px; line-height: 1.4; }
+.sb { display: flex; justify-content: space-between; padding: 12px 26px 4px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sb .isl { width: 84px; height: 22px; background: var(--frame); border-radius: 12px; position: absolute; left: 50%; top: 8px; transform: translateX(-50%); }
+.body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 14px 14px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; }
+.body::-webkit-scrollbar { display: none; }
+.body > * { flex-shrink: 0; }
+.tb { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border); background: var(--panel); padding: 7px 8px 18px; }
+.tb button { border: 0; background: transparent; color: var(--dim); font: 600 10.5px var(--font); display: grid; justify-items: center; gap: 3px; cursor: pointer; padding: 4px 0; border-radius: 12px; }
+.tb button svg { width: 22px; height: 22px; }
+.tb button.on { color: var(--primary); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.top h5 { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; }
+.top .ic { display: flex; gap: 10px; color: var(--text-soft); }
+.top .ic svg { width: 19px; height: 19px; }
+.back { display: flex; align-items: center; color: var(--text-soft); cursor: pointer; background: none; border: 0; padding: 0; }
+.back svg { width: 20px; height: 20px; }
+.ey { font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+.c { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 11px 12px; display: grid; gap: 6px; }
+.c.hl { border-color: var(--primary); }
+.c.deep { background: var(--deep); border-color: var(--deep); color: var(--deep-contrast); }
+.c.deep .sm { color: color-mix(in srgb, var(--deep-contrast) 72%, transparent); }
+.c h6 { margin: 0; font-size: 15px; font-weight: 700; }
+.row { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.row .grow > * { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm { font-size: 11px; color: var(--muted); }
+.btn { border: 0; background: var(--primary); color: var(--primary-contrast); font: 700 12px var(--font); border-radius: 11px; padding: 8px 12px; text-align: center; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn svg { width: 14px; height: 14px; }
+.btn.ghost { background: var(--panel-muted); color: var(--text-soft); }
+.btn.go { background: var(--spark); color: var(--spark-contrast); }
+.btn.full { width: 100%; padding: 11px; font-size: 13px; }
+.btn.danger { background: transparent; color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.pill { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--panel-muted); color: var(--text-soft); white-space: nowrap; }
+.pill.ok { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+.pill.warn { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--warning); }
+.pill.bad { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+.pill.acc { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary-strong); }
+.pill.live { background: var(--spark); color: var(--spark-contrast); }
+.pill.info { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.price { white-space: nowrap; font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+.strike { text-decoration: line-through; color: var(--muted); font-weight: 500; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--panel-muted); border: 1px solid var(--border); border-radius: 12px; padding: 3px; gap: 2px; }
+.seg span, .seg button { text-align: center; font: 700 11px var(--font); padding: 6px 4px; border-radius: 9px; color: var(--dim); border: 0; background: transparent; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seg .on { background: var(--panel); color: var(--text); box-shadow: 0 1px 2px var(--scrim); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip2 { font-size: 10.5px; font-weight: 700; padding: 5px 9px; border-radius: 999px; background: var(--panel); border: 1px solid var(--border); color: var(--dim); white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; cursor: pointer; }
+.chip2.on { color: var(--text); border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--panel)); }
+.chip2.strong { color: var(--text); background: var(--panel-muted); }
+.link { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; font-weight: 600; cursor: pointer; }
+.link span:last-child { color: var(--dim); }
+.acts4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.acts4.five { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.acts4 > span { display: grid; justify-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--text-soft); background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 9px 2px; cursor: pointer; text-align: center; }
+.acts4.five > span { font-size: 9.5px; padding: 9px 1px; }
+.acts4 svg { width: 19px; height: 19px; color: var(--primary); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.stats div { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 8px; display: grid; gap: 1px; min-width: 0; }
+.stats b { font-family: var(--mono); font-size: 15px; }
+.stats span { font-size: 9.5px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.av { width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: var(--on-series); }
+.toggle { width: 34px; height: 20px; border-radius: 999px; background: var(--primary); position: relative; flex: none; }
+.toggle::after { content: ""; position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--control-knob); }
+.toggle.off { background: var(--control-bg); box-shadow: inset 0 0 0 1px var(--border-strong); }
+.toggle.off::after { right: auto; left: 3px; background: var(--dim); }
+.radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--dim); flex: none; }
+.radio.on { border-color: var(--primary); box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 8px var(--primary); }
+.where { font-family: var(--mono); font-size: 10.5px; color: var(--primary-strong); background: color-mix(in srgb, var(--primary) 12%, transparent); border-radius: 6px; padding: 2px 6px; justify-self: start; }
+
+/* shop parts (phone) */
+.thumb { border-radius: 14px; aspect-ratio: 1; display: grid; place-items: center; position: relative; overflow: hidden; color: var(--on-series); background: linear-gradient(150deg, color-mix(in srgb, var(--th, var(--series-1)) 78%, var(--deep)), color-mix(in srgb, var(--th, var(--series-1)) 35%, var(--deep))); }
+.thumb svg { width: 40%; height: 40%; opacity: .9; }
+.thumb .flag { position: absolute; left: 6px; top: 6px; }
+.thumb.sm { width: 44px; height: 44px; border-radius: 11px; flex: none; }
+.thumb.sm svg { width: 22px; height: 22px; }
+.pgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pcard { display: grid; gap: 5px; cursor: pointer; min-width: 0; }
+.pcard b { font-size: 12px; line-height: 1.25; }
+.pcard .sm { line-height: 1.2; }
+.hero2 { border-radius: 18px; aspect-ratio: 1.15; }
+.hero2 svg { width: 34%; height: 34%; }
+.dots { position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: center; gap: 5px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--on-series) 45%, transparent); }
+.dots i.on { background: var(--on-series); }
+.photoNav { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--deep) 55%, transparent); color: var(--deep-contrast); font-weight: 800; font-size: 13px; }
+.sizes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.sizes span { text-align: center; padding: 8px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-weight: 700; font-size: 12px; cursor: pointer; }
+.sizes span.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary-strong); }
+.sizes span.out { color: var(--placeholder); text-decoration: line-through; background: var(--panel-muted); }
+.swatches { display: flex; gap: 8px; align-items: center; }
+.sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); }
+.sw.on { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary); }
+.stepper { display: inline-grid; grid-template-columns: 30px 30px 30px; align-items: center; text-align: center; border: 1px solid var(--border); border-radius: 10px; background: var(--card); font-weight: 700; }
+.stepper span { padding: 5px 0; cursor: pointer; }
+.stepper b { font-family: var(--mono); }
+.line { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.line:last-child { border-bottom: 0; }
+.kv2 { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; font-size: 12px; color: var(--text-soft); }
+.kv2 .mono { white-space: nowrap; }
+.kv2.tot { font-size: 14px; font-weight: 800; color: var(--text); border-top: 1px solid var(--border); padding-top: 7px; margin-top: 3px; }
+.steps3 { display: grid; gap: 0; }
+.st { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; padding: 6px 0; color: var(--muted); font-size: 12px; }
+.st i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border-strong); justify-self: center; }
+.st.done i { background: var(--success); border-color: var(--success); }
+.st.now { color: var(--text); font-weight: 700; }
+.st.now i { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent); }
+.qr { display: grid; grid-template-columns: repeat(21, 1fr); width: 150px; height: 150px; background: var(--paper); padding: 8px; border-radius: 12px; justify-self: center; }
+.qr i.k { background: var(--on-paper); }
+.code { font-family: var(--mono); font-size: 22px; font-weight: 800; letter-spacing: .12em; text-align: center; padding: 10px; border-radius: 12px; border: 1.5px dashed var(--border-strong); background: var(--panel-muted); }
+.sheet { position: absolute; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; z-index: 3; }
+.sheet > div { width: 100%; background: var(--panel); border-radius: 22px 22px 0 0; padding: 10px 14px 18px; display: grid; gap: 9px; box-shadow: var(--shadow-md); }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: var(--border-strong); justify-self: center; }
+.opt2 { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); cursor: pointer; }
+.opt2.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.opt2 .grow { flex: 1; min-width: 0; }
+.opt2 .radio { margin-top: 2px; }
+.perkLogo { width: 38px; height: 38px; border-radius: 12px; flex: none; display: grid; place-items: center; font-weight: 800; font-size: 12px; color: var(--on-series); }
+.badge { display: inline-flex; gap: 4px; align-items: center; font-size: 9.5px; font-weight: 700; color: var(--dim); background: var(--panel-muted); border-radius: 999px; padding: 2px 7px; }
+.post .photoBox { border-radius: 14px; padding: 10px; display: flex; gap: 10px; align-items: center; background: var(--panel-muted); cursor: pointer; }
+.toast { background: var(--deep); color: var(--deep-contrast); border-radius: 12px; padding: 8px 10px; font-size: 11.5px; display: flex; gap: 8px; align-items: center; }
+
+/* ===== console frame (desktop / tablet) ===== */
+.deskWrap { display: grid; gap: 14px; }
+.desk { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-md); position: relative; min-height: 560px; }
+.dbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border); font-size: 13.5px; }
+.dbar .brand { font-weight: 800; letter-spacing: .06em; font-size: 12px; margin-right: 10px; }
+.dbar .nav { color: var(--muted); font-weight: 600; padding: 5px 9px; border-radius: 9px; cursor: pointer; }
+.dbar .nav.on { color: var(--text); background: var(--panel-muted); }
+.dbar .who { margin-left: auto; display: flex; align-items: center; gap: 8px; color: var(--text-soft); font-weight: 600; }
+.dbody { padding: 20px clamp(14px, 3vw, 28px) 28px; display: grid; gap: 16px; font-size: 14px; }
+.dhead { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.dhead h3 { font-size: 24px; font-weight: 800; }
+.dhead .sp { flex: 1; }
+.crumb { font-size: 12.5px; color: var(--muted); }
+.crumb b { color: var(--text-soft); }
+.dseg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; background: var(--panel-muted); border: 1px solid var(--border); border-radius: 13px; padding: 3px; }
+.dseg button { font: 700 13px var(--font); color: var(--dim); background: transparent; border: 0; border-radius: 10px; padding: 8px 6px; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dseg button.on { background: var(--panel); color: var(--text); box-shadow: 0 1px 2px var(--scrim); }
+.dseg button em { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--primary-strong); margin-left: 4px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.kpi { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; display: grid; gap: 2px; cursor: pointer; min-width: 0; }
+.kpi b { font-family: var(--mono); font-size: 22px; }
+.kpi span { font-size: 12.5px; color: var(--muted); }
+.kpi.warn b { color: var(--warning); }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 16px 18px; display: grid; gap: 12px; min-width: 0; }
+.card h4 { font-size: 15px; font-weight: 800; }
+.card .sub { font-size: 12.5px; color: var(--muted); margin-top: -8px; }
+.dgrid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .dgrid { grid-template-columns: minmax(0, 1fr); } }
+.list { display: grid; }
+.lrow { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.lrow:last-child { border-bottom: 0; }
+.lrow .t { font-weight: 700; }
+.lrow .m { font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.lrow .e { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; align-items: center; }
+.lrow.sel { background: color-mix(in srgb, var(--primary) 7%, transparent); border-radius: 12px; padding-inline: 8px; margin-inline: -8px; }
+@media (max-width: 560px) { .lrow { grid-template-columns: 44px minmax(0, 1fr); } .lrow .e { grid-column: 2; justify-content: flex-start; } }
+.meter { width: 70px; height: 6px; border-radius: 3px; background: var(--panel-muted); overflow: hidden; display: inline-block; vertical-align: middle; }
+.meter i { display: block; height: 100%; background: var(--success); }
+.meter.low i { background: var(--warning); } .meter.out i { background: var(--danger); }
+.field { display: grid; gap: 5px; }
+.field label { font-size: 12.5px; font-weight: 700; color: var(--text-soft); }
+.hint2, .field .hint2 { font-size: 12px; color: var(--muted); }
+.input { border: 1px solid var(--border-strong); background: var(--control-bg); border-radius: 11px; padding: 9px 11px; color: var(--text); font-size: 14px; min-height: 40px; display: flex; align-items: center; gap: 8px; }
+.input.ph { color: var(--placeholder); }
+.input.area { min-height: 68px; align-items: flex-start; }
+.input .end { margin-left: auto; color: var(--muted); font-size: 12.5px; }
+.picker { cursor: pointer; }
+.picker::after { content: "▾"; margin-left: auto; color: var(--muted); }
+.f2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.photos .thumb { border-radius: 12px; }
+.drop { border: 1.5px dashed var(--border-strong); border-radius: 12px; display: grid; place-items: center; text-align: center; font-size: 12px; color: var(--muted); aspect-ratio: 1; padding: 6px; cursor: pointer; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tagx { font-size: 12.5px; font-weight: 700; border-radius: 999px; padding: 4px 10px; background: var(--panel-muted); border: 1px solid var(--border); }
+.addchip { font-size: 12.5px; font-weight: 700; border-radius: 999px; padding: 4px 10px; background: var(--spark); color: var(--spark-contrast); cursor: pointer; }
+.vrow { display: grid; grid-template-columns: minmax(0, 1fr) 110px 90px; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+.vrow:last-child { border-bottom: 0; }
+.vrow.hd { font-size: 11.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; padding-top: 0; }
+.vrow .input { min-height: 32px; padding: 5px 8px; font-family: var(--mono); }
+@media (max-width: 520px) { .vrow { grid-template-columns: minmax(0, 1fr) 80px 70px; } }
+.setrow { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.setrow:last-child { border-bottom: 0; }
+.setrow .grow { flex: 1; min-width: 0; }
+.setrow .grow b { display: block; font-size: 13.5px; }
+.setrow .grow span { font-size: 12px; color: var(--muted); }
+.savebar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--panel); font-size: 13px; color: var(--muted); }
+.savebar .sp { flex: 1; }
+.dbtn { border: 0; border-radius: 12px; padding: 9px 14px; font: 700 13.5px var(--font); background: var(--primary); color: var(--primary-contrast); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
+.dbtn svg { width: 16px; height: 16px; }
+.dbtn.ghost { background: var(--panel-muted); color: var(--text-soft); }
+.dbtn.go { background: var(--spark); color: var(--spark-contrast); }
+.dbtn.danger { background: transparent; color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); }
+.dbtn.big { padding: 13px 18px; font-size: 15px; width: 100%; justify-content: center; }
+.empty { display: grid; gap: 14px; justify-items: start; }
+.checklist { display: grid; gap: 8px; }
+.ck { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--text-soft); }
+.ck i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-strong); flex: none; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 800; }
+.ck.done i { background: var(--spark); border-color: var(--spark); color: var(--spark-contrast); }
+.tl2 { display: grid; gap: 0; }
+.tl2 div { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: baseline; padding: 6px 0; font-size: 13px; color: var(--text-soft); }
+.tl2 i { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); justify-self: center; }
+.tl2 .ok i { background: var(--success); }
+.tl2 .now i { background: var(--primary); }
+.tl2 span:last-child { color: var(--muted); font-size: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.tile { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 8px; display: grid; gap: 6px; cursor: pointer; min-width: 0; }
+.tile b { font-size: 13px; line-height: 1.2; }
+.tile .price { font-size: 13px; }
+.tile.add { box-shadow: inset 0 0 0 2px var(--primary); }
+.pos { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .pos { grid-template-columns: minmax(0, 1fr); } }
+.payg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.payg span { text-align: center; padding: 9px 4px; border-radius: 11px; border: 1px solid var(--border); background: var(--card); font-weight: 700; font-size: 12.5px; cursor: pointer; }
+.payg span.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary-strong); }
+.who2 { display: flex; gap: 10px; align-items: center; padding: 9px 10px; border-radius: 12px; background: var(--panel-muted); }
+.who2 .grow { flex: 1; min-width: 0; }
+.who2 b { display: block; }
+.who2 .grow span { font-size: 12px; color: var(--muted); }
+.reasons { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; }
+.reasons span { text-align: center; padding: 8px 6px; border-radius: 11px; border: 1px solid var(--border); background: var(--card); font-weight: 700; font-size: 12.5px; cursor: pointer; }
+.reasons span.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary-strong); }
+.side { position: absolute; inset: 0 0 0 auto; width: min(440px, 100%); background: var(--panel); border-left: 1px solid var(--border); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 4; }
+.side .sh { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.side .sh h4 { flex: 1; font-size: 17px; }
+.side .sb2 { padding: 16px 18px; display: grid; gap: 14px; overflow-y: auto; flex: 1; align-content: start; }
+.side .sf { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px; }
+.x { background: var(--panel-muted); border: 0; border-radius: 9px; width: 30px; height: 30px; cursor: pointer; color: var(--text-soft); font-size: 16px; font-weight: 700; }
+.dim { position: absolute; inset: 0; background: var(--scrim); z-index: 3; }
+.promo { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.promo > div { border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: grid; gap: 8px; background: var(--card); cursor: pointer; align-content: start; }
+.promo > div.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.promo b { font-size: 14.5px; }
+.promo span { font-size: 12.5px; color: var(--muted); }
+.preview { border: 1px solid var(--border); border-radius: 16px; padding: 12px; display: grid; gap: 8px; background: var(--bg); }
+
+/* charts: single-hue marks, labels in text tokens, 4px rounded data-ends, 2px gaps */
+.vbars { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; align-items: end; height: 150px; padding-top: 6px; border-bottom: 1px solid var(--border); }
+.vbars i { display: block; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 2px; position: relative; cursor: default; }
+.vbars i.now { background: color-mix(in srgb, var(--primary) 45%, var(--panel)); }
+.vbars i:hover { background: var(--primary-strong); }
+.vbars i:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--deep); color: var(--deep-contrast); font: 600 11.5px var(--font); padding: 4px 7px; border-radius: 7px; white-space: nowrap; z-index: 2; pointer-events: none; }
+.vaxis { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; font-size: 11px; color: var(--muted); text-align: center; }
+.hbars { display: grid; gap: 9px; }
+.hb { display: grid; grid-template-columns: minmax(90px, 150px) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13px; }
+.hb .tr { height: 12px; background: var(--panel-muted); border-radius: 0 4px 4px 0; overflow: hidden; }
+.hb .tr i { display: block; height: 100%; background: var(--primary); border-radius: 0 4px 4px 0; }
+.hb.shop .tr i { background: var(--primary-strong); }
+.hb b { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hb span:first-child { color: var(--text-soft); }
+.hb .lnk { color: var(--primary-strong); font-weight: 700; cursor: pointer; }
+@media (max-width: 520px) { .hb { grid-template-columns: minmax(0, 1fr) auto; } .hb .tr { grid-column: 1 / -1; grid-row: 2; } }
+.tbl { display: grid; }
+.tr2 { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(60px, 1fr)); gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; align-items: center; }
+.tr2:last-child { border-bottom: 0; }
+.tr2.hd { font-size: 11.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; padding-top: 0; }
+.tr2 .n { font-family: var(--mono); text-align: right; white-space: nowrap; }
+.tr2 [data-k] { color: var(--primary-strong); font-weight: 700; }
+.lineage { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.lineage code { font-size: 11.5px; }
+/* alternatives */
+.alts { display: grid; gap: 16px; }
+.alt { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; display: grid; gap: 12px; }
+.alt h3 { font-size: 19px; }
+.altOpts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.altOpt { border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; background: var(--bg); }
+.altOpt.rec { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.altOpt .k { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted); }
+.altOpt.rec .k { color: var(--primary-strong); }
+.altOpt b { font-size: 15.5px; }
+.altOpt p { font-size: 14px; color: var(--text-soft); }
+.altOpt .show { justify-self: start; font: 600 13px var(--font); color: var(--primary-strong); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+.altOpt .show:hover, .altOpt .show:focus-visible { border-color: var(--primary); outline: none; }
+.recTag { font-size: 11px; font-weight: 800; color: var(--spark-contrast); background: var(--spark); border-radius: 999px; padding: 2px 8px; margin-left: 6px; letter-spacing: .02em; }
+
+/* research */
+.trends { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.trend { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.trend .sig { font-family: var(--mono); font-size: 12px; color: var(--primary-strong); }
+.trend h3 { font-size: 18px; line-height: 1.25; }
+.trend p { font-size: 14.5px; color: var(--text-soft); }
+.trend .so { border-top: 1px dashed var(--border); padding-top: 10px; font-size: 14.5px; color: var(--text); }
+.trend .src { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.trend .src a { color: var(--muted); text-underline-offset: 2px; }
+.mvp { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.mvp > div { border-radius: 18px; padding: 16px 18px; border: 1px solid var(--border); background: var(--panel); min-width: 0; }
+.mvp .k { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.mvp .t1 { border-top: 3px solid var(--success); } .mvp .t1 .k { color: var(--success); }
+.mvp .t2 { border-top: 3px solid var(--info); } .mvp .t2 .k { color: var(--info); }
+.mvp ul { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 5px; color: var(--text-soft); font-size: 14.5px; }
+code { font-family: var(--mono); font-size: 12px; background: var(--panel-muted); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) { .body, .dbody { animation: fade .22s ease; } @keyframes fade { from { opacity: .5; } to { opacity: 1; } } }
+[data-m], [data-k], [data-v] { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<nav class="jump" aria-label="Ενότητες"><div class="wrap">
+  <a href="#ia">Απόφαση IA</a><a href="#console">Κονσόλα</a><a href="#member">Μέλος</a><a href="#alts">Εναλλακτικές</a><a href="#research">Έρευνα</a><a href="#mvp">MVP και αργότερα</a>
+  <button class="themeBtn" type="button" id="themeBtn">Frost / Graphite</button>
+</div></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Palee · Κατάστημα και Προσφορές συνεργατών · mockup v1</span>
+    <h1>Το box <em>πουλάει</em> χωρίς να γίνει marketplace.</h1>
+    <p>Το γυμναστήριο ή ο coach πουλάει ρούχα, συμπληρώματα και αξεσουάρ στα μέλη του. Τα μέλη παραγγέλνουν από το Box και τα παραλαμβάνουν στο box. Η ρεσεψιόν πουλάει από το ταμείο με δύο πατήματα. Κάθε πώληση γίνεται παραστατικό στα υπάρχοντα Οικονομικά και εμφανίζεται στις Συναλλαγές του μέλους. Οι προσφορές συνεργατών (π.χ. −10% σε κατάστημα συμπληρωμάτων) δίνονται μόνο στα μέλη του box, όπως ορίζει ο ιδιοκτήτης.</p>
+    <p class="muted" style="font-size:15px">Πατήστε τα κουμπιά δίπλα στα frames για να αλλάξετε οθόνη. Στοιχεία μέσα στα frames (κάρτες, γραμμές, κουμπιά) οδηγούν στην επόμενη οθόνη. Το κουμπί Frost / Graphite αλλάζει το θέμα.</p>
+  </header>
+
+  <!-- ============ IA ============ -->
+  <section class="block" id="ia">
+    <span class="eyebrow">Η απόφαση</span>
+    <h2>Δικό του τμήμα «Κατάστημα» στην κονσόλα. Οι προσφορές συνεργατών μπαίνουν στις υπάρχουσες «Προσφορές».</h2>
+    <p class="lede">Το κατάστημα έχει τα δικά του καθημερινά jobs: προϊόντα, παραγγελίες προς παράδοση και απόθεμα. Δεν είναι καμπάνια, οπότε δεν μπαίνει στις καμπάνιες. Τα Οικονομικά έχουν ήδη 8 tabs (Μέλη, Πακέτα, Σεζόν, Προσφορές, Παραπομπές, Ουρές, Λογιστική, Εταιρικά), και ο «Εξοπλισμός» (ADR-104) αφορά κόστος: μηχανήματα και αναλώσιμα. Η προώθηση δεν γίνεται νέο σύστημα. Είναι μια ενέργεια «Προώθηση» πάνω στο προϊόν, που ανοίγει δύο εργαλεία που υπάρχουν ήδη: ανάρτηση στο club και κωδικό έκπτωσης από τις Προσφορές.</p>
+    <div class="tree">
+      <div><h3>Κονσόλα › Κατάστημα <span class="pill live">νέο</span></h3><ul>
+        <li><b>Προϊόντα</b>: λίστα, Νέο προϊόν, Επεξεργασία, Προώθηση</li>
+        <li><b>Παραγγελίες</b>: Για ετοιμασία · Έτοιμες · Παραλήφθηκαν · Ακυρώσεις και επιστροφές</li>
+        <li><b>Απόθεμα</b>: ανά παραλλαγή, ημέρες αποθέματος, κινήσεις, διόρθωση</li>
+        <li><b>Αναλυτικά</b>: πωλήσεις στον χρόνο, κορυφαία προϊόντα, περιθώριο, app ή ταμείο, ανά παράρτημα, αξία αποθέματος, απόδοση σε αναρτήσεις και κωδικούς</li>
+        <li><b>Ταμείο</b>: κουμπί στην κεφαλίδα, γρήγορη πώληση στη ρεσεψιόν (και από το check-in desk)</li>
+      </ul></div>
+      <div><h3>Κονσόλα › Οικονομικά › Προσφορές</h3><ul>
+        <li>Segment <b>Του box</b> (σημερινές καμπάνιες και κωδικοί, τώρα και για προϊόντα)</li>
+        <li>Segment <b>Συνεργατών</b> <span class="pill live">νέο</span>: συνεργάτης, κωδικός ή QR, % ή ποσό, ισχύς, ποιοι το βλέπουν, προβολές και χρήσεις</li>
+        <li><b>Επισκόπηση</b>: έσοδα ανά ροή (Συνδρομές · Πακέτα PT · Events · <b>Κατάστημα</b>). Κάθε γραμμή του καταστήματος οδηγεί στην παραγγελία και στο προϊόν, και υπάρχει έλεγχος συμφωνίας παραγγελιών με παραστατικά</li>
+        <li>Η ίδια λέξη «Προσφορές» και στις δύο πλευρές: ο ιδιοκτήτης φτιάχνει εδώ αυτό που το μέλος βλέπει στο Πληρωμές › Προσφορές</li>
+      </ul></div>
+      <div><h3>App μέλους</h3><ul>
+        <li><b>Box › Κατάστημα</b>: σταθερή κάρτα κάτω από τη Συνδρομή → λίστα, προϊόν, καλάθι, παραγγελία</li>
+        <li><b>Εγώ › Πληρωμές › Συναλλαγές</b>: κάθε παραγγελία και πώληση ταμείου ως παραστατικό</li>
+        <li><b>Εγώ › Πληρωμές › Προσφορές</b>: «Από συνεργάτες του box», με αντιγραφή κωδικού ή QR</li>
+        <li><b>Αρχική</b>: ανάρτηση του box με κάρτα προϊόντος που οδηγεί στο Κατάστημα (αναφορά, όχι δεύτερο σπίτι)</li>
+      </ul></div>
+    </div>
+    <div class="homes" role="table" aria-label="Σπίτια αντικειμένων">
+      <div class="home hd" role="row"><b>Αντικείμενο</b><span>Σπίτι (δημιουργία, αλλαγή)</span><span>Εμφανίζεται ως αναφορά</span></div>
+      <div class="home" role="row"><b>Προϊόν, παραλλαγή</b><span>Κονσόλα › Κατάστημα › Προϊόντα</span><span class="ref">Box › Κατάστημα (αγορά) · κάρτα σε ανάρτηση · Ταμείο</span></div>
+      <div class="home" role="row"><b>Απόθεμα, κινήσεις</b><span>Κονσόλα › Κατάστημα › Απόθεμα</span><span class="ref">Γραμμή στη λίστα προϊόντων · ημερήσια σύνοψη (ADR-104)</span></div>
+      <div class="home" role="row"><b>Παραγγελία</b><span>Μέλος: Box › Κατάστημα · Staff: Κατάστημα › Παραγγελίες</span><span class="ref">Εγώ › Πληρωμές › Συναλλαγές · check-in desk («έχει παραγγελία έτοιμη»)</span></div>
+      <div class="home" role="row"><b>Παραστατικό, πληρωμή, επιστροφή</b><span>Οικονομικά (υπάρχει: invoice, payment, refund receipt)</span><span class="ref">Παραγγελία · Συναλλαγές μέλους</span></div>
+      <div class="home" role="row"><b>Κωδικός έκπτωσης προϊόντος</b><span>Οικονομικά › Προσφορές › Του box</span><span class="ref">Προϊόν › Προώθηση · καλάθι («Έχεις κωδικό;»)</span></div>
+      <div class="home" role="row"><b>Προσφορά συνεργάτη</b><span>Οικονομικά › Προσφορές › Συνεργατών</span><span class="ref">Εγώ › Πληρωμές › Προσφορές · ανάρτηση στο #ανακοινώσεις</span></div>
+    </div>
+    <p class="note"><b>Πληρωμή.</b> Σήμερα η πλατφόρμα καταγράφει μόνο χειροκίνητες πληρωμές (μετρητά, τραπεζική μεταφορά, κάρτα στο τερματικό του box). Γι' αυτό το MVP είναι <b>«Παραγγελία τώρα, πληρωμή στην παραλαβή»</b>: η παραγγελία κόβει παραστατικό με υπόλοιπο, και η ρεσεψιόν καταγράφει την πληρωμή όταν δίνει το προϊόν. Η online πληρωμή με κάρτα έρχεται μαζί με τον πάροχο πληρωμών και φαίνεται ως εναλλακτική B στο καλάθι.</p>
+  </section>
+
+  <!-- ============ CONSOLE ============ -->
+  <section class="block" id="console">
+    <span class="eyebrow">Κονσόλα (owner, admin, ρεσεψιόν)</span>
+    <h2>Κατάστημα και Προσφορές συνεργατών</h2>
+    <div class="deskWrap">
+      <div class="tour" id="ktour">
+        <div class="tourGroup"><span>Κατάστημα</span><div class="tourRow">
+          <button type="button" data-k="empty">Πρώτη φορά (κενό κατάστημα)</button>
+          <button type="button" data-k="products">Προϊόντα με απόθεμα</button>
+          <button type="button" data-k="edit">Νέο προϊόν / επεξεργασία</button>
+          <button type="button" data-k="promote">Προώθηση προϊόντος</button>
+          <button type="button" data-k="orders">Παραγγελίες</button>
+          <button type="button" data-k="order">Παραγγελία: έτοιμη, παράδοση, επιστροφή</button>
+          <button type="button" data-k="stock">Απόθεμα και διόρθωση</button>
+          <button type="button" data-k="pos">Ταμείο: γρήγορη πώληση</button>
+          <button type="button" data-k="analytics">Αναλυτικά καταστήματος</button>
+        </div></div>
+        <div class="tourGroup"><span>Οικονομικά</span><div class="tourRow">
+          <button type="button" data-k="finance">Επισκόπηση: έσοδα ανά ροή, με το κατάστημα ξεχωριστά</button>
+        </div></div>
+        <div class="tourGroup"><span>Προσφορές συνεργατών</span><div class="tourRow">
+          <button type="button" data-k="perks">Λίστα με προβολές και χρήσεις</button>
+          <button type="button" data-k="perkNew">Νέα προσφορά συνεργάτη</button>
+        </div></div>
+      </div>
+      <div class="desk" id="desk" aria-live="polite"></div>
+      <p class="hint" id="kcrumb" style="max-width:none;text-align:left"></p>
+    </div>
+  </section>
+
+  <!-- ============ MEMBER ============ -->
+  <section class="block" id="member">
+    <span class="eyebrow">App μέλους</span>
+    <h2>Αγορά από το Box, παραλαβή στο box, προσφορές στις Πληρωμές</h2>
+    <div class="stage">
+      <div class="phoneCol">
+        <div class="phone" id="phone"></div>
+        <p class="hint" id="mcrumb"></p>
+      </div>
+      <div class="tour" id="mtour">
+        <h4>Δοκίμασε στο κινητό</h4>
+        <div class="tourGroup"><span>Box › Κατάστημα</span>
+          <button type="button" data-m="box">Box: η κάρτα «Κατάστημα»</button>
+          <button type="button" data-m="shop">Κατάστημα του box</button>
+          <button type="button" data-m="product">Προϊόν: μέγεθος, χρώμα, απόθεμα</button>
+          <button type="button" data-m="cart">Καλάθι και ολοκλήρωση με παραλαβή</button>
+          <button type="button" data-m="order">Η παραγγελία μου: κατάσταση και παραλαβή</button>
+        </div>
+        <div class="tourGroup"><span>Αρχική</span>
+          <button type="button" data-m="feed">Ανάρτηση του box με κάρτα προϊόντος</button>
+        </div>
+        <div class="tourGroup"><span>Εγώ › Πληρωμές</span>
+          <button type="button" data-m="tx">Συναλλαγές: παραγγελία και αγορά στο ταμείο</button>
+          <button type="button" data-m="offers">Προσφορές: από συνεργάτες του box</button>
+          <button type="button" data-m="perk">Προσφορά συνεργάτη: κωδικός και QR</button>
+        </div>
+        <p class="note" style="margin-top:10px">Η μπάρα κάτω μένει ίδια: Αρχική · Box · Ημερολόγιο · Εγώ. Το κατάστημα δεν παίρνει tab, γιατί ανήκει στη σχέση με το box (αρχή 6: Club ≠ Box). Η κάρτα του έχει σταθερή θέση και κενή κατάσταση, όπως κάθε κάρτα του Box (αρχή 2).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ALTERNATIVES ============ -->
+  <section class="block" id="alts">
+    <span class="eyebrow">Εναλλακτικές</span>
+    <h2>Πέντε σημεία με πραγματική επιλογή</h2>
+    <p class="lede">Δύο επιλογές το πολύ σε κάθε σημείο. Η προτεινόμενη είναι σημειωμένη. Το «Δείξε» αλλάζει το αντίστοιχο frame πιο πάνω.</p>
+    <div class="alts" id="altList"></div>
+  </section>
+
+  <!-- ============ RESEARCH ============ -->
+  <section class="block" id="research">
+    <span class="eyebrow">Αποφάσεις και έρευνα</span>
+    <h2>Τι λένε οι πηγές και τι κάναμε με αυτό</h2>
+    <p class="lede">Η έρευνα έγινε τον Οκτώβριο 2026. Αρκετές πηγές είναι vendors (Wodify, Mindbody, Square), οπότε τις διαβάζουμε ως πρακτική του κλάδου, όχι ως ανεξάρτητα δεδομένα.</p>
+    <div class="trends">
+      <article class="trend"><span class="sig">Πώληση στο γυμναστήριο</span><h3>Τα μέλη αγοράζουν από το app, όχι από ξεχωριστό site</h3><p>Στο Wodify το μέλος βλέπει «Products» δίπλα στα «Memberships» στο ίδιο Buy tab, διαλέγει παραλλαγή και πληρώνει. Κάθε προϊόν ορίζεται για «Point of Sale», «Mobile Retail» ή και τα δύο. Προτείνει προπαραγγελίες για ρούχα (χωρίς ρίσκο υπεραποθέματος) και χρέωση «στον επόμενο λογαριασμό συνδρομής».</p><p class="so">Κανάλια ανά προϊόν: <b>App</b> και <b>Ταμείο</b>. «Στον λογαριασμό μου» ως τρόπος πληρωμής στο ταμείο. Προπαραγγελία για αργότερα.</p><p class="src"><a href="https://help.wodify.com/hc/en-us/articles/34426165595927-Buy-Products-in-the-Mobile-App">Wodify: Buy Products in the Mobile App</a> · <a href="https://www.wodify.com/blog/why-most-gyms-struggle-with-selling-retail-and-how-to-fix-it">Wodify: Why most gyms struggle with retail</a></p></article>
+      <article class="trend"><span class="sig">Ταμείο στη ρεσεψιόν</span><h3>Πλακίδια «Αγαπημένα» και πραγματικό καλάθι</h3><p>Το νέο POS του Mindbody έχει tab «Favorites» με μεγάλα πλακίδια για ό,τι πουλιέται συχνά, καλάθι όπου αλλάζεις τιμή ή προσθέτεις έκπτωση, και banner με ανεξόφλητα υπόλοιπα του πελάτη μέσα στο καλάθι.</p><p class="so">Ταμείο = πλακίδια αγαπημένων + καλάθι + μέλος + τρόπος πληρωμής. Αν το μέλος χρωστάει, φαίνεται στο καλάθι.</p><p class="src"><a href="https://www.mindbodyonline.com/business/education/blog/mindbody-retail-screen-updates">Mindbody: retail screen updates</a></p></article>
+      <article class="trend"><span class="sig">Παραλλαγές και απόθεμα</span><h3>Απόθεμα και ειδοποίηση ανά παραλλαγή, όχι ανά προϊόν</h3><p>Στο Square το όριο ειδοποίησης ορίζεται ανά παραλλαγή, και στο ταμείο εμφανίζεται προειδοποίηση όταν μπαίνει στο καλάθι κάτι χωρίς αρκετό απόθεμα. Ένα προϊόν μπορεί να «φαίνεται διαθέσιμο» ενώ το μέγεθος που πουλάει περισσότερο έχει τελειώσει.</p><p class="so">Απόθεμα ανά μέγεθος/χρώμα. Ειδοποίηση μόνο όταν η κατάσταση χειροτερεύει (ίδιος κανόνας με το ADR-104). Προειδοποίηση στο ταμείο, όχι μπλοκάρισμα.</p><p class="src"><a href="https://squareup.com/help/us/en/article/8451-customize-your-checkout-experience-with-square-for-retail">Square: checkout for Retail</a> · <a href="https://squareup.com/help/us/en/article/5228">Square: stock per variation</a> · <a href="https://notify-me.io/post/how-to-add-low-stock-alerts-on-shopify">Low-stock alerts on Shopify</a></p></article>
+      <article class="trend"><span class="sig">Χαμηλό απόθεμα</span><h3>Μέτρα «ημέρες που απομένουν», όχι τεμάχια</h3><p>Η αναφορά «low days remaining» του Shopify υπολογίζει πόσες ημέρες κρατάει το απόθεμα με βάση τις πρόσφατες πωλήσεις. Κάτω από 14 ημέρες θεωρείται προειδοποίηση.</p><p class="so">Επαναχρησιμοποιούμε το <code>StockPolicy</code> του Εξοπλισμού (ADR-104): κατάσταση από ημέρες αποθέματος, προαιρετικό όριο παραγγελίας, ημερήσια σύνοψη στις 07:07.</p><p class="src"><a href="https://o.shipscience.com/?p=188476">Shopify inventory guide (low days remaining)</a></p></article>
+      <article class="trend"><span class="sig">Κατάσταση προϊόντος</span><h3>Πρόχειρο, Ενεργό, Αρχειοθετημένο</h3><p>Το Shopify χωρίζει Draft (δεν το βλέπει κανείς), Active, Archived (δεν πωλείται πια) και Unlisted (μόνο με σύνδεσμο). Τα νέα και τα διπλότυπα ξεκινούν ως Draft.</p><p class="so">Ένας διακόπτης «Δημοσιευμένο» με πρόχειρο ως αρχική κατάσταση, και «Αρχειοθέτηση» αντί για διαγραφή (κρατάει ιστορικό και παραστατικά). Χωρίς «Unlisted» στο MVP.</p><p class="src"><a href="https://shopify.dev/docs/api/admin-graphql/latest/enums/ProductStatus">Shopify: ProductStatus</a></p></article>
+      <article class="trend"><span class="sig">Λίστα προϊόντων (Baymard)</span><h3>Φωτογραφία σε κάθε προϊόν, τιμή στην κάρτα, παραλλαγές σε μία κάρτα</h3><p>Το 80% των sites έχει σοβαρά προβλήματα στη λίστα. Στο κινητό τα φίλτρα μπαίνουν σε συρτάρι από σταθερό κουμπί «Φίλτρα», τα ενεργά φίλτρα φαίνονται ως chips, οι χρωματικές παραλλαγές ενώνονται σε μία κάρτα, και η επιστροφή από το προϊόν σε φέρνει στο ίδιο σημείο της λίστας.</p><p class="so">Πλέγμα 2 στηλών με φωτογραφία, τιμή, «Τελευταία 2» ή «Εξαντλήθηκε». Σειρά chips με «Φίλτρα (n)» πρώτο (κανόνας 8.5 του brief).</p><p class="src"><a href="https://baymard.com/blog/product-listing-page-plp-ux">Baymard: Product listing page UX</a></p></article>
+      <article class="trend"><span class="sig">Σελίδα προϊόντος</span><h3>Όλα τα μεγέθη ορατά, και τα εξαντλημένα</h3><p>Ο Baymard (guideline 850) καταγράφει ότι οι χρήστες χάνουν μεγέθη όταν δεν φαίνονται άμεσα, και χάνουν χρόνο μέχρι να καταλάβουν ότι το δικό τους έχει τελειώσει.</p><p class="so">Πλέγμα μεγεθών με όλα ορατά. Το εξαντλημένο φαίνεται διαγραμμένο και, αν το πατήσεις, προσφέρει «Ειδοποίησέ με».</p><p class="src"><a href="https://baymard.com/guidelines/850-size-variation-selector-implementation-details">Baymard #850: size selector</a></p></article>
+      <article class="trend"><span class="sig">Ολοκλήρωση αγοράς (Baymard)</span><h3>Λιγότερα πεδία: τα 8 φτάνουν, ο κωδικός πίσω από σύνδεσμο</h3><p>Η μέση ολοκλήρωση έχει 5,1 βήματα και 11,3 πεδία. Τα περισσότερα sites χρειάζονται 8. Το πλήθος πεδίων μετράει περισσότερο από το πλήθος βημάτων. Το πεδίο κουπονιού φαινόμενο σπρώχνει τους χρήστες να φύγουν για να ψάξουν κωδικό.</p><p class="so">Μία οθόνη, κανένα πεδίο: το μέλος είναι ήδη γνωστό και η παραλαβή είναι στο box. Μόνο σημείο παραλαβής (αν έχει πολλά), τρόπος πληρωμής και «Έχεις κωδικό;».</p><p class="src"><a href="https://baymard.com/blog/checkout-flow">Baymard: checkout flow average form fields</a></p></article>
+      <article class="trend"><span class="sig">Παραλαβή από το κατάστημα</span><h3>Ειδοποίηση «έτοιμο», σαφείς οδηγίες παραλαβής, υπενθύμιση</h3><p>Η ταχύτητα της ειδοποίησης «έτοιμο» συσχετίζεται έντονα με το αν ο πελάτης θα ξαναχρησιμοποιήσει την παραλαβή. Οι οδηγίες για το πού και πώς παραλαμβάνεις βαθμολογούνται χαμηλότερα από όλα (4,36/5). Υπενθυμίσεις μειώνουν τις παραγγελίες που δεν παραλαμβάνονται.</p><p class="so">Push «Έτοιμη για παραλαβή» με το πού (ρεσεψιόν, ώρες). Κωδικός και QR παραγγελίας. Υπενθύμιση την 3η ημέρα, αυτόματη ακύρωση μετά από 7 (ρύθμιση).</p><p class="src"><a href="https://www.chatterresearch.com/?p=6197">Chatter Research: BOPIS</a> · <a href="https://www.uphance.com/blog/buy-online-pick-up-in-store-bopis">Uphance: BOPIS</a> · <a href="https://chainstoreage.com/news/study-store-pickup-has-room-improvement">Chain Store Age: store pickup study</a></p></article>
+      <article class="trend"><span class="sig">Ταμείο: πελάτης στην πώληση</span><h3>Πρώτα το μέλος, με αναζήτηση όνομα ή κινητό</h3><p>Στα forum του Shopify POS οι έμποροι παραπονιούνται όταν το «Add customer» ανοίγει «νέος πελάτης» αντί για αναζήτηση, γιατί προσθέτει πατήματα στη ρεσεψιόν.</p><p class="so">Το πεδίο μέλους είναι αναζήτηση (όνομα, κινητό, κάρτα QR). Αν το μέλος έκανε check-in πριν από λίγο, προτείνεται πρώτο. Υπάρχει και «Πελάτης χωρίς λογαριασμό».</p><p class="src"><a href="https://community.shopify.com/t/add-customer-button-on-the-pos-defaults-to-adding-new-customer/319580">Shopify Community: Add customer</a></p></article>
+      <article class="trend"><span class="sig">Συνεργάτες</span><h3>Συμπληρωματικοί τοπικοί συνεργάτες, όροι γραμμένοι</h3><p>Οι πάροχοι λογισμικού γυμναστηρίων προτείνουν συνεργάτες που δεν ανταγωνίζονται το γυμναστήριο (συμπληρώματα, καφέ και smoothies, φυσικοθεραπεία, αθλητικά). Προτείνουν να γράφονται οι όροι, για να μην αποκλίνουν οι προσδοκίες.</p><p class="so">Η φόρμα ζητάει τι ακριβώς καλύπτει η προσφορά και όρους. Δεν είναι marketplace: τη βλέπουν μόνο τα μέλη του box, ποτέ στο Γύρω μου.</p><p class="src"><a href="https://www.gymmaster.com/blog/grow-your-gym-with-partnership-marketing/">GymMaster: partnership marketing</a> · <a href="https://www.pushpress.com/blog/form-local-business-gym-partnership">PushPress: local business partnership</a></p></article>
+      <article class="trend"><span class="sig">Κωδικοί</span><h3>Κοινός κωδικός: απλός αλλά διαρρέει. Προσωπικός: μετράει αλλά κουράζει</h3><p>Ο κωδικός ανά creator (ΝΙΚΟΣ10) λέει ποιος έφερε την πώληση, και κλείνει εύκολα όταν τελειώσει η συνεργασία. Οι κοινοί κωδικοί καταλήγουν σε sites κουπονιών. Οι προσωπικοί, μίας χρήσης κωδικοί σταματούν τη διαρροή αλλά θέλουν παράδοση ανά άτομο και αξίζουν μόνο σε μεγαλύτερο όγκο. Στα συμπληρώματα χρειάζεται και δήλωση της συνεργασίας.</p><p class="so">MVP: ένας κωδικός ανά προσφορά συνεργάτη, φανερός μόνο μέσα στην app. Σήμανση «Συνεργασία» όταν το box έχει όφελος. Προσωπικοί κωδικοί για αργότερα.</p><p class="src"><a href="https://ecommercefastlane.com/shopify-unique-discount-codes/">Unique discount codes: profit or friction</a> · <a href="https://racklify.com/encyclopedia/shopify-collabs-best-practices-common-mistakes-and-growth-tips/">Shopify Collabs best practices</a> · <a href="https://www.growthsuite.net/questions/i-m-working-with-an-influencer-how-can-i-generate-a-specific-memorable-code-for-her-to-share-with-her-followers">Creator-specific codes</a></p></article>
+    </div>
+  </section>
+
+  <!-- ============ MVP ============ -->
+  <section class="block" id="mvp">
+    <span class="eyebrow">Σειρά υλοποίησης</span>
+    <h2>MVP και αργότερα</h2>
+    <div class="mvp">
+      <div class="t1"><span class="k">MVP</span><ul>
+        <li>Προϊόντα με φωτογραφίες, έως 2 επιλογές (μέγεθος, χρώμα), απόθεμα ανά παραλλαγή, πρόχειρο/δημοσιευμένο, «Μόνο μέλη | Όλα τα μέλη και επισκέπτες με λογαριασμό»</li>
+        <li>Box › Κατάστημα, καλάθι, παραγγελία με παραλαβή και πληρωμή στην παραλαβή</li>
+        <li>Παραγγελίες: έτοιμη → παραλήφθηκε, ακύρωση, επιστροφή (με επιστροφή στο απόθεμα)</li>
+        <li>Ταμείο στη ρεσεψιόν: μετρητά, κάρτα στο τερματικό, στον λογαριασμό του μέλους</li>
+        <li>Απόθεμα με κινήσεις και ημέρες αποθέματος (ADR-104), ειδοποίηση και ημερήσια σύνοψη</li>
+        <li>Προώθηση: ανάρτηση στο club και κωδικός έκπτωσης προϊόντος</li>
+        <li>Προσφορές συνεργατών με κοινό κωδικό ή QR, προβολές και δηλωμένες χρήσεις</li>
+        <li>Αναλυτικά καταστήματος και ροή «Κατάστημα» στην Επισκόπηση των Οικονομικών, με διαδρομή από κάθε αριθμό στις γραμμές του</li>
+      </ul></div>
+      <div class="t2"><span class="k">Αργότερα</span><ul>
+        <li>Online πληρωμή με κάρτα (μαζί με τον πάροχο πληρωμών)</li>
+        <li>Προπαραγγελίες ρούχων με ημερομηνία κλεισίματος</li>
+        <li>Προϊόν ως δώρο σε πακέτο ή σεζόν</li>
+        <li>Προσωπικοί κωδικοί συνεργατών και σελίδα επαλήθευσης για τον συνεργάτη, χωρίς λογαριασμό</li>
+        <li>Αποστολή με courier (σήμερα μόνο παραλαβή)</li>
+        <li>Εξαγωγή των αναλυτικών του καταστήματος στις Αναφορές και στη λογιστική εξαγωγή</li>
+      </ul></div>
+    </div>
+    <p class="note">Λεπτομέρειες, μοντέλο δεδομένων και ανοιχτά ερωτήματα: <code>docs/product/2026-10-23-shop-and-perks-proposal.md</code>.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  // ---------- theme ----------
+  const root = document.documentElement;
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+  });
+
+  // ---------- icons ----------
+  const P = {
+    home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+    gym: '<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',
+    book: '<path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><path d="M5 18a3 3 0 0 1 3-3h11"/>',
+    me: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4-6.5 8-6.5s7 2.3 8 6.5"/>',
+    cal: '<rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 10h18M8 2.5v4M16 2.5v4"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+    bag: '<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    shirt: '<path d="M8 3l-5 3 2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"/>',
+    tub: '<rect x="5" y="7" width="14" height="14" rx="3"/><path d="M7 3h10v4H7z"/><path d="M9 13h6"/>',
+    bottle: '<path d="M10 2h4v3l2 3v13H8V8l2-3z"/><path d="M8 12h8"/>',
+    grip: '<path d="M7 3h10v7a5 5 0 0 1-10 0z"/><path d="M10 14v7M14 14v7"/>',
+    chalk: '<circle cx="12" cy="13" r="7"/><path d="M9 6c1-2 5-2 6 0"/>',
+    bar: '<rect x="3" y="9" width="18" height="6" rx="2"/><path d="M7 9v6M17 9v6"/>',
+    tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-4M14 21v-3"/>',
+    copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+    megaphone: '<path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/>',
+    box: '<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
+    cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+    pin: '<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    check: '<path d="M4 12l5 5L20 6"/>',
+    store: '<path d="M3 9l2-5h14l2 5"/><path d="M4 9v11h16V9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-6-6-9 9"/>',
+  };
+  const ic = (n, s) => '<svg viewBox="0 0 24 24" ' + (s ? 'width="' + s + '" height="' + s + '" ' : '') + 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + P[n] + '</svg>';
+  const SER = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)', 'var(--series-5)', 'var(--series-6)'];
+  const av = (ini, i, size) => '<span class="av" style="background:' + SER[i % 6] + (size ? ';width:' + size + 'px;height:' + size + 'px' : '') + '">' + ini + '</span>';
+
+  // ---------- demo catalogue ----------
+  const PR = {
+    tee: { n: 'T-shirt «Κυψέλη Strong»', p: 25, i: 'shirt', c: 0, cat: 'Ρούχα', v: '4 μεγέθη · 2 χρώματα', stock: 23, low: 'Μαύρο M: 1', st: 'low', pub: true },
+    whey: { n: 'Whey Protein 1 kg', p: 39.9, i: 'tub', c: 3, cat: 'Συμπληρώματα', v: 'Σοκολάτα · Βανίλια', stock: 14, st: 'ok', pub: true },
+    grips: { n: 'Λαβές για pull-ups', p: 34, i: 'grip', c: 5, cat: 'Αξεσουάρ', v: 'S · M · L', stock: 9, st: 'ok', pub: true },
+    bar: { n: 'Πρωτεϊνική μπάρα', p: 2.5, i: 'bar', c: 4, cat: 'Συμπληρώματα', v: '3 γεύσεις', stock: 41, st: 'ok', pub: true },
+    chalk: { n: 'Μπάλα μαγνησίας', p: 6, i: 'chalk', c: 2, cat: 'Αξεσουάρ', v: 'Ένα είδος', stock: 4, low: '4 τεμ. · ~6 ημέρες', st: 'crit', pub: true },
+    bottle: { n: 'Παγούρι 750 ml', p: 12, i: 'bottle', c: 1, cat: 'Αξεσουάρ', v: 'Ένα είδος', stock: 0, st: 'out', pub: true },
+    hood: { n: 'Hoodie χειμώνα', p: 45, i: 'shirt', c: 1, cat: 'Ρούχα', v: '4 μεγέθη', stock: 0, st: 'draft', pub: false },
+  };
+  const eur = (x) => x.toFixed(2).replace('.', ',') + ' €';
+  const th = (k, cls) => '<span class="thumb ' + (cls || '') + '" style="--th:' + SER[PR[k].c] + '">' + ic(PR[k].i) + '</span>';
+  const qr = (seed) => { let s = seed, h = ''; const fin = (r, c) => { const z = (a, b) => r >= a && r < a + 7 && c >= b && c < b + 7; const edge = (a, b) => (r === a || r === a + 6 || c === b || c === b + 6) || (r >= a + 2 && r <= a + 4 && c >= b + 2 && c <= b + 4); if (z(0, 0)) return edge(0, 0); if (z(0, 14)) return edge(0, 14); if (z(14, 0)) return edge(14, 0); return null; }; for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const f = fin(r, c); let k; if (f !== null) k = f; else { s = (s * 9301 + 49297) % 233280; k = s / 233280 > 0.52; } h += '<i class="' + (k ? 'k' : '') + '"></i>'; } return '<div class="qr" role="img" aria-label="QR">' + h + '</div>'; };
+
+  // ---------- state ----------
+  const S = { m: 'box', mStack: ['box'], k: 'products', sheet: null, v: { shopHome: 'A', boxEntry: 'A', pay: 'A', perkHome: 'A', perkCode: 'A' } };
+
+  // ======================= MEMBER =======================
+  const head = (title, sub, icons) => '<div class="top"><button class="back" type="button" data-back="1" aria-label="Πίσω">' + ic('back') + '</button><div style="flex:1;min-width:0"><h5 style="font-size:17px">' + title + '</h5>' + (sub ? '<span class="sm">' + sub + '</span>' : '') + '</div><div class="ic">' + (icons || []).map(n => ic(n)).join('') + '</div></div>';
+  const shopCard = '<div class="c" data-m="shop"><div class="row"><span class="ey grow">Κατάστημα του box</span><span class="pill live">2 νέα</span></div>' +
+    '<div class="row" style="gap:6px">' + ['tee', 'whey', 'grips', 'bar'].map(k => '<span style="flex:1">' + th(k) + '</span>').join('') + '</div>' +
+    '<div class="row"><span class="sm grow">Ρούχα, συμπληρώματα, αξεσουάρ · παραλαβή στη ρεσεψιόν</span><span class="sm">›</span></div></div>';
+  const orderReady = '<div class="link" data-m="order" style="border-color:var(--primary)"><span style="display:flex;gap:8px;align-items:center">' + ic('bag', 16) + 'Παραγγελία K-1042 · έτοιμη</span><span>›</span></div>';
+
+  const M = {
+    box: { tab: 1, crumb: 'Box', html: () => {
+      const B = S.v.boxEntry === 'B';
+      return '<div class="top"><h5>Box Κυψέλη <span style="color:var(--dim);font-size:15px">▾</span></h5><div class="ic">' + ic('chat') + ic('bell') + '</div></div>' +
+        '<div class="c deep"><div class="row"><span class="ey grow" style="color:inherit;opacity:.7">WOD της ημέρας</span><span class="pill live">Σήμερα</span></div><h6>Fran</h6><span class="sm">21-15-9 · Thrusters 43/30 kg · Pull-ups</span><div class="row"><span class="btn ghost" style="flex:1">Καταγραφή</span><span class="btn go" style="flex:1">Έναρξη ▶</span></div></div>' +
+        '<div class="c"><span class="ey">Η επόμενη προπόνησή σου</span><div class="row"><div class="grow"><h6>Σήμερα 18:00 · CrossFit</h6><span class="sm">coach Νίκος · 9/14 θέσεις</span></div><span class="btn go">Check-in</span></div></div>' +
+        (B ? '<div class="acts4 five"><span>' + ic('cal') + 'Πρόγραμμα</span><span>' + ic('clock') + 'Ραντεβού</span><span>' + ic('video') + 'Βίντεο</span><span>' + ic('chat') + 'Coach</span><span data-m="shop">' + ic('bag') + 'Κατάστημα</span></div>'
+           : '<div class="acts4"><span>' + ic('cal') + 'Πρόγραμμα</span><span>' + ic('clock') + 'Ραντεβού</span><span>' + ic('video') + 'Βίντεο</span><span>' + ic('chat') + 'Coach</span></div>') +
+        '<div class="c"><div class="row"><div class="grow"><span class="ey">Συνδρομή</span><h6>Πακέτο 12 επισκέψεων</h6><span class="sm">5 επισκέψεις · −10% στα προϊόντα · έως 31/10</span></div><span class="btn ghost">Ανανέωση</span></div></div>' +
+        (B ? '' : shopCard) +
+        '<div class="link"><span>Ανακοινώσεις · 1 νέα</span><span>›</span></div>';
+    } },
+    shop: { tab: 1, crumb: 'Box › Κατάστημα', html: () => head('Κατάστημα', 'Box Κυψέλη · παραλαβή στη ρεσεψιόν', ['search']) +
+      orderReady +
+      '<div class="chips"><span class="chip2 strong">Φίλτρα (0)</span><span class="chip2 on">Όλα</span><span class="chip2">Ρούχα</span><span class="chip2">Συμπληρώματα</span><span class="chip2">Αξεσουάρ</span></div>' +
+      '<div class="pgrid">' + ['tee', 'whey', 'grips', 'bar', 'chalk', 'bottle'].map(k => {
+        const p = PR[k];
+        const flag = p.st === 'out' ? '<span class="pill bad flag">Εξαντλήθηκε</span>' : k === 'chalk' ? '<span class="pill warn flag">Τελευταία 4</span>' : (k === 'tee' || k === 'grips') ? '<span class="pill live flag">Νέο</span>' : '';
+        return '<div class="pcard" data-m="product"><span class="thumb" style="--th:' + SER[p.c] + '">' + ic(p.i) + flag + '</span><b>' + p.n + '</b><span class="sm">' + p.v + '</span><span class="price">' + eur(p.p) + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="sm" style="text-align:center">Με το πακέτο σου: −10% στο καλάθι</p>' },
+    product: { tab: 1, crumb: 'Box › Κατάστημα › Προϊόν', html: () => head('T-shirt «Κυψέλη Strong»', 'Ρούχα', ['heart']) +
+      '<div class="thumb hero2" style="--th:' + SER[0] + '">' + ic('shirt') + '<span class="photoNav" style="left:8px">‹</span><span class="photoNav" style="right:8px">›</span><div class="dots"><i class="on"></i><i></i><i></i></div></div>' +
+      '<div class="row"><div class="grow"><span class="price" style="font-size:20px">25,00 €</span><span class="sm">Με το πακέτο σου: 22,50 €</span></div><span class="pill live">Νέο</span></div>' +
+      '<div class="c"><div class="row"><span class="ey grow">Χρώμα · Μαύρο</span></div><div class="swatches"><span class="sw on" style="background:var(--deep)"></span><span class="sw" style="background:var(--paper)"></span></div>' +
+      '<div class="row"><span class="ey grow">Μέγεθος</span><span class="sm">Οδηγός μεγεθών</span></div>' +
+      '<div class="sizes"><span class="out">XS</span><span>S</span><span class="on">M</span><span>L</span><span>XL</span></div>' +
+      '<span class="sm" style="color:var(--warning)">Μαύρο M: τελευταίο κομμάτι</span><span class="sm">XS: εξαντλήθηκε · <u>Ειδοποίησέ με</u></span></div>' +
+      '<div class="row"><span class="stepper"><span>−</span><b>1</b><span>+</span></span><span class="btn full" data-m="cart" style="flex:1">Στο καλάθι · 25,00 €</span></div>' +
+      '<div class="c" style="gap:4px"><div class="row">' + ic('pin', 16) + '<span class="grow"><b>Παραλαβή από τη ρεσεψιόν</b><span class="sm">Συνήθως έτοιμο την επόμενη ημέρα · Δευ–Παρ 07–22</span></span></div></div>' +
+      '<div class="link"><span>Περιγραφή και υλικά</span><span>›</span></div>' },
+    cart: { tab: 1, crumb: 'Box › Κατάστημα › Καλάθι', html: () => {
+      const B = S.v.pay === 'B';
+      return head('Καλάθι', '2 προϊόντα') +
+        '<div class="c" style="padding-block:4px">' +
+        '<div class="line">' + th('tee', 'sm') + '<div><b>T-shirt «Κυψέλη Strong»</b><div class="sm">Μαύρο · M · 1</div></div><span class="price">25,00 €</span></div>' +
+        '<div class="line">' + th('whey', 'sm') + '<div><b>Whey Protein 1 kg</b><div class="sm">Σοκολάτα · 1</div></div><span class="price">39,90 €</span></div></div>' +
+        '<div class="c"><span class="ey">Παραλαβή</span><div class="row" style="justify-content:space-between"><span><b>Box Κυψέλη · ρεσεψιόν</b><span class="sm" style="display:block">Θα σε ειδοποιήσουμε όταν είναι έτοιμη</span></span><span class="sm">Αλλαγή ▾</span></div></div>' +
+        '<div class="c"><span class="ey">Πληρωμή</span>' +
+        (B ? '<div class="opt2 on"><span class="radio on"></span><div class="grow"><b>Online με κάρτα</b><div class="sm">Αποθηκευμένη κάρτα ···· 4242</div></div></div><div class="opt2"><span class="radio"></span><div class="grow"><b>Στην παραλαβή</b><div class="sm">Μετρητά ή κάρτα στη ρεσεψιόν</div></div></div>'
+           : '<div class="opt2 on"><span class="radio on"></span><div class="grow"><b>Στην παραλαβή</b><div class="sm">Μετρητά ή κάρτα στη ρεσεψιόν</div></div></div><div class="opt2"><span class="radio"></span><div class="grow"><b>Στον λογαριασμό μου</b><div class="sm">Μπαίνει στην επόμενη πληρωμή της συνδρομής, αν το επιτρέπει το box</div></div></div>') +
+        '</div>' +
+        '<span class="sm" style="color:var(--primary-strong);font-weight:700">Έχεις κωδικό;</span>' +
+        '<div class="c" style="gap:0"><div class="kv2"><span>Προϊόντα</span><span class="mono">64,90 €</span></div><div class="kv2"><span>Έκπτωση πακέτου −10%</span><span class="mono">−6,49 €</span></div><div class="kv2 tot"><span>Σύνολο</span><span class="mono">58,41 €</span></div></div>' +
+        '<span class="btn full" data-m="order">' + (B ? 'Πληρωμή 58,41 €' : 'Παραγγελία · πληρωμή στην παραλαβή') + '</span>' +
+        '<p class="sm" style="text-align:center">Το παραστατικό θα εμφανιστεί στο Εγώ › Πληρωμές › Συναλλαγές.</p>';
+    } },
+    order: { tab: 1, crumb: 'Box › Κατάστημα › Η παραγγελία μου', html: () => head('Παραγγελία K-1042', 'Σήμερα 10:14') +
+      '<div class="c deep" style="justify-items:center;text-align:center"><span class="pill live">Έτοιμη για παραλαβή</span>' + qr(1042) + '<b class="mono" style="font-size:18px;letter-spacing:.1em">K-1042</b><span class="sm">Δείξ\' το στη ρεσεψιόν. Ισχύει έως Παρ 30/10.</span></div>' +
+      '<div class="c steps3"><div class="st done"><i></i><span>Η παραγγελία καταχωρήθηκε</span><span class="sm">10:14</span></div><div class="st done"><i></i><span>Έτοιμη στη ρεσεψιόν</span><span class="sm">16:02</span></div><div class="st now"><i></i><span>Παραλαβή</span><span class="sm">Δευ–Παρ 07–22</span></div></div>' +
+      '<div class="c" style="padding-block:4px"><div class="line">' + th('tee', 'sm') + '<div><b>T-shirt · Μαύρο · M</b><div class="sm">1 τεμ.</div></div><span class="price">22,50 €</span></div><div class="line">' + th('whey', 'sm') + '<div><b>Whey · Σοκολάτα</b><div class="sm">1 τεμ.</div></div><span class="price">35,91 €</span></div></div>' +
+      '<div class="row"><span class="sm grow">Πληρωμή στην παραλαβή · 58,41 €</span><span class="btn danger">Ακύρωση</span></div>' +
+      '<div class="toast">' + ic('bell', 16) + '<span>Ειδοποίηση: «Η παραγγελία σου είναι έτοιμη στη ρεσεψιόν»</span></div>' },
+    feed: { tab: 0, crumb: 'Αρχική · ανάρτηση του box', html: () => '<div class="top"><h5>Palee</h5><div class="ic">' + ic('heart') + ic('chat') + '</div></div>' +
+      '<div class="seg"><span class="on">Τα clubs μου</span><span>Γύρω μου</span></div>' +
+      '<div class="c post"><div class="row">' + av('ΚΥ', 0) + '<div class="grow"><b>Box Κυψέλη</b><span class="sm">#ανακοινώσεις · 2ω</span></div><span class="pill acc">Ανακοίνωση</span></div>' +
+      '<div>Ήρθαν τα νέα μπλουζάκια της ομάδας! Πάρε το δικό σου από το app και σε περιμένει στη ρεσεψιόν.</div>' +
+      '<div class="photoBox" data-m="product">' + th('tee', 'sm') + '<div style="flex:1;min-width:0"><b>T-shirt «Κυψέλη Strong»</b><div class="sm">25,00 € · 4 μεγέθη</div></div><span class="btn">Δες το</span></div>' +
+      '<div class="sm">' + ic('heart', 13) + ' 38 · 6 σχόλια</div></div>' +
+      '<div class="c"><div class="row">' + av('ΕΚ', 2) + '<div class="grow"><b>Ελένη Κ.</b><span class="sm">#wod-σήμερα · 3ω</span></div></div><div>Fran 4:12, νέο PR!</div></div>' +
+      '<p class="sm">Η κάρτα προϊόντος είναι αναφορά: οδηγεί στο Box › Κατάστημα, εκεί που αγοράζεις (αρχή 1).</p>' },
+    me: { tab: 3, crumb: 'Εγώ', html: () => '<div class="top"><h5>Εγώ</h5><div class="ic">' + ic('bell') + '</div></div>' +
+      '<div class="row">' + av('ΜΛ', 0, 48) + '<div class="grow"><b style="font-size:15px">Μαρία Λ.</b><span class="sm">Box Κυψέλη · μέλος από 2024</span></div></div>' +
+      ['Φέρε φίλο', 'Buddy', 'Τα box και τα clubs μου', 'Κοινοποίηση & ορατότητα'].map(x => '<div class="link"><span>' + x + '</span><span>›</span></div>').join('') +
+      '<div class="link" data-m="tx"><span>Πληρωμές & αποδείξεις</span><span>›</span></div><div class="link"><span>Ρυθμίσεις</span><span>›</span></div>' },
+    journal: { tab: 2, crumb: 'Ημερολόγιο', html: () => '<div class="top"><h5>Ημερολόγιο</h5></div><p class="sm">Δεν αλλάζει με το κατάστημα.</p>' },
+    tx: { tab: 3, crumb: 'Εγώ › Πληρωμές › Συναλλαγές', html: () => payHead(1) +
+      '<div class="chips"><span class="chip2 strong">Φίλτρα (0)</span><span class="chip2 on">Όλες</span><span class="chip2">Ανοιχτές</span><span class="chip2">Εξοφλημένες</span></div>' +
+      '<div class="c" style="padding-block:4px">' +
+      txRow('bag', 'Κατάστημα · K-1042', 'T-shirt, Whey · πληρωμή στην παραλαβή', '58,41 €', '<span class="pill warn">Ανοιχτό</span>', 'order') +
+      txRow('cash', 'Ρεσεψιόν · αγορά', 'Πρωτεϊνική μπάρα ×2 · μετρητά', '4,50 €', '<span class="pill ok">Εξοφλήθηκε</span>') +
+      txRow('tag', 'Πακέτο 12 επισκέψεων', 'Οκτώβριος · κάρτα στο box', '90,00 €', '<span class="pill ok">Εξοφλήθηκε</span>') +
+      txRow('box', 'Επιστροφή · K-0988', 'Λαβές M → αλλαγή μεγέθους', '−34,00 €', '<span class="pill info">Επιστροφή</span>') + '</div>' +
+      '<p class="sm">Κάθε παραγγελία και κάθε αγορά στο ταμείο είναι παραστατικό των Οικονομικών, όπως οι συνδρομές.</p>' },
+    offers: { tab: 3, crumb: 'Εγώ › Πληρωμές › Προσφορές', html: () => payHead(2) +
+      '<div class="c"><div class="row"><span class="ey grow">Από συνεργάτες του box</span><span class="sm">3</span></div>' +
+      perkRow('NS', 2, 'Nutri Store Κυψέλη', '−10% σε όλα τα συμπληρώματα', 'έως 31/12', true) +
+      perkRow('ΦΚ', 3, 'Φυσικοθεραπεία Κίνηση', '−15 € στην πρώτη συνεδρία', 'έως 30/11', false) +
+      perkRow('ΚΦ', 4, 'Καφέ Αγ. Γεωργίου', 'Δωρεάν shot πρωτεΐνης με κάθε smoothie', 'χωρίς λήξη', false) + '</div>' +
+      '<div class="c"><span class="ey">Προσφορές που χρησιμοποίησες</span><div class="row"><span class="grow"><b>Φθινόπωρο −15%</b><span class="sm">12/09</span></span><span class="sm" style="color:var(--success);font-weight:700">−13,50 €</span></div></div>' +
+      '<div class="c"><span class="ey">Φέρε φίλο</span><span class="sm">2 προσκλήσεις · 1 έγινε μέλος</span><span class="sm" style="color:var(--primary-strong);font-weight:700">Κάλεσε φίλο ›</span></div>' },
+    perk: { tab: 3, crumb: 'Εγώ › Πληρωμές › Προσφορές › Συνεργάτης', html: () => {
+      const B = S.v.perkCode === 'B';
+      return head('Nutri Store Κυψέλη', 'Συμπληρώματα · 350 μ.') +
+        '<div class="c" style="justify-items:center;text-align:center;gap:8px"><span class="perkLogo" style="background:' + SER[2] + ';width:52px;height:52px">NS</span><h6 style="font-size:18px">−10% σε όλα τα συμπληρώματα</h6><span class="sm">Για μέλη του Box Κυψέλη · έως 31/12</span></div>' +
+        (B ? '<div class="c" style="gap:8px"><span class="ey">Ο προσωπικός σου κωδικός</span><div class="code">ML-7Q4K</div><span class="sm">Μίας χρήσης. Ο συνεργάτης τον επιβεβαιώνει και η χρήση μετράει αυτόματα.</span></div>'
+           : '<div class="c" style="gap:8px"><span class="ey">Κωδικός</span><div class="code">ΚΥΨΕΛΗ10</div><div class="row"><span class="btn ghost" style="flex:1">' + ic('copy') + 'Αντιγραφή</span><span class="btn ghost" style="flex:1">' + ic('qr') + 'Δείξε QR</span></div><span class="sm">Δείξε τον στο ταμείο ή γράψε τον στο eshop τους.</span></div>') +
+        '<div class="c" style="gap:4px"><span class="ey">Όροι</span><span class="sm">Δεν ισχύει σε προϊόντα ήδη σε προσφορά. Μία φορά ανά επίσκεψη.</span></div>' +
+        '<div class="link"><span style="display:flex;gap:8px;align-items:center">' + ic('pin', 16) + 'Αγ. Γεωργίου 12 · Οδηγίες</span><span>›</span></div>' +
+        (B ? '' : '<span class="btn full ghost">Το χρησιμοποίησα</span>') +
+        '<span class="badge" style="justify-self:center">Συνεργασία · το box έχει όφελος από αυτή την προσφορά</span>';
+    } },
+  };
+  function payHead(on) { return head('Πληρωμές & αποδείξεις', 'Box Κυψέλη ▾') +
+    '<div class="c"><div class="row"><div class="grow"><span class="ey">Πακέτο 12 επισκέψεων</span><b>5 επισκέψεις · έως 31/10</b><span class="sm">Ανοιχτό υπόλοιπο 58,41 €</span></div></div></div>' +
+    '<div class="seg">' + ['Συνδρομή', 'Συναλλαγές', 'Προσφορές'].map((s, i) => '<button type="button" class="' + (i === on ? 'on' : '') + '"' + (i === 1 ? ' data-m="tx"' : i === 2 ? ' data-m="offers"' : '') + '>' + s + '</button>').join('') + '</div>'; }
+  function txRow(i, t, d, a, pill, go) { return '<div class="line"' + (go ? ' data-m="' + go + '"' : '') + '><span class="thumb sm" style="--th:var(--series-6)">' + ic(i) + '</span><div style="min-width:0"><b>' + t + '</b><div class="sm">' + d + '</div></div><div style="display:grid;justify-items:end;gap:3px"><span class="price">' + a + '</span>' + pill + '</div></div>'; }
+  function perkRow(ini, c, n, o, until, go) { return '<div class="line" data-m="perk"><span class="perkLogo" style="background:' + SER[c] + '">' + ini + '</span><div style="min-width:0"><b>' + n + '</b><div class="sm">' + o + ' · ' + until + '</div></div><span class="btn ghost">Κωδικός</span></div>'; }
+  const TABS = [['Αρχική', 'home', 'feed'], ['Box', 'gym', 'box'], ['Ημερολόγιο', 'book', 'journal'], ['Εγώ', 'me', 'me']];
+  const PARENT = { box: [], shop: ['box'], product: ['box', 'shop'], cart: ['box', 'shop', 'product'], order: ['box', 'shop'], feed: [], me: [], journal: [], tx: ['me'], offers: ['me'], perk: ['me', 'offers'] };
+  const phone = document.getElementById('phone');
+  function renderM() {
+    const sc = M[S.m];
+    phone.innerHTML = '<div class="screen"><div class="sb"><span>9:41</span><span class="isl"></span><span>5G</span></div><div class="body">' + sc.html() + '</div>' +
+      '<nav class="tb" aria-label="Μπάρα">' + TABS.map((t, i) => '<button type="button" data-m="' + t[2] + '" class="' + (i === sc.tab ? 'on' : '') + '">' + ic(t[1]) + t[0] + '</button>').join('') + '</nav></div>';
+    document.getElementById('mcrumb').textContent = sc.crumb;
+    document.querySelectorAll('#mtour [data-m]').forEach(b => b.setAttribute('aria-current', String(b.dataset.m === S.m)));
+  }
+
+  // ======================= CONSOLE =======================
+  const shopInFinance = () => S.v.shopHome === 'B';
+  const perkInShop = () => S.v.perkHome === 'B';
+  function dbar(active) {
+    const items = shopInFinance() ? ['Αρχική', 'Καθοδήγηση', 'Οικονομικά', 'Χρήστες', 'Κοινότητα'] : ['Αρχική', 'Καθοδήγηση', 'Οικονομικά', 'Κατάστημα', 'Χρήστες', 'Κοινότητα'];
+    const go = { 'Κατάστημα': 'products', 'Οικονομικά': 'finance' };
+    return '<div class="dbar"><span class="brand">BOX ΚΥΨΕΛΗ</span>' + items.map(x => '<span class="nav ' + (x === active ? 'on' : '') + '"' + (go[x] ? ' data-k="' + go[x] + '"' : '') + '>' + x + '</span>').join('') + '<span class="who">' + ic('bell', 18) + av('ΑΠ', 0, 26) + 'Απόστολος</span></div>';
+  }
+  const FIN_TABS = ['Επισκόπηση', 'Μέλη', 'Πακέτα', 'Σεζόν', 'Προσφορές', 'Παραπομπές', 'Ουρές', 'Λογιστική'];
+  function shopShell(seg, body, opts) {
+    opts = opts || {};
+    const top = shopInFinance() ? 'Οικονομικά' : 'Κατάστημα';
+    let segs;
+    if (shopInFinance()) {
+      segs = '<div class="dseg" style="grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(96px,1fr))">' + FIN_TABS.concat(['Προϊόντα', 'Παραγγελίες', 'Απόθεμα', 'Αναλυτικά']).map(t => '<button type="button" class="' + (t === seg ? 'on' : '') + '"' + segGo(t) + '>' + t + '</button>').join('') + '</div><p class="crumb">Εναλλακτική B: το κατάστημα ως 4 ακόμη tabs των Οικονομικών (12 συνολικά). Δεν προτείνεται.</p>';
+    } else {
+      const list = ['Προϊόντα', 'Παραγγελίες', 'Απόθεμα', 'Αναλυτικά'].concat(perkInShop() ? ['Συνεργάτες'] : []);
+      segs = '<div class="dseg">' + list.map(t => '<button type="button" class="' + (t === seg ? 'on' : '') + '"' + segGo(t) + '>' + t + (t === 'Παραγγελίες' ? '<em>2</em>' : '') + '</button>').join('') + '</div>';
+    }
+    const kp = opts.kpis === false ? '' : '<div class="kpis"><div class="kpi" data-k="orders"><b>2</b><span>Για ετοιμασία</span></div><div class="kpi" data-k="orders"><b>3</b><span>Έτοιμες, περιμένουν παραλαβή</span></div><div class="kpi warn" data-k="stock"><b>3</b><span>Χαμηλό ή εξαντλημένο απόθεμα</span></div><div class="kpi"><b>1.103 €</b><span>Πωλήσεις Οκτωβρίου</span></div></div>';
+    return dbar(top) + '<div class="dbody"><div class="dhead"><h3>' + (shopInFinance() ? 'Οικονομικά' : 'Κατάστημα') + '</h3><span class="pill ok">Ανοιχτό · 6 προϊόντα</span><span class="sp"></span><button type="button" class="dbtn ghost" data-k="pos">' + ic('cash') + 'Ταμείο</button><button type="button" class="dbtn go" data-k="edit">+ Νέο προϊόν</button></div>' + segs + kp + body + '</div>';
+  }
+  function segGo(t) { const m = { 'Προϊόντα': 'products', 'Παραγγελίες': 'orders', 'Απόθεμα': 'stock', 'Αναλυτικά': 'analytics', 'Επισκόπηση': 'finance', 'Προσφορές': 'perks', 'Συνεργάτες': 'perks' }; return m[t] ? ' data-k="' + m[t] + '"' : ''; }
+  const stPill = (p) => p.st === 'out' ? '<span class="pill bad">Εξαντλήθηκε</span>' : p.st === 'crit' ? '<span class="pill bad">~6 ημέρες</span>' : p.st === 'low' ? '<span class="pill warn">Χαμηλό σε 1 παραλλαγή</span>' : p.st === 'draft' ? '' : '<span class="pill ok">Επαρκές</span>';
+  const meter = (p) => { const w = Math.min(100, p.stock * 3); const cls = p.st === 'out' ? 'out' : (p.st === 'crit' || p.st === 'low') ? 'low' : ''; return '<span class="meter ' + cls + '"><i style="width:' + w + '%"></i></span>'; };
+
+  const K = {
+    empty: { crumb: 'Κονσόλα › Κατάστημα · πρώτη φορά', html: () => dbar(shopInFinance() ? 'Οικονομικά' : 'Κατάστημα') + '<div class="dbody"><div class="dhead"><h3>Κατάστημα</h3><span class="pill">Κλειστό</span></div>' +
+      '<div class="card empty"><h4>Πούλα στα μέλη σου από το app</h4><p class="muted" style="max-width:62ch">Τα μέλη παραγγέλνουν από το Box και παραλαμβάνουν στη ρεσεψιόν. Εσύ βλέπεις τι να ετοιμάσεις και πόσα έμειναν. Η ρεσεψιόν πουλάει και από το ταμείο.</p>' +
+      '<div class="checklist"><div class="ck"><i>1</i>Πρόσθεσε το πρώτο προϊόν (φωτογραφία, τιμή, μεγέθη)</div><div class="ck done"><i>✓</i>Σημείο παραλαβής: ρεσεψιόν Κυψέλη, Δευ–Παρ 07–22</div><div class="ck"><i>3</i>Άνοιξε το κατάστημα στα μέλη</div></div>' +
+      '<div class="row" style="gap:10px;flex-wrap:wrap"><button type="button" class="dbtn go" data-k="edit">+ Νέο προϊόν</button><button type="button" class="dbtn ghost">Ρυθμίσεις παραλαβής</button></div></div>' +
+      '<div class="card"><h4>Τι βλέπουν τα μέλη</h4><p class="muted">Μέχρι να ανοίξεις το κατάστημα, η κάρτα «Κατάστημα» δεν εμφανίζεται στο Box. Μόλις ανοίξει, παίρνει σταθερή θέση κάτω από τη Συνδρομή.</p></div></div>' },
+    products: { crumb: 'Κονσόλα › Κατάστημα › Προϊόντα', html: () => shopShell('Προϊόντα',
+      '<div class="card" style="gap:6px"><div class="chips"><span class="chip2 strong" style="font-size:12.5px">Φίλτρα (0)</span><span class="chip2 on" style="font-size:12.5px">Όλα 7</span><span class="chip2" style="font-size:12.5px">Δημοσιευμένα 6</span><span class="chip2" style="font-size:12.5px">Πρόχειρα 1</span><span class="chip2" style="font-size:12.5px">Χαμηλό απόθεμα 3</span><span class="input ph" style="min-height:30px;padding:4px 10px;flex:1;min-width:150px">' + ic('search', 15) + 'Αναζήτηση</span></div>' +
+      '<div class="list">' + Object.keys(PR).map(k => { const p = PR[k]; return '<div class="lrow" data-k="edit">' + th(k, 'sm') + '<div style="min-width:0"><div class="t">' + p.n + '</div><div class="m"><span>' + p.cat + ' · ' + p.v + '</span><span class="mono">' + eur(p.p) + '</span><span>' + meter(p) + ' ' + p.stock + ' τεμ.' + (p.low ? ' · ' + p.low : '') + '</span></div></div><div class="e">' + stPill(p) + (p.pub ? '<span class="pill live">Δημοσιευμένο</span>' : '<span class="pill">Πρόχειρο</span>') + '</div></div>'; }).join('') + '</div></div>') },
+    edit: { crumb: 'Κονσόλα › Κατάστημα › Προϊόντα › T-shirt «Κυψέλη Strong»', html: () => dbar(shopInFinance() ? 'Οικονομικά' : 'Κατάστημα') + '<div class="dbody">' +
+      '<div class="dhead"><span class="crumb" data-k="products">‹ Προϊόντα</span></div>' +
+      '<div class="dhead"><h3>T-shirt «Κυψέλη Strong»</h3><span class="pill live">Δημοσιευμένο</span><span class="sp"></span><button type="button" class="dbtn ghost" data-k="promote">' + ic('megaphone') + 'Προώθηση</button></div>' +
+      '<div class="dgrid"><div style="display:grid;gap:16px">' +
+      '<div class="card"><h4>Φωτογραφίες</h4><p class="sub">Τετράγωνες, τουλάχιστον 1200 px. Η πρώτη φαίνεται στη λίστα.</p><div class="photos">' + [0, 0, 0].map((c, i) => '<span class="thumb" style="--th:' + SER[i === 1 ? 4 : 0] + '">' + ic(i === 2 ? 'image' : 'shirt') + '</span>').join('') + '<span class="drop">+ Πρόσθεσε<br>ή σύρε εδώ</span></div></div>' +
+      '<div class="card"><div class="field"><label>Όνομα</label><div class="input">T-shirt «Κυψέλη Strong»</div></div><div class="field"><label>Περιγραφή</label><div class="input area">100% βαμβάκι, κανονική εφαρμογή. Το λογότυπο του box μπροστά, «Strong together» πίσω.</div></div>' +
+      '<div class="f2"><div class="field"><label>Κατηγορία</label><div class="input picker">Ρούχα</div></div><div class="field"><label>Τιμή</label><div class="input mono">25,00<span class="end">€ με ΦΠΑ</span></div></div></div>' +
+      '<div class="field"><label>Κόστος αγοράς <span class="muted" style="font-weight:500">(προαιρετικό, μόνο για εσένα)</span></label><div class="input mono" style="max-width:200px">11,00<span class="end">€</span></div></div></div>' +
+      '<div class="card"><h4>Επιλογές και απόθεμα</h4><p class="sub">Έως δύο επιλογές. Το απόθεμα μετριέται ανά συνδυασμό.</p>' +
+      '<div class="field"><label>Μέγεθος</label><div class="tags">' + ['XS', 'S', 'M', 'L', 'XL'].map(x => '<span class="tagx">' + x + ' ×</span>').join('') + '<span class="addchip">+ Προσθήκη</span></div></div>' +
+      '<div class="field"><label>Χρώμα</label><div class="tags"><span class="tagx">Μαύρο ×</span><span class="tagx">Λευκό ×</span><span class="addchip">+ Προσθήκη</span></div></div>' +
+      '<div><div class="vrow hd"><span>Παραλλαγή</span><span>Απόθεμα</span><span>Τιμή</span></div>' +
+      [['Μαύρο · XS', 0, 'out'], ['Μαύρο · S', 4], ['Μαύρο · M', 1, 'low'], ['Μαύρο · L', 5], ['Λευκό · M', 3], ['Λευκό · L', 6]].map(v => '<div class="vrow"><span>' + v[0] + (v[2] === 'out' ? ' <span class="pill bad">0</span>' : v[2] === 'low' ? ' <span class="pill warn">χαμηλό</span>' : '') + '</span><span class="input">' + v[1] + '</span><span class="muted" style="font-size:12.5px">ίδια</span></div>').join('') +
+      '<p class="crumb" style="margin-top:6px">+4 ακόμη · Αλλάζεις την τιμή μιας παραλλαγής μόνο αν χρειάζεται («ίδια» = 25,00 €).</p></div></div>' +
+      '</div><div style="display:grid;gap:16px">' +
+      '<div class="card"><h4>Δημοσίευση</h4><div class="setrow"><div class="grow"><b>Δημοσιευμένο</b><span>Το βλέπουν όσοι ορίζεις πιο κάτω</span></div><span class="toggle"></span></div>' +
+      '<div class="field"><label>Ποιοι μπορούν να αγοράσουν</label><div class="dseg"><button type="button" class="on">Μόνο μέλη</button><button type="button">Και επισκέπτες</button></div><span class="hint2">«Και επισκέπτες»: φαίνεται και στη δημόσια σελίδα του box, για όποιον έχει λογαριασμό Palee.</span></div>' +
+      '<div class="setrow"><div class="grow"><b>Στο app</b><span>Box › Κατάστημα</span></div><span class="toggle"></span></div><div class="setrow"><div class="grow"><b>Στο ταμείο</b><span>Πλακίδιο στα αγαπημένα</span></div><span class="toggle"></span></div></div>' +
+      '<div class="card"><h4>Τιμή και όρια</h4><div class="setrow"><div class="grow"><b>Έκπτωση μέλους από πακέτο</b><span>Εφαρμόζεται το % του πακέτου (−10% στο «12 επισκέψεις»)</span></div><span class="toggle"></span></div>' +
+      '<div class="setrow"><div class="grow"><b>Όριο ανά άτομο</b><span>Χωρίς όριο</span></div><span class="toggle off"></span></div></div>' +
+      '<div class="card"><h4>Παραλαβή</h4><div class="field"><label>Σημεία</label><div class="input picker">Ρεσεψιόν Κυψέλη</div></div><span class="hint2">Με πολλά παραρτήματα το μέλος διαλέγει στο καλάθι.</span></div>' +
+      '<button type="button" class="dbtn ghost" style="justify-self:start">Αρχειοθέτηση</button></div></div></div>' +
+      '<div class="savebar">Μη αποθηκευμένες αλλαγές<span class="sp"></span><button type="button" class="dbtn ghost">Απόρριψη</button><button type="button" class="dbtn" data-k="products">Αποθήκευση</button></div>' },
+    promote: { crumb: 'Κονσόλα › Κατάστημα › Προϊόν › Προώθηση', html: () => K.edit.html() + '<div class="dim" data-k="edit"></div><aside class="side" aria-label="Προώθηση"><div class="sh"><h4>Προώθηση: T-shirt</h4><button type="button" class="x" data-k="edit" aria-label="Κλείσιμο">×</button></div><div class="sb2">' +
+      '<p class="muted" style="font-size:13.5px">Η προώθηση χρησιμοποιεί εργαλεία που έχεις ήδη. Διάλεξε ένα ή και τα δύο.</p>' +
+      '<div class="promo" style="grid-template-columns:minmax(0,1fr)"><div class="on"><b>' + ic('megaphone', 16) + ' Ανάρτηση στο club</b><span>Ανοίγει τη νέα ανάρτηση με την κάρτα του προϊόντος συνημμένη. Κανάλι: #ανακοινώσεις.</span></div>' +
+      '<div><b>' + ic('tag', 16) + ' Κωδικός έκπτωσης</b><span>Ανοίγει τη νέα προσφορά στο Οικονομικά › Προσφορές, μόνο για αυτό το προϊόν, με ημερομηνίες και όριο χρήσεων.</span></div></div>' +
+      '<div class="preview"><span class="crumb">Προεπισκόπηση ανάρτησης</span><div class="row">' + av('ΚΥ', 0, 26) + '<b style="font-size:13px">Box Κυψέλη</b><span class="crumb">#ανακοινώσεις</span></div><div class="input area" style="font-size:13px">Ήρθαν τα νέα μπλουζάκια της ομάδας! Πάρε το δικό σου από το app και σε περιμένει στη ρεσεψιόν.</div><div class="who2">' + th('tee', 'sm') + '<div class="grow"><b>T-shirt «Κυψέλη Strong»</b><span>25,00 € · Δες το</span></div></div></div>' +
+      '<div class="setrow"><div class="grow"><b>Ετικέτα «Νέο» στο κατάστημα</b><span>Αυτόματα για 14 ημέρες από τη δημοσίευση</span></div><span class="toggle"></span></div>' +
+      '</div><div class="sf"><button type="button" class="dbtn ghost" data-k="edit">Άκυρο</button><button type="button" class="dbtn" data-k="edit">Συνέχεια στην ανάρτηση</button></div></aside>' },
+    orders: { crumb: 'Κονσόλα › Κατάστημα › Παραγγελίες', html: () => shopShell('Παραγγελίες',
+      '<div class="card" style="gap:6px"><div class="dseg"><button type="button" class="on">Για ετοιμασία 2</button><button type="button">Έτοιμες 3</button><button type="button">Παραλήφθηκαν</button><button type="button">Ακυρώσεις</button></div>' +
+      '<div class="list">' +
+      ordRow('K-1043', 'ΓΠ', 1, 'Γιώργος Π.', 'Λαβές M ×1', '34,00 €', 'Στην παραλαβή', 'Σήμερα 11:20', false) +
+      ordRow('K-1042', 'ΜΛ', 0, 'Μαρία Λ.', 'T-shirt Μαύρο M, Whey Σοκολάτα', '58,41 €', 'Στην παραλαβή', 'Σήμερα 10:14', true) +
+      '</div><p class="crumb">Οι παραγγελίες κρατούν το απόθεμα μέχρι την παραλαβή ή την ακύρωση. Χωρίς παραλαβή σε 7 ημέρες ακυρώνονται αυτόματα, με υπενθύμιση στο μέλος την 3η.</p></div>') },
+    order: { crumb: 'Κονσόλα › Κατάστημα › Παραγγελίες › K-1042', html: () => K.orders.html() + '<div class="dim" data-k="orders"></div><aside class="side" aria-label="Παραγγελία"><div class="sh"><h4>K-1042 <span class="pill warn" style="vertical-align:middle">Για ετοιμασία</span></h4><button type="button" class="x" data-k="orders" aria-label="Κλείσιμο">×</button></div><div class="sb2">' +
+      '<div class="who2">' + av('ΜΛ', 0) + '<div class="grow"><b>Μαρία Λ.</b><span>Μέλος · Πακέτο 12 επισκέψεων · 69x xxx x412</span></div></div>' +
+      '<div class="list">' + '<div class="lrow" style="cursor:default">' + th('tee', 'sm') + '<div><div class="t">T-shirt · Μαύρο · M</div><div class="m">1 × 25,00 € · −10% πακέτο</div></div><div class="e"><span class="price">22,50 €</span></div></div>' +
+      '<div class="lrow" style="cursor:default">' + th('whey', 'sm') + '<div><div class="t">Whey 1 kg · Σοκολάτα</div><div class="m">1 × 39,90 € · −10% πακέτο</div></div><div class="e"><span class="price">35,91 €</span></div></div></div>' +
+      '<div class="kv2 tot" style="font-size:15px"><span>Σύνολο · παραστατικό ΤΠ-2026-0412</span><span class="mono">58,41 €</span></div>' +
+      '<div class="tl2"><div class="ok"><i></i><span>Καταχωρήθηκε από το app</span><span>10:14</span></div><div class="now"><i></i><span>Ετοιμασία στη ρεσεψιόν</span><span>τώρα</span></div><div><i></i><span>Παραλαβή και πληρωμή</span><span>έως 30/10</span></div></div>' +
+      '<div class="card" style="padding:12px 14px;background:var(--bg)"><h4 style="font-size:13.5px">Κατά την παράδοση</h4><div class="payg"><span class="on">Κάρτα</span><span>Μετρητά</span><span>Στον λογαριασμό</span></div><span class="crumb">Η πληρωμή καταγράφεται στο παραστατικό της παραγγελίας. Το μέλος τη βλέπει στις Συναλλαγές.</span></div>' +
+      '</div><div class="sf"><button type="button" class="dbtn">' + ic('check') + 'Έτοιμη για παραλαβή</button><button type="button" class="dbtn ghost">Παραδόθηκε</button><span style="flex:1"></span><button type="button" class="dbtn danger">Ακύρωση ή επιστροφή</button></div>' +
+      '<p class="crumb" style="padding:0 18px 12px">«Έτοιμη» στέλνει push στο μέλος. Η επιστροφή κόβει απόδειξη επιστροφής (υπάρχει) και ρωτάει αν το προϊόν γυρίζει στο απόθεμα.</p></aside>' },
+    stock: { crumb: 'Κονσόλα › Κατάστημα › Απόθεμα', html: () => shopShell('Απόθεμα',
+      '<div class="dgrid"><div class="card" style="gap:6px"><div class="chips"><span class="chip2 strong" style="font-size:12.5px">Φίλτρα (1)</span><span class="chip2 on" style="font-size:12.5px">Χρειάζονται παραγγελία 3</span><span class="chip2" style="font-size:12.5px">Όλες οι παραλλαγές 24</span></div><div class="list">' +
+      stRow('bottle', 'Παγούρι 750 ml', '0 τεμ. · πουλάει ~3/εβδ.', '<span class="pill bad">Εξαντλήθηκε</span>', false) +
+      stRow('chalk', 'Μπάλα μαγνησίας', '4 τεμ. · ~6 ημέρες', '<span class="pill bad">Κρίσιμο</span>', false) +
+      stRow('tee', 'T-shirt · Μαύρο · M', '1 τεμ. · ~9 ημέρες · 1 δεσμευμένο', '<span class="pill warn">Χαμηλό</span>', true) +
+      '</div><p class="crumb">Η κατάσταση βγαίνει από τις ημέρες αποθέματος με βάση τις πωλήσεις (όπως ο Εξοπλισμός, ADR-104): κρίσιμο κάτω από 7, χαμηλό κάτω από 21. Ειδοποίηση μόνο όταν χειροτερεύει. Μπαίνει στην ημερήσια σύνοψη.</p></div>' +
+      '<div class="card"><h4>Κίνηση: T-shirt · Μαύρο · M</h4><div class="reasons"><span class="on">Παραλαβή εμπορεύματος</span><span>Καταμέτρηση</span><span>Φθορά</span><span>Επιστροφή</span></div>' +
+      '<div class="f2"><div class="field"><label>Ποσότητα</label><div class="stepper" style="font-size:15px"><span>−</span><b>+10</b><span>+</span></div></div><div class="field"><label>Κόστος ανά τεμάχιο</label><div class="input mono">11,00<span class="end">€</span></div></div></div>' +
+      '<div class="field"><label>Σημείωση</label><div class="input ph">π.χ. Τιμολόγιο προμηθευτή 0891</div></div>' +
+      '<div class="kv2" style="font-size:13.5px"><span>Νέο απόθεμα</span><b class="mono">11 τεμ. · ~3 μήνες</b></div><button type="button" class="dbtn">Καταχώρηση</button>' +
+      '<div class="tl2" style="border-top:1px solid var(--border);padding-top:8px"><div><i></i><span>Πώληση app · K-1042 (δέσμευση)</span><span>Σήμ. −1</span></div><div><i></i><span>Πώληση ταμείο · Ελένη Κ.</span><span>Χθες −1</span></div><div class="ok"><i></i><span>Παραλαβή εμπορεύματος · Απόστολος</span><span>02/10 +6</span></div></div></div></div>') },
+    pos: { crumb: 'Κονσόλα › Κατάστημα › Ταμείο (και από το check-in desk)', html: () => dbar(shopInFinance() ? 'Οικονομικά' : 'Κατάστημα') + '<div class="dbody">' +
+      '<div class="dhead"><span class="crumb" data-k="products">‹ Κατάστημα</span><span class="sp"></span><span class="crumb">Ρεσεψιόν Κυψέλη · Ελένη (ρεσεψιόν)</span></div>' +
+      '<div class="pos"><div class="card"><div class="row" style="gap:8px;flex-wrap:wrap"><h4 style="flex:1">Αγαπημένα</h4><span class="input ph" style="min-height:34px;flex:1;min-width:160px">' + ic('search', 15) + 'Προϊόν ή barcode</span></div>' +
+      '<div class="tiles">' + ['bar', 'whey', 'tee', 'chalk', 'grips', 'bottle'].map(k => { const p = PR[k]; return '<div class="tile ' + (k === 'bar' ? 'add' : '') + '"><span class="thumb" style="--th:' + SER[p.c] + ';aspect-ratio:1.6">' + ic(p.i) + (p.st === 'out' ? '<span class="pill bad flag">0</span>' : '') + '</span><b>' + p.n + '</b><span class="price">' + eur(p.p) + '</span></div>'; }).join('') + '</div>' +
+      '<div class="preview"><span class="crumb">Πάτημα σε «T-shirt»: γρήγορη επιλογή παραλλαγής</span><div class="sizes" style="grid-template-columns:repeat(auto-fit,minmax(70px,1fr))"><span class="out">Μαύρο XS</span><span>Μαύρο S</span><span>Μαύρο M · 1</span><span>Μαύρο L</span><span>Λευκό M</span><span>Λευκό L</span></div></div></div>' +
+      '<div class="card"><h4>Πώληση</h4><div class="who2">' + av('ΜΛ', 0) + '<div class="grow"><b>Μαρία Λ.</b><span>Έκανε check-in 18:02 · −10% από πακέτο</span></div><span class="crumb">Αλλαγή</span></div>' +
+      '<div class="note" style="font-size:12.5px;padding:8px 10px;border-radius:10px">Έχει ανοιχτή παραγγελία K-1042 (έτοιμη). <b data-k="order" style="color:var(--primary-strong);cursor:pointer">Παράδοση τώρα ›</b></div>' +
+      '<div class="list"><div class="lrow" style="cursor:default">' + th('bar', 'sm') + '<div><div class="t">Πρωτεϊνική μπάρα · Φιστίκι</div><div class="m"><span class="stepper" style="font-size:12px"><span>−</span><b>2</b><span>+</span></span></div></div><div class="e"><span class="price">5,00 €</span></div></div>' +
+      '<div class="lrow" style="cursor:default">' + th('chalk', 'sm') + '<div><div class="t">Μπάλα μαγνησίας</div><div class="m">1 τεμ.</div></div><div class="e"><span class="price">6,00 €</span></div></div></div>' +
+      '<div class="kv2"><span>Έκπτωση πακέτου −10%</span><span class="mono">−1,10 €</span></div><div class="kv2 tot"><span>Σύνολο</span><span class="mono">9,90 €</span></div>' +
+      '<div class="payg"><span>Μετρητά</span><span class="on">Κάρτα</span><span>Στον λογαριασμό</span></div>' +
+      '<button type="button" class="dbtn big">Χρέωση 9,90 €</button><span class="crumb">Κόβεται παραστατικό με την πληρωμή. Η πώληση εμφανίζεται στις Συναλλαγές της Μαρίας. «Πελάτης χωρίς λογαριασμό» για επισκέπτες.</span></div></div></div>' },
+    analytics: { crumb: 'Κονσόλα › Κατάστημα › Αναλυτικά', html: () => shopShell('Αναλυτικά',
+      '<div class="card" style="gap:8px"><div class="chips"><span class="chip2 strong" style="font-size:12.5px">Φίλτρα (0)</span><span class="chip2" style="font-size:12.5px">Μήνας</span><span class="chip2 on" style="font-size:12.5px">12 εβδομάδες</span><span class="chip2" style="font-size:12.5px">12 μήνες</span><span class="chip2" style="font-size:12.5px">Όλα τα παραρτήματα ▾</span><span class="chip2" style="font-size:12.5px">App + Ταμείο ▾</span></div>' +
+      '<div class="kpis"><div class="kpi"><b>3.582 €</b><span>Πωλήσεις · 12 εβδ. · +18% από τις προηγούμενες 12</span></div><div class="kpi"><b>49%</b><span>Μικτό περιθώριο (όπου υπάρχει κόστος · 6/7 προϊόντα)</span></div><div class="kpi"><b>241</b><span>Τεμάχια · 131 παραγγελίες και πωλήσεις</span></div><div class="kpi" data-k="stock"><b>1.240 €</b><span>Αξία αποθέματος σε κόστος · 3 χαμηλά ›</span></div></div></div>' +
+      '<div class="card"><h4>Πωλήσεις ανά εβδομάδα</h4><p class="sub">Καθαρές από εκπτώσεις και επιστροφές. Η τρέχουσα εβδομάδα, ακόμη σε εξέλιξη, είναι ανοιχτόχρωμη. Πέρασε από πάνω για το ποσό.</p><div><div class="vbars" role="img" aria-label="Πωλήσεις ανά εβδομάδα, 12 εβδομάδες"><i style="height:40%" data-tip="εβδ. 3/8: 196 €"></i><i style="height:55%" data-tip="εβδ. 10/8: 268 €"></i><i style="height:43%" data-tip="εβδ. 17/8: 212 €"></i><i style="height:63%" data-tip="εβδ. 24/8: 310 €"></i><i style="height:49%" data-tip="εβδ. 31/8: 243 €"></i><i style="height:58%" data-tip="εβδ. 7/9: 284 €"></i><i style="height:52%" data-tip="εβδ. 14/9: 253 €"></i><i style="height:76%" data-tip="εβδ. 21/9: 372 €"></i><i style="height:69%" data-tip="εβδ. 28/9: 341 €"></i><i style="height:61%" data-tip="εβδ. 5/10: 299 €"></i><i style="height:100%" data-tip="εβδ. 12/10: 490 €"></i><i style="height:64%" data-tip="εβδ. 19/10: 314 €" class="now"></i></div><div class="vaxis"><span>3/8</span><span></span><span>17/8</span><span></span><span>31/8</span><span></span><span>14/9</span><span></span><span>28/9</span><span></span><span>12/10</span><span></span></div></div><p class="crumb">Κορυφή 12/10: η ανάρτηση για τα νέα T-shirt (490 €).</p></div>' +
+      '<div class="dgrid"><div class="card"><h4>Κορυφαία προϊόντα</h4><div class="tbl"><div class="tr2 hd"><span>Προϊόν</span><span class="n">Τεμ.</span><span class="n">Έσοδα</span><span class="n">Περιθώριο</span></div>' +
+      [['T-shirt «Κυψέλη Strong»', 46, '1.035 €', '56%'], ['Whey Protein 1 kg', 21, '754 €', '31%'], ['Πρωτεϊνική μπάρα', 118, '265 €', '44%'], ['Λαβές για pull-ups', 14, '428 €', '47%'], ['Μπάλα μαγνησίας', 15, '81 €', '—']].map(r => '<div class="tr2"><span data-k="edit">' + r[0] + '</span><span class="n">' + r[1] + '</span><span class="n">' + r[2] + '</span><span class="n">' + r[3] + '</span></div>').join('') +
+      '</div><p class="crumb">«—»: λείπει το κόστος αγοράς, οπότε δεν μπαίνει στο περιθώριο. Το λέμε, αντί να το μετράμε ως 100%.</p></div>' +
+      '<div style="display:grid;gap:16px"><div class="card"><h4>App ή ταμείο</h4><div class="hbars"><div class="hb"><span>App (παραλαβή)</span><span class="tr"><i style="width:58%"></i></span><b>2.078 € · 58%</b></div><div class="hb"><span>Ταμείο</span><span class="tr"><i style="width:42%"></i></span><b>1.504 € · 42%</b></div></div></div>' +
+      '<div class="card"><h4>Ανά παράρτημα</h4><div class="hbars"><div class="hb"><span>Κυψέλη</span><span class="tr"><i style="width:71%"></i></span><b>2.543 €</b></div><div class="hb"><span>Γαλάτσι</span><span class="tr"><i style="width:29%"></i></span><b>1.039 €</b></div></div></div></div></div>' +
+      '<div class="card"><h4>Από πού ήρθαν οι πωλήσεις</h4><p class="sub">Μια παραγγελία αποδίδεται στον κωδικό που χρησιμοποιήθηκε, αλλιώς στην ανάρτηση ή την προσφορά από την οποία άνοιξε το προϊόν μέσα σε 7 ημέρες.</p><div class="hbars">' +
+      '<div class="hb"><span>Ανάρτηση #ανακοινώσεις 12/10</span><span class="tr"><i style="width:41%"></i></span><b>27 παρ. · 612 €</b></div>' +
+      '<div class="hb"><span>Κωδικός TSHIRT10</span><span class="tr"><i style="width:16%"></i></span><b>11 παρ. · 248 €</b></div>' +
+      '<div class="hb"><span>Κάρτα «Κατάστημα» στο Box</span><span class="tr"><i style="width:28%"></i></span><b>30 παρ. · 418 €</b></div>' +
+      '<div class="hb"><span>App, χωρίς απόδοση</span><span class="tr"><i style="width:53%"></i></span><b>12 παρ. · 800 €</b></div>' +
+      '<div class="hb"><span>Ταμείο (χωρίς απόδοση)</span><span class="tr"><i style="width:100%"></i></span><b>51 · 1.504 €</b></div></div>' +
+      '<div class="lineage">Κάθε αριθμός ανοίγει τις γραμμές πίσω του. Πηγή: <code>shop_order_lines</code> → <code>finance_invoice_lines</code> (<code>shop_item</code>), καθαρά από <code>refund_receipts</code>.</div></div>', { kpis: false }) },
+    finance: { crumb: 'Κονσόλα › Οικονομικά › Επισκόπηση', html: () => dbar('Οικονομικά') + '<div class="dbody"><div class="dhead"><h3>Οικονομικά</h3><span class="sp"></span><span class="chip2" style="font-size:12.5px">Οκτώβριος 2026 ▾</span></div>' +
+      '<div class="dseg" style="grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(96px,1fr))">' + FIN_TABS.map(t => '<button type="button" class="' + (t === 'Επισκόπηση' ? 'on' : '') + '"' + segGo(t) + '>' + t + '</button>').join('') + '</div>' +
+      '<div class="kpis"><div class="kpi"><b>12.063 €</b><span>Έσοδα Οκτωβρίου (εισπράξεις)</span></div><div class="kpi warn"><b>1.180 €</b><span>Ανεξόφλητα παραστατικά · 58,41 € από το κατάστημα</span></div><div class="kpi"><b>214</b><span>Ενεργές συνδρομές</span></div></div>' +
+      '<div class="dgrid"><div class="card"><h4>Έσοδα ανά ροή</h4><p class="sub">Κάθε γραμμή παραστατικού έχει ροή από την πηγή της, όχι από το κείμενό της.</p><div class="hbars">' +
+      '<div class="hb"><span>Συνδρομές</span><span class="tr"><i style="width:100%"></i></span><b>8.420 € · 70%</b></div>' +
+      '<div class="hb"><span>Πακέτα PT και υπηρεσίες</span><span class="tr"><i style="width:26%"></i></span><b>2.180 € · 18%</b></div>' +
+      '<div class="hb"><span>Events και σεζόν</span><span class="tr"><i style="width:4%"></i></span><b>360 € · 3%</b></div>' +
+      '<div class="hb shop"><span class="lnk" data-k="analytics">Κατάστημα ›</span><span class="tr"><i style="width:13%"></i></span><b>1.103 € · 9%</b></div></div>' +
+      '<div class="lineage">Ροή από <code>line_type</code>: <code>membership_package</code> · <code>service</code> · <code>event|season</code> · <code>shop_item</code>. Οι χειροκίνητες χρεώσεις με κατηγορία «Προϊόν» μετράνε στο κατάστημα ως «χωρίς παραγγελία».</div></div>' +
+      '<div class="card"><h4>Έλεγχος καταστήματος</h4><div class="setrow"><div class="grow"><b>38 παραγγελίες = 38 παραστατικά</b><span>Καμία παραγγελία χωρίς παραστατικό</span></div><span class="pill ok">Εντάξει</span></div><div class="setrow"><div class="grow"><b>Απόθεμα ↔ πωλήσεις</b><span>Κάθε πώληση έχει κίνηση αποθέματος</span></div><span class="pill ok">Εντάξει</span></div><div class="setrow"><div class="grow"><b>2 χρεώσεις «Προϊόν» χωρίς προϊόν</b><span>Από χειροκίνητα παραστατικά · σύνδεσέ τες ή άφησέ τες</span></div><span class="pill warn">Έλεγχος</span></div></div></div>' +
+      '<div class="card"><h4>Πρόσφατα έσοδα καταστήματος</h4><div class="tbl"><div class="tr2 hd"><span>Παραστατικό · παραγγελία</span><span class="n">Προϊόν</span><span class="n">Ποσό</span><span class="n">Κατάσταση</span></div>' +
+      '<div class="tr2"><span data-k="order">ΤΠ-2026-0412 · K-1042 · Μαρία Λ.</span><span class="n" data-k="edit">T-shirt +1</span><span class="n">58,41 €</span><span class="n"><span class="pill warn">Ανοιχτό</span></span></div>' +
+      '<div class="tr2"><span data-k="order">ΤΠ-2026-0409 · Ταμείο · Μαρία Λ.</span><span class="n" data-k="edit">Μπάρα ×2 +1</span><span class="n">9,90 €</span><span class="n"><span class="pill ok">Εξοφλήθηκε</span></span></div>' +
+      '<div class="tr2"><span data-k="order">ΤΠ-2026-0401 · K-1037 · Γιώργος Π.</span><span class="n" data-k="edit">Whey</span><span class="n">35,91 €</span><span class="n"><span class="pill ok">Εξοφλήθηκε</span></span></div>' +
+      '<div class="tr2"><span data-k="order">ΑΕ-2026-0031 · K-0988 · επιστροφή</span><span class="n" data-k="edit">Λαβές M</span><span class="n">−34,00 €</span><span class="n"><span class="pill info">Επιστροφή</span></span></div></div></div></div>' },
+    perks: { crumb: () => perkInShop() ? 'Κονσόλα › Κατάστημα › Συνεργάτες' : 'Κονσόλα › Οικονομικά › Προσφορές › Συνεργατών', html: () => perkShell(
+      '<div class="card" style="gap:6px"><div class="dhead"><h4 style="flex:1">Προσφορές συνεργατών</h4><button type="button" class="dbtn go" data-k="perkNew">+ Νέα προσφορά συνεργάτη</button></div>' +
+      '<div class="list">' +
+      perkLine('NS', 2, 'Nutri Store Κυψέλη', '−10% σε όλα τα συμπληρώματα', 'ΚΥΨΕΛΗ10 · Όλα τα μέλη · έως 31/12', '412 προβολές · 41 χρήσεις', '<span class="pill live">Ενεργή</span><span class="badge">Συνεργασία</span>') +
+      perkLine('ΦΚ', 3, 'Φυσικοθεραπεία Κίνηση', '−15 € στην πρώτη συνεδρία', 'QR · Πακέτα PT · έως 30/11', '96 προβολές · 7 χρήσεις', '<span class="pill live">Ενεργή</span>') +
+      perkLine('ΚΦ', 4, 'Καφέ Αγ. Γεωργίου', 'Δωρεάν shot πρωτεΐνης', 'Κωδικός ΠΑΛΕΕ · Όλα τα μέλη · χωρίς λήξη', '233 προβολές · 58 χρήσεις', '<span class="pill">Σε παύση</span>') +
+      '</div><p class="crumb">«Προβολές»: πόσα μέλη άνοιξαν τον κωδικό. «Χρήσεις»: όσες δήλωσαν τα μέλη («Το χρησιμοποίησα») συν όσες πέρασες από τη μηνιαία λίστα του συνεργάτη. Οι προσφορές συνεργατών δεν εμφανίζονται ποτέ στο Γύρω μου.</p></div>') },
+    perkNew: { crumb: () => (perkInShop() ? 'Κονσόλα › Κατάστημα › Συνεργάτες' : 'Κονσόλα › Οικονομικά › Προσφορές › Συνεργατών') + ' › Νέα', html: () => perkShell(
+      '<div class="dgrid"><div style="display:grid;gap:16px"><div class="card"><h4>Συνεργάτης</h4><div class="f2"><div class="field"><label>Όνομα</label><div class="input">Nutri Store Κυψέλη</div></div><div class="field"><label>Είδος</label><div class="input picker">Συμπληρώματα</div></div></div><div class="f2"><div class="field"><label>Διεύθυνση ή site</label><div class="input">Αγ. Γεωργίου 12, Κυψέλη</div></div><div class="field"><label>Λογότυπο</label><div class="input ph">+ Ανέβασε εικόνα</div></div></div></div>' +
+      '<div class="card"><h4>Προσφορά</h4><div class="dseg"><button type="button" class="on">Ποσοστό</button><button type="button">Ποσό</button><button type="button">Δώρο</button></div><div class="f2"><div class="field"><label>Έκπτωση</label><div class="input mono">10<span class="end">%</span></div></div><div class="field"><label>Σε τι</label><div class="input">Όλα τα συμπληρώματα</div></div></div><div class="field"><label>Όροι</label><div class="input area">Δεν ισχύει σε προϊόντα ήδη σε προσφορά. Μία φορά ανά επίσκεψη.</div></div></div>' +
+      '<div class="card"><h4>Πώς εξαργυρώνεται</h4>' + (S.v.perkCode === 'B'
+        ? '<div class="dseg"><button type="button">Κοινός κωδικός</button><button type="button" class="on">Προσωπικός κωδικός</button></div><p class="crumb">Κάθε μέλος παίρνει δικό του κωδικό μίας χρήσης. Ο συνεργάτης τον επιβεβαιώνει σε μια απλή σελίδα, χωρίς λογαριασμό. Μετράει ακριβώς, αλλά ο συνεργάτης χρειάζεται εκπαίδευση. Για αργότερα.</p>'
+        : '<div class="dseg"><button type="button" class="on">Κοινός κωδικός</button><button type="button">Προσωπικός κωδικός</button></div><div class="f2"><div class="field"><label>Κωδικός</label><div class="input mono">ΚΥΨΕΛΗ10</div></div><div class="field"><label>Εμφάνιση στο μέλος</label><div class="input picker">Κωδικός και QR</div></div></div><p class="crumb">Ο κωδικός φαίνεται μόνο μέσα στην app, σε μέλη. Αν διαρρεύσει, τον αλλάζεις εδώ και ισχύει αμέσως.</p>') + '</div></div>' +
+      '<div style="display:grid;gap:16px"><div class="card"><h4>Ποιοι τη βλέπουν</h4><div class="dseg"><button type="button" class="on">Όλα τα μέλη</button><button type="button">Συγκεκριμένα πακέτα</button></div><span class="hint2">Ένας coach μπορεί να δώσει τον δικό του κωδικό μόνο στους πελάτες του διαλέγοντας τα πακέτα PT.</span></div>' +
+      '<div class="card"><h4>Ισχύς</h4><div class="f2"><div class="field"><label>Από</label><div class="input picker">23 Οκτ 2026</div></div><div class="field"><label>Έως</label><div class="input picker">31 Δεκ 2026</div></div></div><span class="hint2">Ημερομηνίες από το ημερολόγιο της Palee, όχι του browser.</span></div>' +
+      '<div class="card"><h4>Διαφάνεια</h4><div class="setrow"><div class="grow"><b>Το box έχει όφελος</b><span>Προμήθεια, αντίστοιχη προβολή ή δώρο. Δείχνει «Συνεργασία» στο μέλος.</span></div><span class="toggle"></span></div><div class="setrow"><div class="grow"><b>Ανάρτηση στο #ανακοινώσεις</b><span>Με τη δημοσίευση</span></div><span class="toggle off"></span></div></div>' +
+      '<div class="card" style="background:var(--bg)"><span class="crumb">Έτσι τη βλέπει το μέλος</span><div class="who2"><span class="perkLogo" style="background:' + SER[2] + '">NS</span><div class="grow"><b>Nutri Store Κυψέλη</b><span>−10% σε όλα τα συμπληρώματα · έως 31/12</span></div></div></div></div></div>' +
+      '<div class="savebar" style="border-radius:14px;border:1px solid var(--border)">Πρόχειρο<span class="sp"></span><button type="button" class="dbtn ghost" data-k="perks">Άκυρο</button><button type="button" class="dbtn" data-k="perks">Δημοσίευση</button></div>') },
+  };
+  function ordRow(no, ini, c, who, what, amt, pay, when, sel) { return '<div class="lrow ' + (sel ? 'sel' : '') + '" data-k="order">' + av(ini, c, 36) + '<div style="min-width:0"><div class="t">' + no + ' · ' + who + '</div><div class="m"><span>' + what + '</span><span>' + when + '</span></div></div><div class="e"><span class="price">' + amt + '</span><span class="pill">' + pay + '</span></div></div>'; }
+  function stRow(k, n, m, pill, sel) { return '<div class="lrow ' + (sel ? 'sel' : '') + '">' + th(k, 'sm') + '<div style="min-width:0"><div class="t">' + n + '</div><div class="m">' + m + '</div></div><div class="e">' + pill + '<button type="button" class="dbtn ghost" style="padding:5px 10px;font-size:12.5px">Κίνηση</button></div></div>'; }
+  function perkLine(ini, c, n, o, d, stat, pills) { return '<div class="lrow" data-k="perkNew"><span class="perkLogo" style="background:' + SER[c] + '">' + ini + '</span><div style="min-width:0"><div class="t">' + n + ' · ' + o + '</div><div class="m"><span>' + d + '</span><span class="mono">' + stat + '</span></div></div><div class="e">' + pills + '</div></div>'; }
+  function perkShell(body) {
+    if (perkInShop()) return shopShell('Συνεργάτες', body, { kpis: false });
+    return dbar('Οικονομικά') + '<div class="dbody"><div class="dhead"><h3>Οικονομικά</h3></div>' +
+      '<div class="dseg" style="grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(96px,1fr))">' + FIN_TABS.map(t => '<button type="button" class="' + (t === 'Προσφορές' ? 'on' : '') + '"' + segGo(t) + '>' + t + '</button>').join('') + '</div>' +
+      '<div class="dseg" style="max-width:420px"><button type="button">Του box</button><button type="button" class="on" data-k="perks">Συνεργατών</button></div>' + body + '</div>';
+  }
+  const desk = document.getElementById('desk');
+  function renderK() {
+    const sc = K[S.k];
+    desk.innerHTML = sc.html();
+    document.getElementById('kcrumb').textContent = typeof sc.crumb === 'function' ? sc.crumb() : sc.crumb;
+    document.querySelectorAll('#ktour [data-k]').forEach(b => b.setAttribute('aria-current', String(b.dataset.k === S.k)));
+  }
+
+  // ======================= ALTERNATIVES =======================
+  const ALTS = [
+    { key: 'shopHome', frame: 'k', screen: 'products', q: 'Πού ζει το κατάστημα στην κονσόλα;', o: [
+      ['A', 'Δικό του τμήμα «Κατάστημα»', 'Προϊόντα · Παραγγελίες · Απόθεμα, και «Ταμείο» στην κεφαλίδα. Η ρεσεψιόν το ανοίγει κάθε μέρα όπως το Check-in. Ξεχωριστό δικαίωμα <code>manage_shop</code>.'],
+      ['B', 'Τρία ακόμη tabs στα Οικονομικά', 'Λιγότερα σημεία στη μπάρα, αλλά τα Οικονομικά φτάνουν τα 10 tabs και ανακατεύονται λογιστική με ετοιμασία παραγγελιών. Η ρεσεψιόν θα χρειαζόταν πρόσβαση στα Οικονομικά για να ετοιμάσει ένα μπλουζάκι.']] },
+    { key: 'boxEntry', frame: 'm', screen: 'box', q: 'Πώς φτάνει το μέλος στο κατάστημα από το Box;', o: [
+      ['A', 'Σταθερή κάρτα «Κατάστημα» κάτω από τη Συνδρομή', 'Δείχνει 4 φωτογραφίες και «2 νέα». Η σειρά ενεργειών (Πρόγραμμα · Ραντεβού · Βίντεο · Coach) μένει 4 και καθαρή. Όταν το κατάστημα είναι κλειστό, η κάρτα δεν υπάρχει για κανέναν, οπότε η διάταξη δεν αλλάζει από μέρα σε μέρα.'],
+      ['B', '5η ενέργεια «Κατάστημα» στη σειρά ενεργειών', 'Ένα πάτημα λιγότερο σε οπτικό χώρο, αλλά 5 κουμπιά σε 300 px γίνονται στενά και οι ετικέτες μικραίνουν. Η σειρά ενεργειών αφορά την προπόνηση, και το κατάστημα δεν είναι μέρος της.']] },
+    { key: 'pay', frame: 'm', screen: 'cart', q: 'Πώς πληρώνει το μέλος μια παραγγελία από το app;', o: [
+      ['A', 'Στην παραλαβή (ή στον λογαριασμό του)', 'Δουλεύει σήμερα, χωρίς πάροχο πληρωμών: η παραγγελία κόβει παραστατικό με υπόλοιπο, και η ρεσεψιόν καταγράφει μετρητά ή κάρτα στο τερματικό κατά την παράδοση. «Στον λογαριασμό μου» μόνο αν το επιτρέψει ο ιδιοκτήτης.'],
+      ['B', 'Online με κάρτα τώρα', 'Λιγότερες παραγγελίες που δεν παραλαμβάνονται, αλλά θέλει πάροχο πληρωμών (Stripe, Viva), αποθηκευμένες κάρτες και επιστροφές μέσω του παρόχου. Έρχεται ως δεύτερος τρόπος μαζί με την online ανανέωση συνδρομών.']] },
+    { key: 'perkHome', frame: 'k', screen: 'perks', q: 'Πού φτιάχνει ο ιδιοκτήτης τις προσφορές συνεργατών;', o: [
+      ['A', 'Οικονομικά › Προσφορές › Συνεργατών', 'Η ίδια λέξη με τη μεριά του μέλους (Πληρωμές › Προσφορές). Όλες οι εκπτώσεις, του box και των συνεργατών, σε ένα μέρος. Δεν προσθέτει tab, μόνο ένα segment.'],
+      ['B', 'Κατάστημα › Συνεργάτες', 'Ταιριάζει αν ο ιδιοκτήτης σκέφτεται «ό,τι δίνω στα μέλη πέρα από τη συνδρομή». Όμως ένα box χωρίς κατάστημα θα έπρεπε να ανοίξει το Κατάστημα για να δώσει μια προσφορά καφέ.']] },
+    { key: 'perkCode', frame: 'm', screen: 'perk', q: 'Τι κωδικό δείχνει το μέλος στον συνεργάτη;', o: [
+      ['A', 'Έναν κοινό κωδικό ανά προσφορά, και QR', 'Ο συνεργάτης δεν χρειάζεται τίποτα. Ο κωδικός φαίνεται μόνο σε μέλη μέσα στην app. Μετράμε προβολές και τις χρήσεις που δηλώνουν τα μέλη, και αλλάζεις τον κωδικό αν διαρρεύσει.'],
+      ['B', 'Προσωπικός κωδικός μίας χρήσης', 'Ακριβής μέτρηση και καμία διαρροή, αλλά ο συνεργάτης πρέπει να επιβεβαιώνει κάθε κωδικό σε μια σελίδα. Αξίζει για συνεργασίες με προμήθεια. Για αργότερα.']] },
+  ];
+  document.getElementById('altList').innerHTML = ALTS.map((a, n) => '<article class="alt"><h3>' + (n + 1) + '. ' + a.q + '</h3><div class="altOpts">' + a.o.map(o => '<div class="altOpt ' + (o[0] === 'A' ? 'rec' : '') + '"><span class="k">' + o[0] + (o[0] === 'A' ? '<span class="recTag">Προτείνεται</span>' : '') + '</span><b>' + o[1] + '</b><p>' + o[2] + '</p><button type="button" class="show" data-v="' + a.key + ':' + o[0] + '" data-f="' + a.frame + ':' + a.screen + '">Δείξε το ' + o[0] + '</button></div>').join('') + '</div></article>').join('');
+
+  // ======================= EVENTS =======================
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    const v = t.closest('[data-v]');
+    if (v) {
+      const [key, val] = v.dataset.v.split(':'); S.v[key] = val;
+      const [fr, sc] = v.dataset.f.split(':');
+      if (fr === 'm') { S.m = sc; S.mStack = (PARENT[sc] || []).concat(sc); renderM(); phone.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      else { S.k = sc; renderK(); renderM(); desk.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      renderK(); return;
+    }
+    if (t.closest('#phone [data-back]')) { S.mStack.pop(); S.m = S.mStack[S.mStack.length - 1] || 'box'; if (!S.mStack.length) S.mStack = [S.m]; renderM(); return; }
+    const m = t.closest('[data-m]');
+    if (m && M[m.dataset.m]) { const id = m.dataset.m; const inPhone = !!m.closest('#phone'); S.m = id; S.mStack = (PARENT[id] || []).concat(id); renderM(); if (!inPhone && window.innerWidth < 860) phone.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    const k = t.closest('[data-k]');
+    if (k && K[k.dataset.k]) { S.k = k.dataset.k; renderK(); if (!k.closest('#desk')) desk.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  renderM(); renderK();
+})();
+</script>
+</body>
+</html>
