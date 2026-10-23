@@ -102,6 +102,18 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         },
         cover_media_id: @nullable_uuid,
         cover_url: string(nullable: true),
+        audience:
+          string(
+            enum: Palee.Community.event_audiences(),
+            description:
+              "ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone"
+          ),
+        host: host(),
+        cohosts: %Schema{
+          type: :array,
+          items: box_face("CommunityEventCohost"),
+          description: "ADR-185: boxes that co-host it (accepted)"
+        },
         cancelled: boolean(),
         cancelled_at: @nullable_datetime,
         cancel_reason: string(nullable: true),
@@ -143,6 +155,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
           properties: %{
             inviter: author(),
             usable: boolean(),
+            host: %Schema{type: :boolean, description: "ADR-185: the host's own invitation"},
             reason:
               string(
                 nullable: true,
@@ -173,9 +186,41 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         :cancelled,
         :club,
         :box,
+        :audience,
+        :host,
+        :cohosts,
         :can_rsvp,
         :can_manage
       ]
+    )
+  end
+
+  @doc "ADR-185: who hosts an event: a person (their own event) or a business."
+  def host do
+    object(
+      "CommunityEventHost",
+      %{
+        kind: string(enum: ~w(person business)),
+        organization_id: @uuid,
+        name: string(nullable: true),
+        slug: string(nullable: true, description: "The business's box page; null for a person"),
+        logo_url: string(nullable: true),
+        person: %{author() | nullable: true, description: "The person hosting their own event"}
+      },
+      [:kind, :organization_id]
+    )
+  end
+
+  def box_face(title) do
+    object(
+      title,
+      %{
+        organization_id: @uuid,
+        name: string(nullable: true),
+        slug: string(nullable: true),
+        logo_url: string(nullable: true)
+      },
+      [:organization_id]
     )
   end
 
@@ -205,6 +250,12 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
       price_cents: integer(minimum: 0, maximum: 10_000_000),
       currency: string(pattern: "^[A-Z]{3}$"),
       open_to_non_members: boolean(),
+      audience:
+        string(
+          enum: Palee.Community.event_audiences(),
+          description:
+            "ADR-185: group (its members only; needs channel_id), club, or open (everyone); sets open_to_non_members"
+        ),
       guest_pass_allowed: boolean(),
       guests_per_member: integer(minimum: 1, maximum: 10),
       good_for_friends: %Schema{
@@ -230,7 +281,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
           type: :string,
           format: :uuid,
           description:
-            "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes"
+            "An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)"
         },
         repeat_until: %Schema{
           type: :string,
@@ -292,10 +343,12 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
       %{
         token: string(),
         path: string(description: "Member-app path that opens the event with the invitation"),
-        guests_left: integer(),
+        guests_left:
+          integer(nullable: true, description: "Null for the host's own link (no guest limit)"),
+        host: %Schema{type: :boolean, description: "ADR-185: the host's invitation link"},
         expires_at: @datetime
       },
-      [:token, :path, :guests_left, :expires_at]
+      [:token, :path, :expires_at]
     )
   end
 
@@ -344,6 +397,11 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         payment_method: string(nullable: true),
         amount_cents: integer(nullable: true),
         receipt_issued: %Schema{type: :boolean, description: "Finance issued a receipt"},
+        refunded_at: %{
+          @nullable_datetime
+          | description: "ADR-185: when the payment was given back"
+        },
+        refund_cents: integer(nullable: true),
         checked_in_at: @nullable_datetime,
         cancelled_at: @nullable_datetime,
         late_cancel: %Schema{
@@ -452,4 +510,227 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
       object("CommunityEventSentResponse", %{sent: integer(description: "People notified")}, [
         :sent
       ])
+
+  # ADR-185: hosts --------------------------------------------------------------
+
+  def hosts_response do
+    club =
+      object(
+        "CommunityEventHostClub",
+        %{id: @uuid, name: string(nullable: true), kind: string()},
+        [:id, :kind]
+      )
+
+    choice =
+      object(
+        "CommunityEventHostChoice",
+        %{
+          kind: string(enum: ~w(self business)),
+          id: string(description: "\"self\" for «Ως εγώ», else the business's organisation id"),
+          organization_id: %{
+            @nullable_uuid
+            | description: "The organisation it hosts as (null before your first own event)"
+          },
+          slug: string(nullable: true),
+          name: string(nullable: true),
+          logo_url: string(nullable: true),
+          clubs: list(club)
+        },
+        [:kind, :id, :clubs]
+      )
+
+    object("CommunityEventHostsResponse", %{hosts: list(choice)}, [:hosts])
+  end
+
+  def host_create_request do
+    base = create_request()
+
+    %{
+      base
+      | title: "CommunityEventHostedRequest",
+        properties:
+          Map.merge(base.properties, %{
+            host:
+              string(
+                maxLength: 64,
+                description:
+                  "«Διοργάνωση ως»: \"self\" (default) or the organisation id of a business where you run events"
+              ),
+            club_id: %{
+              @uuid
+              | description: "As a business: which of its clubs (its gym club by default)"
+            }
+          })
+    }
+  end
+
+  def view_response,
+    do: object("CommunityEventViewResponse", %{counted: boolean()}, [:counted])
+
+  # ADR-185: the organiser console -----------------------------------------------
+
+  def refund_request do
+    object(
+      "CommunityEventRefundRequest",
+      %{
+        amount_cents:
+          integer(
+            minimum: 1,
+            maximum: 10_000_000,
+            nullable: true,
+            description: "What was given back; all of it when left out"
+          )
+      },
+      []
+    )
+  end
+
+  @console_scope ~w(all upcoming past)
+  def console_scopes, do: @console_scope
+
+  defp event_line do
+    %{
+      event_id: @uuid,
+      title: string(),
+      starts_at: @datetime,
+      ends_at: @datetime,
+      time_zone: string(nullable: true),
+      cancelled_at: @nullable_datetime
+    }
+  end
+
+  @money ~w(paid_count paid_cents refunded_count refunded_cents net_cents outstanding_count
+            outstanding_cents)a
+
+  def finances_response do
+    money = Map.new(@money, &{&1, integer()})
+
+    row =
+      object(
+        "CommunityEventFinanceRow",
+        Map.merge(event_line(), Map.merge(money, %{currency: string(), price_cents: integer()})),
+        [:event_id, :title, :starts_at, :currency, :price_cents | @money]
+      )
+
+    total =
+      object(
+        "CommunityEventFinanceTotal",
+        Map.merge(money, %{currency: string(), events: integer()}),
+        [:currency, :events | @money]
+      )
+
+    object(
+      "CommunityEventFinancesResponse",
+      %{events: list(row), totals: %{list(total) | description: "One row per currency"}},
+      [:events, :totals]
+    )
+  end
+
+  @counts ~w(views viewers rsvps going waitlisted came)a
+
+  def analytics_response do
+    counts = Map.new(@counts, &{&1, integer()})
+
+    rates = %{
+      attendance_rate:
+        integer(nullable: true, description: "Came of those going, % (once it ended)"),
+      conversion_rate: integer(nullable: true, description: "RSVPs of distinct viewers, %")
+    }
+
+    row =
+      object(
+        "CommunityEventAnalyticsRow",
+        event_line() |> Map.merge(counts) |> Map.merge(rates) |> Map.put(:cancelled, integer()),
+        [:event_id, :title, :starts_at | @counts]
+      )
+
+    total =
+      object(
+        "CommunityEventAnalyticsTotal",
+        counts |> Map.merge(rates) |> Map.put(:events, integer()),
+        [:events | @counts]
+      )
+
+    object(
+      "CommunityEventAnalyticsResponse",
+      %{events: list(row), totals: total},
+      [:events, :totals]
+    )
+  end
+
+  # ADR-185: co-hosts --------------------------------------------------------------
+
+  def cohosts_response do
+    row =
+      object(
+        "CommunityEventCohostRow",
+        %{
+          id: @uuid,
+          status: string(enum: Palee.Community.cohost_statuses()),
+          box: box_face("CommunityEventCohostBox"),
+          invited_at: @datetime,
+          responded_at: @nullable_datetime
+        },
+        [:id, :status, :box, :invited_at]
+      )
+
+    object("CommunityEventCohostsResponse", %{cohosts: list(row)}, [:cohosts])
+  end
+
+  def cohost_invite_request do
+    object(
+      "CommunityEventCohostInviteRequest",
+      %{slug: string(minLength: 1, maxLength: 200, description: "The box page's address")},
+      [:slug]
+    )
+  end
+
+  def cohost_requests_response do
+    request =
+      object(
+        "CommunityEventCohostRequest",
+        %{
+          id: @uuid,
+          status: string(enum: Palee.Community.cohost_statuses()),
+          answerable: boolean(),
+          can_send_trial_offer: boolean(),
+          trial_offer_sent_at: @nullable_datetime,
+          invited_at: @datetime,
+          responded_at: @nullable_datetime,
+          event:
+            object(
+              "CommunityEventCohostRequestEvent",
+              %{
+                id: @uuid,
+                title: string(),
+                starts_at: @datetime,
+                ends_at: @datetime,
+                time_zone: string(nullable: true),
+                cancelled_at: @nullable_datetime,
+                audience: string(enum: Palee.Community.event_audiences()),
+                weekly: boolean()
+              },
+              [:id, :title, :starts_at, :ends_at, :audience, :weekly]
+            ),
+          host: box_face("CommunityEventCohostRequestHost")
+        },
+        [:id, :status, :answerable, :can_send_trial_offer, :invited_at, :event, :host]
+      )
+
+    object("CommunityEventCohostRequestsResponse", %{requests: list(request)}, [:requests])
+  end
+
+  def cohost_answer_request do
+    object(
+      "CommunityEventCohostAnswerRequest",
+      %{
+        answer:
+          string(
+            enum: ~w(accepted declined removed),
+            description: "Accept or decline a request; removed withdraws after accepting"
+          )
+      },
+      [:answer]
+    )
+  end
 end

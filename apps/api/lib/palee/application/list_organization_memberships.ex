@@ -11,6 +11,8 @@ defmodule Palee.Application.ListOrganizationMemberships do
     {:ok,
      user_id
      |> Organizations.list_memberships()
+     # ADR-185: a person's own organiser organisation is not one of their gyms.
+     |> Organizations.provider_memberships()
      |> Enum.map(&with_location_scope(&1, user_id))}
   end
 

@@ -30,8 +30,11 @@ defmodule Palee.Community do
     AudiencePolicy,
     ChannelPolicy,
     ClubPolicy,
+    CohostPolicy,
+    EventNumbers,
     EventPolicy,
     EventSeries,
+    HostPolicy,
     FeedCursor,
     FollowPolicy,
     GroupPolicy,
@@ -238,6 +241,80 @@ defmodule Palee.Community do
 
   @doc "Late cancels per person at the box since `since`: `%{user_id => count}`."
   defdelegate late_cancel_counts(context, user_ids, since), to: EventStore
+
+  # ADR-185: hosts, co-hosts, refunds, views and the console's numbers.
+  def event_audiences, do: Palee.Community.Event.audiences()
+  defdelegate check_event_attrs(attrs), to: Events, as: :check
+  defdelegate event_audience(event), to: EventPolicy, as: :audience
+  defdelegate event_group_only?(event), to: EventPolicy, as: :group_only?
+
+  defdelegate event_invite_check(event, inviter, inviter_status, guests),
+    to: EventPolicy,
+    as: :invite_check
+
+  defdelegate record_event_refund(context, event_id, user_id, amount_cents, now),
+    to: Events,
+    as: :record_refund
+
+  defdelegate event_creation_counts(context, since, now), to: EventStore, as: :creation_counts
+  defdelegate host_creation_check(counts, occurrences), to: HostPolicy, as: :creation_check
+  defdelegate parse_event_host(value), to: HostPolicy, as: :parse
+  defdelegate organiser_event_terms(attrs), to: HostPolicy, as: :organiser_terms
+  defdelegate organiser_name(nickname), to: HostPolicy
+  def self_host, do: HostPolicy.self_host()
+  def organiser_kind, do: HostPolicy.organiser_kind()
+  defdelegate organiser?(organization_or_kind), to: HostPolicy
+
+  defdelegate list_event_cohosts(context, event_ids), to: EventStore, as: :list_cohosts
+  defdelegate get_event_cohost(context, id), to: EventStore, as: :get_cohost
+  defdelegate insert_event_cohost(context, attrs), to: EventStore, as: :insert_cohost
+  defdelegate update_event_cohost(context, cohost, attrs), to: EventStore, as: :update_cohost
+
+  defdelegate event_cohost_requests(context, organization_id),
+    to: EventStore,
+    as: :cohost_requests
+
+  defdelegate respond_event_cohost(context, id, status, now), to: EventStore, as: :respond_cohost
+
+  defdelegate accepted_event_cohosts(context, event_ids, cohost_ids),
+    to: EventStore,
+    as: :accepted_cohosts
+
+  defdelegate event_cohosted_by?(context, event_id, organization_id),
+    to: EventStore,
+    as: :cohosted_by?
+
+  defdelegate cohost_trial_offer_facts(context, id), to: EventStore
+  defdelegate claim_cohost_trial_offer(context, id, now), to: EventStore
+
+  defdelegate cohost_invite_check(event, cohost_id, taken, existing, now),
+    to: CohostPolicy,
+    as: :invite_check
+
+  defdelegate cohost_answer_check(status, answer), to: CohostPolicy, as: :answer_check
+  defdelegate cohost_trial_offer_check(facts, now), to: CohostPolicy, as: :trial_offer_check
+
+  defdelegate cohost_trial_offer_recipients(came_user_ids, member_ids),
+    to: CohostPolicy,
+    as: :trial_offer_recipients
+
+  defdelegate cohost_answerable?(request, now), to: CohostPolicy, as: :answerable?
+  def cohost_answers, do: CohostPolicy.answers()
+  def cohost_statuses, do: Palee.Community.EventCohost.statuses()
+
+  defdelegate record_event_view(context, event_id, day, viewer_key),
+    to: EventStore,
+    as: :record_view
+
+  defdelegate event_view_totals(context, event_ids), to: EventStore, as: :view_totals
+
+  defdelegate empty_organiser_organization_ids(context, before),
+    to: EventStore
+
+  defdelegate event_finances(event, attendees), to: EventNumbers, as: :finances
+  defdelegate event_finance_totals(rows), to: EventNumbers, as: :finance_totals
+  defdelegate event_analytics(event, attendees, views, now), to: EventNumbers, as: :analytics
+  defdelegate event_analytics_totals(rows), to: EventNumbers, as: :analytics_totals
 
   # Posts (M7).
   defdelegate create_post(context, channel, role, joined?, attrs), to: Posts, as: :create

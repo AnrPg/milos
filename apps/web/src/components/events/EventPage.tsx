@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -11,6 +12,7 @@ import {
   createEventInvite,
   eventKey,
   fetchEvent,
+  recordEventView,
   updateEvent,
   type CommunityEvent,
   type EventScope,
@@ -20,11 +22,13 @@ import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { blockPerson } from "@/api/partners";
+import { MoreMenu } from "@/components/community/PostCard";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 import { can } from "@/lib/role-navigation";
 
-import { formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from "./events";
+import { eventHostMode, formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from "./events";
 import { EventEditorSheet, ScopePicker, useEventLocations } from "./EventEditorSheet";
 import { DateBlock, Goers, RsvpButton, useEventError } from "./EventParts";
 import { invalidateEvents } from "./use-events";
@@ -75,9 +79,20 @@ export function EventPage({
   return <EventView event={event.data} invite={invite} />;
 }
 
+/** ADR-185: counts this open of the page once (the API keeps no viewer, and skips hosts). */
+function useCountView(eventId: string) {
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? null;
+  useEffect(() => {
+    if (!token) return;
+    recordEventView(token, eventId).catch(() => undefined);
+  }, [token, eventId]);
+}
+
 function EventView({ event, invite }: { event: CommunityEvent; invite: string | null }) {
   const t = useTranslations("Events");
   const locale = useLocale();
+  useCountView(event.id);
   const apple = useSyncExternalStore(subscribeNever, readApple, serverApple);
   const price = formatPrice(event.price_cents, event.currency, locale);
   const invitation = event.invitation ?? null;
@@ -89,7 +104,14 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
       : address || event.place.name
         ? mapsSearchUrl([event.place.name, address].filter(Boolean).join(", "), apple)
         : null;
-  const who = event.group ? t("whoGroup", { group: event.group.name ?? "" }) : event.open_to_non_members ? t("openToAll") : t("membersOnly");
+  const personHost = event.host?.kind === "person";
+  const who = event.open_to_non_members
+    ? t("openToAll")
+    : event.group && (event.audience ?? "group") === "group"
+      ? t("whoGroup", { group: event.group.name ?? "" })
+      : personHost
+        ? t("whoSelfInvite")
+        : t("membersOnly");
   const spots = event.cancelled
     ? null
     : event.spots_left === 0
@@ -125,6 +147,7 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)", textDecoration: event.cancelled ? "line-through" : undefined }}>
           {event.title}
         </h1>
+        <EventHosts event={event} />
       </header>
 
       {event.cancelled ? (
@@ -195,13 +218,88 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
               {event.my?.paid ? t("paidDone") : t("payAtBoxLong", { price: price ?? "" })}
             </p>
           ) : null}
-          {going ? <GuestPass event={event} /> : null}
+          {going && !event.can_manage ? <GuestPass event={event} /> : null}
           {going ? <AddToCalendar /> : null}
         </div>
       </HubCard>
 
       {event.can_manage ? <ManageEvent event={event} /> : null}
     </main>
+  );
+}
+
+/**
+ * ADR-185: who hosts it (a person or a business) and the boxes that
+ * co-host it. A person's own event can be blocked from here: their events
+ * and posts no longer show to you.
+ */
+function EventHosts({ event }: { event: CommunityEvent }) {
+  const t = useTranslations("Events");
+  const eventError = useEventError();
+  const { tokens, currentUser } = useSession();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [confirming, setConfirming] = useState(false);
+  const host = event.host;
+  const block = useMutation({
+    mutationFn: () => blockPerson(tokens!.access_token, host!.person!.id),
+    onSuccess: async () => {
+      await invalidateEvents(queryClient);
+      router.push("/events");
+    },
+  });
+  if (!host) return null;
+  const cohosts = event.cohosts ?? [];
+  const name = host.name ?? host.person?.nickname ?? "?";
+  const href = host.kind === "person" ? (host.person ? `/people/${host.person.id}` : null) : host.slug ? `/b/${host.slug}` : null;
+  const blockable = host.kind === "person" && host.person && host.person.id !== currentUser?.id && !event.can_manage;
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm" style={{ color: "var(--text-soft)" }}>
+      <span>
+        {t("hostedBy")}{" "}
+        {href ? (
+          <Link href={href} className="font-semibold" style={{ color: "var(--text)" }}>{name}</Link>
+        ) : (
+          <span className="font-semibold" style={{ color: "var(--text)" }}>{name}</span>
+        )}
+      </span>
+      {cohosts.length > 0 ? (
+        <span>
+          {t("withCohosts")}{" "}
+          {cohosts.map((cohost, index) => (
+            <span key={cohost.organization_id}>
+              {index > 0 ? ", " : null}
+              {cohost.slug ? (
+                <Link href={`/b/${cohost.slug}`} className="font-semibold" style={{ color: "var(--text)" }}>{cohost.name ?? "?"}</Link>
+              ) : (
+                <span className="font-semibold" style={{ color: "var(--text)" }}>{cohost.name ?? "?"}</span>
+              )}
+            </span>
+          ))}
+        </span>
+      ) : null}
+      {blockable ? (
+        <MoreMenu label={t("hostActions", { name })} items={[{ label: t("blockHost", { name }), onSelect: () => setConfirming(true) }]} />
+      ) : null}
+      {confirming ? (
+        <Sheet
+          labelId={["block-host", event.id].join("-")}
+          eyebrow={event.title}
+          title={t("blockHost", { name })}
+          onClose={() => setConfirming(false)}
+          footer={
+            <>
+              <SheetButton onClick={() => setConfirming(false)}>{t("keepEvent")}</SheetButton>
+              <SheetButton primary disabled={block.isPending} onClick={() => block.mutate()}>{t("blockConfirm")}</SheetButton>
+            </>
+          }
+        >
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("blockHostBody", { name })}</p>
+          <ErrorLine message={eventError(block.error)} />
+        </Sheet>
+      ) : null}
+    </div>
   );
 }
 
@@ -214,16 +312,21 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-/** «Φέρε φίλο» (board 8 Q4): a guest pass link to share or copy, with the guests left. */
-function GuestPass({ event }: { event: CommunityEvent }) {
+/**
+ * «Φέρε φίλο» (board 8 Q4): a guest pass link to share or copy, with the
+ * guests left. ADR-185: the host's own link (`host`) has no guest limit and
+ * is how people come to an invitation-only event.
+ */
+function GuestPass({ event, host = false }: { event: CommunityEvent; host?: boolean }) {
   const t = useTranslations("Events");
   const eventError = useEventError();
   const { tokens } = useSession();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const invite = useMutation({ mutationFn: () => createEventInvite(tokens!.access_token, event.id) });
-  if (!event.guest_pass_allowed) return null;
-  const left = invite.data?.guests_left ?? event.guests_left ?? 0;
+  if (!host && !event.guest_pass_allowed) return null;
+  const left = host ? 1 : (invite.data?.guests_left ?? event.guests_left ?? 0);
+  const label = host ? t("hostInvite") : t("bringFriend");
   const link = invite.data ? window.location.origin + invite.data.path : "";
 
   async function share() {
@@ -262,15 +365,15 @@ function GuestPass({ event }: { event: CommunityEvent }) {
           className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
           style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
         >
-          {t("bringFriend")}
+          {label}
         </button>
-        <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>{t("guestsLeft", { count: left })}</span>
+        {host ? null : <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>{t("guestsLeft", { count: left })}</span>}
       </div>
       {open ? (
         <Sheet
           labelId={["guest-pass", event.id].join("-")}
           eyebrow={event.title}
-          title={t("bringFriend")}
+          title={label}
           onClose={() => setOpen(false)}
           footer={
             <>
@@ -280,7 +383,7 @@ function GuestPass({ event }: { event: CommunityEvent }) {
           }
         >
           <div className="flex flex-col gap-3">
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("bringFriendBody", { count: left })}</p>
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{host ? t("hostInviteBody") : t("bringFriendBody", { count: left })}</p>
             {invite.isPending ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
             {link ? (
               <Field label={t("inviteLink")}>
@@ -331,8 +434,12 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
   const queryClient = useQueryClient();
   const { memberships } = useSelectedMembershipRole();
   const membership = memberships.find((entry) => entry.organization.slug === event.box.slug) ?? null;
+  const own = event.host?.kind === "person";
   const staff = can(membership, "manage_events") || can(membership, "check_in") || can(membership, "take_payments");
-  const locations = useEventLocations(event.box.slug);
+  const locations = useEventLocations(own ? null : event.box.slug);
+  const groupOnly = (event.audience ?? (event.channel_id ? "group" : "club")) === "group";
+  // ADR-185: a person's own event, and any event run from the organiser console, opens there.
+  const consoleHref = event.host ? `/events/hosting?org=${encodeURIComponent(event.organization_id)}&event=${encodeURIComponent(event.id)}` : null;
   const [editing, setEditing] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
@@ -352,7 +459,16 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
             <SheetButton onClick={() => setCancelling(true)}>{t("cancelEvent")}</SheetButton>
           </>
         ) : null}
-        {staff && event.box.slug ? (
+        {!event.cancelled && !groupOnly ? <GuestPass event={event} host /> : null}
+        {own && consoleHref ? (
+          <Link
+            href={consoleHref}
+            className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {t("openAttendees")}
+          </Link>
+        ) : staff && event.box.slug ? (
           <Link
             href={`/org/${event.box.slug}/admin/community/events/${event.id}`}
             className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
@@ -370,9 +486,10 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
           initialCoverUrl={event.cover_url ?? null}
           editing={{ seriesId: event.series_id ?? null }}
           group={Boolean(event.channel_id)}
+          mode={eventHostMode({ own, group: Boolean(event.channel_id) })}
           locations={locations.data ?? []}
-          coverSlug={can(membership, "manage_settings") ? event.box.slug : null}
-          gymSlug={event.box.slug}
+          coverSlug={!own && can(membership, "manage_settings") ? event.box.slug : null}
+          gymSlug={own ? null : event.box.slug}
           onSubmit={async (body, scope) => saved(await updateEvent(tokens!.access_token, event.id, { ...body, scope }))}
           onClose={() => setEditing(false)}
         />

@@ -21,6 +21,15 @@ function preferredUrl(notification: LinkableNotification) {
   // ADR-153: event notifications open the event page; the trial offer keeps
   // its own link to the box's trial sheet.
   const eventId = notification.payload.event_id;
+  // ADR-185: co-host requests and answers open the organiser console.
+  const consoleUrl = notification.payload.url;
+  if (
+    (notification.type === "community_event_cohost_request" || notification.type === "community_event_cohost_answered") &&
+    typeof consoleUrl === "string" &&
+    consoleUrl.startsWith("/events/hosting")
+  ) {
+    return consoleUrl;
+  }
   if (
     notification.type.startsWith("community_event_") &&
     notification.type !== "community_event_trial_offer" &&

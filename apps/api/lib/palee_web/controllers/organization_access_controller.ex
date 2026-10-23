@@ -55,8 +55,8 @@ defmodule PaleeWeb.OrganizationAccessController do
       id: %Schema{type: :string, format: :uuid},
       name: %Schema{type: :string},
       slug: %Schema{type: :string},
-      # ADR-170: a gym or an independent coach's practice (memberships only).
-      provider_kind: %Schema{type: :string, enum: ["gym", "coach"]},
+      # ADR-170: a gym or an independent coach's practice; ADR-185: a person's own events (organiser).
+      provider_kind: %Schema{type: :string, enum: ["gym", "coach", "organiser"]},
       timezone: %Schema{
         type: :string,
         description:

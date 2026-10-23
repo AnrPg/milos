@@ -34,12 +34,17 @@ defmodule Palee.Organizations.Domain.TenantAuthorization do
         roles = membership_roles(membership)
         coach_scope = Map.get(membership, :coach_scope) || :own
 
+        # ADR-185: organiser organisations have no branches, so their people
+        # work everywhere whatever a stored scope says.
         location_scope =
-          LocationScopePolicy.effective(
-            roles,
-            Map.get(membership, :all_locations, true),
-            location_ids
-          )
+          if Map.get(organization, :provider_kind) == "organiser",
+            do: :all,
+            else:
+              LocationScopePolicy.effective(
+                roles,
+                Map.get(membership, :all_locations, true),
+                location_ids
+              )
 
         {:ok,
          %TenantContext{

@@ -605,6 +605,25 @@ msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} your time"
 
 
+# ADR-185: co-hosting an event.
+msgid "Co-host request"
+msgstr "Co-host request"
+
+msgid "%{box} invites you to co-host «%{event}» (%{when})."
+msgstr "%{box} invites you to co-host «%{event}» (%{when})."
+
+msgid "Co-hosting"
+msgstr "Co-hosting"
+
+msgid "%{box} will co-host «%{event}»."
+msgstr "%{box} will co-host «%{event}»."
+
+msgid "%{box} declined to co-host «%{event}»."
+msgstr "%{box} declined to co-host «%{event}»."
+
+msgid "%{box} no longer co-hosts «%{event}»."
+msgstr "%{box} no longer co-hosts «%{event}»."
+
 # ADR-187: a password reset request (handlers) and the reset itself (the person).
 msgid "Password reset request"
 msgstr "Password reset request"

@@ -96,6 +96,10 @@ Finance already exist and must not learn about events.
     and say they come (`belongs?`, `visible?`, `can_rsvp?`); their card goes in
     the group. From a personal session, RLS shows a group event to the group's
     members (`palee_acting_user_group_ids`) and the box's staff.
+    *Changed by ADR-185:* group events are no longer forced. The group's admin
+    picks the price, guest passes and the audience (`community_events.audience`:
+    the group, the club or everyone). `group_terms/1` and its check constraint
+    were removed, and only `group` events keep the visibility above.
 14. **Late cancels for staff.** The staff attendee list marks «Ακύρωσε αργά»
     (`late_cancel` with `cancelled_at`) and gives each person's late cancels at
     the box over the last 90 days (`late_cancels_90d`); every event's numbers

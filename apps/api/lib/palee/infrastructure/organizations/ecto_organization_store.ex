@@ -944,6 +944,54 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def lock_for_creation(key) when is_binary(key) do
+    Repo.query!("SELECT pg_advisory_xact_lock(hashtext($1))", [key])
+    :ok
+  end
+
+  @impl true
+  def owned_organiser_organization(user_id) do
+    Organization
+    |> join(:inner, [organization], membership in OrganizationMembership,
+      on: membership.organization_id == organization.id
+    )
+    |> where(
+      [organization, membership],
+      membership.user_id == ^user_id and membership.status == :active and
+        fragment("'owner' = ANY(?)", membership.roles) and
+        organization.provider_kind == "organiser" and organization.status in [:active, :archived]
+    )
+    |> order_by([organization], asc: organization.inserted_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  # ADR-185: a definer answers the kind of any organisation (event hosts are
+  # shown as a person or a business to people outside them).
+  @impl true
+  def provider_kinds([]), do: %{}
+
+  def provider_kinds(organization_ids) do
+    ids =
+      organization_ids
+      |> Enum.uniq()
+      |> Enum.flat_map(fn id ->
+        case Ecto.UUID.dump(id) do
+          {:ok, binary} -> [binary]
+          :error -> []
+        end
+      end)
+
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT organization_id, provider_kind FROM palee_event_host_kinds($1)",
+        [ids]
+      )
+
+    Map.new(rows, fn [id, kind] -> {Ecto.UUID.load!(id), kind} end)
+  end
+
+  @impl true
   def transaction(fun) when is_function(fun, 0) do
     if Repo.in_transaction?() do
       fun.()

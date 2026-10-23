@@ -206,19 +206,56 @@ defmodule Palee.Community.EventRulesTest do
       archived_at: nil
     }
 
-    test "a group event is free and for the group, whatever was asked" do
-      assert %{
-               price_cents: 0,
-               open_to_non_members: false,
-               guest_pass_allowed: false,
-               title: "Run"
-             } =
-               EventPolicy.group_terms(%{
-                 title: "Run",
-                 price_cents: 2000,
-                 open_to_non_members: true,
-                 guest_pass_allowed: true
-               })
+    # ADR-185: the group's admin picks the audience; nothing is forced.
+    test "a group event is for the group, the club or everyone, as its host picked" do
+      group_only = event(%{channel_id: "group", audience: "group"})
+      for_club = event(%{channel_id: "group", audience: "club"})
+      for_all = event(%{channel_id: "group", audience: "open", open_to_non_members: true})
+
+      assert EventPolicy.audience(group_only) == "group"
+      assert EventPolicy.audience(for_club) == "club"
+      assert EventPolicy.audience(for_all) == "open"
+
+      refute EventPolicy.belongs?(group_only, %{club_member?: true, group_member?: false})
+      assert EventPolicy.belongs?(group_only, %{group_member?: true})
+      assert EventPolicy.belongs?(for_club, %{club_member?: true, group_member?: false})
+      assert EventPolicy.belongs?(for_club, %{cohost_member?: true})
+
+      refute EventPolicy.visible?(group_only, %{belongs?: false, invited?: true})
+      assert EventPolicy.visible?(for_club, %{belongs?: false, invited?: true})
+      assert EventPolicy.visible?(for_all, %{belongs?: false})
+    end
+
+    test "open to everyone wins over a stale audience" do
+      assert EventPolicy.audience(event(%{audience: "club", open_to_non_members: true})) == "open"
+      assert EventPolicy.audience(event(%{channel_id: "group"})) == "group"
+      assert EventPolicy.audience(event()) == "club"
+    end
+
+    test "a host's own invitation works unless the event is for a group only" do
+      assert :ok = EventPolicy.invite_check(event(%{audience: "club"}), :host, nil, 0)
+
+      assert {:error, :guests_not_allowed} =
+               EventPolicy.invite_check(
+                 event(%{channel_id: "g", audience: "group", guest_pass_allowed: false}),
+                 :host,
+                 nil,
+                 0
+               )
+    end
+
+    test "a refund gives back up to what was paid, once" do
+      paid = %{paid_at: @now, amount_cents: 1500, refunded_at: nil}
+
+      assert EventPolicy.refund_amount(paid, nil) == 1500
+      assert :ok = EventPolicy.refund_check(paid, 1500)
+      assert :ok = EventPolicy.refund_check(paid, 500)
+      assert {:error, :invalid_refund} = EventPolicy.refund_check(paid, 1600)
+      assert {:error, :invalid_refund} = EventPolicy.refund_check(paid, 0)
+      assert {:error, :not_paid} = EventPolicy.refund_check(%{paid | paid_at: nil}, 100)
+
+      assert {:error, :already_refunded} =
+               EventPolicy.refund_check(%{paid | refunded_at: @now}, 100)
     end
 
     test "only an active, live group of the same club takes events" do

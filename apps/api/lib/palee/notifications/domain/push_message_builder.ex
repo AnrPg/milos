@@ -468,6 +468,33 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-185: co-hosting. The invited box's staff hear the request; the
+  # person who asked hears the answer.
+  def build("community_event_cohost_request", payload, localize) do
+    %{
+      title: localize.("Co-host request", %{}),
+      body:
+        localize.(
+          "%{box} invites you to co-host «%{event}» (%{when}).",
+          Map.put(event_bindings(payload), :box, payload["box_name"])
+        ),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_cohost_answered", payload, localize) do
+    bindings = Map.put(event_bindings(payload), :box, payload["box_name"])
+
+    body =
+      case payload["answer"] do
+        "accepted" -> localize.("%{box} will co-host «%{event}».", bindings)
+        "declined" -> localize.("%{box} declined to co-host «%{event}».", bindings)
+        _removed -> localize.("%{box} no longer co-hosts «%{event}».", bindings)
+      end
+
+    %{title: localize.("Co-hosting", %{}), body: body, url: payload["url"] || "/"}
+  end
+
   def build("community_event_message", payload, localize) do
     %{
       title: localize.("Message about «%{event}»", event_bindings(payload)),
