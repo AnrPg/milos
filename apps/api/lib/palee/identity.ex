@@ -6,6 +6,19 @@ defmodule Palee.Identity do
 
   defdelegate register(params), to: RegisterUser, as: :call
   defdelegate find_by_nickname(nickname), to: FindUser, as: :by_nickname
+  defdelegate find_by_handle(handle), to: FindUser, as: :by_nickname
+
+  # ADR-187: logins (one per email) and their up to three profiles.
+  defdelegate create_login_with_profile(params), to: UserStore
+  defdelegate add_profile(login_id, params), to: UserStore
+  defdelegate find_login_by_email(email), to: UserStore, as: :get_login_by_email
+  defdelegate find_by_email(email), to: UserStore, as: :get_by_email
+  defdelegate list_profiles(login_id), to: UserStore
+  defdelegate touch_last_used(login_id, user_id), to: UserStore
+  defdelegate handle_available?(handle, except_user_id \\ nil), to: UserStore
+  defdelegate update_credentials(user_id, params), to: UserStore
+  defdelegate reset_login_password(login_id, password), to: UserStore
+  defdelegate max_profiles(), to: Palee.Identity.Domain.ProfilePolicy
   defdelegate find_by_id(id), to: FindUser, as: :by_id
   defdelegate list_by_ids(ids), to: FindUser, as: :list_by_ids
   defdelegate list_by_role(role), to: FindUser, as: :list_by_role

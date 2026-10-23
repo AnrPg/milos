@@ -2,7 +2,27 @@ defmodule Palee.Identity.UserStore do
   @behaviour Palee.Identity.Ports.UserStore
 
   @impl true
-  def create_user(params), do: impl().create_user(params)
+  def create_login_with_profile(params), do: impl().create_login_with_profile(params)
+  @impl true
+  def add_profile(login_id, params), do: impl().add_profile(login_id, params)
+  @impl true
+  def get_login_by_email(email), do: impl().get_login_by_email(email)
+  @impl true
+  def get_by_email(email), do: impl().get_by_email(email)
+  @impl true
+  def list_profiles(login_id), do: impl().list_profiles(login_id)
+  @impl true
+  def touch_last_used(login_id, user_id), do: impl().touch_last_used(login_id, user_id)
+  @impl true
+  def handle_available?(handle, except_user_id \\ nil),
+    do: impl().handle_available?(handle, except_user_id)
+
+  @impl true
+  def update_credentials(user_id, params), do: impl().update_credentials(user_id, params)
+  @impl true
+  def reset_login_password(login_id, password),
+    do: impl().reset_login_password(login_id, password)
+
   @impl true
   def delete_user(user), do: impl().delete_user(user)
   @impl true

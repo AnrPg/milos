@@ -1,7 +1,7 @@
 defmodule Palee.Application.ListAdminUsers do
   @moduledoc false
 
-  alias Palee.{Finance, Identity.RegistrationPolicy}
+  alias Palee.Finance
   alias Palee.Application.{AuthorizeClientAccess, TenantUserAccess}
 
   def call(params \\ %{}, tenant_context \\ nil) do
@@ -84,15 +84,11 @@ defmodule Palee.Application.ListAdminUsers do
 
   defp filter_query(users, nil), do: users
 
-  defp filter_query(users, query) do
-    Enum.filter(users, fn user ->
-      String.contains?(String.downcase(user.nickname), query) or
-        String.contains?(user.normalized_nickname || "", query)
-    end)
-  end
+  defp filter_query(users, query),
+    do: Enum.filter(users, &Palee.Identity.Domain.NameSearch.matches?(&1, query))
 
   defp normalize_query(value) when is_binary(value) do
-    case value |> RegistrationPolicy.normalize_nickname() do
+    case String.trim(value) do
       "" -> nil
       query -> query
     end

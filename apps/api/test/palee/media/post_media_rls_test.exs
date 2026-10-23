@@ -18,8 +18,13 @@ defmodule Palee.Media.PostMediaRLSTest do
         Postgrex.query!(
           conn,
           """
-          INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
-          VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
+          WITH login AS (
+            INSERT INTO logins (id, email, password_hash, inserted_at, updated_at)
+            VALUES (gen_random_uuid(), $2::text || '@placeholder.invalid', 'x', now(), now())
+            RETURNING id
+          )
+          INSERT INTO users (id, nickname, display_nickname, role, login_id, inserted_at, updated_at)
+          SELECT $1, $2::text, $2::text, 'member', login.id, now(), now() FROM login
           """,
           [id, nick]
         )
