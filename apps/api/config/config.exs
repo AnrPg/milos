@@ -167,6 +167,9 @@ config :palee,
        :referral_store,
        Palee.Infrastructure.Referrals.EctoReferralStore
 
+# ADR-191: partner perks.
+config :palee, :perk_store, Palee.Infrastructure.Perks.EctoPerkStore
+
 # ADR-144: reactions to facts other contexts announce (Palee.DomainEvents).
 config :palee, :domain_event_handlers, %{
   membership_activated: [

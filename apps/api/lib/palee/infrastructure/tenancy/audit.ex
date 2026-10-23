@@ -6,6 +6,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     scheduling_trial_policies scheduling_trial_requests
     season_offerings season_enrollments
     referral_codes referral_attributions
+    perks perk_versions perk_codes perk_claims
     class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
     exercise_variations assigned_workouts assigned_workout_athletes scale_levels
