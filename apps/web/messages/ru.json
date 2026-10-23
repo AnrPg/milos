@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "Свободный зал не входит в ваш пакет. Спросите тренера о его добавлении.",
     "mbErrOpenGymUsedUp": "Вы использовали все посещения свободного зала за этот период.",
     "mbErrLocationArchived": "Это место больше недоступно. Выберите другое.",
+    "apiErrorLocationOutOfScope": "Это относится к филиалу, в котором вы не работаете.",
+    "apiErrorLocationRequired": "Сначала выберите филиал.",
+    "apiErrorLocationScopeExceeded": "Вы можете давать доступ только к своим филиалам.",
+    "apiErrorInvalidLocationScope": "Выберите все филиалы или хотя бы один.",
+    "apiErrorOwnerLocationScope": "Владельцы всегда работают во всех филиалах.",
+    "apiErrorCannotChangeOwnMembership": "Ваш собственный доступ должен изменить кто-то другой.",
+    "apiErrorRoleCeilingExceeded": "Вы не можете выдать роль выше той, что вам разрешено выдавать.",
     "mbErrLocationNotFound": "Не удалось найти это место. Выберите другое.",
     "mbNotifWaitlistPromotedTitle": "Для вас освободилось место!",
     "mbNotifWaitlistPromotedBody": "Освободилось место, и вы записаны: {class}.",
@@ -9659,5 +9666,22 @@
       "copied": "Скопировано",
       "linkHint": "Показывается только сейчас. Новая ссылка заменит эту."
     }
+  },
+  "BranchScope": {
+    "branches": "Филиалы",
+    "branchesHelp": "Где работает этот человек. Сотрудники отдельных филиалов видят и обслуживают только их.",
+    "allBranches": "Все филиалы",
+    "searchBranches": "Поиск филиалов",
+    "noBranchMatches": "Нет подходящих филиалов.",
+    "chooseOneBranch": "Выберите хотя бы один филиал.",
+    "branchManager": "Управляющий филиалом",
+    "branchManagerHelp": "Права администратора только для филиалов, выбранных ниже.",
+    "staffRoles": "Роли сотрудника",
+    "chooseOneRole": "Выберите хотя бы одну роль.",
+    "inviteBranches": "Работает в",
+    "inviteBranchesHelp": "Филиалы, к которым даёт доступ эта ссылка.",
+    "kindClient": "Клиент",
+    "kindStaff": "Сотрудник",
+    "staffLinkReady": "Ссылка готова. Отправьте её новому сотруднику ({roles})."
   }
 }

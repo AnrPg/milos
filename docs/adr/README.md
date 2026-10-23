@@ -185,4 +185,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-183 | The member first-run and account interests | Accepted |
 | ADR-184 | Business accounts: demo mode, the go-live gate and activation by the Palee team | Accepted |
 | ADR-185 | Event organisers («Διοργάνωση ως»), co-hosting and the organiser console | Accepted |
+| ADR-186 | Branch-scoped staff and the branch manager | Accepted |
 | ADR-187 | Logins with up to three profiles, @handle + display name, and mail-free password recovery | Accepted |

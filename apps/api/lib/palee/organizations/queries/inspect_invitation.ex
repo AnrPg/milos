@@ -1,7 +1,14 @@
 defmodule Palee.Organizations.Queries.InspectInvitation do
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.{GoLivePolicy, InvitationPolicy, InvitationToken}
-  alias Palee.Organizations.OrganizationStore
+
+  alias Palee.Organizations.Domain.{
+    GoLivePolicy,
+    InvitationPolicy,
+    InvitationToken,
+    LocationScopePolicy
+  }
+
+  alias Palee.Organizations.{OrganizationStore, RegistrationInvitation}
 
   def call(token, now) do
     # The holder of an invitation is by definition not yet a member, so the
@@ -20,6 +27,11 @@ defmodule Palee.Organizations.Queries.InspectInvitation do
          invitation_id: invitation.id,
          organization: organization,
          role: invitation.role,
+         roles: RegistrationInvitation.granted_roles(invitation),
+         location_scope:
+           invitation
+           |> RegistrationInvitation.granted_scope()
+           |> LocationScopePolicy.to_payload(),
          expires_at: invitation.expires_at
        }}
     else

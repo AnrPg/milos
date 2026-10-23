@@ -16,6 +16,10 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     manage_memberships: :all,
     invite_clients: :all,
     manage_settings: :all,
+    # ADR-186: a branch's own settings (address, hours, door codes); a branch
+    # manager keeps it for their branches while gym-wide settings stay with
+    # staff who work everywhere.
+    manage_locations: :all,
     view_directory: :all,
     view_billing_contacts: :all,
     view_client_training: :all,

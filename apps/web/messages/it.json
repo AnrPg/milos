@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "L'open gym non fa parte del tuo pacchetto. Chiedi al tuo coach come aggiungerlo.",
     "mbErrOpenGymUsedUp": "Hai usato tutti i tuoi ingressi open gym per questo periodo.",
     "mbErrLocationArchived": "Questa sede non è più disponibile. Scegline un'altra.",
+    "apiErrorLocationOutOfScope": "Questo riguarda una sede in cui non lavori.",
+    "apiErrorLocationRequired": "Scegli prima la sede.",
+    "apiErrorLocationScopeExceeded": "Puoi dare accesso solo alle tue sedi.",
+    "apiErrorInvalidLocationScope": "Scegli tutte le sedi o almeno una.",
+    "apiErrorOwnerLocationScope": "I titolari lavorano sempre in tutte le sedi.",
+    "apiErrorCannotChangeOwnMembership": "Il tuo accesso deve essere modificato da qualcun altro.",
+    "apiErrorRoleCeilingExceeded": "Non puoi assegnare un ruolo superiore a quelli che puoi concedere.",
     "mbErrLocationNotFound": "Non troviamo questa sede. Scegline un'altra.",
     "mbNotifWaitlistPromotedTitle": "Hai ottenuto un posto!",
     "mbNotifWaitlistPromotedBody": "Si è liberato un posto e sei prenotato: {class}.",
@@ -9659,5 +9666,22 @@
       "copied": "Copiato",
       "linkHint": "Mostrato solo ora. Un nuovo link sostituisce questo."
     }
+  },
+  "BranchScope": {
+    "branches": "Sedi",
+    "branchesHelp": "Dove lavora questa persona. Lo staff di alcune sedi vede e gestisce solo quelle sedi.",
+    "allBranches": "Tutte le sedi",
+    "searchBranches": "Cerca sedi",
+    "noBranchMatches": "Nessuna sede corrisponde.",
+    "chooseOneBranch": "Scegli almeno una sede.",
+    "branchManager": "Responsabile di sede",
+    "branchManagerHelp": "Permessi da amministratore, limitati alle sedi che scegli qui sotto.",
+    "staffRoles": "Ruoli dello staff",
+    "chooseOneRole": "Scegli almeno un ruolo.",
+    "inviteBranches": "Lavora presso",
+    "inviteBranchesHelp": "Le sedi a cui questo link dà accesso.",
+    "kindClient": "Cliente",
+    "kindStaff": "Staff",
+    "staffLinkReady": "Link pronto. Invialo al nuovo membro dello staff ({roles})."
   }
 }

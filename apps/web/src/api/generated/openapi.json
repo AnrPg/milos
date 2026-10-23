@@ -71192,6 +71192,26 @@
                       "format": "date_time",
                       "type": "string"
                     },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "organization": {
                       "properties": {
                         "activation": {
@@ -71238,6 +71258,13 @@
                     },
                     "role": {
                       "type": "string"
+                    },
+                    "roles": {
+                      "description": "ADR-186: the role set; `role` is its primary role",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
                     },
                     "token": {
                       "nullable": true,
@@ -115403,6 +115430,26 @@
                         "format": "uuid",
                         "type": "string"
                       },
+                      "location_scope": {
+                        "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                        "properties": {
+                          "all_locations": {
+                            "type": "boolean"
+                          },
+                          "location_ids": {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "all_locations",
+                          "location_ids"
+                        ],
+                        "type": "object"
+                      },
                       "notes_visible_to_admins": {
                         "description": "ADR-101",
                         "type": "boolean"
@@ -115550,6 +115597,26 @@
                       "format": "uuid",
                       "type": "string"
                     },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
                     "notes_visible_to_admins": {
                       "description": "ADR-101",
                       "type": "boolean"
@@ -115667,6 +115734,26 @@
                     "id": {
                       "format": "uuid",
                       "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
                     },
                     "notes_visible_to_admins": {
                       "description": "ADR-101",
@@ -115824,6 +115911,26 @@
                     "id": {
                       "format": "uuid",
                       "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
                     },
                     "notes_visible_to_admins": {
                       "description": "ADR-101",
@@ -158760,6 +158867,119 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/users/{id}/location-scope": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.StaffLocationScopeController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "all_locations": {
+                    "type": "boolean"
+                  },
+                  "location_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "location_scope"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Scope"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Beyond your own branches or roles"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid scope"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set the branches someone works at as staff («Όλα τα καταστήματα» or a list)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/membership-status": {
       "get": {
         "callbacks": {},
@@ -182454,8 +182674,34 @@
                         "format": "date_time",
                         "type": "string"
                       },
+                      "location_scope": {
+                        "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                        "properties": {
+                          "all_locations": {
+                            "type": "boolean"
+                          },
+                          "location_ids": {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "all_locations",
+                          "location_ids"
+                        ],
+                        "type": "object"
+                      },
                       "role": {
                         "type": "string"
+                      },
+                      "roles": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
                       }
                     },
                     "required": [
@@ -182502,6 +182748,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "all_locations": {
+                    "description": "ADR-186: staff work at every branch («Όλα τα καταστήματα»)",
+                    "type": "boolean"
+                  },
                   "intended_email": {
                     "type": "string"
                   },
@@ -182510,20 +182760,48 @@
                     "minimum": 300,
                     "type": "integer"
                   },
+                  "location_ids": {
+                    "description": "ADR-186: the branches staff work at; defaults to the issuer's own scope",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "role": {
+                    "description": "One role (older clients); `roles` wins when both are sent",
                     "enum": [
                       "owner",
                       "admin",
                       "coach",
+                      "front_desk",
+                      "accountant",
+                      "janitor",
                       "member",
                       "athlete"
                     ],
                     "type": "string"
+                  },
+                  "roles": {
+                    "description": "ADR-186: the role set the invited person gets",
+                    "items": {
+                      "enum": [
+                        "owner",
+                        "admin",
+                        "coach",
+                        "front_desk",
+                        "accountant",
+                        "janitor",
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
                   }
                 },
-                "required": [
-                  "role"
-                ],
                 "type": "object"
               }
             }
@@ -182539,6 +182817,26 @@
                     "expires_at": {
                       "format": "date_time",
                       "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
                     },
                     "organization": {
                       "properties": {
@@ -182586,6 +182884,13 @@
                     },
                     "role": {
                       "type": "string"
+                    },
+                    "roles": {
+                      "description": "ADR-186: the role set; `role` is its primary role",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
                     },
                     "token": {
                       "nullable": true,

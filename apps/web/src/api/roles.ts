@@ -21,6 +21,7 @@ type AreaResponse = Json<Op["PaleeWeb.CleaningController.create_area"]["response
 type EntriesResponse = Json<Op["PaleeWeb.CleaningController.entries"]["responses"][200]>;
 type EntryResponse = Json<Op["PaleeWeb.CleaningController.start"]["responses"][201]>;
 type MembershipStatusResponse = Json<Op["PaleeWeb.AdminUserController.membership_status"]["responses"][200]>;
+type LocationScopeResponse = Json<Op["PaleeWeb.StaffLocationScopeController.update"]["responses"][200]>;
 
 export type MembershipRoles = MembershipRolesResponse["membership"];
 export type RoleName = "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
@@ -53,6 +54,16 @@ export async function updateCoachScope(token: string, userId: string, coachScope
     body: { coach_scope: coachScope },
   });
   return response.membership;
+}
+
+/** The branches a staff member works at (ADR-186); `null` means every branch. */
+export async function updateLocationScope(token: string, userId: string, locationIds: string[] | null) {
+  const response = await apiRequest<LocationScopeResponse>(`/admin/users/${userId}/location-scope`, {
+    method: "PUT",
+    token,
+    body: locationIds === null ? { all_locations: true } : { all_locations: false, location_ids: locationIds },
+  });
+  return response.location_scope;
 }
 
 export async function fetchMembershipStatus(token: string, userId: string) {

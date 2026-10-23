@@ -35,9 +35,17 @@ defmodule PaleeWeb.InventoryController do
     :serial_number
   ]
 
+  # ADR-186: machines stand at a branch; branch-scoped staff see and log their
+  # own branches' machines. Supplies are shared stock and stay unscoped.
   def machines(conn, _params) do
     context = conn.assigns.tenant_context
-    json(conn, %{machines: context |> Inventory.list_machines() |> redact(context)})
+
+    machines =
+      context
+      |> Inventory.list_machines()
+      |> then(&Organizations.filter_by_location_scope(context, &1))
+
+    json(conn, %{machines: redact(machines, context)})
   end
 
   operation(:create_machine,
@@ -47,8 +55,11 @@ defmodule PaleeWeb.InventoryController do
   )
 
   def create_machine(conn, _params) do
-    with {:ok, machine} <-
-           Inventory.save_machine(conn.assigns.tenant_context, nil, conn.body_params) do
+    context = conn.assigns.tenant_context
+
+    with :ok <-
+           Organizations.authorize_location(context, Map.get(conn.body_params, :location_id)),
+         {:ok, machine} <- Inventory.save_machine(context, nil, conn.body_params) do
       conn |> put_status(:created) |> json(%{machine: machine})
     end
   end
@@ -61,8 +72,11 @@ defmodule PaleeWeb.InventoryController do
   )
 
   def update_machine(conn, %{id: id}) do
-    with {:ok, machine} <-
-           Inventory.save_machine(conn.assigns.tenant_context, id, conn.body_params) do
+    context = conn.assigns.tenant_context
+
+    with :ok <- machine_in_scope(context, id),
+         :ok <- moved_in_scope(context, conn.body_params),
+         {:ok, machine} <- Inventory.save_machine(context, id, conn.body_params) do
       json(conn, %{machine: machine})
     end
   end
@@ -74,7 +88,8 @@ defmodule PaleeWeb.InventoryController do
   )
 
   def archive_machine(conn, %{id: id}) do
-    with {:ok, machine} <- Inventory.archive_machine(conn.assigns.tenant_context, id) do
+    with :ok <- machine_in_scope(conn.assigns.tenant_context, id),
+         {:ok, machine} <- Inventory.archive_machine(conn.assigns.tenant_context, id) do
       json(conn, %{machine: machine})
     end
   end
@@ -86,8 +101,10 @@ defmodule PaleeWeb.InventoryController do
   )
 
   def machine_events(conn, %{id: id}) do
-    events = Inventory.list_machine_events(conn.assigns.tenant_context, id)
-    json(conn, %{events: with_nicknames(events)})
+    with :ok <- machine_in_scope(conn.assigns.tenant_context, id) do
+      events = Inventory.list_machine_events(conn.assigns.tenant_context, id)
+      json(conn, %{events: with_nicknames(events)})
+    end
   end
 
   operation(:log_machine_event,
@@ -108,7 +125,8 @@ defmodule PaleeWeb.InventoryController do
   def log_machine_event(conn, %{id: id}) do
     context = conn.assigns.tenant_context
 
-    with {:ok, %{event: event}} <-
+    with :ok <- machine_in_scope(context, id),
+         {:ok, %{event: event}} <-
            ManageInventory.log_machine_event(context, id, conn.body_params),
          %{} = machine <-
            Enum.find(Inventory.list_machines(context), &(&1.id == event.machine_id)) ||
@@ -264,8 +282,28 @@ defmodule PaleeWeb.InventoryController do
     responses: [ok: {"Report", "application/json", S.report()}]
   )
 
+  # ADR-186: the spending report covers the whole business.
   def report(conn, params) do
-    json(conn, Inventory.report(conn.assigns.tenant_context, Map.get(params, :months) || 12))
+    with :ok <- Organizations.authorize_location(conn.assigns.tenant_context, nil) do
+      json(conn, Inventory.report(conn.assigns.tenant_context, Map.get(params, :months) || 12))
+    end
+  end
+
+  defp machine_in_scope(context, id) do
+    if Organizations.location_scope(context) == :all do
+      :ok
+    else
+      case Inventory.get_machine(context, id) do
+        %{} = machine -> Organizations.authorize_location(context, Map.get(machine, :location_id))
+        _missing -> {:error, :not_found}
+      end
+    end
+  end
+
+  defp moved_in_scope(context, params) do
+    if Map.has_key?(params, :location_id),
+      do: Organizations.authorize_location(context, params.location_id),
+      else: :ok
   end
 
   defp redact(records, context) when is_list(records),

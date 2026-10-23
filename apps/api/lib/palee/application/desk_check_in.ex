@@ -98,11 +98,14 @@ defmodule Palee.Application.DeskCheckIn do
     date = param(params, :date) || CheckInPolicy.local_date(now, zone)
     {from, to} = day_bounds(date, zone)
 
-    Facility.list_visitor_scans(context, %{
+    context
+    |> Facility.list_visitor_scans(%{
       from: from,
       to: to,
       location_id: param(params, :location_id)
     })
+    # ADR-186: only the doors of the desk's own branches.
+    |> then(&Organizations.filter_by_location_scope(context, &1))
   end
 
   # -- who
@@ -115,10 +118,17 @@ defmodule Palee.Application.DeskCheckIn do
       else: {:error, :not_a_member}
   end
 
-  defp location(_context, nil), do: {:ok, nil}
-  defp location(_context, ""), do: {:ok, nil}
-
+  # ADR-186: a branch-scoped desk works at its own branches (its only one
+  # when none is named).
   defp location(context, location_id) do
+    case Organizations.desk_location(context, location_id) do
+      {:ok, nil} -> {:ok, nil}
+      {:ok, id} -> active_location(context, id)
+      error -> error
+    end
+  end
+
+  defp active_location(context, location_id) do
     case Facility.get_location(context, location_id) do
       %{archived_at: nil, id: id} -> {:ok, id}
       %{} -> {:error, :location_archived}

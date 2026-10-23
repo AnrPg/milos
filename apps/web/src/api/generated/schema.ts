@@ -6898,6 +6898,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/{id}/location-scope": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set the branches someone works at as staff («Όλα τα καταστήματα» or a list) */
+        put: operations["PaleeWeb.StaffLocationScopeController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}/membership-status": {
         parameters: {
             query?: never;
@@ -33522,6 +33539,11 @@ export interface operations {
                     "application/json": {
                         /** Format: date_time */
                         expires_at: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         organization: {
                             /**
                              * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
@@ -33540,6 +33562,8 @@ export interface operations {
                             timezone_confirmed?: boolean;
                         };
                         role: string;
+                        /** @description ADR-186: the role set; `role` is its primary role */
+                        roles?: string[];
                         token?: string | null;
                     };
                 };
@@ -50471,6 +50495,11 @@ export interface operations {
                         home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
@@ -50533,6 +50562,11 @@ export interface operations {
                         home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
@@ -50582,6 +50616,11 @@ export interface operations {
                         home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
@@ -50649,6 +50688,11 @@ export interface operations {
                         home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         /** @description ADR-101 */
                         notes_visible_to_admins?: boolean;
                         organization: {
@@ -66868,6 +66912,65 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.StaffLocationScopeController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    location_ids?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Scope */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+            /** @description Beyond your own branches or roles */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid scope */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminUserController.membership_status": {
         parameters: {
             query?: never;
@@ -75121,7 +75224,13 @@ export interface operations {
                         id: string;
                         /** Format: date_time */
                         issued_at: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         role: string;
+                        roles?: string[];
                     }[];
                 };
             };
@@ -75139,10 +75248,19 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-186: staff work at every branch («Όλα τα καταστήματα») */
+                    all_locations?: boolean;
                     intended_email?: string;
                     lifetime_seconds?: number;
-                    /** @enum {string} */
-                    role: "owner" | "admin" | "coach" | "member" | "athlete";
+                    /** @description ADR-186: the branches staff work at; defaults to the issuer's own scope */
+                    location_ids?: string[];
+                    /**
+                     * @description One role (older clients); `roles` wins when both are sent
+                     * @enum {string}
+                     */
+                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
+                    /** @description ADR-186: the role set the invited person gets */
+                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
                 };
             };
         };
@@ -75156,6 +75274,11 @@ export interface operations {
                     "application/json": {
                         /** Format: date_time */
                         expires_at: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         organization: {
                             /**
                              * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
@@ -75174,6 +75297,8 @@ export interface operations {
                             timezone_confirmed?: boolean;
                         };
                         role: string;
+                        /** @description ADR-186: the role set; `role` is its primary role */
+                        roles?: string[];
                         token?: string | null;
                     };
                 };

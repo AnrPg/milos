@@ -423,8 +423,28 @@ defmodule Palee.Application.CommunityEvents do
   @doc "An event of the context's gym, or `{:error, :not_found}`."
   def fetch_own(%{organization_id: organization_id} = context, event_id) do
     case Community.get_event(context, event_id) do
-      %{organization_id: ^organization_id} = event -> {:ok, event}
-      _other -> {:error, :not_found}
+      %{organization_id: ^organization_id} = event ->
+        if in_staff_scope?(context, event),
+          do: {:ok, event},
+          else: {:error, :location_out_of_scope}
+
+      _other ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
+  ADR-186: whether staff work this event: one at their branches, or (without
+  a branch) when they work everywhere or created it themselves.
+  """
+  def in_staff_scope?(context, event) do
+    case Map.get(event, :location_id) do
+      nil ->
+        Organizations.location_scope(context) == :all or
+          Map.get(event, :created_by_id) == Map.get(context, :user_id)
+
+      location_id ->
+        Organizations.location_in_scope?(context, location_id)
     end
   end
 

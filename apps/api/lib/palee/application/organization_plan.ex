@@ -34,9 +34,12 @@ defmodule Palee.Application.OrganizationPlan do
       else: :ok
   end
 
-  @doc "The seat check for an invitation: only a staff invitation reserves a seat."
+  @doc """
+  The seat check for an invitation: only a staff invitation reserves a seat.
+  `role` is one role or a role set (ADR-186).
+  """
   def check_invitation(context, role) do
-    if takes_staff_seat?([role]), do: check_staff_seat(context), else: :ok
+    if takes_staff_seat?(List.wrap(role)), do: check_staff_seat(context), else: :ok
   end
 
   defp takes_staff_seat?(roles) do

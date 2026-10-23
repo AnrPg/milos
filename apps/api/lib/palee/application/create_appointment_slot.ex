@@ -8,7 +8,7 @@ defmodule Palee.Application.CreateAppointmentSlot do
     coach_id = value(params, :coach_id) || staff_id
 
     with :ok <- staff_member(organization_id, coach_id),
-         :ok <- ClassLocation.check(context, params) do
+         :ok <- ClassLocation.check_appointment(context, params, coach_id) do
       attrs =
         params
         |> Map.new(fn {key, value} -> {to_string(key), value} end)

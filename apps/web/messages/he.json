@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "אימון חופשי אינו חלק מהחבילה שלך. שאלו את המאמן/ת על הוספה.",
     "mbErrOpenGymUsedUp": "ניצלת את כל האימונים החופשיים לתקופה הזו.",
     "mbErrLocationArchived": "המיקום הזה כבר לא זמין. בחרו מיקום אחר.",
+    "apiErrorLocationOutOfScope": "זה שייך לסניף שאינך עובד/ת בו.",
+    "apiErrorLocationRequired": "יש לבחור קודם את הסניף.",
+    "apiErrorLocationScopeExceeded": "אפשר לתת גישה רק לסניפים שלך.",
+    "apiErrorInvalidLocationScope": "יש לבחור את כל הסניפים או לפחות סניף אחד.",
+    "apiErrorOwnerLocationScope": "בעלים עובדים תמיד בכל הסניפים.",
+    "apiErrorCannotChangeOwnMembership": "את הגישה שלך צריך לשנות מישהו אחר.",
+    "apiErrorRoleCeilingExceeded": "אי אפשר לתת תפקיד גבוה ממה שמותר לך להעניק.",
     "mbErrLocationNotFound": "לא מצאנו את המיקום הזה. בחרו מיקום אחר.",
     "mbNotifWaitlistPromotedTitle": "התפנה לך מקום!",
     "mbNotifWaitlistPromotedBody": "התפנה מקום ונרשמת: {class}.",
@@ -9659,5 +9666,22 @@
       "copied": "הועתק",
       "linkHint": "מוצג רק עכשיו. קישור חדש יחליף את זה."
     }
+  },
+  "BranchScope": {
+    "branches": "סניפים",
+    "branchesHelp": "היכן האדם הזה עובד. צוות של סניפים מסוימים רואה ומטפל רק בסניפים האלה.",
+    "allBranches": "כל הסניפים",
+    "searchBranches": "חיפוש סניפים",
+    "noBranchMatches": "אין סניף מתאים.",
+    "chooseOneBranch": "יש לבחור לפחות סניף אחד.",
+    "branchManager": "מנהל/ת סניף",
+    "branchManagerHelp": "הרשאות מנהל, מוגבלות לסניפים שתבחר/י למטה.",
+    "staffRoles": "תפקידי צוות",
+    "chooseOneRole": "יש לבחור לפחות תפקיד אחד.",
+    "inviteBranches": "עובד/ת ב",
+    "inviteBranchesHelp": "הסניפים שהקישור הזה נותן אליהם גישה.",
+    "kindClient": "לקוח/ה",
+    "kindStaff": "צוות",
+    "staffLinkReady": "הקישור מוכן. שלח/י אותו לחבר/ת הצוות החדש/ה ({roles})."
   }
 }
