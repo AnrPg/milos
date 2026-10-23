@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { ApiError } from "@/api/client";
 import {
   createScheduleSlot,
+  createScheduleSlotsAt,
   createScheduleSeries,
   linkScheduleSlotWorkout,
   deleteScheduleSlot,
@@ -32,6 +33,7 @@ import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
+import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import { listAdminLocations } from "@/api/facility";
 import { useQuery } from "@tanstack/react-query";
 import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
@@ -128,6 +130,7 @@ export function ScheduleConsole({
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
+  const branchT = useTranslations("BranchScope");
   const locale = useLocale();
   const { tokens } = useSession();
   const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
@@ -136,6 +139,9 @@ export function ScheduleConsole({
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
   const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null | undefined>(undefined);
   const [notice, setNotice] = useState<string | null>(null);
+  // ADR-186 §8: «Ισχύει για» on a new class or series, and what it created.
+  const [createBranches, setCreateBranches] = useState<string[]>([]);
+  const [created, setCreated] = useState<{ kind: "classes" | "series"; items: { id: string; label: string; slotId?: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const submitCommand = useOutboxCommand();
@@ -171,6 +177,8 @@ export function ScheduleConsole({
     enabled: isAdmin && Boolean(tokens?.access_token),
   });
   const adminLocations = adminLocationsQuery.data ?? [];
+  const manyBranches = showsAppliesTo(adminLocations);
+  const locationName = (id: string | null | undefined) => adminLocations.find((location) => location.id === id)?.name ?? "";
   const coachesQuery = useQuery({
     queryKey: ["staff", "members"],
     queryFn: () => fetchGymStaff(tokens!.access_token),
@@ -442,6 +450,18 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
+      if (!editor.slotId && manyBranches) {
+        const slots = await createScheduleSlotsAt(tokens.access_token, editor.values, createBranches);
+        setCreated({
+          kind: "classes",
+          items: slots.map((slot) => ({ id: slot.id, slotId: slot.id, label: `${slot.name} · ${locationName(slot.location_id)}` })),
+        });
+        setNotice(slots.some((slot) => !slot.master_workout_id) ? i18n("classDraftSavedNotice") : null);
+        setEditor(null);
+        await loadSchedule();
+        return;
+      }
+
       const saved = editor.slotId
         ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values)
         : await createScheduleSlot(tokens.access_token, editor.values);
@@ -509,6 +529,7 @@ export function ScheduleConsole({
       return;
     }
 
+    setCreateBranches(defaultAppliesTo(adminLocations));
     setEditor({
       slotId: null,
       values: defaultSlotValues(isoDate, types, schedulingDefaults, gymZone),
@@ -522,6 +543,7 @@ export function ScheduleConsole({
     }
 
     const base = defaultSlotValues(startDate, types, schedulingDefaults, gymZone);
+    setCreateBranches(defaultAppliesTo(adminLocations));
     setSeriesEditor({
       values: {
         master_workout_id: null,
@@ -557,8 +579,16 @@ export function ScheduleConsole({
           .split(",")
           .map((date) => date.trim())
           .filter(Boolean),
+        ...(manyBranches ? { location_id: null, location_ids: createBranches } : {}),
       });
       if (!result.series.occurrence_count) setError(i18n("featureNoSeriesOccurrences"));
+      if (manyBranches) {
+        const list = result.series_list ?? [result.series];
+        setCreated({
+          kind: "series",
+          items: list.map((series) => ({ id: series.id, label: `${seriesEditor.values.name} · ${locationName(series.location_id)}` })),
+        });
+      }
       setSeriesEditor(null);
       await loadSchedule();
     } catch (reason) {
@@ -646,6 +676,43 @@ export function ScheduleConsole({
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" role="alert" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 19%, transparent)", color: "var(--primary-strong)" }}>
             {error}
+          </div>
+        ) : null}
+
+        {created ? (
+          <div
+            className="flex items-start justify-between gap-3 rounded-[1.6rem] px-5 py-4 text-sm"
+            role="status"
+            style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 28%, transparent)", color: "var(--text-soft)" }}
+          >
+            <div>
+              <p className="font-semibold" style={{ color: "var(--text)" }}>
+                {created.kind === "classes"
+                  ? branchT("createdClasses", { count: created.items.length })
+                  : branchT("createdSeries", { count: created.items.length })}
+              </p>
+              <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                {created.items.map((item) => (
+                  <li key={item.id}>
+                    {item.slotId ? (
+                      <button
+                        type="button"
+                        className="underline underline-offset-2"
+                        style={{ color: "var(--primary)" }}
+                        onClick={() => setReopenSlotId(item.slotId!)}
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <span>{item.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button className="shrink-0 text-xs font-semibold" style={{ color: "var(--dim)" }} onClick={() => setCreated(null)} type="button">
+              {common("close")}
+            </button>
           </div>
         ) : null}
 
@@ -787,7 +854,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim()}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0)}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -929,16 +996,28 @@ export function ScheduleConsole({
               {t("autoApproveBookingsForThisSlot")}
             </label>
 
-            <SlotLocationSelect
-              className="mt-4 block space-y-2 text-sm font-semibold"
-              locations={adminLocations}
-              onChange={(locationId) =>
-                setEditor((current) => (current ? { ...current, values: { ...current.values, location_id: locationId } } : current))
-              }
-              selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
-              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={editor.values.location_id}
-            />
+            {!editor.slotId && manyBranches ? (
+              <div className="mt-4">
+                <AppliesToBranches
+                  kind="each"
+                  locations={adminLocations}
+                  value={createBranches}
+                  onChange={(value) => setCreateBranches(value === "all" ? defaultAppliesTo(adminLocations) : value)}
+                />
+              </div>
+            ) : (
+              // Editing: the class stays one class at one branch.
+              <SlotLocationSelect
+                className="mt-4 block space-y-2 text-sm font-semibold"
+                locations={adminLocations}
+                onChange={(locationId) =>
+                  setEditor((current) => (current ? { ...current, values: { ...current.values, location_id: locationId } } : current))
+                }
+                selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+                selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                value={editor.values.location_id}
+              />
+            )}
 
             {canManageSchedule ? (
               <ClassCoachSelect
@@ -980,7 +1059,7 @@ export function ScheduleConsole({
           title={i18n("featureCreateClassSeries")}
           size="2xl"
           footer={
-            <div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim()} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div>
+            <div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim() || (manyBranches && createBranches.length === 0)} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div>
           }
         >
             <div className="grid gap-4 sm:grid-cols-2">
@@ -1005,7 +1084,18 @@ export function ScheduleConsole({
               <label className="text-sm font-semibold">{i18n("featureTime")}<TimeInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.time} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, time: value })} /></label>
               <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
-              <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
+              {manyBranches ? (
+                <div className="sm:col-span-2">
+                  <AppliesToBranches
+                    kind="each"
+                    locations={adminLocations}
+                    value={createBranches}
+                    onChange={(value) => setCreateBranches(value === "all" ? defaultAppliesTo(adminLocations) : value)}
+                  />
+                </div>
+              ) : (
+                <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
+              )}
               {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>

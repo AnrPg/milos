@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "Los propietarios siempre trabajan en todas las sedes.",
     "apiErrorCannotChangeOwnMembership": "Otra persona tiene que cambiar tu propio acceso.",
     "apiErrorRoleCeilingExceeded": "No puedes dar un rol superior al que tienes permitido.",
+    "apiErrorPromotionLocationNotIncluded": "Esta promoción no es válida en las sedes de este paquete.",
     "mbErrLocationNotFound": "No encontramos esa sede. Elige otra.",
     "mbNotifWaitlistPromotedTitle": "¡Tienes plaza!",
     "mbNotifWaitlistPromotedBody": "Se liberó una plaza y ya tienes reserva: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "Las sedes a las que da acceso este enlace.",
     "kindClient": "Cliente",
     "kindStaff": "Personal",
-    "staffLinkReady": "Enlace listo. Envíalo a tu nueva incorporación ({roles})."
+    "staffLinkReady": "Enlace listo. Envíalo a tu nueva incorporación ({roles}).",
+    "filterLabel": "Sedes:",
+    "filterAll": "Todas",
+    "filterCount": "{count, plural, one {# sede} other {# sedes}}",
+    "perBranch": "Por sede",
+    "perBranchHelp": "Cada persona cuenta en su sede principal: donde más entrenó en los últimos 90 días, entre las sedes que permite su paquete. Quien no tiene una solo cuenta en los totales.",
+    "branch": "Sede",
+    "checkIns": "Entradas registradas",
+    "attended": "Clases asistidas",
+    "activeMemberships": "Membresías activas",
+    "appliesTo": "Válido en",
+    "appliesToEachHelp": "Se crea uno independiente en cada sede que elijas.",
+    "appliesToCoveringHelp": "Un solo elemento, válido en las sedes que elijas.",
+    "createdClasses": "{count, plural, one {Se creó # clase:} other {Se crearon # clases:}}",
+    "createdSeries": "{count, plural, one {Se creó # serie de clases:} other {Se crearon # series de clases:}}",
+    "createdAppointmentSlots": "{count, plural, one {Se creó # hueco para citas.} other {Se crearon # huecos para citas, uno por sede.}}"
   }
 }

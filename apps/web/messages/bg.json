@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "Собствениците винаги работят във всички обекти.",
     "apiErrorCannotChangeOwnMembership": "Собствения ви достъп трябва да промени някой друг.",
     "apiErrorRoleCeilingExceeded": "Не можете да дадете роля, по-висока от позволената ви.",
+    "apiErrorPromotionLocationNotIncluded": "Тази промоция не важи в обектите на този пакет.",
     "mbErrLocationNotFound": "Не намерихме тази локация. Избери друга.",
     "mbNotifWaitlistPromotedTitle": "Имаш място!",
     "mbNotifWaitlistPromotedBody": "Освободи се място и си записан: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "Обектите, до които дава достъп тази връзка.",
     "kindClient": "Клиент",
     "kindStaff": "Персонал",
-    "staffLinkReady": "Връзката е готова. Изпратете я на новия служител ({roles})."
+    "staffLinkReady": "Връзката е готова. Изпратете я на новия служител ({roles}).",
+    "filterLabel": "Обекти:",
+    "filterAll": "Всички",
+    "filterCount": "{count, plural, one {# обект} other {# обекта}}",
+    "perBranch": "По обекти",
+    "perBranchHelp": "Всеки човек се отчита в основния си обект: там, където е тренирал най-много през последните 90 дни, сред обектите, които пакетът му позволява. Хората без такъв се отчитат само в общите суми.",
+    "branch": "Обект",
+    "checkIns": "Регистрирани посещения",
+    "attended": "Посетени занятия",
+    "activeMemberships": "Активни членства",
+    "appliesTo": "Важи за",
+    "appliesToEachHelp": "Във всеки избран обект се създава отделен елемент.",
+    "appliesToCoveringHelp": "Един елемент, валиден в избраните обекти.",
+    "createdClasses": "{count, plural, one {Създадено е # занятие:} other {Създадени са # занятия:}}",
+    "createdSeries": "{count, plural, one {Създадена е # серия занятия:} other {Създадени са # серии занятия:}}",
+    "createdAppointmentSlots": "{count, plural, one {Създаден е # свободен час.} other {Създадени са # свободни часа, по един на обект.}}"
   }
 }

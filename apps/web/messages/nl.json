@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "Eigenaren werken altijd bij alle vestigingen.",
     "apiErrorCannotChangeOwnMembership": "Iemand anders moet je eigen toegang wijzigen.",
     "apiErrorRoleCeilingExceeded": "Je kunt geen hogere rol geven dan je mag toekennen.",
+    "apiErrorPromotionLocationNotIncluded": "Deze actie geldt niet bij de vestigingen van dit pakket.",
     "mbErrLocationNotFound": "We konden die locatie niet vinden. Kies een andere.",
     "mbNotifWaitlistPromotedTitle": "Je hebt een plek!",
     "mbNotifWaitlistPromotedBody": "Er kwam een plek vrij en je bent geboekt: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "De vestigingen waartoe deze link toegang geeft.",
     "kindClient": "Klant",
     "kindStaff": "Team",
-    "staffLinkReady": "Link klaar. Stuur hem naar je nieuwe teamlid ({roles})."
+    "staffLinkReady": "Link klaar. Stuur hem naar je nieuwe teamlid ({roles}).",
+    "filterLabel": "Vestigingen:",
+    "filterAll": "Alle",
+    "filterCount": "{count, plural, one {# vestiging} other {# vestigingen}}",
+    "perBranch": "Per vestiging",
+    "perBranchHelp": "Iedereen telt mee bij de eigen thuisvestiging: waar diegene de afgelopen 90 dagen het meest trainde, binnen de vestigingen die het pakket toestaat. Wie er geen heeft, telt alleen mee in de totalen.",
+    "branch": "Vestiging",
+    "checkIns": "Check-ins",
+    "attended": "Bijgewoonde lessen",
+    "activeMemberships": "Actieve lidmaatschappen",
+    "appliesTo": "Geldt voor",
+    "appliesToEachHelp": "Bij elke gekozen vestiging wordt er een apart aangemaakt.",
+    "appliesToCoveringHelp": "Eén item, geldig bij de gekozen vestigingen.",
+    "createdClasses": "{count, plural, one {# les aangemaakt:} other {# lessen aangemaakt:}}",
+    "createdSeries": "{count, plural, one {# lesreeks aangemaakt:} other {# lesreeksen aangemaakt:}}",
+    "createdAppointmentSlots": "{count, plural, one {# afspraakmoment aangemaakt.} other {# afspraakmomenten aangemaakt, één per vestiging.}}"
   }
 }

@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "يعمل المالكون دائمًا في جميع الفروع.",
     "apiErrorCannotChangeOwnMembership": "يجب أن يغيّر شخص آخر صلاحياتك.",
     "apiErrorRoleCeilingExceeded": "لا يمكنك منح دور أعلى مما يُسمح لك بمنحه.",
+    "apiErrorPromotionLocationNotIncluded": "هذا العرض غير صالح في فروع هذه الباقة.",
     "mbErrLocationNotFound": "لم نتمكن من العثور على هذا الموقع. يرجى اختيار موقع آخر.",
     "mbNotifWaitlistPromotedTitle": "حصلت على مكان!",
     "mbNotifWaitlistPromotedBody": "توفر مكان وتم حجزك: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "الفروع التي يمنح هذا الرابط الوصول إليها.",
     "kindClient": "عميل",
     "kindStaff": "موظف",
-    "staffLinkReady": "الرابط جاهز. أرسله إلى الشخص الجديد بدور: {roles}."
+    "staffLinkReady": "الرابط جاهز. أرسله إلى الشخص الجديد بدور: {roles}.",
+    "filterLabel": "الفروع:",
+    "filterAll": "الكل",
+    "filterCount": "{count, plural, one {فرع واحد} two {فرعان} few {# فروع} many {# فرعًا} other {# فرع}}",
+    "perBranch": "حسب الفرع",
+    "perBranchHelp": "يُحتسب كل شخص في فرعه الأساسي: الفرع الذي تدرّب فيه أكثر خلال آخر 90 يومًا، من بين الفروع التي تسمح بها باقته. ومن ليس له فرع أساسي يُحتسب في الإجماليات فقط.",
+    "branch": "الفرع",
+    "checkIns": "تسجيلات الحضور",
+    "attended": "الحصص التي حضرها",
+    "activeMemberships": "الاشتراكات النشطة",
+    "appliesTo": "ينطبق على",
+    "appliesToEachHelp": "يُنشأ عنصر منفصل في كل فرع تختاره.",
+    "appliesToCoveringHelp": "عنصر واحد، صالح في الفروع التي تختارها.",
+    "createdClasses": "{count, plural, one {تم إنشاء حصة واحدة:} two {تم إنشاء حصتين:} few {تم إنشاء # حصص:} many {تم إنشاء # حصة:} other {تم إنشاء # حصة:}}",
+    "createdSeries": "{count, plural, one {تم إنشاء سلسلة حصص واحدة:} two {تم إنشاء سلسلتي حصص:} few {تم إنشاء # سلاسل حصص:} many {تم إنشاء # سلسلة حصص:} other {تم إنشاء # سلسلة حصص:}}",
+    "createdAppointmentSlots": "{count, plural, one {تم إنشاء موعد متاح واحد.} two {تم إنشاء موعدين متاحين، واحد لكل فرع.} few {تم إنشاء # مواعيد متاحة، واحد لكل فرع.} many {تم إنشاء # موعدًا متاحًا، واحد لكل فرع.} other {تم إنشاء # موعد متاح، واحد لكل فرع.}}"
   }
 }

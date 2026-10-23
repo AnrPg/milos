@@ -18,8 +18,11 @@ export type AttendanceRecord = {
   notes?: string;
 };
 
-export async function fetchAthletes(token: string, query?: string) {
-  const suffix = query ? `?q=${encodeURIComponent(query)}` : "";
+export async function fetchAthletes(token: string, query?: string, locationIds?: string) {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (locationIds) params.set("location_ids", locationIds);
+  const suffix = params.size > 0 ? `?${params.toString()}` : "";
   return apiRequest<{ athletes: AthleteSummary[] }>(`/admin/athletes${suffix}`, { token });
 }
 

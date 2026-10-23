@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "בעלים עובדים תמיד בכל הסניפים.",
     "apiErrorCannotChangeOwnMembership": "את הגישה שלך צריך לשנות מישהו אחר.",
     "apiErrorRoleCeilingExceeded": "אי אפשר לתת תפקיד גבוה ממה שמותר לך להעניק.",
+    "apiErrorPromotionLocationNotIncluded": "המבצע הזה אינו תקף בסניפים של החבילה הזו.",
     "mbErrLocationNotFound": "לא מצאנו את המיקום הזה. בחרו מיקום אחר.",
     "mbNotifWaitlistPromotedTitle": "התפנה לך מקום!",
     "mbNotifWaitlistPromotedBody": "התפנה מקום ונרשמת: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "הסניפים שהקישור הזה נותן אליהם גישה.",
     "kindClient": "לקוח/ה",
     "kindStaff": "צוות",
-    "staffLinkReady": "הקישור מוכן. שלח/י אותו לחבר/ת הצוות החדש/ה ({roles})."
+    "staffLinkReady": "הקישור מוכן. שלח/י אותו לחבר/ת הצוות החדש/ה ({roles}).",
+    "filterLabel": "סניפים:",
+    "filterAll": "הכול",
+    "filterCount": "{count, plural, one {סניף אחד} other {# סניפים}}",
+    "perBranch": "לפי סניף",
+    "perBranchHelp": "כל אדם נספר בסניף הבית שלו: הסניף שבו התאמן הכי הרבה ב־90 הימים האחרונים, מבין הסניפים שהחבילה שלו מאפשרת. מי שאין לו סניף בית נספר רק בסיכומים.",
+    "branch": "סניף",
+    "checkIns": "כניסות",
+    "attended": "שיעורים שהשתתף בהם",
+    "activeMemberships": "מנויים פעילים",
+    "appliesTo": "חל על",
+    "appliesToEachHelp": "בכל סניף שתבחר נוצר פריט נפרד.",
+    "appliesToCoveringHelp": "פריט אחד, תקף בסניפים שתבחר.",
+    "createdClasses": "{count, plural, one {נוצר שיעור אחד:} other {נוצרו # שיעורים:}}",
+    "createdSeries": "{count, plural, one {נוצרה סדרת שיעורים אחת:} other {נוצרו # סדרות שיעורים:}}",
+    "createdAppointmentSlots": "{count, plural, one {נוצר מועד פגישה אחד.} other {נוצרו # מועדי פגישה, אחד לכל סניף.}}"
   }
 }

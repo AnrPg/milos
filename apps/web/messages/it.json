@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "I titolari lavorano sempre in tutte le sedi.",
     "apiErrorCannotChangeOwnMembership": "Il tuo accesso deve essere modificato da qualcun altro.",
     "apiErrorRoleCeilingExceeded": "Non puoi assegnare un ruolo superiore a quelli che puoi concedere.",
+    "apiErrorPromotionLocationNotIncluded": "Questa promozione non è valida nelle sedi di questo pacchetto.",
     "mbErrLocationNotFound": "Non troviamo questa sede. Scegline un'altra.",
     "mbNotifWaitlistPromotedTitle": "Hai ottenuto un posto!",
     "mbNotifWaitlistPromotedBody": "Si è liberato un posto e sei prenotato: {class}.",
@@ -9167,6 +9168,21 @@
     "inviteBranchesHelp": "Le sedi a cui questo link dà accesso.",
     "kindClient": "Cliente",
     "kindStaff": "Staff",
-    "staffLinkReady": "Link pronto. Invialo al nuovo membro dello staff ({roles})."
+    "staffLinkReady": "Link pronto. Invialo al nuovo membro dello staff ({roles}).",
+    "filterLabel": "Sedi:",
+    "filterAll": "Tutte",
+    "filterCount": "{count, plural, one {# sede} other {# sedi}}",
+    "perBranch": "Per sede",
+    "perBranchHelp": "Ogni persona conta nella sua sede principale: dove si è allenata di più negli ultimi 90 giorni, tra le sedi consentite dal suo pacchetto. Chi non ne ha una conta solo nei totali.",
+    "branch": "Sede",
+    "checkIns": "Ingressi registrati",
+    "attended": "Lezioni frequentate",
+    "activeMemberships": "Abbonamenti attivi",
+    "appliesTo": "Valido per",
+    "appliesToEachHelp": "Ne viene creato uno separato in ogni sede che scegli.",
+    "appliesToCoveringHelp": "Un solo elemento, valido nelle sedi che scegli.",
+    "createdClasses": "{count, plural, one {Creata # lezione:} other {Create # lezioni:}}",
+    "createdSeries": "{count, plural, one {Creata # serie di lezioni:} other {Create # serie di lezioni:}}",
+    "createdAppointmentSlots": "{count, plural, one {Creata # disponibilità per appuntamenti.} other {Create # disponibilità per appuntamenti, una per sede.}}"
   }
 }

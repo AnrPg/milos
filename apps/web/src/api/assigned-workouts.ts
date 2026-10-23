@@ -94,6 +94,9 @@ export type AssignWorkoutPayload = {
   instructions?: string;
   /** ADR-125: makes the assignment one member's version of this class. */
   source_slot_id?: string;
+  /** ADR-186 §8: «Ισχύει για» — every branch, or these. */
+  all_locations?: boolean;
+  location_ids?: string[];
 };
 
 export type UpdateAssignedWorkoutPayload = {
