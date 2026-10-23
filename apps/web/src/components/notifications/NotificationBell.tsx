@@ -28,6 +28,7 @@ import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
 import { buddyNotificationText } from "@/components/buddy/buddy-links";
 import { seasonNotificationText } from "@/components/seasons/season-links";
+import { shopNotificationText } from "@/components/shop/shop-links";
 import { passwordResetNotificationText } from "@/components/password-resets/reset-notifications";
 import {
   notificationOrigin,
@@ -88,6 +89,11 @@ function NotificationCard({
   }
   const tBuddy = useTranslations("Buddy");
   const tSeasons = useTranslations("Seasons");
+  const tShop = useTranslations("Shop");
+  // ADR-190: a shop order ready for pickup, its reminder, a cancellation, and back in stock.
+  function shopText(notification: NotificationRecord, part: "title" | "body") {
+    return shopNotificationText(notification.type, notification.payload, part, (key, values) => tShop(key, values));
+  }
   // ADR-167: season requests (staff) and their answers (members).
   function seasonText(notification: NotificationRecord, part: "title" | "body") {
     return seasonNotificationText(notification.type, notification.payload, part, (key, values) => tSeasons(key, values));
@@ -202,6 +208,8 @@ function NotificationCard({
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "body");
     if (season !== null) return season;
+    const shop = shopText(notification, "body");
+    if (shop !== null) return shop;
     const partner = partnerText(notification, "body");
     if (partner !== null) return partner;
     const device = deviceText(notification, "body");
@@ -475,6 +483,8 @@ function NotificationCard({
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "title");
     if (season !== null) return season;
+    const shop = shopText(notification, "title");
+    if (shop !== null) return shop;
     const partner = partnerText(notification, "title");
     if (partner !== null) return partner;
     const device = deviceText(notification, "title");

@@ -3,6 +3,6 @@
  * must come with its copy and its backend.
  */
 export const features = {
-  /** Partner perks (outside-store deals) in Πληρωμές › Προσφορές: post-MVP (owner, 2026-10-23). */
-  partnerPerks: false,
+  /** Partner perks (ADR-191) in Πληρωμές › Προσφορές › «Από συνεργάτες του box»; on with the perks screens. */
+  partnerPerks: true,
 } as const;

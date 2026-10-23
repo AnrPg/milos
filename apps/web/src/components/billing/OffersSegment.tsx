@@ -8,6 +8,8 @@ import type { BillingProvider } from "@/api/my-billing";
 import { formatDate, StatusBadge } from "@/components/finance/MembershipEntitlement";
 import { HubCard } from "@/components/member-app/HubParts";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { PerkRows } from "@/components/perks/PerkRows";
+import { useMemberPerks } from "@/components/perks/use-perks";
 import { features } from "@/lib/features";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 
@@ -16,8 +18,9 @@ import { Empty, Group, Row } from "./parts";
 type T = ReturnType<typeof useTranslations<"Billing">>;
 
 /**
- * Προσφορές, in this order: codes the box offers members (and, later,
- * partner perks behind `features.partnerPerks`), offers already claimed,
+ * Προσφορές, in this order: codes the box offers members, «Από συνεργάτες
+ * του box» (partner perks, ADR-191, behind `features.partnerPerks`, read
+ * from `/me/perks` rather than the billing slot), offers already claimed,
  * seasons joined, referral rewards with «Φέρε φίλο», trials. Empty groups
  * stay hidden; a wholly empty segment shows one line.
  */
@@ -25,7 +28,8 @@ export function OffersSegment({ provider, currency }: { provider: BillingProvide
   const t = useTranslations("Billing");
   const locale = useUiLocale();
   const referrals = provider.referrals;
-  const perks = features.partnerPerks ? provider.perks : [];
+  const memberPerks = useMemberPerks(features.partnerPerks);
+  const perks = (memberPerks.data ?? []).filter((perk) => perk.provider.organization_id === provider.organization_id);
   const hasReferrals = referrals.invited > 0 || referrals.credits.length > 0;
   const empty =
     provider.available_offers.length === 0 &&
@@ -57,7 +61,7 @@ export function OffersSegment({ provider, currency }: { provider: BillingProvide
   return (
     <HubCard>
       <div className="flex min-w-0 flex-col gap-5">
-        {provider.available_offers.length > 0 || perks.length > 0 ? (
+        {provider.available_offers.length > 0 ? (
           <Group title={t("availableTitle")}>
             {provider.available_offers.map((offer) => (
               <Row
@@ -72,10 +76,12 @@ export function OffersSegment({ provider, currency }: { provider: BillingProvide
                 end={<CopyCode code={offer.code} />}
               />
             ))}
-            {/* Partner perks slot (post-MVP): data only, no copy of its own yet. */}
-            {perks.map((perk) => (
-              <Row key={perk.id} title={perk.store} detail={perk.discount ?? null} end={<CopyCode code={perk.code} />} />
-            ))}
+          </Group>
+        ) : null}
+
+        {perks.length > 0 ? (
+          <Group title={t("perksTitle")}>
+            <PerkRows perks={perks} />
           </Group>
         ) : null}
 

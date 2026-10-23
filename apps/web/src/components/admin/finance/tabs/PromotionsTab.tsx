@@ -23,6 +23,9 @@ import { membershipLocationScope, toLocationScope, type LocationScope, type Loca
 import { BranchCoverageBadge } from "@/components/admin/BranchFilter";
 import type { FacilityLocation } from "@/api/facility";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { useTranslations } from "next-intl";
+import { PartnerPerksPanel } from "@/components/admin/finance/perks/PartnerPerksPanel";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -32,8 +35,45 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
 
 const BLANK = { name: "", description: "", starts_on: "", ends_on: "", active: true };
 
-/** `locationIds`: the page branch filter (ADR-186 §7); promotions valid there or everywhere show. */
+/**
+ * Οικονομικά › Προσφορές: «Του box» (the box's own campaigns and codes) and
+ * «Συνεργατών» (partner perks, ADR-191), one full-grid segment, `?offers=`.
+ */
 export function PromotionsTab({ locationIds }: { locationIds?: string } = {}) {
+  const t = useTranslations("PerksAdmin");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const segment = searchParams.get("offers") === "partners" ? "partners" : "box";
+
+  function setSegment(next: "box" | "partners") {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "partners") params.set("offers", "partners");
+    else params.delete("offers");
+    params.delete("campaign");
+    params.delete("new");
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }
+
+  return (
+    <div className="space-y-4">
+      <SegmentPicker
+        ariaLabel={t("segment")}
+        stretch
+        className="max-w-md"
+        value={segment}
+        onChange={setSegment}
+        options={[
+          { value: "box", label: t("segmentBox") },
+          { value: "partners", label: t("segmentPartners") },
+        ]}
+      />
+      {segment === "partners" ? <PartnerPerksPanel /> : <BoxPromotions locationIds={locationIds} />}
+    </div>
+  );
+}
+
+/** `locationIds`: the page branch filter (ADR-186 §7); promotions valid there or everywhere show. */
+function BoxPromotions({ locationIds }: { locationIds?: string }) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
