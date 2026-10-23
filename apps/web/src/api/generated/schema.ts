@@ -19124,6 +19124,12 @@ export interface components {
             organization_id: string;
             slug?: string | null;
         };
+        /** CommunityEventCohostFailure */
+        CommunityEventCohostFailure: {
+            /** @description Why that box wasn't asked, e.g. box_not_found */
+            code: string;
+            slug: string;
+        };
         /** CommunityEventCohostInviteRequest */
         CommunityEventCohostInviteRequest: {
             /** @description The box page's address */
@@ -19275,6 +19281,12 @@ export interface components {
         };
         /** CommunityEventCreatedResponse */
         CommunityEventCreatedResponse: {
+            /** @description ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created */
+            cohost_failures?: {
+                /** @description Why that box wasn't asked, e.g. box_not_found */
+                code: string;
+                slug: string;
+            }[];
             /** CommunityEvent */
             event: {
                 /**
@@ -19591,6 +19603,8 @@ export interface components {
              * @description As a business: which of its clubs (its gym club by default)
              */
             club_id?: string;
+            /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+            cohost_slugs?: string[];
             /**
              * Format: uuid
              * @description A ready box photo upload
@@ -19718,6 +19732,8 @@ export interface components {
              * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
              */
             channel_id?: string;
+            /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+            cohost_slugs?: string[];
             /**
              * Format: uuid
              * @description A ready box photo upload
@@ -30340,6 +30356,12 @@ export interface components {
         };
         /** StaffCommunityEventCreatedResponse */
         StaffCommunityEventCreatedResponse: {
+            /** @description ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created */
+            cohost_failures?: {
+                /** @description Why that box wasn't asked, e.g. box_not_found */
+                code: string;
+                slug: string;
+            }[];
             /** StaffCommunityEvent */
             event: {
                 /** CommunityEventAttendees */
@@ -30722,6 +30744,8 @@ export interface components {
             channel_id?: string;
             /** Format: uuid */
             club_id: string;
+            /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+            cohost_slugs?: string[];
             /**
              * Format: uuid
              * @description A ready box photo upload
@@ -42141,6 +42165,8 @@ export interface operations {
                      * @description An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)
                      */
                     channel_id?: string;
+                    /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+                    cohost_slugs?: string[];
                     /**
                      * Format: uuid
                      * @description A ready box photo upload
@@ -42185,6 +42211,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created */
+                        cohost_failures?: {
+                            /** @description Why that box wasn't asked, e.g. box_not_found */
+                            code: string;
+                            slug: string;
+                        }[];
                         /** CommunityEvent */
                         event: {
                             /**
@@ -45633,6 +45665,8 @@ export interface operations {
                      * @description As a business: which of its clubs (its gym club by default)
                      */
                     club_id?: string;
+                    /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+                    cohost_slugs?: string[];
                     /**
                      * Format: uuid
                      * @description A ready box photo upload
@@ -45679,6 +45713,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created */
+                        cohost_failures?: {
+                            /** @description Why that box wasn't asked, e.g. box_not_found */
+                            code: string;
+                            slug: string;
+                        }[];
                         /** CommunityEvent */
                         event: {
                             /**
@@ -56637,6 +56677,8 @@ export interface operations {
                     channel_id?: string;
                     /** Format: uuid */
                     club_id: string;
+                    /** @description ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures */
+                    cohost_slugs?: string[];
                     /**
                      * Format: uuid
                      * @description A ready box photo upload
@@ -56681,6 +56723,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created */
+                        cohost_failures?: {
+                            /** @description Why that box wasn't asked, e.g. box_not_found */
+                            code: string;
+                            slug: string;
+                        }[];
                         /** StaffCommunityEvent */
                         event: {
                             /** CommunityEventAttendees */

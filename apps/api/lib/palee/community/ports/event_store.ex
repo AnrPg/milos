@@ -28,6 +28,17 @@ defmodule Palee.Community.Ports.EventStore do
 
   @doc "Inserts every occurrence of a new event in one transaction."
   @callback insert_events(context(), [map()]) :: {:ok, [Event.t()]} | {:error, term()}
+
+  @doc """
+  ADR-185: inserts every occurrence of a new event and, on each, a pending
+  co-host request per organisation in `cohosts`, all in one transaction:
+  either the event and every request exist, or nothing does.
+  """
+  @callback insert_events_with_cohosts(context(), [map()], %{
+              cohost_organization_ids: [id()],
+              invited_by_id: id() | nil
+            }) ::
+              {:ok, %{events: [Event.t()], cohosts: [EventCohost.t()]}} | {:error, term()}
   @callback get_event(context(), id()) :: Event.t() | nil
   @callback list_events(context(), event_filter()) :: [Event.t()]
   @callback update_event(context(), Event.t(), map()) ::

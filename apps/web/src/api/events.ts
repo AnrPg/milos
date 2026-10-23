@@ -35,8 +35,12 @@ export async function fetchClubEvents(token: string, clubId: string, scope: Even
 }
 
 /** Creates an event (or a weekly run with `repeat_until`) in a club; `channel_id` makes it a member group's. */
+/** ADR-185: an address in `cohost_slugs` the API could not ask (no published box); the event was still made. */
+export type EventCohostFailure = components["schemas"]["CommunityEventCohostFailure"];
+type EventCreated = { event: CommunityEvent; occurrences: number; cohost_failures?: EventCohostFailure[] };
+
 export function createClubEvent(token: string, clubId: string, draft: EventDraft) {
-  return apiRequest<{ event: CommunityEvent; occurrences: number }>(`/me/community/clubs/${id(clubId)}/events`, {
+  return apiRequest<EventCreated>(`/me/community/clubs/${id(clubId)}/events`, {
     method: "POST",
     token,
     body: draft,
@@ -115,5 +119,5 @@ export async function fetchEventHosts(token: string) {
 
 /** Creates an event as yourself (`host: "self"`) or as a business (its organisation id). */
 export function createHostedEvent(token: string, draft: HostedEventDraft) {
-  return apiRequest<{ event: CommunityEvent; occurrences: number }>("/me/events", { method: "POST", token, body: draft });
+  return apiRequest<EventCreated>("/me/events", { method: "POST", token, body: draft });
 }

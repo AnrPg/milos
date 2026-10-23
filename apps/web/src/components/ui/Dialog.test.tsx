@@ -31,6 +31,20 @@ describe("Dialog", () => {
     expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   });
 
+  it("fills a phone's screen in the screen variant and is a centred card from sm up", () => {
+    render(
+      <Dialog onClose={() => {}} title="New event" closeLabel="Close" variant="screen" size="2xl">
+        <p>Step</p>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole("dialog", { name: "New event" });
+    expect(dialog.className).toContain("h-full");
+    expect(dialog.className).toContain("sm:h-auto");
+    expect(dialog.className).toContain("sm:max-w-2xl");
+    expect(dialog.className).not.toContain("rounded-t-");
+    expect(dialog.parentElement!.className).toContain("items-stretch");
+  });
+
   it("closes from Escape, the close button and a press on the backdrop, but not from inside", () => {
     const onClose = vi.fn();
     render(

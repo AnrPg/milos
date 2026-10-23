@@ -24426,6 +24426,23 @@
         "title": "CommunityEventCohostBox",
         "type": "object"
       },
+      "CommunityEventCohostFailure": {
+        "properties": {
+          "code": {
+            "description": "Why that box wasn't asked, e.g. box_not_found",
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "code"
+        ],
+        "title": "CommunityEventCohostFailure",
+        "type": "object"
+      },
       "CommunityEventCohostInviteRequest": {
         "properties": {
           "slug": {
@@ -24903,6 +24920,27 @@
       },
       "CommunityEventCreatedResponse": {
         "properties": {
+          "cohost_failures": {
+            "description": "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created",
+            "items": {
+              "properties": {
+                "code": {
+                  "description": "Why that box wasn't asked, e.g. box_not_found",
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "slug",
+                "code"
+              ],
+              "title": "CommunityEventCohostFailure",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "event": {
             "properties": {
               "audience": {
@@ -25822,6 +25860,15 @@
             "format": "uuid",
             "type": "string"
           },
+          "cohost_slugs": {
+            "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+            "items": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
           "cover_media_id": {
             "description": "A ready box photo upload",
             "format": "uuid",
@@ -26180,6 +26227,15 @@
             "description": "An active member group of the club: its admin (or staff) makes the group's event and picks its price, audience and guest passes (ADR-185)",
             "format": "uuid",
             "type": "string"
+          },
+          "cohost_slugs": {
+            "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+            "items": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
           },
           "cover_media_id": {
             "description": "A ready box photo upload",
@@ -60282,6 +60338,27 @@
       },
       "StaffCommunityEventCreatedResponse": {
         "properties": {
+          "cohost_failures": {
+            "description": "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created",
+            "items": {
+              "properties": {
+                "code": {
+                  "description": "Why that box wasn't asked, e.g. box_not_found",
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "slug",
+                "code"
+              ],
+              "title": "CommunityEventCohostFailure",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "event": {
             "properties": {
               "attendees": {
@@ -61379,6 +61456,15 @@
           "club_id": {
             "format": "uuid",
             "type": "string"
+          },
+          "cohost_slugs": {
+            "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+            "items": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
           },
           "cover_media_id": {
             "description": "A ready box photo upload",
@@ -93355,6 +93441,15 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "cohost_slugs": {
+                    "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+                    "items": {
+                      "maxLength": 200,
+                      "type": "string"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
                   "cover_media_id": {
                     "description": "A ready box photo upload",
                     "format": "uuid",
@@ -93456,6 +93551,27 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "cohost_failures": {
+                      "description": "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created",
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "description": "Why that box wasn't asked, e.g. box_not_found",
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "code"
+                        ],
+                        "title": "CommunityEventCohostFailure",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "event": {
                       "properties": {
                         "audience": {
@@ -102449,6 +102565,15 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "cohost_slugs": {
+                    "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+                    "items": {
+                      "maxLength": 200,
+                      "type": "string"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
                   "cover_media_id": {
                     "description": "A ready box photo upload",
                     "format": "uuid",
@@ -102555,6 +102680,27 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "cohost_failures": {
+                      "description": "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created",
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "description": "Why that box wasn't asked, e.g. box_not_found",
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "code"
+                        ],
+                        "title": "CommunityEventCohostFailure",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "event": {
                       "properties": {
                         "audience": {
@@ -131146,6 +131292,15 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "cohost_slugs": {
+                    "description": "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures",
+                    "items": {
+                      "maxLength": 200,
+                      "type": "string"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
                   "cover_media_id": {
                     "description": "A ready box photo upload",
                     "format": "uuid",
@@ -131248,6 +131403,27 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "cohost_failures": {
+                      "description": "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created",
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "description": "Why that box wasn't asked, e.g. box_not_found",
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "code"
+                        ],
+                        "title": "CommunityEventCohostFailure",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "event": {
                       "properties": {
                         "attendees": {
