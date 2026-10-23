@@ -43,6 +43,52 @@ defmodule PaleeWeb.TelemetryTest do
     end
   end
 
+  describe "ADR-192 revenue and shop metrics" do
+    setup do
+      name = Module.concat(__MODULE__, "ShopExporter#{System.unique_integer([:positive])}")
+      start_supervised!({PrometheusExporter, name: name, metrics: Telemetry.prometheus_metrics()})
+      {:ok, exporter: name}
+    end
+
+    test "count revenue by stream and shop activity with folded labels", %{exporter: exporter} do
+      alias Palee.Finance.RevenueTelemetry
+      alias Palee.Shop.Observability
+
+      RevenueTelemetry.payment_recorded("shop", 2_500)
+      RevenueTelemetry.refund_recorded("shop", 500)
+      RevenueTelemetry.payment_recorded("not-a-stream", 100, "euros")
+      Observability.order_placed(:online, 2_500)
+      Observability.order_paid("pos", :cash, 2_500)
+      Observability.order_refunded("pos", 500)
+      Observability.stock_moved("sale", -2)
+      Observability.low_stock(:low)
+
+      Observability.reconciliation_checked(%{
+        days: [%{}, %{}],
+        drifted: [%{drift_cents: 7}],
+        drift_cents: 7
+      })
+
+      output = exporter |> PrometheusExporter.scrape() |> IO.iodata_to_binary()
+
+      for expected <- [
+            ~s(palee_revenue_recorded_cents_total{stream="shop",currency="EUR"} 2500),
+            ~s(palee_revenue_refunded_cents_total{stream="shop",currency="EUR"} 500),
+            ~s(palee_revenue_recorded_cents_total{stream="other",currency="XXX"} 100),
+            ~s(palee_revenue_payments_total{stream="shop"} 1),
+            ~s(palee_shop_orders_placed_total{channel="online"} 1),
+            ~s(palee_shop_orders_paid_total{channel="pos",method="cash"} 1),
+            ~s(palee_shop_refunded_cents_total{channel="pos"} 500),
+            ~s(palee_shop_stock_units_moved_total{kind="sale"} 2),
+            ~s(palee_shop_low_stock_alerts_total{status="low"} 1),
+            ~s(palee_shop_reconciliation_runs_total{result="drift"} 1),
+            ~s(palee_shop_reconciliation_drift_cents 7)
+          ] do
+        assert output =~ expected, "missing #{expected} in:\n#{output}"
+      end
+    end
+  end
+
   describe "emit_readiness_measurements/0" do
     setup do
       previous = Application.fetch_env!(:palee, :readiness_checker)

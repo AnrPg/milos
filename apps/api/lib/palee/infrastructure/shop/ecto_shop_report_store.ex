@@ -87,16 +87,18 @@ defmodule Palee.Infrastructure.Shop.EctoShopReportStore do
 
   def order_groups(filters, :source) do
     """
-    SELECT o.source, o.source_ref_id, #{@order_totals}
+    SELECT o.source, o.source_ref_id,
+           (o.promotion_code IS NOT NULL AND o.promotion_code <> ''), #{@order_totals}
     FROM shop_orders o
     WHERE #{@paid_orders}
-    GROUP BY 1, 2
+    GROUP BY 1, 2, 3
     """
     |> query(filters)
-    |> Enum.map(fn [source, ref, orders, gross, refunded] ->
+    |> Enum.map(fn [source, ref, with_code, orders, gross, refunded] ->
       %{
         source: source,
         source_ref_id: uuid(ref),
+        with_code: with_code,
         orders: orders,
         gross_cents: gross,
         refunded_cents: refunded
