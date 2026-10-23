@@ -1,17 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
 import {
   cancelStaffEvent,
+  eventCohostsKey,
+  fetchEventCohosts,
   fetchStaffEvent,
+  inviteCohost,
   markPaid,
   messageAttendees,
   PAYMENT_METHODS,
+  refundAttendee,
   removeAttendee,
+  removeCohost,
   sendTrialOffer,
   setCheckedIn,
   staffEventKey,
@@ -38,6 +43,61 @@ import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type ListTab = "going" | "waitlisted" | "cancelled" | "came";
 const LIST_TABS: ListTab[] = ["going", "waitlisted", "cancelled", "came"];
+
+/**
+ * Where the event is run from and what the person may do there: the
+ * selected gym's admin (from their membership), or ADR-185's organiser
+ * console, which names the organisation (`slug`) and what its host holds.
+ */
+export type EventConsoleScope = {
+  slug: string | null;
+  manage: boolean;
+  checkIn: boolean;
+  takePayments: boolean;
+  settings: boolean;
+  /** People open in the gym's admin; a person's own event has none. */
+  peopleLinks: boolean;
+};
+
+const ConsoleScopeContext = createContext<EventConsoleScope | null>(null);
+
+function useConsoleScope(): EventConsoleScope {
+  const explicit = useContext(ConsoleScopeContext);
+  const { membership } = useSelectedMembershipRole();
+  if (explicit) return explicit;
+  const manage = can(membership, "manage_events");
+  return {
+    slug: null,
+    manage,
+    checkIn: manage || can(membership, "check_in"),
+    takePayments: manage || can(membership, "take_payments"),
+    settings: can(membership, "manage_settings"),
+    peopleLinks: true,
+  };
+}
+
+/** ADR-185: an event in the organiser console, run in the organisation `scope.slug` names. */
+export function HostedEventPanel({ eventId, scope }: { eventId: string; scope: EventConsoleScope }) {
+  const tEvents = useTranslations("Events");
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? "";
+  const event = useQuery({
+    queryKey: staffEventKey(eventId),
+    enabled: Boolean(token),
+    queryFn: () => fetchStaffEvent(token, eventId, scope.slug),
+  });
+  return (
+    <ConsoleScopeContext.Provider value={scope}>
+      {event.isPending ? (
+        <p style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
+      ) : event.data ? (
+        <StaffEventView event={event.data} />
+      ) : (
+        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{tEvents("eventNotFound")}</p>
+      )}
+    </ConsoleScopeContext.Provider>
+  );
+}
 
 /**
  * An event for staff (board 8 Q6): Πάνε · Αναμονή · Ακύρωσαν · Ήρθαν with
@@ -96,10 +156,11 @@ function StaffEventView({ event }: { event: StaffEvent }) {
   const price = usePriceLabel();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
-  const { membership } = useSelectedMembershipRole();
-  const manage = can(membership, "manage_events");
+  const scope = useConsoleScope();
+  const manage = scope.manage;
+  const own = event.host?.kind === "person";
   const applied = useStaffAction(event.id);
-  const locations = useEventLocations(manage ? event.box.slug : null);
+  const locations = useEventLocations(manage && !own ? event.box.slug : null);
   const [tab, setTab] = useState<ListTab>("going");
   const [sheet, setSheet] = useState<"edit" | "cancel" | "message" | "trial" | null>(null);
   const over = hasEnded(event);
@@ -167,6 +228,10 @@ function StaffEventView({ event }: { event: StaffEvent }) {
         </dl>
       </Panel>
 
+      {manage && !event.cancelled && !over && (event.audience ?? (event.channel_id ? "group" : "club")) !== "group" ? (
+        <CohostsPanel event={event} />
+      ) : null}
+
       {over && !event.cancelled && manage ? (
         <Panel title={t("trialTitle")}>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>
@@ -211,17 +276,18 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           initialCoverUrl={event.cover_url ?? null}
           editing={{ seriesId: event.series_id ?? null }}
           group={Boolean(event.channel_id)}
+          mode={own ? "self" : event.channel_id ? "group" : "club"}
           locations={locations.data ?? []}
-          coverSlug={can(membership, "manage_settings") ? event.box.slug : null}
-          gymSlug={event.box.slug}
-          onSubmit={async (body, scope) => applied(await updateStaffEvent(token, event.id, { ...body, scope }))}
+          coverSlug={!own && scope.settings ? event.box.slug : null}
+          gymSlug={own ? null : event.box.slug}
+          onSubmit={async (body, which) => applied(await updateStaffEvent(token, event.id, { ...body, scope: which }, scope.slug))}
           onClose={() => setSheet(null)}
         />
       ) : null}
       {sheet === "cancel" ? (
         <CancelEventSheet
           event={event}
-          onCancel={async (reason, scope) => applied(await cancelStaffEvent(token, event.id, reason, scope))}
+          onCancel={async (reason, which) => applied(await cancelStaffEvent(token, event.id, reason, which, scope.slug))}
           onClose={() => setSheet(null)}
         />
       ) : null}
@@ -237,27 +303,29 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
   const eventError = useEventError();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
-  const { membership, selectedOrganizationSlug } = useSelectedMembershipRole();
+  const { selectedOrganizationSlug } = useSelectedMembershipRole();
+  const scope = useConsoleScope();
   const applied = useStaffAction(event.id);
-  const [sheet, setSheet] = useState<"paid" | "remove" | null>(null);
+  const [sheet, setSheet] = useState<"paid" | "refund" | "remove" | null>(null);
   const userId = row.person.id;
   const act = useMutation({
     mutationFn: async (action: "check_in" | "undo_check_in" | "remove") => {
       const fresh =
-        action === "remove" ? await removeAttendee(token, event.id, userId) : await setCheckedIn(token, event.id, userId, action === "check_in");
+        action === "remove"
+          ? await removeAttendee(token, event.id, userId, scope.slug)
+          : await setCheckedIn(token, event.id, userId, action === "check_in", scope.slug);
       await applied(fresh);
     },
     onSuccess: () => setSheet(null),
   });
-  const manage = can(membership, "manage_events");
-  const checkIn = manage || can(membership, "check_in");
-  const takePayments = manage || can(membership, "take_payments");
+  const { manage, checkIn, takePayments } = scope;
   const holds = row.status === "going";
   const clock = (iso: string) =>
     new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const notes = [
     row.source === "guest" ? t("guestOf", { name: row.invited_by?.nickname ?? "?" }) : null,
     row.paid_at ? t("paidWith", { method: t(["pay", row.payment_method ?? "other"].join("_")) }) : null,
+    row.refunded_at ? t("refundedNote", { amount: refundLabel(row, event, locale) }) : null,
     row.removed_by ? t("removedBy", { name: row.removed_by.nickname ?? "?" }) : null,
     row.status === "cancelled" && !row.late_cancel && !row.removed_by && row.cancelled_at ? t("cancelledAt", { time: clock(row.cancelled_at) }) : null,
     row.late_cancels_90d > 0 ? t("lateCancels90", { count: row.late_cancels_90d }) : null,
@@ -266,13 +334,15 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
   return (
     <li className="flex flex-col gap-1 py-3">
       <div className="flex flex-wrap items-center gap-3">
-        <Link href={adminHref(`/admin/users/${userId}`, selectedOrganizationSlug)} className="flex min-w-0 grow items-center gap-3">
-          <PersonAvatar name={row.person.nickname} url={row.person.avatar_url} />
-          <span className="min-w-0">
-            <span className="block truncate font-bold" style={{ color: "var(--text)" }}>{row.person.nickname ?? "?"}</span>
-            {notes.length > 0 ? <span className="block text-xs" style={{ color: "var(--dim)" }}>{notes.join(" · ")}</span> : null}
+        {scope.peopleLinks ? (
+          <Link href={adminHref(`/admin/users/${userId}`, selectedOrganizationSlug)} className="flex min-w-0 grow items-center gap-3">
+            <PersonLine row={row} notes={notes} />
+          </Link>
+        ) : (
+          <span className="flex min-w-0 grow items-center gap-3">
+            <PersonLine row={row} notes={notes} />
           </span>
-        </Link>
+        )}
         {row.late_cancel && row.cancelled_at ? (
           <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)", color: "var(--warning)" }}>
             {t("lateCancelTag", { time: clock(row.cancelled_at) })}
@@ -306,12 +376,23 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
             {t("markPaid")}
           </button>
         ) : null}
+        {takePayments && row.paid_at && !row.refunded_at ? (
+          <button
+            type="button"
+            onClick={() => setSheet("refund")}
+            className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold"
+            style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+          >
+            {t("refund")}
+          </button>
+        ) : null}
         {manage && row.status !== "cancelled" && !event.cancelled ? (
           <MoreMenu label={t("personActions", { name: row.person.nickname ?? "?" })} items={[{ label: t("remove"), onSelect: () => setSheet("remove") }]} />
         ) : null}
       </div>
       <ErrorLine message={eventError(act.error)} />
       {sheet === "paid" ? <PaidSheet event={event} row={row} onClose={() => setSheet(null)} /> : null}
+      {sheet === "refund" ? <RefundSheet event={event} row={row} onClose={() => setSheet(null)} /> : null}
       {sheet === "remove" ? (
         <Sheet
           labelId={["remove", userId].join("-")}
@@ -333,16 +414,158 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
   );
 }
 
+function PersonLine({ row, notes }: { row: StaffAttendee; notes: (string | null)[] }) {
+  return (
+    <>
+      <PersonAvatar name={row.person.nickname} url={row.person.avatar_url} />
+      <span className="min-w-0">
+        <span className="block truncate font-bold" style={{ color: "var(--text)" }}>{row.person.nickname ?? "?"}</span>
+        {notes.length > 0 ? <span className="block text-xs" style={{ color: "var(--dim)" }}>{notes.join(" · ")}</span> : null}
+      </span>
+    </>
+  );
+}
+
+function refundLabel(row: StaffAttendee, event: StaffEvent, locale: string) {
+  const cents = row.refund_cents ?? row.amount_cents ?? 0;
+  return new Intl.NumberFormat(locale, { style: "currency", currency: event.currency || "EUR" }).format(cents / 100);
+}
+
+/**
+ * ADR-185 «Επιστροφή»: records that a paid place was given back, all of it
+ * or part. The money moves outside Palee, like «Πλήρωσε».
+ */
+function RefundSheet({ event, row, onClose }: { event: StaffEvent; row: StaffAttendee; onClose: () => void }) {
+  const t = useTranslations("EventsAdmin");
+  const locale = useLocale();
+  const eventError = useEventError();
+  const { tokens } = useSession();
+  const scope = useConsoleScope();
+  const applied = useStaffAction(event.id);
+  const [amount, setAmount] = useState("");
+  const cents = amount.trim() ? Math.round(Number(amount.trim().replace(",", ".")) * 100) : null;
+  const invalid = cents != null && (!Number.isFinite(cents) || cents <= 0 || cents > (row.amount_cents ?? 0));
+  const refund = useMutation({
+    mutationFn: async () => applied(await refundAttendee(tokens!.access_token, event.id, row.person.id, cents, scope.slug)),
+    onSuccess: onClose,
+  });
+  const paid = new Intl.NumberFormat(locale, { style: "currency", currency: event.currency || "EUR" }).format((row.amount_cents ?? 0) / 100);
+  return (
+    <Sheet
+      labelId={["refund", row.person.id].join("-")}
+      eyebrow={[row.person.nickname ?? "?", paid].join(" · ")}
+      title={t("refundTitle")}
+      onClose={onClose}
+      footer={
+        <>
+          <SheetButton onClick={onClose}>{t("keep")}</SheetButton>
+          <SheetButton primary disabled={refund.isPending || invalid} onClick={() => refund.mutate()}>{t("refund")}</SheetButton>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("refundBody", { amount: paid })}</p>
+        <Field label={t("refundAmount")}>
+          <input
+            inputMode="decimal"
+            value={amount}
+            aria-invalid={invalid}
+            onChange={(change) => setAmount(change.target.value.replace(/[^\d.,]/g, "").slice(0, 8))}
+            placeholder={String((row.amount_cents ?? 0) / 100)}
+            className="min-h-11 rounded-2xl px-3 text-sm font-normal"
+            style={inputStyle}
+          />
+        </Field>
+        <ErrorLine message={eventError(refund.error)} />
+      </div>
+    </Sheet>
+  );
+}
+
+/**
+ * ADR-185 co-hosts: ask a box by its page address, see who answered, take
+ * a co-host off. An accepted co-host shows the event on its page and feed.
+ */
+function CohostsPanel({ event }: { event: StaffEvent }) {
+  const t = useTranslations("EventsAdmin");
+  const eventError = useEventError();
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? "";
+  const scope = useConsoleScope();
+  const queryClient = useQueryClient();
+  const [boxSlug, setBoxSlug] = useState("");
+  const cohosts = useQuery({
+    queryKey: eventCohostsKey(event.id),
+    enabled: Boolean(token),
+    queryFn: () => fetchEventCohosts(token, event.id, scope.slug),
+  });
+  const put = (rows: Awaited<ReturnType<typeof fetchEventCohosts>>) => queryClient.setQueryData(eventCohostsKey(event.id), rows);
+  const invite = useMutation({
+    mutationFn: () => inviteCohost(token, event.id, boxSlug.trim(), scope.slug),
+    onSuccess: (rows) => {
+      put(rows);
+      setBoxSlug("");
+    },
+  });
+  const remove = useMutation({ mutationFn: (cohostId: string) => removeCohost(token, event.id, cohostId, scope.slug), onSuccess: put });
+  const rows = (cohosts.data ?? []).filter((row) => row.status !== "removed");
+
+  return (
+    <Panel title={t("cohostsTitle")}>
+      <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("cohostsHint")}</p>
+      {rows.length > 0 ? (
+        <ul className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
+          {rows.map((row) => (
+            <li key={row.id} className="flex flex-wrap items-center gap-3 py-2">
+              <span className="min-w-0 grow truncate font-semibold" style={{ color: "var(--text)" }}>{row.box.name ?? row.box.slug ?? "?"}</span>
+              <Badge muted={row.status !== "accepted"}>{t(["cohostStatus", row.status].join("_"))}</Badge>
+              {row.status === "declined" ? null : (
+                <MoreMenu
+                  label={t("cohostActions", { name: row.box.name ?? "?" })}
+                  items={[{ label: t("cohostRemove"), onSelect: () => remove.mutate(row.id) }]}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <form
+        className="flex flex-wrap items-end gap-2"
+        onSubmit={(submit) => {
+          submit.preventDefault();
+          if (boxSlug.trim()) invite.mutate();
+        }}
+      >
+        <span className="grow">
+          <Field label={t("cohostSlug")}>
+            <input
+              value={boxSlug}
+              maxLength={200}
+              onChange={(change) => setBoxSlug(change.target.value)}
+              placeholder={t("cohostSlugPlaceholder")}
+              className="min-h-11 rounded-2xl px-3 text-sm font-normal"
+              style={inputStyle}
+            />
+          </Field>
+        </span>
+        <SheetButton type="submit" disabled={!boxSlug.trim() || invite.isPending}>{t("cohostInvite")}</SheetButton>
+      </form>
+      <ErrorLine message={eventError(invite.error) ?? eventError(remove.error)} />
+    </Panel>
+  );
+}
+
 /** «Πλήρωσε»: how they paid at the box (a Finance receipt when they have a record there). */
 function PaidSheet({ event, row, onClose }: { event: StaffEvent; row: StaffAttendee; onClose: () => void }) {
   const t = useTranslations("EventsAdmin");
   const price = usePriceLabel();
   const eventError = useEventError();
   const { tokens } = useSession();
+  const scope = useConsoleScope();
   const applied = useStaffAction(event.id);
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const pay = useMutation({
-    mutationFn: async () => applied(await markPaid(tokens!.access_token, event.id, row.person.id, method)),
+    mutationFn: async () => applied(await markPaid(tokens!.access_token, event.id, row.person.id, method, scope.slug)),
     onSuccess: onClose,
   });
   return (
@@ -378,8 +601,9 @@ function MessageSheet({ event, onClose }: { event: StaffEvent; onClose: () => vo
   const t = useTranslations("EventsAdmin");
   const eventError = useEventError();
   const { tokens } = useSession();
+  const scope = useConsoleScope();
   const [body, setBody] = useState("");
-  const send = useMutation({ mutationFn: () => messageAttendees(tokens!.access_token, event.id, body.trim()) });
+  const send = useMutation({ mutationFn: () => messageAttendees(tokens!.access_token, event.id, body.trim(), scope.slug) });
   return (
     <Sheet
       labelId={["message", event.id].join("-")}
@@ -418,8 +642,9 @@ function TrialOfferSheet({ event, onClose }: { event: StaffEvent; onClose: () =>
   const eventError = useEventError();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
+  const scope = useConsoleScope();
   const send = useMutation({
-    mutationFn: () => sendTrialOffer(tokens!.access_token, event.id),
+    mutationFn: () => sendTrialOffer(tokens!.access_token, event.id, scope.slug),
     onSuccess: () => invalidateEvents(queryClient),
   });
   return (

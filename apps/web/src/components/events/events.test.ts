@@ -239,12 +239,26 @@ describe("the create form", () => {
   it("tags «Καλό για φίλους» only where a friend can come", () => {
     expect(eventRequest({ ...form, openToAll: false, guestPass: false }).good_for_friends).toBe(false);
     expect(eventRequest({ ...form, openToAll: false }).good_for_friends).toBe(true);
-    expect(eventRequest(form, { group: true }).good_for_friends).toBe(false);
+    expect(eventRequest({ ...form, groupOnly: true }, { group: true }).good_for_friends).toBe(false);
   });
 
-  it("keeps a member group's event free, for its members and without guests", () => {
-    expect(eventRequest(form, { group: true })).toMatchObject({ price_cents: 0, open_to_non_members: false, guest_pass_allowed: false, guests_per_member: 0 });
+  it("lets a member group's admin pick the price, who it is for and guest passes (ADR-185)", () => {
+    expect(eventRequest({ ...form, groupOnly: true }, { group: true })).toMatchObject({
+      price_cents: 1550,
+      audience: "group",
+      open_to_non_members: false,
+      guest_pass_allowed: false,
+      guests_per_member: 0,
+    });
+    expect(eventRequest({ ...form, groupOnly: false }, { group: true })).toMatchObject({ audience: "open", open_to_non_members: true, guest_pass_allowed: true });
+    expect(eventRequest({ ...form, groupOnly: false, openToAll: false }, { group: true }).audience).toBe("club");
     expect(eventRequest(form, { editing: true }).repeat_until).toBeUndefined();
+  });
+
+  it("makes a person's own event open or by invitation, never with guest passes", () => {
+    expect(eventRequest(form, { mode: "self" })).toMatchObject({ audience: "open", open_to_non_members: true, guest_pass_allowed: false, guests_per_member: 0 });
+    expect(eventRequest({ ...form, openToAll: false }, { mode: "self" })).toMatchObject({ audience: "club", open_to_non_members: false });
+    expect(eventRequest({ ...form, groupOnly: true }, { mode: "self" }).audience).toBe("open");
   });
 
   it("fills the form from an event for editing", () => {
