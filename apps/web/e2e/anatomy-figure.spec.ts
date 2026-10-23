@@ -48,7 +48,7 @@ test("renders the figure, picks, focuses and shares one context across thumbnail
 
   await page.goto("/dev/anatomy");
   const figure = page.locator("[data-anatomy-status]");
-  await waitForFigure(page, figure);
+  await waitForFigure(figure);
   await expect(figure).toHaveAttribute("data-anatomy-status", "ready");
   await expect(figure).toHaveAttribute("aria-label", /Primary: .*Quadriceps/);
   expect(glb).toEqual(expect.arrayContaining(["/anatomy/v1/muscles.glb", "/anatomy/v1/bones.glb"]));

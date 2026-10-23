@@ -211,7 +211,7 @@ test("the goals sheet opens the atlas on a muscle; the panel, breadcrumb, figure
 
   // The 3D figure loads and frames the muscle.
   const figure = page.getByTestId("atlas-figure").locator("[data-anatomy-status]");
-  await waitForFigure(page, figure);
+  await waitForFigure(figure);
   await expect(figure).toHaveAttribute("data-anatomy-status", "ready");
   await expect(figure).toHaveAttribute("data-anatomy-framed", "quadriceps");
   await expect(figure).toHaveAttribute("aria-label", /Primary: Quadriceps/);

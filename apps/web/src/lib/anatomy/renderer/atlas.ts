@@ -176,17 +176,29 @@ export class AnatomyScene {
   }
 }
 
+/** The browser could not make a WebGL context at all: the figure cannot render on this device. */
+export class WebglUnavailableError extends Error {
+  constructor(cause: unknown) {
+    super("WebGL is unavailable", { cause });
+    this.name = "WebglUnavailableError";
+  }
+}
+
 /**
  * A WebGL renderer for the figure. Multisampling is the first thing a weak or
  * busy GPU (or a software one) refuses, so a context that cannot be made with
- * it is retried once without it before the caller shows its fallback.
+ * it is retried once without it; when that fails too, WebglUnavailableError.
  */
 export function createRenderer(canvas?: HTMLCanvasElement, preserveDrawingBuffer = false): THREE.WebGLRenderer {
   let renderer: THREE.WebGLRenderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer });
   } catch {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer });
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer });
+    } catch (error) {
+      throw new WebglUnavailableError(error);
+    }
   }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;

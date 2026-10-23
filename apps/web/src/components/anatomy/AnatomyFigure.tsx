@@ -81,6 +81,8 @@ function LiveFigure({
   const controllerRef = useRef<FigureController | null>(null);
   const onPickRef = useRef(onPick);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // Why the figure could not render: no WebGL on this device, or anything else.
+  const [failure, setFailure] = useState<"webgl" | "load" | null>(null);
   const pickable = onPick != null;
 
   // Latest values for the mount effect, which must not re-run on every change.
@@ -113,8 +115,10 @@ function LiveFigure({
         controllerRef.current = created;
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setFailure(error instanceof Error && error.name === "WebglUnavailableError" ? "webgl" : "load");
+        setStatus("error");
       });
     return () => {
       cancelled = true;
@@ -150,6 +154,7 @@ function LiveFigure({
       title={interactive ? t("figure.interactiveHint") : undefined}
       tabIndex={interactive ? 0 : undefined}
       data-anatomy-status={status}
+      data-anatomy-failure={failure ?? undefined}
       className={`relative overflow-hidden rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] ${sizeClass} ${className}`}
     >
       {status !== "ready" ? (

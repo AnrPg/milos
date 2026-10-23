@@ -70,6 +70,16 @@ describe("AnatomyFigure", () => {
     expect(screen.getByRole("img", { name: "Body figure. No muscles highlighted." })).toBeInTheDocument();
   });
 
+  it("says why it failed: no WebGL context, or anything else", async () => {
+    const noWebgl = Object.assign(new Error("WebGL is unavailable"), { name: "WebglUnavailableError" });
+    createFigure.mockRejectedValueOnce(noWebgl).mockRejectedValueOnce(new Error("atlas 404"));
+    const { unmount } = wrap(<AnatomyFigure highlights={{}} />);
+    await waitFor(() => expect(screen.getByRole("img")).toHaveAttribute("data-anatomy-failure", "webgl"));
+    unmount();
+    wrap(<AnatomyFigure highlights={{}} />);
+    await waitFor(() => expect(screen.getByRole("img")).toHaveAttribute("data-anatomy-failure", "load"));
+  });
+
   it("renders a static thumb through the shared thumbnail renderer", async () => {
     renderThumb.mockResolvedValue("data:image/png;base64,AAAA");
     const { container } = wrap(<AnatomyFigure highlights={{ deltoid: "primary" }} size="thumb" />);
