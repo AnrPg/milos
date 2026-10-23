@@ -76,7 +76,8 @@
     "messages": "Сообщения",
     "messagesUnread": "Сообщения (непрочитанных: {count})",
     "socialApp": "Соцсеть",
-    "shop": "Магазин"
+    "shop": "Магазин",
+    "switchProfile": "Сменить профиль"
   },
   "Profile": {
     "eyebrow": "Профиль",

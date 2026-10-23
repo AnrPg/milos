@@ -76,7 +76,8 @@
     "messages": "Mensajes",
     "messagesUnread": "Mensajes ({count} sin leer)",
     "socialApp": "Social",
-    "shop": "Tienda"
+    "shop": "Tienda",
+    "switchProfile": "Cambiar de perfil"
   },
   "Profile": {
     "eyebrow": "Perfil",

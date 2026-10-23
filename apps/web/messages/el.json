@@ -76,7 +76,8 @@
     "messages": "Μηνύματα",
     "messagesUnread": "Μηνύματα ({count} αδιάβαστα)",
     "socialApp": "Social",
-    "shop": "Κατάστημα"
+    "shop": "Κατάστημα",
+    "switchProfile": "Αλλαγή προφίλ"
   },
   "Profile": {
     "eyebrow": "Λογαριασμός",

@@ -76,7 +76,8 @@
     "messages": "הודעות",
     "messagesUnread": "הודעות (לא נקראו: {count})",
     "socialApp": "חברתי",
-    "shop": "חנות"
+    "shop": "חנות",
+    "switchProfile": "החלפת פרופיל"
   },
   "Profile": {
     "eyebrow": "פרופיל",

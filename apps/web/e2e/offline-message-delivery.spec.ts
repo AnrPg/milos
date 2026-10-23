@@ -118,6 +118,11 @@ async function mockAuthenticatedApi(
     if (path.startsWith("/api/notifications")) {
       return json(route, { notifications: [], unread_count: 0 });
     }
+    // "/" is the member's Feed (ADR-137), whose ✈ button opens messages; it
+    // needs real list shapes, or the empty-object fallback crashes it.
+    if (path === "/api/me/feed") return json(route, { posts: [], pinned: [], next_cursor: null });
+    if (path === "/api/me/clubs") return json(route, { clubs: [] });
+    if (path === "/api/me/trials") return json(route, { trials: [] });
     if (path === "/api/my/finance") return json(route, {});
     if (path === "/api/theme") return json(route, {});
 
