@@ -6815,6 +6815,7 @@
     "placeAddress": "Περιοχή γύρω από αυτή τη διεύθυνση",
     "placeAdding": "Προσθήκη…",
     "worldwideUnavailable": "Η παγκόσμια αναζήτηση δεν είναι διαθέσιμη αυτή τη στιγμή, οπότε βλέπεις μόνο μέρη που ήδη γνωρίζουμε.",
+    "placesAttribution": "Τοποθεσίες: © συντελεστές OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Περιοχή",
     "from": "Από: {place}",
     "searchingFrom": "Αναζήτηση από: {place}",

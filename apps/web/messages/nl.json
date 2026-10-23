@@ -6815,6 +6815,7 @@
     "placeAddress": "Gebied rond dit adres",
     "placeAdding": "Toevoegen…",
     "worldwideUnavailable": "Wereldwijd zoeken lukt nu niet, dus je ziet alleen plaatsen die we al kennen.",
+    "placesAttribution": "Plaatsen: © OpenStreetMap-bijdragers, GeoNames (CC BY 4.0)",
     "placeUnknown": "Gebied",
     "from": "Vanaf: {place}",
     "searchingFrom": "Zoeken vanaf: {place}",

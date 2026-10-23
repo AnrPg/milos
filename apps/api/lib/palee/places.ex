@@ -15,7 +15,8 @@ defmodule Palee.Places do
     Origin,
     SearchArea,
     SearchKey,
-    WorldPlace
+    WorldPlace,
+    GeonamesPlace
   }
 
   # The filter.
@@ -86,9 +87,24 @@ defmodule Palee.Places do
   defdelegate area_for_address(address, local, english), to: WorldPlace
   defdelegate world_place_id(slug), to: WorldPlace, as: :id
 
+  # Towns worldwide from GeoNames (ADR-188).
+  defdelegate geonames_place(line, admin1, countries), to: GeonamesPlace, as: :from_line
+  defdelegate geonames_admin1_names(lines), to: GeonamesPlace, as: :admin1_names
+  defdelegate geonames_country_names(lines), to: GeonamesPlace, as: :country_names
+  defdelegate duplicates_known_place?(place, known), to: GeonamesPlace, as: :duplicate?
+  defdelegate upsert_reference_places(source, places), to: GazetteerStore, as: :upsert_many
+  defdelegate reference_refreshed_at(source), to: GazetteerStore, as: :refreshed_at
+  defdelegate reference_places(source), to: GazetteerStore, as: :list_source
+
   @doc "Stores a geocoded place (or refreshes it) and returns the gazetteer row."
   def import_neighbourhood(place),
-    do: GazetteerStore.import(Map.put(place, :search_key, WorldPlace.search_key(place)))
+    do:
+      GazetteerStore.import(
+        Map.merge(place, %{
+          search_key: WorldPlace.search_key(place),
+          name_key: WorldPlace.name_key(place)
+        })
+      )
 
   # «Η περιοχή μου».
   defdelegate home_area(context), to: HomeAreaStore, as: :list

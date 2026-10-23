@@ -43,7 +43,7 @@ import {
 } from "./around";
 import { useMyInterests } from "@/components/interests/InterestsEditor";
 
-import { PlaceOption, useAroundError, useNeighbourhoodName } from "./AreaPicker";
+import { PlaceOption, PlacesAttribution, useAroundError, useNeighbourhoodName } from "./AreaPicker";
 import { useAround, useAroundArea, useNeighbourhoodSearch, useResolvePlace, useSavedFilterActions } from "./use-around";
 
 /** «2,5 km» in the reader's numbers. */
@@ -529,6 +529,7 @@ function AroundFilterSheet({
           </ul>
         ) : null}
         <ErrorLine message={aroundError(resolvePlace.error)} />
+        {placeQuery.trim().length >= 2 ? <PlacesAttribution /> : null}
       </FilterSection>
 
       <FilterSection label={t("sectionWhat")}>

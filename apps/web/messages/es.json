@@ -6815,6 +6815,7 @@
     "placeAddress": "Zona alrededor de esta dirección",
     "placeAdding": "Añadiendo…",
     "worldwideUnavailable": "La búsqueda mundial no está disponible ahora, así que solo se muestran lugares que ya conocemos.",
+    "placesAttribution": "Lugares: © colaboradores de OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Zona",
     "from": "Desde: {place}",
     "searchingFrom": "Buscando desde: {place}",

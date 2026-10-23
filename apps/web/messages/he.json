@@ -6815,6 +6815,7 @@
     "placeAddress": "האזור סביב הכתובת הזו",
     "placeAdding": "מוסיפים…",
     "worldwideUnavailable": "החיפוש העולמי לא זמין כרגע, לכן מוצגים רק מקומות שכבר מוכרים לנו.",
+    "placesAttribution": "מקומות: © תורמי OpenStreetMap, ‏GeoNames (CC BY 4.0)",
     "placeUnknown": "אזור",
     "from": "מ: {place}",
     "searchingFrom": "חיפוש מ: {place}",
