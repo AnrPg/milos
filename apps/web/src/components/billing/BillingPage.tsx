@@ -4,52 +4,34 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import type { EffectiveEntitlement } from "@/api/my-finance";
-import {
-  fetchMyBilling,
-  fetchProviderRefundReceiptDocument,
-  getProviderInvoiceDownloadUrl,
-  MY_BILLING_QUERY_KEY,
-  type BillingProvider,
-  type BillingSubscription,
-} from "@/api/my-billing";
+import { fetchMyBilling, MY_BILLING_QUERY_KEY, type BillingProvider, type BillingSubscription } from "@/api/my-billing";
 import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollmentCard";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { AccessNotice, EntitlementCard, formatDate, StatusBadge } from "@/components/finance/MembershipEntitlement";
-import { RefundReceiptDocumentDialog } from "@/components/finance/RefundReceiptDocumentDialog";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useHasBillingProviders } from "@/lib/billing-providers";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 
-import {
-  billingDocuments,
-  billingTab,
-  DOCUMENT_FILTER_THRESHOLD,
-  filterDocuments,
-  sessionsLeft,
-  validityProgress,
-  type BillingDocument,
-  type BillingTab,
-  type DocumentFilter,
-} from "./billing-model";
-
-type T = ReturnType<typeof useTranslations<"Billing">>;
+import { billingTab, sessionsLeft, validityProgress, type BillingTab } from "./billing-model";
+import { OffersSegment } from "./OffersSegment";
+import { Detail, Empty, Row } from "./parts";
+import { TransactionsSegment } from "./TransactionsSegment";
 
 /**
  * Εγώ › Πληρωμές (vision §6.3, §7.11): per gym or coach the person is a
  * client of. A summary on top (package, what is left, balance, one way to
  * reach the box), then three segments in `?tab=`: «Συνδρομή» (package,
- * allowances, history, corporate plan), «Αποδείξεις» (invoices, payments and
- * refund receipts in one list) and «Προσφορές» (offers, seasons, referral
- * rewards, trials). Members cannot buy or cancel here (staff assign
+ * allowances, history, corporate plan), «Συναλλαγές» (the complete money
+ * history, events at any host included) and «Προσφορές» (codes to use,
+ * offers claimed, seasons, referral rewards, trials). Members cannot buy or cancel here (staff assign
  * packages), so those needs go to «Επικοινωνία με το box». Several providers
  * get a dropdown (`?box=`). People without a provider never see the entry,
  * and the route sends them back to Εγώ.
@@ -91,7 +73,9 @@ export function BillingPage() {
   function setParam(key: "box" | "tab", value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
-    router.replace(`?${params.toString()}`, { scroll: false });
+    // A segment is a step Back returns from; switching provider is not.
+    if (key === "tab") router.push(`?${params.toString()}`, { scroll: false });
+    else router.replace(`?${params.toString()}`, { scroll: false });
   }
 
   if (status !== "authenticated" || isLoading || !hasBillingProviders) {
@@ -180,7 +164,7 @@ function ProviderBilling({
         onChange={onTab}
         options={[
           { value: "membership", label: t("tabMembership") },
-          { value: "documents", label: t("tabDocuments") },
+          { value: "transactions", label: t("tabTransactions") },
           { value: "offers", label: t("tabOffers") },
         ]}
       />
@@ -188,10 +172,10 @@ function ProviderBilling({
       <div id={panelId} role="tabpanel" aria-labelledby={`billing-tab-${tab}`} className="flex min-w-0 flex-col gap-4">
         {tab === "membership" ? (
           <MembershipSegment provider={provider} entitlement={entitlement} onEnrolled={onEnrolled} />
-        ) : tab === "documents" ? (
-          <DocumentsSegment provider={provider} />
+        ) : tab === "transactions" ? (
+          <TransactionsSegment organizationId={provider.organization_id} />
         ) : (
-          <OffersSegment provider={provider} />
+          <OffersSegment provider={provider} currency={currencyOf(provider)} />
         )}
       </div>
     </section>
@@ -344,303 +328,12 @@ function SubscriptionDetails({ subscription }: { subscription: BillingSubscripti
   );
 }
 
-// ─── «Αποδείξεις» ────────────────────────────────────────────────────────────
-
-function DocumentsSegment({ provider }: { provider: BillingProvider }) {
-  const t = useTranslations("Billing");
-  const locale = useUiLocale();
-  const documents = billingDocuments(provider);
-  const [filter, setFilter] = useState<DocumentFilter>("all");
-  const [open, setOpen] = useState<BillingDocument | null>(null);
-  const shown = filterDocuments(documents, documents.length > DOCUMENT_FILTER_THRESHOLD ? filter : "all");
-
-  if (documents.length === 0) return <Empty>{t("noDocuments")}</Empty>;
-
-  return (
-    <>
-      {documents.length > DOCUMENT_FILTER_THRESHOLD ? (
-        <Select
-          aria-label={t("filterDocuments")}
-          value={filter}
-          onValueChange={(value) => setFilter(value as DocumentFilter)}
-          className="min-h-11 w-full rounded-2xl px-3 text-sm font-semibold"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-        >
-          <option value="all">{t("filterAll")}</option>
-          <option value="invoice">{t("filterInvoices")}</option>
-          <option value="payment">{t("filterPayments")}</option>
-          <option value="refund">{t("filterRefunds")}</option>
-        </Select>
-      ) : null}
-      <HubCard>
-        <ul className="flex flex-col">
-          {shown.map((document) => (
-            <li key={document.key} style={{ borderBottom: "1px solid var(--border)" }}>
-              <button
-                type="button"
-                onClick={() => setOpen(document)}
-                className="flex min-h-12 w-full min-w-0 items-center gap-3 py-2.5 text-start"
-              >
-                <KindIcon kind={document.kind} />
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{documentTitle(t, document)}</span>
-                  <span className="truncate text-xs" style={{ color: "var(--dim)" }}>{document.date ? formatDate(locale, document.date) : "—"}</span>
-                </span>
-                <span className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--text)" }}>
-                    {formatMinorUnits(locale, document.amountCents, document.currency)}
-                  </span>
-                  {document.status ? <StatusBadge status={document.status} /> : null}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </HubCard>
-      {open ? <DocumentDialog document={open} slug={provider.slug} onClose={() => setOpen(null)} /> : null}
-    </>
-  );
-}
-
-function DocumentDialog({ document, slug, onClose }: { document: BillingDocument; slug: string; onClose: () => void }) {
-  const t = useTranslations("Billing");
-  const locale = useUiLocale();
-  const { tokens } = useSession();
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [receipt, setReceipt] = useState<string | null>(null);
-
-  async function download() {
-    if (!tokens?.access_token) return;
-    setBusy(true);
-    setFailed(false);
-    try {
-      if (document.kind === "refund") {
-        setReceipt(await fetchProviderRefundReceiptDocument(tokens.access_token, slug, document.id, locale));
-      } else {
-        const data = await getProviderInvoiceDownloadUrl(tokens.access_token, slug, document.id);
-        if (data?.download_url) window.open(data.download_url, "_blank", "noopener,noreferrer");
-      }
-    } catch {
-      setFailed(true);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (receipt) {
-    return <RefundReceiptDocumentDialog html={receipt} receiptNumber={document.number ?? ""} onClose={onClose} />;
-  }
-
-  return (
-    <Dialog
-      onClose={onClose}
-      title={documentTitle(t, document)}
-      closeLabel={t("close")}
-      variant="sheet"
-      size="sm"
-      footer={
-        <>
-          <DialogButton onClick={onClose}>{t("close")}</DialogButton>
-          {document.downloadable ? (
-            <DialogButton tone="primary" onClick={() => void download()} disabled={busy}>
-              {document.kind === "refund" ? t("view") : t("download")}
-            </DialogButton>
-          ) : null}
-        </>
-      }
-    >
-      <dl className="flex flex-col gap-2 text-sm">
-        <Detail label={t("amount")} value={formatMinorUnits(locale, document.amountCents, document.currency)} />
-        <Detail label={t("date")} value={document.date ? formatDate(locale, document.date) : "—"} />
-        {document.status ? <Detail label={t("status")} value={<StatusBadge status={document.status} />} /> : null}
-        {document.kind === "invoice" && document.dueDate ? <Detail label={t("dueDate")} value={formatDate(locale, document.dueDate)} /> : null}
-        {document.kind === "invoice" && (document.balanceDueCents ?? 0) > 0 ? (
-          <Detail label={t("outstanding")} value={formatMinorUnits(locale, document.balanceDueCents ?? 0, document.currency)} />
-        ) : null}
-        {document.method ? <Detail label={t("method")} value={<SemanticLabel value={document.method} />} /> : null}
-        {document.invoiceNumber ? <Detail label={t("invoice")} value={document.invoiceNumber} /> : null}
-        {document.reason ? <Detail label={t("reason")} value={document.reason} /> : null}
-      </dl>
-      {!document.downloadable ? <p className="mt-3 text-xs" style={{ color: "var(--dim)" }}>{t("noPdf")}</p> : null}
-      {failed ? <p className="mt-3 text-xs" role="alert" style={{ color: "var(--danger)" }}>{t("downloadFailed")}</p> : null}
-    </Dialog>
-  );
-}
-
-function documentTitle(t: T, document: BillingDocument) {
-  const label =
-    document.kind === "payment"
-      ? t("payment")
-      : document.kind === "refund"
-        ? t("refund")
-        : document.documentKind === "receipt"
-          ? t("receipt")
-          : t("invoice");
-  return document.number ? `${label} ${document.number}` : label;
-}
-
-function KindIcon({ kind }: { kind: BillingDocument["kind"] }) {
-  const glyph = kind === "invoice" ? "🧾" : kind === "payment" ? "€" : "↩";
-  return (
-    <span
-      aria-hidden="true"
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
-      style={{ background: "var(--panel-muted)", color: kind === "refund" ? "var(--success)" : "var(--text-soft)" }}
-    >
-      {glyph}
-    </span>
-  );
-}
-
-// ─── «Προσφορές» ─────────────────────────────────────────────────────────────
-
-function OffersSegment({ provider }: { provider: BillingProvider }) {
-  const t = useTranslations("Billing");
-  const locale = useUiLocale();
-  const currency = currencyOf(provider);
-  const referrals = provider.referrals;
-  const hasReferrals = referrals.invited > 0 || referrals.credits.length > 0;
-  const empty = provider.promotions.length === 0 && provider.seasons.length === 0 && provider.trials.length === 0 && !hasReferrals;
-  const inviteLink = (
-    <Link
-      href={`/me/referrals?box=${encodeURIComponent(provider.slug)}`}
-      className="inline-flex min-h-11 items-center text-sm font-semibold"
-      style={{ color: "var(--primary-strong)" }}
-    >
-      {t("inviteFriend")} ›
-    </Link>
-  );
-
-  if (empty) {
-    return (
-      <div className="flex flex-col">
-        <Empty>{t("noOffers")}</Empty>
-        {inviteLink}
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {provider.promotions.length > 0 ? (
-        <HubCard eyebrow={t("offersTitle")}>
-          <ul className="flex flex-col">
-            {provider.promotions.map((promotion) => (
-              <Row
-                key={promotion.id}
-                title={promotion.campaign_name ?? t("offer")}
-                detail={promotion.redeemed_at ? formatDate(locale, promotion.redeemed_at) : null}
-                end={<span className="text-sm font-semibold" style={{ color: "var(--success)" }}>{discountText(t, locale, promotion, currency)}</span>}
-              />
-            ))}
-          </ul>
-        </HubCard>
-      ) : null}
-      {provider.seasons.length > 0 ? (
-        <HubCard eyebrow={t("seasonsTitle")}>
-          <ul className="flex flex-col">
-            {provider.seasons.map((season) => (
-              <Row
-                key={season.id}
-                title={season.title}
-                detail={`${formatDate(locale, season.starts_on)} – ${formatDate(locale, season.ends_on)}`}
-                end={<StatusBadge status={season.status} />}
-              />
-            ))}
-          </ul>
-        </HubCard>
-      ) : null}
-      <HubCard eyebrow={t("referralsTitle")}>
-        {hasReferrals ? (
-          <>
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-              {t("referralCounts", { invited: referrals.invited, paid: referrals.paid })}
-            </p>
-            {referrals.credit_total_cents > 0 ? (
-              <p className="mt-1 text-sm font-bold tabular-nums" style={{ color: "var(--success)" }}>
-                {t("rewardsTotal", { amount: formatMinorUnits(locale, referrals.credit_total_cents, currency) })}
-              </p>
-            ) : null}
-            {referrals.credits.length > 0 ? (
-              <ul className="mt-2 flex flex-col">
-                {referrals.credits.map((credit) => (
-                  <Row
-                    key={credit.id}
-                    title={credit.description ?? t("referralReward")}
-                    detail={credit.occurred_on ? formatDate(locale, credit.occurred_on) : null}
-                    end={<span className="text-sm font-semibold tabular-nums">{formatMinorUnits(locale, credit.amount_cents, credit.currency)}</span>}
-                  />
-                ))}
-              </ul>
-            ) : null}
-          </>
-        ) : null}
-        {inviteLink}
-      </HubCard>
-      {provider.trials.length > 0 ? (
-        <HubCard eyebrow={t("trialsTitle")}>
-          <ul className="flex flex-col">
-            {provider.trials.map((trial) => (
-              <Row
-                key={trial.id}
-                title={trial.class_name ?? t("trial")}
-                detail={trial.class_starts_at ? formatDate(locale, trial.class_starts_at) : null}
-                end={<StatusBadge status={trial.status} />}
-              />
-            ))}
-          </ul>
-        </HubCard>
-      ) : null}
-    </>
-  );
-}
-
 // ─── small parts ─────────────────────────────────────────────────────────────
 
 function contactHref(provider: BillingProvider) {
   return provider.contact.box_chat_slug ? `/b/${encodeURIComponent(provider.contact.box_chat_slug)}/chat` : "/me/activity/chats";
 }
 
-function Row({ title, detail, end }: { title: ReactNode; detail?: ReactNode; end?: ReactNode }) {
-  return (
-    <li className="flex min-w-0 items-center justify-between gap-3 py-2.5" style={{ borderBottom: "1px solid var(--border)" }}>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="break-words text-sm font-semibold" style={{ color: "var(--text)" }}>{title}</span>
-        {detail ? <span className="break-words text-xs" style={{ color: "var(--dim)" }}>{detail}</span> : null}
-      </div>
-      {end ? <div className="shrink-0">{end}</div> : null}
-    </li>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="flex min-w-0 items-center justify-between gap-3">
-      <dt style={{ color: "var(--dim)" }}>{label}</dt>
-      <dd className="min-w-0 break-words text-end font-semibold" style={{ color: "var(--text)" }}>{value}</dd>
-    </div>
-  );
-}
-
-function Empty({ children }: { children: ReactNode }) {
-  return <p className="text-sm" style={{ color: "var(--dim)" }}>{children}</p>;
-}
-
 function currencyOf(provider: BillingProvider) {
   return provider.invoices[0]?.currency ?? provider.payments[0]?.currency ?? "EUR";
-}
-
-function discountText(t: T, locale: string, promotion: BillingProvider["promotions"][number], currency: string) {
-  const value = promotion.discount_value;
-  switch (promotion.discount_type) {
-    case "percent":
-      return value == null ? t("discount") : `−${value}%`;
-    case "fixed_amount":
-      return value == null ? t("discount") : `−${formatMinorUnits(locale, value, currency)}`;
-    case "free_period":
-      return t("freePeriod");
-    default:
-      return t("discount");
-  }
 }
