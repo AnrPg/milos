@@ -11,7 +11,7 @@ enum PaleeTheme {
     static let border = dynamic(light: 0xDFE2E8, dark: 0x2C2F37)
     static let primary = dynamic(light: 0x2F5BFF, dark: 0x5B7CFF)
     static let primaryContrast = dynamic(light: 0xFFFFFF, dark: 0x0E0F12)
-    static let spark = dynamic(light: 0xE4FF6E, dark: 0xE4FF6E)
+    static let spark = dynamic(light: 0xC8FF4D, dark: 0xE4FF6E)
     static let sparkContrast = dynamic(light: 0x17181C, dark: 0x17181C)
 
     private static func dynamic(light: UInt32, dark: UInt32) -> Color {

@@ -28,6 +28,7 @@ import {
   QUICK_PRESETS,
 } from "@/lib/free-text-timer";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { workoutPublishedHref } from "@/lib/workout-return";
 import {
   describePreset,
   emptySection,
@@ -231,7 +232,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
       const draft = await updateDraftWorkout(accessToken, draftId, payload);
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       await publishWorkoutDraft(accessToken, draftId, { ...payload, expected_source_revision: revisionRef.current });
-      router.push(adminHref("/admin/workouts", organizationSlug));
+      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
     } catch (error) {
       const details = error instanceof ApiError ? (error.payload?.details as { sections?: SectionProblem[] } | undefined) : undefined;
       if (details?.sections?.length) {

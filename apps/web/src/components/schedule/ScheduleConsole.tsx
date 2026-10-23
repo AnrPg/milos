@@ -7,6 +7,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
 import {
@@ -36,6 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
 import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
+import { FirstClassTypeDialog } from "@/components/schedule/FirstClassTypeDialog";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
@@ -50,7 +52,10 @@ import { can } from "@/lib/role-navigation";
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
 import { dateTimeLocalInZone, dateTimeLocalToIso, zoneLabel, zonedText, zonedToInstant } from "@/lib/zoned-time";
-import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/organization-slug";
+import { RETURNED_WORKOUT_PARAM, newWorkoutHref } from "@/lib/workout-return";
+import { WodPicker } from "@/components/schedule/WodPicker";
+import { stashClassDraft, takeClassDraft } from "@/components/schedule/class-draft-handoff";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
@@ -69,6 +74,14 @@ type SeriesEditorState = {
   excludedDates: string;
   timezone: string;
 };
+
+/** What staff were adding when the gym turned out to have no class type yet. */
+type PendingCreate = { kind: "slot"; isoDate: string } | { kind: "series" };
+
+/** A class form left open for the WOD editor ("+ New WOD"). */
+type ClassDraft = { kind: "slot"; editor: SlotEditorState } | { kind: "series"; editor: SeriesEditorState };
+
+const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !type.archived_at);
 
 // ADR-179: a class's date and time are typed on the gym's clock (`zone`),
 // whatever the device's zone; without one, the device's clock.
@@ -132,6 +145,9 @@ export function ScheduleConsole({
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
   const [editor, setEditor] = useState<SlotEditorState | null>(null);
   const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
+  const [pendingCreate, setPendingCreate] = useState<PendingCreate | null>(null);
+  const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   // ADR-176: series follow the gym's time zone, not the editing device's.
   const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
@@ -293,6 +309,30 @@ export function ScheduleConsole({
     }
   }, [initialOpenSlotId, schedule]);
 
+  // Back from the WOD editor: reopen the class form as the coach left it, with
+  // the WOD they just published (`?wod=`) chosen, then tidy the address.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const returnedWorkoutId = url.searchParams.get(RETURNED_WORKOUT_PARAM);
+    const draft = takeClassDraft<ClassDraft>();
+    if (returnedWorkoutId) {
+      url.searchParams.delete(RETURNED_WORKOUT_PARAM);
+      router.replace(`${url.pathname}${url.search}`, { scroll: false });
+    }
+    if (!draft) return;
+    const master_workout_id = returnedWorkoutId ?? draft.editor.values.master_workout_id;
+    const frame = window.requestAnimationFrame(() => {
+      if (draft.kind === "slot") setEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
+      else setSeriesEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [router]);
+
+  function createNewWod(draft: ClassDraft) {
+    stashClassDraft(draft);
+    router.push(newWorkoutHref(adminHref("/admin/workouts/new", organizationSlug), window.location.pathname));
+  }
+
   const editorDateValue = useMemo(() => {
     if (!editor) return "";
     return formatDateTimeLocal(editor.values.scheduled_at, gymZone);
@@ -430,20 +470,27 @@ export function ScheduleConsole({
     }
   }
 
-  function openCreateEditor(isoDate: string) {
-    if (!classTypes.some((type) => !type.archived_at)) {
-      setError(t("createPrerequisites"));
+  // ADR-176: a class needs a class type, never a WOD. A gym without any type
+  // names its first one inline and goes on to the class it was adding.
+  function openCreateEditor(isoDate: string, types: ClassTypeRecord[] = classTypes) {
+    if (!hasActiveClassType(types)) {
+      setPendingCreate({ kind: "slot", isoDate });
       return;
     }
 
     setEditor({
       slotId: null,
-      values: defaultSlotValues(isoDate, classTypes, schedulingDefaults, gymZone),
+      values: defaultSlotValues(isoDate, types, schedulingDefaults, gymZone),
     });
   }
 
-  function openSeriesEditor() {
-    const base = defaultSlotValues(startDate, classTypes, schedulingDefaults, gymZone);
+  function openSeriesEditor(types: ClassTypeRecord[] = classTypes) {
+    if (!hasActiveClassType(types)) {
+      setPendingCreate({ kind: "series" });
+      return;
+    }
+
+    const base = defaultSlotValues(startDate, types, schedulingDefaults, gymZone);
     setSeriesEditor({
       values: {
         master_workout_id: null,
@@ -557,7 +604,7 @@ export function ScheduleConsole({
 
         {isAdmin ? (
           <div className="flex justify-end">
-            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button>
+            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={() => openSeriesEditor()}>{i18n("featureCreateSeries")}</button>
           </div>
         ) : null}
 
@@ -566,7 +613,7 @@ export function ScheduleConsole({
         ) : null}
 
         {error ? (
-          <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
+          <div className="rounded-[1.6rem] px-5 py-4 text-sm" role="alert" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 19%, transparent)", color: "var(--primary-strong)" }}>
             {error}
           </div>
         ) : null}
@@ -598,7 +645,7 @@ export function ScheduleConsole({
             days={days}
             isAdmin={isAdmin}
             locations={locations}
-            onCreateSlot={openCreateEditor}
+            onCreateSlot={(isoDate) => openCreateEditor(isoDate)}
             onSelectSlot={setSelectedSlot}
             slots={schedule}
             startDate={startDate}
@@ -721,33 +768,32 @@ export function ScheduleConsole({
         >
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { label: t("workout"), type: "select" as const },
                 { label: t("classType"), type: "select-type" as const },
                 { label: i18n("featureClassName"), type: "name" as const },
-                { label: i18n("featureDurationMinutes"), type: "number-duration" as const },
+                { label: t("workout"), type: "select" as const },
                 { label: t("scheduledAt"), type: "datetime" as const },
+                { label: i18n("featureDurationMinutes"), type: "number-duration" as const },
                 { label: t("capacity"), type: "number-cap" as const },
                 { label: t("timeoutMinutes"), type: "number-timeout" as const },
-              ].map(({ label, type }) => (
-                <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
-                  <span>{label}</span>
-                  {type === "select" ? (
-                    <Select
-                      className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      onValueChange={(value) =>
+              ].map(({ label, type }) =>
+                type === "select" ? (
+                  <div key={label} className="md:col-span-2">
+                    <WodPicker
+                      label={label}
+                      workouts={workouts}
+                      value={editor.values.master_workout_id ?? null}
+                      onChange={(workoutId) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, master_workout_id: value || null } } : current,
+                          current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current,
                         )
                       }
-                      value={editor.values.master_workout_id ?? ""}
-                    >
-                      <option value="">{i18n("classNoWodYet")}</option>
-                      {workouts.map((workout) => (
-                        <option key={workout.id} value={workout.id}>{workout.title}</option>
-                      ))}
-                    </Select>
-                  ) : type === "select-type" ? (
+                      onCreateNew={() => createNewWod({ kind: "slot", editor })}
+                    />
+                  </div>
+                ) : (
+                <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
+                  <span>{label}</span>
+                  {type === "select-type" ? (
                     <Select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -832,7 +878,8 @@ export function ScheduleConsole({
                     />
                   )}
                 </label>
-              ))}
+                ),
+              )}
             </div>
 
             <label className="mt-4 flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--muted)" }}>
@@ -877,6 +924,21 @@ export function ScheduleConsole({
         </Dialog>
       ) : null}
 
+      {pendingCreate && tokens?.access_token ? (
+        <FirstClassTypeDialog
+          token={tokens.access_token}
+          onClose={() => setPendingCreate(null)}
+          onCreated={(classType) => {
+            const next = [...classTypes, classType];
+            const pending = pendingCreate;
+            setClassTypes(next);
+            setPendingCreate(null);
+            if (pending.kind === "slot") openCreateEditor(pending.isoDate, next);
+            else openSeriesEditor(next);
+          }}
+        />
+      ) : null}
+
       {seriesEditor ? (
         <Dialog
           onClose={() => setSeriesEditor(null)}
@@ -888,10 +950,19 @@ export function ScheduleConsole({
           }
         >
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
-              <label className="text-sm font-semibold">{i18n("classSeriesWod")}<Select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id ?? ""} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: value || null } })}><option value="">{i18n("classNoWodYet")}</option>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</Select><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("classSeriesWodHint")}</span></label>
               <label className="text-sm font-semibold">{i18n("featureClassType")}<Select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
+              <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
+              <div className="sm:col-span-2">
+                <WodPicker
+                  label={i18n("classSeriesWod")}
+                  workouts={workouts}
+                  value={seriesEditor.values.master_workout_id ?? null}
+                  onChange={(workoutId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: workoutId } })}
+                  onCreateNew={() => createNewWod({ kind: "series", editor: seriesEditor })}
+                  noneHint={i18n("classSeriesWodHint")}
+                />
+              </div>
+              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
               <label className="text-sm font-semibold">{i18n("featureStarts")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.startDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, startDate: value })} /></label>
               <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} value={seriesEditor.endDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, endDate: value })} /></label>
               <label className="text-sm font-semibold">{i18n("featureTime")}<TimeInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.time} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, time: value })} /></label>
