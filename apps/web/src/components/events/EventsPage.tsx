@@ -6,6 +6,9 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { NearbyEvents } from "@/components/around/Nearby";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { distinctOptions, listFilterCount, picked } from "@/components/filters/list-filter";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 
 import { EventList } from "./EventParts";
@@ -13,6 +16,9 @@ import { HostedEventSheet, useEventHosts } from "./HostedEventSheet";
 import { useClubsEvents } from "./use-events";
 
 type Segment = "clubs" | "near";
+
+/** «Τα clubs μου» filters (vision §7.2 «Events»), remembered on `events`; client-side, the list is whole. */
+const EVENTS_SHAPE = { club: "many", free: "toggle", going: "toggle" } as const;
 
 /**
  * Events (board 8 Q5, mockup `eventsScreen`): «Τα clubs μου», upcoming
@@ -29,6 +35,17 @@ export function EventsPage({ nearFirst = false }: { nearFirst?: boolean }) {
   const hosts = useEventHosts();
   const hosting = (hosts.data ?? []).some((host) => Boolean(host.organization_id && host.slug));
   const [creating, setCreating] = useState(false);
+  const { filter, setFilter } = useListFilter("events", EVENTS_SHAPE);
+  const all = events.data ?? [];
+  const shown = filter
+    ? all.filter(
+        (event) =>
+          picked(filter.club, event.club_id) &&
+          (!filter.free || event.price_cents === 0) &&
+          (!filter.going || event.my?.status === "going" || event.my?.status === "waitlisted"),
+      )
+    : all;
+  const narrowed = filter !== null && listFilterCount(filter) > 0;
 
   return (
     <HubPage
@@ -62,14 +79,28 @@ export function EventsPage({ nearFirst = false }: { nearFirst?: boolean }) {
           </button>
         ))}
       </div>
+      {segment === "clubs" && filter && all.length > 0 ? (
+        <ListFilters
+          shape={EVENTS_SHAPE}
+          fields={[
+            { key: "club", label: t("filterClub"), options: distinctOptions(all, (event) => event.club_id, (event) => event.club.name ?? "") },
+            { key: "free", label: t("filterFree"), section: t("filterPrice") },
+            { key: "going", label: t("filterGoing"), section: t("filterMine") },
+          ]}
+          filter={filter}
+          onChange={setFilter}
+          title={t("filtersTitle")}
+          resultCount={shown.length}
+        />
+      ) : null}
       {segment === "clubs" ? (
         <HubCard eyebrow={t("myClubs")}>
           {events.isPending ? (
             <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-          ) : (events.data ?? []).length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("emptyClubs")}</p>
+          ) : shown.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{narrowed && all.length > 0 ? t("filtersNoMatch") : t("emptyClubs")}</p>
           ) : (
-            <EventList events={events.data ?? []} />
+            <EventList events={shown} />
           )}
         </HubCard>
       ) : (
