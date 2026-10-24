@@ -72,9 +72,8 @@ export function HomeHub() {
         </div>
       }
     >
-      {clubs.data && clubs.data.length > 0 ? (
-        <ClubBar clubs={clubs.data} />
-      ) : null}
+      {/* Always there, so «+ Βρες» is reachable before the first club (vision §6.1). */}
+      <ClubBar clubs={clubs.data ?? []} />
       <ScopeToggle current="clubs" />
       <GreetingCard
         nickname={currentUser?.nickname ?? ""}
