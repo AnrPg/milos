@@ -833,6 +833,8 @@ defmodule Palee.Infrastructure.Community.EctoCommunityStore do
     |> media_shown_to(viewer_id)
     |> not_reported_by(viewer_id)
     |> maybe_author(Map.get(filter, :author_id))
+    |> of_kinds(Map.get(filter, :kinds))
+    |> by_authors(Map.get(filter, :authors))
     |> before(Map.get(filter, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
     |> limit(^filter.limit)
@@ -906,6 +908,26 @@ defmodule Palee.Infrastructure.Community.EctoCommunityStore do
 
   defp maybe_author(query, nil), do: query
   defp maybe_author(query, author_id), do: where(query, [p], p.author_id == ^author_id)
+
+  # ADR-197 feed filters: a post of any of the kinds, by staff of its gym.
+  defp of_kinds(query, nil), do: query
+
+  defp of_kinds(query, %{channel_ids: channel_ids, attachment_types: types}),
+    do: where(query, [p], p.channel_id in ^channel_ids or p.attachment_type in ^types)
+
+  defp by_authors(query, nil), do: query
+
+  defp by_authors(query, authors) do
+    condition =
+      Enum.reduce(authors, dynamic(false), fn {organization_id, author_ids}, acc ->
+        dynamic(
+          [p],
+          ^acc or (p.organization_id == ^organization_id and p.author_id in ^author_ids)
+        )
+      end)
+
+    where(query, ^condition)
+  end
 
   defp only_ids(query, nil), do: query
   defp only_ids(query, ids), do: where(query, [p], p.id in ^ids)

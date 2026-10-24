@@ -17,7 +17,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
-  avatarHue,
+  avatarTone,
   filterDirectory,
   initialsOf,
   roleCounts,
@@ -275,12 +275,12 @@ function Avatar({ user }: { user: AdminUserDirectoryEntry }) {
     return <img src={user.avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />;
   }
 
-  const hue = avatarHue(user.id);
+  const tone = avatarTone(user.id);
   return (
     <span
       aria-hidden="true"
       className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold"
-      style={{ background: `hsl(${hue} 55% 42% / 0.22)`, color: `hsl(${hue} 60% 62%)` }}
+      style={{ background: `color-mix(in srgb, ${tone} 22%, transparent)`, color: tone }}
     >
       {initialsOf(user.nickname)}
     </span>

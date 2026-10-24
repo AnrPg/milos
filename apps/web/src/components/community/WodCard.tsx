@@ -16,18 +16,10 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 /**
  * The club's #wod-σήμερα card (ADR-138 D6, mockup «lbCard»): today's class
  * WOD, its classes, and the leaderboard of members who opted in, with the
- * member's own row and «Καταχώρησε το σκορ σου» until they log it.
+ * member's own row and «Καταχώρησε το σκορ σου» until they log it. Shown
+ * only when there is a workout today (ANR 2026-10-24, vision §4.2).
  */
-export function WodCard({
-  club,
-  showOrigin = true,
-  hideWhenEmpty = false,
-}: {
-  club: CommunityClub;
-  showOrigin?: boolean;
-  /** Αρχική shows the card only when there is a workout today (ANR 2026-10-24). */
-  hideWhenEmpty?: boolean;
-}) {
+export function WodCard({ club, showOrigin = true }: { club: CommunityClub; showOrigin?: boolean }) {
   const t = useTranslations("Community");
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -45,67 +37,61 @@ export function WodCard({
     void queryClient.invalidateQueries({ queryKey: WOD_KEY });
   }
 
-  if (hideWhenEmpty && !data?.workout) return null;
+  if (!data?.workout) return null;
 
   return (
     <HubCard eyebrow={showOrigin && wod ? `${club.name} › #${channelName(wod, t)}` : `#${channelName({ kind: "wod" }, t)}`}>
-      {card.isPending ? (
-        <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-      ) : !data?.workout ? (
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("wodNoWorkout")}</p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {/* The screen's hero (BRAND.md): the WOD on the deep surface, tagged in
-              Spark, with a Dojo edge so Spark and Graphite never stand alone. */}
-          <div
-            className="rounded-2xl p-4"
-            style={{ background: "var(--deep)", color: "var(--deep-contrast)", borderInlineStart: "4px solid var(--primary)" }}
+      <div className="flex flex-col gap-3">
+        {/* The screen's hero (BRAND.md): the WOD on the deep surface, tagged in
+            Spark, with a Dojo edge so Spark and Graphite never stand alone. */}
+        <div
+          className="rounded-2xl p-4"
+          style={{ background: "var(--deep)", color: "var(--deep-contrast)", borderInlineStart: "4px solid var(--primary)" }}
+        >
+          <span
+            className="inline-block rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.14em]"
+            style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
           >
-            <span
-              className="inline-block rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.14em]"
-              style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
-            >
-              #{channelName({ kind: "wod" }, t)}
-            </span>
-            <h2 className="mt-2 text-xl font-extrabold">{data.workout.title}</h2>
-            <p className="text-sm" style={{ opacity: 0.75 }}>
-              {[...data.classes.map((entry) => time(entry.scheduled_at)), t("wodScoreCount", { count: data.leaderboard.length })].join(" · ")}
-            </p>
-          </div>
-          {data.score ? (
-            <ol className="flex flex-col gap-1" aria-label={t("wodLeaderboard")}>
-              {data.leaderboard.map((row) => (
-                <LeaderboardRow key={row.user_id} row={row} />
-              ))}
-              {!mine ? (
-                <li className="flex items-center gap-3 rounded-xl px-2 py-1.5" style={{ background: "var(--panel-raised)" }}>
-                  <span className="w-5 text-center font-mono text-sm" style={{ color: "var(--dim)" }}>–</span>
-                  <b className="grow text-sm" style={{ color: "var(--text)" }}>{t("wodYou")}</b>
-                  <span className="text-xs" style={{ color: "var(--dim)" }}>{t("wodNoScore")}</span>
-                </li>
-              ) : null}
-            </ol>
-          ) : null}
-          {mine && !mine.opted_in ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>
-              {t("wodOptInHint")}{" "}
-              <Link href="/me/sharing" className="font-semibold underline" style={{ color: "var(--primary)" }}>
-                {t("wodOptInLink")}
-              </Link>
-            </p>
-          ) : null}
-          {!data.logged_by_me && token ? (
-            <button
-              type="button"
-              onClick={() => setLogDialog({ mode: "pick" })}
-              className="min-h-11 rounded-2xl text-sm font-semibold"
-              style={{ border: "1px solid var(--border)", color: "var(--text)" }}
-            >
-              {t("wodLogScore")}
-            </button>
-          ) : null}
+            #{channelName({ kind: "wod" }, t)}
+          </span>
+          <h2 className="mt-2 text-xl font-extrabold">{data.workout.title}</h2>
+          <p className="text-sm" style={{ opacity: 0.75 }}>
+            {[...data.classes.map((entry) => time(entry.scheduled_at)), t("wodScoreCount", { count: data.leaderboard.length })].join(" · ")}
+          </p>
         </div>
-      )}
+        {data.score ? (
+          <ol className="flex flex-col gap-1" aria-label={t("wodLeaderboard")}>
+            {data.leaderboard.map((row) => (
+              <LeaderboardRow key={row.user_id} row={row} />
+            ))}
+            {!mine ? (
+              <li className="flex items-center gap-3 rounded-xl px-2 py-1.5" style={{ background: "var(--panel-raised)" }}>
+                <span className="w-5 text-center font-mono text-sm" style={{ color: "var(--dim)" }}>–</span>
+                <b className="grow text-sm" style={{ color: "var(--text)" }}>{t("wodYou")}</b>
+                <span className="text-xs" style={{ color: "var(--dim)" }}>{t("wodNoScore")}</span>
+              </li>
+            ) : null}
+          </ol>
+        ) : null}
+        {mine && !mine.opted_in ? (
+          <p className="text-xs" style={{ color: "var(--dim)" }}>
+            {t("wodOptInHint")}{" "}
+            <Link href="/me/sharing" className="font-semibold underline" style={{ color: "var(--primary)" }}>
+              {t("wodOptInLink")}
+            </Link>
+          </p>
+        ) : null}
+        {!data.logged_by_me && token ? (
+          <button
+            type="button"
+            onClick={() => setLogDialog({ mode: "pick" })}
+            className="min-h-11 rounded-2xl text-sm font-semibold"
+            style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+          >
+            {t("wodLogScore")}
+          </button>
+        ) : null}
+      </div>
       {logDialog.mode !== "closed" && token ? (
         <TrainingLogDialog state={logDialog} token={token} onNavigate={setLogDialog} onClose={closeLog} />
       ) : null}

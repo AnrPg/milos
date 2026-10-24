@@ -6,7 +6,8 @@ defmodule Palee.Places.Domain.AroundFilterTest do
   @vocabulary %{
     disciplines: ~w(crossfit hyrox running yoga),
     audiences: ~w(beginners women_only over_40),
-    amenities: ~w(showers wheelchair_accessible accessible_restroom)
+    amenities: ~w(showers wheelchair_accessible accessible_restroom),
+    levels: ~w(beginner all_levels advanced)
   }
   @id "0b9d3f1e-6a52-4c8e-9a51-2f3b7c1d8e90"
 
@@ -68,6 +69,18 @@ defmodule Palee.Places.Domain.AroundFilterTest do
 
     assert {:ok, ^filter} =
              params |> Jason.encode!() |> Jason.decode!() |> AroundFilter.parse(@vocabulary)
+  end
+
+  test "levels are class levels, count once and reach the plan (ADR-197)" do
+    assert {:ok, filter} = AroundFilter.parse(%{levels: ["advanced", "beginner"]}, @vocabulary)
+    assert filter.levels == ~w(beginner advanced)
+    assert AroundFilter.active_count(filter) == 1
+    assert AroundFilter.to_params(filter)["levels"] == ~w(beginner advanced)
+    assert {:error, [levels: _]} = AroundFilter.parse(%{levels: ["expert"]}, @vocabulary)
+
+    viewer = %{user_id: Ecto.UUID.generate(), organization_ids: []}
+    assert AroundPlan.build(filter, viewer, DateTime.utc_now()).levels == ~w(beginner advanced)
+    assert AroundPlan.build(AroundFilter.default(), viewer, DateTime.utc_now()).levels == nil
   end
 
   test "unknown keys are ignored; a newer version is refused" do

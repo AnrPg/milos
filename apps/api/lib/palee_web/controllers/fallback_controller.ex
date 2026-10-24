@@ -26,6 +26,22 @@ defmodule PaleeWeb.FallbackController do
       {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
   }
 
+  # ADR-199: notification preferences.
+  @notification_preference_errors %{
+    unknown_category: {:not_found, "There is no such notification category"},
+    locked_category:
+      {:unprocessable_entity, "Account and payment notifications cannot be switched off"},
+    invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@notification_preference_errors, reason) do
+    {status, message} = Map.fetch!(@notification_preference_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, reason}) when is_map_key(@business_errors, reason) do
     {status, message} = Map.fetch!(@business_errors, reason)
 
@@ -1858,6 +1874,13 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: "The upload or profile was rejected."})
   end
 
+  # ADR-193: at most Palee.Guides.max_guides/0 walkthroughs per person.
+  def call(conn, {:error, :too_many_guides}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "too_many_guides", error: "Too many walkthroughs."})
+  end
+
   def call(conn, {:error, :media_not_found}) do
     conn
     |> put_status(:not_found)
@@ -2141,7 +2164,9 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "Choose at least one coach, or keep the entry private"},
     audience_not_supported: {:unprocessable_entity, "This entry cannot be shared that way"},
     export_in_progress: {:conflict, "An export is already being prepared"},
-    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"}
+    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"},
+    # ADR-196: a PR on the profile is for followers or private.
+    invalid_profile_audience: {:unprocessable_entity, "Use followers or private"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do
@@ -2231,6 +2256,7 @@ defmodule PaleeWeb.FallbackController do
     invalid_partner_level: {:unprocessable_entity, "Choose your level"},
     invalid_partner_times: {:unprocessable_entity, "Choose when you train"},
     invalid_partner_goals: {:unprocessable_entity, "Choose one to three goals"},
+    invalid_partner_disciplines: {:unprocessable_entity, "Choose up to five disciplines"},
     invalid_partner_gender: {:unprocessable_entity, "Unknown gender"},
     invalid_partner_gender_preference: {:unprocessable_entity, "Unknown preference"},
     invalid_partner_active: {:unprocessable_entity, "active must be true or false"},

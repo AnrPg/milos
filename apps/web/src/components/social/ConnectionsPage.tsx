@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 
 import { fetchPRSharing, fetchPRsSharedWithMe } from "@/api/pr-sharing";
 import {
+  fetchBuddies,
   fetchFollowers,
   fetchFollowing,
   removeFollower,
@@ -23,35 +24,43 @@ import { useSession } from "@/components/session-provider";
 import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { FollowButton } from "@/components/social/FollowButton";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
+import { PeopleResults, PeopleSearchField } from "@/components/social/PeopleSearch";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { BuddyBadge } from "@/components/social/SocialBits";
+import { CONNECTIONS_TABS, connectionsTab, isPeopleSearch, type ConnectionsTab } from "@/components/social/social-model";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
-const TABS = ["followers", "following", "boxes", "clubs", "prs"] as const;
-type Tab = (typeof TABS)[number];
-
 /**
- * Connections (plan §5a Q12), opened from the line under the name in Εγώ:
- * followers (with pending requests on top), people and boxes followed, the
- * member's clubs and PR sharing in both directions.
+ * Connections (plan §5a Q12, ADR-193 §1), opened from the line under the name
+ * in Εγώ, whose three parts open the first three tabs: Buddies (you follow
+ * each other), people who follow you only (pending requests on top), people
+ * you follow only, boxes followed, the member's clubs and PR sharing in both
+ * directions. «Βρες άτομα» on top searches all of Palee; while it holds a
+ * search, its results take the tabs' place.
  */
 export function ConnectionsPage() {
   const t = useTranslations("Social");
   const router = useRouter();
   const params = useSearchParams();
-  const requested = params.get("tab");
-  const tab: Tab = TABS.includes(requested as Tab) ? (requested as Tab) : "followers";
+  const tab = connectionsTab(params.get("tab"));
   const summary = useSocialSummary();
+  const groups = summary.data?.follow_groups;
+  const [find, setFind] = useState("");
+  const findTerm = useDebounced(find.trim(), 250);
+  const finding = isPeopleSearch(find) && isPeopleSearch(findTerm);
 
-  const label = (value: Tab) => {
+  const label = (value: ConnectionsTab) => {
     switch (value) {
+      case "buddies":
+        return t("tabBuddies", { count: groups?.buddies ?? 0 });
       case "followers":
-        return t("tabFollowers", { count: summary.data?.followers_count ?? 0 });
+        return t("tabFollowYou", { count: groups?.followers_only ?? 0 });
       case "following":
-        return t("tabFollowing", { count: summary.data?.following_count ?? 0 });
+        return t("tabYouFollow", { count: groups?.following_only ?? 0 });
       case "boxes":
         return t("tabBoxes");
       case "clubs":
@@ -63,21 +72,31 @@ export function ConnectionsPage() {
 
   return (
     <HubPage back={<BackToMe />} title={t("connectionsTitle")}>
-      <SegmentPicker
-        ariaLabel={t("connectionsTitle")}
-        idPrefix="connections"
-        panelId="connections-panel"
-        value={tab}
-        onChange={(value) => router.replace(`/me/connections?tab=${value}`, { scroll: false })}
-        options={TABS.map((value) => ({ value, label: label(value) }))}
-      />
-      <div id="connections-panel" role="tabpanel" aria-labelledby={`connections-tab-${tab}`} className="flex flex-col gap-2">
-        {tab === "followers" ? <Followers /> : null}
-        {tab === "following" ? <People type="user" /> : null}
-        {tab === "boxes" ? <People type="organization" /> : null}
-        {tab === "clubs" ? <Clubs /> : null}
-        {tab === "prs" ? <PrSharing /> : null}
-      </div>
+      <PeopleSearchField id="connections-find-people" value={find} onChange={setFind} label={t("findPeople")} />
+      {finding ? (
+        <section aria-label={t("findPeople")} className="flex flex-col gap-2">
+          <PeopleResults term={findTerm} />
+        </section>
+      ) : (
+        <>
+          <SegmentPicker
+            ariaLabel={t("connectionsTitle")}
+            idPrefix="connections"
+            panelId="connections-panel"
+            value={tab}
+            onChange={(value) => router.replace(`/me/connections?tab=${value}`, { scroll: false })}
+            options={CONNECTIONS_TABS.map((value) => ({ value, label: label(value) }))}
+          />
+          <div id="connections-panel" role="tabpanel" aria-labelledby={`connections-tab-${tab}`} className="flex flex-col gap-2">
+            {tab === "buddies" ? <Buddies /> : null}
+            {tab === "followers" ? <Followers /> : null}
+            {tab === "following" ? <People type="user" /> : null}
+            {tab === "boxes" ? <People type="organization" /> : null}
+            {tab === "clubs" ? <Clubs /> : null}
+            {tab === "prs" ? <PrSharing /> : null}
+          </div>
+        </>
+      )}
     </HubPage>
   );
 }
@@ -148,6 +167,30 @@ function List({
   );
 }
 
+function Buddies() {
+  const t = useTranslations("Social");
+  const search = useSearch();
+  const query = usePaged([...SOCIAL_KEY, "buddies", search.term], (token, cursor) => fetchBuddies(token, cursor, search.term));
+  return (
+    <>
+      <SearchField search={search} label={t("searchBuddies")} />
+      <List
+        query={query}
+        empty={t("buddiesEmpty")}
+        searching={search.term !== ""}
+        render={(entry) =>
+          entry.person ? (
+            // Every row here is a Buddy, so the marker would only repeat the tab.
+            <PersonRow key={entry.follow_id} entry={entry} marker={false}>
+              <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.person.my_status} buddy />
+            </PersonRow>
+          ) : null
+        }
+      />
+    </>
+  );
+}
+
 function Followers() {
   const t = useTranslations("Social");
   const search = useSearch();
@@ -159,12 +202,18 @@ function Followers() {
       <SearchField search={search} label={t("searchPeople")} />
       <List
         query={query}
-        empty={t("followersEmpty")}
+        empty={t("followYouEmpty")}
         searching={search.term !== ""}
         render={(entry) =>
           entry.person ? (
             <PersonRow key={entry.follow_id} entry={entry}>
-              <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.person.my_status} followsMe />
+              <FollowButton
+                targetType="user"
+                targetId={entry.person.id}
+                initialStatus={entry.person.my_status}
+                followsMe
+                buddy={entry.person.buddy}
+              />
               <RemoveFollower followId={entry.follow_id} />
             </PersonRow>
           ) : null
@@ -185,12 +234,12 @@ function People({ type }: { type: "user" | "organization" }) {
       <SearchField search={search} label={type === "user" ? t("searchPeople") : t("searchBoxes")} />
       <List
         query={query}
-        empty={type === "user" ? t("followingEmpty") : t("boxesEmpty")}
+        empty={type === "user" ? t("youFollowEmpty") : t("boxesEmpty")}
         searching={search.term !== ""}
         render={(entry) =>
           entry.person ? (
             <PersonRow key={entry.follow_id} entry={entry}>
-              <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.status} />
+              <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.status} buddy={entry.person.buddy} />
             </PersonRow>
           ) : entry.box ? (
             <Row key={entry.follow_id} href={`/b/${entry.box.slug}`} name={entry.box.name} image={entry.box.logo_url}>
@@ -203,21 +252,44 @@ function People({ type }: { type: "user" | "organization" }) {
   );
 }
 
-function PersonRow({ entry, children }: { entry: FollowEntry; children: React.ReactNode }) {
+/** A person in one of the lists: @handle under the name, and «Buddy» where it says something. */
+function PersonRow({ entry, marker = true, children }: { entry: FollowEntry; marker?: boolean; children: React.ReactNode }) {
   const person = entry.person!;
+  const detail =
+    person.handle || (marker && person.buddy) ? (
+      <span className="flex min-w-0 items-center gap-1.5 text-xs" style={{ color: "var(--dim)" }}>
+        {person.handle ? <span className="truncate">@{person.handle}</span> : null}
+        {marker && person.buddy ? <BuddyBadge /> : null}
+      </span>
+    ) : null;
   return (
-    <Row href={`/people/${person.id}`} name={person.nickname ?? "?"} image={person.avatar_url}>
+    <Row href={`/people/${person.id}`} name={person.nickname ?? "?"} image={person.avatar_url} detail={detail}>
       {children}
     </Row>
   );
 }
 
-function Row({ href, name, image, children }: { href: string; name: string; image?: string | null; children?: React.ReactNode }) {
+function Row({
+  href,
+  name,
+  image,
+  detail,
+  children,
+}: {
+  href: string;
+  name: string;
+  image?: string | null;
+  detail?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
   return (
     <li className="flex items-center gap-3 rounded-3xl p-3" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <Link href={href} className="flex min-w-0 flex-1 items-center gap-3">
         <PersonAvatar name={name} url={image} />
-        <span className="truncate font-bold" style={{ color: "var(--text)" }}>{name}</span>
+        <span className="min-w-0">
+          <span className="block truncate font-bold" style={{ color: "var(--text)" }}>{name}</span>
+          {detail}
+        </span>
       </Link>
       <div className="flex shrink-0 items-center gap-2">{children}</div>
     </li>

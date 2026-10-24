@@ -14,6 +14,7 @@ export type AroundFilter = AroundNormalizedFilter;
 export type When = NonNullable<AroundFilter["when"]>;
 export type DayTime = AroundFilter["times"][number];
 export type Cost = AroundFilter["cost"][number];
+export type Level = AroundFilter["levels"][number];
 
 export const DEFAULT_RADIUS_KM = 3;
 export const MIN_RADIUS_KM = 0.5;
@@ -24,6 +25,8 @@ export const KIND_ORDER: AroundKind[] = ["events", "boxes", "clubs", "posts"];
 export const WHENS: When[] = ["today", "tomorrow", "weekend", "week"];
 export const DAY_TIMES: DayTime[] = ["morning", "midday", "evening"];
 export const COSTS: Cost[] = ["free", "trial"];
+/** «Επίπεδο»: a class level of the box (class_types.level; ADR-197). */
+export const LEVELS = ["beginner", "all_levels", "advanced"] as const;
 /** «Έως €15», the price shortcut chip. */
 export const PRICE_CAP_CENTS = 1500;
 /** The price slider (cents): its top end means «no maximum». */
@@ -59,6 +62,7 @@ export const DEFAULT_FILTER: AroundFilter = {
   audiences: [],
   languages: [],
   amenities: [],
+  levels: [],
 };
 
 const strings = (value: unknown, allowed?: readonly string[], max = 20): string[] => {
@@ -100,6 +104,7 @@ export function parseFilter(params: unknown): AroundFilter {
     audiences: strings(raw.audiences, undefined, 10),
     languages: strings(raw.languages, undefined, 10).filter((code) => /^[a-z]{2}$/.test(code)),
     amenities: strings(raw.amenities, undefined, 10),
+    levels: strings(raw.levels, LEVELS) as Level[],
   };
 }
 
@@ -112,7 +117,7 @@ export function hasWhere(filter: AroundFilter) {
 
 /**
  * «Φίλτρα (n)», counted like the API (AroundFilter.active_count/1): where,
- * what, discipline, when, cost, audience, language and amenities count once each.
+ * what, discipline, when, cost, audience, language, amenities and level count once each.
  */
 export function activeFilterCount(filter: AroundFilter) {
   return [hasWhere(filter), ...narrowingFacets(filter)].filter(Boolean).length;
@@ -127,6 +132,7 @@ function narrowingFacets(filter: AroundFilter) {
     filter.audiences.length > 0,
     filter.languages.length > 0,
     filter.amenities.length > 0,
+    filter.levels.length > 0,
   ];
 }
 
@@ -164,6 +170,7 @@ export function filterKey(filter: AroundFilter) {
     sorted(filter.audiences),
     sorted(filter.languages),
     sorted(filter.amenities),
+    sorted(filter.levels),
   ]);
 }
 
@@ -173,6 +180,26 @@ export function sameFilter(a: AroundFilter, b: AroundFilter) {
 
 export function toggleValue<T extends string>(values: readonly T[], value: T): T[] {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+}
+
+/** «Δες όλα» (and old `/around/<kind>` links): the «what» filter narrowed to one kind. */
+export function onlyKind(filter: AroundFilter, kind: AroundKind): AroundFilter {
+  return { ...filter, kinds: [kind] };
+}
+
+/** The one kind the filter shows, when it shows exactly one: Γύρω μου then lists it in full. */
+export function singleKind(filter: AroundFilter): AroundKind | null {
+  return filter.kinds.length === 1 ? filter.kinds[0] : null;
+}
+
+/** A kind's string from a link (`?kind=`), when it names one. */
+export function parseKind(value: string | null | undefined): AroundKind | null {
+  return KIND_ORDER.find((kind) => kind === value) ?? null;
+}
+
+/** The link to Γύρω μου with one kind preselected. */
+export function aroundKindHref(kind: AroundKind) {
+  return `/around?kind=${encodeURIComponent(kind)}`;
 }
 
 /** Turning off the last kind is not allowed: the default kinds come back. */

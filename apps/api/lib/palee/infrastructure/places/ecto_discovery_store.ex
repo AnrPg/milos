@@ -2,7 +2,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
   @moduledoc """
   Discovery through the `palee_around_*` SECURITY DEFINER functions
   (ADR-154, migration `20261024100000_around_me`; the price range since
-  `20261214100000_around_price_range`). The origin goes in as a
+  `20261214100000_around_price_range`, the level since `20261218100000_around_level`). The origin goes in as a
   geography multipoint and the search area's bounding box as an envelope,
   so the spatial predicates in the functions use the GiST indexes.
   """
@@ -20,8 +20,8 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     """
     SELECT id, organization_id, latitude, longitude, distance_m, starts_at, total
     FROM palee_around_events(#{@area}, $7::timestamptz, $8::timestamptz[], $9::timestamptz[],
-      $10::integer, $11::integer, $12::text[], $13::text[], $14::text[], $15::text[], $16::timestamptz,
-      $17::timestamptz, $18::uuid, $19::integer)
+      $10::integer, $11::integer, $12::text[], $13::text[], $14::text[], $15::text[], $16::text[],
+      $17::timestamptz, $18::timestamptz, $19::uuid, $20::integer)
     """
     |> query(
       area_params(area) ++
@@ -35,6 +35,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           plan.audiences,
           plan.languages,
           plan.amenities,
+          plan.levels,
           plan.created_after,
           cursor && cursor.at,
           cursor && uuid(cursor.id),
@@ -58,7 +59,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     SELECT organization_id, location_id, latitude, longitude, distance_m, neighbourhood, city,
            takes_trials, snapshot, slug, title, logo_url, primary_color, rank, total
     FROM palee_around_boxes(#{@area}, $7::boolean, $8::uuid[], $9::text[], $10::text[], $11::text[], $12::text[],
-      $13::timestamptz, $14::integer, $15::float8, $16::uuid, $17::integer)
+      $13::text[], $14::timestamptz, $15::integer, $16::float8, $17::uuid, $18::integer)
     """
     |> query(
       area_params(area) ++
@@ -69,6 +70,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           plan.audiences,
           plan.languages,
           plan.amenities,
+          plan.levels,
           plan.created_after,
           cursor && cursor.rank,
           cursor && cursor.distance_m,
@@ -115,8 +117,8 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
   def search(_context, "clubs", area, plan, cursor, limit) do
     """
     SELECT id, organization_id, latitude, longitude, distance_m, total
-    FROM palee_around_clubs(#{@area}, $7::text[], $8::text[], $9::text[], $10::text[], $11::timestamptz,
-      $12::float8, $13::uuid, $14::integer)
+    FROM palee_around_clubs(#{@area}, $7::text[], $8::text[], $9::text[], $10::text[], $11::text[],
+      $12::timestamptz, $13::float8, $14::uuid, $15::integer)
     """
     |> query(
       area_params(area) ++
@@ -125,6 +127,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           plan.audiences,
           plan.languages,
           plan.amenities,
+          plan.levels,
           plan.created_after,
           cursor && cursor.distance_m,
           cursor && uuid(cursor.id),
@@ -147,7 +150,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     SELECT id, source, organization_id, author_id, latitude, longitude, distance_m,
            created_at, total
     FROM palee_around_posts(#{@area}, $7::timestamptz, $8::uuid, $9::text[], $10::text[], $11::text[], $12::text[],
-      $13::timestamptz, $14::timestamptz, $15::uuid, $16::integer)
+      $13::text[], $14::timestamptz, $15::timestamptz, $16::uuid, $17::integer)
     """
     |> query(
       area_params(area) ++
@@ -158,6 +161,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           plan.audiences,
           plan.languages,
           plan.amenities,
+          plan.levels,
           plan.created_after,
           cursor && cursor.at,
           cursor && uuid(cursor.id),
@@ -193,7 +197,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
       ST_MakeEnvelope($4::float8, $5::float8, $6::float8, $7::float8, 4326)::geography,
       $8::text[], $9::timestamptz, $10::timestamptz[], $11::timestamptz[], $12::integer, $13::integer,
       $14::boolean, $15::uuid[], $16::timestamptz, $17::uuid, $18::text[], $19::text[], $20::text[], $21::text[],
-      $22::timestamptz)
+      $22::text[], $23::timestamptz)
     """
     |> query([
       multipoint(area.points),
@@ -217,6 +221,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
       plan.audiences,
       plan.languages,
       plan.amenities,
+      plan.levels,
       plan.created_after
     ])
     |> Enum.reduce(%{}, fn [kind, radius, total], acc ->
@@ -234,7 +239,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     SELECT kind, id, latitude, longitude, title, slug, distance_m
     FROM palee_around_pins(#{@area}, $7::text[], $8::timestamptz, $9::timestamptz[],
       $10::timestamptz[], $11::integer, $12::integer, $13::boolean, $14::uuid[], $15::timestamptz,
-      $16::uuid, $17::text[], $18::text[], $19::text[], $20::text[], $21::integer)
+      $16::uuid, $17::text[], $18::text[], $19::text[], $20::text[], $21::text[], $22::integer)
     """
     |> query(
       area_params(area) ++
@@ -253,6 +258,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           plan.audiences,
           plan.languages,
           plan.amenities,
+          plan.levels,
           limit
         ]
     )
@@ -267,6 +273,13 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
         distance_m: distance
       }
     end)
+  end
+
+  @impl true
+  def people_within(_context, user_ids, radius_m) do
+    "SELECT palee_partner_people_within($1::uuid[], $2::float8)"
+    |> query([uuids(user_ids), radius_m * 1.0])
+    |> Enum.map(fn [id] -> load(id) end)
   end
 
   defp query(sql, params), do: Repo.query!(sql, params).rows

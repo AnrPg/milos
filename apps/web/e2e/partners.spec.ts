@@ -46,6 +46,9 @@ const options = {
   max_goals: 3,
   about_max: 140,
   daily_swipes: 200,
+  disciplines: ["crossfit", "running"],
+  max_disciplines: 5,
+  distances_km: [2, 5, 10, 25],
 };
 
 const person = (id: string, nickname: string) => ({ id, nickname, avatar_url: null });
@@ -56,7 +59,8 @@ const card = (id: string, nickname: string, shared: { times: string[]; goals: st
   times: ["early", "evening"],
   goals: ["strength", "skills"],
   about: `${nickname} trains for Hyrox`,
-  shared,
+  disciplines: [],
+  shared: { disciplines: [], ...shared },
 });
 
 const match = {
@@ -109,7 +113,7 @@ test.describe("partners", () => {
     const calls = { profile: [] as unknown[], swipes: [] as unknown[], undone: [] as string[], deckQueries: [] as string[] };
     let profile: Record<string, unknown> | null = null;
     await page.route("**/api/me/clubs/club-1/partners", (route) =>
-      route.fulfill(json({ club_id: "club-1", offered: true, unavailable_reason: null, member: true, profile, swipes_remaining: 200, options })),
+      route.fulfill(json({ club_id: "club-1", offered: true, unavailable_reason: null, member: true, profile, swipes_remaining: 200, options, distance: "available" })),
     );
     await page.route("**/api/me/clubs/club-1/partners/profile", (route) => {
       const body = route.request().postDataJSON();
@@ -155,18 +159,24 @@ test.describe("partners", () => {
     await sheet.getByRole("button", { name: "Skills" }).click();
     await sheet.getByRole("button", { name: "Competition" }).click();
     await expect(sheet.getByRole("button", { name: "Consistency" })).toBeDisabled();
+    await sheet.getByRole("button", { name: "Running" }).click();
     await sheet.getByRole("button", { name: "Turn on" }).click();
     await expect(sheet).toBeHidden();
-    expect(calls.profile[0]).toMatchObject({ active: true, times: ["early"], goals: ["strength", "skills", "competition"], gender_preference: "any" });
+    expect(calls.profile[0]).toMatchObject({ active: true, times: ["early"], goals: ["strength", "skills", "competition"], disciplines: ["running"], gender_preference: "any" });
 
     const first = page.getByTestId("partner-card");
     await expect(first).toContainText("Eleni");
     await expect(first).toContainText("You both: Intermediate · Early morning · Strength");
 
-    await page.getByRole("button", { name: "Filters" }).click();
-    await page.getByTestId("partner-filters").getByRole("button", { name: "Evening" }).click();
+    const filters = page.getByTestId("partner-filters");
+    await filters.getByRole("button", { name: "Time" }).click();
+    await page.getByRole("menuitemradio", { name: "Evening" }).click();
     await expect.poll(() => calls.deckQueries.at(-1)).toBe("?time=evening");
-    await expect(page.getByRole("button", { name: "Filters (1)" })).toBeVisible();
+    await expect(filters.getByRole("button", { name: "Filters (1)" })).toBeVisible();
+    // ADR-197: in an open club, for people shown in Around me, the distance too.
+    await filters.getByRole("button", { name: "Distance" }).click();
+    await page.getByRole("menuitemradio", { name: "Within 5 km" }).click();
+    await expect.poll(() => calls.deckQueries.at(-1)).toBe("?time=evening&within_km=5");
 
     await page.getByRole("button", { name: "Not now, Eleni" }).click();
     await expect(page.getByTestId("partner-card")).toContainText("Dimitra");
@@ -247,7 +257,7 @@ test.describe("partners", () => {
     const confirm = page.getByRole("dialog", { name: "Block Dimitra?" });
     await expect(confirm).toContainText("won't be told");
     await confirm.getByRole("button", { name: "Block" }).click();
-    await expect(page).toHaveURL(/\/me\/activity\/chats/);
+    await expect(page).toHaveURL(/\/messages\?filter=partners/);
     expect(blocked).toEqual([{ user_id: "member-3" }]);
   });
 

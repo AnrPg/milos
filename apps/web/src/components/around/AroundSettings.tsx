@@ -48,7 +48,7 @@ export function AroundVisibilitySetting() {
           aria-describedby="around-visibility-state"
           disabled={save.isPending || !summary.data}
           onClick={() => save.mutate(!visible)}
-          className="relative h-8 w-14 shrink-0 rounded-full disabled:opacity-60"
+          className="hit-area relative h-8 w-14 shrink-0 rounded-full disabled:opacity-60"
           style={{ background: visible ? "var(--primary)" : "var(--panel-raised)", border: "1px solid var(--border)" }}
         >
           <span

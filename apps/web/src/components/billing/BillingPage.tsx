@@ -20,6 +20,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useHasBillingProviders } from "@/lib/billing-providers";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 import { useOrganizationSlug } from "@/lib/organization-slug";
+import { inboxHref } from "@/components/chat/inbox/inbox-model";
 
 import { billingTab, sessionsLeft, validityProgress, type BillingTab } from "./billing-model";
 import { OffersSegment } from "./OffersSegment";
@@ -331,7 +332,7 @@ function SubscriptionDetails({ subscription }: { subscription: BillingSubscripti
 // ─── small parts ─────────────────────────────────────────────────────────────
 
 function contactHref(provider: BillingProvider) {
-  return provider.contact.box_chat_slug ? `/b/${encodeURIComponent(provider.contact.box_chat_slug)}/chat` : "/me/activity/chats";
+  return provider.contact.box_chat_slug ? `/b/${encodeURIComponent(provider.contact.box_chat_slug)}/chat` : inboxHref({ filter: provider.kind === "coach" ? "coach" : "clubs" });
 }
 
 function currencyOf(provider: BillingProvider) {

@@ -36,6 +36,8 @@ defmodule Palee.Scheduling do
   }
 
   defdelegate transaction(context, fun), to: Palee.Scheduling.SchedulingStore
+  @doc "The class levels a class type can have (ADR-197 reads them for Γύρω μου)."
+  defdelegate class_levels(), to: Palee.Scheduling.ClassType, as: :levels
   defdelegate create_slot(context, params), to: CreateSlot, as: :call
   defdelegate create_slot(params), to: CreateSlot, as: :call
   defdelegate create_class_series(context, params), to: CreateClassSeries, as: :call
@@ -124,6 +126,13 @@ defmodule Palee.Scheduling do
   @doc "The member's attendance status per class, for the classes given."
   def list_user_attendance(%{organization_id: _} = context, user_id, slot_ids),
     do: Palee.Scheduling.SchedulingStore.list_user_attendance(context, user_id, slot_ids)
+
+  @doc """
+  ADR-198: everyone's attendance on the classes given, keyed by
+  `{slot_id, user_id}`, for the staff roster (the coach's check-in desk).
+  """
+  def list_class_attendance(%{organization_id: _} = context, slot_ids),
+    do: Palee.Scheduling.SchedulingStore.list_class_attendance(context, slot_ids)
 
   @doc "ADR-155: one attendance record by id (undoing a scan)."
   def get_attendance(%{organization_id: _} = context, id),

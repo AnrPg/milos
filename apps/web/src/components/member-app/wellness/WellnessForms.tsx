@@ -398,7 +398,7 @@ function Disclosure({
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className="flex min-h-10 items-center justify-between text-sm font-semibold"
+        className="flex min-h-11 items-center justify-between text-sm font-semibold"
         style={{ color: "var(--text)" }}
       >
         {label}
@@ -419,7 +419,7 @@ function Stepper({ label, value, onChange }: { label: string; value: number; onC
           type="button"
           aria-label={t("less", { what: label })}
           onClick={() => onChange(stepPortion(value, -0.5))}
-          className="h-9 w-9 rounded-full text-lg font-bold"
+          className="hit-area h-9 w-9 rounded-full text-lg font-bold"
           style={{ background: "var(--panel-raised)", color: "var(--text)" }}
         >
           −
@@ -431,7 +431,7 @@ function Stepper({ label, value, onChange }: { label: string; value: number; onC
           type="button"
           aria-label={t("more", { what: label })}
           onClick={() => onChange(stepPortion(value, 0.5))}
-          className="h-9 w-9 rounded-full text-lg font-bold"
+          className="hit-area h-9 w-9 rounded-full text-lg font-bold"
           style={{ background: "var(--panel-raised)", color: "var(--text)" }}
         >
           +
@@ -517,7 +517,7 @@ export function CravingSheet({
           aria-label={t("craving.support")}
           disabled={Boolean(craving?.support_requested_at)}
           onClick={() => setSupport(!support)}
-          className="relative h-7 w-12 shrink-0 rounded-full disabled:opacity-60"
+          className="hit-area relative h-7 w-12 shrink-0 rounded-full disabled:opacity-60"
           style={{ background: support ? "var(--primary)" : "var(--panel-raised)", border: "1px solid var(--border)" }}
         >
           <span
@@ -638,7 +638,7 @@ export function HowDidItGo({ craving, onSaved }: { craving: Craving; onSaved: ()
             type="button"
             disabled={answer.isPending}
             onClick={() => answer.mutate(outcome)}
-            className="min-h-10 rounded-full px-3 text-sm font-semibold"
+            className="min-h-11 rounded-full px-3 text-sm font-semibold"
             style={{ border: "1px solid var(--border)", color: "var(--text)" }}
           >
             {t(`outcome.${outcome}`)}

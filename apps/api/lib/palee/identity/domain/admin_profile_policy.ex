@@ -13,7 +13,7 @@ defmodule Palee.Identity.Domain.AdminProfilePolicy do
 
   def operational_links(%{id: id, role: role}, organization_slug) do
     %{
-      messages: "/account/activity/chats",
+      messages: "/messages",
       user_id: id
     }
     |> maybe_put(

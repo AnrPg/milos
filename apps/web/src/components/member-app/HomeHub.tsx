@@ -12,6 +12,9 @@ import { gymClubFor } from "@/components/community/community";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { feedHasPosts } from "@/components/community/community";
+import { FEED_POSTS_SHAPE, PostFilters, narrowsPosts, postsFeedFilter } from "@/components/community/PostFilters";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
+import type { CommunityClub } from "@/api/community";
 import {
   useClubRealtime,
   useFeed,
@@ -37,7 +40,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * leaderboard (trials at other boxes and their follow-up after the greeting,
  * board 6), then the feed of the member's clubs (ADR-138) under the club
  * bar, with ⊕ to post and ♡ for notifications and follow requests. The WOD slot is the selected gym club's #wod-σήμερα
- * card with its leaderboard (ADR-138 D6). «Τα clubs μου | Γύρω μου» switches
+ * card with its leaderboard (ADR-138 D6). «Οι δικοί μου | Γύρω μου» switches
  * to /around (ADR-154) and is remembered.
  *
  * A card with nothing in it is not shown at all (ANR 2026-10-24, vision §4
@@ -72,9 +75,8 @@ export function HomeHub() {
         </div>
       }
     >
-      {clubs.data && clubs.data.length > 0 ? (
-        <ClubBar clubs={clubs.data} />
-      ) : null}
+      {/* Always there, so «+ Βρες» is reachable before the first club (vision §6.1). */}
+      <ClubBar clubs={clubs.data ?? []} />
       <ScopeToggle current="clubs" />
       <GreetingCard
         nickname={currentUser?.nickname ?? ""}
@@ -83,22 +85,27 @@ export function HomeHub() {
       <SupportInbox />
       <WellnessStrip />
       <MyTrialsCard />
-      {gymClub ? <WodCard club={gymClub} hideWhenEmpty /> : null}
+      {gymClub ? <WodCard club={gymClub} /> : null}
       <MyEventsCard />
       <ChallengesCard challenges={gamification?.active_challenges ?? []} />
       {gamification && membership ? (
         <LeaderboardCard leaderboard={gamification.leaderboard} />
       ) : null}
-      <ClubPosts />
+      <ClubPosts clubs={clubs.data ?? []} />
     </FeedPage>
   );
 }
 
-/** «Από το club σου»: the clubs' posts, shown only once there is one. */
-function ClubPosts() {
+/**
+ * «Από το club σου»: the clubs' posts, shown only once there is one, with
+ * the Feed/club filters (vision §7.2), remembered in the `feed` surface.
+ */
+function ClubPosts({ clubs }: { clubs: CommunityClub[] }) {
   const t = useTranslations("MemberApp");
+  const tCommunity = useTranslations("Community");
   const feed = useFeed(HOME_FEED);
-  if (!feedHasPosts(feed.data)) return null;
+  const { filter, setFilter } = useListFilter("feed", FEED_POSTS_SHAPE, "posts");
+  if (!feedHasPosts(feed.data) || filter === null) return null;
 
   return (
     <section aria-label={t("feedPosts")} className="flex flex-col gap-3">
@@ -108,7 +115,11 @@ function ClubPosts() {
       >
         {t("feedPosts")}
       </p>
-      <FeedList filter={HOME_FEED} />
+      <PostFilters shape={FEED_POSTS_SHAPE} filter={filter} onChange={setFilter} clubs={clubs} />
+      <FeedList
+        filter={narrowsPosts(filter) ? postsFeedFilter(filter, clubs) : HOME_FEED}
+        empty={narrowsPosts(filter) ? tCommunity("postsNoMatch") : undefined}
+      />
     </section>
   );
 }

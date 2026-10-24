@@ -7,7 +7,7 @@ import { clientNavItems, type NavItem } from "@/lib/role-navigation";
 /**
  * The bell sits in the bar, next to the avatar. Set to false for the 4-tab
  * fallback: the bar keeps the four tabs and the bell goes back to the Feed
- * header (♡ next to ✈), with nothing else to change.
+ * header (♡ next to Μηνύματα), with nothing else to change.
  */
 export const BELL_IN_BOTTOM_NAV = true;
 

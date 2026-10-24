@@ -15,12 +15,14 @@ import type {
 import { clubInitials } from "@/components/community/community";
 import { OpenClubRow } from "@/components/community/FindPage";
 import { PostCard } from "@/components/community/PostCard";
+import { ErrorLine } from "@/components/community/Sheet";
 import { EventPostCard } from "@/components/events/EventPostCard";
 import { HubCard } from "@/components/member-app/HubParts";
 
-import { KIND_ORDER, type ThinResults } from "./around";
+import { KIND_ORDER, onlyKind, type ThinResults } from "./around";
+import { useAroundError } from "./AreaPicker";
 import { useKm } from "./AroundFilters";
-import { useAround } from "./use-around";
+import { useAround, useAroundKind } from "./use-around";
 
 /** The id a map pin carries for an item: the gym's id for a box. */
 export function itemPinId(kind: AroundKind, item: AroundEventItem | AroundBoxItem | AroundClubItem | AroundPostItem) {
@@ -170,40 +172,44 @@ export function AroundRow({ kind, item }: { kind: AroundKind; item: Item }) {
 /**
  * The sections (board 9): Events (soonest), Box κοντά σου (trial-takers
  * first; one quiet line for people who already have a gym), Ανοιχτά clubs
- * and, when asked for, Αναρτήσεις. Each keeps its slot with an empty state
- * and offers «Δες όλα».
+ * and, when asked for, Αναρτήσεις. A section with nothing in it is hidden
+ * (vision §4.2; the «Τίποτα έως…» card speaks for an empty search). «Δες
+ * όλα» narrows «what» to that kind in place, and Γύρω μου then lists it in
+ * full (`AroundKindList`).
  */
 export function AroundSections({ data }: { data: AroundSearchResponse }) {
   const t = useTranslations("Around");
-  const km = useKm();
-  const distance = km(data.filter.radius_km);
+  const { filter, setFilter } = useAround();
+
+  function seeAll(kind: AroundKind) {
+    setFilter(onlyKind(filter, kind));
+    requestAnimationFrame(() => document.getElementById(AROUND_RESULTS_ID)?.scrollIntoView({ block: "start" }));
+  }
 
   return (
     <div className="flex flex-col gap-4">
       {KIND_ORDER.map((kind) => {
         const section = data.sections[kind];
-        if (!section) return null;
-        const items = section.items as Item[];
+        const items = (section?.items ?? []) as Item[];
+        if (!section || items.length === 0) return null;
         const collapsed = kind === "boxes" && "placement" in section && section.placement === "collapsed";
-        const body =
-          items.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t(["empty", kind].join("_"), { distance })}</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {items.map((item) => (
-                <AroundRow key={itemPinId(kind, item)} kind={kind} item={item} />
-              ))}
-            </ul>
-          );
+        const body = (
+          <ul className="flex flex-col gap-2">
+            {items.map((item) => (
+              <AroundRow key={itemPinId(kind, item)} kind={kind} item={item} />
+            ))}
+          </ul>
+        );
         const more =
-          section.total > 0 ? (
-            <Link
-              href={`/around/${kind}`}
+          section.total > items.length ? (
+            <button
+              type="button"
+              onClick={() => seeAll(kind)}
               className="mt-2 flex min-h-11 items-center text-sm font-bold"
               style={{ color: "var(--primary-strong, var(--primary))" }}
             >
               {t("seeAll", { count: section.total })}
-            </Link>
+            </button>
           ) : null;
 
         if (collapsed) return <CollapsedBoxes key={kind} total={section.total} body={body} more={more} />;
@@ -224,6 +230,65 @@ export function AroundSections({ data }: { data: AroundSearchResponse }) {
         );
       })}
     </div>
+  );
+}
+
+/** Where the results start, so «Δες όλα» can bring the full list into view. */
+export const AROUND_RESULTS_ID = "around-results";
+
+/**
+ * One kind near you in full, cursor-paged: what Γύρω μου shows when «what»
+ * is a single kind (was `/around/<kind>`). Nothing found shows nothing here;
+ * the «Τίποτα έως…» card above offers wider radii.
+ */
+export function AroundKindList({ kind }: { kind: AroundKind }) {
+  const t = useTranslations("Around");
+  const aroundError = useAroundError();
+  const { ready, queryFilter, origin } = useAround();
+  const list = useAroundKind(kind, { filter: queryFilter, origin, enabled: ready });
+  const items = (list.data?.pages ?? []).flatMap((page) => page.items as Item[]);
+
+  if (list.isPending) return null;
+  if (list.isError && items.length === 0) {
+    return (
+      <HubCard>
+        <ErrorLine message={aroundError(list.error)} />
+        <button
+          type="button"
+          onClick={() => void list.refetch()}
+          className="mt-3 min-h-11 rounded-2xl px-4 text-sm font-bold"
+          style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+        >
+          {t("retry")}
+        </button>
+      </HubCard>
+    );
+  }
+  if (items.length === 0) return null;
+
+  return (
+    <section aria-labelledby="around-kind-list" className="flex flex-col gap-2">
+      <h2 id="around-kind-list" className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+        {t(["section", kind].join("_"))}
+      </h2>
+      <ul className="flex flex-col gap-2">
+        {items.map((item) => (
+          <AroundRow key={itemPinId(kind, item)} kind={kind} item={item} />
+        ))}
+      </ul>
+      {list.hasNextPage ? (
+        <button
+          type="button"
+          onClick={() => void list.fetchNextPage()}
+          disabled={list.isFetchingNextPage}
+          className="min-h-11 rounded-2xl text-sm font-semibold disabled:opacity-50"
+          style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+        >
+          {list.isFetchingNextPage ? t("loadingMore") : t("loadMore")}
+        </button>
+      ) : null}
+      {list.isFetchNextPageError ? <ErrorLine message={aroundError(list.error)} /> : null}
+    </section>
   );
 }
 

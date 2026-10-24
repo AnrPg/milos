@@ -60,7 +60,7 @@ export function PartnersSection({ clubId }: { clubId: string }) {
           </>
         ) : (
           <>
-            <PartnerDeck clubId={clubId} options={data.options} swipesRemaining={data.swipes_remaining} />
+            <PartnerDeck clubId={clubId} options={data.options} swipesRemaining={data.swipes_remaining} distance={data.distance} />
             <TextButton onClick={() => setEditing(true)}>{t("editProfile")}</TextButton>
           </>
         )}

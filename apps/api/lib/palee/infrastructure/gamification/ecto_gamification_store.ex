@@ -556,6 +556,8 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
       on: p.user_id == o.user_id and p.challenge_id == o.challenge_id
     )
     |> where([p, _o], p.challenge_id == ^challenge_id)
+    # ADR-196: members who turned challenge rankings off are left out.
+    |> where([p, _o], not fragment("palee_hides_challenge_rankings(?)", p.user_id))
     |> order_by([p, _o], desc: p.progress)
     |> limit(50)
     |> Repo.all()
@@ -568,7 +570,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
 
     case Repo.get_by(UserGamificationPreferences, user_id: user_id) do
       nil -> nil
-      prefs -> %{off_days: prefs.off_days}
+      prefs -> UserGamificationPreferences.present(prefs)
     end
   end
 
@@ -583,7 +585,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
     |> UserGamificationPreferences.changeset(user_preferences_params(user_id, params))
     |> Repo.insert_or_update()
     |> case do
-      {:ok, prefs} -> {:ok, %{off_days: prefs.off_days}}
+      {:ok, prefs} -> {:ok, UserGamificationPreferences.present(prefs)}
       {:error, changeset} -> {:error, changeset}
     end
   end

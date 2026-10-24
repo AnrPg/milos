@@ -1,5 +1,5 @@
 import { apiRequest } from "@/api/client";
-import type { operations } from "@/api/generated/schema";
+import type { components, operations } from "@/api/generated/schema";
 
 export type NotificationsResponse =
   operations["PaleeWeb.NotificationController.index"]["responses"][200]["content"]["application/json"];
@@ -116,5 +116,35 @@ export async function deletePushSubscription(token: string, payload: DeletePushS
     method: "DELETE",
     token,
     body: payload,
+  });
+}
+
+/**
+ * ADR-199: per-category notification choices (Εγώ › Ρυθμίσεις ›
+ * Ειδοποιήσεις). Each category lists the channels it reaches people on; a
+ * locked one (account and payments) is always on.
+ */
+export type NotificationPreference = components["schemas"]["NotificationPreference"];
+export type NotificationPreferenceList = components["schemas"]["NotificationPreferenceList"];
+export type NotificationCategory = NotificationPreference["category"];
+export type NotificationChannel = "in_app" | "push";
+
+export const notificationPreferencesKey = (userId: string | null | undefined) =>
+  ["notification-preferences", userId ?? null] as const;
+
+export function fetchNotificationPreferences(token: string) {
+  return apiRequest<NotificationPreferenceList>("/notifications/preferences", { token, scope: "account" });
+}
+
+export function updateNotificationPreference(
+  token: string,
+  category: NotificationCategory,
+  change: Partial<Record<NotificationChannel, boolean>>,
+) {
+  return apiRequest<NotificationPreferenceList>(`/notifications/preferences/${encodeURIComponent(category)}`, {
+    token,
+    scope: "account",
+    method: "PUT",
+    body: change,
   });
 }

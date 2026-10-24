@@ -11,6 +11,7 @@ import { CLASS_LEVELS, fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
 import { parseLocalDate } from "@/components/schedule/calendar-window";
 import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
+import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
 import { useSession } from "@/components/session-provider";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useUiTranslations } from "@/i18n/ui";
@@ -345,6 +346,9 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
           />
         )}
       </section>
+
+      {/* Mockup «Box › Πρόγραμμα»: «Open gym · Check-in» under the classes, when the package covers it. */}
+      {token ? <OpenGymCheckIn accessToken={token} entitlement={entitlementQuery.data?.entitlement} /> : null}
 
       {filtersOpen ? (
         <ScheduleFiltersPage

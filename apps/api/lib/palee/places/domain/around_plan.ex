@@ -7,7 +7,7 @@ defmodule Palee.Places.Domain.AroundPlan do
     keeps events inside it, and clubs while it starts at free; «Δοκιμαστικό»
     keeps boxes that take trial guests. Posts have no cost and ignore it.
     «Δωρεάν» with a range reads as the range reaching down to free.
-  * **Tags** (discipline, audience, language, amenities) narrow every kind
+  * **Tags** (discipline, audience, language, amenities) and **level** narrow every kind
     through the host box's published profile; a person's post has no host
     and drops out when any tag is chosen.
   * **When** narrows events only.
@@ -64,6 +64,7 @@ defmodule Palee.Places.Domain.AroundPlan do
       audiences: nil_if_empty(filter.audiences),
       languages: nil_if_empty(filter.languages),
       amenities: nil_if_empty(filter.amenities),
+      levels: nil_if_empty(filter.levels),
       boxes_placement: if(has_gym?, do: "collapsed", else: "category"),
       created_after: nil
     }

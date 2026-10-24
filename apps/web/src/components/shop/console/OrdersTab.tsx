@@ -20,6 +20,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { orderActions, orderLabel, pickupNeedsPayment, refundableLines } from "@/lib/shop/console";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 const STATUSES: ShopOrderStatus[] = ["placed", "ready_for_pickup", "picked_up", "cancelled"];
 const STATUS_TONE: Record<ShopOrderStatus, "primary" | "spark" | "success" | "neutral"> = {
@@ -48,7 +49,7 @@ export function OrdersTab({ locationIds, branchFilter }: { locationIds?: string;
   };
 
   return (
-    <section className="flex flex-col gap-4" aria-label={t("title")}>
+    <section {...guideAnchor("shop.orders")} className="flex flex-col gap-4" aria-label={t("title")}>
       <SegmentPicker
         ariaLabel={t("filter")}
         semantics="radiogroup"

@@ -56,7 +56,7 @@ export function Pills<T extends string | number>({
             type="button"
             aria-pressed={on}
             onClick={() => onToggle(option)}
-            className="min-h-10 rounded-full px-3.5 text-sm font-semibold"
+            className="min-h-11 rounded-full px-3.5 text-sm font-semibold"
             style={{
               background: on ? "var(--primary)" : "var(--panel-raised)",
               color: on ? "var(--primary-contrast)" : "var(--text)",

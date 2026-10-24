@@ -83,7 +83,7 @@ export function SupportRequestCard({ request, openChatAfterReply = true }: { req
             type="button"
             disabled={reply.isPending}
             onClick={() => reply.mutate({ kind, text: words.trim() || null })}
-            className="min-h-10 rounded-full px-3 text-sm font-semibold disabled:opacity-50"
+            className="min-h-11 rounded-full px-3 text-sm font-semibold disabled:opacity-50"
             style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
           >
             {t(replyKey(kind))}

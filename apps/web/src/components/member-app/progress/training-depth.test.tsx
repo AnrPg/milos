@@ -104,26 +104,51 @@ describe("Πρόοδος depth sections (ADR-165)", () => {
     expect(within(load).getByText(/not medical advice/)).toBeInTheDocument();
   });
 
-  it("keeps every slot with neutral empty states, also for a {} answer", async () => {
+  // ANR 2026-10-24 (PR #101): the member's Πρόοδος hides a card with nothing in it.
+  it("hides every empty slot from the member, also for a {} answer", async () => {
     apiRequest.mockResolvedValue({});
     renderWith(<ProgressDepthSections filter={{ range: "4w", sources: [] }} />);
+    await waitFor(() => expect(apiRequest).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByRole("region", { name: "Muscle coverage" })).toBeNull());
+    expect(screen.queryByRole("region", { name: "Fitness qualities" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Training load" })).toBeNull();
+    expect(screen.queryByText("No workouts in this period.")).toBeNull();
+  });
+
+  it("keeps every slot for the coach with neutral empty states, also for a {} answer", async () => {
+    apiRequest.mockResolvedValue({});
+    renderWith(<CoachTrainingDepthPanel userId="u-1" />);
     expect(await screen.findAllByText("No workouts in this period.")).toHaveLength(3);
     expect(screen.getByRole("region", { name: "Muscle coverage" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Fitness qualities" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Training load" })).toBeInTheDocument();
   });
 
-  it("asks for more weeks before comparing load, and says there is no data", async () => {
-    apiRequest.mockResolvedValue({
+  it("asks for more weeks before comparing load, and the coach sees there is no data", async () => {
+    const empty = {
       ...depth,
       coverage: { ...depth.coverage, sessions: 0, most: [], least: [] },
       qualities: { sessions: 0, felt_entries: 0, qualities: [] },
       load: { ...depth.load, sufficient: false, ratio: null, band: null, unrated_sessions: 0, weeks: [] },
-    });
-    renderWith(<ProgressDepthSections filter={{ range: "4w", sources: [] }} />);
+    };
+    apiRequest.mockResolvedValue(empty);
+    renderWith(<CoachTrainingDepthPanel userId="u-1" />);
     expect(await screen.findAllByText("No workouts in this period.")).toHaveLength(2);
     expect(screen.getByText(/The comparison appears after 3 weeks/)).toBeInTheDocument();
     expect(screen.queryByTestId("load-band")).toBeNull();
+  });
+
+  it("shows the member only the slots that hold something", async () => {
+    apiRequest.mockResolvedValue({
+      ...depth,
+      qualities: { sessions: 0, felt_entries: 0, qualities: [] },
+      load: { ...depth.load, sufficient: false, ratio: null, band: null, unrated_sessions: 0, weeks: [] },
+    });
+    renderWith(<ProgressDepthSections filter={{ range: "4w", sources: [] }} />);
+    expect(await screen.findByRole("region", { name: "Muscle coverage" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Fitness qualities" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Training load" })).toBeNull();
+    expect(screen.queryByText("No workouts in this period.")).toBeNull();
   });
 
   it("gives the coach the client's shared view without atlas links, by range", async () => {

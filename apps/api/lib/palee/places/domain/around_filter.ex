@@ -13,6 +13,9 @@ defmodule Palee.Places.Domain.AroundFilter do
     `languages` and `amenities` from the box-profile vocabularies
     (ADR-142). Accessibility is the amenities `wheelchair_accessible` and
     `accessible_restroom`.
+  * **Επίπεδο:** `levels` among the class levels (`beginner all_levels
+    advanced`, ADR-197): a host matches when it runs a current class type
+    at one of them; like the tags, a person's post has no host and drops out.
   * **Πότε:** `when` (`today tomorrow weekend week range`, with `date_from`
     and `date_to` for a range of at most 62 days) and `times`
     (`morning midday evening`); they narrow events only.
@@ -57,7 +60,8 @@ defmodule Palee.Places.Domain.AroundFilter do
             max_price_cents: nil,
             audiences: [],
             languages: [],
-            amenities: []
+            amenities: [],
+            levels: []
 
   def version, do: @version
   def kinds, do: @kinds
@@ -75,7 +79,7 @@ defmodule Palee.Places.Domain.AroundFilter do
 
   @doc """
   Parses and normalises filter params (string or atom keys). `vocabulary`
-  holds the allowed `disciplines`, `audiences` and `amenities`. Errors are
+  holds the allowed `disciplines`, `audiences`, `amenities` and `levels`. Errors are
   `{:error, [{field, message}]}`.
   """
   def parse(params, vocabulary) when is_map(params) do
@@ -88,6 +92,7 @@ defmodule Palee.Places.Domain.AroundFilter do
          {:ok, disciplines} <- tags(:disciplines, params["disciplines"], vocabulary),
          {:ok, audiences} <- tags(:audiences, params["audiences"], vocabulary),
          {:ok, amenities} <- tags(:amenities, params["amenities"], vocabulary),
+         {:ok, levels} <- tags(:levels, params["levels"], vocabulary),
          {:ok, languages} <- languages(params["languages"]),
          {:ok, {when_, date_from, date_to}} <-
            when_(params["when"], params["date_from"], params["date_to"]),
@@ -103,6 +108,7 @@ defmodule Palee.Places.Domain.AroundFilter do
          disciplines: disciplines,
          audiences: audiences,
          amenities: amenities,
+         levels: levels,
          languages: languages,
          when: when_,
          date_from: date_from,
@@ -135,14 +141,15 @@ defmodule Palee.Places.Domain.AroundFilter do
       "max_price_cents" => filter.max_price_cents,
       "audiences" => filter.audiences,
       "languages" => filter.languages,
-      "amenities" => filter.amenities
+      "amenities" => filter.amenities,
+      "levels" => filter.levels
     }
   end
 
   @doc """
   How many facets differ from the default, for «Φίλτρα (n)»: where (a radius
   other than the default, or neighbourhoods), what, discipline, when, cost,
-  audience, language and amenities each count once.
+  audience, language, amenities and level each count once.
   """
   def active_count(%__MODULE__{} = filter) do
     [
@@ -153,7 +160,8 @@ defmodule Palee.Places.Domain.AroundFilter do
       filter.cost != [] or price_range?(filter),
       filter.audiences != [],
       filter.languages != [],
-      filter.amenities != []
+      filter.amenities != [],
+      filter.levels != []
     ]
     |> Enum.count(& &1)
   end

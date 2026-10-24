@@ -8,7 +8,11 @@ import { PostCard } from "@/components/community/PostCard";
 import { useFeed } from "@/components/community/use-community";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
-/** A feed of posts: pinned announcements first, then newest first (ADR-138). */
+/**
+ * A feed of posts: pinned announcements first, then newest first (ADR-138).
+ * With no posts it shows nothing (vision §4.2), unless the page gives an
+ * `empty` line of its own (such as «Οι αναρτήσεις μου»).
+ */
 export function FeedList({ filter, empty }: { filter: FeedFilter; empty?: string }) {
   const t = useTranslations("Community");
   const feed = useFeed(filter);
@@ -22,7 +26,7 @@ export function FeedList({ filter, empty }: { filter: FeedFilter; empty?: string
   if (feed.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (feed.isError) return <ErrorNotice>{t("loadFailed")}</ErrorNotice>;
   if (pinned.length === 0 && posts.length === 0)
-    return <p className="text-sm" style={{ color: "var(--text-soft)" }}>{empty ?? t("feedEmpty")}</p>;
+    return empty ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{empty}</p> : null;
 
   return (
     <div className="flex flex-col gap-3">

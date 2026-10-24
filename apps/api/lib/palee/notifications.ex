@@ -10,6 +10,7 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Commands.MarkNotificationRead
   alias Palee.Notifications.Commands.SaveNativePushToken
   alias Palee.Notifications.Commands.SavePushSubscription
+  alias Palee.Notifications.Domain.NotificationCategories
   alias Palee.Notifications.Domain.NotificationDedupe
   alias Palee.Notifications.NativePush
   alias Palee.Notifications.NativePushTokenStore
@@ -19,6 +20,7 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Queries.ListInboxPage
   alias Palee.Notifications.Queries.GetPushSubscriptionStatus
   alias Palee.Notifications.Queries.ListPushSubscriptions
+  alias Palee.Notifications.NotificationPreferenceStore
   alias Palee.Notifications.NotificationStore
   alias Palee.Notifications.PushSubscriptionStore
   alias Palee.Notifications.Queries.ListNotifications
@@ -161,6 +163,23 @@ defmodule Palee.Notifications do
     end
   end
 
+  # ADR-199: a person's per-category notification choices.
+  def list_preferences(context) do
+    case NotificationPreferenceStore.list(context) do
+      choices when is_list(choices) -> {:ok, NotificationCategories.resolve(choices)}
+      {:error, _reason} = error -> error
+    end
+  end
+
+  def update_preference(context, category, params, now \\ DateTime.utc_now()) do
+    with {:ok, pairs} <- NotificationCategories.parse_change(category, params),
+         :ok <- NotificationPreferenceStore.put(context, category, pairs, now) do
+      list_preferences(context)
+    end
+  end
+
+  def notification_categories, do: NotificationCategories.category_ids()
+
   def get_push_settings, do: NotificationStore.get_push_settings()
 
   def update_push_settings(params), do: NotificationStore.update_push_settings(params)
@@ -237,6 +256,40 @@ defmodule Palee.Notifications do
         follower_nickname: field(payload, :follower_nickname),
         dedupe_key: "follow_requested:#{field(payload, :follow_id)}",
         url: "/me/follow-requests"
+      })
+
+  # ADR-193 §2: a public person was followed at once.
+  def process_event("new_follower", payload),
+    do:
+      enqueue_simple(:new_follower, payload, %{
+        follow_id: field(payload, :follow_id),
+        follower_id: field(payload, :follower_id),
+        follower_nickname: field(payload, :follower_nickname),
+        dedupe_key: "new_follower:#{field(payload, :follow_id)}",
+        url: "/people/#{field(payload, :follower_id)}"
+      })
+
+  # ADR-193 §3: a message in a person conversation (who wrote, never what);
+  # a conversation that landed in requests tells its recipient once.
+  def process_event("person_message", payload),
+    do:
+      enqueue_simple(:person_message, payload, %{
+        conversation_id: field(payload, :conversation_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/messages/#{field(payload, :conversation_id)}"
+      })
+
+  def process_event("message_request", payload),
+    do:
+      enqueue_simple(:message_request, payload, %{
+        conversation_id: field(payload, :conversation_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: "message_request:#{field(payload, :conversation_id)}",
+        url: "/messages?folder=requests"
       })
 
   def process_event("follow_accepted", payload),
@@ -410,7 +463,7 @@ defmodule Palee.Notifications do
         club_name: field(payload, :club_name),
         nickname: field(payload, :partner_nickname),
         dedupe_key: field(payload, :dedupe_key),
-        url: "/partners/#{field(payload, :match_id)}"
+        url: partner_url(field(payload, :match_id))
       })
 
   def process_event("partner_message", payload),
@@ -421,7 +474,7 @@ defmodule Palee.Notifications do
         author_id: field(payload, :author_id),
         nickname: field(payload, :author_nickname),
         dedupe_key: field(payload, :dedupe_key),
-        url: "/partners/#{field(payload, :match_id)}"
+        url: partner_url(field(payload, :match_id))
       })
 
   # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
@@ -480,7 +533,7 @@ defmodule Palee.Notifications do
       enqueue_simple(:journal_export_ready, payload, %{
         export_id: field(payload, :export_id),
         dedupe_key: field(payload, :dedupe_key),
-        url: "/me/settings/export"
+        url: "/me/settings#journal-export"
       })
 
   # ADR-161 (board 16, Q6): a device stopped syncing; once per spell.
@@ -552,7 +605,7 @@ defmodule Palee.Notifications do
         booking_id: field(payload, :booking_id),
         scheduled_class_id: field(payload, :scheduled_class_id),
         status: field(payload, :status),
-        url: "/schedule"
+        url: "/box/schedule"
       })
 
   def process_event("package_expiring", payload),
@@ -562,7 +615,7 @@ defmodule Palee.Notifications do
         ends_on: field(payload, :ends_on),
         days: field(payload, :days),
         subscription_id: field(payload, :subscription_id),
-        url: "/account/billing"
+        url: "/me/payments"
       })
 
   # ADR-098 coaching notifications.
@@ -580,7 +633,7 @@ defmodule Palee.Notifications do
       enqueue_simple(:form_review_completed, payload, %{
         form_review_id: field(payload, :form_review_id),
         exercise_name: field(payload, :exercise_name),
-        url: "/coaching"
+        url: "/box/coach"
       })
 
   # ADR-176: a class still without its WOD on its day. The use case fans out
@@ -612,7 +665,7 @@ defmodule Palee.Notifications do
       })
 
   def process_event("password_reset_completed", payload),
-    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings"})
+    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings#security"})
 
   # ADR-184 follow-up: a demo business nobody used for a while will be
   # archived; once per idle spell, to each owner.
@@ -641,7 +694,7 @@ defmodule Palee.Notifications do
     do:
       enqueue_simple(:nutrition_plan_updated, payload, %{
         title: field(payload, :title),
-        url: "/coaching"
+        url: "/box/coach"
       })
 
   def process_event("appointment_booked", payload),
@@ -662,7 +715,7 @@ defmodule Palee.Notifications do
         slot_id: field(payload, :slot_id),
         kind: field(payload, :kind),
         starts_at: field(payload, :starts_at),
-        url: field(payload, :url) || "/appointments"
+        url: field(payload, :url) || "/box/appointments"
       })
 
   # ADR-100: owners and admins see when a coach takes an athlete.
@@ -772,7 +825,7 @@ defmodule Palee.Notifications do
         variant_id: field(payload, :variant_id),
         product_title: field(payload, :product_title),
         variant_title: field(payload, :variant_title),
-        url: "/box/shop/products/#{field(payload, :product_id)}"
+        url: "/box/shop/product/#{field(payload, :product_id)}"
       })
 
   def process_event("inventory_digest", payload),
@@ -827,7 +880,7 @@ defmodule Palee.Notifications do
     payload =
       payload
       |> Map.put_new(:dedupe_key, "#{type}:#{field(payload, :message_id)}")
-      |> Map.put_new(:url, "/account/activity/chats?thread=#{field(payload, :thread_id)}")
+      |> Map.put_new(:url, "/messages?thread=#{field(payload, :thread_id)}")
 
     case deliver_notification(user_id, type, payload) do
       {:ok, _notification} -> :ok
@@ -845,7 +898,7 @@ defmodule Palee.Notifications do
         :dedupe_key,
         field(payload, :dedupe_key) || "chat-message:#{field(payload, :message_id)}"
       )
-      |> Map.put_new(:url, "/account/activity/chats?thread=#{field(payload, :thread_id)}")
+      |> Map.put_new(:url, "/messages?thread=#{field(payload, :thread_id)}")
 
     case deliver_notification(user_id, :chat_message, payload) do
       {:ok, _notification} -> :ok
@@ -1011,7 +1064,7 @@ defmodule Palee.Notifications do
           workout_title: field(payload, :workout_title),
           scheduled_for: field(payload, :scheduled_for),
           dedupe_key: NotificationDedupe.batch_key(athlete_id, :workout_assigned, batch_at),
-          url: "/my-workouts"
+          url: "/box/workouts"
         })
 
       if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
@@ -1091,7 +1144,7 @@ defmodule Palee.Notifications do
       invoice_number: invoice_number,
       total_cents: total_cents,
       due_date: due_date,
-      url: "/account/billing"
+      url: "/me/payments"
     }
 
     case deliver_notification(user_id, :invoice_issued, payload) do
@@ -1116,7 +1169,7 @@ defmodule Palee.Notifications do
 
     notification_payload = %{
       outstanding_balance_cents: outstanding_cents,
-      url: "/account/billing"
+      url: "/me/payments"
     }
 
     case deliver_notification(user_id, :payment_reminder, notification_payload) do
@@ -1312,7 +1365,7 @@ defmodule Palee.Notifications do
         :cancelled_bookings
       ])
       |> Map.merge(%{
-        url: "/account/billing",
+        url: "/me/payments",
         dedupe_key: dedupe_key(type, payload)
       })
 
@@ -1419,7 +1472,7 @@ defmodule Palee.Notifications do
       status: to_string(field(booking, :status)),
       admin_message: field(booking, :admin_message),
       dedupe_key: NotificationDedupe.booking_key(user_id, type, field(booking, :id)),
-      url: "/schedule"
+      url: "/box/schedule"
     }
 
     if type == :booking_approved do
@@ -1579,4 +1632,11 @@ defmodule Palee.Notifications do
 
   def purge_tenant_data(context),
     do: Palee.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # ADR-196: a partner notice opens the match's chat, or the inbox's Partners
+  # segment when the match is unknown (there is no `/partners` index page).
+  defp partner_url(match_id) when is_binary(match_id) and match_id != "",
+    do: "/partners/#{match_id}"
+
+  defp partner_url(_match_id), do: "/messages?filter=partners"
 end

@@ -1,15 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchMyVideos, type OnDemandVideo } from "@/api/content";
 import { useSession } from "@/components/session-provider";
 import { ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { FeatureGate } from "@/components/client/FeatureGate";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { filterVideosByTag, safeVideoUrl, videoHost, videoTags } from "@/components/client/video";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+
+/** Tags (vision §7.2 «Videos»), remembered on `box_videos`. */
+const VIDEOS_SHAPE = { tag: "many" } as const;
 
 /** `/box/videos`: published on-demand videos (needs `watch_on_demand`). */
 export function VideosConsole() {
@@ -27,7 +32,7 @@ function VideoLibrary() {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
-  const [tag, setTag] = useState<string | null>(null);
+  const { filter, setFilter, empty } = useListFilter("box_videos", VIDEOS_SHAPE);
   const query = useQuery({
     queryKey: ["me", "videos"],
     enabled: Boolean(tokens?.access_token),
@@ -35,36 +40,22 @@ function VideoLibrary() {
   });
   const videos = useMemo(() => query.data ?? [], [query.data]);
   const tags = useMemo(() => videoTags(videos, locale), [videos, locale]);
-  const visible = useMemo(() => filterVideosByTag(videos, tag), [videos, tag]);
+  const visible = useMemo(() => filterVideosByTag(videos, (filter ?? empty).tag), [videos, filter, empty]);
 
-  if (query.isPending) return <LoadingLine />;
+  if (query.isPending || !filter) return <LoadingLine />;
   if (query.isError) return <QueryProblem error={query.error} onRetry={() => void query.refetch()} />;
   if (videos.length === 0) return <EmptyLine>{i18n("clVideosEmpty")}</EmptyLine>;
 
   return (
     <div className="flex flex-col gap-4">
-      {tags.length > 0 ? (
-        <div role="group" aria-label={i18n("clVideosFilterLabel")} className="flex flex-wrap gap-2">
-          {[null, ...tags].map((value) => {
-            const active = tag === value;
-            return (
-              <button
-                key={value ?? "__all"}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setTag(value)}
-                className="rounded-full px-3 py-1 text-xs font-semibold"
-                style={{
-                  background: active ? "var(--primary)" : "var(--border)",
-                  color: active ? "var(--primary-contrast)" : "var(--text-soft)",
-                }}
-              >
-                {value ?? i18n("all6a72085")}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      <ListFilters
+        shape={VIDEOS_SHAPE}
+        fields={[{ key: "tag", label: i18n("tags848eed0"), options: tags.map((tag) => ({ value: tag, label: tag })) }]}
+        filter={filter}
+        onChange={setFilter}
+        title={i18n("clVideosFilterLabel")}
+        resultCount={visible.length}
+      />
 
       {visible.length === 0 ? (
         <EmptyLine>{i18n("clVideosNoMatch")}</EmptyLine>

@@ -191,7 +191,7 @@ export function LocationPicker() {
           type="button"
           onClick={locate}
           disabled={locating}
-          className="min-h-9 rounded-full px-3 text-xs font-bold disabled:opacity-60"
+          className="min-h-11 rounded-full px-3 text-xs font-bold disabled:opacity-60"
           style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
         >
           {position ? t("usingMyLocation") : t("useMyLocation")}
@@ -225,7 +225,7 @@ export function LocationPicker() {
             {...bind()}
             aria-expanded={sheet !== "hidden"}
             aria-label={sheet === "full" ? t("collapseList") : t("expandList")}
-            className="flex h-7 shrink-0 touch-none items-center justify-center"
+            className="flex h-11 shrink-0 touch-none items-center justify-center"
           >
             <span className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
           </button>

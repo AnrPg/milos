@@ -53,7 +53,7 @@ defmodule Palee.Application.DeleteWorkout do
         kind: "assigned_workout",
         assigned_workout_id: target.assigned_workout_id,
         scheduled_for: Date.to_iso8601(target.scheduled_for),
-        url: "/my-workouts?open_assignment=#{target.assigned_workout_id}"
+        url: "/box/workouts?open_assignment=#{target.assigned_workout_id}"
       }
 
       unless Notifications.enqueue_workout_deleted(target.user_id, payload) == :ok do
@@ -71,7 +71,7 @@ defmodule Palee.Application.DeleteWorkout do
         scheduled_class_id: target.scheduled_class_id,
         scheduled_at: DateTime.to_iso8601(target.scheduled_at),
         training_type: to_string(target.training_type),
-        url: "/schedule?open_slot=#{target.scheduled_class_id}"
+        url: "/box/schedule?open_slot=#{target.scheduled_class_id}"
       }
 
       unless Notifications.enqueue_workout_deleted(target.user_id, payload) == :ok do

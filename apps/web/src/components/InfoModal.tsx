@@ -28,7 +28,7 @@ export function HelpIcon({ tooltip, onClick }: HelpIconProps) {
   const i18n = useUiTranslations();
   return (
     <button
-      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors hover:opacity-80"
+      className="hit-area flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors hover:opacity-80"
       style={{ background: "var(--border)", color: "var(--dim)", border: "1px solid var(--border-strong)" }}
       title={tooltip}
       onClick={onClick}

@@ -23,6 +23,7 @@ import {
   DEFAULT_FILTER,
   DEFAULT_RADIUS_KM,
   KIND_ORDER,
+  LEVELS,
   MAX_NEIGHBOURHOODS,
   PRICE_CAP_CENTS,
   PRICE_SLIDER,
@@ -406,6 +407,7 @@ function AroundFilterSheet({
 }) {
   const t = useTranslations("Around");
   const tags = useTranslations("BoxTags");
+  const levels = useTranslations("BoxSchedule");
   const locale = useLocale();
   const km = useKm();
   const placeName = useNeighbourhoodName();
@@ -648,6 +650,16 @@ function AroundFilterSheet({
           }))}
           selected={filter.audiences}
           onChange={(audiences) => update({ audiences })}
+        />
+      </FilterSection>
+
+      <FilterSection label={t("sectionLevel")} hint={t("levelHint")}>
+        <ChoiceChips
+          ariaLabel={t("sectionLevel")}
+          multiple
+          options={LEVELS.map((level) => ({ value: level, label: levels(`level_${level}`) }))}
+          selected={filter.levels}
+          onChange={(values) => update({ levels: values as typeof filter.levels })}
         />
       </FilterSection>
 

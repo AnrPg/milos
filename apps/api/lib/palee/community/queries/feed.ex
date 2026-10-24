@@ -21,6 +21,8 @@ defmodule Palee.Community.Queries.Feed do
           viewer_id: viewer_id,
           moderated_organization_ids: Map.get(params, :moderated_organization_ids, []),
           author_id: Map.get(params, :author_id),
+          kinds: Map.get(params, :kinds),
+          authors: Map.get(params, :authors),
           before: before,
           limit: limit + 1
         })

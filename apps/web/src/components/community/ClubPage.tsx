@@ -16,30 +16,35 @@ import {
 import { clientErrorMessage } from "@/components/client/errors";
 import { channelName, channelSections } from "@/components/community/community";
 import { ClubBar } from "@/components/community/ClubBar";
+import { ClubFeed } from "@/components/community/ClubFeed";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { GroupsCard } from "@/components/community/GroupsCard";
 import { ClubSquadsCard } from "@/components/community/squads/ClubSquadsCard";
 import { MembersTab } from "@/components/community/MembersTab";
 import { OpenClubLanding } from "@/components/community/OpenClubLanding";
+import { CLUB_POSTS_SHAPE, PostFilters, narrowsPosts, postsFeedFilter } from "@/components/community/PostFilters";
 import { MoreMenu } from "@/components/community/PostCard";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { WodCard } from "@/components/community/WodCard";
 import { ClubEventsTab } from "@/components/events/ClubEventsTab";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type ClubTab = "feed" | "channels" | "events" | "members";
 const TABS: ClubTab[] = ["feed", "channels", "events", "members"];
 const TAB_KEYS: Record<ClubTab, string> = { feed: "tabFeed", channels: "tabChannels", events: "tabEvents", members: "tabMembers" };
 
 /**
- * A club's page (vision §7.1, mockup «club», board 7): Ροή (pinned
- * announcements, the #wod-σήμερα card, then every channel's posts; or one
- * channel's posts), Κανάλια (the box's channels, member groups, class groups
+ * A club's page (vision §7.1, mockup «club», board 7): Ροή (`ClubFeed`:
+ * pinned announcement → WOD and leaderboard → challenges → PR celebrations →
+ * events → members' posts; with a filter (channel, type, coaches only, §7.2)
+ * the matching posts, newest first), Κανάλια (the box's channels, member groups, class groups
  * with the ones offered to the member first), Events (ADR-153) and Μέλη. An open
  * club the member hasn't joined shows its landing with «Μπες».
  */
@@ -49,12 +54,21 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
   const clubs = useMyClubs();
   useClubRealtime(clubs.data);
   const [tab, setTab] = useState<ClubTab>("feed");
-  const [openChannelId, setOpenChannelId] = useState<string | null>(channelId);
   const club = clubs.data?.find((entry) => entry.id === clubId);
-  const openChannel = club?.channels.find((channel) => channel.id === openChannelId) ?? null;
+  // The Ροή's filter, remembered per club; a channel link (or Κανάλια) picks the channel.
+  const remembered = useListFilter("club", CLUB_POSTS_SHAPE, clubId);
+  const [linkedChannelId, setLinkedChannelId] = useState<string | null>(channelId);
+  const posts =
+    remembered.filter && linkedChannelId ? { ...remembered.filter, channel: [linkedChannelId] } : remembered.filter;
+  const openChannel = club?.channels.find((channel) => channel.id === posts?.channel[0]) ?? null;
+
+  function changePosts(next: typeof remembered.empty) {
+    setLinkedChannelId(null);
+    remembered.setFilter(next);
+  }
 
   function showChannel(id: string) {
-    setOpenChannelId(id);
+    changePosts({ ...(posts ?? remembered.empty), channel: [id] });
     setTab("feed");
   }
 
@@ -89,12 +103,13 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
       {club.kind === "open" && club.description ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{club.description}</p>
       ) : null}
-      <div role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
+      <div {...guideAnchor("club.tabs")} role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
         {TABS.map((id) => (
           <button
             key={id}
             type="button"
             role="tab"
+            data-segment={id}
             aria-selected={tab === id}
             onClick={() => setTab(id)}
             className="min-h-11 rounded-2xl px-1 text-sm font-semibold"
@@ -118,26 +133,19 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
         <ClubEventsTab club={club} />
       ) : tab === "members" ? (
         <MembersTab club={club} />
-      ) : openChannel ? (
-        <>
-          <div className="flex items-center gap-2">
-            <p className="grow font-bold" style={{ color: "var(--text)" }}>#{channelName(openChannel, t)}</p>
-            <button
-              type="button"
-              onClick={() => setOpenChannelId(null)}
-              className="min-h-11 rounded-full px-4 text-sm font-semibold"
-              style={{ border: "1px solid var(--border)", color: "var(--text)" }}
-            >
-              {t("channelShowAll")}
-            </button>
-          </div>
-          {openChannel.kind === "wod" ? <WodCard club={club} showOrigin={false} /> : null}
-          <FeedList filter={{ clubId: club.id, channelId: openChannel.id }} />
-        </>
+      ) : posts === null ? (
+        <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : (
         <>
-          {club.kind === "gym" ? <WodCard club={club} showOrigin={false} /> : null}
-          <FeedList filter={{ clubId: club.id }} />
+          <PostFilters shape={CLUB_POSTS_SHAPE} filter={posts} onChange={changePosts} clubs={clubs.data ?? []} clubId={club.id} />
+          {narrowsPosts(posts) ? (
+            <>
+              {openChannel?.kind === "wod" ? <WodCard club={club} showOrigin={false} /> : null}
+              <FeedList filter={postsFeedFilter(posts, clubs.data ?? [], club.id)} empty={t("postsNoMatch")} />
+            </>
+          ) : (
+            <ClubFeed club={club} onShowEvents={() => setTab("events")} />
+          )}
         </>
       )}
     </HubPage>

@@ -20,11 +20,11 @@ import { RecoveryCodesSection } from "@/components/account/RecoveryCodesSection"
 import { BusinessAccountSettings } from "@/components/business/BusinessAccountSettings";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { AroundAreaSetting } from "@/components/around/AroundSettings";
 import { JournalSettingsSections } from "@/components/providers/JournalSettings";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -33,9 +33,11 @@ import {
   type AppLocale,
 } from "@/i18n/locales";
 import { PageHeader } from "@/components/PageHeader";
-import { ReplayTourButton } from "@/components/onboarding/Onboarding";
 import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
 import { BackToMe } from "@/components/member-app/me/BackToMe";
+import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
+import { JournalSectionsSetting, UnitsSetting } from "@/components/body/BodyPreferenceSettings";
+import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -67,10 +69,12 @@ export function ProfilePage() {
   const tAround = useTranslations("Around");
   const tMe = useTranslations("MemberApp");
   const tAccount = useTranslations("accountProfiles");
+  const tBody = useTranslations("Body");
+  const tFirstRun = useTranslations("FirstRun");
   const { tokens, currentUser, signOut } = useSession();
+  const selfService = showsTenantSelfServiceSurfaces(currentUser);
   const user = currentUser as CurrentUserWithAvatar | null;
   useLegacySectionRedirects();
-  const push = usePushNotifications(tokens?.access_token);
 
   const [languagePending, setLanguagePending] = useState(false);
   const [languageError, setLanguageError] = useState<string | null>(null);
@@ -169,19 +173,7 @@ export function ProfilePage() {
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
         <BackToMe />
-        <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
-
-        <Link
-          href="/me/sharing"
-          className="flex items-center justify-between gap-4 rounded-[2.4rem] p-8"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        >
-          <span>
-            <span className="block text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>{tMe("meSharing")}</span>
-            <span className="mt-1 block text-sm" style={{ color: "var(--muted)" }}>{tMe("meSharingHint")}</span>
-          </span>
-          <span aria-hidden="true" className="text-xl" style={{ color: "var(--dim)" }}>›</span>
-        </Link>
+        <PageHeader title={tProfile("title")} />
 
         <div className="flex justify-end">
           <button
@@ -239,9 +231,35 @@ export function ProfilePage() {
           <ThemeSetting />
         </CollapsibleSection>
 
+        {/* ADR-196: units and journal sections have one home, here; Σώμα links to them. */}
+        <CollapsibleSection id="units" title={tBody("unitsLabel")} description={tMe("settingsUnitsHint")} defaultOpen>
+          <UnitsSetting />
+        </CollapsibleSection>
+
+        {/* ADR-199: per-category notifications and push on this device. */}
+        <NotificationSettings />
+
         <CollapsibleSection id="around-area" title={tAround("areaTitle")} description={tAround("areaSettingHint")} defaultOpen>
           <AroundAreaSetting />
         </CollapsibleSection>
+
+        <SettingsLink href="/me/settings/interests" title={tFirstRun("interestsTitle")} hint={tFirstRun("interestsHubHint")} />
+
+        <CollapsibleSection id="journal-sections" title={tBody("sectionsLabel")} description={tMe("settingsSectionsHint")}>
+          <JournalSectionsSetting />
+        </CollapsibleSection>
+
+        <SettingsLink href="/me/settings/body" title={tBody("settingsTitle")} hint={tBody("settingsHubHint")} />
+
+        {selfService ? (
+          <CollapsibleSection
+            id="training-schedule"
+            title={i18n("trainingSchedule80e51e2")}
+            description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
+          >
+            <RestDaysSettings />
+          </CollapsibleSection>
+        ) : null}
 
         <JournalSettingsSections />
 
@@ -253,32 +271,6 @@ export function ProfilePage() {
           description={i18n("activeSessionsAndAccountProtection4aeac5f")}
         >
           <div className="space-y-4">
-            {push.supported && push.enabled && (
-              <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                      {i18n("browserPushIsOnForThisDevicea620272")}
-                    </p>
-                    <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                      {i18n("thisChoiceAppliesOnlyToThisBrowserAnd0ca4181")}
-                    </p>
-                  </div>
-                  {push.enabled ? (
-                    <button
-                      type="button"
-                      disabled={push.busy}
-                      onClick={() => void push.disablePush()}
-                      className="shrink-0 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                      style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
-                    >
-                      {push.busy ? i18n("disabling3bf14ec") : i18n("disable9a7d4e0")}
-                    </button>
-                  ) : null}
-                </div>
-                {push.error ? <ErrorNotice variant="field" className="mt-3">{push.error}</ErrorNotice> : null}
-              </div>
-            )}
             <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
               {i18n("revokeEveryRefreshSessionIncludingThisBrowserYoudd5d38f")}
             </p>
@@ -394,10 +386,27 @@ export function ProfilePage() {
   );
 }
 
+/** A settings page of its own, listed among the sections (ADR-196). */
+function SettingsLink({ href, title, hint }: { href: string; title: string; hint: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between gap-4 rounded-[2.4rem] p-8"
+      style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+    >
+      <span>
+        <span className="block text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>{title}</span>
+        <span className="mt-1 block text-sm" style={{ color: "var(--muted)" }}>{hint}</span>
+      </span>
+      <span aria-hidden="true" className="text-xl" style={{ color: "var(--dim)" }}>›</span>
+    </Link>
+  );
+}
+
 /**
  * Sections that left Ρυθμίσεις in ADR-137 keep working from old links:
- * the Vault and training history live in Ημερολόγιο › Vault, PR sharing and
- * rest days in Εγώ › Κοινοποίηση & ορατότητα.
+ * the Vault and training history live in Ημερολόγιο › Vault, PR sharing in
+ * Εγώ › Κοινοποίηση & ορατότητα. Rest days came back here (ADR-196).
  */
 function useLegacySectionRedirects() {
   const router = useRouter();
@@ -411,6 +420,5 @@ const LEGACY_SECTION_TARGETS: Record<string, string> = {
   "#vault": "/journal/vault",
   "#history": "/journal/vault#history",
   "#pr-sharing": "/me/sharing#pr-sharing",
-  "#training-schedule": "/me/sharing#training-schedule",
   "#account-activity": "/journal/reviews",
 };

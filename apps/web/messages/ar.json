@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "منزل واحد خاص تتم استضافته ذاتيًا للفصول الجماعية والبرمجة الشخصية وتنفيذ التمارين الحية ومحادثات التدريب والتقدم الذي يخص الرياضي.",
     "createAnAccount3f4f547": "إنشاء حساب",
     "signInada2e9e": "تسجيل الدخول",
-    "conversationHistory0f18fb3": "تاريخ المحادثة",
     "loading33ce417": "جارٍ التحميل…",
-    "noConversations06b83a9": "لا محادثات.",
-    "selectAConversationToViewMessagesaf2cf2c": "حدد محادثة لعرض الرسائل.",
     "availablePackages48a5129": "الحزم المتاحة",
     "closebf5d9ce": "✕ إغلاق",
     "noPackagesAvailable14160fb": "لا توجد حزم متاحة.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "تحميل .ics",
     "loadingCalendarLinks1dad320": "جارٍ تحميل روابط التقويم...",
     "writeAMessage24bf2a3": "اكتب رسالة…",
-    "chat67305ee": "← دردشة",
     "searchOrStartAConversationabb1d82": "ابحث أو ابدأ محادثة...",
     "noConversationsYetSearchToStartOne1a91cf7": "لا توجد محادثات حتى الآن. البحث لبدء واحدة.",
     "hideConversationdfb77ca": "إخفاء المحادثة",
@@ -730,8 +726,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "لا تتضمن درجات الاتساق والمثابرة الخاصة بك أيام الراحة المجدولة - ولكننا لا نعرف أي أيام هذه الأيام بعد.",
     "setYourRestDaysInProfilefd0fbe4": "قم بتعيين أيام الراحة الخاصة بك في ملف التعريف →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "اليوم هو يوم الراحة المقرر لك، والتعافي جزء من البرنامج.",
-    "dayStreakca360c4": "خط اليوم",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "أكمل تمرينك الأول لتحصل على شارتك الأولى.",
     "loadingYourTrainingOverview39806c7": "جارٍ تحميل نظرة عامة على التدريب الخاص بك...",
     "yourTrainingOverviewIsUnavailable0a82b18": "نظرة عامة على التدريب الخاص بك غير متوفرة.",
     "refreshSessionf2ed411": "تحديث الجلسة",
@@ -743,7 +737,6 @@
     "showLeaderboardOptIna95255e": "إظهار الاشتراك في لوحة المتصدرين",
     "optInRanking04c1cd3": "التقيد في الترتيب",
     "joinLeaderboardad480b1": "انضم إلى المتصدرين",
-    "noRankedUsersYetForThisPeriod2fa66a4": "لا يوجد مستخدمين مصنفين حتى الآن لهذه الفترة.",
     "leaveLeaderboard834f047": "ترك المتصدرين",
     "coachNotes2ea7a97": "ملاحظات المدرب",
     "latestGuidance58da2dc": "أحدث التوجيهات",
@@ -1294,9 +1287,6 @@
     "coaches181feb6": "المدربين",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "قم ببرمجة التقدم التدريبي والتواصل معه وفهمه دون مراقبة أو إعلانات.",
     "directMessagefc7f864": "رسالة مباشرة",
-    "workoutThreada03f1e1": "موضوع تجريب",
-    "classThreadf030236": "موضوع الطبقة",
-    "thread7863f75": "خيط",
     "eurd06e073": "يورو",
     "downloada479c9c": "تحميل",
     "billed763fe55": "فاتورة",
@@ -1546,15 +1536,10 @@
     "executionNotAvailablea9817d4": "التنفيذ غير متاح.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "تعذر تحميل الصفحة المقصودة.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "تكرار التمرين مقابل الهدف الأسبوعي – آخر 10 أسابيع",
-    "noWorkoutsYet85a9204": "لا التدريبات بعد",
-    "setAWeeklyTargetdd70e51": "حدد هدفًا أسبوعيًا",
-    "calculatingc573779": "جارٍ الحساب…",
     "howCloselyYouFollowedPrescribedExercises760e833": "مدى التزامك بالتمارين الموصوفة",
     "prs80e1569": "العلاقات العامة ·",
     "whatAreChallengesfdf13a8": "ما هي التحديات؟",
     "howDoesTheLeaderboardWork74f2b8a": "كيف تعمل لوحة المتصدرين؟",
-    "theLeaderboardIsCurrentlyUnavailableYourOptIn96132c6": "لوحة المتصدرين غير متاحة حاليًا. يتم حفظ تفضيل الاشتراك الخاص بك.",
-    "theLeaderboardStaysPrivateUntilYouExplicitlyOpt9e982f1": "تظل لوحة المتصدرين خاصة حتى تقوم بالاشتراك فيها بشكل صريح.",
     "workoutsThisWeek0268fc5": "التدريبات هذا الأسبوع",
     "prsThisMonthd85bc56": "العلاقات العامة هذا الشهر",
     "noWorkoutsInThisPeriodc124c5e": "لا توجد تدريبات في هذه الفترة",
@@ -1751,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "على سبيل المثال 4 جولات + 3 تكرارات",
     "fail2758e32": "يفشل",
     "capa8fba29": "· كاب",
-    "directbc81524": "مباشر",
-    "class41ff354": "فصل",
-    "directChat3892e2c": "الدردشة المباشرة",
     "createAndManagePromotionalOffers46d33bb": "إنشاء وإدارة العروض الترويجية.",
     "reviewReferralActivityAndRewardActions8ea1271": "قم بمراجعة نشاط الإحالة وإجراءات المكافأة.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "إدارة الحزم المستخدمة من قبل العضويات والاستحقاقات.",
@@ -3642,8 +3624,6 @@
     "clVideoUnavailable": "الرابط غير متاح",
     "clMinutesShort": "{count} د",
     "clPercentValue": "{value}٪",
-    "clProgressTitle": "تقدّمي",
-    "clProgressIntro": "تدريبك خلال آخر 12 أسبوعًا.",
     "clProgressSessions": "الجلسات",
     "clProgressMinutes": "الدقائق",
     "clProgressWorkouts": "تمارين مختلفة",
@@ -3687,7 +3667,6 @@
     "clFormReviewWithdraw": "سحب",
     "clFormReviewWithdrawConfirm": "هل تريد سحب هذا الطلب؟ ستعود المراجعة إلى باقتك.",
     "clNutritionTitle": "الخطة الغذائية",
-    "clNutritionEmpty": "لم يشارك مدربك خطة غذائية بعد.",
     "clNutritionUpdated": "حُدِّث {date}",
     "clNutritionCalories": "السعرات",
     "clNutritionProtein": "البروتين",
@@ -4313,7 +4292,6 @@
     "msgTopicFacility": "المرافق",
     "msgSendAsCoaching": "كرسالة تدريب",
     "msgSendAsCoachingHint": "تُحتسب تواصلًا تدريبيًا مع عميلك.",
-    "chatsTabBox": "النادي",
     "chatsBoxThread": "ناديك",
     "coachLatestTitle": "آخر ما أرسله مدربك",
     "coachLatestEmpty": "لا توجد رسائل من مدربك بعد.",
@@ -4461,7 +4439,36 @@
     "apiErrorAccountNotFound": "لا يوجد حساب مطابق.",
     "apiErrorUnknownDemoSection": "لا توجد بيانات تجريبية لهذه الشاشة.",
     "ntfBusinessDemoIdleTitle": "نشاطك التجريبي بانتظارك",
-    "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت."
+    "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت.",
+    "clApptFiltersTitle": "تصفية المواعيد",
+    "clApptFilterKind": "النوع",
+    "clApptFilterFormat": "الصيغة",
+    "clApptFilterCoach": "المدرب",
+    "clApptNoMatch": "لا شيء يطابق هذه الفلاتر.",
+    "reviewsFiltersTitle": "تصفية المراجعات",
+    "reviewsFilterTarget": "عن ماذا",
+    "reviewsFilterSentiment": "الانطباع",
+    "reviewsNoMatch": "لا توجد مراجعات تطابق هذه الفلاتر.",
+    "workoutsFiltersTitle": "تصفية التمارين",
+    "workoutsFilterStatus": "الحالة",
+    "workoutsStatusDone": "منجز",
+    "workoutsStatusPending": "قيد الانتظار",
+    "workoutsFilterKind": "النوع",
+    "workoutsKindPersonal": "شخصي",
+    "workoutsFilterSeason": "الموسم",
+    "clProgressOnTargetWeeks": "{onTarget} من {weeks} أسابيع ضمن الهدف",
+    "clProgressStreakDays": "{count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+    "clProgressTarget": "الهدف {count}/أسبوع",
+    "clProgressHeatmap": "أيام التمرين",
+    "clProgressHeatWeek": "أسبوع {date}: {count, plural, zero {لا حصص} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}{onTarget, select, true {، ضمن الهدف} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {بلا تمرين} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}",
+    "clProgressBadges": "الشارات",
+    "prTrendEstimated": "1RM تقديري {value} {unit}",
+    "prTrendRetest": "حان وقت إعادة الاختبار؟",
+    "clNutritionMacros": "المغذيات الكبرى",
+    "clNutritionMacrosHidden": "الأرقام مخفية",
+    "clNutritionHideMacros": "إخفاء الأرقام",
+    "clNutritionShowMacros": "إظهار الأرقام"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -5064,7 +5071,6 @@
     "signOut": "تسجيل الخروج",
     "todayWorkout": "تمرين اليوم",
     "todaySources": "تمارين اليوم حسب المصدر",
-    "todayEmpty": "لا شيء مخطط لليوم. احجز حصة أو سجّل تمرينًا خاصًا بك.",
     "classChip": "حصة {time}",
     "programmeChip": "{title} · من مدربك",
     "logWorkout": "تسجيل",
@@ -5072,8 +5078,6 @@
     "startWorkout": "ابدأ",
     "resumeWorkout": "متابعة",
     "nextSession": "حصتك التالية",
-    "noBooking": "لا يوجد حجز بعد.",
-    "bookClass": "احجز حصة",
     "manageBooking": "فتح الحجز",
     "todayLabel": "اليوم",
     "boxActions": "إجراءات النادي",
@@ -5082,7 +5086,6 @@
     "actionVideos": "الفيديوهات",
     "actionCoach": "المدرب",
     "membership": "الاشتراك",
-    "membershipNone": "لا توجد باقة نشطة.",
     "meProfileTabs": "ملفك الشخصي",
     "meAllPosts": "كل منشوراتك",
     "meAllPrs": "كل الأرقام القياسية",
@@ -5097,14 +5100,12 @@
     "meSharingHint": "ما يمكن لمدربك وللآخرين رؤيته",
     "mePayments": "المدفوعات والإيصالات",
     "mePaymentsHint": "الفواتير والمبالغ المستردة وباقتك",
-    "meChats": "المحادثات",
     "meSettings": "الإعدادات",
     "meSettingsHint": "الملف الشخصي واللغة والمظهر والحساب",
     "meTour": "جولة تعريفية",
     "meChecklist": "البدء",
     "meConsole": "الإدارة",
     "meConsoleHint": "فتح لوحة الموظفين",
-    "meMyBoxes": "نواديّ",
     "bookingStatus": {
       "approved": "محجوز",
       "pending": "قيد الانتظار",
@@ -5135,7 +5136,7 @@
       "measure": "الوزن، المحيطات، الصور",
       "wellness": "كوب، الليلة الماضية، وجبة",
       "craving": "سجّلها أو اطلب الدعم",
-      "support": "رسالة سريعة إلى رفيقك",
+      "support": "رسالة سريعة إلى رفيق دعمك",
       "voice": "قل ما قمت به"
     },
     "homeTitle": "الموجز",
@@ -5282,7 +5283,7 @@
         "glasses": "{filled} من {goal} أكواب",
         "added": "أُضيف كوب ({ml} مل)",
         "dropsLabel": "أكواب اليوم",
-        "remove": "إزالة هذا الكوب"
+        "remove": "إزالة آخر كوب"
       },
       "sleep": {
         "title": "النوم",
@@ -5364,9 +5365,6 @@
         "noPortions": "خطة مدربك لا تحتوي بعد على حصص يومية."
       },
       "mood": {
-        "mood": "المزاج {value}/4",
-        "stress": "التوتر {value}/4",
-        "empty": "كيف تشعر؟",
         "open": "أجب عن «كيف أشعر»"
       },
       "craving": {
@@ -5376,7 +5374,7 @@
         "count": "{count, plural, one {# اليوم} other {# اليوم}}",
         "edit": "تعديل",
         "support": "أحتاج إلى دعم",
-        "supportNoBuddy": "عندما تختار رفيقًا، تصله رسالة قصيرة. لا تصله التفاصيل أبدًا.",
+        "supportNoBuddy": "عندما تختار رفيق دعم، تصله رسالة قصيرة. لا تصله التفاصيل أبدًا.",
         "intensity": "ما شدتها؟",
         "trigger": "ما الذي أثارها؟",
         "outcome": "ماذا حدث؟",
@@ -5463,7 +5461,45 @@
         "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "المساعدة والجولة",
+    "meHelpHint": "الجولة، الخطوات الأولى، التواصل",
+    "meHelpResetsWaiting": "{count, plural, zero {لا توجد طلبات إعادة تعيين} one {طلب إعادة تعيين واحد بانتظارك} two {طلبا إعادة تعيين بانتظارك} few {# طلبات إعادة تعيين بانتظارك} many {# طلبًا لإعادة التعيين بانتظارك} other {# طلب إعادة تعيين بانتظارك}}",
+    "helpVisibility": "كيف تعمل الخصوصية",
+    "helpVisibilityPrivate": "كل ما تسجّله في اليوميات ملكك: لا يراه أحد غيرك ما لم تختر غير ذلك.",
+    "helpVisibilityCoach": "يرى مدرّبك فقط ما تسمح به في المشاركة. أما الإصابات فيراها دائمًا، حفاظًا على سلامتك.",
+    "helpVisibilityPosts": "تظهر منشوراتك لمن تختارهم عند نشرها: النادي أو متابعيك أو الجميع.",
+    "helpContactBox": "تواصل مع ناديك",
+    "helpContactBoxHint": "راسل ناديك من الرسائل",
+    "helpReport": "الإبلاغ عن مشكلة",
+    "helpReportSubject": "مشكلة في Palee",
+    "helpStaffOnly": "للموظفين فقط",
+    "settingsUnitsHint": "كيف يُعرض الوزن والطول والمحيطات.",
+    "settingsSectionsHint": "الأقسام الموجودة في يومياتك وكيف يظهر وزنك.",
+    "mePrsPrivate": "{count, plural, zero {لا أرقام قياسية خاصة.} one {رقم قياسي آخر خاص.} two {رقمان قياسيان آخران خاصان.} few {# أرقام قياسية أخرى خاصة.} many {# رقمًا قياسيًا آخر خاص.} other {# رقم قياسي آخر خاص.}} اختر ما يظهر من المشاركة والظهور.",
+    "mePrsNoneShown": "لا تعرض أي رقم قياسي في ملفك بعد.",
+    "sharing": {
+      "coachSeesTitle": "ما يراه مدرّبي",
+      "coachSeesHint": "ما يصل إلى مدرّبيك دون أن ترسله في كل مرة.",
+      "injuriesAlways": "تظهر الإصابات دائمًا لمدرّبك، حفاظًا على سلامتك.",
+      "communityTitle": "المجتمع",
+      "communityHint": "أين تظهر في الأندية وللآخرين.",
+      "prCelebrations": "الاحتفال بالأرقام القياسية",
+      "prCelebrationsHint": "بطاقة تلقائية في ناديك عند تحقيق رقم قياسي",
+      "challenges": "التحديات",
+      "challengesHint": "اسمك في ترتيب التحديات",
+      "profilePrsTitle": "الأرقام القياسية في ملفك",
+      "profilePrsHint": "لا يرى متابعوك إلا ما تفعّله. ويبقى الباقي خاصًا.",
+      "profilePrsEmpty": "ليس لديك أرقام قياسية بعد.",
+      "defaultsTitle": "الإعداد الافتراضي للإدخالات الجديدة",
+      "defaultsHint": "من أين يبدأ كل إدخال جديد. يمكنك تغيير أي منها متى شئت.",
+      "defaultKind": {
+        "workout": "التمارين",
+        "note": "الملاحظات",
+        "check_in": "تسجيلات الحضور"
+      },
+      "saveError": "لم يُحفظ ذلك. حاول مرة أخرى."
+    }
   },
   "Community": {
     "all": "الكل",
@@ -5536,7 +5572,6 @@
       "announcements": "الإعلانات فقط",
       "none": "كتم"
     },
-    "wodNoWorkout": "لا يوجد WOD للحصة اليوم.",
     "wodScoreCount": "نتائج اليوم: {count}",
     "wodLeaderboard": "الترتيب",
     "wodYou": "أنت",
@@ -5546,7 +5581,6 @@
     "wodOptInLink": "تفعيل",
     "announcementsEmpty": "لا توجد إعلانات بعد.",
     "announcementsOpen": "كل الإعلانات",
-    "channelShowAll": "كل القنوات",
     "channelSuggested": "مقترح",
     "channelSuggestedHint": "تحجز هذه الحصة كثيرًا",
     "channelsOfBox": "من النادي",
@@ -5573,7 +5607,19 @@
     "more": "المزيد",
     "report": "إبلاغ",
     "commentHidden": "مخفي",
-    "channelsOfClub": "قنوات النادي"
+    "channelsOfClub": "قنوات النادي",
+    "postFiltersTitle": "تصفية المنشورات",
+    "filterClub": "النادي",
+    "filterChannel": "القناة",
+    "filterType": "النوع",
+    "postType": {
+      "announcement": "إعلانات",
+      "pr": "أرقام شخصية",
+      "event": "فعاليات"
+    },
+    "filterCoachesOnly": "المدربون فقط",
+    "filterAuthor": "الكاتب",
+    "postsNoMatch": "لا توجد منشورات تطابق هذه الفلاتر."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {عوامل التصفية} other {عوامل التصفية (#)}}",
@@ -5581,7 +5627,8 @@
     "clear": "مسح",
     "back": "رجوع",
     "showResults": "{count, plural, =0 {لا توجد نتائج} other {عرض #}}",
-    "show": "عرض"
+    "show": "عرض",
+    "all": "الكل"
   },
   "BoxSchedule": {
     "title": "الجدول",
@@ -5940,16 +5987,10 @@
     "requestsRowHint": "اقبل أو ارفض",
     "notifications": "الإشعارات",
     "notificationsUnread": "{count, plural, one {إشعار واحد غير مقروء} other {# إشعارات غير مقروءة}}",
-    "countsLine": "{followers, plural, one {متابع واحد} other {# متابعين}} · تتابع {following}",
-    "countsLineOther": "{followers, plural, one {متابع واحد} other {# متابعين}} · يتابع {following}",
     "connectionsTitle": "الاتصالات",
-    "tabFollowers": "المتابعون {count}",
-    "tabFollowing": "تتابع {count}",
     "tabBoxes": "الصالات",
     "tabClubs": "الأندية",
     "tabPrs": "الأرقام القياسية",
-    "followersEmpty": "لا يتابعك أحد بعد.",
-    "followingEmpty": "لا تتابع أحدًا بعد.",
     "boxesEmpty": "لا تتابع أي صالة بعد.",
     "clubsEmpty": "لست في أي نادٍ بعد.",
     "remove": "إزالة",
@@ -5988,7 +6029,48 @@
     "searchPeople": "ابحث عن أشخاص",
     "searchBoxes": "ابحث عن صالات",
     "searchClubs": "ابحث عن نوادٍ",
-    "searchNoMatch": "لا توجد نتائج لهذا البحث."
+    "searchNoMatch": "لا توجد نتائج لهذا البحث.",
+    "countBuddies": "{count, plural, zero {لا رفاق} one {رفيق واحد} two {رفيقان} few {# رفاق} many {# رفيقًا} other {# رفيق}}",
+    "countFollowYou": "{count, plural, zero {لا أحد يتابعك} one {شخص واحد يتابعك} two {شخصان يتابعانك} few {# أشخاص يتابعونك} many {# شخصًا يتابعونك} other {# شخص يتابعونك}}",
+    "countYouFollow": "تتابع {count}",
+    "countFollowers": "{count, plural, zero {لا متابعين} one {متابع واحد} two {متابعان} few {# متابعين} many {# متابعًا} other {# متابع}}",
+    "countFollowing": "يتابع {count}",
+    "tabBuddies": "الرفاق {count}",
+    "tabFollowYou": "يتابعونك {count}",
+    "tabYouFollow": "تتابعهم {count}",
+    "buddyBadge": "رفيق",
+    "relationClub": "في ناديك",
+    "relationNearby": "بالقرب منك",
+    "relationYouFollow": "تتابعه",
+    "findPeople": "ابحث عن أشخاص",
+    "findClubsAndPeople": "ابحث عن أندية وأشخاص",
+    "peopleTitle": "أشخاص",
+    "peopleNoMatch": "لم نجد أحدًا. الحسابات الخاصة تظهر فقط لمن يعرفها مسبقًا.",
+    "peopleSearchFailed": "تعذّر البحث. حاول مرة أخرى.",
+    "searchBuddies": "ابحث في الرفاق",
+    "buddiesEmpty": "لا رفاق بعد. عندما يتابعك شخص تتابعه، تصبحان رفيقين.",
+    "followYouEmpty": "لا أحد هنا. يظهر هنا من يتابعك ولا تتابعه.",
+    "youFollowEmpty": "لا أحد هنا. يظهر هنا من تتابعه ولا يتابعك.",
+    "unfollowBuddyConfirm": "إيقاف المتابعة؟ لن تبقيا رفيقين ولن ترى منشوراته المخصّصة للمتابعين.",
+    "lockedPrivate": "حساب خاص. أرسل طلب متابعة لترى أيضًا المنشورات المخصّصة للمتابعين؛ يوافق صاحبه على كل طلب.",
+    "privacyTitle": "الحساب الخاص والبحث",
+    "privacyHint": "من يستطيع متابعتك ومن يستطيع العثور عليك.",
+    "privateAccountToggle": "حساب خاص",
+    "privateAccountOn": "يتابعك فقط من توافق عليهم. إذا أوقفته يصبح حسابك عامًا: يمكن لأي شخص متابعتك فورًا، وتُقبل الطلبات المنتظرة.",
+    "privateAccountOff": "حسابك عام: يمكن لأي شخص متابعتك فورًا. فعّله مجددًا لتوافق بنفسك على كل متابع جديد؛ ويبقى متابعوك الحاليون.",
+    "goPublicConfirm": "{count, plural, zero {جعل الحساب عامًا؟} one {جعل الحساب عامًا؟ سيُقبل الآن الطلب المنتظر.} two {جعل الحساب عامًا؟ سيُقبل الآن الطلبان المنتظران.} few {جعل الحساب عامًا؟ ستُقبل الآن # طلبات منتظرة.} many {جعل الحساب عامًا؟ سيُقبل الآن # طلبًا منتظرًا.} other {جعل الحساب عامًا؟ سيُقبل الآن # طلب منتظر.}}",
+    "goPublic": "اجعله عامًا",
+    "keepPrivate": "أبقِه خاصًا",
+    "searchableToggle": "إظهاري في البحث",
+    "searchableOn": "يمكن لأي شخص على Palee العثور عليك بالاسم أو @handle.",
+    "searchablePrivate": "يعثر عليك بالاسم أو @handle أعضاء أنديتك ومن تتابعهم أو يتابعونك. وسيعثر عليك الآخرون عندما يصبح حسابك عامًا.",
+    "searchableOff": "في البحث لا يعثر عليك إلا من تعرفهم مسبقًا، من أنديتك أو متابعاتك.",
+    "notifNewFollowerTitle": "متابع جديد",
+    "notifNewFollowerBody": "بدأ {name} بمتابعتك.",
+    "notifFollowRequestedTitle": "طلب متابعة",
+    "notifFollowRequestedBody": "يريد {name} متابعتك.",
+    "notifFollowAcceptedTitle": "تم قبول الطلب",
+    "notifFollowAcceptedBody": "قبل {name} طلب متابعتك."
   },
   "BoxPage": {
     "allWeek": "الأسبوع كاملًا",
@@ -6309,7 +6391,6 @@
     "clubLeaveBody": "ستختفي منشوراته من موجزك. يمكنك الانضمام مجددًا من «اكتشف».",
     "find": "اكتشف",
     "findTitle": "اكتشف الأندية",
-    "findSearch": "ابحث عن أندية ومجموعات",
     "findOpenClubs": "الأندية المفتوحة",
     "findGroups": "مجموعات في صالاتك",
     "findNoClubs": "لا توجد أندية مفتوحة بعد في الصالات التي تنتمي إليها أو تتابعها.",
@@ -6363,7 +6444,10 @@
     "notif_event_cohost_answered_title": "رد على الاستضافة المشتركة",
     "notif_event_cohost_answered_accepted_body": "يستضيف {box} «{event}» معك ({when}).",
     "notif_event_cohost_answered_declined_body": "رفض {box} الاستضافة المشتركة لـ «{event}».",
-    "notif_event_cohost_answered_removed_body": "لم يعد {box} يستضيف «{event}» معك."
+    "notif_event_cohost_answered_removed_body": "لم يعد {box} يستضيف «{event}» معك.",
+    "filterKind": "النوع",
+    "filterBox": "النادي الرياضي",
+    "findFiltersTitle": "تصفية النتائج"
   },
   "CommunityAdmin": {
     "title": "المجتمع",
@@ -6638,7 +6722,14 @@
     "err_already_refunded": "تم استرداد هذه الدفعة بالفعل.",
     "err_invalid_refund": "يجب أن يكون المبلغ المسترد أكبر من صفر ولا يتجاوز ما دفعه.",
     "err_invalid_cohosts": "تعذّرت قراءة عناوين المنظمين المشاركين هذه. تحقّق من كل عنوان صفحة.",
-    "err_duplicate_cohost": "طُلب النشاط التجاري نفسه مرتين."
+    "err_duplicate_cohost": "طُلب النشاط التجاري نفسه مرتين.",
+    "filtersTitle": "تصفية الفعاليات",
+    "filterClub": "النادي",
+    "filterFree": "مجاني",
+    "filterPrice": "السعر",
+    "filterGoing": "سأحضر",
+    "filterMine": "أنا",
+    "filtersNoMatch": "لا توجد فعاليات تطابق هذه الفلاتر."
   },
   "EventsAdmin": {
     "emptyUpcoming": "لا فعاليات قادمة. أنشئ واحدة عبر «+ فعالية جديدة».",
@@ -6779,7 +6870,7 @@
   },
   "Around": {
     "scopeLabel": "ما يعرضه الموجز",
-    "scopeClubs": "أنديتي",
+    "scopeClubs": "جماعتي",
     "scopeAround": "حولي",
     "loading": "جارٍ التحميل…",
     "updating": "جارٍ تحديث النتائج…",
@@ -6892,10 +6983,6 @@
     "section_boxes": "بوكسات قريبة منك",
     "section_clubs": "أندية مفتوحة",
     "section_posts": "المنشورات",
-    "empty_events": "لا فعاليات مفتوحة ضمن {distance}.",
-    "empty_boxes": "لا بوكسات ضمن {distance}.",
-    "empty_clubs": "لا أندية مفتوحة ضمن {distance}.",
-    "empty_posts": "لا منشورات عامة ضمن {distance}.",
     "seeAll": "{count, plural, one {اعرضه} other {اعرض الكل (#)}}",
     "otherBoxes": "بوكسات أخرى في المنطقة ({count})",
     "trialBadge": "تجريبية",
@@ -6924,8 +7011,6 @@
     "pin_posts": "منشور",
     "open": "فتح",
     "closeCard": "إغلاق",
-    "backToAround": "حولي",
-    "kindCount": "{count, plural, =0 {لا شيء} other {#}} ضمن {distance}",
     "loadMore": "المزيد",
     "loadingMore": "جارٍ التحميل…",
     "needArea": "اختر أولًا أين نبحث.",
@@ -6949,7 +7034,9 @@
     "dateTo": "إلى",
     "priceOpenEnd": "{price}+",
     "priceFrom": "أدنى سعر",
-    "priceTo": "أعلى سعر"
+    "priceTo": "أعلى سعر",
+    "sectionLevel": "المستوى",
+    "levelHint": "نوادٍ لديها حصص بهذا المستوى"
   },
   "CheckIn": {
     "loading": "جارٍ التحميل…",
@@ -7431,7 +7518,7 @@
     "helpIntro": "بشريط قياس ليّن، على الجلد، ملاصق دون شدّ. قِس في الوقت نفسه من اليوم، والأفضل صباحًا.",
     "helpPhotos": "للصور: المكان نفسه، والإضاءة نفسها، والمسافة نفسها. يمنحك المؤقت 10 ثوانٍ للابتعاد.",
     "settingsTitle": "إعدادات الجسم",
-    "settingsHubHint": "الوحدات، الوزن، الصور، التذكير",
+    "settingsHubHint": "الصور، تذكير القياس",
     "settingsIntro": "بيانات جسمك خاصة افتراضيًا. هنا تختار كيف تظهر ومن يراها.",
     "unitsLabel": "الوحدات",
     "sectionsLabel": "أقسام اليوميات",
@@ -7602,7 +7689,8 @@
       "share_photo_missing": "يحتاج كلا القياسين إلى صورة جاهزة لهذه الوضعية.",
       "media_not_ready": "ما زالت إحدى الصور قيد المعالجة. حاول بعد قليل."
     },
-    "fromGarmin": "من Garmin"
+    "fromGarmin": "من Garmin",
+    "unitsAndSectionsLink": "الوحدات والأقسام في الإعدادات"
   },
   "Referrals": {
     "title": "أحضر صديقًا",
@@ -7925,10 +8013,6 @@
     "return_garmin_account_in_use": "حساب Garmin هذا مرتبط بالفعل بحساب Palee آخر.",
     "return_garmin_connect_failed": "تعذّر على Garmin إكمال الربط. حاول مجددًا.",
     "restingTitle": "نبض الراحة",
-    "restingRange": "الفترة",
-    "restingRange_1m": "شهر",
-    "restingRange_3m": "3 أشهر",
-    "restingRange_1y": "سنة",
     "bpmValue": "{value} ن/د",
     "restingLatest": "آخر قراءة · {date}",
     "restingAverage": "المتوسط {value} ن/د خلال {days, plural, one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
@@ -7969,10 +8053,10 @@
     "rowHint": "شخص أو شخصان للحظات الصعبة",
     "backToMe": "أنا",
     "intro": "شخص أو شخصان تثق بهما: شريك أو صديق أو مدربك. يتلقون فقط ما ترسله عبر «أحتاج إلى دعم». لا شيء تلقائي.",
-    "myBuddies": "رفاقي",
-    "noBuddies": "لا يوجد رفيق بعد. ادعُ شخصًا تثق به.",
+    "myBuddies": "رفاق دعمي",
+    "noBuddies": "لا يوجد رفيق دعم بعد. ادعُ شخصًا تثق به.",
     "add": "أضف شخصًا أو مدربك",
-    "full": "لديك {max} من الرفاق أو الدعوات، وهو الحد الأقصى.",
+    "full": "لديك {max} من رفاق الدعم أو الدعوات، وهو الحد الأقصى.",
     "needSupport": "أحتاج إلى دعم",
     "ask": "اطلب",
     "invitationsTitle": "دعوات لك",
@@ -8009,9 +8093,9 @@
     "withdraw": "سحب الدعوة",
     "withdrawConfirm": "سحب الدعوة الموجهة إلى {name}؟",
     "stop": "إيقاف",
-    "stopConfirm": "إيقاف الرفقة مع {name}؟",
+    "stopConfirm": "إيقاف رفقة الدعم مع {name}؟",
     "stopSupportingConfirm": "التوقف عن دعم {name}؟",
-    "stopQuiet": "سيرى ذلك في صفحة الرفيق لديه؛ لا يُرسل أي إشعار.",
+    "stopQuiet": "سيرى ذلك في صفحة رفيق الدعم لديه؛ لا يُرسل أي إشعار.",
     "stopYes": "نعم، أوقف",
     "cancel": "إلغاء",
     "close": "إغلاق",
@@ -8025,11 +8109,11 @@
     "quietFrom": "من",
     "quietTo": "إلى",
     "quietSaved": "ساعات الهدوء: {range}",
-    "sharePhone": "مشاركة رقم هاتفي مع رفاقي",
-    "sharePhoneHint": "فقط لـ «اتصل بي»، وفقط مع رفاقك النشطين. مغلق ما لم تفعّله.",
+    "sharePhone": "مشاركة رقم هاتفي مع رفاق دعمي",
+    "sharePhoneHint": "فقط لـ «اتصل بي»، وفقط مع رفاق دعمك النشطين. مغلق ما لم تفعّله.",
     "phone": "رقم الهاتف",
     "footer": "يمكن لأي منكما التوقف في أي وقت. يرى الآخر ذلك هنا، دون إشعار.",
-    "addTitle": "رفيق جديد",
+    "addTitle": "رفيق دعم جديد",
     "addIntro": "مدربك، أو أشخاص من أنديتك، أو من تتابعهم. لا يبدأ شيء قبل أن يقبلوا.",
     "searchLabel": "بحث",
     "searchPlaceholder": "الاسم أو اللقب",
@@ -8042,7 +8126,7 @@
     },
     "candidateStatus": {
       "pending": "تمت دعوته",
-      "active": "رفيقك بالفعل"
+      "active": "رفيق دعمك بالفعل"
     },
     "invite": "دعوة",
     "inviteName": "دعوة {name}",
@@ -8053,9 +8137,9 @@
     "linkReady": "رابطك جاهز للمشاركة.",
     "linkCopied": "تم نسخ الرابط. الصقه في رسالة.",
     "linkLabel": "رابط الدعوة",
-    "noBuddyYet": "ليس لديك رفيق نشط بعد. بمجرد أن يقبل أحد، يذهب «أحتاج إلى دعم» إليه.",
-    "noBuddyYetShort": "اختر رفيقًا وسيصله هذا بلمسة واحدة.",
-    "setUpBuddy": "اختر رفيقًا",
+    "noBuddyYet": "ليس لديك رفيق دعم نشط بعد. بمجرد أن يقبل أحد، يذهب «أحتاج إلى دعم» إليه.",
+    "noBuddyYetShort": "اختر رفيق دعم وسيصله هذا بلمسة واحدة.",
+    "setUpBuddy": "اختر رفيق دعم",
     "messageLabel": "رسالة (اختيارية)",
     "messagePlaceholder": "مثلًا: مساء صعب.",
     "goesTo": "يذهب إلى: {names}",
@@ -8114,17 +8198,17 @@
     "chatWith": "محادثة مع {name}",
     "chatEmpty": "لا رسائل بعد.",
     "chatPlaceholder": "اكتب رسالة",
-    "chatReadOnly": "انتهت رابطة الرفقة هذه. تبقى المحادثة للقراءة؛ لا يمكن لأحد الكتابة.",
+    "chatReadOnly": "انتهت رابطة رفقة الدعم هذه. تبقى المحادثة للقراءة؛ لا يمكن لأحد الكتابة.",
     "earlier": "رسائل أقدم",
     "read": "مقروءة",
-    "threadsTitle": "محادثات الرفاق",
-    "threadMyBuddy": "رفيقك",
+    "threadsTitle": "محادثات رفاق الدعم",
+    "threadMyBuddy": "رفيق دعمك",
     "threadISupport": "أنت تدعمه",
-    "inviteHeading": "دعوة رفيق",
+    "inviteHeading": "دعوة لتكون رفيق دعم",
     "inviteFrom": "يودّ {name} أن تكون رفيق دعمه",
     "inviteFromSomeone": "شخص ما يودّ أن تكون رفيق دعمه",
-    "whatIsBuddy": "ما هو الرفيق",
-    "whatOnly": "يتلقى الرفيق فقط ما يرسله الطرف الآخر عبر «أحتاج إلى دعم». لا شيء تلقائي، ولا تفاصيل أبدًا.",
+    "whatIsBuddy": "ما هو رفيق الدعم",
+    "whatOnly": "يتلقى رفيق الدعم فقط ما يرسله الطرف الآخر عبر «أحتاج إلى دعم». لا شيء تلقائي، ولا تفاصيل أبدًا.",
     "whatReplies": "تردّ بلمسة واحدة: أنا هنا · هل نتمشى؟ · اتصل بي، أو بكلماتك الخاصة.",
     "whatQuiet": "يمكنك تحديد ساعات هدوء؛ عندها تصل الطلبات بهدوء.",
     "whatStop": "يمكن لأي منكما التوقف في أي وقت.",
@@ -8133,10 +8217,10 @@
     "notNow": "ليس الآن",
     "inviteAccepted": "أصبحت الآن رفيق دعم {name}.",
     "inviteAcceptedNoName": "أصبحت الآن رفيق دعم.",
-    "openBuddy": "افتح الرفيق",
+    "openBuddy": "افتح رفيق الدعم",
     "inviteExpired": "انتهت صلاحية هذه الدعوة. اطلب رابطًا جديدًا.",
     "inviteUnavailable": "رابط الدعوة هذا لم يعد يعمل.",
-    "inviteFooter": "Palee ليس خدمة طبية ولا خدمة طوارئ. الرفيق شخص تعرفه، بجانبك في لحظة صعبة.",
+    "inviteFooter": "Palee ليس خدمة طبية ولا خدمة طوارئ. رفيق الدعم شخص تعرفه، بجانبك في لحظة صعبة.",
     "linesTitle": "خطوط المساعدة",
     "linesIntro": "إن كان الأمر أكثر من لحظة صعبة، يمكن لهذه الخدمات أن تساعد. هذه معلومات وليست نصيحة؛ Palee ليس خدمة طبية ولا خدمة طوارئ.",
     "linesGreece": "في اليونان",
@@ -8152,7 +8236,7 @@
     },
     "linesNote": "خارج اليونان، رقم الطوارئ هو 112 في كل الاتحاد الأوروبي، أو رقم بلدك.",
     "cravingGoesTo": "تذهب رسالة قصيرة إلى {names}. لا تفاصيل أبدًا.",
-    "cravingSupportSent": "أُرسل إلى رفاقك. ترى الحالة في قسم العافية.",
+    "cravingSupportSent": "أُرسل إلى رفاق دعمك. ترى الحالة في قسم العافية.",
     "sharingSectionTitle": "ملخص العافية الأسبوعي للمدرب",
     "sharingSectionHint": "ما يراه مدربك من العافية، فقط إن سمحت",
     "shareWellness": "العافية · ملخص أسبوعي",
@@ -8179,7 +8263,7 @@
     "coachAllowedSince": "سمح {name} بهذا الملخص في {date}. كل مرة تفتحه يمكنه رؤية ذلك.",
     "notif": {
       "buddy_invite": {
-        "title": "دعوة رفيق",
+        "title": "دعوة لتكون رفيق دعم",
         "body": "يطلب منك {name} أن تكون رفيق دعم."
       },
       "buddy_accepted": {
@@ -8203,7 +8287,7 @@
         "body": "لحظات صعبة: {moments}، تم تجاوز: {overcome}، طلبات دعم: {requests}."
       },
       "buddy_message": {
-        "title": "رسالة من رفيق",
+        "title": "رسالة من رفيق الدعم",
         "body": "أرسل لك {name} رسالة."
       },
       "coach_wellness_summary": {
@@ -8212,18 +8296,18 @@
       }
     },
     "errors": {
-      "buddy_limit_reached": "يمكنك أن يكون لديك رفيقان أو دعوتان كحد أقصى.",
+      "buddy_limit_reached": "يمكنك أن يكون لديك رفيقا دعم أو دعوتان كحد أقصى.",
       "buddy_already_invited": "لقد دعوت هذا الشخص بالفعل.",
       "buddy_invite_expired": "انتهت صلاحية هذه الدعوة.",
-      "buddy_link_closed": "انتهت رابطة الرفقة هذه بالفعل.",
+      "buddy_link_closed": "انتهت رابطة رفقة الدعم هذه بالفعل.",
       "buddy_invite_unavailable": "رابط الدعوة هذا لم يعد يعمل.",
-      "cannot_buddy_self": "لا يمكنك أن تكون رفيق نفسك.",
+      "cannot_buddy_self": "لا يمكنك أن تكون رفيق دعم لنفسك.",
       "not_eligible_for_buddy": "ادعُ مدربك أو شخصًا من أنديتك أو شخصًا تتابعه، أو أرسل رابطًا.",
       "message_too_long": "الرسالة 280 حرفًا كحد أقصى.",
-      "support_rate_limited": "طلبت عدة مرات في هذه الساعة؛ رفاقك تلقوا الطلب.",
-      "no_active_buddies": "أضف رفيقًا أولًا.",
+      "support_rate_limited": "طلبت عدة مرات في هذه الساعة؛ رفاق دعمك تلقوا الطلب.",
+      "no_active_buddies": "أضف رفيق دعم أولًا.",
       "already_undone": "تم سحب هذا الطلب بالفعل.",
-      "undo_window_passed": "تم إبلاغ رفاقك بالفعل.",
+      "undo_window_passed": "تم إبلاغ رفاق دعمك بالفعل.",
       "reply_text_required": "اكتب بضع كلمات.",
       "reply_too_long": "الرد 500 حرف كحد أقصى.",
       "invalid_quiet_hours": "تحتاج ساعات الهدوء إلى وقتين مختلفين.",
@@ -8232,7 +8316,7 @@
       "summary_required": "فعّل الملخص الأسبوعي أولًا.",
       "message_body_required": "اكتب رسالة.",
       "message_too_long_body": "الرسالة 2000 حرف كحد أقصى.",
-      "buddy_link_read_only": "انتهت رابطة الرفقة؛ المحادثة للقراءة فقط."
+      "buddy_link_read_only": "انتهت رابطة رفقة الدعم؛ المحادثة للقراءة فقط."
     }
   },
   "Providers": {
@@ -8253,7 +8337,6 @@
     "formerHint": "ما أنجزته معهم يبقى في سجلّك وVault وتقدّمك. لم يعودوا يرون تدويناتك.",
     "formerSince": "انتهى في {date} · لم يعد يرى تدويناتك",
     "todayTitle": "اليوم",
-    "todayEmpty": "لا شيء مخطط اليوم مع أي من الجهات.",
     "todayPartial": "تعذّر تحميل اليوم من {names}.",
     "todayKind": {
       "class": "حصة",
@@ -8841,7 +8924,6 @@
     "editProfile": "تعديل ملفي",
     "safetyLine": "أعضاء هذا النادي فقط. التوافق يحتاج موافقتكما معًا. يمكنك الإبلاغ أو الحظر في أي وقت.",
     "filters": "عوامل التصفية",
-    "filtersCount": "عوامل التصفية ({count})",
     "swipesLeft": "{count, plural, one {بقي اختيار واحد اليوم} other {بقي # اختيارًا اليوم}}",
     "loading": "جارٍ التحميل…",
     "limitReached": "يكفي لليوم. أشخاص جدد غدًا.",
@@ -8875,7 +8957,7 @@
     "endConfirm": "إنهاء",
     "blockConfirm": "حظر",
     "endBody": "لن يُبلَّغ {name}. تبقى المحادثة مقروءة لكنها تُغلق، ولن تريا بعضكما مجددًا.",
-    "blockBody": "لن يُبلَّغ {name}. تنتهي شراكتكما وأي رابط buddy بينكما، ولن تريا بعضكما في Partners مجددًا. يمكنك إلغاء الحظر من المشاركة والظهور.",
+    "blockBody": "لن يُبلَّغ {name}. تنتهي شراكتكما وأي رابطة رفقة دعم بينكما، ولن تريا بعضكما في Partners مجددًا. يمكنك إلغاء الحظر من المشاركة والظهور.",
     "planEyebrow": "احجزا معًا",
     "planClass": "حصة",
     "planBook": "افتح الحصة للحجز",
@@ -8899,7 +8981,7 @@
     "settingsSwitch": "أظهرني في Partners",
     "settingsSwitchHint": "{count, plural, one {ملفك في نادٍ واحد} other {ملفاتك في # أندية}}. الإيقاف يجمّدها مؤقتًا؛ لا يُحذف شيء.",
     "blockedTitle": "الأشخاص المحظورون",
-    "blockedHint": "لا يستطيعون العثور عليك في Partners، وانتهت روابط buddy معهم.",
+    "blockedHint": "لا يستطيعون العثور عليك في Partners، وانتهت روابط رفقة الدعم معهم.",
     "blockedEmpty": "لم تحظر أحدًا.",
     "blockedSince": "محظور منذ {date}",
     "unblock": "إلغاء الحظر",
@@ -8922,7 +9004,14 @@
     "error_partner_match_read_only": "انتهت هذه المحادثة.",
     "error_partner_plans_unavailable": "اقتراح الحصص متاح فقط في أندية النادي الرياضي نفسه.",
     "error_message_body_required": "اكتب شيئًا أولًا.",
-    "error_cannot_block_self": "لا يمكنك حظر نفسك."
+    "error_cannot_block_self": "لا يمكنك حظر نفسك.",
+    "disciplineLabel": "الرياضة",
+    "disciplinesLabel": "ما تريد التدرب عليه معًا (حتى {max})",
+    "allDisciplines": "كل الرياضات",
+    "fewerDisciplines": "عدد أقل",
+    "distanceLabel": "المسافة",
+    "withinKm": "حتى {km} كم",
+    "distanceNeedsArea": "لتصفية حسب المسافة، اظهر في «حولي» مع منطقتك."
   },
   "Squads": {
     "title": "الفرق",
@@ -9078,8 +9167,6 @@
       "minutes": "{minutes} د",
       "join": "انضم إلى المكالمة",
       "manage": "إدارة",
-      "noSession": "لم تحجز أي جلسة بعد.",
-      "bookSession": "احجز جلسة",
       "noPackage": "لا توجد باقة جلسات بعد. اسأل مدربك.",
       "sessionsLeft": "تبقّى {remaining} من {limit} جلسات",
       "sessionsUnlimited": "جلسات غير محدودة"
@@ -9549,7 +9636,8 @@
     "backToMe": "العودة إلى أنا",
     "saveInterests": "حفظ",
     "interestsSaved": "تم الحفظ.",
-    "interestsHubHint": "الرياضات والمستوى، للاقتراحات"
+    "interestsHubHint": "الرياضات والمستوى، للاقتراحات",
+    "photoAddLabel": "إضافة صورة"
   },
   "Business": {
     "common": {
@@ -10801,5 +10889,397 @@
     "reviewNoLimit": "بلا حد",
     "reviewCohosts": "طلبات المشاركة في التنظيم إلى: {names}",
     "reviewNoCohosts": "لا منظمين مشاركين"
+  },
+  "Conversations": {
+    "title": "الرسائل",
+    "requests": "الطلبات",
+    "requestsEntry": "طلبات المراسلة ({count})",
+    "buddy": "رفيق",
+    "you": "أنت: {text}",
+    "someone": "شخص ما",
+    "unread": "غير مقروءة",
+    "emptyInbox": "لا توجد محادثات بعد. ابحث عن شخص لتراسله.",
+    "emptyRequests": "لا توجد طلبات مراسلة.",
+    "loading": "جارٍ التحميل…",
+    "loadMore": "عرض المزيد",
+    "earlier": "رسائل أقدم",
+    "accept": "قبول",
+    "decline": "رفض",
+    "requestTitle": "طلب مراسلة",
+    "requestBanner": "يريد {name} أن يرسل إليك رسالة.",
+    "requestBannerHint": "اقبل الطلب لنقله إلى الوارد. إذا رفضته فسيختفي ولن يعلم {name} بذلك.",
+    "placeholder": "اكتب رسالة…",
+    "send": "إرسال",
+    "sending": "جارٍ الإرسال…",
+    "failed": "لم تُرسل.",
+    "retry": "إعادة المحاولة",
+    "discard": "تجاهل",
+    "tooLong": "يمكن أن تصل الرسالة إلى {max} حرف.",
+    "chatWith": "محادثة مع {name}",
+    "chatEmpty": "ألقِ التحية على {name}.",
+    "unavailable": "هذه المحادثة غير متاحة.",
+    "back": "الرسائل",
+    "message": "مراسلة",
+    "messageA11y": "راسل {name}",
+    "viewProfile": "الملف الشخصي لـ {name}",
+    "searchEmpty": "لم يُعثر على أحد.",
+    "notif_person_message_title": "رسالة من {name}",
+    "notif_person_message_body": "أرسل إليك {name} رسالة.",
+    "notif_message_request_title": "طلب مراسلة",
+    "notif_message_request_body": "يريد {name} أن يرسل إليك رسالة."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "الأدلة",
+      "listIntro": "جولات قصيرة على الشاشات الحقيقية. اضغط معنا؛ لا يُحفظ شيء إلا إذا حفظته.",
+      "forStaff": "لنشاطك التجاري",
+      "forYou": "لك",
+      "minutes": "{count, plural, zero {# دقيقة} one {# دقيقة} two {# دقيقتان} few {# دقائق} many {# دقيقة} other {# دقيقة}}",
+      "start": "ابدأ",
+      "resume": "متابعة",
+      "replay": "إعادة",
+      "state_new": "جديد",
+      "state_started": "قيد التنفيذ",
+      "state_completed": "تم",
+      "state_dismissed": "لم يبدأ",
+      "state_outdated": "محدَّث",
+      "openGuide": "جولة إرشادية",
+      "openGuideAria": "ابدأ الجولة: {title}",
+      "next": "التالي",
+      "back": "رجوع",
+      "finish": "تم",
+      "close": "إغلاق الجولة",
+      "stepOf": "{current} من {total}",
+      "doIt": "نفّذها عني",
+      "tapHint": "اضغط على المكان المميَّز",
+      "notHere": "هذا غير ظاهر على الشاشة الآن، فإليك الخلاصة.",
+      "fillDemo": "املأ ببيانات تجريبية أولًا",
+      "filling": "جارٍ الملء…",
+      "demoFilled": "أُضيفت البيانات التجريبية",
+      "offerEyebrow": "جديد هنا؟",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "أرني",
+      "offerLater": "ليس الآن",
+      "meRow": "الأدلة",
+      "meRowHint": "جولات في المتجر والفعاليات والعروض وناديك الخاص",
+      "loadFailed": "لم يتم تحميل الأدلة. حاول مرة أخرى."
+    },
+    "shop_staff": {
+      "title": "أدِر متجرك",
+      "summary": "أضف المنتجات، وبِع في التطبيق وفي الصندوق، وحافظ على دقة المخزون.",
+      "chapters": {
+        "setup": "الإعداد",
+        "sell": "البيع",
+        "track": "المتابعة"
+      },
+      "welcome": {
+        "title": "متجر صالتك",
+        "body": "يطلب الأعضاء من التطبيق ويستلمون من الاستقبال. وتبيع أنت من الصندوق أيضًا."
+      },
+      "newProduct": {
+        "title": "أضف منتجًا",
+        "body": "اضغط على «{label}»."
+      },
+      "photos": {
+        "title": "الصور تبيع",
+        "body": "أضف بعض الصور الواضحة. الأولى هي صورة الغلاف."
+      },
+      "price": {
+        "title": "السعر والخيارات",
+        "body": "سعر واحد، أو مقاسات ونكهات لكل منها مخزونها.",
+        "tip": "يُحسب المخزون لكل خيار، فلا يختلط «M» مع «L» أبدًا."
+      },
+      "selling": {
+        "title": "أين يُباع",
+        "body": "في التطبيق، أو في الصندوق، أو كليهما. للأعضاء فقط، أو للجميع."
+      },
+      "save": {
+        "title": "احفظ ثم انشر",
+        "body": "المنتج الجديد مسودة. انشره لفتح المتجر.",
+        "tip": "لا يرى الأعضاء بطاقة المتجر في Box إلا بعد نشر شيء ما."
+      },
+      "ordersTab": {
+        "title": "الطلبات",
+        "body": "اضغط على «{label}»."
+      },
+      "orders": {
+        "title": "جهّز ثم سلّم",
+        "body": "حدّد الطلب كجاهز، فيُبلَّغ العضو بمكان استلامه.",
+        "tip": "الطلبات غير المستلمة تُلغى تلقائيًا بعد 7 أيام ويعود المخزون."
+      },
+      "pos": {
+        "title": "صندوق الاستقبال",
+        "body": "بِع في الاستقبال خلال ثوانٍ، بالدفع الآن أو على حساب العضو."
+      },
+      "stock": {
+        "title": "المخزون",
+        "body": "كل بيع وتوريد وجرد يُسجَّل. وتصلك تنبيهات عند انخفاض المخزون."
+      },
+      "analytics": {
+        "title": "ما الذي يُباع",
+        "body": "المبيعات الأسبوعية، والهوامش، وأكثر منتجاتك مبيعًا.",
+        "tip": "تظهر مبيعات المتجر أيضًا في المالية كمصدر دخل مستقل."
+      },
+      "done": {
+        "title": "كل شيء جاهز",
+        "body": "أعد هذه الجولة متى شئت من الأدلة."
+      }
+    },
+    "events_organising": {
+      "title": "نظّم الفعاليات",
+      "summary": "خطّط في 7 خطوات قصيرة، وبِع الأماكن، وسجّل الحضور، وتابع الأرقام.",
+      "chapters": {
+        "plan": "التخطيط",
+        "run": "التنفيذ"
+      },
+      "welcome": {
+        "title": "الفعاليات من البداية إلى النهاية",
+        "body": "خطّط، واملأ الأماكن، ونفّذ، واعرف كيف سارت، في مكان واحد."
+      },
+      "new": {
+        "title": "أنشئ فعالية",
+        "body": "اضغط على «{label}»."
+      },
+      "steps": {
+        "title": "سبع خطوات قصيرة",
+        "body": "المستضيف، الأساسيات، متى، أين، لمن والسعر، الأماكن، المراجعة. اضغط على خطوة مكتملة للعودة إليها."
+      },
+      "screen": {
+        "title": "قرار واحد في كل شاشة",
+        "body": "املأ هذا، ثم التالي.",
+        "tip": "تُحفظ مسودتك على هذا الجهاز، فيمكنك التوقف والعودة لاحقًا."
+      },
+      "next": {
+        "title": "«التالي» يعرف ما الناقص",
+        "body": "إذا بقي شيء، سيخبرك ما هو."
+      },
+      "cohosts": {
+        "title": "استضِف مع آخرين",
+        "body": "في «{label}»، اطلب من صالة أو مدرب الاستضافة المشتركة عبر عنوان صفحته.",
+        "tip": "بعد موافقتهم، تظهر الفعالية على صفحتهم وتصل إلى أعضائهم."
+      },
+      "manage": {
+        "title": "الإدارة",
+        "body": "لكل فعالية: الحضور، وتسجيل الحضور، والدفع في الصالة، والمبالغ المستردة، والرسائل."
+      },
+      "finances": {
+        "title": "المالية",
+        "body": "اضغط على «{label}»: الدخل، والمبالغ المستردة، وما لم يُدفع بعد."
+      },
+      "analytics": {
+        "title": "التحليلات",
+        "body": "اضغط على «{label}»: المشاهدات، والتسجيلات، وقائمة الانتظار، ومن حضر.",
+        "tip": "يوضح معدل التحويل كم من المشاهدين سجّلوا."
+      },
+      "done": {
+        "title": "جاهز للاستضافة",
+        "body": "أعد هذه الجولة متى شئت من الأدلة."
+      }
+    },
+    "finance_offers": {
+      "title": "العروض والشركاء والإحالات",
+      "summary": "حملات وأكواد، ومزايا من الشركاء، وبرنامج «أحضر صديقًا».",
+      "chapters": {
+        "campaigns": "الحملات",
+        "partners": "الشركاء",
+        "referrals": "الإحالات"
+      },
+      "welcome": {
+        "title": "انمُ بالعروض",
+        "body": "حملاتك وأكوادك، ومزايا من متاجر شريكة، ومكافآت على إحضار الأصدقاء."
+      },
+      "campaignNew": {
+        "title": "ابدأ حملة",
+        "body": "اضغط على «{label}»."
+      },
+      "campaignForm": {
+        "title": "الاسم والتواريخ",
+        "body": "تجمع الحملة عروضك، مثل «الصيف». اختر متى تعمل."
+      },
+      "coupons": {
+        "title": "الأكواد",
+        "body": "افتح حملة لإضافة أكواد: خصم بنسبة أو بمبلغ، مع حد للاستخدام.",
+        "tip": "يظهر لكل كود عدد مرات استخدامه، فتعرف أي عرض ينجح."
+      },
+      "partners": {
+        "title": "عروض الشركاء",
+        "body": "اضغط على «{label}»."
+      },
+      "perkNew": {
+        "title": "أضف عرض شريك",
+        "body": "اضغط على «{label}»."
+      },
+      "perkPartner": {
+        "title": "الشريك",
+        "body": "اسمه ورابطه وشعاره."
+      },
+      "perkBenefit": {
+        "title": "ما يحصل عليه الأعضاء",
+        "body": "نسبة، أو مبلغ، أو أي شيء آخر، مثل قهوة مجانية."
+      },
+      "perkMethod": {
+        "title": "كيف يتحقق المتجر",
+        "body": "كود مشترك، أو رابط يتضمن الكود، أو عرض عضوية سارية.",
+        "tip": "إذا تسرّب كود، غيّره هنا ويُطبَّق فورًا."
+      },
+      "perkRules": {
+        "title": "الشروط",
+        "body": "التواريخ، ومن يحصل عليه وكم مرة. احفظ مسودة، وانشر عند الاتفاق."
+      },
+      "referrals": {
+        "title": "أحضر صديقًا",
+        "body": "برنامج يكافئ الأعضاء الذين يُحضرون شخصًا ينضم."
+      },
+      "referralsFlow": {
+        "title": "وافق وكافئ",
+        "body": "تصل الإحالات إلى هنا. وافق على إحداها فتُرسل مكافأتها.",
+        "tip": "يمكن أن تذهب المكافأة إلى الاثنين: العضو والصديق."
+      },
+      "done": {
+        "title": "كل شيء جاهز",
+        "body": "أعد هذه الجولة متى شئت من الأدلة."
+      }
+    },
+    "member_club_event": {
+      "title": "ناديك وفعاليتك",
+      "summary": "أنشئ مجموعة في نادي صالتك وخطّط لفعالية، بمفردك أو مع صالة.",
+      "chapters": {
+        "club": "ناديك",
+        "event": "فعاليتك"
+      },
+      "welcome": {
+        "title": "اجعله لك",
+        "body": "أنشئ مجموعة مع ناسك وخطّط لفعالياتك الخاصة."
+      },
+      "channels": {
+        "title": "نادي صالتك",
+        "body": "اضغط على «{label}»."
+      },
+      "groups": {
+        "title": "المجموعات",
+        "body": "أندية صغيرة داخل الصالة: لها دردشتها وفعالياتها."
+      },
+      "propose": {
+        "title": "أنشئ مجموعة",
+        "body": "اضغط على «{label}»."
+      },
+      "groupSheet": {
+        "title": "سمّها واختر من ينضم",
+        "body": "مفتوحة للجميع، أو بطلب.",
+        "tip": "بعض الصالات توافق على المجموعات الجديدة أولًا؛ ستصلك رسالة عندما تصبح نشطة."
+      },
+      "noBox": {
+        "title": "المجموعات تكون داخل صالة",
+        "body": "انضم إلى صالة أولًا، ثم أنشئ مجموعة في ناديها. أما الفعاليات فيمكنك التخطيط لها فورًا."
+      },
+      "eventNew": {
+        "title": "خطّط لفعالية",
+        "body": "اضغط على «{label}»."
+      },
+      "hostAs": {
+        "title": "من يستضيف",
+        "body": "أنت، أو مجموعة أو نشاط تجاري تديره.",
+        "tip": "«{label}» لا يحتاج إلى صالة أبدًا."
+      },
+      "alone": {
+        "title": "بمفردك",
+        "body": "مفتوحة لأي شخص قريب، أو بالدعوة فقط عبر رابطك."
+      },
+      "withBox": {
+        "title": "مع صالة",
+        "body": "في «{label}»، اطلب من الصالة الاستضافة المشتركة عبر عنوان صفحتها.",
+        "tip": "بعد موافقتها، تظهر الفعالية على صفحة الصالة أيضًا."
+      },
+      "hosting": {
+        "title": "أدِرها",
+        "body": "بعد النشر، تجد في «{label}» الحضور وتسجيل الحضور والأرقام."
+      },
+      "done": {
+        "title": "الدور لك",
+        "body": "أعد هذه الجولة متى شئت من الأدلة."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "عملائي",
+    "replies": "بانتظار ردك",
+    "reviews": "مراجعة الأداء",
+    "desk": "تسجيل الحضور اليوم",
+    "clients": "العملاء",
+    "sentAt": "أُرسلت {time}",
+    "overdue": "متأخر",
+    "dueSoon": "يستحق قريبًا",
+    "unknownClient": "عضو",
+    "openVideo": "شاهد الفيديو",
+    "checkedIn": "حضر {count} من {total}",
+    "attended": "حضر",
+    "noShow": "لم يحضر",
+    "attendanceOf": "حضور {name}",
+    "markError": "لم يُحفظ. حاول مجددًا.",
+    "showAll": "عرض الكل ({count})",
+    "showFewer": "عرض أقل",
+    "moreInConsole": "عرض الكل في لوحة الإدارة"
+  },
+  "Inbox": {
+    "title": "الرسائل",
+    "segmentsLabel": "الرسائل المعروضة",
+    "segment": {
+      "all": "الكل",
+      "coach": "المدرّب",
+      "clubs": "الأندية",
+      "partners": "الشركاء"
+    },
+    "loading": "جارٍ تحميل الرسائل…",
+    "emptySegment": "لا توجد محادثات هنا بعد.",
+    "workoutThread": "محادثة التمرين",
+    "classThread": "محادثة الحصة",
+    "searchAtGym": "في ناديك"
+  },
+  "NotificationSettings": {
+    "title": "الإشعارات",
+    "description": "ما يصلك داخل التطبيق وكإشعارات فورية",
+    "loading": "جارٍ التحميل…",
+    "loadError": "إعدادات الإشعارات غير متاحة الآن.",
+    "saveError": "لم يُحفظ هذا التغيير. حاول مرة أخرى.",
+    "locked": "مفعّلة دائمًا",
+    "perClub": "لكل نادٍ، من صالاتي وأنديتي",
+    "channel": {
+      "in_app": "في التطبيق",
+      "push": "فوري"
+    },
+    "category": {
+      "bookings": {
+        "title": "الحجوزات والحصص",
+        "hint": "الموافقات وقائمة الانتظار والتجارب والمواعيد والمواسم"
+      },
+      "messages": {
+        "title": "الرسائل",
+        "hint": "المحادثات وطلبات المراسلة ورسائل الصالة والمدرب"
+      },
+      "community": {
+        "title": "الأندية والمجتمع",
+        "hint": "المتابعون والفعاليات والتحديات والمجموعات والدعوات."
+      },
+      "coach": {
+        "title": "المدرب",
+        "hint": "البرامج وملاحظات التمارين ومراجعات الأداء والتغذية"
+      },
+      "partners": {
+        "title": "الشركاء والرفاق",
+        "hint": "التوافقات ورفيق الدعم ورسائلهم"
+      },
+      "journal": {
+        "title": "تذكيرات اليوميات",
+        "hint": "الماء والقياسات ومتابعة الرغبة الشديدة ومزامنة الأجهزة"
+      },
+      "staff": {
+        "title": "إدارة الصالة",
+        "hint": "الحجوزات الجديدة والتجارب والزوار والمخزون والبلاغات"
+      },
+      "account": {
+        "title": "الحساب والمدفوعات",
+        "hint": "الأمان والفواتير والتجديدات والطلبات"
+      }
+    }
   }
 }

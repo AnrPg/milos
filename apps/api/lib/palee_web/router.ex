@@ -1404,6 +1404,9 @@ defmodule PaleeWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
+    # ADR-199: per-category notification choices (Εγώ › Ρυθμίσεις).
+    get("/notifications/preferences", NotificationPreferenceController, :index)
+    put("/notifications/preferences/:category", NotificationPreferenceController, :update)
     # ADR-171: push to the store apps.
     post("/notifications/native-push-tokens", NotificationController, :create_native_push_token)
 
@@ -1447,6 +1450,10 @@ defmodule PaleeWeb.Router do
     # ADR-162: one journal across providers, Box ▾ and the merged «Σήμερα».
     get("/me/journal/coach-audience", JournalController, :coach_audience)
     put("/me/journal/coach-audience", JournalController, :put_coach_audience)
+
+    # ADR-196: Εγώ › Κοινοποίηση › «Προεπιλογή νέων καταχωρήσεων».
+    get("/me/journal/visibility-defaults", JournalController, :visibility_defaults)
+    put("/me/journal/visibility-defaults", JournalController, :put_visibility_default)
     put("/me/journal/entries/:kind/:id/audience", JournalController, :entry_audience)
     post("/me/journal/export", JournalController, :export)
     get("/me/journal/exports", JournalController, :exports)
@@ -1472,6 +1479,10 @@ defmodule PaleeWeb.Router do
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)
+    # ADR-193: in-app walkthrough progress.
+    get("/me/guides", GuideProgressController, :index)
+    put("/me/guides/:guide_id", GuideProgressController, :update)
+    delete("/me/guides/:guide_id", GuideProgressController, :delete)
     get("/me/filters/:surface", SavedFilterController, :show)
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)
@@ -1527,6 +1538,18 @@ defmodule PaleeWeb.Router do
     get("/me/followers", FollowController, :followers)
     delete("/me/followers/:id", FollowController, :remove)
     get("/me/following", FollowController, :following)
+    # ADR-193: Buddies, privacy and person-to-person conversations.
+    get("/me/buddies-list", FollowController, :buddies)
+    put("/me/social/privacy", FollowController, :privacy)
+    get("/me/conversations", PersonConversationController, :index)
+    get("/me/conversations/unread-count", PersonConversationController, :unread_count)
+    post("/me/conversations", PersonConversationController, :create)
+    get("/me/conversations/:id", PersonConversationController, :show)
+    get("/me/conversations/:id/messages", PersonConversationController, :messages)
+    post("/me/conversations/:id/messages", PersonConversationController, :send_message)
+    post("/me/conversations/:id/read", PersonConversationController, :read)
+    post("/me/conversations/:id/accept", PersonConversationController, :accept)
+    post("/me/conversations/:id/decline", PersonConversationController, :decline)
     get("/me/post-attachments/:type/:id", PostAttachmentController, :show)
     post("/profile-posts", ProfilePostController, :create)
     delete("/profile-posts/:id", ProfilePostController, :delete)
@@ -1833,12 +1856,29 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/", PRController, :index)
+    get("/history", PRController, :all_history)
     post("/", PRController, :create)
     patch("/:id/edit", PRController, :edit)
     patch("/:id", PRController, :update)
     delete("/:id", PRController, :delete)
     get("/:id/history", PRController, :history)
     post("/:id/share", PRController, :share)
+    # ADR-196: a PR on the profile for followers, and a profile's PRs.
+    put("/:id/profile-audience", PRController, :profile_audience)
+    get("/profile/:user_id", PRController, :profile)
+  end
+
+  # ADR-193 §4: people search across Palee, in the personal session.
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :search_rate_limited
+    ])
+
+    get("/people-search", PeopleController, :search)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).

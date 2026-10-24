@@ -107,7 +107,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     wellness_summary_grants
     device_connections device_activities device_imports daily_stats
     account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
-    user_insights
+    user_insights guide_progress notification_preferences
   )
 
   def report do

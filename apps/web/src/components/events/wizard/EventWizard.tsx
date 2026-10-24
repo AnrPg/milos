@@ -36,6 +36,7 @@ import { WhereStep } from "./WhereStep";
 import { WhoStep } from "./WhoStep";
 import { WizardStepBar } from "./WizardStepBar";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 /** The create or edit body; a new event may carry the co-hosts to ask with it (ADR-185). */
 export type EventRequestBody = ReturnType<typeof eventRequest> & { cohost_slugs?: string[] };
@@ -230,6 +231,7 @@ export function EventWizard({
       eyebrow={eyebrow}
       variant="screen"
       size="2xl"
+      guide="events.wizard"
       dismissible={!save.isPending}
       plainBody
       onSubmit={submit}
@@ -256,6 +258,7 @@ export function EventWizard({
               </DialogButton>
             )}
             <button
+              {...guideAnchor("events.wizard.next")}
               type="submit"
               aria-disabled={(!failures && (Boolean(reason) || busy)) || undefined}
               aria-describedby={!failures && reason ? reasonId : undefined}
@@ -289,7 +292,7 @@ export function EventWizard({
         </div>
       ) : (
         <>
-          <div className="shrink-0 px-5 pb-2 sm:px-6">
+          <div {...guideAnchor("events.wizard.steps")} className="shrink-0 px-5 pb-2 sm:px-6">
             <WizardStepBar
               steps={steps}
               current={step}
@@ -322,7 +325,7 @@ export function EventWizard({
                 </div>
               </div>
             ) : null}
-            <section aria-labelledby={headingId} className="flex flex-col gap-4">
+            <section {...guideAnchor("events.wizard.body")} aria-labelledby={headingId} className="flex flex-col gap-4">
               <h3 id={headingId} ref={headingRef} tabIndex={-1} className="text-lg font-semibold outline-none" style={{ color: "var(--text)" }}>
                 {heading}
               </h3>

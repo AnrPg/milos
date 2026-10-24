@@ -156,6 +156,10 @@ config :palee,
        Palee.Infrastructure.Community.EctoSocialStore
 
 config :palee,
+       :conversation_store,
+       Palee.Infrastructure.Conversations.EctoConversationStore
+
+config :palee,
        :community_event_store,
        Palee.Infrastructure.Community.EctoEventStore
 
@@ -319,6 +323,11 @@ config :palee,
        :notification_store,
        Palee.Infrastructure.Notifications.EctoNotificationStore
 
+# ADR-199: per-category notification choices.
+config :palee,
+       :notification_preference_store,
+       Palee.Infrastructure.Notifications.EctoNotificationPreferenceStore
+
 # ADR-171: push to the store apps. Credentials come from runtime config
 # (runtime.exs); without them a provider is off and registration answers 503.
 config :palee,
@@ -348,6 +357,10 @@ config :palee,
 config :palee,
        :insight_store,
        Palee.Infrastructure.Insights.EctoInsightStore
+
+config :palee,
+       :guide_progress_store,
+       Palee.Infrastructure.Guides.EctoGuideProgressStore
 
 config :palee,
        :messaging_thread_store,

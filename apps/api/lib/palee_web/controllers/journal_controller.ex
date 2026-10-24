@@ -14,6 +14,7 @@ defmodule PaleeWeb.JournalController do
     JournalAudience,
     JournalExports,
     JournalNotes,
+    JournalVisibilityDefaults,
     SetJournalVisibility
   }
 
@@ -118,6 +119,71 @@ defmodule PaleeWeb.JournalController do
   def index(conn, params) do
     with {:ok, page} <- GetJournalFeed.call(conn.assigns.user_context, feed_params(params)) do
       json(conn, page)
+    end
+  end
+
+  @defaults_schema %Schema{
+    type: :object,
+    description: "The rung a new entry of each kind starts on (ADR-139 §3)",
+    required: [:workout, :pr, :note, :check_in],
+    properties: %{
+      workout: %Schema{type: :string, enum: ["private", "coach_can_view"]},
+      pr: %Schema{type: :string, enum: ["private", "coach_can_view"]},
+      note: %Schema{type: :string, enum: ["private", "coach_can_view"]},
+      check_in: %Schema{type: :string, enum: ["private", "coach_can_view"]}
+    }
+  }
+
+  operation(:visibility_defaults,
+    summary: "Who sees my new journal entries, per kind (ADR-196)",
+    responses: [
+      ok:
+        {"Defaults", "application/json",
+         %Schema{type: :object, required: [:defaults], properties: %{defaults: @defaults_schema}}}
+    ]
+  )
+
+  def visibility_defaults(conn, _params) do
+    with {:ok, defaults} <- JournalVisibilityDefaults.call(conn.assigns.user_context) do
+      json(conn, %{defaults: defaults})
+    end
+  end
+
+  operation(:put_visibility_default,
+    summary: "Set who sees my new entries of one kind (workout, note, check_in; ADR-196)",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            required: [:kind, :visibility],
+            properties: %{
+              kind: %Schema{type: :string, enum: ["workout", "note", "check_in"]},
+              visibility: %Schema{type: :string, enum: ["private", "coach_can_view"]}
+            }
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Defaults", "application/json",
+         %Schema{type: :object, required: [:defaults], properties: %{defaults: @defaults_schema}}},
+      unprocessable_entity: {"Unknown kind or rung", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def put_visibility_default(conn, _params) do
+    body = body_params(conn)
+
+    with {:ok, defaults} <-
+           JournalVisibilityDefaults.put(
+             conn.assigns.user_context,
+             body["kind"],
+             body["visibility"]
+           ) do
+      json(conn, %{defaults: defaults})
     end
   end
 

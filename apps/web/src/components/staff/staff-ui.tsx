@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // Small presentational pieces shared by the staff screens, styled like the
 // existing admin panels.
@@ -36,16 +37,20 @@ export function StaffPanel({
   actions,
   children,
   labelledBy,
+  guide,
 }: {
   title: ReactNode;
   eyebrow?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
   labelledBy: string;
+  /** A walkthrough anchor (ADR-193). */
+  guide?: GuideAnchor;
 }) {
   return (
     <section
       aria-labelledby={labelledBy}
+      data-guide={guide}
       className="rounded-[2rem] p-5 md:p-6"
       style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
     >

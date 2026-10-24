@@ -1,4 +1,5 @@
 import type { AdminUserDirectoryEntry } from "@/api/admin-users";
+import { SERIES_TOKENS, tokenVar } from "@/lib/theme";
 
 export type DirectoryRole = "all" | "member" | "athlete" | "admin";
 export type DirectorySort = "name" | "newest" | "oldest";
@@ -46,9 +47,13 @@ export function initialsOf(name: string) {
   return letters.toLocaleUpperCase();
 }
 
-/** Stable hue per user so avatars keep their colour between visits. */
-export function avatarHue(id: string) {
+/**
+ * A stable theme series colour per user (one of `SERIES_TOKENS`), so avatars keep
+ * their colour between visits and follow the theme (ADR-194: no computed
+ * hsl()).
+ */
+export function avatarTone(id: string) {
   let hash = 0;
-  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) % 360;
-  return hash;
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) % SERIES_TOKENS.length;
+  return tokenVar(SERIES_TOKENS[hash]);
 }

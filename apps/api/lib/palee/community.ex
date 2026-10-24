@@ -36,6 +36,7 @@ defmodule Palee.Community do
     EventSeries,
     HostPolicy,
     FeedCursor,
+    FeedFilter,
     FollowPolicy,
     GroupPolicy,
     SquadPolicy,
@@ -339,6 +340,11 @@ defmodule Palee.Community do
   defdelegate list_comments(context, post_id), to: CommunityStore
   defdelegate feed_page(context, params), to: Feed, as: :page
   defdelegate pinned_posts(context, channel_ids, viewer_id), to: Feed, as: :pinned
+  defdelegate feed_post_types(), to: FeedFilter, as: :types
+  defdelegate parse_feed_filter(params), to: FeedFilter, as: :parse
+  defdelegate feed_filter_active?(filter), to: FeedFilter, as: :active?
+  defdelegate feed_narrowing(filter, clubs, staff), to: FeedFilter, as: :narrowing
+  defdelegate keep_in_feed?(post, narrowing), to: FeedFilter, as: :keep?
   def attachment_types, do: Palee.Community.Post.attachment_types()
   def shareable_attachment_types, do: Palee.Community.Post.shareable_attachment_types()
 
@@ -365,6 +371,14 @@ defmodule Palee.Community do
   defdelegate follow_status(context, type, target_id), to: Follows, as: :status
   defdelegate accept_follow(context, follow_id, now), to: Follows, as: :accept
   defdelegate remove_incoming_follow(context, follow_id), to: Follows, as: :remove_incoming
+  defdelegate accept_all_follow_requests(context, now), to: Follows, as: :accept_all
+
+  # Buddies, relations and people search (ADR-193).
+  defdelegate buddy_ids(context, user_id), to: SocialStore
+  defdelegate person_relations(context, ids), to: SocialStore
+  defdelegate search_people(context, handle_term, name_term, limit), to: SocialStore
+  defdelegate public_user_ids(ids), to: SocialStore
+  defdelegate buddies?(mine, theirs), to: FollowPolicy
 
   defdelegate list_incoming_follows(context, type, target_id, status, page),
     to: SocialStore,
@@ -387,6 +401,7 @@ defmodule Palee.Community do
   defdelegate get_follow(context, follower_id, type, target_id), to: SocialStore
   defdelegate follower_counts(type, ids), to: SocialStore
   defdelegate following_count(user_id), to: SocialStore
+  defdelegate follow_groups(user_id), to: SocialStore
   def follow_target_types, do: FollowPolicy.target_types()
 
   # Social settings (ADR-142 decision 12).

@@ -56,6 +56,7 @@ export function ProposeGroupSheet({
   return (
     <Sheet
       labelId="propose-group"
+      guide="club.groupSheet"
       eyebrow={club.name}
       title={waiting ? t("proposeSentTitle") : t("proposeTitle")}
       onClose={onClose}

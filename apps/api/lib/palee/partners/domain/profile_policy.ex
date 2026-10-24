@@ -3,7 +3,8 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
   A Partners profile (ADR-169 §1, plan D6). Pure.
 
   What a member says about training: a level, the times they train, up to
-  three goals and an optional line of at most 140 characters. Gender and a
+  three goals, up to five disciplines (keys of the box vocabulary, ADR-197)
+  and an optional line of at most 140 characters. Gender and a
   gender preference are optional, used only to honour preferences and
   never shown to anyone. Lists keep a canonical order so two profiles
   compare cleanly.
@@ -15,6 +16,7 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
   @genders ~w(woman man other)
   @gender_preferences ~w(any women men)
   @max_goals 3
+  @max_disciplines 5
   @about_max 140
 
   def levels, do: @levels
@@ -23,20 +25,27 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
   def genders, do: @genders
   def gender_preferences, do: @gender_preferences
   def max_goals, do: @max_goals
+  def max_disciplines, do: @max_disciplines
   def about_max, do: @about_max
 
   @doc """
   The profile attributes from a request: every field is checked and
   normalized (trimmed `about`, deduplicated lists in canonical order). With
-  `current`, missing fields keep their current values.
+  `current`, missing fields keep their current values. `disciplines` is the
+  box vocabulary the disciplines are checked against.
   """
-  def normalize(params, current \\ nil) when is_map(params) do
+  def normalize(params, current \\ nil, disciplines \\ []) when is_map(params) do
     current = current || %{}
 
     with {:ok, level} <- level(fetch(params, :level, Map.get(current, :level))),
          {:ok, times} <- list(fetch(params, :times, Map.get(current, :times)), @times, :times),
          {:ok, goals} <- list(fetch(params, :goals, Map.get(current, :goals)), @goals, :goals),
          :ok <- goal_count(goals),
+         {:ok, picked} <-
+           disciplines(
+             fetch(params, :disciplines, Map.get(current, :disciplines, [])),
+             disciplines
+           ),
          {:ok, about} <- about(fetch(params, :about, Map.get(current, :about))),
          {:ok, gender} <- gender(fetch(params, :gender, Map.get(current, :gender))),
          {:ok, preference} <-
@@ -49,6 +58,7 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
          level: level,
          times: times,
          goals: goals,
+         disciplines: picked,
          about: about,
          gender: gender,
          gender_preference: preference,
@@ -84,6 +94,16 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
   end
 
   defp list(_values, _allowed, field), do: {:error, :"invalid_partner_#{field}"}
+
+  defp disciplines(nil, _allowed), do: {:ok, []}
+
+  defp disciplines(values, allowed) when is_list(values) do
+    if length(Enum.uniq(values)) <= @max_disciplines and Enum.all?(values, &(&1 in allowed)),
+      do: {:ok, Enum.filter(allowed, &(&1 in values))},
+      else: {:error, :invalid_partner_disciplines}
+  end
+
+  defp disciplines(_values, _allowed), do: {:error, :invalid_partner_disciplines}
 
   defp goal_count(goals) when length(goals) <= @max_goals, do: :ok
   defp goal_count(_goals), do: {:error, :invalid_partner_goals}

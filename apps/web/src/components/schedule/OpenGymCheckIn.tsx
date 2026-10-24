@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useLocale } from "next-intl";
 
 import { checkInOpenGym, listMemberLocations, type MemberCheckIn, type MemberLocation } from "@/api/member-facility";
@@ -14,14 +14,18 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 /**
  * Open-gym self check-in (ADR-097). Renders nothing unless the member's
  * package includes open gym; the location picker appears only with several
- * active locations.
+ * active locations. Box › Πρόγραμμα shows it under the classes, and Box in
+ * the next booking's place when there is none (vision §6.2).
  */
 export function OpenGymCheckIn({
   accessToken,
   entitlement,
+  extra,
 }: {
   accessToken: string;
   entitlement: EffectiveEntitlement | null | undefined;
+  /** Another way in next to «Check-in», such as Box's «QR check-in». */
+  extra?: ReactNode;
 }) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -106,7 +110,7 @@ export function OpenGymCheckIn({
             </Select>
           ) : null}
           <button
-            className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
+            className="min-h-11 rounded-full px-5 text-sm font-semibold disabled:opacity-50"
             style={SPARK_GO_STYLE}
             disabled={busy}
             onClick={() => void handleCheckIn()}
@@ -114,6 +118,7 @@ export function OpenGymCheckIn({
           >
             {i18n("mbCheckIn")}
           </button>
+          {extra}
         </div>
       )}
     </section>

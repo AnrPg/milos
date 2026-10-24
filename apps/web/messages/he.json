@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "בית פרטי אחד באירוח עצמי לשיעורים קבוצתיים, תכנות מותאם אישית, ביצוע אימון חי, שיחות אימון והתקדמות ששייכת לספורטאי.",
     "createAnAccount3f4f547": "צור חשבון",
     "signInada2e9e": "היכנס",
-    "conversationHistory0f18fb3": "היסטוריית שיחות",
     "loading33ce417": "טוען...",
-    "noConversations06b83a9": "אין שיחות.",
-    "selectAConversationToViewMessagesaf2cf2c": "בחר שיחה כדי להציג הודעות.",
     "availablePackages48a5129": "חבילות זמינות",
     "closebf5d9ce": "✕ סגור",
     "noPackagesAvailable14160fb": "אין חבילות זמינות.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "הורד את .ics",
     "loadingCalendarLinks1dad320": "טוען קישורי יומן...",
     "writeAMessage24bf2a3": "כתוב הודעה…",
-    "chat67305ee": "← צ'אט",
     "searchOrStartAConversationabb1d82": "חפש או התחל שיחה...",
     "noConversationsYetSearchToStartOne1a91cf7": "עדיין אין שיחות. חפש כדי להתחיל אחד.",
     "hideConversationdfb77ca": "הסתר שיחה",
@@ -730,8 +726,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "ציוני העקביות וההתמדה שלך אינם כוללים את ימי המנוחה המתוכננים שלך - אך איננו יודעים אילו ימים אלו עדיין.",
     "setYourRestDaysInProfilefd0fbe4": "הגדר את ימי המנוחה שלך בפרופיל →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "היום הוא יום המנוחה המתוכנן שלך - ההתאוששות היא חלק מהתוכנית.",
-    "dayStreakca360c4": "רצף ימים",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "השלם את האימון הראשון שלך כדי לזכות בתג הראשון שלך.",
     "loadingYourTrainingOverview39806c7": "טוען את סקירת האימונים שלך...",
     "yourTrainingOverviewIsUnavailable0a82b18": "סקירת ההדרכה שלך אינה זמינה.",
     "refreshSessionf2ed411": "סשן רענון",
@@ -743,7 +737,6 @@
     "showLeaderboardOptIna95255e": "הצג הסכמה ל-Leaderboard",
     "optInRanking04c1cd3": "דירוג הסכמה",
     "joinLeaderboardad480b1": "הצטרף ל- Leaderboard",
-    "noRankedUsersYetForThisPeriod2fa66a4": "אין עדיין משתמשים מדורגים לתקופה זו.",
     "leaveLeaderboard834f047": "עזוב את לוח התוצאות",
     "coachNotes2ea7a97": "הערות המאמן",
     "latestGuidance58da2dc": "הנחיות אחרונות",
@@ -1294,9 +1287,6 @@
     "coaches181feb6": "מאמנים",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "תכנת, תקשר והבין את התקדמות ההדרכה ללא מעקב או מודעות.",
     "directMessagefc7f864": "הודעה ישירה",
-    "workoutThreada03f1e1": "חוט אימון",
-    "classThreadf030236": "חוט כיתתי",
-    "thread7863f75": "חוט",
     "eurd06e073": "יורו",
     "downloada479c9c": "הורד",
     "billed763fe55": "מחויב",
@@ -1546,15 +1536,10 @@
     "executionNotAvailablea9817d4": "ביצוע לא זמין.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "לא ניתן היה לטעון את דף הנחיתה.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "תדירות אימון מול יעד שבועי - 10 השבועות האחרונים",
-    "noWorkoutsYet85a9204": "עדיין אין אימונים",
-    "setAWeeklyTargetdd70e51": "הגדר יעד שבועי",
-    "calculatingc573779": "מחשב...",
     "howCloselyYouFollowedPrescribedExercises760e833": "עד כמה עקבת אחר התרגילים שנקבעו",
     "prs80e1569": "יחסי ציבור ·",
     "whatAreChallengesfdf13a8": "מהם אתגרים?",
     "howDoesTheLeaderboardWork74f2b8a": "איך עובד לוח התוצאות?",
-    "theLeaderboardIsCurrentlyUnavailableYourOptIn96132c6": "ה-Leaderboard אינו זמין כרגע. העדפת ההצטרפות שלך נשמרת.",
-    "theLeaderboardStaysPrivateUntilYouExplicitlyOpt9e982f1": "ה-Leaderboard יישאר פרטי עד שתצטרף באופן מפורש.",
     "workoutsThisWeek0268fc5": "אימונים השבוע",
     "prsThisMonthd85bc56": "יחסי ציבור החודש",
     "noWorkoutsInThisPeriodc124c5e": "אין אימונים בתקופה זו",
@@ -1751,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "למשל 4 סיבובים + 3 חזרות",
     "fail2758e32": "נכשל",
     "capa8fba29": "· כובע",
-    "directbc81524": "ישיר",
-    "class41ff354": "כיתה",
-    "directChat3892e2c": "צ'אט ישיר",
     "createAndManagePromotionalOffers46d33bb": "צור ונהל הצעות קידום מכירות.",
     "reviewReferralActivityAndRewardActions8ea1271": "סקור פעילות הפניה ופעולות תגמול.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "נהל את החבילות המשמשות את החברות והזכויות.",
@@ -3642,8 +3624,6 @@
     "clVideoUnavailable": "הקישור אינו זמין",
     "clMinutesShort": "{count} דק׳",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "ההתקדמות שלי",
-    "clProgressIntro": "האימונים שלך ב-12 השבועות האחרונים.",
     "clProgressSessions": "אימונים",
     "clProgressMinutes": "דקות",
     "clProgressWorkouts": "אימונים שונים",
@@ -3687,7 +3667,6 @@
     "clFormReviewWithdraw": "ביטול הבקשה",
     "clFormReviewWithdrawConfirm": "לבטל את הבקשה? הבדיקה תוחזר לחבילה שלך.",
     "clNutritionTitle": "תוכנית תזונה",
-    "clNutritionEmpty": "המאמן שלך עדיין לא שיתף תוכנית תזונה.",
     "clNutritionUpdated": "עודכן {date}",
     "clNutritionCalories": "קלוריות",
     "clNutritionProtein": "חלבון",
@@ -4313,7 +4292,6 @@
     "msgTopicFacility": "מתקנים",
     "msgSendAsCoaching": "כהודעת אימון",
     "msgSendAsCoachingHint": "נספר כנקודת מגע אימונית עם הלקוח.",
-    "chatsTabBox": "המכון",
     "chatsBoxThread": "המכון שלך",
     "coachLatestTitle": "האחרון מהמאמן",
     "coachLatestEmpty": "עדיין אין הודעות מהמאמן שלך.",
@@ -4461,7 +4439,36 @@
     "apiErrorAccountNotFound": "לא נמצא חשבון תואם.",
     "apiErrorUnknownDemoSection": "אין נתוני הדגמה למסך הזה.",
     "ntfBusinessDemoIdleTitle": "העסק לדוגמה שלך מחכה לך",
-    "ntfBusinessDemoIdleBody": "אף אחד לא השתמש ב-{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת."
+    "ntfBusinessDemoIdleBody": "אף אחד לא השתמש ב-{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת.",
+    "clApptFiltersTitle": "סינון פגישות",
+    "clApptFilterKind": "סוג",
+    "clApptFilterFormat": "פורמט",
+    "clApptFilterCoach": "מאמן",
+    "clApptNoMatch": "אין התאמות לסינון.",
+    "reviewsFiltersTitle": "סינון ביקורות",
+    "reviewsFilterTarget": "על מה",
+    "reviewsFilterSentiment": "תחושה",
+    "reviewsNoMatch": "אין ביקורות שתואמות לסינון.",
+    "workoutsFiltersTitle": "סינון אימונים",
+    "workoutsFilterStatus": "מצב",
+    "workoutsStatusDone": "בוצעו",
+    "workoutsStatusPending": "לביצוע",
+    "workoutsFilterKind": "סוג",
+    "workoutsKindPersonal": "אישיים",
+    "workoutsFilterSeason": "עונה",
+    "clProgressOnTargetWeeks": "{onTarget} מתוך {weeks} שבועות ביעד",
+    "clProgressStreakDays": "{count, plural, one {יום אחד} other {# ימים}}",
+    "clProgressTarget": "יעד {count}/שבוע",
+    "clProgressHeatmap": "ימי אימון",
+    "clProgressHeatWeek": "שבוע {date}: {count, plural, one {אימון אחד} other {# אימונים}}{onTarget, select, true {, ביעד} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {ללא אימון} one {אימון אחד} other {# אימונים}}",
+    "clProgressBadges": "תגים",
+    "prTrendEstimated": "1RM משוער {value} {unit}",
+    "prTrendRetest": "הגיע הזמן לבדיקה חוזרת?",
+    "clNutritionMacros": "מאקרו",
+    "clNutritionMacrosHidden": "המספרים מוסתרים",
+    "clNutritionHideMacros": "הסתר מספרים",
+    "clNutritionShowMacros": "הצג מספרים"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -5064,7 +5071,6 @@
     "signOut": "התנתקות",
     "todayWorkout": "האימון של היום",
     "todaySources": "אימוני היום לפי מקור",
-    "todayEmpty": "אין שום דבר מתוכנן להיום. הזמינו שיעור או תעדו אימון משלכם.",
     "classChip": "שיעור {time}",
     "programmeChip": "{title} · מהמאמן",
     "logWorkout": "תיעוד",
@@ -5072,8 +5078,6 @@
     "startWorkout": "התחלה",
     "resumeWorkout": "המשך",
     "nextSession": "האימון הבא שלכם",
-    "noBooking": "עדיין אין הזמנה.",
-    "bookClass": "הזמנת שיעור",
     "manageBooking": "פתיחת ההזמנה",
     "todayLabel": "היום",
     "boxActions": "פעולות הבוקס",
@@ -5082,7 +5086,6 @@
     "actionVideos": "סרטונים",
     "actionCoach": "מאמן",
     "membership": "מנוי",
-    "membershipNone": "אין חבילה פעילה.",
     "meProfileTabs": "הפרופיל שלך",
     "meAllPosts": "כל הפוסטים שלך",
     "meAllPrs": "כל השיאים",
@@ -5097,14 +5100,12 @@
     "meSharingHint": "מה המאמן ואחרים יכולים לראות",
     "mePayments": "תשלומים וקבלות",
     "mePaymentsHint": "חשבוניות, החזרים והחבילה שלכם",
-    "meChats": "שיחות",
     "meSettings": "הגדרות",
     "meSettingsHint": "פרופיל, שפה, ערכת נושא, חשבון",
     "meTour": "סיור במערכת",
     "meChecklist": "צעדים ראשונים",
     "meConsole": "ניהול",
     "meConsoleHint": "פתיחת מסוף הצוות",
-    "meMyBoxes": "הבוקסים שלי",
     "bookingStatus": {
       "approved": "מוזמן",
       "pending": "ממתין",
@@ -5135,7 +5136,7 @@
       "measure": "משקל, היקפים, תמונות",
       "wellness": "כוס, הלילה שעבר, ארוחה",
       "craving": "רשום/י אותו או בקש/י תמיכה",
-      "support": "הודעה מהירה לבאדי שלך",
+      "support": "הודעה מהירה לחבר לתמיכה שלך",
       "voice": "ספר/י מה עשית"
     },
     "homeTitle": "פיד",
@@ -5282,7 +5283,7 @@
         "glasses": "{filled} מתוך {goal} כוסות",
         "added": "נוספה כוס ({ml} מ״ל)",
         "dropsLabel": "הכוסות של היום",
-        "remove": "הסרת הכוס הזו"
+        "remove": "הסר את הכוס האחרונה"
       },
       "sleep": {
         "title": "שינה",
@@ -5364,9 +5365,6 @@
         "noPortions": "בתוכנית של המאמן שלך עוד אין מנות יומיות."
       },
       "mood": {
-        "mood": "מצב רוח {value}/4",
-        "stress": "מתח {value}/4",
-        "empty": "איך את/ה מרגיש/ה?",
         "open": "ענה/י על «איך אני מרגיש/ה»"
       },
       "craving": {
@@ -5376,7 +5374,7 @@
         "count": "{count, plural, one {# היום} other {# היום}}",
         "edit": "עריכה",
         "support": "אני צריך/ה תמיכה",
-        "supportNoBuddy": "כשתבחר/י באדי, הוא יקבל הודעה קצרה. אף פעם לא את הפרטים.",
+        "supportNoBuddy": "כשתבחר/י חבר לתמיכה, הוא יקבל הודעה קצרה. אף פעם לא את הפרטים.",
         "intensity": "כמה חזק?",
         "trigger": "מה עורר אותו?",
         "outcome": "מה קרה?",
@@ -5463,7 +5461,45 @@
         "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "עזרה וסיור",
+    "meHelpHint": "סיור, צעדים ראשונים, יצירת קשר",
+    "meHelpResetsWaiting": "{count, plural, one {איפוס סיסמה אחד ממתין} two {שני איפוסי סיסמה ממתינים} other {# איפוסי סיסמה ממתינים}}",
+    "helpVisibility": "איך עובדת הנראות",
+    "helpVisibilityPrivate": "כל מה שאתה רושם ביומן שייך לך: רק אתה רואה אותו, אלא אם תבחר אחרת.",
+    "helpVisibilityCoach": "המאמן שלך רואה רק את מה שאתה מתיר בשיתוף. פציעות הוא רואה תמיד, למען בטיחותך.",
+    "helpVisibilityPosts": "הפוסטים שלך מוצגים למי שתבחר בעת הפרסום: המועדון, העוקבים שלך או כולם.",
+    "helpContactBox": "יצירת קשר עם המכון",
+    "helpContactBoxHint": "כתוב למכון דרך ההודעות",
+    "helpReport": "דיווח על בעיה",
+    "helpReportSubject": "בעיה ב-Palee",
+    "helpStaffOnly": "לצוות בלבד",
+    "settingsUnitsHint": "איך מוצגים משקל, גובה והיקפים.",
+    "settingsSectionsHint": "אילו מקטעים יש ביומן שלך ואיך מוצג המשקל.",
+    "mePrsPrivate": "{count, plural, one {שיא אישי נוסף פרטי.} two {עוד שני שיאים אישיים פרטיים.} other {עוד # שיאים אישיים פרטיים.}} בחר אילו מוצגים בשיתוף ונראות.",
+    "mePrsNoneShown": "עדיין אינך מציג שיאים אישיים בפרופיל.",
+    "sharing": {
+      "coachSeesTitle": "המאמן שלי רואה",
+      "coachSeesHint": "מה מגיע למאמנים שלך בלי שתשלח בכל פעם.",
+      "injuriesAlways": "פציעות תמיד גלויות למאמן, למען בטיחותך.",
+      "communityTitle": "קהילה",
+      "communityHint": "היכן אתה מופיע במועדונים ולאחרים.",
+      "prCelebrations": "חגיגת שיאים",
+      "prCelebrationsHint": "כרטיס אוטומטי במועדון כשאתה שובר שיא",
+      "challenges": "אתגרים",
+      "challengesHint": "השם שלך בדירוג האתגרים",
+      "profilePrsTitle": "שיאים בפרופיל שלך",
+      "profilePrsHint": "העוקבים שלך רואים רק את מה שתפעיל. השאר נשארים פרטיים.",
+      "profilePrsEmpty": "אין לך שיאים עדיין.",
+      "defaultsTitle": "ברירת מחדל לרשומות חדשות",
+      "defaultsHint": "מאיפה מתחילה כל רשומה חדשה. אפשר לשנות כל אחת מתי שתרצה.",
+      "defaultKind": {
+        "workout": "אימונים",
+        "note": "הערות",
+        "check_in": "צ׳ק-אין"
+      },
+      "saveError": "השינוי לא נשמר. נסה שוב."
+    }
   },
   "Community": {
     "all": "הכול",
@@ -5536,7 +5572,6 @@
       "announcements": "הודעות בלבד",
       "none": "מושתק"
     },
-    "wodNoWorkout": "אין היום WOD של שיעור.",
     "wodScoreCount": "תוצאות היום: {count}",
     "wodLeaderboard": "דירוג",
     "wodYou": "את/ה",
@@ -5546,7 +5581,6 @@
     "wodOptInLink": "הפעלה",
     "announcementsEmpty": "אין עדיין הודעות.",
     "announcementsOpen": "כל ההודעות",
-    "channelShowAll": "כל הערוצים",
     "channelSuggested": "מומלץ",
     "channelSuggestedHint": "את/ה מזמינים את השיעור הזה לעיתים קרובות",
     "channelsOfBox": "מהמכון",
@@ -5573,7 +5607,19 @@
     "more": "עוד",
     "report": "דיווח",
     "commentHidden": "מוסתר",
-    "channelsOfClub": "ערוצי המועדון"
+    "channelsOfClub": "ערוצי המועדון",
+    "postFiltersTitle": "סינון פוסטים",
+    "filterClub": "מועדון",
+    "filterChannel": "ערוץ",
+    "filterType": "סוג",
+    "postType": {
+      "announcement": "הודעות",
+      "pr": "שיאים אישיים",
+      "event": "אירועים"
+    },
+    "filterCoachesOnly": "מאמנים בלבד",
+    "filterAuthor": "כותב",
+    "postsNoMatch": "אין פוסטים שתואמים לסינון."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {מסננים} other {מסננים (#)}}",
@@ -5581,7 +5627,8 @@
     "clear": "ניקוי",
     "back": "חזרה",
     "showResults": "{count, plural, =0 {אין תוצאות} other {הצגת #}}",
-    "show": "הצג"
+    "show": "הצג",
+    "all": "הכול"
   },
   "BoxSchedule": {
     "title": "לוח שיעורים",
@@ -5940,16 +5987,10 @@
     "requestsRowHint": "אשר או דחה",
     "notifications": "התראות",
     "notificationsUnread": "{count, plural, one {התראה אחת שלא נקראה} other {# התראות שלא נקראו}}",
-    "countsLine": "{followers, plural, one {עוקב אחד} other {# עוקבים}} · {following} במעקב",
-    "countsLineOther": "{followers, plural, one {עוקב אחד} other {# עוקבים}} · {following} במעקב",
     "connectionsTitle": "קשרים",
-    "tabFollowers": "{count, plural, one {עוקב אחד} other {# עוקבים}}",
-    "tabFollowing": "במעקב {count}",
     "tabBoxes": "בוקסים",
     "tabClubs": "מועדונים",
     "tabPrs": "שיאים",
-    "followersEmpty": "עוד אף אחד לא עוקב אחריך.",
-    "followingEmpty": "אתה עוד לא עוקב אחרי אף אחד.",
     "boxesEmpty": "אתה עוד לא עוקב אחרי בוקס.",
     "clubsEmpty": "אתה עוד לא במועדון.",
     "remove": "הסר",
@@ -5988,7 +6029,48 @@
     "searchPeople": "חיפוש אנשים",
     "searchBoxes": "חיפוש מכונים",
     "searchClubs": "חיפוש מועדונים",
-    "searchNoMatch": "אין תוצאות לחיפוש הזה."
+    "searchNoMatch": "אין תוצאות לחיפוש הזה.",
+    "countBuddies": "{count, plural, one {# חבר} other {# חבר'ה}}",
+    "countFollowYou": "{count, plural, one {# עוקב אחריך} other {# עוקבים אחריך}}",
+    "countYouFollow": "{count} במעקב שלך",
+    "countFollowers": "{count, plural, one {עוקב אחד} other {# עוקבים}}",
+    "countFollowing": "{count} במעקב",
+    "tabBuddies": "החבר'ה {count}",
+    "tabFollowYou": "עוקבים אחריך {count}",
+    "tabYouFollow": "במעקב שלך {count}",
+    "buddyBadge": "חבר",
+    "relationClub": "במועדון שלך",
+    "relationNearby": "בקרבתך",
+    "relationYouFollow": "במעקב שלך",
+    "findPeople": "מצא אנשים",
+    "findClubsAndPeople": "חיפוש מועדונים ואנשים",
+    "peopleTitle": "אנשים",
+    "peopleNoMatch": "לא נמצא אף אחד. חשבונות פרטיים מופיעים רק למי שכבר מכיר אותם.",
+    "peopleSearchFailed": "החיפוש נכשל. נסה שוב.",
+    "searchBuddies": "חיפוש בחבר'ה",
+    "buddiesEmpty": "עדיין אין לך חבר'ה. כשמישהו שאתה עוקב אחריו עוקב גם אחריך, אתם חברים.",
+    "followYouEmpty": "אין כאן אף אחד. כאן מופיעים מי שעוקבים אחריך ואתה לא עוקב אחריהם.",
+    "youFollowEmpty": "אין כאן אף אחד. כאן מופיעים מי שאתה עוקב אחריהם והם לא עוקבים אחריך.",
+    "unfollowBuddyConfirm": "להפסיק לעקוב? לא תהיו יותר חברים ולא תראה את הפוסטים לעוקבים בלבד.",
+    "lockedPrivate": "חשבון פרטי. שלח בקשת מעקב כדי לראות גם פוסטים לעוקבים בלבד; כל בקשה מאושרת בנפרד.",
+    "privacyTitle": "חשבון פרטי וחיפוש",
+    "privacyHint": "מי יכול לעקוב אחריך ומי יכול למצוא אותך.",
+    "privateAccountToggle": "חשבון פרטי",
+    "privateAccountOn": "רק מי שאישרת עוקב אחריך. אם תכבה, החשבון יהפוך לציבורי: כל אחד יוכל לעקוב אחריך מיד, ובקשות שממתינות יאושרו.",
+    "privateAccountOff": "החשבון שלך ציבורי: כל אחד יכול לעקוב אחריך מיד. הפעל שוב כדי לאשר בעצמך כל עוקב חדש; העוקבים הנוכחיים נשארים.",
+    "goPublicConfirm": "{count, plural, one {להפוך לציבורי? הבקשה שממתינה תאושר עכשיו.} two {להפוך לציבורי? שתי הבקשות שממתינות יאושרו עכשיו.} other {להפוך לציבורי? # הבקשות שממתינות יאושרו עכשיו.}}",
+    "goPublic": "הפוך לציבורי",
+    "keepPrivate": "השאר פרטי",
+    "searchableToggle": "הצג אותי בחיפוש",
+    "searchableOn": "כל אחד ב-Palee יכול למצוא אותך לפי שם או @handle.",
+    "searchablePrivate": "אנשים מהמועדונים שלך ומהמעקבים שלך מוצאים אותך לפי שם או @handle. אחרים ימצאו אותך כשהחשבון יהיה ציבורי.",
+    "searchableOff": "בחיפוש מוצאים אותך רק אנשים שאתה כבר מכיר, מהמועדונים או מהמעקבים שלך.",
+    "notifNewFollowerTitle": "עוקב חדש",
+    "notifNewFollowerBody": "{name} התחיל לעקוב אחריך.",
+    "notifFollowRequestedTitle": "בקשת מעקב",
+    "notifFollowRequestedBody": "{name} רוצה לעקוב אחריך.",
+    "notifFollowAcceptedTitle": "הבקשה אושרה",
+    "notifFollowAcceptedBody": "{name} אישר את בקשת המעקב שלך."
   },
   "BoxPage": {
     "allWeek": "כל השבוע",
@@ -6309,7 +6391,6 @@
     "clubLeaveBody": "הפוסטים שלו ייעלמו מהפיד שלך. אפשר להצטרף שוב מ«גילוי».",
     "find": "גילוי",
     "findTitle": "גילוי מועדונים",
-    "findSearch": "חיפוש מועדונים וקבוצות",
     "findOpenClubs": "מועדונים פתוחים",
     "findGroups": "קבוצות במכונים שלך",
     "findNoClubs": "בבוקסים שאת/ה חברים בהם או עוקבים אחריהם עוד אין מועדונים פתוחים.",
@@ -6363,7 +6444,10 @@
     "notif_event_cohost_answered_title": "תשובה לאירוח משותף",
     "notif_event_cohost_answered_accepted_body": "{box} מארח/ת יחד את «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} סירב/ה לארח יחד את «{event}».",
-    "notif_event_cohost_answered_removed_body": "{box} כבר לא מארח/ת יחד את «{event}»."
+    "notif_event_cohost_answered_removed_body": "{box} כבר לא מארח/ת יחד את «{event}».",
+    "filterKind": "סוג",
+    "filterBox": "מכון",
+    "findFiltersTitle": "סינון חיפוש"
   },
   "CommunityAdmin": {
     "title": "קהילה",
@@ -6638,7 +6722,14 @@
     "err_already_refunded": "התשלום הזה כבר הוחזר.",
     "err_invalid_refund": "סכום ההחזר צריך להיות מעל אפס ולא יותר ממה ששולם.",
     "err_invalid_cohosts": "אי אפשר לקרוא את כתובות המארגנים השותפים האלה. בדוק כל כתובת דף.",
-    "err_duplicate_cohost": "אותו עסק מוזמן פעמיים."
+    "err_duplicate_cohost": "אותו עסק מוזמן פעמיים.",
+    "filtersTitle": "סינון אירועים",
+    "filterClub": "מועדון",
+    "filterFree": "בחינם",
+    "filterPrice": "מחיר",
+    "filterGoing": "אני מגיע/ה",
+    "filterMine": "אני",
+    "filtersNoMatch": "אין אירועים שתואמים לסינון."
   },
   "EventsAdmin": {
     "emptyUpcoming": "אין אירועים קרובים. צרו אחד עם «+ אירוע חדש».",
@@ -6779,7 +6870,7 @@
   },
   "Around": {
     "scopeLabel": "מה מוצג בפיד",
-    "scopeClubs": "המועדונים שלי",
+    "scopeClubs": "האנשים שלי",
     "scopeAround": "סביבי",
     "loading": "טוען…",
     "updating": "מעדכן תוצאות…",
@@ -6892,10 +6983,6 @@
     "section_boxes": "בוקסים קרובים אליך",
     "section_clubs": "מועדונים פתוחים",
     "section_posts": "פוסטים",
-    "empty_events": "אין אירועים פתוחים בטווח {distance}.",
-    "empty_boxes": "אין בוקסים בטווח {distance}.",
-    "empty_clubs": "אין מועדונים פתוחים בטווח {distance}.",
-    "empty_posts": "אין פוסטים ציבוריים בטווח {distance}.",
     "seeAll": "{count, plural, one {לצפייה} other {לכל התוצאות (#)}}",
     "otherBoxes": "בוקסים נוספים באזור ({count})",
     "trialBadge": "ניסיון",
@@ -6924,8 +7011,6 @@
     "pin_posts": "פוסט",
     "open": "פתיחה",
     "closeCard": "סגירה",
-    "backToAround": "סביבי",
-    "kindCount": "{count, plural, =0 {אין} one {#} other {#}} בטווח {distance}",
     "loadMore": "עוד",
     "loadingMore": "טוען…",
     "needArea": "קודם בוחרים איפה לחפש.",
@@ -6949,7 +7034,9 @@
     "dateTo": "עד",
     "priceOpenEnd": "{price}+",
     "priceFrom": "מחיר מינימלי",
-    "priceTo": "מחיר מקסימלי"
+    "priceTo": "מחיר מקסימלי",
+    "sectionLevel": "רמה",
+    "levelHint": "מכונים עם שיעורים ברמה הזו"
   },
   "CheckIn": {
     "loading": "טוען…",
@@ -7431,7 +7518,7 @@
     "helpIntro": "בסרט מדידה רך, על העור, צמוד אבל לא הדוק. מדוד באותה שעה ביום, רצוי בבוקר.",
     "helpPhotos": "לתמונות: אותו מקום, אותה תאורה, אותו מרחק. הטיימר נותן לך 10 שניות להתרחק.",
     "settingsTitle": "הגדרות גוף",
-    "settingsHubHint": "יחידות, משקל, תמונות, תזכורת",
+    "settingsHubHint": "תמונות, תזכורת מדידה",
     "settingsIntro": "נתוני הגוף שלך פרטיים כברירת מחדל. כאן בוחרים איך הם מוצגים ומי רואה אותם.",
     "unitsLabel": "יחידות",
     "sectionsLabel": "אזורי היומן",
@@ -7602,7 +7689,8 @@
       "share_photo_missing": "שתי המדידות צריכות תמונה מוכנה של התנוחה הזו.",
       "media_not_ready": "תמונה עדיין בעיבוד. נסה שוב בעוד רגע."
     },
-    "fromGarmin": "מ-Garmin"
+    "fromGarmin": "מ-Garmin",
+    "unitsAndSectionsLink": "יחידות ומקטעים בהגדרות"
   },
   "Referrals": {
     "title": "הבא חבר",
@@ -7925,10 +8013,6 @@
     "return_garmin_account_in_use": "חשבון Garmin הזה כבר מקושר לחשבון Palee אחר.",
     "return_garmin_connect_failed": "Garmin לא הצליח להשלים את החיבור. נסה שוב.",
     "restingTitle": "דופק במנוחה",
-    "restingRange": "תקופה",
-    "restingRange_1m": "חודש",
-    "restingRange_3m": "3 חודשים",
-    "restingRange_1y": "שנה",
     "bpmValue": "{value} פעימות/דקה",
     "restingLatest": "מדידה אחרונה · {date}",
     "restingAverage": "ממוצע {value} פעימות/דקה {days, plural, one {ביום אחד} two {ביומיים} other {ב-# ימים}}",
@@ -7965,18 +8049,18 @@
     "error_phone_health_not_connected": "לא מחובר. אפשר לחבר מהאפליקציה בטלפון."
   },
   "Buddy": {
-    "title": "באדי לתמיכה",
+    "title": "חבר לתמיכה",
     "rowHint": "אדם אחד או שניים לרגעים הקשים",
     "backToMe": "אני",
     "intro": "אדם אחד או שניים שאתה סומך עליהם: בן זוג, חבר או המאמן שלך. הם מקבלים רק את מה שאתה שולח עם «אני צריך תמיכה». שום דבר אוטומטי.",
-    "myBuddies": "הבאדים שלי",
-    "noBuddies": "עדיין אין באדי. הזמן מישהו שאתה סומך עליו.",
+    "myBuddies": "החברים שלי לתמיכה",
+    "noBuddies": "עדיין אין חבר לתמיכה. הזמן מישהו שאתה סומך עליו.",
     "add": "הוסף אדם או את המאמן שלך",
-    "full": "יש לך {max} באדים או הזמנות, המקסימום האפשרי.",
+    "full": "יש לך {max} חברים לתמיכה או הזמנות, המקסימום האפשרי.",
     "needSupport": "אני צריך תמיכה",
     "ask": "בקש",
     "invitationsTitle": "הזמנות בשבילך",
-    "invitationBody": "{name} מבקש שתהיה באדי לתמיכה. תשמע ממנו רק כשהוא יבקש.",
+    "invitationBody": "{name} מבקש שתהיה חבר לתמיכה. תשמע ממנו רק כשהוא יבקש.",
     "accept": "אישור",
     "acceptName": "אשר את ההזמנה של {name}",
     "decline": "לא עכשיו",
@@ -8009,9 +8093,9 @@
     "withdraw": "בטל הזמנה",
     "withdrawConfirm": "לבטל את ההזמנה אל {name}?",
     "stop": "הפסק",
-    "stopConfirm": "להפסיק להיות באדים עם {name}?",
+    "stopConfirm": "להפסיק להיות חברים לתמיכה עם {name}?",
     "stopSupportingConfirm": "להפסיק לתמוך ב{name}?",
-    "stopQuiet": "הוא יראה את זה בדף הבאדי שלו; לא נשלחת התראה.",
+    "stopQuiet": "הוא יראה את זה בדף החבר לתמיכה שלו; לא נשלחת התראה.",
     "stopYes": "כן, הפסק",
     "cancel": "ביטול",
     "close": "סגירה",
@@ -8025,11 +8109,11 @@
     "quietFrom": "מ־",
     "quietTo": "עד",
     "quietSaved": "שעות שקטות: {range}",
-    "sharePhone": "שתף את הטלפון שלי עם הבאדים שלי",
-    "sharePhoneHint": "רק בשביל «תתקשר אליי», רק עם הבאדים הפעילים שלך. כבוי עד שתפעיל.",
+    "sharePhone": "שתף את הטלפון שלי עם החברים שלי לתמיכה",
+    "sharePhoneHint": "רק בשביל «תתקשר אליי», רק עם החברים הפעילים שלך לתמיכה. כבוי עד שתפעיל.",
     "phone": "מספר טלפון",
     "footer": "כל אחד מכם יכול להפסיק בכל רגע. הצד השני רואה זאת כאן, בלי התראה.",
-    "addTitle": "באדי חדש",
+    "addTitle": "חבר חדש לתמיכה",
     "addIntro": "המאמן שלך, אנשים מהמועדונים שלך או מי שאתה עוקב אחריו. שום דבר לא מתחיל לפני שהם מאשרים.",
     "searchLabel": "חיפוש",
     "searchPlaceholder": "שם או כינוי",
@@ -8042,20 +8126,20 @@
     },
     "candidateStatus": {
       "pending": "הוזמן",
-      "active": "כבר הבאדי שלך"
+      "active": "כבר החבר שלך לתמיכה"
     },
     "invite": "הזמן",
     "inviteName": "הזמן את {name}",
     "sendLink": "שלח קישור למישהו שאינו ב־Palee",
     "sendLinkHint": "הקישור תקף {days} ימים ופעם אחת בלבד. שום דבר לא מתחיל לפני שהוא מאשר.",
-    "shareTitle": "תהיה הבאדי שלי לתמיכה",
-    "shareText": "הייתי רוצה שתהיה הבאדי שלי לתמיכה ב־Palee. תשמע ממני רק כשאבקש.",
+    "shareTitle": "תהיה החבר שלי לתמיכה",
+    "shareText": "הייתי רוצה שתהיה החבר שלי לתמיכה ב־Palee. תשמע ממני רק כשאבקש.",
     "linkReady": "הקישור שלך מוכן לשיתוף.",
     "linkCopied": "הקישור הועתק. הדבק אותו בהודעה.",
     "linkLabel": "קישור הזמנה",
-    "noBuddyYet": "עדיין אין לך באדי פעיל. ברגע שמישהו יאשר, «אני צריך תמיכה» יגיע אליו.",
-    "noBuddyYetShort": "בחר באדי וזה יגיע אליו בלחיצה אחת.",
-    "setUpBuddy": "בחר באדי",
+    "noBuddyYet": "עדיין אין לך חבר פעיל לתמיכה. ברגע שמישהו יאשר, «אני צריך תמיכה» יגיע אליו.",
+    "noBuddyYetShort": "בחר חבר לתמיכה וזה יגיע אליו בלחיצה אחת.",
+    "setUpBuddy": "בחר חבר לתמיכה",
     "messageLabel": "הודעה (לא חובה)",
     "messagePlaceholder": "למשל: ערב קשה.",
     "goesTo": "נשלח אל: {names}",
@@ -8114,29 +8198,29 @@
     "chatWith": "שיחה עם {name}",
     "chatEmpty": "עדיין אין הודעות.",
     "chatPlaceholder": "כתוב הודעה",
-    "chatReadOnly": "קשר הבאדי הסתיים. השיחה נשארת לקריאה; אי אפשר לכתוב.",
+    "chatReadOnly": "הקשר עם החבר לתמיכה הסתיים. השיחה נשארת לקריאה; אי אפשר לכתוב.",
     "earlier": "הודעות קודמות",
     "read": "נקרא",
-    "threadsTitle": "שיחות באדי",
-    "threadMyBuddy": "הבאדי שלך",
+    "threadsTitle": "שיחות עם חברים לתמיכה",
+    "threadMyBuddy": "החבר שלך לתמיכה",
     "threadISupport": "אתה תומך בו",
-    "inviteHeading": "הזמנה להיות באדי",
-    "inviteFrom": "{name} רוצה שתהיה הבאדי שלו לתמיכה",
-    "inviteFromSomeone": "מישהו רוצה שתהיה הבאדי שלו לתמיכה",
-    "whatIsBuddy": "מה זה באדי",
-    "whatOnly": "באדי מקבל רק את מה שהצד השני שולח עם «אני צריך תמיכה». שום דבר אוטומטי, אף פעם לא פרטים.",
+    "inviteHeading": "הזמנה להיות חבר לתמיכה",
+    "inviteFrom": "{name} רוצה שתהיה החבר שלו לתמיכה",
+    "inviteFromSomeone": "מישהו רוצה שתהיה החבר שלו לתמיכה",
+    "whatIsBuddy": "מה זה חבר לתמיכה",
+    "whatOnly": "חבר לתמיכה מקבל רק את מה שהצד השני שולח עם «אני צריך תמיכה». שום דבר אוטומטי, אף פעם לא פרטים.",
     "whatReplies": "עונים בלחיצה אחת: אני כאן · נצא להליכה? · תתקשר אליי, או במילים שלך.",
     "whatQuiet": "אפשר להגדיר שעות שקטות; אז הבקשות מגיעות בשקט.",
     "whatStop": "כל אחד מכם יכול להפסיק בכל רגע.",
     "inviteSignUp": "צור חשבון ואשר",
     "inviteSignIn": "התחבר ואשר",
     "notNow": "לא עכשיו",
-    "inviteAccepted": "עכשיו אתה הבאדי לתמיכה של {name}.",
-    "inviteAcceptedNoName": "עכשיו אתה באדי לתמיכה.",
-    "openBuddy": "פתח באדי",
+    "inviteAccepted": "עכשיו אתה החבר לתמיכה של {name}.",
+    "inviteAcceptedNoName": "עכשיו אתה חבר לתמיכה.",
+    "openBuddy": "פתח חבר לתמיכה",
     "inviteExpired": "ההזמנה פגה. בקש קישור חדש.",
     "inviteUnavailable": "קישור ההזמנה הזה כבר לא עובד.",
-    "inviteFooter": "Palee אינו שירות רפואי ואינו שירות חירום. באדי הוא אדם שאתה מכיר, לצידך ברגע קשה.",
+    "inviteFooter": "Palee אינו שירות רפואי ואינו שירות חירום. חבר לתמיכה הוא אדם שאתה מכיר, לצידך ברגע קשה.",
     "linesTitle": "קווי סיוע",
     "linesIntro": "אם זה יותר מרגע קשה, השירותים האלה יכולים לעזור. זה מידע, לא עצה; Palee אינו שירות רפואי ואינו שירות חירום.",
     "linesGreece": "ביוון",
@@ -8152,7 +8236,7 @@
     },
     "linesNote": "מחוץ ליוון, מספר החירום בכל האיחוד האירופי הוא 112, או המספר של המדינה שלך.",
     "cravingGoesTo": "הודעה קצרה נשלחת אל {names}. אף פעם לא הפרטים.",
-    "cravingSupportSent": "נשלח לבאדים שלך. את הסטטוס רואים בדף רווחה.",
+    "cravingSupportSent": "נשלח לחברים שלך לתמיכה. את הסטטוס רואים בדף רווחה.",
     "sharingSectionTitle": "סיכום רווחה שבועי למאמן",
     "sharingSectionHint": "מה המאמן רואה מהרווחה שלך, רק אם תאפשר",
     "shareWellness": "רווחה · סיכום שבועי",
@@ -8179,11 +8263,11 @@
     "coachAllowedSince": "{name} אישר את הסיכום הזה ב־{date}. בכל פעם שאתה פותח אותו, הוא יכול לראות.",
     "notif": {
       "buddy_invite": {
-        "title": "הזמנה להיות באדי",
-        "body": "{name} מבקש שתהיה באדי לתמיכה."
+        "title": "הזמנה להיות חבר לתמיכה",
+        "body": "{name} מבקש שתהיה חבר לתמיכה."
       },
       "buddy_accepted": {
-        "title": "יש לך באדי לתמיכה",
+        "title": "יש לך חבר לתמיכה",
         "body": "{name} אישר, וישמע ממך רק כשתבקש."
       },
       "support_request": {
@@ -8203,7 +8287,7 @@
         "body": "רגעים קשים: {moments}, התגברות: {overcome}, בקשות תמיכה: {requests}."
       },
       "buddy_message": {
-        "title": "הודעה מבאדי",
+        "title": "הודעה מחבר לתמיכה",
         "body": "{name} שלח לך הודעה."
       },
       "coach_wellness_summary": {
@@ -8212,18 +8296,18 @@
       }
     },
     "errors": {
-      "buddy_limit_reached": "אפשר שיהיו לך עד שני באדים או הזמנות.",
+      "buddy_limit_reached": "אפשר שיהיו לך עד שני חברים לתמיכה או הזמנות.",
       "buddy_already_invited": "כבר הזמנת את האדם הזה.",
       "buddy_invite_expired": "ההזמנה פגה.",
-      "buddy_link_closed": "קשר הבאדי הזה כבר הסתיים.",
+      "buddy_link_closed": "הקשר עם החבר לתמיכה כבר הסתיים.",
       "buddy_invite_unavailable": "קישור ההזמנה הזה כבר לא עובד.",
-      "cannot_buddy_self": "אי אפשר להיות הבאדי של עצמך.",
+      "cannot_buddy_self": "אי אפשר להיות החבר לתמיכה של עצמך.",
       "not_eligible_for_buddy": "הזמן את המאמן שלך, מישהו מהמועדונים שלך או מישהו שאתה עוקב אחריו, או שלח קישור.",
       "message_too_long": "ההודעה היא עד 280 תווים.",
-      "support_rate_limited": "ביקשת כמה פעמים בשעה הזו; הבאדים שלך קיבלו.",
-      "no_active_buddies": "הוסף קודם באדי.",
+      "support_rate_limited": "ביקשת כמה פעמים בשעה הזו; החברים שלך לתמיכה קיבלו.",
+      "no_active_buddies": "הוסף קודם חבר לתמיכה.",
       "already_undone": "הבקשה הזו כבר בוטלה.",
-      "undo_window_passed": "הבאדים שלך כבר קיבלו הודעה.",
+      "undo_window_passed": "החברים שלך לתמיכה כבר קיבלו הודעה.",
       "reply_text_required": "כתוב כמה מילים.",
       "reply_too_long": "תשובה היא עד 500 תווים.",
       "invalid_quiet_hours": "שעות שקטות צריכות שתי שעות שונות.",
@@ -8232,7 +8316,7 @@
       "summary_required": "הפעל קודם את הסיכום השבועי.",
       "message_body_required": "כתוב הודעה.",
       "message_too_long_body": "הודעה היא עד 2000 תווים.",
-      "buddy_link_read_only": "קשר הבאדי הסתיים; השיחה לקריאה בלבד."
+      "buddy_link_read_only": "הקשר עם החבר לתמיכה הסתיים; השיחה לקריאה בלבד."
     }
   },
   "Providers": {
@@ -8253,7 +8337,6 @@
     "formerHint": "מה שעשית איתם נשאר ביומן, ב-Vault ובהתקדמות שלך. הם כבר לא רואים את הרשומות שלך.",
     "formerSince": "הסתיים ב-{date} · כבר לא רואה את הרשומות שלך",
     "todayTitle": "היום",
-    "todayEmpty": "אין שום דבר מתוכנן היום עם אף ספק.",
     "todayPartial": "לא ניתן לטעון את היום מ-{names}.",
     "todayKind": {
       "class": "שיעור",
@@ -8841,7 +8924,6 @@
     "editProfile": "עריכת הפרופיל",
     "safetyLine": "רק חברי המועדון הזה. התאמה דורשת את שניכם. אפשר לדווח או לחסום בכל עת.",
     "filters": "מסננים",
-    "filtersCount": "מסננים ({count})",
     "swipesLeft": "{count, plural, one {נותרה בחירה אחת להיום} other {נותרו # בחירות להיום}}",
     "loading": "טוען…",
     "limitReached": "מספיק להיום. מחר יהיו אנשים חדשים.",
@@ -8875,7 +8957,7 @@
     "endConfirm": "סיום",
     "blockConfirm": "חסימה",
     "endBody": "{name} לא יקבל הודעה. השיחה נשארת לקריאה אבל נסגרת, ולא תראו זה את זה שוב.",
-    "blockBody": "{name} לא יקבל הודעה. השותפות שלכם וכל קשר buddy מסתיימים, ולא תראו זה את זה שוב ב-Partners. אפשר לבטל חסימה בשיתוף ונראות.",
+    "blockBody": "{name} לא יקבל הודעה. השותפות שלכם וכל קשר של חברים לתמיכה מסתיימים, ולא תראו זה את זה שוב ב-Partners. אפשר לבטל חסימה בשיתוף ונראות.",
     "planEyebrow": "קובעים יחד",
     "planClass": "שיעור",
     "planBook": "לפתוח את השיעור להזמנה",
@@ -8899,7 +8981,7 @@
     "settingsSwitch": "להציג אותי ב-Partners",
     "settingsSwitchHint": "{count, plural, one {הפרופיל שלך במועדון אחד} other {הפרופילים שלך ב-# מועדונים}}. כיבוי משהה אותם; שום דבר לא נמחק.",
     "blockedTitle": "אנשים חסומים",
-    "blockedHint": "הם לא מוצאים אותך ב-Partners, וקשרי buddy איתם הסתיימו.",
+    "blockedHint": "הם לא מוצאים אותך ב-Partners, וקשרי החברים לתמיכה איתם הסתיימו.",
     "blockedEmpty": "לא חסמת אף אחד.",
     "blockedSince": "נחסם ב-{date}",
     "unblock": "ביטול חסימה",
@@ -8922,7 +9004,14 @@
     "error_partner_match_read_only": "השיחה הזו הסתיימה.",
     "error_partner_plans_unavailable": "הצעות שיעור זמינות רק במועדונים של חדר הכושר עצמו.",
     "error_message_body_required": "כתבו משהו קודם.",
-    "error_cannot_block_self": "אי אפשר לחסום את עצמך."
+    "error_cannot_block_self": "אי אפשר לחסום את עצמך.",
+    "disciplineLabel": "ענף",
+    "disciplinesLabel": "מה תתאמנו יחד (עד {max})",
+    "allDisciplines": "כל הענפים",
+    "fewerDisciplines": "פחות",
+    "distanceLabel": "מרחק",
+    "withinKm": "עד {km} ק״מ",
+    "distanceNeedsArea": "כדי לסנן לפי מרחק, הופיעו ב«סביבי» עם האזור שלכם."
   },
   "Squads": {
     "title": "סקוואדים",
@@ -9078,8 +9167,6 @@
       "minutes": "{minutes} דק׳",
       "join": "הצטרפות לשיחה",
       "manage": "ניהול",
-      "noSession": "עוד לא הזמנת אימון.",
-      "bookSession": "הזמנת אימון",
       "noPackage": "עוד אין לך חבילת אימונים. שאל את המאמן שלך.",
       "sessionsLeft": "נותרו {remaining} מתוך {limit} אימונים",
       "sessionsUnlimited": "אימונים ללא הגבלה"
@@ -9549,7 +9636,8 @@
     "backToMe": "חזרה לאני",
     "saveInterests": "שמירה",
     "interestsSaved": "נשמר.",
-    "interestsHubHint": "ענפי ספורט ורמה, להצעות"
+    "interestsHubHint": "ענפי ספורט ורמה, להצעות",
+    "photoAddLabel": "הוספת תמונה"
   },
   "Business": {
     "common": {
@@ -9756,7 +9844,7 @@
     "socialTitle": "אפליקציה חברתית לספורטאים",
     "socialSummary": "פיד של המועדונים שלך ושל האנשים שאחריהם את/ה עוקב/ת, ערוצי מועדון, פוסטים עם תמונות ואימונים, וסביבי לגילוי אירועים, מועדונים פתוחים וחדרי כושר קרובים על המפה.",
     "partnersTitle": "שותפים לאימון ותמיכה",
-    "partnersSummary": "מציאת שותף לאימון בין חברים מאומתים במועדון שלך, בהסכמה הדדית, ובחירת חבר תומך שישמע ממך רק כשתבקש/י עזרה.",
+    "partnersSummary": "מציאת שותף לאימון בין חברים מאומתים במועדון שלך, בהסכמה הדדית, ובחירת חבר לתמיכה שישמע ממך רק כשתבקש/י עזרה.",
     "eventsTitle": "אירועים ומארגנים",
     "eventsSummary": "WOD פתוחים, מחנות אימון, ריצות ותחרויות עם אישורי הגעה, מכסת משתתפים, רשימת המתנה, כרטיסי אורח, ארגון משותף וקונסולת מארגן לניהול, כספים וניתוח נתונים.",
     "boxTitle": "חדר הכושר שלך בכיס",
@@ -10801,5 +10889,397 @@
     "reviewNoLimit": "בלי הגבלה",
     "reviewCohosts": "בקשות למארגנים שותפים: {names}",
     "reviewNoCohosts": "בלי מארגנים שותפים"
+  },
+  "Conversations": {
+    "title": "הודעות",
+    "requests": "בקשות",
+    "requestsEntry": "בקשות הודעה ({count})",
+    "buddy": "חבר",
+    "you": "את/ה: {text}",
+    "someone": "מישהו",
+    "unread": "לא נקראה",
+    "emptyInbox": "עדיין אין שיחות. חפשו מישהו לכתוב לו.",
+    "emptyRequests": "אין בקשות הודעה.",
+    "loading": "טוען…",
+    "loadMore": "הצגת עוד",
+    "earlier": "הודעות קודמות",
+    "accept": "אישור",
+    "decline": "דחייה",
+    "requestTitle": "בקשת הודעה",
+    "requestBanner": "{name} רוצה לשלוח לך הודעה.",
+    "requestBannerHint": "אשרו כדי להעביר אותה לתיבת הדואר. אם תדחו, היא תיעלם ו־{name} לא יידע על כך.",
+    "placeholder": "כתבו הודעה…",
+    "send": "שליחה",
+    "sending": "שולח…",
+    "failed": "לא נשלחה.",
+    "retry": "ניסיון חוזר",
+    "discard": "מחיקה",
+    "tooLong": "הודעה יכולה להכיל עד {max} תווים.",
+    "chatWith": "שיחה עם {name}",
+    "chatEmpty": "תגידו שלום ל־{name}.",
+    "unavailable": "השיחה הזו לא זמינה.",
+    "back": "הודעות",
+    "message": "הודעה",
+    "messageA11y": "שליחת הודעה ל־{name}",
+    "viewProfile": "הפרופיל של {name}",
+    "searchEmpty": "לא נמצא אף אחד.",
+    "notif_person_message_title": "הודעה מ־{name}",
+    "notif_person_message_body": "{name} שלח/ה לך הודעה.",
+    "notif_message_request_title": "בקשת הודעה",
+    "notif_message_request_body": "{name} רוצה לשלוח לך הודעה."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "מדריכים",
+      "listIntro": "הדרכות קצרות על המסכים האמיתיים. לחצו יחד איתנו; שום דבר לא נשמר אלא אם תשמרו.",
+      "forStaff": "לעסק שלכם",
+      "forYou": "בשבילכם",
+      "minutes": "{count, plural, one {# דק׳} two {# דק׳} other {# דק׳}}",
+      "start": "התחלה",
+      "resume": "המשך",
+      "replay": "שוב מההתחלה",
+      "state_new": "חדש",
+      "state_started": "בתהליך",
+      "state_completed": "בוצע",
+      "state_dismissed": "לא התחיל",
+      "state_outdated": "עודכן",
+      "openGuide": "הדרכה",
+      "openGuideAria": "התחלת ההדרכה: {title}",
+      "next": "הבא",
+      "back": "הקודם",
+      "finish": "סיום",
+      "close": "סגירת ההדרכה",
+      "stepOf": "{current} מתוך {total}",
+      "doIt": "תעשו את זה בשבילי",
+      "tapHint": "לחצו על המקום המודגש",
+      "notHere": "זה לא מופיע במסך כרגע, אז הנה העיקר.",
+      "fillDemo": "קודם למלא בנתוני הדגמה",
+      "filling": "ממלאים…",
+      "demoFilled": "נתוני ההדגמה נוספו",
+      "offerEyebrow": "חדשים כאן?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "הראו לי",
+      "offerLater": "לא עכשיו",
+      "meRow": "מדריכים",
+      "meRowHint": "הדרכות על החנות, האירועים, ההטבות והמועדון שלכם",
+      "loadFailed": "המדריכים לא נטענו. נסו שוב."
+    },
+    "shop_staff": {
+      "title": "ניהול החנות",
+      "summary": "הוסיפו מוצרים, מכרו באפליקציה ובקופה, ושמרו על מלאי מדויק.",
+      "chapters": {
+        "setup": "הגדרה",
+        "sell": "מכירה",
+        "track": "מעקב"
+      },
+      "welcome": {
+        "title": "החנות של הבוקס",
+        "body": "המנויים מזמינים באפליקציה ואוספים בדלפק. אתם מוכרים גם מהקופה."
+      },
+      "newProduct": {
+        "title": "הוספת מוצר",
+        "body": "לחצו על «{label}»."
+      },
+      "photos": {
+        "title": "תמונות מוכרות",
+        "body": "הוסיפו כמה תמונות ברורות. הראשונה היא תמונת השער."
+      },
+      "price": {
+        "title": "מחיר ואפשרויות",
+        "body": "מחיר אחד, או מידות וטעמים עם מלאי משלהם.",
+        "tip": "המלאי נספר לכל אפשרות, כך ש־«M» ו־«L» אף פעם לא מתבלבלים."
+      },
+      "selling": {
+        "title": "איפה זה נמכר",
+        "body": "באפליקציה, בקופה או בשניהם. למנויים בלבד, או לכולם."
+      },
+      "save": {
+        "title": "שומרים, ואז מפרסמים",
+        "body": "מוצר חדש הוא טיוטה. פרסמו אותו כדי לפתוח את החנות.",
+        "tip": "המנויים רואים את כרטיס החנות ב־Box רק אחרי שמשהו פורסם."
+      },
+      "ordersTab": {
+        "title": "הזמנות",
+        "body": "לחצו על «{label}»."
+      },
+      "orders": {
+        "title": "מכינים, ואז מוסרים",
+        "body": "סמנו הזמנה כמוכנה והמנוי יקבל הודעה איפה לאסוף אותה.",
+        "tip": "הזמנות שלא נאספו מתבטלות לבד אחרי 7 ימים, והמלאי משתחרר."
+      },
+      "pos": {
+        "title": "הקופה בדלפק",
+        "body": "מכירה בדלפק בשניות, בתשלום מיידי או על חשבון המנוי."
+      },
+      "stock": {
+        "title": "מלאי",
+        "body": "כל מכירה, משלוח וספירה נרשמים. מלאי נמוך מתריע לכם."
+      },
+      "analytics": {
+        "title": "מה נמכר",
+        "body": "מכירות שבועיות, רווחיות והמוצרים המובילים שלכם.",
+        "tip": "מכירות החנות מופיעות גם בכספים כמקור הכנסה נפרד."
+      },
+      "done": {
+        "title": "הכול מוכן",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "events_organising": {
+      "title": "ארגון אירועים",
+      "summary": "תכננו ב־7 צעדים קצרים, מכרו מקומות, עשו צ׳ק-אין וראו את המספרים.",
+      "chapters": {
+        "plan": "תכנון",
+        "run": "ניהול"
+      },
+      "welcome": {
+        "title": "אירועים מההתחלה ועד הסוף",
+        "body": "מתכננים, ממלאים, מנהלים ורואים איך היה, הכול במקום אחד."
+      },
+      "new": {
+        "title": "יצירת אירוע",
+        "body": "לחצו על «{label}»."
+      },
+      "steps": {
+        "title": "שבעה צעדים קצרים",
+        "body": "מארח, פרטים בסיסיים, מתי, איפה, למי ומחיר, מקומות, סקירה. לחצו על צעד שהושלם כדי לחזור אליו."
+      },
+      "screen": {
+        "title": "החלטה אחת בכל מסך",
+        "body": "מלאו את זה, ואז הבא.",
+        "tip": "הטיוטה נשמרת במכשיר הזה, כך שאפשר לעצור ולחזור."
+      },
+      "next": {
+        "title": "«הבא» יודע מה חסר",
+        "body": "אם משהו נשאר, הוא יגיד לכם מה."
+      },
+      "cohosts": {
+        "title": "אירוח יחד עם אחרים",
+        "body": "ב־«{label}», בקשו מבוקס או ממאמן לארח יחד לפי כתובת הדף שלהם.",
+        "tip": "אחרי שהם מאשרים, האירוע מופיע בדף שלהם ומגיע למנויים שלהם."
+      },
+      "manage": {
+        "title": "ניהול",
+        "body": "לכל אירוע: משתתפים, צ׳ק-אין, תשלומים בבוקס, החזרים והודעות."
+      },
+      "finances": {
+        "title": "כספים",
+        "body": "לחצו על «{label}»: הכנסות, החזרים ומה עוד לא שולם."
+      },
+      "analytics": {
+        "title": "נתונים",
+        "body": "לחצו על «{label}»: צפיות, הרשמות, רשימת המתנה ומי הגיע.",
+        "tip": "ההמרה מראה כמה מהצופים נרשמו."
+      },
+      "done": {
+        "title": "מוכנים לארח",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "finance_offers": {
+      "title": "מבצעים, שותפים והפניות",
+      "summary": "קמפיינים וקודים, הטבות שותפים ותוכנית «הבא חבר».",
+      "chapters": {
+        "campaigns": "קמפיינים",
+        "partners": "שותפים",
+        "referrals": "הפניות"
+      },
+      "welcome": {
+        "title": "צומחים עם מבצעים",
+        "body": "הקמפיינים והקודים שלכם, הטבות מחנויות שותפות ותגמולים על הבאת חברים."
+      },
+      "campaignNew": {
+        "title": "יצירת קמפיין",
+        "body": "לחצו על «{label}»."
+      },
+      "campaignForm": {
+        "title": "שם ותאריכים",
+        "body": "קמפיין מקבץ את המבצעים שלכם, למשל «קיץ». בחרו מתי הוא פעיל."
+      },
+      "coupons": {
+        "title": "קודים",
+        "body": "פתחו קמפיין כדי להוסיף קודים: הנחה באחוזים או בסכום, עם מגבלת שימוש.",
+        "tip": "ליד כל קוד רואים כמה פעמים השתמשו בו, כך שברור איזה מבצע עובד."
+      },
+      "partners": {
+        "title": "הטבות שותפים",
+        "body": "לחצו על «{label}»."
+      },
+      "perkNew": {
+        "title": "הוספת הטבת שותף",
+        "body": "לחצו על «{label}»."
+      },
+      "perkPartner": {
+        "title": "השותף",
+        "body": "השם, הקישור והלוגו שלו."
+      },
+      "perkBenefit": {
+        "title": "מה המנויים מקבלים",
+        "body": "אחוזים, סכום, או כל דבר אחר, כמו קפה חינם."
+      },
+      "perkMethod": {
+        "title": "איך החנות בודקת",
+        "body": "קוד משותף, קישור עם הקוד בתוכו, או הצגת מנוי פעיל.",
+        "tip": "אם קוד דלף, שנו אותו כאן והשינוי חל מיד."
+      },
+      "perkRules": {
+        "title": "תנאים",
+        "body": "תאריכים, מי מקבל וכמה פעמים. שמרו טיוטה ופרסמו כשסוכם."
+      },
+      "referrals": {
+        "title": "הבא חבר",
+        "body": "תוכנית שמתגמלת מנויים שמביאים מישהו שמצטרף."
+      },
+      "referralsFlow": {
+        "title": "מאשרים ומתגמלים",
+        "body": "ההפניות מגיעות לכאן. אשרו אחת והתגמול יוצא.",
+        "tip": "התגמול יכול ללכת לשניהם: למנוי ולחבר."
+      },
+      "done": {
+        "title": "הכול מוכן",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "member_club_event": {
+      "title": "המועדון והאירוע שלכם",
+      "summary": "פתחו קבוצה במועדון של הבוקס ותכננו אירוע, לבד או עם בוקס.",
+      "chapters": {
+        "club": "המועדון שלכם",
+        "event": "האירוע שלכם"
+      },
+      "welcome": {
+        "title": "שיהיה שלכם",
+        "body": "פתחו קבוצה עם האנשים שלכם ותכננו אירועים משלכם."
+      },
+      "channels": {
+        "title": "המועדון של הבוקס",
+        "body": "לחצו על «{label}»."
+      },
+      "groups": {
+        "title": "קבוצות",
+        "body": "מועדונים קטנים בתוך הבוקס: עם צ׳אט ואירועים משלהם."
+      },
+      "propose": {
+        "title": "פתיחת קבוצה",
+        "body": "לחצו על «{label}»."
+      },
+      "groupSheet": {
+        "title": "תנו שם, בחרו מי מצטרף",
+        "body": "פתוחה לכולם, או לפי בקשה.",
+        "tip": "חלק מהבוקסים מאשרים קבוצות חדשות קודם; תקבלו הודעה כשהיא פעילה."
+      },
+      "noBox": {
+        "title": "קבוצות נמצאות בתוך בוקס",
+        "body": "הצטרפו קודם לבוקס, ואז פתחו קבוצה במועדון שלו. אירועים אפשר לתכנן כבר עכשיו."
+      },
+      "eventNew": {
+        "title": "תכנון אירוע",
+        "body": "לחצו על «{label}»."
+      },
+      "hostAs": {
+        "title": "מי מארח",
+        "body": "אתם, או קבוצה או עסק שאתם מנהלים.",
+        "tip": "«{label}» לא צריך בוקס בכלל."
+      },
+      "alone": {
+        "title": "לבד",
+        "body": "פתוח לכל מי שבסביבה, או בהזמנה בלבד עם הקישור שלכם."
+      },
+      "withBox": {
+        "title": "עם בוקס",
+        "body": "ב־«{label}», בקשו מהבוקס לארח יחד לפי כתובת הדף שלו.",
+        "tip": "אחרי שהוא מאשר, האירוע מופיע גם בדף של הבוקס."
+      },
+      "hosting": {
+        "title": "מנהלים את זה",
+        "body": "אחרי הפרסום, ב־«{label}» יש משתתפים, צ׳ק-אין והמספרים."
+      },
+      "done": {
+        "title": "עכשיו תורכם",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "הלקוחות שלי",
+    "replies": "ממתינים לתשובה",
+    "reviews": "בדיקת טכניקה",
+    "desk": "צ׳ק-אין היום",
+    "clients": "לקוחות",
+    "sentAt": "נשלח {time}",
+    "overdue": "באיחור",
+    "dueSoon": "מועד קרוב",
+    "unknownClient": "חבר/ה",
+    "openVideo": "צפה בסרטון",
+    "checkedIn": "הגיעו {count} מתוך {total}",
+    "attended": "הגיע/ה",
+    "noShow": "לא הגיע/ה",
+    "attendanceOf": "נוכחות של {name}",
+    "markError": "לא נשמר. נסה שוב.",
+    "showAll": "הצג הכול ({count})",
+    "showFewer": "הצג פחות",
+    "moreInConsole": "הכול בממשק הניהול"
+  },
+  "Inbox": {
+    "title": "הודעות",
+    "segmentsLabel": "אילו הודעות להציג",
+    "segment": {
+      "all": "הכול",
+      "coach": "מאמן",
+      "clubs": "מועדונים",
+      "partners": "שותפים"
+    },
+    "loading": "טוען הודעות…",
+    "emptySegment": "אין כאן שיחות עדיין.",
+    "workoutThread": "שיחת אימון",
+    "classThread": "שיחת שיעור",
+    "searchAtGym": "במכון שלך"
+  },
+  "NotificationSettings": {
+    "title": "התראות",
+    "description": "מה מגיע אליך, באפליקציה וכהתראות פוש",
+    "loading": "טוען…",
+    "loadError": "הגדרות ההתראות אינן זמינות כרגע.",
+    "saveError": "השינוי לא נשמר. נסה שוב.",
+    "locked": "תמיד פעילות",
+    "perClub": "לכל מועדון, בבוקסים והמועדונים שלי",
+    "channel": {
+      "in_app": "באפליקציה",
+      "push": "פוש"
+    },
+    "category": {
+      "bookings": {
+        "title": "הזמנות ושיעורים",
+        "hint": "אישורים, רשימת המתנה, אימוני ניסיון, פגישות ועונות"
+      },
+      "messages": {
+        "title": "הודעות",
+        "hint": "צ׳אטים, בקשות הודעה והודעות מהבוקס ומהמאמן"
+      },
+      "community": {
+        "title": "מועדונים וקהילה",
+        "hint": "עוקבים, אירועים, אתגרים, קבוצות והזמנות."
+      },
+      "coach": {
+        "title": "מאמן",
+        "hint": "תוכניות, הערות לאימון, בדיקות טכניקה ותזונה"
+      },
+      "partners": {
+        "title": "שותפים וחברים",
+        "hint": "התאמות, חבר התמיכה שלך וההודעות שלהם"
+      },
+      "journal": {
+        "title": "תזכורות ביומן",
+        "hint": "מים, מדידות, מעקב אחרי חשקים וסנכרון מכשירים"
+      },
+      "staff": {
+        "title": "ניהול הבוקס",
+        "hint": "הזמנות חדשות, אימוני ניסיון, מבקרים, מלאי ודיווחים"
+      },
+      "account": {
+        "title": "חשבון ותשלומים",
+        "hint": "אבטחה, חשבוניות, חידושים והזמנות"
+      }
+    }
   }
 }

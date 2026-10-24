@@ -50,6 +50,26 @@ defmodule Palee.Analytics.Domain.ProgressFilter do
   def since(%__MODULE__{range: "6m"}, today), do: Date.shift(today, month: -6)
   def since(%__MODULE__{range: "1y"}, today), do: Date.shift(today, year: -1)
 
+  @all_weeks_min 12
+  @all_weeks_max 156
+
+  @doc """
+  How many calendar weeks (this one included) the weekly chart, the
+  consistency and its day grid cover (ADR-194): the range's own length, and
+  for `all` the span since the first session, at least #{@all_weeks_min} and
+  at most #{@all_weeks_max} weeks (three years) so the grid stays readable.
+  """
+  def weeks(%__MODULE__{range: "4w"}, _today, _first), do: 4
+  def weeks(%__MODULE__{range: "12w"}, _today, _first), do: 12
+  def weeks(%__MODULE__{range: "6m"}, _today, _first), do: 26
+  def weeks(%__MODULE__{range: "1y"}, _today, _first), do: 52
+  def weeks(%__MODULE__{range: "all"}, _today, nil), do: @all_weeks_min
+
+  def weeks(%__MODULE__{range: "all"}, today, %Date{} = first) do
+    span = div(Date.diff(Date.beginning_of_week(today), Date.beginning_of_week(first)), 7) + 1
+    span |> max(@all_weeks_min) |> min(@all_weeks_max)
+  end
+
   defp range(nil), do: {:ok, "all"}
   defp range(""), do: {:ok, "all"}
   defp range(value) when value in @ranges, do: {:ok, value}

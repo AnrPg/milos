@@ -13,20 +13,25 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Follow a person or a box (plan §5a Q9): «Ακολούθησε» → «Εκκρεμεί» →
- * «Ακολουθείς ✓». A person approves each request; a box is followed at once.
- * Unfollowing, or withdrawing a request, asks first.
+ * «Ακολουθείς ✓». A private person approves each request; a public person
+ * (ADR-193 §2) and a box are followed at once, so the API answers `active`
+ * and the button skips «Εκκρεμεί». It always shows what the API answered.
+ * Unfollowing, or withdrawing a request, asks first; unfollowing a Buddy
+ * says the Buddy status ends with it.
  */
 export function FollowButton({
   targetType,
   targetId,
   initialStatus,
   followsMe = false,
+  buddy = false,
   wide = false,
 }: {
   targetType: FollowTargetType;
   targetId: string;
   initialStatus?: FollowStatus;
   followsMe?: boolean;
+  buddy?: boolean;
   wide?: boolean;
 }) {
   const t = useTranslations("Social");
@@ -70,7 +75,13 @@ export function FollowButton({
     return (
       <div className={`flex flex-col gap-2 ${wide ? "w-full" : ""}`}>
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-          {current === "requested" ? t("withdrawConfirm") : targetType === "organization" ? t("unfollowBoxConfirm") : t("unfollowConfirm")}
+          {current === "requested"
+            ? t("withdrawConfirm")
+            : targetType === "organization"
+              ? t("unfollowBoxConfirm")
+              : buddy
+                ? t("unfollowBuddyConfirm")
+                : t("unfollowConfirm")}
         </p>
         <div className="flex gap-2">
           <button

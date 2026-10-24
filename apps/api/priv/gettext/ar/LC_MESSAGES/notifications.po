@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "فترة بعد الظهر وقت مناسب لتعويض شرب الماء."
 
 msgid "Buddy message"
-msgstr "رسالة من رفيقك"
+msgstr "رسالة من رفيق الدعم"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: العافية الأسبوعية"
@@ -675,3 +675,15 @@ msgstr "متوفر من جديد"
 
 msgid "%{item} is available again."
 msgstr "%{item} متوفر من جديد."
+
+msgid "New follower"
+msgstr "متابع جديد"
+
+msgid "%{nickname} started following you."
+msgstr "بدأ %{nickname} بمتابعتك."
+
+msgid "Message request"
+msgstr "طلب مراسلة"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "يريد %{nickname} أن يرسل إليك رسالة."

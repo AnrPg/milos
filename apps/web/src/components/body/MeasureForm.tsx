@@ -330,10 +330,15 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
                         else if (current) setRemoved((ids) => [...ids, current.id]);
                       }}
                       aria-label={t("removePose", { pose: label })}
-                      className="absolute end-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-[var(--on-media)]"
-                      style={{ background: "var(--media-control)" }}
+                      className="absolute end-0 top-0 inline-flex h-11 w-11 items-center justify-center rounded-full"
                     >
-                      <span aria-hidden="true">×</span>
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-[var(--on-media)]"
+                        style={{ background: "var(--media-control)" }}
+                      >
+                        ×
+                      </span>
                     </button>
                   ) : null}
                 </div>
@@ -362,7 +367,7 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
                   key={metric}
                   type="button"
                   onClick={() => setOpened((current) => [...current, metric])}
-                  className="min-h-9 rounded-full px-3 text-sm font-semibold"
+                  className="min-h-11 rounded-full px-3 text-sm font-semibold"
                   style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
                 >
                   {t(key("metric", metric))}

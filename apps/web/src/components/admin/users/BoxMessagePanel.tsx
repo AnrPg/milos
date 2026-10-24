@@ -84,7 +84,7 @@ export function BoxMessagePanel({ userId }: { userId: string }) {
           {send.isPending ? i18n("sendingcf76551") : i18n("send9bc2575")}
         </button>
         {send.isSuccess ? (
-          <Link href={`/me/activity/chats?thread=${encodeURIComponent(send.data)}`} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
+          <Link href={`/messages?thread=${encodeURIComponent(send.data)}`} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
             {i18n("bmSentOpen")}
           </Link>
         ) : null}

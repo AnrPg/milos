@@ -76,6 +76,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     wellbeing/wellbeing_store
     notifications/notification_store
     notifications/native_push_token_store
+    notifications/notification_preference_store
     widgets/widget_token_store
     coaching/coaching_store
     pantheon/pr_store
@@ -98,11 +99,13 @@ defmodule Mix.Tasks.Palee.Architecture do
     nutrition/nutrition_store
     community/community_store
     community/social_store
+    conversations/conversation_store
     community/event_store
     trials/trial_store
     seasons/season_store
     media/media_store
     identity/saved_filter_store
+    guides/guide_progress_store
     organizations/public_profile_store
     organizations/location_scope_store
     ai_usage/ai_usage_store

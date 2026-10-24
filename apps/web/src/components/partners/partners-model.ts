@@ -1,4 +1,5 @@
 import { ApiError } from "@/api/client";
+import type { ListFilter } from "@/components/filters/list-filter";
 import type {
   PartnerCard,
   PartnerFilters,
@@ -26,7 +27,7 @@ export function partnersStage(overview: PartnersClubOverview | undefined): Partn
   return profile.active ? "deck" : "paused";
 }
 
-export type ProfileDraft = Required<Pick<PartnerProfileRequest, "level" | "times" | "goals" | "gender_preference">> & {
+export type ProfileDraft = Required<Pick<PartnerProfileRequest, "level" | "times" | "goals" | "gender_preference" | "disciplines">> & {
   about: string;
   gender: PartnerProfileRequest["gender"];
 };
@@ -36,6 +37,7 @@ export function profileDraft(profile: PartnerProfile | null | undefined): Profil
     level: profile?.level ?? "intermediate",
     times: profile?.times ?? [],
     goals: profile?.goals ?? [],
+    disciplines: profile?.disciplines ?? [],
     about: profile?.about ?? "",
     gender: profile?.gender ?? null,
     gender_preference: profile?.gender_preference ?? "any",
@@ -64,9 +66,30 @@ export function draftRequest(draft: ProfileDraft, active = true): PartnerProfile
     level: draft.level,
     times: draft.times,
     goals: draft.goals,
+    disciplines: draft.disciplines,
     about: draft.about.trim() || null,
     gender: draft.gender ?? null,
     gender_preference: draft.gender_preference,
+  };
+}
+
+/** The deck's filters (vision §7.3), remembered per club on the `partners` surface. */
+export const PARTNER_DECK_SHAPE = { time: "one", level: "one", goal: "one", discipline: "one", within: "one" } as const;
+export type PartnerDeckFilter = ListFilter<typeof PARTNER_DECK_SHAPE>;
+
+/**
+ * What the deck API is asked for: a stored value the club no longer offers is
+ * dropped, and the distance only counts where the club offers it.
+ */
+export function partnerFilters(filter: PartnerDeckFilter, options: PartnerOptions, distance: boolean): PartnerFilters {
+  const pick = <T extends string>(values: readonly T[], value: string | undefined) => values.find((item) => item === value) ?? null;
+  const km = Number(filter.within[0]);
+  return {
+    time: pick(options.times, filter.time[0]),
+    level: pick(options.levels, filter.level[0]),
+    goal: pick(options.goals, filter.goal[0]),
+    discipline: pick(options.disciplines, filter.discipline[0]),
+    within_km: distance && options.distances_km.includes(km) ? km : null,
   };
 }
 
@@ -75,8 +98,9 @@ export function withoutCard(cards: readonly PartnerCard[], userId: string): Part
   return cards.filter((card) => card.person.id !== userId);
 }
 
+/** «Φίλτρα (n)» of what the deck is asked for. */
 export function activeFilters(filters: PartnerFilters): number {
-  return [filters.time, filters.level, filters.goal].filter(Boolean).length;
+  return [filters.time, filters.level, filters.goal, filters.discipline, filters.within_km].filter(Boolean).length;
 }
 
 /** What the two share, as message keys and values, for the card's "you both" line. */

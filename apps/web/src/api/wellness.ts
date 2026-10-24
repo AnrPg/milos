@@ -91,6 +91,14 @@ export function deleteCraving(token: string, id: string) {
   return apiRequest<void>(`/me/wellness/cravings/${id}`, { method: "DELETE", token });
 }
 
+/** The preferences alone (no consent needed), e.g. `hide_macros` for the coach's plan (ADR-194). */
+export const WELLNESS_PREFERENCES_KEY = [...WELLNESS_KEY, "preferences"] as const;
+
+export async function fetchWellnessPreferences(token: string) {
+  const data = await apiRequest<{ preferences: WellnessPreferences }>("/me/wellness/preferences", { token });
+  return data.preferences;
+}
+
 export async function updateWellnessPreferences(token: string, body: WellnessPreferencesRequest) {
   const data = await apiRequest<{ preferences: WellnessPreferences }>("/me/wellness/preferences", {
     method: "PUT",

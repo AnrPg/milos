@@ -4,7 +4,9 @@ defmodule Palee.Wellness.Domain.PreferencesPolicy do
   and glass size, the sleep goal, and the items they turned off. Targets are
   the member's; a coach may suggest but never sets them. The tiles come in
   the member's own order (board 14, Q1); items they never placed follow in
-  the default order, so a new item never disappears.
+  the default order, so a new item never disappears. The macros of a coach's
+  nutrition plan show only while there is a plan, and the member can hide
+  them (`hide_macros`, ADR-194).
   """
 
   @items ~w(water sleep meals plan mood)
@@ -15,7 +17,8 @@ defmodule Palee.Wellness.Domain.PreferencesPolicy do
     sleep_goal_minutes: 420,
     hidden_items: [],
     item_order: [],
-    water_reminder: true
+    water_reminder: true,
+    hide_macros: false
   }
 
   def items, do: @items

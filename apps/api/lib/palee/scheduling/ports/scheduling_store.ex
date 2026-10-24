@@ -59,6 +59,7 @@ defmodule Palee.Scheduling.Ports.SchedulingStore do
   @callback list_recent_class_check_ins(TenantContext.t(), DateTime.t(), Ecto.UUID.t() | nil) ::
               [map()]
   @callback list_user_attendance(TenantContext.t(), Ecto.UUID.t(), [Ecto.UUID.t()]) :: map()
+  @callback list_class_attendance(TenantContext.t(), [Ecto.UUID.t()]) :: map()
   @callback get_attendance_for_user_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               map() | nil
   @callback get_approved_booking_for_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::

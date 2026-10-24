@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 /**
  * A bottom sheet (a centred dialog on wide screens): the shared dialog shell
@@ -16,6 +17,7 @@ export function Sheet({
   children,
   footer,
   labelId,
+  guide,
 }: {
   title: string;
   eyebrow?: string;
@@ -23,10 +25,13 @@ export function Sheet({
   children: ReactNode;
   footer?: ReactNode;
   labelId: string;
+  /** A walkthrough anchor of the sheet (ADR-193). */
+  guide?: GuideAnchor;
 }) {
   return (
     <Dialog
       onClose={onClose}
+      guide={guide}
       title={title}
       eyebrow={eyebrow}
       titleId={labelId}

@@ -354,6 +354,51 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Strength A" })).toBeVisible();
   });
 
+  test("Box hides empty cards: no workout or booking means no card, and «Schedule» stays in the action row", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.route("**/api/org/*/schedule?**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), days: 7, class_types: [], slots: [] })),
+    );
+    await page.route("**/api/org/*/my-workouts**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), assignments: [] })),
+    );
+    await page.route("**/api/org/*/me/entitlement", (route) => route.fulfill(json({ entitlement: null })));
+    await page.goto("/box");
+
+    await expect(page.getByRole("heading", { name: "Box Kypseli" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Schedule" })).toHaveAttribute("href", "/box/schedule");
+    await expect(page.getByText("Membership", { exact: true })).toBeVisible();
+    // Vision §4.2, §8.5: a card with nothing in it is hidden, never an empty state.
+    await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Your next session", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Open gym", { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/Nothing planned|No booking yet|No active package/)).toHaveCount(0);
+  });
+
+  test("Box offers open-gym check-in without a booking when the package covers it (§6.2)", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.route("**/api/org/*/schedule?**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), days: 7, class_types: [], slots: [] })),
+    );
+    await page.route("**/api/org/*/me/entitlement", (route) =>
+      route.fulfill(
+        json({
+          entitlement: {
+            status: "active",
+            enforcement_mode: "enforce",
+            plan: { entitlement_version: 1, channels: [], capabilities: ["open_gym"] },
+            allowances: {},
+          },
+        }),
+      ),
+    );
+    await page.goto("/box");
+
+    await expect(page.getByText("Open gym", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Check in", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "QR check-in" })).toHaveAttribute("href", "/box/check-in");
+  });
+
   test("Journal's one write action lists the entry kinds that exist", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/journal");
@@ -373,7 +418,7 @@ test.describe("member app shell", () => {
     await page.goto("/box");
 
     await expect(page.getByRole("heading", { name: "You're not in a box yet" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around/boxes");
+    await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around?kind=boxes");
     await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Membership", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Schedule" })).toHaveCount(0);
@@ -383,7 +428,7 @@ test.describe("member app shell", () => {
 
     // The gym's landing payload doesn't exist without a gym: Progress skips it, no «not found».
     await page.goto("/journal/progress");
-    await expect(page.getByRole("heading", { name: "My progress" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Personal Records" })).toBeVisible();
     await expect(page.getByText("The requested item was not found.")).toHaveCount(0);
   });
 
@@ -432,7 +477,15 @@ test.describe("member app shell", () => {
     await page.goto("/me");
     await expect(page.getByRole("main").getByText("Maria L")).toBeVisible();
     await expect(page.getByRole("link", { name: /Payments & receipts/ })).toHaveAttribute("href", "/me/payments");
+    // ADR-196: the fixed §7.11 list; tour and first steps live in Help & tour.
+    await expect(page.getByRole("button", { name: "Take the tour" })).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/me.png", fullPage: true });
+    await page.getByRole("link", { name: /Help & tour/ }).click();
+    await expect(page).toHaveURL(/\/me\/help$/);
+    await expect(page.getByRole("button", { name: "How visibility works" })).toBeVisible();
+
+    await page.goto("/me/activity/chats");
+    await expect(page).toHaveURL(/\/messages$/);
 
     await page.goto("/profile");
     await expect(page).toHaveURL(/\/me\/settings$/);
@@ -451,6 +504,8 @@ test.describe("member app shell", () => {
     await expect(page.getByText("From your club")).toHaveCount(0);
     await expect(page.getByText("My events", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Seasonal momentum")).toHaveCount(0);
+    // A ranking with no rows is no card; joining lives in Me › Sharing.
+    await expect(page.getByText("Opt-in ranking")).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
   });
 
@@ -475,13 +530,20 @@ test.describe("member app shell", () => {
     await page.screenshot({ path: "test-results/member-app/progress.png", fullPage: true });
   });
 
-  test("Sharing & visibility gathers PR sharing, the leaderboard and rest days; old anchors follow them", async ({ page }) => {
+  test("Sharing & visibility groups what the coach sees and the community opt-ins; rest days moved to Settings", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/me");
     await page.getByRole("link", { name: /Sharing & visibility/ }).click();
     await expect(page).toHaveURL(/\/me\/sharing$/);
-    await expect(page.getByRole("button", { name: "Join leaderboard" })).toBeVisible();
+    await expect(page.locator("#coach-sees")).toContainText("Injuries are always visible to your coach");
+    await expect(page.locator("#community").getByRole("button", { name: "Join leaderboard" })).toBeVisible();
+    await expect(page.locator("#community").getByRole("switch", { name: /PR celebrations/ })).not.toBeChecked();
+    await expect(page.locator("#community").getByRole("switch", { name: /Challenges/ })).toBeChecked();
+    await expect(page.locator("#training-schedule")).toHaveCount(0);
 
+    // ADR-196: rest days live in Settings; the old anchor follows them.
+    await page.goto("/me/sharing#training-schedule");
+    await expect(page).toHaveURL(/\/me\/settings#training-schedule$/);
     const sunday = page.locator("#training-schedule").getByRole("button", { pressed: true });
     await expect(sunday).toHaveCount(1);
     const saved = page.waitForRequest((request) => request.url().includes("/gamification/preferences") && request.method() !== "GET");

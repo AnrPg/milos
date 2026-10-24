@@ -21,7 +21,7 @@ defmodule Palee.Application.GetAdminUserMessages do
            thread_count: length(threads),
            unread_thread_count: unread_thread_count
          },
-         operational_links: %{workspace: "/account/activity/chats"}
+         operational_links: %{workspace: "/messages"}
        }}
     end
   end

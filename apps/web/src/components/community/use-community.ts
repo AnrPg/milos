@@ -42,7 +42,14 @@ export function useWodToday(slug: string | null) {
 }
 
 export function feedKey(filter: FeedFilter) {
-  return [...FEED_KEY, filter.clubId ?? null, filter.channelId ?? null, Boolean(filter.mine)] as const;
+  return [
+    ...FEED_KEY,
+    filter.clubId ?? null,
+    filter.channelId ?? null,
+    Boolean(filter.mine),
+    [...(filter.types ?? [])].sort().join(","),
+    Boolean(filter.coachesOnly),
+  ] as const;
 }
 
 /** One feed (all clubs, one club, one channel or my posts), newest first. */

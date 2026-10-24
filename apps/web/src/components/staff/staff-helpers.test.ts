@@ -188,7 +188,7 @@ describe("payment models", () => {
   });
 
   it("links reply queue items to the chat thread", () => {
-    expect(chatThreadHref("t 1")).toBe("/me/activity/chats?thread=t%201");
+    expect(chatThreadHref("t 1")).toBe("/messages?filter=coach&thread=t%201");
   });
 });
 

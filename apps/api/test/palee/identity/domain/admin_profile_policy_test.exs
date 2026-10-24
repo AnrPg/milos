@@ -23,6 +23,6 @@ defmodule Palee.Identity.Domain.AdminProfilePolicyTest do
 
     assert links.finance == "/org/atlas-gym/admin/finance"
     assert links.classes == "/org/atlas-gym/admin/class-schedule"
-    assert links.messages == "/account/activity/chats"
+    assert links.messages == "/messages"
   end
 end

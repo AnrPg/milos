@@ -306,6 +306,26 @@
             "additionalProperties": true,
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "filter": {
             "additionalProperties": true,
             "type": "object"
@@ -454,6 +474,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -523,6 +544,26 @@
               "consistency": {
                 "additionalProperties": true,
                 "type": "object"
+              },
+              "days": {
+                "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                "items": {
+                  "properties": {
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "sessions": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "sessions"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
               "filter": {
                 "additionalProperties": true,
@@ -672,6 +713,7 @@
             "required": [
               "totals",
               "weekly",
+              "days",
               "consistency",
               "sources",
               "score_history",
@@ -3152,6 +3194,18 @@
             },
             "type": "array"
           },
+          "levels": {
+            "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+            "items": {
+              "enum": [
+                "beginner",
+                "all_levels",
+                "advanced"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
           "max_price_cents": {
             "minimum": 0,
             "nullable": true,
@@ -3269,6 +3323,18 @@
               "languages": {
                 "items": {
                   "pattern": "^[a-z]{2}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
                   "type": "string"
                 },
                 "type": "array"
@@ -5148,6 +5214,18 @@
             },
             "type": "array"
           },
+          "levels": {
+            "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+            "items": {
+              "enum": [
+                "beginner",
+                "all_levels",
+                "advanced"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
           "max_price_cents": {
             "minimum": 0,
             "nullable": true,
@@ -5214,7 +5292,8 @@
           "max_price_cents",
           "audiences",
           "languages",
-          "amenities"
+          "amenities",
+          "levels"
         ],
         "title": "AroundNormalizedFilter",
         "type": "object"
@@ -5420,6 +5499,18 @@
               "languages": {
                 "items": {
                   "pattern": "^[a-z]{2}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
                   "type": "string"
                 },
                 "type": "array"
@@ -7342,6 +7433,18 @@
                 },
                 "type": "array"
               },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "max_price_cents": {
                 "minimum": 0,
                 "nullable": true,
@@ -7512,6 +7615,18 @@
                 },
                 "type": "array"
               },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "max_price_cents": {
                 "minimum": 0,
                 "nullable": true,
@@ -7578,7 +7693,8 @@
               "max_price_cents",
               "audiences",
               "languages",
-              "amenities"
+              "amenities",
+              "levels"
             ],
             "title": "AroundNormalizedFilter",
             "type": "object"
@@ -35177,6 +35293,31 @@
         "title": "ContentVideo",
         "type": "object"
       },
+      "ConversationPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ConversationPerson",
+        "type": "object"
+      },
       "CorporateClient": {
         "properties": {
           "active_seats": {
@@ -36025,6 +36166,7 @@
             "enum": [
               "1m",
               "3m",
+              "6m",
               "1y"
             ],
             "type": "string"
@@ -39940,6 +40082,14 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "buddy": {
+                    "description": "ADR-193: you follow each other",
+                    "type": "boolean"
+                  },
+                  "handle": {
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "id": {
                     "format": "uuid",
                     "type": "string"
@@ -39964,7 +40114,8 @@
                 },
                 "required": [
                   "id",
-                  "my_status"
+                  "my_status",
+                  "buddy"
                 ],
                 "title": "FollowPerson",
                 "type": "object"
@@ -39991,6 +40142,27 @@
           "since"
         ],
         "title": "FollowEntry",
+        "type": "object"
+      },
+      "FollowGroups": {
+        "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+        "properties": {
+          "buddies": {
+            "type": "integer"
+          },
+          "followers_only": {
+            "type": "integer"
+          },
+          "following_only": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "buddies",
+          "followers_only",
+          "following_only"
+        ],
+        "title": "FollowGroups",
         "type": "object"
       },
       "FollowPage": {
@@ -40045,6 +40217,14 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "buddy": {
+                          "description": "ADR-193: you follow each other",
+                          "type": "boolean"
+                        },
+                        "handle": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -40069,7 +40249,8 @@
                       },
                       "required": [
                         "id",
-                        "my_status"
+                        "my_status",
+                        "buddy"
                       ],
                       "title": "FollowPerson",
                       "type": "object"
@@ -40117,6 +40298,14 @@
             "nullable": true,
             "type": "string"
           },
+          "buddy": {
+            "description": "ADR-193: you follow each other",
+            "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -40141,7 +40330,8 @@
         },
         "required": [
           "id",
-          "my_status"
+          "my_status",
+          "buddy"
         ],
         "title": "FollowPerson",
         "type": "object"
@@ -41302,6 +41492,166 @@
           "role"
         ],
         "title": "GoalMuscle",
+        "type": "object"
+      },
+      "GuideProgress": {
+        "properties": {
+          "completed_at": {
+            "description": "The first finish of the current run.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "guide_id": {
+            "description": "The web app's guide id, e.g. `shop_staff`.",
+            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+            "type": "string"
+          },
+          "runs": {
+            "description": "How many times it was started.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "description": "The step reached in the current run, from 0.",
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "completed_at",
+          "guide_id",
+          "runs",
+          "started_at",
+          "status",
+          "step",
+          "updated_at",
+          "version"
+        ],
+        "title": "GuideProgress",
+        "type": "object"
+      },
+      "GuideProgressList": {
+        "properties": {
+          "guides": {
+            "items": {
+              "properties": {
+                "completed_at": {
+                  "description": "The first finish of the current run.",
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "guide_id": {
+                  "description": "The web app's guide id, e.g. `shop_staff`.",
+                  "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                  "type": "string"
+                },
+                "runs": {
+                  "description": "How many times it was started.",
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "started",
+                    "completed",
+                    "dismissed"
+                  ],
+                  "type": "string"
+                },
+                "step": {
+                  "description": "The step reached in the current run, from 0.",
+                  "maximum": 99,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "version": {
+                  "maximum": 1000,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "completed_at",
+                "guide_id",
+                "runs",
+                "started_at",
+                "status",
+                "step",
+                "updated_at",
+                "version"
+              ],
+              "title": "GuideProgress",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "guides"
+        ],
+        "title": "GuideProgressList",
+        "type": "object"
+      },
+      "GuideProgressUpdate": {
+        "properties": {
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "default": 0,
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "default": 1,
+            "description": "A newer version than the stored one starts a new run.",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "GuideProgressUpdate",
         "type": "object"
       },
       "GymAiSettings": {
@@ -48008,6 +48358,140 @@
         "title": "NeighbourhoodsResponse",
         "type": "object"
       },
+      "NotificationPreference": {
+        "properties": {
+          "audience": {
+            "description": "`staff`: only box staff get these, so only they need the switch.",
+            "enum": [
+              "everyone",
+              "staff"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "description": "A notification category, in the order the switches are shown.",
+            "enum": [
+              "bookings",
+              "messages",
+              "community",
+              "coach",
+              "partners",
+              "journal",
+              "staff",
+              "account"
+            ],
+            "type": "string"
+          },
+          "channels": {
+            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+            "properties": {
+              "email": {
+                "type": "boolean"
+              },
+              "in_app": {
+                "type": "boolean"
+              },
+              "push": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "locked": {
+            "description": "Always delivered (account, security, payments); cannot be changed.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "audience",
+          "category",
+          "channels",
+          "locked"
+        ],
+        "title": "NotificationPreference",
+        "type": "object"
+      },
+      "NotificationPreferenceList": {
+        "properties": {
+          "preferences": {
+            "items": {
+              "properties": {
+                "audience": {
+                  "description": "`staff`: only box staff get these, so only they need the switch.",
+                  "enum": [
+                    "everyone",
+                    "staff"
+                  ],
+                  "type": "string"
+                },
+                "category": {
+                  "description": "A notification category, in the order the switches are shown.",
+                  "enum": [
+                    "bookings",
+                    "messages",
+                    "community",
+                    "coach",
+                    "partners",
+                    "journal",
+                    "staff",
+                    "account"
+                  ],
+                  "type": "string"
+                },
+                "channels": {
+                  "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                  "properties": {
+                    "email": {
+                      "type": "boolean"
+                    },
+                    "in_app": {
+                      "type": "boolean"
+                    },
+                    "push": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "locked": {
+                  "description": "Always delivered (account, security, payments); cannot be changed.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "audience",
+                "category",
+                "channels",
+                "locked"
+              ],
+              "title": "NotificationPreference",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "preferences"
+        ],
+        "title": "NotificationPreferenceList",
+        "type": "object"
+      },
+      "NotificationPreferenceUpdate": {
+        "description": "One or more channels of the category to switch on or off.",
+        "properties": {
+          "email": {
+            "type": "boolean"
+          },
+          "in_app": {
+            "type": "boolean"
+          },
+          "push": {
+            "type": "boolean"
+          }
+        },
+        "title": "NotificationPreferenceUpdate",
+        "type": "object"
+      },
       "NutritionPlan": {
         "nullable": true,
         "properties": {
@@ -48621,6 +49105,53 @@
         "title": "OrganizationPlatformSubscriptions",
         "type": "object"
       },
+      "PRHistoryList": {
+        "properties": {
+          "history": {
+            "items": {
+              "properties": {
+                "beaten_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "pr_record_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "supporting_metrics": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "pr_record_id",
+                "score",
+                "beaten_on",
+                "supporting_metrics"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "history"
+        ],
+        "title": "PRHistoryList",
+        "type": "object"
+      },
       "PRTimelineEntry": {
         "properties": {
           "beaten_on": {
@@ -48673,6 +49204,12 @@
             "nullable": true,
             "type": "string"
           },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "goals": {
             "items": {
               "enum": [
@@ -48724,6 +49261,12 @@
           },
           "shared": {
             "properties": {
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "goals": {
                 "items": {
                   "enum": [
@@ -48758,6 +49301,7 @@
             "required": [
               "times",
               "goals",
+              "disciplines",
               "same_level"
             ],
             "title": "PartnerShared",
@@ -48783,6 +49327,7 @@
           "level",
           "times",
           "goals",
+          "disciplines",
           "about",
           "shared"
         ],
@@ -48797,6 +49342,12 @@
                 "about": {
                   "nullable": true,
                   "type": "string"
+                },
+                "disciplines": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 },
                 "goals": {
                   "items": {
@@ -48849,6 +49400,12 @@
                 },
                 "shared": {
                   "properties": {
+                    "disciplines": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "goals": {
                       "items": {
                         "enum": [
@@ -48883,6 +49440,7 @@
                   "required": [
                     "times",
                     "goals",
+                    "disciplines",
                     "same_level"
                   ],
                   "title": "PartnerShared",
@@ -48908,6 +49466,7 @@
                 "level",
                 "times",
                 "goals",
+                "disciplines",
                 "about",
                 "shared"
               ],
@@ -49534,6 +50093,20 @@
           "daily_swipes": {
             "type": "integer"
           },
+          "disciplines": {
+            "description": "Box vocabulary keys a profile may name (ADR-197)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "distances_km": {
+            "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
           "gender_preferences": {
             "items": {
               "enum": [
@@ -49581,6 +50154,9 @@
             },
             "type": "array"
           },
+          "max_disciplines": {
+            "type": "integer"
+          },
           "max_goals": {
             "type": "integer"
           },
@@ -49605,6 +50181,9 @@
           "genders",
           "gender_preferences",
           "max_goals",
+          "disciplines",
+          "max_disciplines",
+          "distances_km",
           "about_max",
           "daily_swipes"
         ],
@@ -49693,6 +50272,12 @@
             "format": "uuid",
             "type": "string"
           },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "gender": {
             "description": "Only used to honour preferences; never shown to anyone",
             "enum": [
@@ -49767,6 +50352,7 @@
           "level",
           "times",
           "goals",
+          "disciplines",
           "about",
           "gender",
           "gender_preference"
@@ -49783,6 +50369,13 @@
           },
           "active": {
             "type": "boolean"
+          },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5,
+            "type": "array"
           },
           "gender": {
             "enum": [
@@ -49854,6 +50447,12 @@
               "club_id": {
                 "format": "uuid",
                 "type": "string"
+              },
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
               },
               "gender": {
                 "description": "Only used to honour preferences; never shown to anyone",
@@ -49929,6 +50528,7 @@
               "level",
               "times",
               "goals",
+              "disciplines",
               "about",
               "gender",
               "gender_preference"
@@ -50094,6 +50694,12 @@
       },
       "PartnerShared": {
         "properties": {
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "goals": {
             "items": {
               "enum": [
@@ -50128,6 +50734,7 @@
         "required": [
           "times",
           "goals",
+          "disciplines",
           "same_level"
         ],
         "title": "PartnerShared",
@@ -50311,6 +50918,15 @@
             "format": "uuid",
             "type": "string"
           },
+          "distance": {
+            "description": "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου",
+            "enum": [
+              "available",
+              "needs_area"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "member": {
             "description": "Whether the viewer is a member of the club now",
             "type": "boolean"
@@ -50325,6 +50941,20 @@
               },
               "daily_swipes": {
                 "type": "integer"
+              },
+              "disciplines": {
+                "description": "Box vocabulary keys a profile may name (ADR-197)",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "distances_km": {
+                "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
               },
               "gender_preferences": {
                 "items": {
@@ -50373,6 +51003,9 @@
                 },
                 "type": "array"
               },
+              "max_disciplines": {
+                "type": "integer"
+              },
               "max_goals": {
                 "type": "integer"
               },
@@ -50397,6 +51030,9 @@
               "genders",
               "gender_preferences",
               "max_goals",
+              "disciplines",
+              "max_disciplines",
+              "distances_km",
               "about_max",
               "daily_swipes"
             ],
@@ -50417,6 +51053,12 @@
                   "club_id": {
                     "format": "uuid",
                     "type": "string"
+                  },
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
                   },
                   "gender": {
                     "description": "Only used to honour preferences; never shown to anyone",
@@ -50492,6 +51134,7 @@
                   "level",
                   "times",
                   "goals",
+                  "disciplines",
                   "about",
                   "gender",
                   "gender_preference"
@@ -50521,9 +51164,120 @@
           "member",
           "profile",
           "swipes_remaining",
+          "distance",
           "options"
         ],
         "title": "PartnersClubOverview",
+        "type": "object"
+      },
+      "PeopleSearchPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "buddy": {
+            "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "my_status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "club",
+              "buddy",
+              "follow",
+              "nearby",
+              "public"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "buddy",
+          "id",
+          "my_status",
+          "relation"
+        ],
+        "title": "PeopleSearchPerson",
+        "type": "object"
+      },
+      "PeopleSearchResponse": {
+        "properties": {
+          "people": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "buddy": {
+                  "type": "boolean"
+                },
+                "handle": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "my_status": {
+                  "enum": [
+                    "none",
+                    "requested",
+                    "active"
+                  ],
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "relation": {
+                  "enum": [
+                    "club",
+                    "buddy",
+                    "follow",
+                    "nearby",
+                    "public"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "buddy",
+                "id",
+                "my_status",
+                "relation"
+              ],
+              "title": "PeopleSearchPerson",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "people"
+        ],
+        "title": "PeopleSearchResponse",
         "type": "object"
       },
       "PerkBenefit": {
@@ -52200,6 +52954,571 @@
         "title": "PerkVersionList",
         "type": "object"
       },
+      "PersonConversation": {
+        "properties": {
+          "buddy": {
+            "description": "You and they follow each other",
+            "type": "boolean"
+          },
+          "folder": {
+            "enum": [
+              "inbox",
+              "requests"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_message": {
+            "allOf": [
+              {
+                "properties": {
+                  "author_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "conversation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "mine": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "author_id",
+                  "body",
+                  "conversation_id",
+                  "created_at",
+                  "id",
+                  "mine"
+                ],
+                "title": "PersonMessage",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "last_message_at": {
+            "allOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              }
+            ],
+            "nullable": true
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "handle": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "ConversationPerson",
+            "type": "object"
+          },
+          "started_by_me": {
+            "type": "boolean"
+          },
+          "unread": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "buddy",
+          "folder",
+          "id",
+          "person",
+          "started_by_me",
+          "unread"
+        ],
+        "title": "PersonConversation",
+        "type": "object"
+      },
+      "PersonConversationOpenRequest": {
+        "properties": {
+          "person_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id"
+        ],
+        "title": "PersonConversationOpenRequest",
+        "type": "object"
+      },
+      "PersonConversationPage": {
+        "properties": {
+          "conversations": {
+            "items": {
+              "properties": {
+                "buddy": {
+                  "description": "You and they follow each other",
+                  "type": "boolean"
+                },
+                "folder": {
+                  "enum": [
+                    "inbox",
+                    "requests"
+                  ],
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "last_message": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "author_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_operation_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "conversation_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "author_id",
+                        "body",
+                        "conversation_id",
+                        "created_at",
+                        "id",
+                        "mine"
+                      ],
+                      "title": "PersonMessage",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "last_message_at": {
+                  "allOf": [
+                    {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "ConversationPerson",
+                  "type": "object"
+                },
+                "started_by_me": {
+                  "type": "boolean"
+                },
+                "unread": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "buddy",
+                "folder",
+                "id",
+                "person",
+                "started_by_me",
+                "unread"
+              ],
+              "title": "PersonConversation",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "conversations"
+        ],
+        "title": "PersonConversationPage",
+        "type": "object"
+      },
+      "PersonConversationResponse": {
+        "properties": {
+          "conversation": {
+            "properties": {
+              "buddy": {
+                "description": "You and they follow each other",
+                "type": "boolean"
+              },
+              "folder": {
+                "enum": [
+                  "inbox",
+                  "requests"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "last_message": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "author_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "body": {
+                        "type": "string"
+                      },
+                      "client_operation_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "conversation_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "mine": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "author_id",
+                      "body",
+                      "conversation_id",
+                      "created_at",
+                      "id",
+                      "mine"
+                    ],
+                    "title": "PersonMessage",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              },
+              "last_message_at": {
+                "allOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                ],
+                "nullable": true
+              },
+              "person": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "handle": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "ConversationPerson",
+                "type": "object"
+              },
+              "started_by_me": {
+                "type": "boolean"
+              },
+              "unread": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "buddy",
+              "folder",
+              "id",
+              "person",
+              "started_by_me",
+              "unread"
+            ],
+            "title": "PersonConversation",
+            "type": "object"
+          }
+        },
+        "required": [
+          "conversation"
+        ],
+        "title": "PersonConversationResponse",
+        "type": "object"
+      },
+      "PersonConversationUnreadCount": {
+        "properties": {
+          "inbox": {
+            "type": "integer"
+          },
+          "requests": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "inbox",
+          "requests"
+        ],
+        "title": "PersonConversationUnreadCount",
+        "type": "object"
+      },
+      "PersonMessage": {
+        "properties": {
+          "author_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "client_operation_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "conversation_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mine": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "author_id",
+          "body",
+          "conversation_id",
+          "created_at",
+          "id",
+          "mine"
+        ],
+        "title": "PersonMessage",
+        "type": "object"
+      },
+      "PersonMessagePage": {
+        "properties": {
+          "messages": {
+            "items": {
+              "properties": {
+                "author_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "client_operation_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "conversation_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "mine": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "author_id",
+                "body",
+                "conversation_id",
+                "created_at",
+                "id",
+                "mine"
+              ],
+              "title": "PersonMessage",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "PersonMessagePage",
+        "type": "object"
+      },
+      "PersonMessageRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "client_operation_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "PersonMessageRequest",
+        "type": "object"
+      },
+      "PersonMessageResponse": {
+        "properties": {
+          "message": {
+            "properties": {
+              "author_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              },
+              "client_operation_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "conversation_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "mine": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "author_id",
+              "body",
+              "conversation_id",
+              "created_at",
+              "id",
+              "mine"
+            ],
+            "title": "PersonMessage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "PersonMessageResponse",
+        "type": "object"
+      },
       "PersonPostsResponse": {
         "properties": {
           "next_cursor": {
@@ -53063,6 +54382,31 @@
             "nullable": true,
             "type": "string"
           },
+          "buddy": {
+            "description": "ADR-193: you follow each other",
+            "type": "boolean"
+          },
+          "follow_groups": {
+            "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+            "properties": {
+              "buddies": {
+                "type": "integer"
+              },
+              "followers_only": {
+                "type": "integer"
+              },
+              "following_only": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "buddies",
+              "followers_only",
+              "following_only"
+            ],
+            "title": "FollowGroups",
+            "type": "object"
+          },
           "followers_count": {
             "type": "integer"
           },
@@ -53071,6 +54415,10 @@
           },
           "follows_me": {
             "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
           },
           "id": {
             "format": "uuid",
@@ -53090,15 +54438,22 @@
           "nickname": {
             "nullable": true,
             "type": "string"
+          },
+          "private": {
+            "description": "ADR-193: following them is a request",
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "is_me",
+          "private",
           "followers_count",
           "following_count",
+          "follow_groups",
           "my_status",
-          "follows_me"
+          "follows_me",
+          "buddy"
         ],
         "title": "PersonProfile",
         "type": "object"
@@ -54455,6 +55810,26 @@
             ],
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training in the weekly span, oldest first",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "pr_timeline": {
             "items": {
               "properties": {
@@ -54619,6 +55994,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -59668,7 +61044,14 @@
               "journal",
               "vault",
               "progress",
-              "partners"
+              "partners",
+              "box_workouts",
+              "box_videos",
+              "box_appointments",
+              "events",
+              "find_clubs",
+              "my_posts",
+              "reviews"
             ],
             "type": "string"
           }
@@ -66233,6 +67616,35 @@
         "title": "ShopVariantStock",
         "type": "object"
       },
+      "SocialPrivacy": {
+        "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+        "properties": {
+          "private_account": {
+            "type": "boolean"
+          },
+          "searchable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "private_account",
+          "searchable"
+        ],
+        "title": "SocialPrivacy",
+        "type": "object"
+      },
+      "SocialPrivacyRequest": {
+        "properties": {
+          "private_account": {
+            "type": "boolean"
+          },
+          "searchable": {
+            "type": "boolean"
+          }
+        },
+        "title": "SocialPrivacyRequest",
+        "type": "object"
+      },
       "SocialSummary": {
         "properties": {
           "around_visibility": {
@@ -66270,6 +67682,27 @@
             "title": "BookingSharing",
             "type": "object"
           },
+          "follow_groups": {
+            "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+            "properties": {
+              "buddies": {
+                "type": "integer"
+              },
+              "followers_only": {
+                "type": "integer"
+              },
+              "following_only": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "buddies",
+              "followers_only",
+              "following_only"
+            ],
+            "title": "FollowGroups",
+            "type": "object"
+          },
           "followers_count": {
             "type": "integer"
           },
@@ -66292,18 +67725,37 @@
           "posts_count": {
             "type": "integer"
           },
+          "privacy": {
+            "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+            "properties": {
+              "private_account": {
+                "type": "boolean"
+              },
+              "searchable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "private_account",
+              "searchable"
+            ],
+            "title": "SocialPrivacy",
+            "type": "object"
+          },
           "requests_count": {
             "type": "integer"
           }
         },
         "required": [
-          "posts_count",
+          "around_visibility",
+          "booking_sharing",
+          "follow_groups",
           "followers_count",
           "following_count",
-          "requests_count",
-          "booking_sharing",
           "member_visibility",
-          "around_visibility"
+          "posts_count",
+          "privacy",
+          "requests_count"
         ],
         "title": "SocialSummary",
         "type": "object"
@@ -77031,6 +78483,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -77066,7 +78522,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           },
@@ -77144,6 +78601,10 @@
             },
             "type": "array"
           },
+          "hide_macros": {
+            "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+            "type": "boolean"
+          },
           "item_order": {
             "description": "Tile order; every item appears once (unplaced ones follow in default order)",
             "items": {
@@ -77199,6 +78660,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -77234,7 +78699,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           }
@@ -78743,6 +80209,18 @@
                         },
                         "type": "array"
                       },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
                       "max_price_cents": {
                         "minimum": 0,
                         "nullable": true,
@@ -78960,6 +80438,18 @@
                         },
                         "type": "array"
                       },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
                       "max_price_cents": {
                         "minimum": 0,
                         "nullable": true,
@@ -79138,6 +80628,18 @@
                           },
                           "type": "array"
                         },
+                        "levels": {
+                          "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                          "items": {
+                            "enum": [
+                              "beginner",
+                              "all_levels",
+                              "advanced"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "max_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -79204,7 +80706,8 @@
                         "max_price_cents",
                         "audiences",
                         "languages",
-                        "amenities"
+                        "amenities",
+                        "levels"
                       ],
                       "title": "AroundNormalizedFilter",
                       "type": "object"
@@ -81130,6 +82633,18 @@
                       "languages": {
                         "items": {
                           "pattern": "^[a-z]{2}$",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
                           "type": "string"
                         },
                         "type": "array"
@@ -90260,6 +91775,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "challenge_rankings": {
+                    "description": "ADR-196: appear in challenge rankings (on by default)",
+                    "type": "boolean"
+                  },
                   "off_days": {
                     "description": "Day-of-week indices (0=Sun..6=Sat) treated as rest days",
                     "items": {
@@ -90269,6 +91788,10 @@
                     },
                     "maxItems": 5,
                     "type": "array"
+                  },
+                  "pr_celebrations": {
+                    "description": "ADR-196: an automatic card in my clubs when I set a PR (off by default)",
+                    "type": "boolean"
                   }
                 },
                 "type": "object"
@@ -97433,6 +98956,177 @@
         ]
       }
     },
+    "/api/me/buddies-list": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.FollowController.buddies",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "box": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "primary_color": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "description": "Canonical slug; redirect when it differs",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "organization_id",
+                                  "slug",
+                                  "name"
+                                ],
+                                "title": "PublicBox",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "follow_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "my_status": {
+                                    "allOf": [
+                                      {
+                                        "enum": [
+                                          "none",
+                                          "requested",
+                                          "active"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    ],
+                                    "description": "Whether you follow them"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "my_status",
+                                  "buddy"
+                                ],
+                                "title": "FollowPerson",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "since": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "follow_id",
+                          "status",
+                          "since"
+                        ],
+                        "title": "FollowEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "FollowPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddies"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: your Buddies, the people you and they follow each other",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
     "/api/me/buddies/candidates": {
       "get": {
         "callbacks": {},
@@ -99625,6 +101319,15 @@
                       "format": "uuid",
                       "type": "string"
                     },
+                    "distance": {
+                      "description": "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου",
+                      "enum": [
+                        "available",
+                        "needs_area"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "member": {
                       "description": "Whether the viewer is a member of the club now",
                       "type": "boolean"
@@ -99639,6 +101342,20 @@
                         },
                         "daily_swipes": {
                           "type": "integer"
+                        },
+                        "disciplines": {
+                          "description": "Box vocabulary keys a profile may name (ADR-197)",
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "distances_km": {
+                          "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+                          "items": {
+                            "type": "integer"
+                          },
+                          "type": "array"
                         },
                         "gender_preferences": {
                           "items": {
@@ -99687,6 +101404,9 @@
                           },
                           "type": "array"
                         },
+                        "max_disciplines": {
+                          "type": "integer"
+                        },
                         "max_goals": {
                           "type": "integer"
                         },
@@ -99711,6 +101431,9 @@
                         "genders",
                         "gender_preferences",
                         "max_goals",
+                        "disciplines",
+                        "max_disciplines",
+                        "distances_km",
                         "about_max",
                         "daily_swipes"
                       ],
@@ -99731,6 +101454,12 @@
                             "club_id": {
                               "format": "uuid",
                               "type": "string"
+                            },
+                            "disciplines": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
                             },
                             "gender": {
                               "description": "Only used to honour preferences; never shown to anyone",
@@ -99806,6 +101535,7 @@
                             "level",
                             "times",
                             "goals",
+                            "disciplines",
                             "about",
                             "gender",
                             "gender_preference"
@@ -99835,6 +101565,7 @@
                     "member",
                     "profile",
                     "swipes_remaining",
+                    "distance",
                     "options"
                   ],
                   "title": "PartnersClubOverview",
@@ -99913,6 +101644,31 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "description": "People who named this discipline, a box vocabulary key (ADR-197)",
+            "in": "query",
+            "name": "discipline",
+            "required": false,
+            "schema": {
+              "maxLength": 60,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours",
+            "in": "query",
+            "name": "within_km",
+            "required": false,
+            "schema": {
+              "enum": [
+                2,
+                5,
+                10,
+                25
+              ],
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -99927,6 +101683,12 @@
                           "about": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "disciplines": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
                           },
                           "goals": {
                             "items": {
@@ -99979,6 +101741,12 @@
                           },
                           "shared": {
                             "properties": {
+                              "disciplines": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
                               "goals": {
                                 "items": {
                                   "enum": [
@@ -100013,6 +101781,7 @@
                             "required": [
                               "times",
                               "goals",
+                              "disciplines",
                               "same_level"
                             ],
                             "title": "PartnerShared",
@@ -100038,6 +101807,7 @@
                           "level",
                           "times",
                           "goals",
+                          "disciplines",
                           "about",
                           "shared"
                         ],
@@ -100105,6 +101875,13 @@
                   },
                   "active": {
                     "type": "boolean"
+                  },
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 5,
+                    "type": "array"
                   },
                   "gender": {
                     "enum": [
@@ -100185,6 +101962,12 @@
                           "format": "uuid",
                           "type": "string"
                         },
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "gender": {
                           "description": "Only used to honour preferences; never shown to anyone",
                           "enum": [
@@ -100259,6 +102042,7 @@
                         "level",
                         "times",
                         "goals",
+                        "disciplines",
                         "about",
                         "gender",
                         "gender_preference"
@@ -107196,6 +108980,1134 @@
         ]
       }
     },
+    "/api/me/conversations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "folder",
+            "required": false,
+            "schema": {
+              "enum": [
+                "inbox",
+                "requests"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversations": {
+                      "items": {
+                        "properties": {
+                          "buddy": {
+                            "description": "You and they follow each other",
+                            "type": "boolean"
+                          },
+                          "folder": {
+                            "enum": [
+                              "inbox",
+                              "requests"
+                            ],
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_message": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "author_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "body": {
+                                    "type": "string"
+                                  },
+                                  "client_operation_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "conversation_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "mine": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "author_id",
+                                  "body",
+                                  "conversation_id",
+                                  "created_at",
+                                  "id",
+                                  "mine"
+                                ],
+                                "title": "PersonMessage",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "last_message_at": {
+                            "allOf": [
+                              {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "ConversationPerson",
+                            "type": "object"
+                          },
+                          "started_by_me": {
+                            "type": "boolean"
+                          },
+                          "unread": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "buddy",
+                          "folder",
+                          "id",
+                          "person",
+                          "started_by_me",
+                          "unread"
+                        ],
+                        "title": "PersonConversation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "conversations"
+                  ],
+                  "title": "PersonConversationPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your conversations in the inbox (default) or in message requests, latest first",
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "person_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "person_id"
+                ],
+                "title": "PersonConversationOpenRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open (or find) your conversation with a person",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/unread-count": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "inbox": {
+                      "type": "integer"
+                    },
+                    "requests": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "inbox",
+                    "requests"
+                  ],
+                  "title": "PersonConversationUnreadCount",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Counts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How many conversations hold unread messages, in the inbox and in requests",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One conversation as you see it",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/accept": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.accept",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept a message request (it moves to the inbox)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/decline": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.decline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Declined"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline a message request (you never see it again; the sender is not told)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/messages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.messages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "messages": {
+                      "items": {
+                        "properties": {
+                          "author_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "client_operation_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "conversation_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "mine": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "author_id",
+                          "body",
+                          "conversation_id",
+                          "created_at",
+                          "id",
+                          "mine"
+                        ],
+                        "title": "PersonMessage",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "messages"
+                  ],
+                  "title": "PersonMessagePage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Messages"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The conversation's messages, newest first (cursor paging)",
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.send_message",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "PersonMessageRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "properties": {
+                        "author_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_operation_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "conversation_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "author_id",
+                        "body",
+                        "conversation_id",
+                        "created_at",
+                        "id",
+                        "mine"
+                      ],
+                      "title": "PersonMessage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "PersonMessageResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Message"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write a message (a retry with the same client_operation_id is answered once)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/read": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark the conversation read up to now",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
     "/api/me/daily-stats": {
       "get": {
         "callbacks": {},
@@ -107223,7 +110135,8 @@
               "enum": [
                 "1m",
                 "1y",
-                "3m"
+                "3m",
+                "6m"
               ],
               "type": "string"
             }
@@ -107315,6 +110228,7 @@
                       "enum": [
                         "1m",
                         "3m",
+                        "6m",
                         "1y"
                       ],
                       "type": "string"
@@ -113792,6 +116706,34 @@
             }
           },
           {
+            "description": "Only club posts of these kinds (ADR-197): `announcement` (#ανακοινώσεις), `pr`, `event`",
+            "explode": true,
+            "in": "query",
+            "name": "types",
+            "required": false,
+            "schema": {
+              "items": {
+                "enum": [
+                  "announcement",
+                  "pr",
+                  "event"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Only club posts by the gym's staff (ADR-197)",
+            "in": "query",
+            "name": "coaches_only",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "in": "query",
             "name": "cursor",
             "required": false,
@@ -115550,7 +118492,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -115613,7 +118562,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -115658,7 +118614,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -115748,7 +118711,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -115795,7 +118765,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -115879,7 +118856,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -115926,7 +118910,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -115998,7 +118989,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -116046,7 +119044,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -116137,7 +119142,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -116236,6 +119248,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116260,7 +119280,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116474,6 +119495,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116498,7 +119527,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116686,6 +119716,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116710,7 +119748,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116833,7 +119872,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Follow a person (a request they accept) or a published box (at once)",
+        "summary": "Follow a person (a request when they are private, ADR-193) or a published box (at once)",
         "tags": [
           "Follows"
         ]
@@ -116964,6 +120003,339 @@
         "summary": "Whether you follow a person or box",
         "tags": [
           "Follows"
+        ]
+      }
+    },
+    "/api/me/guides": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your progress in every walkthrough you have opened",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/guides/{guide_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Forget one walkthrough's progress, so it is offered again",
+        "tags": [
+          "Me"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "started",
+                      "completed",
+                      "dismissed"
+                    ],
+                    "type": "string"
+                  },
+                  "step": {
+                    "default": 0,
+                    "maximum": 99,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "version": {
+                    "default": 1,
+                    "description": "A newer version than the stored one starts a new run.",
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "title": "GuideProgressUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_at": {
+                      "description": "The first finish of the current run.",
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "guide_id": {
+                      "description": "The web app's guide id, e.g. `shop_staff`.",
+                      "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                      "type": "string"
+                    },
+                    "runs": {
+                      "description": "How many times it was started.",
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "started_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "started",
+                        "completed",
+                        "dismissed"
+                      ],
+                      "type": "string"
+                    },
+                    "step": {
+                      "description": "The step reached in the current run, from 0.",
+                      "maximum": 99,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "version": {
+                      "maximum": 1000,
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "completed_at",
+                    "guide_id",
+                    "runs",
+                    "started_at",
+                    "status",
+                    "step",
+                    "updated_at",
+                    "version"
+                  ],
+                  "title": "GuideProgress",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record a step reached, a finish or a «not now» in one walkthrough",
+        "tags": [
+          "Me"
         ]
       }
     },
@@ -119361,6 +122733,191 @@
           }
         ],
         "summary": "Edit one of your notes",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/visibility-defaults": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.JournalController.visibility_defaults",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "defaults": {
+                      "description": "The rung a new entry of each kind starts on (ADR-139 §3)",
+                      "properties": {
+                        "check_in": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "pr": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "workout": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout",
+                        "pr",
+                        "note",
+                        "check_in"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "defaults"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Defaults"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who sees my new journal entries, per kind (ADR-196)",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.JournalController.put_visibility_default",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "workout",
+                      "note",
+                      "check_in"
+                    ],
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "private",
+                      "coach_can_view"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "visibility"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "defaults": {
+                      "description": "The rung a new entry of each kind starts on (ADR-139 §3)",
+                      "properties": {
+                        "check_in": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "pr": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "workout": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout",
+                        "pr",
+                        "note",
+                        "check_in"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "defaults"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Defaults"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown kind or rung"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set who sees my new entries of one kind (workout, note, check_in; ADR-196)",
         "tags": [
           "Journal"
         ]
@@ -122563,6 +126120,26 @@
                           "additionalProperties": true,
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "filter": {
                           "additionalProperties": true,
                           "type": "object"
@@ -122711,6 +126288,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -123626,6 +127204,27 @@
                       "title": "BookingSharing",
                       "type": "object"
                     },
+                    "follow_groups": {
+                      "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+                      "properties": {
+                        "buddies": {
+                          "type": "integer"
+                        },
+                        "followers_only": {
+                          "type": "integer"
+                        },
+                        "following_only": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "buddies",
+                        "followers_only",
+                        "following_only"
+                      ],
+                      "title": "FollowGroups",
+                      "type": "object"
+                    },
                     "followers_count": {
                       "type": "integer"
                     },
@@ -123648,18 +127247,37 @@
                     "posts_count": {
                       "type": "integer"
                     },
+                    "privacy": {
+                      "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+                      "properties": {
+                        "private_account": {
+                          "type": "boolean"
+                        },
+                        "searchable": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "private_account",
+                        "searchable"
+                      ],
+                      "title": "SocialPrivacy",
+                      "type": "object"
+                    },
                     "requests_count": {
                       "type": "integer"
                     }
                   },
                   "required": [
-                    "posts_count",
+                    "around_visibility",
+                    "booking_sharing",
+                    "follow_groups",
                     "followers_count",
                     "following_count",
-                    "requests_count",
-                    "booking_sharing",
                     "member_visibility",
-                    "around_visibility"
+                    "posts_count",
+                    "privacy",
+                    "requests_count"
                   ],
                   "title": "SocialSummary",
                   "type": "object"
@@ -123674,7 +127292,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Your counts for Εγώ: posts, followers, following, waiting requests",
+        "summary": "Your counts for Εγώ: posts, followers, following, Buddies, waiting requests",
         "tags": [
           "Follows"
         ]
@@ -123856,6 +127474,67 @@
           }
         ],
         "summary": "Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1)",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/social/privacy": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.FollowController.privacy",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "private_account": {
+                    "type": "boolean"
+                  },
+                  "searchable": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "SocialPrivacyRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+                  "properties": {
+                    "private_account": {
+                      "type": "boolean"
+                    },
+                    "searchable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "private_account",
+                    "searchable"
+                  ],
+                  "title": "SocialPrivacy",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Setting"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: private account (follows become requests) and showing in people search",
         "tags": [
           "Follows"
         ]
@@ -127871,6 +131550,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -127906,7 +131589,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     },
@@ -129392,6 +133076,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -129427,7 +133115,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -129481,6 +133170,10 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "hide_macros": {
+                    "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                    "type": "boolean"
                   },
                   "item_order": {
                     "description": "Tile order; every item appears once (unplaced ones follow in default order)",
@@ -129545,6 +133238,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -129580,7 +133277,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -130734,6 +134432,229 @@
           }
         ],
         "summary": "Stop push to a store app install of the current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.NotificationPreferenceController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "description": "`staff`: only box staff get these, so only they need the switch.",
+                            "enum": [
+                              "everyone",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "category": {
+                            "description": "A notification category, in the order the switches are shown.",
+                            "enum": [
+                              "bookings",
+                              "messages",
+                              "community",
+                              "coach",
+                              "partners",
+                              "journal",
+                              "staff",
+                              "account"
+                            ],
+                            "type": "string"
+                          },
+                          "channels": {
+                            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                            "properties": {
+                              "email": {
+                                "type": "boolean"
+                              },
+                              "in_app": {
+                                "type": "boolean"
+                              },
+                              "push": {
+                                "type": "boolean"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "locked": {
+                            "description": "Always delivered (account, security, payments); cannot be changed.",
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "category",
+                          "channels",
+                          "locked"
+                        ],
+                        "title": "NotificationPreference",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "NotificationPreferenceList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Notification preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your notification choices, per category and channel",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/preferences/{category}": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.NotificationPreferenceController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "description": "A notification category, in the order the switches are shown.",
+              "enum": [
+                "bookings",
+                "messages",
+                "community",
+                "coach",
+                "partners",
+                "journal",
+                "staff",
+                "account"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "One or more channels of the category to switch on or off.",
+                "properties": {
+                  "email": {
+                    "type": "boolean"
+                  },
+                  "in_app": {
+                    "type": "boolean"
+                  },
+                  "push": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "NotificationPreferenceUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "description": "`staff`: only box staff get these, so only they need the switch.",
+                            "enum": [
+                              "everyone",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "category": {
+                            "description": "A notification category, in the order the switches are shown.",
+                            "enum": [
+                              "bookings",
+                              "messages",
+                              "community",
+                              "coach",
+                              "partners",
+                              "journal",
+                              "staff",
+                              "account"
+                            ],
+                            "type": "string"
+                          },
+                          "channels": {
+                            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                            "properties": {
+                              "email": {
+                                "type": "boolean"
+                              },
+                              "in_app": {
+                                "type": "boolean"
+                              },
+                              "push": {
+                                "type": "boolean"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "locked": {
+                            "description": "Always delivered (account, security, payments); cannot be changed.",
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "category",
+                          "channels",
+                          "locked"
+                        ],
+                        "title": "NotificationPreference",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "NotificationPreferenceList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Notification preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Switch channels of one notification category on or off",
         "tags": [
           "Notifications"
         ]
@@ -205413,6 +209334,26 @@
                           ],
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training in the weekly span, oldest first",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "pr_timeline": {
                           "items": {
                             "properties": {
@@ -205577,6 +209518,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -238468,6 +242410,103 @@
         ]
       }
     },
+    "/api/people-search": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PeopleController.search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "people": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "buddy": {
+                            "type": "boolean"
+                          },
+                          "handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "my_status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "relation": {
+                            "enum": [
+                              "club",
+                              "buddy",
+                              "follow",
+                              "nearby",
+                              "public"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "buddy",
+                          "id",
+                          "my_status",
+                          "relation"
+                        ],
+                        "title": "PeopleSearchPerson",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "people"
+                  ],
+                  "title": "PeopleSearchResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "People"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: find people by @handle or name (shared clubs, Buddies, follows, nearby, public)",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
     "/api/people/{id}": {
       "get": {
         "callbacks": {},
@@ -238493,6 +242532,31 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "buddy": {
+                      "description": "ADR-193: you follow each other",
+                      "type": "boolean"
+                    },
+                    "follow_groups": {
+                      "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+                      "properties": {
+                        "buddies": {
+                          "type": "integer"
+                        },
+                        "followers_only": {
+                          "type": "integer"
+                        },
+                        "following_only": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "buddies",
+                        "followers_only",
+                        "following_only"
+                      ],
+                      "title": "FollowGroups",
+                      "type": "object"
+                    },
                     "followers_count": {
                       "type": "integer"
                     },
@@ -238501,6 +242565,10 @@
                     },
                     "follows_me": {
                       "type": "boolean"
+                    },
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
                     },
                     "id": {
                       "format": "uuid",
@@ -238520,15 +242588,22 @@
                     "nickname": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "private": {
+                      "description": "ADR-193: following them is a request",
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "id",
                     "is_me",
+                    "private",
                     "followers_count",
                     "following_count",
+                    "follow_groups",
                     "my_status",
-                    "follows_me"
+                    "follows_me",
+                    "buddy"
                   ],
                   "title": "PersonProfile",
                   "type": "object"
@@ -246697,6 +250772,173 @@
         ]
       }
     },
+    "/api/prs/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.all_history",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "history": {
+                      "items": {
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "pr_record_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "supporting_metrics": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "pr_record_id",
+                          "score",
+                          "beaten_on",
+                          "supporting_metrics"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "history"
+                  ],
+                  "title": "PRHistoryList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR history"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Score history of all my PRs, oldest first (ADR-194)",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/prs/profile/{user_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "prs": {
+                      "items": {
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "current_score": {
+                            "type": "number"
+                          },
+                          "higher_is_better": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "supporting_metrics": {
+                            "type": "object"
+                          },
+                          "unit": {
+                            "enum": [
+                              "mins_secs",
+                              "reps",
+                              "sets",
+                              "kcals",
+                              "m",
+                              "kg"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "current_score",
+                          "unit",
+                          "higher_is_better",
+                          "beaten_on"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "prs"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile PRs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The PRs a person shows on their profile, as a follower sees them (ADR-196)",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
     "/api/prs/{id}": {
       "delete": {
         "callbacks": {},
@@ -247002,6 +251244,88 @@
           }
         ],
         "summary": "Get score history for a PR",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/prs/{id}/profile-audience": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.profile_audience",
+        "parameters": [
+          {
+            "description": "PR Record ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "audience": {
+                    "enum": [
+                      "private",
+                      "followers"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audience"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Audience",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show a PR on my profile to followers, or keep it private (ADR-196)",
         "tags": [
           "Pantheon"
         ]

@@ -49,6 +49,9 @@ defmodule Palee.Notifications.Notification do
     :access_ended,
     :follow_requested,
     :follow_accepted,
+    :new_follower,
+    :person_message,
+    :message_request,
     :trial_requested,
     :trial_booked,
     :trial_cancelled,
@@ -116,6 +119,9 @@ defmodule Palee.Notifications.Notification do
 
     timestamps(updated_at: false)
   end
+
+  @doc "Every notification type, as atoms (ADR-199 maps each to a category)."
+  def types, do: @types
 
   def changeset(notification \\ %__MODULE__{}, params) do
     notification

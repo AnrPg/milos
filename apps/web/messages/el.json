@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Το δικό σου training space για group classes, personal workouts, άμεσο chat με τον coach και progress που σου ταιριάζει.",
     "createAnAccount3f4f547": "Δημιουργήσε έναν λογαριασμό",
     "signInada2e9e": "Συνδέσου",
-    "conversationHistory0f18fb3": "Ιστορικό συνομιλιών",
     "loading33ce417": "Φόρτωση…",
-    "noConversations06b83a9": "Καμία συνομιλία.",
-    "selectAConversationToViewMessagesaf2cf2c": "Επιλέξτε μια συνομιλία για προβολή μηνυμάτων.",
     "availablePackages48a5129": "Διαθέσιμα πακέτα συνδρομής",
     "closebf5d9ce": "✕ Κλείσιμο",
     "noPackagesAvailable14160fb": "Δεν υπάρχουν διαθέσιμα πακέτα συνδρομής.",
@@ -273,7 +270,7 @@
     "usernameRules4b5de12": "Χρησιμοποιήστε 3–30 γράμματα, αριθμούς ή κάτω παύλες μόνο. Χωρίς κενά ή ειδικούς χαρακτήρες.",
     "passwordRules0c63f14": "Χρησιμοποιήστε τουλάχιστον 4 χαρακτήρες.",
     "trainingSchedule80e51e2": "Πρόγραμμα προπονήσεων",
-    "offDaysAreTransparentToYourStreakMissingb808660": "Τα rest days δεν σπάνε το streak (σερί προπονήσεων) σου — οι προγραμματισμένες ημέρες ξεκούρασης δεν μετράνε ως χαμένες προπονήσεις.",
+    "offDaysAreTransparentToYourStreakMissingb808660": "Οι μέρες ξεκούρασης δεν σπάνε το σερί σου: οι προγραμματισμένες μέρες ξεκούρασης δεν μετράνε ως χαμένες προπονήσεις.",
     "failedToSavePleaseTryAgainb68b7e7": "Αποτυχία αποθήκευσης. Δοκιμάστε ξανά.",
     "avatarPreview9d0ac09": "Προεπισκόπηση Εικόνας Προφίλ",
     "currentAvatar8634e3c": "Τρέχουσα Εικόνα Προφίλ",
@@ -671,9 +668,9 @@
     "weeklyWorkoutTargetInfo19b03c8": "Πληροφορίες στόχου εβδομαδιαίας προπόνησης",
     "howManyCompletedWorkoutsAUserNeedsPere99943b": "Πόσες ολοκληρωμένες προπονήσεις χρειάζεται ένας χρήστης την εβδομάδα για εκείνη την εβδομάδα για να μετρήσει στο σερί του.",
     "validValuesInteger1Default281502ef": "Έγκυρες τιμές: ακέραιος αριθμός ≥ 1. Προεπιλογή: 2.",
-    "streakShieldResetDayd22b9ea": "Ημέρα ανανέωσης προστασίας σερί",
-    "streakShieldResetDayInfo10555c2": "Πληροφορίες ανανέωσης προστασίας σερί",
-    "dayOfMonthWhenEachUserGetsTheir605b967": "Ημέρα του μήνα που ανανεώνεται η μηνιαία προστασία σερί κάθε χρήστη. Επιτρέπονται 1–28 ή κενό για ανανέωση με βάση την ημερομηνία εγγραφής.",
+    "streakShieldResetDayd22b9ea": "Ημέρα ανανέωσης ασπίδας σερί",
+    "streakShieldResetDayInfo10555c2": "Πληροφορίες ανανέωσης ασπίδας σερί",
+    "dayOfMonthWhenEachUserGetsTheir605b967": "Ημέρα του μήνα που ανανεώνεται η μηνιαία ασπίδα σερί κάθε χρήστη. Επιτρέπονται 1–28 ή κενό για ανανέωση με βάση την ημερομηνία εγγραφής.",
     "useSignupRelativeMonthlyReseta55c3a9": "Ανανέωση κάθε μήνα από την ημερομηνία εγγραφής",
     "enableLeaderboardGloballyc5e326f": "Ενεργοποίηση βαθμολογικού πίνακα παγκοσμίως",
     "enableLeaderboardGloballyInfo62095ee": "Ενεργοποίηση πληροφοριών βαθμολογικού πίνακα παγκοσμίως",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Λήψη .ics",
     "loadingCalendarLinks1dad320": "Φόρτωση συνδέσμων ημερολογίου…",
     "writeAMessage24bf2a3": "Γράψτε ένα μήνυμα…",
-    "chat67305ee": "← Συνομιλία",
     "searchOrStartAConversationabb1d82": "Αναζήτηση ή έναρξη συνομιλίας…",
     "noConversationsYetSearchToStartOne1a91cf7": "Δεν υπάρχουν ακόμη συνομιλίες. Αναζήτηση για να ξεκινήσετε ένα.",
     "hideConversationdfb77ca": "Απόκρυψη συνομιλίας",
@@ -730,8 +726,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Οι βαθμολογίες Συνέπειάς και Επιμονής σας αποκλείουν τις προγραμματισμένες ημέρες ανάπαυσης — αλλά δεν γνωρίζουμε ποιες ημέρες είναι ακόμα.",
     "setYourRestDaysInProfilefd0fbe4": "Ορίστε τις ημέρες ανάπαυσης στο Προφίλ →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Σήμερα είναι η προγραμματισμένη ημέρα ανάπαυσης — η αποκατάσταση είναι μέρος του προγράμματος.",
-    "dayStreakca360c4": "ημέρες σερί",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Ολοκληρώστε την πρώτη σας προπόνηση για να κερδίσετε το πρώτο σας σήμα.",
     "loadingYourTrainingOverview39806c7": "Φόρτωση της επισκόπησης της προπόνησής σας...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Η επισκόπηση της προπόνησής σας δεν είναι διαθέσιμη.",
     "refreshSessionf2ed411": "Ανανέωση συνεδρίας",
@@ -743,7 +737,6 @@
     "showLeaderboardOptIna95255e": "Εμφάνιση συμμετοχής στον πίνακα κατάταξης",
     "optInRanking04c1cd3": "Κατάταξη με συμμετοχή",
     "joinLeaderboardad480b1": "Συμμετοχή στον πίνακα κατάταξης",
-    "noRankedUsersYetForThisPeriod2fa66a4": "Δεν υπάρχουν ακόμη ταξινομημένοι χρήστες για αυτήν την περίοδο.",
     "leaveLeaderboard834f047": "Αποχώρηση από τον πίνακα κατάταξης",
     "coachNotes2ea7a97": "Σημειώσεις προπονητή",
     "latestGuidance58da2dc": "Τελευταία καθοδήγηση",
@@ -757,9 +750,9 @@
     "theNumberOfConsecutiveUserRelativeTrainingWeeks23b79ed": "Ο αριθμός των διαδοχικών εβδομάδων εκπαίδευσης σχετικά με το χρήστη κατά τις οποίες ολοκληρώσατε τουλάχιστον",
     "howToImprove1fadc66": "Πώς να βελτιώσετε:",
     "completeAtLeastfd38f65": "Συμπληρώστε τουλάχιστον",
-    "eachTrainingWeekAStreakShieldCanProtecte2b0f06": "κάθε εβδομάδα προπόνησης. Μια ασπίδα ράβδου μπορεί να προστατεύσει μια εβδομάδα στόχου που χάθηκε.",
+    "eachTrainingWeekAStreakShieldCanProtecte2b0f06": "κάθε εβδομάδα προπόνησης. Μια ασπίδα σερί μπορεί να προστατεύσει μια εβδομάδα που δεν έπιασες τον στόχο.",
     "whyItMatterscdfa2a6": "Γιατί έχει σημασία:",
-    "streaksBuildTheHabitOfRegularWeeklyTraining48e3b44": "Οι ραβδώσεις δημιουργούν τη συνήθεια του τακτικού εβδομαδιαίου όγκου προπόνησης.",
+    "streaksBuildTheHabitOfRegularWeeklyTraining48e3b44": "Το σερί χτίζει τη συνήθεια της τακτικής εβδομαδιαίας προπόνησης.",
     "yourRankingAmongMembersWhoHaveOptedIn1b6e973": "Η κατάταξή σας μεταξύ των μελών που έχουν επιλέξει, με βάση τον όγκο και τη συχνότητα προπόνησης.",
     "weeklyRanking7015bcf": "Εβδομαδιαία κατάταξη:",
     "countsWorkoutsCompletedInTheCurrentCalendarWeek042a854": "Μετρά τις προπονήσεις που ολοκληρώθηκαν την τρέχουσα ημερολογιακή εβδομάδα.",
@@ -1294,9 +1287,6 @@
     "coaches181feb6": "Προπονητές",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Προγραμματίστε, επικοινωνήστε και κατανοήστε την πρόοδο της εκπαίδευσης χωρίς επιτήρηση ή διαφημίσεις.",
     "directMessagefc7f864": "Άμεσο μήνυμα",
-    "workoutThreada03f1e1": "νήμα προπόνησης",
-    "classThreadf030236": "νήμα τάξης",
-    "thread7863f75": "Νήμα",
     "eurd06e073": "ευρώ",
     "downloada479c9c": "Λήψη",
     "billed763fe55": "Τιμολογήθηκε",
@@ -1546,15 +1536,10 @@
     "executionNotAvailablea9817d4": "Η εκτέλεση δεν είναι διαθέσιμη.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Δεν ήταν δυνατή η φόρτωση της σελίδας προορισμού.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Συχνότητα προπόνησης έναντι εβδομαδιαίου στόχου — τελευταίες 10 εβδομάδες",
-    "noWorkoutsYet85a9204": "Δεν υπάρχουν ακόμη προπονήσεις",
-    "setAWeeklyTargetdd70e51": "Θέστε έναν εβδομαδιαίο στόχο",
-    "calculatingc573779": "Υπολογισμός…",
     "howCloselyYouFollowedPrescribedExercises760e833": "Πόσο προσεκτικά ακολουθήσατε τις συνταγογραφημένες ασκήσεις",
     "prs80e1569": "PRs ·",
     "whatAreChallengesfdf13a8": "Τι είναι οι προκλήσεις;",
     "howDoesTheLeaderboardWork74f2b8a": "Πώς λειτουργεί το leaderboard;",
-    "theLeaderboardIsCurrentlyUnavailableYourOptIn96132c6": "Ο πίνακας κατάταξης δεν είναι διαθέσιμος αυτήν τη στιγμή. Η προτίμησή σας για συμμετοχή έχει αποθηκευτεί.",
-    "theLeaderboardStaysPrivateUntilYouExplicitlyOpt9e982f1": "Ο βαθμολογικός πίνακας παραμένει ιδιωτικός μέχρι να δηλώσετε συμμετοχή.",
     "workoutsThisWeek0268fc5": "προπονήσεις αυτή την εβδομάδα",
     "prsThisMonthd85bc56": "PR αυτόν τον μήνα",
     "noWorkoutsInThisPeriodc124c5e": "Καμία προπόνηση αυτή την περίοδο",
@@ -1751,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "π.χ. 4 γύροι + 3 επαναλήψεις",
     "fail2758e32": "Αποτυχία",
     "capa8fba29": "· Καπ",
-    "directbc81524": "Άμεση",
-    "class41ff354": "Τάξη",
-    "directChat3892e2c": "Απευθείας συνομιλία",
     "createAndManagePromotionalOffers46d33bb": "Δημιουργήστε και διαχειριστείτε προωθητικές προσφορές.",
     "reviewReferralActivityAndRewardActions8ea1271": "Ελέγξτε τη δραστηριότητα παραπομπής και τις ενέργειες επιβράβευσης.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Διαχειριστείτε τα πακέτα που χρησιμοποιούνται από τις συνδρομές και τα δικαιώματα.",
@@ -3642,8 +3624,6 @@
     "clVideoUnavailable": "Μη διαθέσιμος σύνδεσμος",
     "clMinutesShort": "{count} λεπ.",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "Η πρόοδός μου",
-    "clProgressIntro": "Η προπόνησή σου τις τελευταίες 12 εβδομάδες.",
     "clProgressSessions": "Προπονήσεις",
     "clProgressMinutes": "Λεπτά",
     "clProgressWorkouts": "Διαφορετικές προπονήσεις",
@@ -3687,7 +3667,6 @@
     "clFormReviewWithdraw": "Απόσυρση",
     "clFormReviewWithdrawConfirm": "Να αποσυρθεί αυτό το αίτημα; Η αξιολόγηση επιστρέφει στο πακέτο σου.",
     "clNutritionTitle": "Διατροφικό πλάνο",
-    "clNutritionEmpty": "Ο προπονητής σου δεν έχει μοιραστεί ακόμη διατροφικό πλάνο.",
     "clNutritionUpdated": "Ενημερώθηκε {date}",
     "clNutritionCalories": "Θερμίδες",
     "clNutritionProtein": "Πρωτεΐνη",
@@ -4313,7 +4292,6 @@
     "msgTopicFacility": "Χώρος",
     "msgSendAsCoaching": "Ως μήνυμα coaching",
     "msgSendAsCoachingHint": "Μετράει στις επαφές coaching του πελάτη.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Το box",
     "coachLatestTitle": "Τελευταία από τον coach",
     "coachLatestEmpty": "Δεν υπάρχουν ακόμη μηνύματα από τον coach σου.",
@@ -4461,7 +4439,36 @@
     "apiErrorAccountNotFound": "Δεν βρέθηκε λογαριασμός.",
     "apiErrorUnknownDemoSection": "Δεν υπάρχουν δεδομένα επίδειξης για αυτή την οθόνη.",
     "ntfBusinessDemoIdleTitle": "Η demo επιχείρησή σου σε περιμένει",
-    "ntfBusinessDemoIdleBody": "Κανείς δεν έχει χρησιμοποιήσει το {business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες {days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις."
+    "ntfBusinessDemoIdleBody": "Κανείς δεν έχει χρησιμοποιήσει το {business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες {days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις.",
+    "clApptFiltersTitle": "Φίλτρα ραντεβού",
+    "clApptFilterKind": "Είδος",
+    "clApptFilterFormat": "Μορφή",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Τίποτα με αυτά τα φίλτρα.",
+    "reviewsFiltersTitle": "Φίλτρα κριτικών",
+    "reviewsFilterTarget": "Για τι",
+    "reviewsFilterSentiment": "Εντύπωση",
+    "reviewsNoMatch": "Καμία κριτική με αυτά τα φίλτρα.",
+    "workoutsFiltersTitle": "Φίλτρα προπονήσεων",
+    "workoutsFilterStatus": "Κατάσταση",
+    "workoutsStatusDone": "Ολοκληρωμένες",
+    "workoutsStatusPending": "Εκκρεμείς",
+    "workoutsFilterKind": "Είδος",
+    "workoutsKindPersonal": "Προσωπικές",
+    "workoutsFilterSeason": "Σεζόν",
+    "clProgressOnTargetWeeks": "{onTarget} από {weeks} εβδομάδες στον στόχο",
+    "clProgressStreakDays": "{count, plural, one {# ημέρα} other {# ημέρες}}",
+    "clProgressTarget": "Στόχος {count}/εβδ.",
+    "clProgressHeatmap": "Μέρες προπόνησης",
+    "clProgressHeatWeek": "Εβδομάδα {date}: {count, plural, one {# προπόνηση} other {# προπονήσεις}}{onTarget, select, true {, στον στόχο} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {χωρίς προπόνηση} one {# προπόνηση} other {# προπονήσεις}}",
+    "clProgressBadges": "Διακρίσεις",
+    "prTrendEstimated": "Εκτ. 1RM {value} {unit}",
+    "prTrendRetest": "Ώρα για νέα δοκιμή;",
+    "clNutritionMacros": "Μακροθρεπτικά",
+    "clNutritionMacrosHidden": "Κρυμμένοι αριθμοί",
+    "clNutritionHideMacros": "Απόκρυψη αριθμών",
+    "clNutritionShowMacros": "Εμφάνιση αριθμών"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -5064,7 +5071,6 @@
     "signOut": "Αποσύνδεση",
     "todayWorkout": "Η προπόνηση της ημέρας",
     "todaySources": "Οι σημερινές προπονήσεις ανά πηγή",
-    "todayEmpty": "Τίποτα προγραμματισμένο για σήμερα. Κλείσε θέση σε μάθημα ή κατέγραψε μια δική σου προπόνηση.",
     "classChip": "WOD {time}",
     "programmeChip": "{title} · από τον coach",
     "logWorkout": "Καταγραφή",
@@ -5072,8 +5078,6 @@
     "startWorkout": "Έναρξη",
     "resumeWorkout": "Συνέχεια",
     "nextSession": "Η επόμενη προπόνησή σου",
-    "noBooking": "Καμία κράτηση ακόμη.",
-    "bookClass": "Κλείσε θέση",
     "manageBooking": "Άνοιγμα κράτησης",
     "todayLabel": "Σήμερα",
     "boxActions": "Ενέργειες box",
@@ -5082,7 +5086,6 @@
     "actionVideos": "Βίντεο",
     "actionCoach": "Coach",
     "membership": "Συνδρομή",
-    "membershipNone": "Κανένα ενεργό πακέτο.",
     "meProfileTabs": "Το προφίλ σου",
     "meAllPosts": "Όλες οι αναρτήσεις σου",
     "meAllPrs": "Όλα τα PRs",
@@ -5097,14 +5100,12 @@
     "meSharingHint": "Τι βλέπει ο coach και οι άλλοι",
     "mePayments": "Πληρωμές & αποδείξεις",
     "mePaymentsHint": "Τιμολόγια, επιστροφές και το πακέτο σου",
-    "meChats": "Συνομιλίες",
     "meSettings": "Ρυθμίσεις",
     "meSettingsHint": "Προφίλ, γλώσσα, θέμα, λογαριασμός",
     "meTour": "Ξενάγηση",
     "meChecklist": "Πρώτα βήματα",
     "meConsole": "Διαχείριση",
     "meConsoleHint": "Άνοιγμα της κονσόλας προσωπικού",
-    "meMyBoxes": "Τα box μου",
     "bookingStatus": {
       "approved": "Κλεισμένο",
       "pending": "Σε αναμονή έγκρισης",
@@ -5135,7 +5136,7 @@
       "measure": "Βάρος, περιφέρειες, φωτογραφίες",
       "wellness": "Ένα ποτήρι, η χθεσινή νύχτα, ένα γεύμα",
       "craving": "Κατέγραψέ τη ή ζήτα στήριξη",
-      "support": "Ένα γρήγορο μήνυμα στον buddy σου",
+      "support": "Ένα γρήγορο μήνυμα στο φιλαράκι στήριξής σου",
       "voice": "Πες τι έκανες"
     },
     "homeTitle": "Feed",
@@ -5282,7 +5283,7 @@
         "glasses": "{filled} από {goal} ποτήρια",
         "added": "Προστέθηκε ένα ποτήρι ({ml} ml)",
         "dropsLabel": "Ποτήρια σήμερα",
-        "remove": "Αφαίρεση αυτού του ποτηριού"
+        "remove": "Αφαίρεση του τελευταίου ποτηριού"
       },
       "sleep": {
         "title": "Ύπνος",
@@ -5364,9 +5365,6 @@
         "noPortions": "Το πλάνο του coach σου δεν έχει ακόμη μερίδες ανά ημέρα."
       },
       "mood": {
-        "mood": "Διάθεση {value}/4",
-        "stress": "Στρες {value}/4",
-        "empty": "Πώς νιώθεις;",
         "open": "Απάντησε στο «Πώς νιώθω»"
       },
       "craving": {
@@ -5376,7 +5374,7 @@
         "count": "{count, plural, one {# σήμερα} other {# σήμερα}}",
         "edit": "Επεξεργασία",
         "support": "Χρειάζομαι στήριξη",
-        "supportNoBuddy": "Όταν ορίσεις buddy, θα του πηγαίνει ένα σύντομο μήνυμα. Ποτέ οι λεπτομέρειες.",
+        "supportNoBuddy": "Όταν ορίσεις φιλαράκι στήριξης, θα του πηγαίνει ένα σύντομο μήνυμα. Ποτέ οι λεπτομέρειες.",
         "intensity": "Πόσο έντονη;",
         "trigger": "Τι την προκάλεσε;",
         "outcome": "Τι έγινε;",
@@ -5463,7 +5461,45 @@
         "invalid_media": "Η φωτογραφία δεν είναι έτοιμη. Διάλεξέ τη ξανά."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Βοήθεια & ξενάγηση",
+    "meHelpHint": "Ξενάγηση, πρώτα βήματα, επικοινωνία",
+    "meHelpResetsWaiting": "{count, plural, one {# επαναφορά κωδικού περιμένει} other {# επαναφορές κωδικού περιμένουν}}",
+    "helpVisibility": "Πώς λειτουργεί η ορατότητα",
+    "helpVisibilityPrivate": "Ό,τι καταγράφεις στο Ημερολόγιο είναι δικό σου: το βλέπεις μόνο εσύ, εκτός αν επιλέξεις αλλιώς.",
+    "helpVisibilityCoach": "Ο coach σου βλέπει μόνο ό,τι του επιτρέπεις στην Κοινοποίηση. Τους τραυματισμούς τους βλέπει πάντα, για την ασφάλειά σου.",
+    "helpVisibilityPosts": "Οι αναρτήσεις σου φαίνονται σε όσους διαλέξεις όταν τις δημοσιεύεις: το club, τους followers σου ή όλους.",
+    "helpContactBox": "Επικοινωνία με το box",
+    "helpContactBoxHint": "Γράψε στο box από τα Μηνύματα",
+    "helpReport": "Αναφορά προβλήματος",
+    "helpReportSubject": "Πρόβλημα στο Palee",
+    "helpStaffOnly": "Μόνο για staff",
+    "settingsUnitsHint": "Πώς δείχνονται βάρος, ύψος και περίμετροι.",
+    "settingsSectionsHint": "Ποιες ενότητες έχει το Ημερολόγιό σου και πώς φαίνεται το βάρος.",
+    "mePrsPrivate": "{count, plural, one {Ένα ακόμα PR είναι ιδιωτικό.} other {Τα υπόλοιπα # PRs είναι ιδιωτικά.}} Ορίζεις ποια φαίνονται από Κοινοποίηση & ορατότητα.",
+    "mePrsNoneShown": "Δεν δείχνεις ακόμα κανένα PR στο προφίλ σου.",
+    "sharing": {
+      "coachSeesTitle": "Ο coach μου βλέπει",
+      "coachSeesHint": "Τι φτάνει στους coaches σου χωρίς να το στείλεις κάθε φορά.",
+      "injuriesAlways": "Οι τραυματισμοί φαίνονται πάντα στον coach, για την ασφάλειά σου.",
+      "communityTitle": "Κοινότητα",
+      "communityHint": "Πού εμφανίζεσαι στα clubs και στους άλλους.",
+      "prCelebrations": "PR celebrations",
+      "prCelebrationsHint": "Αυτόματη κάρτα στο club όταν σπας ένα PR",
+      "challenges": "Challenges",
+      "challengesHint": "Το όνομά σου στην κατάταξη των challenges",
+      "profilePrsTitle": "PRs στο προφίλ σου",
+      "profilePrsHint": "Όσοι σε ακολουθούν βλέπουν μόνο όσα ενεργοποιήσεις. Τα υπόλοιπα μένουν ιδιωτικά.",
+      "profilePrsEmpty": "Δεν έχεις PRs ακόμα.",
+      "defaultsTitle": "Προεπιλογή νέων καταχωρήσεων",
+      "defaultsHint": "Από πού ξεκινά κάθε νέα καταχώρηση. Την αλλάζεις όποτε θέλεις, μία μία.",
+      "defaultKind": {
+        "workout": "Προπονήσεις",
+        "note": "Σημειώσεις",
+        "check_in": "Check-in"
+      },
+      "saveError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά."
+    }
   },
   "Community": {
     "all": "Όλα",
@@ -5536,7 +5572,6 @@
       "announcements": "Μόνο ανακοινώσεις",
       "none": "Σίγαση"
     },
-    "wodNoWorkout": "Σήμερα δεν υπάρχει WOD τάξης.",
     "wodScoreCount": "Σκορ σήμερα: {count}",
     "wodLeaderboard": "Κατάταξη",
     "wodYou": "Εσύ",
@@ -5546,7 +5581,6 @@
     "wodOptInLink": "Ενεργοποίηση",
     "announcementsEmpty": "Δεν υπάρχουν ακόμη ανακοινώσεις.",
     "announcementsOpen": "Όλες οι ανακοινώσεις",
-    "channelShowAll": "Όλα τα κανάλια",
     "channelSuggested": "Προτείνεται",
     "channelSuggestedHint": "κάνεις συχνά κράτηση σε αυτή την τάξη",
     "channelsOfBox": "Του box",
@@ -5573,7 +5607,19 @@
     "more": "Περισσότερα",
     "report": "Αναφορά",
     "commentHidden": "Κρυμμένο",
-    "channelsOfClub": "Κανάλια του club"
+    "channelsOfClub": "Κανάλια του club",
+    "postFiltersTitle": "Φίλτρα αναρτήσεων",
+    "filterClub": "Club",
+    "filterChannel": "Κανάλι",
+    "filterType": "Είδος",
+    "postType": {
+      "announcement": "Ανακοινώσεις",
+      "pr": "Ρεκόρ",
+      "event": "Events"
+    },
+    "filterCoachesOnly": "Μόνο coaches",
+    "filterAuthor": "Συντάκτης",
+    "postsNoMatch": "Καμία ανάρτηση με αυτά τα φίλτρα."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Φίλτρα} other {Φίλτρα (#)}}",
@@ -5581,7 +5627,8 @@
     "clear": "Καθαρισμός",
     "back": "Πίσω",
     "showResults": "{count, plural, =0 {Κανένα αποτέλεσμα} other {Δείξε #}}",
-    "show": "Δείξε"
+    "show": "Δείξε",
+    "all": "Όλα"
   },
   "BoxSchedule": {
     "title": "Πρόγραμμα",
@@ -5940,16 +5987,10 @@
     "requestsRowHint": "Αποδέξου ή απόρριψε",
     "notifications": "Ειδοποιήσεις",
     "notificationsUnread": "{count, plural, one {# αδιάβαστη ειδοποίηση} other {# αδιάβαστες ειδοποιήσεις}}",
-    "countsLine": "{followers, plural, one {# ακόλουθος} other {# ακόλουθοι}} · {following} ακολουθείς",
-    "countsLineOther": "{followers, plural, one {# ακόλουθος} other {# ακόλουθοι}} · ακολουθεί {following}",
     "connectionsTitle": "Συνδέσεις",
-    "tabFollowers": "{count, plural, one {# ακόλουθος} other {# ακόλουθοι}}",
-    "tabFollowing": "Ακολουθείς {count}",
     "tabBoxes": "Boxes",
     "tabClubs": "Clubs",
     "tabPrs": "PRs",
-    "followersEmpty": "Δεν σε ακολουθεί κανείς ακόμα.",
-    "followingEmpty": "Δεν ακολουθείς κανέναν ακόμα.",
     "boxesEmpty": "Δεν ακολουθείς κάποιο box ακόμα.",
     "clubsEmpty": "Δεν είσαι σε κάποιο club ακόμα.",
     "remove": "Αφαίρεση",
@@ -5988,7 +6029,48 @@
     "searchPeople": "Αναζήτηση ατόμων",
     "searchBoxes": "Αναζήτηση box",
     "searchClubs": "Αναζήτηση clubs",
-    "searchNoMatch": "Κανένα αποτέλεσμα για αυτή την αναζήτηση."
+    "searchNoMatch": "Κανένα αποτέλεσμα για αυτή την αναζήτηση.",
+    "countBuddies": "{count, plural, one {# Φιλαράκι} other {# Φιλαράκια}}",
+    "countFollowYou": "{count, plural, one {# σε ακολουθεί} other {# σε ακολουθούν}}",
+    "countYouFollow": "{count} ακολουθείς",
+    "countFollowers": "{count, plural, one {# ακόλουθος} other {# ακόλουθοι}}",
+    "countFollowing": "ακολουθεί {count}",
+    "tabBuddies": "Φιλαράκια {count}",
+    "tabFollowYou": "Σε ακολουθούν {count}",
+    "tabYouFollow": "Ακολουθείς {count}",
+    "buddyBadge": "Φιλαράκι",
+    "relationClub": "Στο club σου",
+    "relationNearby": "Κοντά σου",
+    "relationYouFollow": "Ακολουθείς",
+    "findPeople": "Βρες άτομα",
+    "findClubsAndPeople": "Αναζήτηση clubs και ατόμων",
+    "peopleTitle": "Άτομα",
+    "peopleNoMatch": "Δεν βρέθηκε κανείς. Οι ιδιωτικοί λογαριασμοί εμφανίζονται μόνο σε όσους ήδη τους γνωρίζουν.",
+    "peopleSearchFailed": "Η αναζήτηση δεν έγινε. Δοκίμασε ξανά.",
+    "searchBuddies": "Αναζήτηση στα Φιλαράκια",
+    "buddiesEmpty": "Δεν έχεις φιλαράκια ακόμα. Όταν κάποιος που ακολουθείς σε ακολουθήσει κι αυτός, γίνεστε φιλαράκια.",
+    "followYouEmpty": "Κανείς εδώ. Εδώ εμφανίζονται όσοι σε ακολουθούν χωρίς να τους ακολουθείς κι εσύ.",
+    "youFollowEmpty": "Κανείς εδώ. Εδώ εμφανίζονται όσοι ακολουθείς χωρίς να σε ακολουθούν κι αυτοί.",
+    "unfollowBuddyConfirm": "Να σταματήσεις να ακολουθείς; Δεν θα είστε πια φιλαράκια και δεν θα βλέπεις τις αναρτήσεις του για ακολούθους.",
+    "lockedPrivate": "Ιδιωτικός λογαριασμός. Στείλε αίτημα ακολούθησης για να βλέπεις και τις αναρτήσεις για ακολούθους· εγκρίνει κάθε αίτημα.",
+    "privacyTitle": "Ιδιωτικός λογαριασμός & αναζήτηση",
+    "privacyHint": "Ποιος μπορεί να σε ακολουθήσει και ποιος να σε βρει.",
+    "privateAccountToggle": "Ιδιωτικός λογαριασμός",
+    "privateAccountOn": "Σε ακολουθούν μόνο όσοι εγκρίνεις. Αν τον κλείσεις, ο λογαριασμός γίνεται δημόσιος: όλοι μπορούν να σε ακολουθήσουν αμέσως και τα αιτήματα που περιμένουν γίνονται αποδεκτά.",
+    "privateAccountOff": "Ο λογαριασμός σου είναι δημόσιος: όλοι μπορούν να σε ακολουθήσουν αμέσως. Άνοιξέ τον ξανά για να εγκρίνεις εσύ κάθε νέο ακόλουθο· όσοι σε ακολουθούν ήδη μένουν.",
+    "goPublicConfirm": "{count, plural, one {Να γίνει δημόσιος; Το # αίτημα που περιμένει θα γίνει αποδεκτό τώρα.} other {Να γίνει δημόσιος; Τα # αιτήματα που περιμένουν θα γίνουν αποδεκτά τώρα.}}",
+    "goPublic": "Κάν' τον δημόσιο",
+    "keepPrivate": "Μείνε ιδιωτικός",
+    "searchableToggle": "Εμφάνιση στην αναζήτηση",
+    "searchableOn": "Όλοι στο Palee μπορούν να σε βρουν με το όνομα ή το @handle σου.",
+    "searchablePrivate": "Σε βρίσκουν με το όνομα ή το @handle σου όσοι είναι στα clubs σου και όσοι συνδέεστε με ακολούθηση. Οι υπόλοιποι θα σε βρίσκουν όταν ο λογαριασμός σου γίνει δημόσιος.",
+    "searchableOff": "Στην αναζήτηση σε βρίσκουν μόνο όσοι ήδη γνωρίζεις, από τα clubs σου ή τις ακολουθήσεις σου.",
+    "notifNewFollowerTitle": "Νέος ακόλουθος",
+    "notifNewFollowerBody": "{name} άρχισε να σε ακολουθεί.",
+    "notifFollowRequestedTitle": "Αίτημα ακολούθησης",
+    "notifFollowRequestedBody": "{name} θέλει να σε ακολουθήσει.",
+    "notifFollowAcceptedTitle": "Το αίτημα έγινε δεκτό",
+    "notifFollowAcceptedBody": "{name} αποδέχτηκε το αίτημα ακολούθησής σου."
   },
   "BoxPage": {
     "allWeek": "Όλη η εβδομάδα",
@@ -6309,7 +6391,6 @@
     "clubLeaveBody": "Οι αναρτήσεις του φεύγουν από τη ροή σου. Μπορείς να ξαναμπείς από το Βρες.",
     "find": "Βρες",
     "findTitle": "Βρες clubs",
-    "findSearch": "Αναζήτηση σε clubs και ομάδες",
     "findOpenClubs": "Ανοιχτά clubs",
     "findGroups": "Ομάδες στα γυμναστήριά σου",
     "findNoClubs": "Τα box όπου είσαι μέλος ή που ακολουθείς δεν έχουν ακόμα ανοιχτά clubs.",
@@ -6363,7 +6444,10 @@
     "notif_event_cohost_answered_title": "Απάντηση συνδιοργάνωσης",
     "notif_event_cohost_answered_accepted_body": "Η {box} συνδιοργανώνει το «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "Η {box} αρνήθηκε να συνδιοργανώσει το «{event}».",
-    "notif_event_cohost_answered_removed_body": "Η {box} δεν συνδιοργανώνει πια το «{event}»."
+    "notif_event_cohost_answered_removed_body": "Η {box} δεν συνδιοργανώνει πια το «{event}».",
+    "filterKind": "Είδος",
+    "filterBox": "Box",
+    "findFiltersTitle": "Φίλτρα αναζήτησης"
   },
   "CommunityAdmin": {
     "title": "Κοινότητα",
@@ -6638,7 +6722,14 @@
     "err_already_refunded": "Αυτή η πληρωμή έχει ήδη επιστραφεί.",
     "err_invalid_refund": "Η επιστροφή πρέπει να είναι πάνω από μηδέν και όχι περισσότερη από όσα πλήρωσε.",
     "err_invalid_cohosts": "Δεν διαβάζονται αυτές οι διευθύνσεις συνδιοργανωτών. Έλεγξε κάθε διεύθυνση σελίδας.",
-    "err_duplicate_cohost": "Η ίδια επιχείρηση ζητείται δύο φορές."
+    "err_duplicate_cohost": "Η ίδια επιχείρηση ζητείται δύο φορές.",
+    "filtersTitle": "Φίλτρα events",
+    "filterClub": "Club",
+    "filterFree": "Δωρεάν",
+    "filterPrice": "Τιμή",
+    "filterGoing": "Θα πάω",
+    "filterMine": "Εγώ",
+    "filtersNoMatch": "Κανένα event με αυτά τα φίλτρα."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Κανένα επερχόμενο event. Φτιάξε ένα με «+ Νέο event».",
@@ -6779,7 +6870,7 @@
   },
   "Around": {
     "scopeLabel": "Τι δείχνει το Feed",
-    "scopeClubs": "Τα clubs μου",
+    "scopeClubs": "Οι δικοί μου",
     "scopeAround": "Γύρω μου",
     "loading": "Φόρτωση…",
     "updating": "Ενημέρωση αποτελεσμάτων…",
@@ -6892,10 +6983,6 @@
     "section_boxes": "Box κοντά σου",
     "section_clubs": "Ανοιχτά clubs",
     "section_posts": "Αναρτήσεις",
-    "empty_events": "Κανένα ανοιχτό event έως {distance}.",
-    "empty_boxes": "Κανένα box έως {distance}.",
-    "empty_clubs": "Κανένα ανοιχτό club έως {distance}.",
-    "empty_posts": "Καμία δημόσια ανάρτηση έως {distance}.",
     "seeAll": "{count, plural, one {Δες το} other {Δες όλα (#)}}",
     "otherBoxes": "Άλλα box στην περιοχή ({count})",
     "trialBadge": "Δοκιμαστικό",
@@ -6924,8 +7011,6 @@
     "pin_posts": "Ανάρτηση",
     "open": "Άνοιγμα",
     "closeCard": "Κλείσιμο",
-    "backToAround": "Γύρω μου",
-    "kindCount": "{count, plural, =0 {Κανένα} one {#} other {#}} έως {distance}",
     "loadMore": "Περισσότερα",
     "loadingMore": "Φόρτωση…",
     "needArea": "Διάλεξε πρώτα από πού να ψάξουμε.",
@@ -6949,7 +7034,9 @@
     "dateTo": "Έως",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Χαμηλότερη τιμή",
-    "priceTo": "Υψηλότερη τιμή"
+    "priceTo": "Υψηλότερη τιμή",
+    "sectionLevel": "Επίπεδο",
+    "levelHint": "Box με μαθήματα σε αυτό το επίπεδο"
   },
   "CheckIn": {
     "loading": "Φόρτωση…",
@@ -7431,7 +7518,7 @@
     "helpIntro": "Με μαλακή μεζούρα, πάνω στο δέρμα, εφαρμοστά αλλά όχι σφιχτά. Μέτρα την ίδια ώρα της ημέρας, ιδανικά το πρωί.",
     "helpPhotos": "Για τις φωτογραφίες: ίδιο σημείο, ίδιο φως, ίδια απόσταση. Το χρονόμετρο σου δίνει 10 δευτερόλεπτα να απομακρυνθείς.",
     "settingsTitle": "Ρυθμίσεις Σώματος",
-    "settingsHubHint": "Μονάδες, εμφάνιση βάρους, φωτογραφίες, υπενθύμιση",
+    "settingsHubHint": "Φωτογραφίες, υπενθύμιση μέτρησης",
     "settingsIntro": "Τα δεδομένα του σώματός σου είναι ιδιωτικά από προεπιλογή. Εδώ διαλέγεις πώς φαίνονται και ποιος τα βλέπει.",
     "unitsLabel": "Μονάδες",
     "sectionsLabel": "Ενότητες ημερολογίου",
@@ -7602,7 +7689,8 @@
       "share_photo_missing": "Και οι δύο μετρήσεις χρειάζονται έτοιμη φωτογραφία αυτής της στάσης.",
       "media_not_ready": "Μια φωτογραφία επεξεργάζεται ακόμα. Δοκίμασε σε λίγο."
     },
-    "fromGarmin": "από Garmin"
+    "fromGarmin": "από Garmin",
+    "unitsAndSectionsLink": "Μονάδες & ενότητες στις Ρυθμίσεις"
   },
   "Referrals": {
     "title": "Φέρε φίλο",
@@ -7925,10 +8013,6 @@
     "return_garmin_account_in_use": "Αυτός ο λογαριασμός Garmin είναι ήδη συνδεδεμένος με άλλον λογαριασμό Palee.",
     "return_garmin_connect_failed": "Η σύνδεση με το Garmin δεν ολοκληρώθηκε. Δοκίμασε ξανά.",
     "restingTitle": "Ρυθμός ηρεμίας",
-    "restingRange": "Περίοδος",
-    "restingRange_1m": "1 μήνας",
-    "restingRange_3m": "3 μήνες",
-    "restingRange_1y": "1 χρόνος",
     "bpmValue": "{value} bpm",
     "restingLatest": "Τελευταία μέτρηση · {date}",
     "restingAverage": "Μέσος όρος {value} bpm σε {days, plural, one {# μέρα} other {# μέρες}}",
@@ -7965,18 +8049,18 @@
     "error_phone_health_not_connected": "Δεν είναι συνδεδεμένο. Σύνδεσέ το από την εφαρμογή στο κινητό."
   },
   "Buddy": {
-    "title": "Buddy για στήριξη",
+    "title": "Φιλαράκι στήριξης",
     "rowHint": "Ένας ή δύο άνθρωποι για τις δύσκολες στιγμές",
     "backToMe": "Εγώ",
     "intro": "Ένας ή δύο άνθρωποι που εμπιστεύεσαι: partner, φίλος ή ο coach σου. Λαμβάνουν μόνο ό,τι στέλνεις με το «Χρειάζομαι στήριξη». Τίποτα αυτόματο.",
-    "myBuddies": "Οι buddy μου",
-    "noBuddies": "Κανένας buddy ακόμα. Κάλεσε κάποιον που εμπιστεύεσαι.",
+    "myBuddies": "Τα φιλαράκια στήριξής μου",
+    "noBuddies": "Κανένα φιλαράκι στήριξης ακόμα. Κάλεσε κάποιον που εμπιστεύεσαι.",
     "add": "Πρόσθεσε άτομο ή τον coach",
-    "full": "Έχεις {max} buddy ή προσκλήσεις, όσες επιτρέπονται.",
+    "full": "Έχεις ήδη {max} φιλαράκια στήριξης ή προσκλήσεις, το μέγιστο.",
     "needSupport": "Χρειάζομαι στήριξη",
     "ask": "Ζήτα",
     "invitationsTitle": "Προσκλήσεις για σένα",
-    "invitationBody": "Ο/Η {name} σού ζητά να γίνεις buddy στήριξης. Θα σου γράφει μόνο όταν το ζητήσει.",
+    "invitationBody": "Ο/Η {name} σού ζητά να γίνεις φιλαράκι στήριξης. Θα σου γράφει μόνο όταν το ζητήσει.",
     "accept": "Αποδοχή",
     "acceptName": "Αποδοχή της πρόσκλησης από {name}",
     "decline": "Όχι τώρα",
@@ -8011,7 +8095,7 @@
     "stop": "Σταμάτα",
     "stopConfirm": "Να σταματήσει η σύνδεση με {name};",
     "stopSupportingConfirm": "Να σταματήσεις να υποστηρίζεις τον/την {name};",
-    "stopQuiet": "Θα το δει στη σελίδα Buddy· δεν στέλνεται ειδοποίηση.",
+    "stopQuiet": "Θα το δει στη σελίδα Φιλαράκι στήριξης· δεν στέλνεται ειδοποίηση.",
     "stopYes": "Ναι, σταμάτα",
     "cancel": "Άκυρο",
     "close": "Κλείσιμο",
@@ -8025,11 +8109,11 @@
     "quietFrom": "Από",
     "quietTo": "Έως",
     "quietSaved": "Ώρες ησυχίας: {range}",
-    "sharePhone": "Κοινοποίηση του τηλεφώνου μου στους buddy",
-    "sharePhoneHint": "Μόνο για το «Πάρε με τηλέφωνο», μόνο στους ενεργούς buddy σου. Κλειστό, εκτός αν το ανοίξεις.",
+    "sharePhone": "Κοινοποίηση του τηλεφώνου μου στα φιλαράκια στήριξης",
+    "sharePhoneHint": "Μόνο για το «Πάρε με τηλέφωνο», μόνο στα ενεργά φιλαράκια στήριξής σου. Κλειστό, εκτός αν το ανοίξεις.",
     "phone": "Αριθμός τηλεφώνου",
     "footer": "Μπορείτε να σταματήσετε όποτε θέλετε, και οι δύο. Ο άλλος το βλέπει εδώ, χωρίς ειδοποίηση.",
-    "addTitle": "Νέος buddy",
+    "addTitle": "Νέο φιλαράκι στήριξης",
     "addIntro": "Ο coach σου, άνθρωποι από τα clubs σου ή όσοι ακολουθείς. Τίποτα δεν ξεκινά πριν αποδεχτούν.",
     "searchLabel": "Αναζήτηση",
     "searchPlaceholder": "Όνομα ή nickname",
@@ -8042,20 +8126,20 @@
     },
     "candidateStatus": {
       "pending": "Προσκλήθηκε",
-      "active": "Ήδη buddy σου"
+      "active": "Ήδη φιλαράκι στήριξής σου"
     },
     "invite": "Πρόσκληση",
     "inviteName": "Πρόσκληση στον/στην {name}",
     "sendLink": "Στείλε σύνδεσμο σε κάποιον εκτός Palee",
     "sendLinkHint": "Ο σύνδεσμος ισχύει {days} ημέρες και μόνο μία φορά. Τίποτα δεν ξεκινά πριν αποδεχτεί.",
-    "shareTitle": "Γίνε buddy στήριξης",
-    "shareText": "Θα ήθελα να γίνεις buddy στήριξης στο Palee. Θα σου γράφω μόνο όταν το χρειαστώ.",
+    "shareTitle": "Γίνε το φιλαράκι στήριξής μου",
+    "shareText": "Θα ήθελα να γίνεις το φιλαράκι στήριξής μου στο Palee. Θα σου γράφω μόνο όταν το χρειαστώ.",
     "linkReady": "Ο σύνδεσμός σου είναι έτοιμος.",
     "linkCopied": "Ο σύνδεσμος αντιγράφηκε. Επικόλλησέ τον σε ένα μήνυμα.",
     "linkLabel": "Σύνδεσμος πρόσκλησης",
-    "noBuddyYet": "Δεν έχεις ακόμα ενεργό buddy. Μόλις κάποιος αποδεχτεί, το «Χρειάζομαι στήριξη» πηγαίνει σε αυτόν.",
-    "noBuddyYetShort": "Όρισε buddy και θα του πηγαίνει με ένα πάτημα.",
-    "setUpBuddy": "Όρισε buddy",
+    "noBuddyYet": "Δεν έχεις ακόμα ενεργό φιλαράκι στήριξης. Μόλις κάποιος αποδεχτεί, το «Χρειάζομαι στήριξη» πηγαίνει σε αυτόν.",
+    "noBuddyYetShort": "Όρισε φιλαράκι στήριξης και θα του πηγαίνει με ένα πάτημα.",
+    "setUpBuddy": "Όρισε φιλαράκι στήριξης",
     "messageLabel": "Μήνυμα (προαιρετικό)",
     "messagePlaceholder": "π.χ. Δύσκολο βράδυ.",
     "goesTo": "Πάει σε: {names}",
@@ -8114,29 +8198,29 @@
     "chatWith": "Συνομιλία με {name}",
     "chatEmpty": "Κανένα μήνυμα ακόμα.",
     "chatPlaceholder": "Γράψε ένα μήνυμα",
-    "chatReadOnly": "Η σύνδεση buddy έληξε. Η συνομιλία μένει για ανάγνωση· δεν γράφει κανείς.",
+    "chatReadOnly": "Η σύνδεση με το φιλαράκι στήριξης έληξε. Η συνομιλία μένει για ανάγνωση· δεν γράφει κανείς.",
     "earlier": "Παλαιότερα μηνύματα",
     "read": "Διαβάστηκε",
-    "threadsTitle": "Συνομιλίες buddy",
-    "threadMyBuddy": "Ο buddy σου",
+    "threadsTitle": "Συνομιλίες με φιλαράκια στήριξης",
+    "threadMyBuddy": "Το φιλαράκι στήριξής σου",
     "threadISupport": "Τον/την υποστηρίζεις",
-    "inviteHeading": "Πρόσκληση για buddy",
-    "inviteFrom": "Ο/Η {name} θα ήθελε να γίνεις buddy στήριξης",
-    "inviteFromSomeone": "Κάποιος θα ήθελε να γίνεις buddy στήριξης",
-    "whatIsBuddy": "Τι είναι ένας buddy",
-    "whatOnly": "Ο buddy λαμβάνει μόνο ό,τι στέλνει ρητά ο άλλος με το «Χρειάζομαι στήριξη». Τίποτα αυτόματο, ποτέ λεπτομέρειες.",
+    "inviteHeading": "Πρόσκληση για φιλαράκι στήριξης",
+    "inviteFrom": "Ο/Η {name} θα ήθελε να γίνεις φιλαράκι στήριξης",
+    "inviteFromSomeone": "Κάποιος θα ήθελε να γίνεις φιλαράκι στήριξης",
+    "whatIsBuddy": "Τι είναι ένα φιλαράκι στήριξης",
+    "whatOnly": "Το φιλαράκι στήριξης λαμβάνει μόνο ό,τι στέλνει ρητά ο άλλος με το «Χρειάζομαι στήριξη». Τίποτα αυτόματο, ποτέ λεπτομέρειες.",
     "whatReplies": "Απαντάς με ένα πάτημα: Είμαι εδώ · Πάμε βόλτα; · Πάρε με τηλέφωνο, ή με δικά σου λόγια.",
     "whatQuiet": "Μπορείς να ορίσεις ώρες ησυχίας· τότε τα αιτήματα έρχονται αθόρυβα.",
     "whatStop": "Μπορείτε να σταματήσετε όποτε θέλετε, και οι δύο.",
     "inviteSignUp": "Δημιούργησε λογαριασμό και αποδέξου",
     "inviteSignIn": "Σύνδεση και αποδοχή",
     "notNow": "Όχι τώρα",
-    "inviteAccepted": "Είσαι πλέον buddy στήριξης του/της {name}.",
-    "inviteAcceptedNoName": "Είσαι πλέον buddy στήριξης.",
-    "openBuddy": "Άνοιξε το Buddy",
+    "inviteAccepted": "Είσαι πλέον φιλαράκι στήριξης του/της {name}.",
+    "inviteAcceptedNoName": "Είσαι πλέον φιλαράκι στήριξης.",
+    "openBuddy": "Άνοιξε το Φιλαράκι στήριξης",
     "inviteExpired": "Η πρόσκληση έληξε. Ζήτα νέο σύνδεσμο.",
     "inviteUnavailable": "Αυτός ο σύνδεσμος πρόσκλησης δεν ισχύει πια.",
-    "inviteFooter": "Το Palee δεν είναι ιατρική υπηρεσία ούτε υπηρεσία έκτακτης ανάγκης. Ο buddy είναι ένας άνθρωπος που γνωρίζεις, για μια δύσκολη στιγμή.",
+    "inviteFooter": "Το Palee δεν είναι ιατρική υπηρεσία ούτε υπηρεσία έκτακτης ανάγκης. Το φιλαράκι στήριξης είναι ένας άνθρωπος που γνωρίζεις, για μια δύσκολη στιγμή.",
     "linesTitle": "Γραμμές βοήθειας",
     "linesIntro": "Αν είναι κάτι παραπάνω από μια δύσκολη στιγμή, αυτές οι υπηρεσίες μπορούν να βοηθήσουν. Είναι πληροφορία, όχι συμβουλή· το Palee δεν είναι ιατρική υπηρεσία ούτε υπηρεσία έκτακτης ανάγκης.",
     "linesGreece": "Στην Ελλάδα",
@@ -8152,7 +8236,7 @@
     },
     "linesNote": "Εκτός Ελλάδας, ο αριθμός έκτακτης ανάγκης είναι το 112 σε όλη την ΕΕ, ή ο αντίστοιχος της χώρας σου.",
     "cravingGoesTo": "Ένα σύντομο μήνυμα πάει σε: {names}. Ποτέ οι λεπτομέρειες.",
-    "cravingSupportSent": "Στάλθηκε στους buddy σου. Την κατάσταση τη βλέπεις στην Ευεξία.",
+    "cravingSupportSent": "Στάλθηκε στα φιλαράκια στήριξής σου. Την κατάσταση τη βλέπεις στην Ευεξία.",
     "sharingSectionTitle": "Εβδομαδιαία σύνοψη ευεξίας για τον coach",
     "sharingSectionHint": "Τι βλέπει ο coach από την Ευεξία, μόνο αν το επιτρέψεις",
     "shareWellness": "Ευεξία · εβδομαδιαία σύνοψη",
@@ -8179,11 +8263,11 @@
     "coachAllowedSince": "Ο/Η {name} επέτρεψε αυτή τη σύνοψη στις {date}. Κάθε φορά που την ανοίγεις, το βλέπει.",
     "notif": {
       "buddy_invite": {
-        "title": "Πρόσκληση για buddy",
-        "body": "Ο/Η {name} σού ζητά να γίνεις buddy στήριξης."
+        "title": "Πρόσκληση για φιλαράκι στήριξης",
+        "body": "Ο/Η {name} σού ζητά να γίνεις φιλαράκι στήριξης."
       },
       "buddy_accepted": {
-        "title": "Έχεις buddy στήριξης",
+        "title": "Έχεις φιλαράκι στήριξης",
         "body": "Ο/Η {name} αποδέχτηκε. Μαθαίνει μόνο όταν το ζητήσεις."
       },
       "support_request": {
@@ -8203,7 +8287,7 @@
         "body": "{moments} δύσκολες στιγμές, {overcome} ξεπεράστηκαν, {requests} αιτήματα στήριξης."
       },
       "buddy_message": {
-        "title": "Μήνυμα από buddy",
+        "title": "Μήνυμα από φιλαράκι στήριξης",
         "body": "Ο/Η {name} σού έστειλε μήνυμα."
       },
       "coach_wellness_summary": {
@@ -8212,18 +8296,18 @@
       }
     },
     "errors": {
-      "buddy_limit_reached": "Μπορείς να έχεις έως δύο buddy ή προσκλήσεις.",
+      "buddy_limit_reached": "Μπορείς να έχεις έως δύο φιλαράκια στήριξης ή προσκλήσεις.",
       "buddy_already_invited": "Έχεις ήδη προσκαλέσει αυτό το άτομο.",
       "buddy_invite_expired": "Η πρόσκληση έληξε.",
-      "buddy_link_closed": "Αυτή η σύνδεση buddy έχει ήδη σταματήσει.",
+      "buddy_link_closed": "Αυτή η σύνδεση με φιλαράκι στήριξης έχει ήδη σταματήσει.",
       "buddy_invite_unavailable": "Αυτός ο σύνδεσμος πρόσκλησης δεν ισχύει πια.",
-      "cannot_buddy_self": "Δεν μπορείς να είσαι buddy του εαυτού σου.",
+      "cannot_buddy_self": "Δεν μπορείς να είσαι φιλαράκι στήριξης του εαυτού σου.",
       "not_eligible_for_buddy": "Κάλεσε τον coach σου, κάποιον από τα clubs σου ή κάποιον που ακολουθείς, ή στείλε σύνδεσμο.",
       "message_too_long": "Το μήνυμα είναι έως 280 χαρακτήρες.",
-      "support_rate_limited": "Το ζήτησες μερικές φορές αυτή την ώρα· οι buddy σου το έχουν.",
-      "no_active_buddies": "Πρόσθεσε πρώτα έναν buddy.",
+      "support_rate_limited": "Το ζήτησες μερικές φορές αυτή την ώρα· τα φιλαράκια στήριξής σου το έχουν.",
+      "no_active_buddies": "Πρόσθεσε πρώτα ένα φιλαράκι στήριξης.",
       "already_undone": "Αυτό το αίτημα έχει ήδη ανακληθεί.",
-      "undo_window_passed": "Οι buddy σου έχουν ήδη ειδοποιηθεί.",
+      "undo_window_passed": "Τα φιλαράκια στήριξής σου έχουν ήδη ειδοποιηθεί.",
       "reply_text_required": "Γράψε λίγα λόγια.",
       "reply_too_long": "Μια απάντηση είναι έως 500 χαρακτήρες.",
       "invalid_quiet_hours": "Οι ώρες ησυχίας θέλουν δύο διαφορετικές ώρες.",
@@ -8232,7 +8316,7 @@
       "summary_required": "Άνοιξε πρώτα την εβδομαδιαία σύνοψη.",
       "message_body_required": "Γράψε ένα μήνυμα.",
       "message_too_long_body": "Ένα μήνυμα είναι έως 2000 χαρακτήρες.",
-      "buddy_link_read_only": "Η σύνδεση buddy έληξε· η συνομιλία είναι μόνο για ανάγνωση."
+      "buddy_link_read_only": "Η σύνδεση με το φιλαράκι στήριξης έληξε· η συνομιλία είναι μόνο για ανάγνωση."
     }
   },
   "Providers": {
@@ -8253,7 +8337,6 @@
     "formerHint": "Ό,τι έκανες μαζί τους μένει στο Ημερολόγιο, στο Vault και στην Πρόοδο. Δεν βλέπουν πια τις καταχωρήσεις σου.",
     "formerSince": "Έληξε {date} · δεν βλέπει πια τις καταχωρήσεις σου",
     "todayTitle": "Σήμερα",
-    "todayEmpty": "Τίποτα προγραμματισμένο σήμερα σε κανέναν πάροχο.",
     "todayPartial": "Δεν φόρτωσε το σήμερα από: {names}.",
     "todayKind": {
       "class": "Μάθημα",
@@ -8841,7 +8924,6 @@
     "editProfile": "Αλλαγή προφίλ",
     "safetyLine": "Μόνο μέλη του club. Ταιριάζετε μόνο αν το θέλετε και οι δύο. Μπορείς πάντα να κάνεις αναφορά ή αποκλεισμό.",
     "filters": "Φίλτρα",
-    "filtersCount": "Φίλτρα ({count})",
     "swipesLeft": "{count, plural, one {Μένει # για σήμερα} other {Μένουν # για σήμερα}}",
     "loading": "Φόρτωση…",
     "limitReached": "Αρκετά για σήμερα. Νέα άτομα αύριο.",
@@ -8875,7 +8957,7 @@
     "endConfirm": "Τέλος",
     "blockConfirm": "Αποκλεισμός",
     "endBody": "{name}: δεν θα ειδοποιηθεί. Η συνομιλία μένει για ανάγνωση αλλά κλείνει, και δεν θα ξαναδείτε ο ένας τον άλλον.",
-    "blockBody": "{name}: δεν θα ειδοποιηθεί. Η συνεργασία σας και κάθε σύνδεση buddy τελειώνουν, και δεν θα ξαναδείτε ο ένας τον άλλον στα Partners. Η άρση γίνεται από Κοινοποίηση & ορατότητα.",
+    "blockBody": "{name}: δεν θα ειδοποιηθεί. Η συνεργασία σας και κάθε σύνδεση ως φιλαράκια στήριξης τελειώνουν, και δεν θα ξαναδείτε ο ένας τον άλλον στα Partners. Η άρση γίνεται από Κοινοποίηση & ορατότητα.",
     "planEyebrow": "Κλείστε μαζί",
     "planClass": "Μάθημα",
     "planBook": "Άνοιξε το μάθημα για κράτηση",
@@ -8899,7 +8981,7 @@
     "settingsSwitch": "Να με προτείνει σε μέλη",
     "settingsSwitchHint": "{count, plural, one {Το προφίλ σου σε # club} other {Τα προφίλ σου σε # clubs}}. Το «off» τα βάζει σε παύση· τίποτα δεν διαγράφεται.",
     "blockedTitle": "Αποκλεισμένα άτομα",
-    "blockedHint": "Δεν σε βρίσκουν στα Partners, και οι συνδέσεις buddy μαζί τους έληξαν.",
+    "blockedHint": "Δεν σε βρίσκουν στα Partners, και οι συνδέσεις ως φιλαράκια στήριξης μαζί τους έληξαν.",
     "blockedEmpty": "Δεν έχεις αποκλείσει κανέναν.",
     "blockedSince": "Αποκλεισμός {date}",
     "unblock": "Άρση",
@@ -8922,7 +9004,14 @@
     "error_partner_match_read_only": "Η συνομιλία έκλεισε.",
     "error_partner_plans_unavailable": "Τα μαθήματα προτείνονται μόνο στα clubs του ίδιου του γυμναστηρίου.",
     "error_message_body_required": "Γράψε κάτι πρώτα.",
-    "error_cannot_block_self": "Δεν μπορείς να αποκλείσεις τον εαυτό σου."
+    "error_cannot_block_self": "Δεν μπορείς να αποκλείσεις τον εαυτό σου.",
+    "disciplineLabel": "Άθλημα",
+    "disciplinesLabel": "Τι θα προπονηθείτε μαζί (έως {max})",
+    "allDisciplines": "Όλα τα αθλήματα",
+    "fewerDisciplines": "Λιγότερα",
+    "distanceLabel": "Απόσταση",
+    "withinKm": "Έως {km} χλμ",
+    "distanceNeedsArea": "Για φίλτρο απόστασης, εμφανίσου στο «Γύρω μου» με την περιοχή σου."
   },
   "Squads": {
     "title": "Squads",
@@ -9078,8 +9167,6 @@
       "minutes": "{minutes} λεπ.",
       "join": "Σύνδεση στην κλήση",
       "manage": "Διαχείριση",
-      "noSession": "Δεν έχεις κλείσει συνεδρία ακόμα.",
-      "bookSession": "Κλείσε συνεδρία",
       "noPackage": "Δεν έχεις πακέτο συνεδριών ακόμα. Ρώτα τον προπονητή σου.",
       "sessionsLeft": "Απομένουν {remaining} από {limit} συνεδρίες",
       "sessionsUnlimited": "Απεριόριστες συνεδρίες"
@@ -9549,7 +9636,8 @@
     "backToMe": "Πίσω στο Εγώ",
     "saveInterests": "Αποθήκευση",
     "interestsSaved": "Αποθηκεύτηκε.",
-    "interestsHubHint": "Αθλήματα και επίπεδο, για προτάσεις"
+    "interestsHubHint": "Αθλήματα και επίπεδο, για προτάσεις",
+    "photoAddLabel": "Προσθήκη φωτογραφίας"
   },
   "Business": {
     "common": {
@@ -9756,7 +9844,7 @@
     "socialTitle": "Κοινωνική εφαρμογή για αθλητές",
     "socialSummary": "Ροή από τα clubs σου και τους ανθρώπους που ακολουθείς, κανάλια clubs, αναρτήσεις με φωτογραφίες και προπονήσεις, και το Γύρω μου για να ανακαλύπτεις στον χάρτη κοντινές εκδηλώσεις, ανοιχτά clubs και γυμναστήρια.",
     "partnersTitle": "Συνπροπονούμενοι και στήριξη",
-    "partnersSummary": "Βρες συνπροπονούμενο ανάμεσα σε επαληθευμένα μέλη του clubs σου, μόνο με αμοιβαία συναίνεση, και διάλεξε ένα άτομο στήριξης που σε ακούει μόνο όταν ζητάς βοήθεια.",
+    "partnersSummary": "Βρες συνπροπονούμενο ανάμεσα σε επαληθευμένα μέλη του clubs σου, μόνο με αμοιβαία συναίνεση, και διάλεξε ένα φιλαράκι στήριξης που σε ακούει μόνο όταν ζητάς βοήθεια.",
     "eventsTitle": "Εκδηλώσεις και διοργανωτές",
     "eventsSummary": "Ανοιχτά WOD, εντατικές προπονήσεις, τρεξίματα και αγώνες με δηλώσεις συμμετοχής, χωρητικότητα, λίστα αναμονής, πάσο καλεσμένου, συνδιοργάνωση και κονσόλα διοργανωτή για διαχείριση, οικονομικά και στατιστικά.",
     "boxTitle": "Το γυμναστήριό σου στην τσέπη σου",
@@ -10801,5 +10889,397 @@
     "reviewNoLimit": "Χωρίς όριο",
     "reviewCohosts": "Αιτήματα συνδιοργάνωσης σε: {names}",
     "reviewNoCohosts": "Χωρίς συνδιοργανωτές"
+  },
+  "Conversations": {
+    "title": "Μηνύματα",
+    "requests": "Αιτήματα",
+    "requestsEntry": "Αιτήματα μηνυμάτων ({count})",
+    "buddy": "Φιλαράκι",
+    "you": "Εσύ: {text}",
+    "someone": "Κάποιος",
+    "unread": "Μη αναγνωσμένο",
+    "emptyInbox": "Δεν έχεις συνομιλίες ακόμα. Ψάξε κάποιον για να του γράψεις.",
+    "emptyRequests": "Δεν υπάρχουν αιτήματα μηνυμάτων.",
+    "loading": "Φόρτωση…",
+    "loadMore": "Περισσότερα",
+    "earlier": "Παλαιότερα μηνύματα",
+    "accept": "Αποδοχή",
+    "decline": "Απόρριψη",
+    "requestTitle": "Αίτημα μηνύματος",
+    "requestBanner": "Ο/Η {name} θέλει να σου στείλει μήνυμα.",
+    "requestBannerHint": "Αποδέξου το για να πάει στα εισερχόμενα. Αν το απορρίψεις, εξαφανίζεται και ο/η {name} δεν το μαθαίνει.",
+    "placeholder": "Γράψε ένα μήνυμα…",
+    "send": "Αποστολή",
+    "sending": "Αποστολή…",
+    "failed": "Δεν στάλθηκε.",
+    "retry": "Ξανά",
+    "discard": "Απόρριψη",
+    "tooLong": "Ένα μήνυμα έχει έως {max} χαρακτήρες.",
+    "chatWith": "Συνομιλία με {name}",
+    "chatEmpty": "Πες ένα γεια στον/στην {name}.",
+    "unavailable": "Αυτή η συνομιλία δεν είναι διαθέσιμη.",
+    "back": "Μηνύματα",
+    "message": "Μήνυμα",
+    "messageA11y": "Μήνυμα στον/στην {name}",
+    "viewProfile": "Προφίλ: {name}",
+    "searchEmpty": "Δεν βρέθηκε κανείς.",
+    "notif_person_message_title": "Μήνυμα από {name}",
+    "notif_person_message_body": "Ο/Η {name} σου έστειλε μήνυμα.",
+    "notif_message_request_title": "Αίτημα μηνύματος",
+    "notif_message_request_body": "Ο/Η {name} θέλει να σου στείλει μήνυμα."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Οδηγοί",
+      "listIntro": "Σύντομες ξεναγήσεις στις πραγματικές οθόνες. Ακολούθησε πατώντας· τίποτα δεν αποθηκεύεται αν δεν το αποθηκεύσεις εσύ.",
+      "forStaff": "Για την επιχείρησή σου",
+      "forYou": "Για σένα",
+      "minutes": "{count, plural, one {# λεπτό} other {# λεπτά}}",
+      "start": "Έναρξη",
+      "resume": "Συνέχεια",
+      "replay": "Ξανά",
+      "state_new": "Νέο",
+      "state_started": "Σε εξέλιξη",
+      "state_completed": "Έγινε",
+      "state_dismissed": "Δεν ξεκίνησε",
+      "state_outdated": "Ενημερώθηκε",
+      "openGuide": "Ξενάγηση",
+      "openGuideAria": "Ξεκίνα την ξενάγηση: {title}",
+      "next": "Επόμενο",
+      "back": "Πίσω",
+      "finish": "Τέλος",
+      "close": "Κλείσε την ξενάγηση",
+      "stepOf": "{current} από {total}",
+      "doIt": "Κάν' το για μένα",
+      "tapHint": "Πάτα στο σημείο που φωτίζεται",
+      "notHere": "Δεν είναι σε αυτή την οθόνη τώρα, οπότε να η ουσία.",
+      "fillDemo": "Γέμισε πρώτα με δεδομένα επίδειξης",
+      "filling": "Γέμισμα…",
+      "demoFilled": "Προστέθηκαν δεδομένα επίδειξης",
+      "offerEyebrow": "Πρώτη φορά εδώ;",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Δείξε μου",
+      "offerLater": "Όχι τώρα",
+      "meRow": "Οδηγοί",
+      "meRowHint": "Ξεναγήσεις στο κατάστημα, τα events, τις προσφορές και το δικό σου club",
+      "loadFailed": "Δεν φόρτωσαν οι οδηγοί. Δοκίμασε ξανά."
+    },
+    "shop_staff": {
+      "title": "Τρέξε το κατάστημά σου",
+      "summary": "Πρόσθεσε προϊόντα, πούλα στο app και στο ταμείο, κράτα σωστό το απόθεμα.",
+      "chapters": {
+        "setup": "Ρύθμιση",
+        "sell": "Πωλήσεις",
+        "track": "Παρακολούθηση"
+      },
+      "welcome": {
+        "title": "Το κατάστημα του box σου",
+        "body": "Τα μέλη παραγγέλνουν στο app και παραλαμβάνουν στη ρεσεψιόν. Πουλάς και από το ταμείο."
+      },
+      "newProduct": {
+        "title": "Πρόσθεσε προϊόν",
+        "body": "Πάτα «{label}»."
+      },
+      "photos": {
+        "title": "Οι φωτογραφίες πουλάνε",
+        "body": "Πρόσθεσε μερικές καθαρές φωτογραφίες. Η πρώτη είναι το εξώφυλλο."
+      },
+      "price": {
+        "title": "Τιμή και επιλογές",
+        "body": "Μία τιμή ή μεγέθη και γεύσεις με δικό τους απόθεμα.",
+        "tip": "Το απόθεμα μετράει ανά επιλογή, έτσι το «M» και το «L» δεν μπερδεύονται ποτέ."
+      },
+      "selling": {
+        "title": "Πού πουλιέται",
+        "body": "Στο app, στο ταμείο ή και στα δύο. Μόνο για μέλη ή για όλους."
+      },
+      "save": {
+        "title": "Αποθήκευσε, μετά δημοσίευσε",
+        "body": "Ένα νέο προϊόν είναι πρόχειρο. Δημοσίευσέ το για να ανοίξει το κατάστημα.",
+        "tip": "Τα μέλη βλέπουν την κάρτα «Κατάστημα» στο Box μόνο όταν δημοσιευτεί κάτι."
+      },
+      "ordersTab": {
+        "title": "Παραγγελίες",
+        "body": "Πάτα «{label}»."
+      },
+      "orders": {
+        "title": "Ετοίμασε, μετά παράδωσε",
+        "body": "Σημείωσε μια παραγγελία ως έτοιμη και το μέλος μαθαίνει πού να την παραλάβει.",
+        "tip": "Όσες παραγγελίες δεν παραληφθούν ακυρώνονται μόνες τους μετά από 7 ημέρες και το απόθεμα ελευθερώνεται."
+      },
+      "pos": {
+        "title": "Το ταμείο",
+        "body": "Πούλα στο ταμείο σε δευτερόλεπτα, με πληρωμή τώρα ή στον λογαριασμό του μέλους."
+      },
+      "stock": {
+        "title": "Απόθεμα",
+        "body": "Κάθε πώληση, παραλαβή εμπορεύματος και καταμέτρηση καταγράφεται. Το χαμηλό απόθεμα σε ειδοποιεί."
+      },
+      "analytics": {
+        "title": "Τι πουλάει",
+        "body": "Εβδομαδιαίες πωλήσεις, περιθώρια κέρδους και τα πιο δημοφιλή προϊόντα σου.",
+        "tip": "Οι πωλήσεις του καταστήματος φαίνονται και στα Οικονομικά ως ξεχωριστή πηγή εσόδων."
+      },
+      "done": {
+        "title": "Όλα έτοιμα",
+        "body": "Δες το ξανά όποτε θες από τους Οδηγούς."
+      }
+    },
+    "events_organising": {
+      "title": "Οργάνωσε events",
+      "summary": "Σχεδίασε σε 7 σύντομα βήματα, πούλα θέσεις, κάνε check-in, δες τα νούμερα.",
+      "chapters": {
+        "plan": "Σχεδιασμός",
+        "run": "Διεξαγωγή"
+      },
+      "welcome": {
+        "title": "Events από την αρχή ως το τέλος",
+        "body": "Σχεδίασέ το, γέμισέ το, τρέξ' το και δες πώς πήγε, όλα σε ένα σημείο."
+      },
+      "new": {
+        "title": "Ξεκίνα ένα event",
+        "body": "Πάτα «{label}»."
+      },
+      "steps": {
+        "title": "Επτά σύντομα βήματα",
+        "body": "Διοργανωτής, βασικά, πότε, πού, ποιοι και τιμή, θέσεις, έλεγχος. Πάτα ένα ολοκληρωμένο βήμα για να γυρίσεις πίσω."
+      },
+      "screen": {
+        "title": "Μία απόφαση ανά οθόνη",
+        "body": "Συμπλήρωσε αυτό και μετά Επόμενο.",
+        "tip": "Το πρόχειρό σου μένει σε αυτή τη συσκευή, οπότε μπορείς να σταματήσεις και να συνεχίσεις αργότερα."
+      },
+      "next": {
+        "title": "Το Επόμενο ξέρει τι λείπει",
+        "body": "Αν λείπει κάτι, σου λέει τι."
+      },
+      "cohosts": {
+        "title": "Συνδιοργάνωση με άλλους",
+        "body": "Στο «{label}», ζήτα από ένα box ή έναν coach να συνδιοργανώσει, με τη διεύθυνση της σελίδας του.",
+        "tip": "Μόλις δεχτεί, το event εμφανίζεται στη σελίδα του και φτάνει στα μέλη του."
+      },
+      "manage": {
+        "title": "Διαχείριση",
+        "body": "Για κάθε event: συμμετοχές, check-in, πληρωμές στο box, επιστροφές χρημάτων και μηνύματα."
+      },
+      "finances": {
+        "title": "Οικονομικά",
+        "body": "Πάτα «{label}»: έσοδα, επιστροφές και τι χρωστιέται ακόμα."
+      },
+      "analytics": {
+        "title": "Αναλυτικά",
+        "body": "Πάτα «{label}»: προβολές, εγγραφές, λίστα αναμονής και ποιοι ήρθαν.",
+        "tip": "Η μετατροπή δείχνει πόσοι από όσους το είδαν γράφτηκαν."
+      },
+      "done": {
+        "title": "Ώρα για διοργάνωση",
+        "body": "Δες το ξανά όποτε θες από τους Οδηγούς."
+      }
+    },
+    "finance_offers": {
+      "title": "Προσφορές, συνεργάτες και συστάσεις",
+      "summary": "Καμπάνιες και κωδικοί έκπτωσης, προνόμια συνεργατών και πρόγραμμα «Φέρε φίλο».",
+      "chapters": {
+        "campaigns": "Καμπάνιες",
+        "partners": "Συνεργάτες",
+        "referrals": "Συστάσεις"
+      },
+      "welcome": {
+        "title": "Μεγάλωσε με προσφορές",
+        "body": "Δικές σου καμπάνιες και κωδικοί, προνόμια από καταστήματα συνεργατών και ανταμοιβές για όσους φέρνουν φίλους."
+      },
+      "campaignNew": {
+        "title": "Ξεκίνα καμπάνια",
+        "body": "Πάτα «{label}»."
+      },
+      "campaignForm": {
+        "title": "Όνομα και ημερομηνίες",
+        "body": "Μια καμπάνια ομαδοποιεί τις προσφορές σου, π.χ. «Καλοκαίρι». Διάλεξε πότε τρέχει."
+      },
+      "coupons": {
+        "title": "Κωδικοί έκπτωσης",
+        "body": "Άνοιξε μια καμπάνια για να προσθέσεις κωδικούς: έκπτωση σε ποσοστό ή ποσό, με όριο χρήσεων.",
+        "tip": "Κάθε κωδικός δείχνει πόσες φορές χρησιμοποιήθηκε, οπότε βλέπεις ποια προσφορά δουλεύει."
+      },
+      "partners": {
+        "title": "Προνόμια συνεργατών",
+        "body": "Πάτα «{label}»."
+      },
+      "perkNew": {
+        "title": "Πρόσθεσε προσφορά συνεργάτη",
+        "body": "Πάτα «{label}»."
+      },
+      "perkPartner": {
+        "title": "Ο συνεργάτης",
+        "body": "Όνομα, σύνδεσμος και λογότυπο."
+      },
+      "perkBenefit": {
+        "title": "Τι παίρνουν τα μέλη",
+        "body": "Ποσοστό, ποσό ή οτιδήποτε άλλο, όπως έναν δωρεάν καφέ."
+      },
+      "perkMethod": {
+        "title": "Πώς το ελέγχει το κατάστημα",
+        "body": "Κοινός κωδικός, σύνδεσμος με τον κωδικό μέσα ή επίδειξη ζωντανής συνδρομής.",
+        "tip": "Αν διαρρεύσει ένας κωδικός, άλλαξέ τον εδώ και ισχύει αμέσως."
+      },
+      "perkRules": {
+        "title": "Όροι",
+        "body": "Ημερομηνίες, ποιοι το παίρνουν και πόσο συχνά. Αποθήκευσε πρόχειρο, δημοσίευσε όταν συμφωνηθεί."
+      },
+      "referrals": {
+        "title": "Φέρε φίλο",
+        "body": "Ένα πρόγραμμα ανταμείβει τα μέλη που φέρνουν κάποιον που γράφεται."
+      },
+      "referralsFlow": {
+        "title": "Έγκριση και ανταμοιβή",
+        "body": "Οι συστάσεις έρχονται εδώ. Έγκρινε μία και η ανταμοιβή της στέλνεται.",
+        "tip": "Η ανταμοιβή μπορεί να πάει και στους δύο: στο μέλος και στον φίλο."
+      },
+      "done": {
+        "title": "Όλα έτοιμα",
+        "body": "Δες το ξανά όποτε θες από τους Οδηγούς."
+      }
+    },
+    "member_club_event": {
+      "title": "Το δικό σου club και event",
+      "summary": "Ξεκίνα μια ομάδα στο club του box σου και οργάνωσε ένα event, μόνο εσύ ή μαζί με ένα box.",
+      "chapters": {
+        "club": "Το club σου",
+        "event": "Το event σου"
+      },
+      "welcome": {
+        "title": "Κάν' το δικό σου",
+        "body": "Ξεκίνα μια ομάδα με τους δικούς σου ανθρώπους και οργάνωσε τα δικά σου events."
+      },
+      "channels": {
+        "title": "Το club του box σου",
+        "body": "Πάτα «{label}»."
+      },
+      "groups": {
+        "title": "Ομάδες",
+        "body": "Μικρά club μέσα στο box, με δική τους συνομιλία και events."
+      },
+      "propose": {
+        "title": "Ξεκίνα ομάδα",
+        "body": "Πάτα «{label}»."
+      },
+      "groupSheet": {
+        "title": "Δώσε όνομα, διάλεξε ποιοι μπαίνουν",
+        "body": "Ανοιχτή σε όλους ή με αίτημα.",
+        "tip": "Κάποια box εγκρίνουν πρώτα τις νέες ομάδες· θα ειδοποιηθείς όταν ενεργοποιηθεί."
+      },
+      "noBox": {
+        "title": "Οι ομάδες ανήκουν σε box",
+        "body": "Γράψου πρώτα σε ένα box και μετά ξεκίνα ομάδα στο club του. Events μπορείς να οργανώσεις αμέσως."
+      },
+      "eventNew": {
+        "title": "Οργάνωσε ένα event",
+        "body": "Πάτα «{label}»."
+      },
+      "hostAs": {
+        "title": "Ποιος διοργανώνει",
+        "body": "Εσύ ή μια ομάδα ή επιχείρηση που τρέχεις.",
+        "tip": "Το «{label}» δεν χρειάζεται καθόλου box."
+      },
+      "alone": {
+        "title": "Μόνο εσύ",
+        "body": "Ανοιχτό σε όποιον είναι κοντά ή μόνο με πρόσκληση, μέσω του συνδέσμου σου."
+      },
+      "withBox": {
+        "title": "Με ένα box",
+        "body": "Στο «{label}», ζήτα από το box να συνδιοργανώσει, με τη διεύθυνση της σελίδας του.",
+        "tip": "Μόλις δεχτεί, το event εμφανίζεται και στη σελίδα του box."
+      },
+      "hosting": {
+        "title": "Τρέξ' το",
+        "body": "Μετά τη δημοσίευση, στο «{label}» βρίσκεις συμμετοχές, check-in και τα νούμερα."
+      },
+      "done": {
+        "title": "Σειρά σου",
+        "body": "Δες το ξανά όποτε θες από τους Οδηγούς."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "Πελάτες μου",
+    "replies": "Περιμένουν απάντηση",
+    "reviews": "Αξιολόγηση τεχνικής",
+    "desk": "Check-in σήμερα",
+    "clients": "Πελάτες",
+    "sentAt": "Στάλθηκε {time}",
+    "overdue": "Εκπρόθεσμο",
+    "dueSoon": "Λήγει σύντομα",
+    "unknownClient": "Μέλος",
+    "openVideo": "Δες το βίντεο",
+    "checkedIn": "Ήρθαν {count} από {total}",
+    "attended": "Ήρθε",
+    "noShow": "Δεν ήρθε",
+    "attendanceOf": "Παρουσία: {name}",
+    "markError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+    "showAll": "Όλοι ({count})",
+    "showFewer": "Λιγότεροι",
+    "moreInConsole": "Όλα στη Διαχείριση"
+  },
+  "Inbox": {
+    "title": "Μηνύματα",
+    "segmentsLabel": "Ποια μηνύματα βλέπεις",
+    "segment": {
+      "all": "Όλα",
+      "coach": "Coach",
+      "clubs": "Clubs",
+      "partners": "Partners"
+    },
+    "loading": "Φόρτωση μηνυμάτων…",
+    "emptySegment": "Δεν υπάρχουν συνομιλίες εδώ ακόμα.",
+    "workoutThread": "Συνομιλία προπόνησης",
+    "classThread": "Συνομιλία μαθήματος",
+    "searchAtGym": "Στο box σου"
+  },
+  "NotificationSettings": {
+    "title": "Ειδοποιήσεις",
+    "description": "Τι σου έρχεται, μέσα στην εφαρμογή και ως push",
+    "loading": "Φόρτωση…",
+    "loadError": "Οι ρυθμίσεις ειδοποιήσεων δεν είναι διαθέσιμες αυτή τη στιγμή.",
+    "saveError": "Η αλλαγή δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+    "locked": "Πάντα ενεργές",
+    "perClub": "Ανά club, από Τα box και τα clubs μου",
+    "channel": {
+      "in_app": "Στην εφαρμογή",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Κρατήσεις & μαθήματα",
+        "hint": "Εγκρίσεις, λίστα αναμονής, δοκιμαστικά, ραντεβού και σεζόν"
+      },
+      "messages": {
+        "title": "Μηνύματα",
+        "hint": "Συνομιλίες, αιτήματα μηνυμάτων και μηνύματα από το box και τον προπονητή"
+      },
+      "community": {
+        "title": "Clubs & κοινότητα",
+        "hint": "Ακόλουθοι, εκδηλώσεις, challenges, ομάδες και προσκλήσεις."
+      },
+      "coach": {
+        "title": "Προπονητής",
+        "hint": "Προγράμματα, σημειώσεις προπόνησης, έλεγχος τεχνικής και διατροφή"
+      },
+      "partners": {
+        "title": "Partners & φιλαράκια",
+        "hint": "Ταιριάσματα, το φιλαράκι στήριξης και τα μηνύματά τους"
+      },
+      "journal": {
+        "title": "Υπενθυμίσεις ημερολογίου",
+        "hint": "Νερό, μετρήσεις, λιγούρες και συγχρονισμός συσκευών"
+      },
+      "staff": {
+        "title": "Διαχείριση box",
+        "hint": "Νέες κρατήσεις, δοκιμαστικά, επισκέπτες, απόθεμα και αναφορές"
+      },
+      "account": {
+        "title": "Λογαριασμός & πληρωμές",
+        "hint": "Ασφάλεια, τιμολόγια, ανανεώσεις και παραγγελίες"
+      }
+    }
   }
 }

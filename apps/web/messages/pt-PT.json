@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Uma casa privada e auto-hospedada para aulas em grupo, programação personalizada, execução de treino ao vivo, conversas de coaching e progresso que pertence ao atleta.",
     "createAnAccount3f4f547": "Crie uma conta",
     "signInada2e9e": "Faça login",
-    "conversationHistory0f18fb3": "Histórico de conversas",
     "loading33ce417": "Carregando…",
-    "noConversations06b83a9": "Sem conversas.",
-    "selectAConversationToViewMessagesaf2cf2c": "Selecione uma conversa para ver as mensagens.",
     "availablePackages48a5129": "Pacotes Disponíveis",
     "closebf5d9ce": "✕ Fechar",
     "noPackagesAvailable14160fb": "Nenhum pacote disponível.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Baixar .ics",
     "loadingCalendarLinks1dad320": "Carregando links da agenda…",
     "writeAMessage24bf2a3": "Escreva uma mensagem…",
-    "chat67305ee": "← Bate-papo",
     "searchOrStartAConversationabb1d82": "Pesquise ou inicie uma conversa…",
     "noConversationsYetSearchToStartOne1a91cf7": "Nenhuma conversa ainda. Pesquise para iniciar um.",
     "hideConversationdfb77ca": "Ocultar conversa",
@@ -730,8 +726,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Suas pontuações de Consistência e Perseverança excluem seus dias de descanso programados – mas ainda não sabemos quais são esses dias.",
     "setYourRestDaysInProfilefd0fbe4": "Defina seus dias de descanso em Perfil →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Hoje é o seu dia de descanso programado – a recuperação faz parte do programa.",
-    "dayStreakca360c4": "sequência do dia",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Conclua seu primeiro treino para ganhar seu primeiro distintivo.",
     "loadingYourTrainingOverview39806c7": "Carregando sua visão geral do treinamento...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Sua visão geral do treinamento não está disponível.",
     "refreshSessionf2ed411": "Atualizar sessão",
@@ -743,7 +737,6 @@
     "showLeaderboardOptIna95255e": "Mostrar ativação do placar",
     "optInRanking04c1cd3": "Classificação de aceitação",
     "joinLeaderboardad480b1": "Junte-se à tabela de classificação",
-    "noRankedUsersYetForThisPeriod2fa66a4": "Ainda não há usuários classificados neste período.",
     "leaveLeaderboard834f047": "Sair da tabela de classificação",
     "coachNotes2ea7a97": "Notas do treinador",
     "latestGuidance58da2dc": "Orientações mais recentes",
@@ -1294,9 +1287,6 @@
     "coaches181feb6": "Treinadores",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Programe, comunique e entenda o progresso do treinamento sem vigilância ou anúncios.",
     "directMessagefc7f864": "Mensagem direta",
-    "workoutThreada03f1e1": "Tópico de treino",
-    "classThreadf030236": "Tópico de aula",
-    "thread7863f75": "Tópico",
     "eurd06e073": "euros",
     "downloada479c9c": "Baixar",
     "billed763fe55": "Faturado",
@@ -1546,15 +1536,10 @@
     "executionNotAvailablea9817d4": "Execução não disponível.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Não foi possível carregar a página de destino.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Frequência de treino versus meta semanal – últimas 10 semanas",
-    "noWorkoutsYet85a9204": "Ainda não há treinos",
-    "setAWeeklyTargetdd70e51": "Defina uma meta semanal",
-    "calculatingc573779": "Calculando…",
     "howCloselyYouFollowedPrescribedExercises760e833": "Quão rigorosamente você seguiu os exercícios prescritos",
     "prs80e1569": "relações públicas ·",
     "whatAreChallengesfdf13a8": "O que são desafios?",
     "howDoesTheLeaderboardWork74f2b8a": "Como funciona a tabela de classificação?",
-    "theLeaderboardIsCurrentlyUnavailableYourOptIn96132c6": "A tabela de classificação não está disponível no momento. Sua preferência de aceitação é salva.",
-    "theLeaderboardStaysPrivateUntilYouExplicitlyOpt9e982f1": "A tabela de classificação permanece privada até você aceitar explicitamente.",
     "workoutsThisWeek0268fc5": "treinos esta semana",
     "prsThisMonthd85bc56": "PRs este mês",
     "noWorkoutsInThisPeriodc124c5e": "Sem treinos neste período",
@@ -1751,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "por exemplo 4 rodadas + 3 repetições",
     "fail2758e32": "Falha",
     "capa8fba29": "· Boné",
-    "directbc81524": "Direto",
-    "class41ff354": "Classe",
-    "directChat3892e2c": "Bate-papo direto",
     "createAndManagePromotionalOffers46d33bb": "Crie e gerencie ofertas promocionais.",
     "reviewReferralActivityAndRewardActions8ea1271": "Revise a atividade de referência e as ações de recompensa.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Gerencie os pacotes usados por associações e direitos.",
@@ -3642,8 +3624,6 @@
     "clVideoUnavailable": "Ligação indisponível",
     "clMinutesShort": "{count} min",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "O meu progresso",
-    "clProgressIntro": "O teu treino nas últimas 12 semanas.",
     "clProgressSessions": "Sessões",
     "clProgressMinutes": "Minutos",
     "clProgressWorkouts": "Treinos diferentes",
@@ -3687,7 +3667,6 @@
     "clFormReviewWithdraw": "Retirar",
     "clFormReviewWithdrawConfirm": "Retirar este pedido? A revisão volta para o teu pacote.",
     "clNutritionTitle": "Plano de nutrição",
-    "clNutritionEmpty": "O teu treinador ainda não partilhou um plano de nutrição.",
     "clNutritionUpdated": "Atualizado em {date}",
     "clNutritionCalories": "Calorias",
     "clNutritionProtein": "Proteína",
@@ -4313,7 +4292,6 @@
     "msgTopicFacility": "Instalações",
     "msgSendAsCoaching": "Como mensagem de coaching",
     "msgSendAsCoachingHint": "Conta como contacto de coaching com o teu cliente.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "A tua box",
     "coachLatestTitle": "Últimas do teu coach",
     "coachLatestEmpty": "Ainda não há mensagens do teu coach.",
@@ -4461,7 +4439,36 @@
     "apiErrorAccountNotFound": "Nenhuma conta corresponde.",
     "apiErrorUnknownDemoSection": "Não há dados de demonstração para este ecrã.",
     "ntfBusinessDemoIdleTitle": "O teu negócio de demonstração está à tua espera",
-    "ntfBusinessDemoIdleBody": "Ninguém usa {business} há algum tempo. Se ninguém o abrir nos próximos {days} dias, os dados de demonstração serão removidos e será arquivado. Podes reabri-lo quando quiseres."
+    "ntfBusinessDemoIdleBody": "Ninguém usa {business} há algum tempo. Se ninguém o abrir nos próximos {days} dias, os dados de demonstração serão removidos e será arquivado. Podes reabri-lo quando quiseres.",
+    "clApptFiltersTitle": "Filtros de marcações",
+    "clApptFilterKind": "Tipo",
+    "clApptFilterFormat": "Formato",
+    "clApptFilterCoach": "Treinador",
+    "clApptNoMatch": "Nada corresponde a estes filtros.",
+    "reviewsFiltersTitle": "Filtros de avaliações",
+    "reviewsFilterTarget": "Sobre",
+    "reviewsFilterSentiment": "Impressão",
+    "reviewsNoMatch": "Nenhuma avaliação corresponde a estes filtros.",
+    "workoutsFiltersTitle": "Filtros de treinos",
+    "workoutsFilterStatus": "Estado",
+    "workoutsStatusDone": "Feitos",
+    "workoutsStatusPending": "Por fazer",
+    "workoutsFilterKind": "Tipo",
+    "workoutsKindPersonal": "Pessoais",
+    "workoutsFilterSeason": "Época",
+    "clProgressOnTargetWeeks": "{onTarget} de {weeks} semanas no objetivo",
+    "clProgressStreakDays": "{count, plural, one {# dia} other {# dias}}",
+    "clProgressTarget": "Objetivo {count}/semana",
+    "clProgressHeatmap": "Dias de treino",
+    "clProgressHeatWeek": "Semana de {date}: {count, plural, one {# sessão} other {# sessões}}{onTarget, select, true {, no objetivo} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {sem treino} one {# sessão} other {# sessões}}",
+    "clProgressBadges": "Distintivos",
+    "prTrendEstimated": "1RM estimado {value} {unit}",
+    "prTrendRetest": "Altura de voltar a testar?",
+    "clNutritionMacros": "Macros",
+    "clNutritionMacrosHidden": "Números ocultos",
+    "clNutritionHideMacros": "Ocultar números",
+    "clNutritionShowMacros": "Mostrar números"
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -5064,7 +5071,6 @@
     "signOut": "Terminar sessão",
     "todayWorkout": "Treino de hoje",
     "todaySources": "Treinos de hoje por origem",
-    "todayEmpty": "Nada planeado para hoje. Reserve uma aula ou registe um treino seu.",
     "classChip": "Aula {time}",
     "programmeChip": "{title} · do seu treinador",
     "logWorkout": "Registar",
@@ -5072,8 +5078,6 @@
     "startWorkout": "Começar",
     "resumeWorkout": "Retomar",
     "nextSession": "A sua próxima sessão",
-    "noBooking": "Ainda sem reservas.",
-    "bookClass": "Reservar aula",
     "manageBooking": "Abrir reserva",
     "todayLabel": "Hoje",
     "boxActions": "Ações do box",
@@ -5082,7 +5086,6 @@
     "actionVideos": "Vídeos",
     "actionCoach": "Treinador",
     "membership": "Subscrição",
-    "membershipNone": "Nenhum pacote ativo.",
     "meProfileTabs": "O teu perfil",
     "meAllPosts": "Todas as tuas publicações",
     "meAllPrs": "Todos os PR",
@@ -5097,14 +5100,12 @@
     "meSharingHint": "O que o seu treinador e os outros podem ver",
     "mePayments": "Pagamentos e recibos",
     "mePaymentsHint": "Faturas, reembolsos e o seu pacote",
-    "meChats": "Conversas",
     "meSettings": "Definições",
     "meSettingsHint": "Perfil, idioma, tema, conta",
     "meTour": "Fazer a visita guiada",
     "meChecklist": "Primeiros passos",
     "meConsole": "Gestão",
     "meConsoleHint": "Abrir a consola da equipa",
-    "meMyBoxes": "Os meus boxes",
     "bookingStatus": {
       "approved": "Reservado",
       "pending": "Pendente",
@@ -5135,7 +5136,7 @@
       "measure": "Peso, perímetros, fotografias",
       "wellness": "Um copo, a noite passada, uma refeição",
       "craving": "Regista ou pede apoio",
-      "support": "Uma mensagem rápida ao teu buddy",
+      "support": "Uma mensagem rápida ao teu amigalhaço de apoio",
       "voice": "Diz o que fizeste"
     },
     "homeTitle": "Feed",
@@ -5282,7 +5283,7 @@
         "glasses": "{filled} de {goal} copos",
         "added": "Copo adicionado ({ml} ml)",
         "dropsLabel": "Copos de hoje",
-        "remove": "Remover este copo"
+        "remove": "Remover o último copo"
       },
       "sleep": {
         "title": "Sono",
@@ -5364,9 +5365,6 @@
         "noPortions": "O plano do teu coach ainda não tem porções diárias."
       },
       "mood": {
-        "mood": "Humor {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Como te sentes?",
         "open": "Responder a «Como me sinto»"
       },
       "craving": {
@@ -5376,7 +5374,7 @@
         "count": "{count, plural, one {# hoje} other {# hoje}}",
         "edit": "Editar",
         "support": "Preciso de apoio",
-        "supportNoBuddy": "Quando escolheres um buddy, ele recebe uma mensagem curta. Nunca os detalhes.",
+        "supportNoBuddy": "Quando escolheres um amigalhaço de apoio, ele recebe uma mensagem curta. Nunca os detalhes.",
         "intensity": "Que intensidade?",
         "trigger": "O que o provocou?",
         "outcome": "O que aconteceu?",
@@ -5463,7 +5461,45 @@
         "invalid_media": "A foto não está pronta. Escolhe-a de novo."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Ajuda e visita guiada",
+    "meHelpHint": "Visita, primeiros passos, contacto",
+    "meHelpResetsWaiting": "{count, plural, one {# reposição de palavra-passe pendente} other {# reposições de palavra-passe pendentes}}",
+    "helpVisibility": "Como funciona a visibilidade",
+    "helpVisibilityPrivate": "Tudo o que registas no Diário é teu: só tu o vês, a não ser que escolhas o contrário.",
+    "helpVisibilityCoach": "O teu treinador só vê o que permitires em Partilha. As lesões vê-as sempre, para tua segurança.",
+    "helpVisibilityPosts": "As tuas publicações são vistas por quem escolheres ao publicar: o clube, os teus seguidores ou todos.",
+    "helpContactBox": "Contactar o ginásio",
+    "helpContactBoxHint": "Escreve ao ginásio a partir das Mensagens",
+    "helpReport": "Reportar um problema",
+    "helpReportSubject": "Um problema no Palee",
+    "helpStaffOnly": "Só para a equipa",
+    "settingsUnitsHint": "Como são mostrados o peso, a altura e os perímetros.",
+    "settingsSectionsHint": "Que secções tem o teu Diário e como aparece o teu peso.",
+    "mePrsPrivate": "{count, plural, one {Mais um PR é privado.} other {Os outros # PRs são privados.}} Escolhe quais aparecem em Partilha e visibilidade.",
+    "mePrsNoneShown": "Ainda não mostras nenhum PR no teu perfil.",
+    "sharing": {
+      "coachSeesTitle": "O meu treinador vê",
+      "coachSeesHint": "O que chega aos teus treinadores sem o enviares de cada vez.",
+      "injuriesAlways": "As lesões estão sempre visíveis para o treinador, para tua segurança.",
+      "communityTitle": "Comunidade",
+      "communityHint": "Onde apareces nos clubes e aos outros.",
+      "prCelebrations": "Celebração de PRs",
+      "prCelebrationsHint": "Um cartão automático no clube quando bates um PR",
+      "challenges": "Desafios",
+      "challengesHint": "O teu nome na classificação dos desafios",
+      "profilePrsTitle": "PRs no teu perfil",
+      "profilePrsHint": "Quem te segue só vê os que ativares. Os restantes ficam privados.",
+      "profilePrsEmpty": "Ainda não tens PRs.",
+      "defaultsTitle": "Predefinição das novas entradas",
+      "defaultsHint": "Onde começa cada nova entrada. Podes alterar qualquer uma quando quiseres.",
+      "defaultKind": {
+        "workout": "Treinos",
+        "note": "Notas",
+        "check_in": "Check-ins"
+      },
+      "saveError": "Não foi guardado. Tenta novamente."
+    }
   },
   "Community": {
     "all": "Tudo",
@@ -5536,7 +5572,6 @@
       "announcements": "Só anúncios",
       "none": "Silenciado"
     },
-    "wodNoWorkout": "Hoje não há WOD de aula.",
     "wodScoreCount": "Pontuações de hoje: {count}",
     "wodLeaderboard": "Classificação",
     "wodYou": "Tu",
@@ -5546,7 +5581,6 @@
     "wodOptInLink": "Ativar",
     "announcementsEmpty": "Ainda não há anúncios.",
     "announcementsOpen": "Todos os anúncios",
-    "channelShowAll": "Todos os canais",
     "channelSuggested": "Sugerido",
     "channelSuggestedHint": "reservas esta aula com frequência",
     "channelsOfBox": "Da box",
@@ -5573,7 +5607,19 @@
     "more": "Mais",
     "report": "Denunciar",
     "commentHidden": "Oculto",
-    "channelsOfClub": "Canais do club"
+    "channelsOfClub": "Canais do club",
+    "postFiltersTitle": "Filtros de publicações",
+    "filterClub": "Clube",
+    "filterChannel": "Canal",
+    "filterType": "Tipo",
+    "postType": {
+      "announcement": "Anúncios",
+      "pr": "Recordes pessoais",
+      "event": "Eventos"
+    },
+    "filterCoachesOnly": "Só treinadores",
+    "filterAuthor": "Autor",
+    "postsNoMatch": "Nenhuma publicação corresponde a estes filtros."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filtros} other {Filtros (#)}}",
@@ -5581,7 +5627,8 @@
     "clear": "Limpar",
     "back": "Voltar",
     "showResults": "{count, plural, =0 {Sem resultados} other {Mostrar #}}",
-    "show": "Mostrar"
+    "show": "Mostrar",
+    "all": "Todos"
   },
   "BoxSchedule": {
     "title": "Horário",
@@ -5940,16 +5987,10 @@
     "requestsRowHint": "Aceita ou recusa",
     "notifications": "Notificações",
     "notificationsUnread": "{count, plural, one {# notificação por ler} other {# notificações por ler}}",
-    "countsLine": "{followers, plural, one {# seguidor} other {# seguidores}} · a seguir {following}",
-    "countsLineOther": "{followers, plural, one {# seguidor} other {# seguidores}} · a seguir {following}",
     "connectionsTitle": "Ligações",
-    "tabFollowers": "{count, plural, one {# seguidor} other {# seguidores}}",
-    "tabFollowing": "A seguir {count}",
     "tabBoxes": "Boxes",
     "tabClubs": "Clubes",
     "tabPrs": "PRs",
-    "followersEmpty": "Ainda ninguém te segue.",
-    "followingEmpty": "Ainda não segues ninguém.",
     "boxesEmpty": "Ainda não segues nenhuma box.",
     "clubsEmpty": "Ainda não estás num clube.",
     "remove": "Remover",
@@ -5988,7 +6029,48 @@
     "searchPeople": "Procurar pessoas",
     "searchBoxes": "Procurar boxes",
     "searchClubs": "Procurar clubes",
-    "searchNoMatch": "Sem resultados para esta pesquisa."
+    "searchNoMatch": "Sem resultados para esta pesquisa.",
+    "countBuddies": "{count, plural, one {# Amigalhaço} other {# Amigalhaços}}",
+    "countFollowYou": "{count, plural, one {# segue-te} other {# seguem-te}}",
+    "countYouFollow": "segues {count}",
+    "countFollowers": "{count, plural, one {# seguidor} other {# seguidores}}",
+    "countFollowing": "a seguir {count}",
+    "tabBuddies": "Amigalhaços {count}",
+    "tabFollowYou": "Seguem-te {count}",
+    "tabYouFollow": "Segues {count}",
+    "buddyBadge": "Amigalhaço",
+    "relationClub": "No teu clube",
+    "relationNearby": "Perto de ti",
+    "relationYouFollow": "Segues",
+    "findPeople": "Encontrar pessoas",
+    "findClubsAndPeople": "Procurar clubes e pessoas",
+    "peopleTitle": "Pessoas",
+    "peopleNoMatch": "Não encontrámos ninguém. As contas privadas só aparecem a quem já as conhece.",
+    "peopleSearchFailed": "A pesquisa falhou. Tenta outra vez.",
+    "searchBuddies": "Procurar amigalhaços",
+    "buddiesEmpty": "Ainda não tens amigalhaços. Quando alguém que segues te seguir também, ficam amigalhaços.",
+    "followYouEmpty": "Ninguém aqui. Aqui aparece quem te segue sem que o sigas.",
+    "youFollowEmpty": "Ninguém aqui. Aqui aparece quem segues sem que te siga.",
+    "unfollowBuddyConfirm": "Deixar de seguir? Deixam de ser amigalhaços e não vais ver as publicações só para seguidores.",
+    "lockedPrivate": "Conta privada. Envia um pedido para veres também as publicações só para seguidores; cada pedido tem de ser aprovado.",
+    "privacyTitle": "Conta privada e pesquisa",
+    "privacyHint": "Quem te pode seguir e quem te pode encontrar.",
+    "privateAccountToggle": "Conta privada",
+    "privateAccountOn": "Só te seguem as pessoas que aprovas. Se a desligares, a conta fica pública: qualquer pessoa te pode seguir de imediato e os pedidos pendentes são aceites.",
+    "privateAccountOff": "A tua conta é pública: qualquer pessoa te pode seguir de imediato. Volta a ligá-la para aprovares tu cada novo seguidor; os atuais ficam.",
+    "goPublicConfirm": "{count, plural, one {Tornar pública? O # pedido pendente vai ser aceite agora.} other {Tornar pública? Os # pedidos pendentes vão ser aceites agora.}}",
+    "goPublic": "Tornar pública",
+    "keepPrivate": "Manter privada",
+    "searchableToggle": "Mostrar-me na pesquisa",
+    "searchableOn": "Qualquer pessoa no Palee te pode encontrar pelo nome ou @handle.",
+    "searchablePrivate": "Encontram-te pelo nome ou @handle as pessoas dos teus clubes e de quem segues ou te segue. As outras, quando a conta for pública.",
+    "searchableOff": "Na pesquisa só te encontra quem já conheces, dos teus clubes ou de quem segues.",
+    "notifNewFollowerTitle": "Novo seguidor",
+    "notifNewFollowerBody": "{name} começou a seguir-te.",
+    "notifFollowRequestedTitle": "Pedido para seguir",
+    "notifFollowRequestedBody": "{name} quer seguir-te.",
+    "notifFollowAcceptedTitle": "Pedido aceite",
+    "notifFollowAcceptedBody": "{name} aceitou o teu pedido para seguir."
   },
   "BoxPage": {
     "allWeek": "Semana toda",
@@ -6309,7 +6391,6 @@
     "clubLeaveBody": "As publicações saem do teu feed. Podes voltar a entrar em Encontrar.",
     "find": "Encontrar",
     "findTitle": "Encontrar clubs",
-    "findSearch": "Procurar clubs e grupos",
     "findOpenClubs": "Clubs abertos",
     "findGroups": "Grupos nas tuas boxes",
     "findNoClubs": "As boxes de que és membro ou que segues ainda não têm clubs abertos.",
@@ -6363,7 +6444,10 @@
     "notif_event_cohost_answered_title": "Resposta de coorganização",
     "notif_event_cohost_answered_accepted_body": "{box} coorganiza «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} recusou coorganizar «{event}».",
-    "notif_event_cohost_answered_removed_body": "{box} já não coorganiza «{event}»."
+    "notif_event_cohost_answered_removed_body": "{box} já não coorganiza «{event}».",
+    "filterKind": "Tipo",
+    "filterBox": "Box",
+    "findFiltersTitle": "Filtros de pesquisa"
   },
   "CommunityAdmin": {
     "title": "Comunidade",
@@ -6638,7 +6722,14 @@
     "err_already_refunded": "Este pagamento já foi reembolsado.",
     "err_invalid_refund": "Reembolsa um valor acima de zero e não superior ao que foi pago.",
     "err_invalid_cohosts": "Não é possível ler esses endereços de coorganizadores. Verifica cada endereço de página.",
-    "err_duplicate_cohost": "O mesmo negócio é convidado duas vezes."
+    "err_duplicate_cohost": "O mesmo negócio é convidado duas vezes.",
+    "filtersTitle": "Filtros de eventos",
+    "filterClub": "Clube",
+    "filterFree": "Grátis",
+    "filterPrice": "Preço",
+    "filterGoing": "Vou",
+    "filterMine": "Eu",
+    "filtersNoMatch": "Nenhum evento corresponde a estes filtros."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Não há próximos eventos. Cria um com «+ Novo evento».",
@@ -6779,7 +6870,7 @@
   },
   "Around": {
     "scopeLabel": "O que o Feed mostra",
-    "scopeClubs": "Os meus clubs",
+    "scopeClubs": "A minha malta",
     "scopeAround": "Perto de mim",
     "loading": "A carregar…",
     "updating": "A atualizar resultados…",
@@ -6892,10 +6983,6 @@
     "section_boxes": "Boxes perto de ti",
     "section_clubs": "Clubs abertos",
     "section_posts": "Publicações",
-    "empty_events": "Nenhum evento aberto num raio de {distance}.",
-    "empty_boxes": "Nenhuma box num raio de {distance}.",
-    "empty_clubs": "Nenhum club aberto num raio de {distance}.",
-    "empty_posts": "Nenhuma publicação pública num raio de {distance}.",
     "seeAll": "{count, plural, one {Ver} other {Ver todos (#)}}",
     "otherBoxes": "Outras boxes na zona ({count})",
     "trialBadge": "Experimental",
@@ -6924,8 +7011,6 @@
     "pin_posts": "Publicação",
     "open": "Abrir",
     "closeCard": "Fechar",
-    "backToAround": "Perto de mim",
-    "kindCount": "{count, plural, =0 {Nenhum} one {#} other {#}} num raio de {distance}",
     "loadMore": "Mais",
     "loadingMore": "A carregar…",
     "needArea": "Primeiro escolhe onde procurar.",
@@ -6949,7 +7034,9 @@
     "dateTo": "Até",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Preço mínimo",
-    "priceTo": "Preço máximo"
+    "priceTo": "Preço máximo",
+    "sectionLevel": "Nível",
+    "levelHint": "Boxes com aulas deste nível"
   },
   "CheckIn": {
     "loading": "A carregar…",
@@ -7431,7 +7518,7 @@
     "helpIntro": "Com uma fita macia, sobre a pele, justa mas sem apertar. Mede à mesma hora do dia, de preferência de manhã.",
     "helpPhotos": "Para as fotografias: mesmo sítio, mesma luz, mesma distância. O temporizador dá-te 10 segundos para te afastares.",
     "settingsTitle": "Definições de Corpo",
-    "settingsHubHint": "Unidades, peso, fotografias, lembrete",
+    "settingsHubHint": "Fotografias, lembrete de medição",
     "settingsIntro": "Os teus dados corporais são privados por predefinição. Aqui escolhes como aparecem e quem os vê.",
     "unitsLabel": "Unidades",
     "sectionsLabel": "Secções do diário",
@@ -7602,7 +7689,8 @@
       "share_photo_missing": "As duas medições precisam de uma fotografia pronta dessa pose.",
       "media_not_ready": "Uma fotografia ainda está a ser processada. Tenta daqui a pouco."
     },
-    "fromGarmin": "do Garmin"
+    "fromGarmin": "do Garmin",
+    "unitsAndSectionsLink": "Unidades e secções nas Definições"
   },
   "Referrals": {
     "title": "Traz um amigo",
@@ -7925,10 +8013,6 @@
     "return_garmin_account_in_use": "Essa conta Garmin já está ligada a outra conta Palee.",
     "return_garmin_connect_failed": "O Garmin não conseguiu concluir a ligação. Tenta outra vez.",
     "restingTitle": "Frequência cardíaca em repouso",
-    "restingRange": "Período",
-    "restingRange_1m": "1 mês",
-    "restingRange_3m": "3 meses",
-    "restingRange_1y": "1 ano",
     "bpmValue": "{value} bpm",
     "restingLatest": "Última medição · {date}",
     "restingAverage": "Média {value} bpm em {days, plural, one {# dia} other {# dias}}",
@@ -7965,18 +8049,18 @@
     "error_phone_health_not_connected": "Não está ligado. Liga-o a partir da app no telemóvel."
   },
   "Buddy": {
-    "title": "Buddy de apoio",
+    "title": "Amigalhaço de apoio",
     "rowHint": "Uma ou duas pessoas para os momentos difíceis",
     "backToMe": "Eu",
     "intro": "Uma ou duas pessoas de confiança: parceiro, amigo ou o teu coach. Só recebem o que envias com «Preciso de apoio». Nada automático.",
-    "myBuddies": "Os meus buddies",
-    "noBuddies": "Ainda não tens buddy. Convida alguém em quem confias.",
+    "myBuddies": "Os meus amigalhaços de apoio",
+    "noBuddies": "Ainda não tens amigalhaço de apoio. Convida alguém em quem confias.",
     "add": "Adicionar uma pessoa ou o teu coach",
-    "full": "Tens {max} buddies ou convites, o máximo possível.",
+    "full": "Tens {max} amigalhaços de apoio ou convites, o máximo possível.",
     "needSupport": "Preciso de apoio",
     "ask": "Pedir",
     "invitationsTitle": "Convites para ti",
-    "invitationBody": "{name} pede-te para seres o seu buddy de apoio. Só terás notícias quando essa pessoa pedir.",
+    "invitationBody": "{name} pede-te para seres o seu amigalhaço de apoio. Só terás notícias quando essa pessoa pedir.",
     "accept": "Aceitar",
     "acceptName": "Aceitar o convite de {name}",
     "decline": "Agora não",
@@ -8009,9 +8093,9 @@
     "withdraw": "Retirar o convite",
     "withdrawConfirm": "Retirar o convite a {name}?",
     "stop": "Terminar",
-    "stopConfirm": "Deixar de ser buddy de {name}?",
+    "stopConfirm": "Deixar de ser amigalhaço de apoio de {name}?",
     "stopSupportingConfirm": "Deixar de apoiar {name}?",
-    "stopQuiet": "A pessoa vê isto na página Buddy; não é enviada nenhuma notificação.",
+    "stopQuiet": "A pessoa vê isto na página Amigalhaço de apoio; não é enviada nenhuma notificação.",
     "stopYes": "Sim, terminar",
     "cancel": "Cancelar",
     "close": "Fechar",
@@ -8025,11 +8109,11 @@
     "quietFrom": "Das",
     "quietTo": "Às",
     "quietSaved": "Horas de silêncio: {range}",
-    "sharePhone": "Partilhar o meu telefone com os meus buddies",
-    "sharePhoneHint": "Só para «Liga-me», só com os teus buddies ativos. Desligado até o ligares.",
+    "sharePhone": "Partilhar o meu telefone com os meus amigalhaços de apoio",
+    "sharePhoneHint": "Só para «Liga-me», só com os teus amigalhaços de apoio ativos. Desligado até o ligares.",
     "phone": "Número de telefone",
     "footer": "Qualquer um de vocês pode terminar a qualquer momento. O outro vê isso aqui, sem notificação.",
-    "addTitle": "Novo buddy",
+    "addTitle": "Novo amigalhaço de apoio",
     "addIntro": "O teu coach, pessoas dos teus clubs ou que segues. Nada começa até aceitarem.",
     "searchLabel": "Pesquisar",
     "searchPlaceholder": "Nome ou alcunha",
@@ -8042,20 +8126,20 @@
     },
     "candidateStatus": {
       "pending": "Convidado",
-      "active": "Já é teu buddy"
+      "active": "Já é teu amigalhaço de apoio"
     },
     "invite": "Convidar",
     "inviteName": "Convidar {name}",
     "sendLink": "Enviar um link a alguém fora do Palee",
     "sendLinkHint": "O link vale {days} dias e uma só vez. Nada começa até a pessoa aceitar.",
-    "shareTitle": "Sê o meu buddy de apoio",
-    "shareText": "Gostava que fosses o meu buddy de apoio no Palee. Só terás notícias minhas quando eu pedir.",
+    "shareTitle": "Sê o meu amigalhaço de apoio",
+    "shareText": "Gostava que fosses o meu amigalhaço de apoio no Palee. Só terás notícias minhas quando eu pedir.",
     "linkReady": "O teu link está pronto a partilhar.",
     "linkCopied": "Link copiado. Cola-o numa mensagem.",
     "linkLabel": "Link de convite",
-    "noBuddyYet": "Ainda não tens um buddy ativo. Assim que alguém aceitar, «Preciso de apoio» vai para essa pessoa.",
-    "noBuddyYetShort": "Escolhe um buddy e chega-lhe com um toque.",
-    "setUpBuddy": "Escolher um buddy",
+    "noBuddyYet": "Ainda não tens um amigalhaço de apoio ativo. Assim que alguém aceitar, «Preciso de apoio» vai para essa pessoa.",
+    "noBuddyYetShort": "Escolhe um amigalhaço de apoio e chega-lhe com um toque.",
+    "setUpBuddy": "Escolher um amigalhaço de apoio",
     "messageLabel": "Mensagem (opcional)",
     "messagePlaceholder": "ex. Noite difícil.",
     "goesTo": "Vai para: {names}",
@@ -8114,29 +8198,29 @@
     "chatWith": "Conversa com {name}",
     "chatEmpty": "Ainda não há mensagens.",
     "chatPlaceholder": "Escreve uma mensagem",
-    "chatReadOnly": "Esta ligação buddy terminou. A conversa continua legível; ninguém pode escrever.",
+    "chatReadOnly": "Esta ligação de amigalhaço de apoio terminou. A conversa continua legível; ninguém pode escrever.",
     "earlier": "Mensagens anteriores",
     "read": "Lida",
-    "threadsTitle": "Conversas buddy",
-    "threadMyBuddy": "O teu buddy",
+    "threadsTitle": "Conversas com amigalhaços de apoio",
+    "threadMyBuddy": "O teu amigalhaço de apoio",
     "threadISupport": "Apoias esta pessoa",
-    "inviteHeading": "Um convite buddy",
-    "inviteFrom": "{name} gostava que fosses o seu buddy de apoio",
-    "inviteFromSomeone": "Alguém gostava que fosses o seu buddy de apoio",
-    "whatIsBuddy": "O que é um buddy",
-    "whatOnly": "Um buddy só recebe o que a outra pessoa envia com «Preciso de apoio». Nada automático, nunca detalhes.",
+    "inviteHeading": "Um convite para amigalhaço de apoio",
+    "inviteFrom": "{name} gostava que fosses o seu amigalhaço de apoio",
+    "inviteFromSomeone": "Alguém gostava que fosses o seu amigalhaço de apoio",
+    "whatIsBuddy": "O que é um amigalhaço de apoio",
+    "whatOnly": "Um amigalhaço de apoio só recebe o que a outra pessoa envia com «Preciso de apoio». Nada automático, nunca detalhes.",
     "whatReplies": "Respondes com um toque: Estou aqui · Vamos dar uma volta? · Liga-me, ou com as tuas palavras.",
     "whatQuiet": "Podes definir horas de silêncio; os pedidos chegam então em silêncio.",
     "whatStop": "Qualquer um de vocês pode terminar a qualquer momento.",
     "inviteSignUp": "Criar conta e aceitar",
     "inviteSignIn": "Entrar e aceitar",
     "notNow": "Agora não",
-    "inviteAccepted": "Agora és buddy de apoio de {name}.",
-    "inviteAcceptedNoName": "Agora és buddy de apoio.",
-    "openBuddy": "Abrir Buddy",
+    "inviteAccepted": "Agora és amigalhaço de apoio de {name}.",
+    "inviteAcceptedNoName": "Agora és amigalhaço de apoio.",
+    "openBuddy": "Abrir Amigalhaço de apoio",
     "inviteExpired": "Este convite expirou. Pede um novo link.",
     "inviteUnavailable": "Este link de convite já não funciona.",
-    "inviteFooter": "O Palee não é um serviço médico nem de emergência. Um buddy é uma pessoa que conheces, para um momento difícil.",
+    "inviteFooter": "O Palee não é um serviço médico nem de emergência. Um amigalhaço de apoio é uma pessoa que conheces, para um momento difícil.",
     "linesTitle": "Linhas de ajuda",
     "linesIntro": "Se for mais do que um momento difícil, estes serviços podem ajudar. É informação, não um conselho; o Palee não é um serviço médico nem de emergência.",
     "linesGreece": "Na Grécia",
@@ -8152,7 +8236,7 @@
     },
     "linesNote": "Fora da Grécia, o número de emergência é o 112 em toda a UE, ou o do teu país.",
     "cravingGoesTo": "Uma mensagem curta vai para {names}. Nunca os detalhes.",
-    "cravingSupportSent": "Enviado aos teus buddies. Vês o estado em Bem-estar.",
+    "cravingSupportSent": "Enviado aos teus amigalhaços de apoio. Vês o estado em Bem-estar.",
     "sharingSectionTitle": "Resumo semanal de bem-estar para o coach",
     "sharingSectionHint": "O que o teu coach vê do Bem-estar, só se permitires",
     "shareWellness": "Bem-estar · resumo semanal",
@@ -8179,11 +8263,11 @@
     "coachAllowedSince": "{name} permitiu este resumo em {date}. Cada vez que o abres, essa pessoa vê.",
     "notif": {
       "buddy_invite": {
-        "title": "Um convite buddy",
-        "body": "{name} pede-te para seres o seu buddy de apoio."
+        "title": "Um convite para amigalhaço de apoio",
+        "body": "{name} pede-te para seres o seu amigalhaço de apoio."
       },
       "buddy_accepted": {
-        "title": "Tens um buddy de apoio",
+        "title": "Tens um amigalhaço de apoio",
         "body": "{name} aceitou e só terá notícias tuas quando pedires."
       },
       "support_request": {
@@ -8203,7 +8287,7 @@
         "body": "{moments} momentos difíceis, {overcome} ultrapassados, {requests} pedidos de apoio."
       },
       "buddy_message": {
-        "title": "Mensagem de buddy",
+        "title": "Mensagem do amigalhaço de apoio",
         "body": "{name} enviou-te uma mensagem."
       },
       "coach_wellness_summary": {
@@ -8212,18 +8296,18 @@
       }
     },
     "errors": {
-      "buddy_limit_reached": "Podes ter até dois buddies ou convites.",
+      "buddy_limit_reached": "Podes ter até dois amigalhaços de apoio ou convites.",
       "buddy_already_invited": "Já convidaste esta pessoa.",
       "buddy_invite_expired": "Este convite expirou.",
-      "buddy_link_closed": "Esta ligação buddy já terminou.",
+      "buddy_link_closed": "Esta ligação de amigalhaço de apoio já terminou.",
       "buddy_invite_unavailable": "Este link de convite já não funciona.",
-      "cannot_buddy_self": "Não podes ser o teu próprio buddy.",
+      "cannot_buddy_self": "Não podes ser o teu próprio amigalhaço de apoio.",
       "not_eligible_for_buddy": "Convida o teu coach, alguém dos teus clubs ou alguém que segues, ou envia um link.",
       "message_too_long": "A mensagem tem no máximo 280 caracteres.",
-      "support_rate_limited": "Já pediste algumas vezes nesta hora; os teus buddies já receberam.",
-      "no_active_buddies": "Adiciona primeiro um buddy.",
+      "support_rate_limited": "Já pediste algumas vezes nesta hora; os teus amigalhaços de apoio já receberam.",
+      "no_active_buddies": "Adiciona primeiro um amigalhaço de apoio.",
       "already_undone": "Este pedido já foi retirado.",
-      "undo_window_passed": "Os teus buddies já foram avisados.",
+      "undo_window_passed": "Os teus amigalhaços de apoio já foram avisados.",
       "reply_text_required": "Escreve algumas palavras.",
       "reply_too_long": "Uma resposta tem no máximo 500 caracteres.",
       "invalid_quiet_hours": "As horas de silêncio precisam de duas horas diferentes.",
@@ -8232,7 +8316,7 @@
       "summary_required": "Liga primeiro o resumo semanal.",
       "message_body_required": "Escreve uma mensagem.",
       "message_too_long_body": "Uma mensagem tem no máximo 2000 caracteres.",
-      "buddy_link_read_only": "Esta ligação buddy terminou; a conversa é só de leitura."
+      "buddy_link_read_only": "Esta ligação de amigalhaço de apoio terminou; a conversa é só de leitura."
     }
   },
   "Providers": {
@@ -8253,7 +8337,6 @@
     "formerHint": "O que fizeste com eles fica no teu diário, no Vault e no teu progresso. Já não veem os teus registos.",
     "formerSince": "Terminou a {date} · já não vê os teus registos",
     "todayTitle": "Hoje",
-    "todayEmpty": "Nada planeado para hoje com nenhum dos teus prestadores.",
     "todayPartial": "Não foi possível carregar o dia de hoje de {names}.",
     "todayKind": {
       "class": "Aula",
@@ -8841,7 +8924,6 @@
     "editProfile": "Editar o meu perfil",
     "safetyLine": "Só membros deste clube. Para ficarem ligados é preciso que ambos queiram. Podes denunciar ou bloquear a qualquer momento.",
     "filters": "Filtros",
-    "filtersCount": "Filtros ({count})",
     "swipesLeft": "{count, plural, one {Resta # hoje} other {Restam # hoje}}",
     "loading": "A carregar…",
     "limitReached": "Chega por hoje. Amanhã há pessoas novas.",
@@ -8875,7 +8957,7 @@
     "endConfirm": "Terminar",
     "blockConfirm": "Bloquear",
     "endBody": "{name} não será avisado. A conversa continua legível mas fecha, e não voltam a ver-se na pilha.",
-    "blockBody": "{name} não será avisado. A vossa parceria e qualquer ligação buddy terminam, e não voltam a ver-se em Partners. Podes desbloquear em Partilha e visibilidade.",
+    "blockBody": "{name} não será avisado. A vossa parceria e qualquer ligação de amigalhaço de apoio terminam, e não voltam a ver-se em Partners. Podes desbloquear em Partilha e visibilidade.",
     "planEyebrow": "Marquem juntos",
     "planClass": "Aula",
     "planBook": "Abrir a aula para reservar",
@@ -8899,7 +8981,7 @@
     "settingsSwitch": "Mostrar-me em Partners",
     "settingsSwitchHint": "{count, plural, one {O teu perfil em # clube} other {Os teus perfis em # clubes}}. Desligado põe-nos em pausa; nada é apagado.",
     "blockedTitle": "Pessoas bloqueadas",
-    "blockedHint": "Não te encontram em Partners, e as ligações buddy com elas terminaram.",
+    "blockedHint": "Não te encontram em Partners, e as ligações de amigalhaço de apoio com elas terminaram.",
     "blockedEmpty": "Não bloqueaste ninguém.",
     "blockedSince": "Bloqueado a {date}",
     "unblock": "Desbloquear",
@@ -8922,7 +9004,14 @@
     "error_partner_match_read_only": "Esta conversa terminou.",
     "error_partner_plans_unavailable": "As sugestões de aula são só para os clubes do próprio ginásio.",
     "error_message_body_required": "Escreve algo primeiro.",
-    "error_cannot_block_self": "Não te podes bloquear a ti próprio."
+    "error_cannot_block_self": "Não te podes bloquear a ti próprio.",
+    "disciplineLabel": "Modalidade",
+    "disciplinesLabel": "O que treinariam juntos (até {max})",
+    "allDisciplines": "Todas as modalidades",
+    "fewerDisciplines": "Menos",
+    "distanceLabel": "Distância",
+    "withinKm": "Até {km} km",
+    "distanceNeedsArea": "Para filtrar por distância, aparece em «À minha volta» com a tua zona."
   },
   "Squads": {
     "title": "Squads",
@@ -9078,8 +9167,6 @@
       "minutes": "{minutes} min",
       "join": "Entrar na chamada",
       "manage": "Gerir",
-      "noSession": "Ainda não marcaste nenhuma sessão.",
-      "bookSession": "Marcar sessão",
       "noPackage": "Ainda não tens pacote de sessões. Pergunta ao teu treinador.",
       "sessionsLeft": "Restam {remaining} de {limit} sessões",
       "sessionsUnlimited": "Sessões ilimitadas"
@@ -9549,7 +9636,8 @@
     "backToMe": "Voltar a Eu",
     "saveInterests": "Guardar",
     "interestsSaved": "Guardado.",
-    "interestsHubHint": "Desportos e nível, para sugestões"
+    "interestsHubHint": "Desportos e nível, para sugestões",
+    "photoAddLabel": "Adicionar foto"
   },
   "Business": {
     "common": {
@@ -9756,7 +9844,7 @@
     "socialTitle": "App social para atletas",
     "socialSummary": "Um feed dos teus clubes e das pessoas que segues, canais de clube, publicações com fotos e treinos, e Perto de mim para descobrir num mapa eventos, clubes abertos e ginásios próximos.",
     "partnersTitle": "Parceiros de treino e apoio",
-    "partnersSummary": "Encontra um parceiro de treino entre os membros verificados do teu próprio clube, sempre com consentimento mútuo, e escolhe um parceiro de apoio que só recebe notícias tuas quando pedires ajuda.",
+    "partnersSummary": "Encontra um parceiro de treino entre os membros verificados do teu próprio clube, sempre com consentimento mútuo, e escolhe um amigalhaço de apoio que só recebe notícias tuas quando pedires ajuda.",
     "eventsTitle": "Eventos e organizadores",
     "eventsSummary": "WODs abertos, bootcamps, corridas e competições com confirmações de presença, lotação, lista de espera, passes de convidado, coorganização e uma consola de organizador para gestão, finanças e estatísticas.",
     "boxTitle": "O teu ginásio no bolso",
@@ -10801,5 +10889,397 @@
     "reviewNoLimit": "Sem limite",
     "reviewCohosts": "Pedidos de coorganização a: {names}",
     "reviewNoCohosts": "Sem coorganizadores"
+  },
+  "Conversations": {
+    "title": "Mensagens",
+    "requests": "Pedidos",
+    "requestsEntry": "Pedidos de mensagem ({count})",
+    "buddy": "Amigalhaço",
+    "you": "Tu: {text}",
+    "someone": "Alguém",
+    "unread": "Não lida",
+    "emptyInbox": "Ainda não tens conversas. Procura alguém a quem escrever.",
+    "emptyRequests": "Não há pedidos de mensagem.",
+    "loading": "A carregar…",
+    "loadMore": "Ver mais",
+    "earlier": "Mensagens anteriores",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "requestTitle": "Pedido de mensagem",
+    "requestBanner": "{name} quer enviar-te uma mensagem.",
+    "requestBannerHint": "Aceita para a passares para a caixa de entrada. Se recusares, desaparece e {name} não fica a saber.",
+    "placeholder": "Escreve uma mensagem…",
+    "send": "Enviar",
+    "sending": "A enviar…",
+    "failed": "Não enviada.",
+    "retry": "Tentar de novo",
+    "discard": "Descartar",
+    "tooLong": "Uma mensagem pode ter até {max} caracteres.",
+    "chatWith": "Conversa com {name}",
+    "chatEmpty": "Diz olá a {name}.",
+    "unavailable": "Esta conversa não está disponível.",
+    "back": "Mensagens",
+    "message": "Mensagem",
+    "messageA11y": "Enviar mensagem a {name}",
+    "viewProfile": "Ver o perfil de {name}",
+    "searchEmpty": "Ninguém encontrado.",
+    "notif_person_message_title": "Mensagem de {name}",
+    "notif_person_message_body": "{name} enviou-te uma mensagem.",
+    "notif_message_request_title": "Pedido de mensagem",
+    "notif_message_request_body": "{name} quer enviar-te uma mensagem."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Guias",
+      "listIntro": "Visitas curtas pelos ecrãs reais. Acompanha os passos; nada fica guardado se não o guardares.",
+      "forStaff": "Para o teu negócio",
+      "forYou": "Para ti",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Começar",
+      "resume": "Continuar",
+      "replay": "Rever",
+      "state_new": "Novo",
+      "state_started": "Em curso",
+      "state_completed": "Concluído",
+      "state_dismissed": "Por começar",
+      "state_outdated": "Atualizado",
+      "openGuide": "Visita guiada",
+      "openGuideAria": "Começar a visita guiada: {title}",
+      "next": "Seguinte",
+      "back": "Voltar",
+      "finish": "Concluir",
+      "close": "Fechar a visita guiada",
+      "stepOf": "{current} de {total}",
+      "doIt": "Faz por mim",
+      "tapHint": "Toca na zona destacada",
+      "notHere": "Não está neste ecrã agora, por isso fica o resumo.",
+      "fillDemo": "Preencher primeiro com dados de demonstração",
+      "filling": "A preencher…",
+      "demoFilled": "Dados de demonstração adicionados",
+      "offerEyebrow": "És novo por aqui?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Mostra-me",
+      "offerLater": "Agora não",
+      "meRow": "Guias",
+      "meRowHint": "Visitas guiadas à loja, aos eventos, às ofertas e ao teu próprio clube",
+      "loadFailed": "Os guias não carregaram. Tenta novamente."
+    },
+    "shop_staff": {
+      "title": "Gere a tua loja",
+      "summary": "Adiciona produtos, vende na app e na caixa, mantém o stock certo.",
+      "chapters": {
+        "setup": "Configurar",
+        "sell": "Vender",
+        "track": "Acompanhar"
+      },
+      "welcome": {
+        "title": "A loja da tua box",
+        "body": "Os membros encomendam na app e levantam na receção. Também vendes na caixa."
+      },
+      "newProduct": {
+        "title": "Adiciona um produto",
+        "body": "Toca em «{label}»."
+      },
+      "photos": {
+        "title": "As fotos vendem",
+        "body": "Adiciona algumas fotos nítidas. A primeira é a capa."
+      },
+      "price": {
+        "title": "Preço e variantes",
+        "body": "Um só preço, ou tamanhos e sabores com stock próprio.",
+        "tip": "O stock conta-se por variante, por isso «M» e «L» nunca se misturam."
+      },
+      "selling": {
+        "title": "Onde se vende",
+        "body": "Na app, na caixa ou em ambas. Só membros, ou qualquer pessoa."
+      },
+      "save": {
+        "title": "Guarda e depois publica",
+        "body": "Um produto novo é um rascunho. Publica-o para abrir a loja.",
+        "tip": "Os membros só veem o cartão Loja na Box quando houver algo publicado."
+      },
+      "ordersTab": {
+        "title": "Encomendas",
+        "body": "Toca em «{label}»."
+      },
+      "orders": {
+        "title": "Prepara e entrega",
+        "body": "Marca uma encomenda como pronta e o membro fica a saber onde a levantar.",
+        "tip": "As encomendas não levantadas são canceladas sozinhas ao fim de 7 dias e libertam o stock."
+      },
+      "pos": {
+        "title": "A caixa",
+        "body": "Vende na receção em segundos, pago logo ou na conta do membro."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Cada venda, entrega e contagem fica registada. Avisamos-te quando o stock está baixo."
+      },
+      "analytics": {
+        "title": "O que vende",
+        "body": "Vendas semanais, margens e os teus produtos mais vendidos.",
+        "tip": "As vendas da loja também aparecem em Finanças como fonte de receita própria."
+      },
+      "done": {
+        "title": "Está tudo pronto",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "events_organising": {
+      "title": "Organiza eventos",
+      "summary": "Planeia em 7 passos curtos, vende lugares, faz o check-in e vê os números.",
+      "chapters": {
+        "plan": "Planear",
+        "run": "Gerir"
+      },
+      "welcome": {
+        "title": "Eventos, do início ao fim",
+        "body": "Planeia, enche, gere e vê como correu, tudo num só sítio."
+      },
+      "new": {
+        "title": "Cria um evento",
+        "body": "Toca em «{label}»."
+      },
+      "steps": {
+        "title": "Sete passos curtos",
+        "body": "Organizador, dados básicos, quando, onde, quem e preço, lugares, revisão. Toca num passo feito para voltar."
+      },
+      "screen": {
+        "title": "Uma decisão por ecrã",
+        "body": "Preenche isto e depois Seguinte.",
+        "tip": "O teu rascunho fica guardado neste dispositivo, por isso podes parar e voltar."
+      },
+      "next": {
+        "title": "Seguinte sabe o que falta",
+        "body": "Se faltar algo, diz-te o quê."
+      },
+      "cohosts": {
+        "title": "Coorganiza com outros",
+        "body": "Em «{label}», pede a uma box ou a um coach para coorganizar pelo endereço da página.",
+        "tip": "Quando aceitarem, o evento aparece na página deles e chega aos seus membros."
+      },
+      "manage": {
+        "title": "Gerir",
+        "body": "Cada evento: participantes, check-in, pagamentos na box, reembolsos e mensagens."
+      },
+      "finances": {
+        "title": "Finanças",
+        "body": "Toca em «{label}»: receitas, reembolsos e o que ainda está por pagar."
+      },
+      "analytics": {
+        "title": "Análises",
+        "body": "Toca em «{label}»: visualizações, inscrições, lista de espera e quem apareceu.",
+        "tip": "A conversão mostra quantos visitantes se inscreveram."
+      },
+      "done": {
+        "title": "Pronto para organizar",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "finance_offers": {
+      "title": "Ofertas, parceiros e indicações",
+      "summary": "Campanhas e cupões, vantagens de parceiros e um programa Traz um amigo.",
+      "chapters": {
+        "campaigns": "Campanhas",
+        "partners": "Parceiros",
+        "referrals": "Indicações"
+      },
+      "welcome": {
+        "title": "Cresce com ofertas",
+        "body": "As tuas campanhas e cupões, vantagens de lojas parceiras e recompensas por trazer amigos."
+      },
+      "campaignNew": {
+        "title": "Cria uma campanha",
+        "body": "Toca em «{label}»."
+      },
+      "campaignForm": {
+        "title": "Nome e datas",
+        "body": "Uma campanha agrupa as tuas ofertas, p. ex. «Verão». Escolhe quando decorre."
+      },
+      "coupons": {
+        "title": "Cupões",
+        "body": "Abre uma campanha para adicionar códigos: uma percentagem ou um valor de desconto, com limite de utilizações.",
+        "tip": "Cada código mostra quantas vezes foi usado, por isso vês que oferta resulta."
+      },
+      "partners": {
+        "title": "Vantagens de parceiros",
+        "body": "Toca em «{label}»."
+      },
+      "perkNew": {
+        "title": "Adiciona uma oferta de parceiro",
+        "body": "Toca em «{label}»."
+      },
+      "perkPartner": {
+        "title": "O parceiro",
+        "body": "O nome, o link e o logótipo."
+      },
+      "perkBenefit": {
+        "title": "O que os membros recebem",
+        "body": "Uma percentagem, um valor ou outra coisa, como um café grátis."
+      },
+      "perkMethod": {
+        "title": "Como a loja confirma",
+        "body": "Um código partilhado, um link com o código ou mostrar uma subscrição ativa.",
+        "tip": "Se um código for divulgado, muda-o aqui e aplica-se logo."
+      },
+      "perkRules": {
+        "title": "Condições",
+        "body": "Datas, quem recebe e com que frequência. Guarda um rascunho e publica quando estiver acordado."
+      },
+      "referrals": {
+        "title": "Traz um amigo",
+        "body": "Um programa que recompensa os membros que trazem alguém que se inscreve."
+      },
+      "referralsFlow": {
+        "title": "Aprova e recompensa",
+        "body": "As indicações chegam aqui. Aprova uma e a recompensa é enviada.",
+        "tip": "A recompensa pode ir para os dois: o membro e o amigo."
+      },
+      "done": {
+        "title": "Está tudo pronto",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "member_club_event": {
+      "title": "O teu próprio clube e evento",
+      "summary": "Cria um grupo no clube da tua box e planeia um evento, sozinho ou com uma box.",
+      "chapters": {
+        "club": "O teu clube",
+        "event": "O teu evento"
+      },
+      "welcome": {
+        "title": "Torna-o teu",
+        "body": "Cria um grupo com a tua malta e planeia os teus próprios eventos."
+      },
+      "channels": {
+        "title": "O clube da tua box",
+        "body": "Toca em «{label}»."
+      },
+      "groups": {
+        "title": "Grupos",
+        "body": "Pequenos clubes dentro da box: com chat e eventos próprios."
+      },
+      "propose": {
+        "title": "Cria um grupo",
+        "body": "Toca em «{label}»."
+      },
+      "groupSheet": {
+        "title": "Dá-lhe um nome e escolhe quem entra",
+        "body": "Aberto a todos, ou por pedido.",
+        "tip": "Algumas boxes aprovam primeiro os grupos novos; recebes um aviso quando estiver ativo."
+      },
+      "noBox": {
+        "title": "Os grupos vivem numa box",
+        "body": "Junta-te primeiro a uma box e depois cria um grupo no clube dela. Eventos podes planear já."
+      },
+      "eventNew": {
+        "title": "Planeia um evento",
+        "body": "Toca em «{label}»."
+      },
+      "hostAs": {
+        "title": "Quem organiza",
+        "body": "Tu, ou um grupo ou negócio que geres.",
+        "tip": "«{label}» não precisa de box nenhuma."
+      },
+      "alone": {
+        "title": "Por tua conta",
+        "body": "Aberto a qualquer pessoa por perto, ou só por convite com o teu link."
+      },
+      "withBox": {
+        "title": "Com uma box",
+        "body": "Em «{label}», pede à box para coorganizar pelo endereço da página dela.",
+        "tip": "Quando aceitar, o evento também aparece na página da box."
+      },
+      "hosting": {
+        "title": "Gere-o",
+        "body": "Depois de publicares, em «{label}» tens participantes, check-in e os números."
+      },
+      "done": {
+        "title": "Agora é contigo",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "Os meus clientes",
+    "replies": "À espera de resposta",
+    "reviews": "Revisão técnica",
+    "desk": "Check-in de hoje",
+    "clients": "Clientes",
+    "sentAt": "Enviado {time}",
+    "overdue": "Em atraso",
+    "dueSoon": "Vence em breve",
+    "unknownClient": "Membro",
+    "openVideo": "Ver o vídeo",
+    "checkedIn": "{count} de {total} chegaram",
+    "attended": "Veio",
+    "noShow": "Faltou",
+    "attendanceOf": "Presença de {name}",
+    "markError": "Não foi guardado. Tente novamente.",
+    "showAll": "Ver todos ({count})",
+    "showFewer": "Ver menos",
+    "moreInConsole": "Ver tudo na consola"
+  },
+  "Inbox": {
+    "title": "Mensagens",
+    "segmentsLabel": "Que mensagens ver",
+    "segment": {
+      "all": "Todas",
+      "coach": "Treinador",
+      "clubs": "Clubes",
+      "partners": "Parceiros"
+    },
+    "loading": "A carregar mensagens…",
+    "emptySegment": "Ainda não há conversas aqui.",
+    "workoutThread": "Conversa do treino",
+    "classThread": "Conversa da aula",
+    "searchAtGym": "No teu ginásio"
+  },
+  "NotificationSettings": {
+    "title": "Notificações",
+    "description": "O que te chega, na app e como push",
+    "loading": "A carregar…",
+    "loadError": "As definições de notificações não estão disponíveis neste momento.",
+    "saveError": "A alteração não foi guardada. Tenta novamente.",
+    "locked": "Sempre ativas",
+    "perClub": "Por clube, em As minhas boxes e clubes",
+    "channel": {
+      "in_app": "Na app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Reservas e aulas",
+        "hint": "Aprovações, lista de espera, aulas experimentais, marcações e temporadas"
+      },
+      "messages": {
+        "title": "Mensagens",
+        "hint": "Conversas, pedidos de mensagem e mensagens da box e do treinador"
+      },
+      "community": {
+        "title": "Clubes e comunidade",
+        "hint": "Seguidores, eventos, desafios, grupos e convites."
+      },
+      "coach": {
+        "title": "Treinador",
+        "hint": "Programas, notas de treino, revisões de técnica e nutrição"
+      },
+      "partners": {
+        "title": "Parceiros e buddies",
+        "hint": "Correspondências, o teu buddy de apoio e as mensagens deles"
+      },
+      "journal": {
+        "title": "Lembretes do diário",
+        "hint": "Água, medições, acompanhamento de desejos e sincronização de dispositivos"
+      },
+      "staff": {
+        "title": "Gestão da box",
+        "hint": "Novas reservas, aulas experimentais, visitantes, stock e denúncias"
+      },
+      "account": {
+        "title": "Conta e pagamentos",
+        "hint": "Segurança, faturas, renovações e encomendas"
+      }
+    }
   }
 }

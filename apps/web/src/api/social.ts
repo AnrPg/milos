@@ -19,12 +19,23 @@ export type ProfileAudience = ProfilePostCreate["audience"];
 export type PublicBoxPage = components["schemas"]["PublicBoxResponse"];
 export type PublicBoxSchedule = components["schemas"]["PublicBoxScheduleResponse"];
 export type PublicBoxPosts = components["schemas"]["PublicBoxPostsResponse"];
+/** ADR-193: Buddies, people who follow only, people followed only (never overlapping). */
+export type FollowGroups = components["schemas"]["FollowGroups"];
+export type SocialPrivacy = components["schemas"]["SocialPrivacy"];
+export type SocialPrivacyRequest = components["schemas"]["SocialPrivacyRequest"];
+export type PeopleSearchResponse = components["schemas"]["PeopleSearchResponse"];
+export type PeopleSearchPerson = components["schemas"]["PeopleSearchPerson"];
+export type PeopleRelation = PeopleSearchPerson["relation"];
 
 export const SOCIAL_KEY = ["social"] as const;
 export const SUMMARY_KEY = ["social", "summary"] as const;
 export const REQUESTS_KEY = ["social", "requests"] as const;
 export const followKey = (type: FollowTargetType, id: string) => ["social", "follow", type, id] as const;
 export const personKey = (id: string) => ["social", "person", id] as const;
+export const peopleSearchKey = (q: string) => ["social", "people-search", q] as const;
+
+/** ADR-193 §4: the search answers only from two characters on. */
+export const PEOPLE_SEARCH_MIN = 2;
 
 export function fetchSocialSummary(token: string) {
   return apiRequest<SocialSummary>("/me/social", { token });
@@ -82,6 +93,21 @@ export function removeFollower(token: string, followId: string) {
 
 export function fetchFollowing(token: string, type: "user" | "organization", cursor: string | null = null, q = "") {
   return apiRequest<FollowPage>(paged("/me/following", cursor, q ? { type, q } : { type }), { token });
+}
+
+/** ADR-193 §1: people you follow who follow you back; `q` filters names as above. */
+export function fetchBuddies(token: string, cursor: string | null = null, q = "") {
+  return apiRequest<FollowPage>(paged("/me/buddies-list", cursor, q ? { q } : {}), { token });
+}
+
+/** ADR-193 §4: anyone on Palee who isn't private, plus the people you already know. */
+export function searchPeople(token: string, q: string) {
+  return apiRequest<PeopleSearchResponse>(`/people-search?${new URLSearchParams({ q })}`, { token });
+}
+
+/** ADR-193 §2: going public also accepts the requests that are waiting. */
+export function setSocialPrivacy(token: string, body: SocialPrivacyRequest) {
+  return apiRequest<SocialPrivacy>("/me/social/privacy", { method: "PUT", token, body });
 }
 
 export function fetchPerson(token: string, id: string) {

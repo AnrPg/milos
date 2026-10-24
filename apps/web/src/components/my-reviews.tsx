@@ -6,7 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError } from "@/i18n/presentation";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -17,6 +17,12 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { distinctOptions, listFilterCount, picked } from "@/components/filters/list-filter";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
+
+/** What was reviewed and how it felt (vision §7.2 «Reviews»), remembered on `reviews`. */
+const REVIEWS_SHAPE = { target: "one", sentiment: "many" } as const;
 
 export function isCompletedExecution(execution: WorkoutExecution) {
   return execution.status === "completed" || Boolean(execution.completed_at_utc);
@@ -216,10 +222,14 @@ type Review = {
   target_type: unknown;
   rating?: unknown;
   body?: unknown;
+  sentiment?: unknown;
 };
+
+const text = (value: unknown) => (typeof value === "string" && value ? value : null);
 
 export function ReviewList({ reviews }: { reviews: Review[] }) {
   const i18n = useUiTranslations();
+  const { filter, setFilter } = useListFilter("reviews", REVIEWS_SHAPE);
   if (reviews.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--muted)" }}>
@@ -227,10 +237,26 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
       </p>
     );
   }
+  if (!filter) return null;
+  const shown = reviews.filter((review) => picked(filter.target, text(review.target_type)) && picked(filter.sentiment, text(review.sentiment)));
 
   return (
     <section className="grid gap-3">
-      {reviews.map((review) => (
+      <ListFilters
+        shape={REVIEWS_SHAPE}
+        fields={[
+          { key: "target", label: i18n("reviewsFilterTarget"), options: distinctOptions(reviews, (review) => text(review.target_type), (review) => semanticLabel(review.target_type, i18n)) },
+          { key: "sentiment", label: i18n("reviewsFilterSentiment"), options: distinctOptions(reviews, (review) => text(review.sentiment), (review) => semanticLabel(review.sentiment, i18n)) },
+        ]}
+        filter={filter}
+        onChange={setFilter}
+        title={i18n("reviewsFiltersTitle")}
+        resultCount={shown.length}
+      />
+      {shown.length === 0 && listFilterCount(filter) > 0 ? (
+        <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("reviewsNoMatch")}</p>
+      ) : null}
+      {shown.map((review) => (
         <ReviewCard key={String(review.id)} review={review} />
       ))}
     </section>

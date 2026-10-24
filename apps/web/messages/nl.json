@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Eén privé, door uzelf gehost huis voor groepslessen, gepersonaliseerde programmering, uitvoering van live trainingen, coachinggesprekken en voortgang die toebehoort aan de atleet.",
     "createAnAccount3f4f547": "Maak een account aan",
     "signInada2e9e": "Log in",
-    "conversationHistory0f18fb3": "Gespreksgeschiedenis",
     "loading33ce417": "Laden…",
-    "noConversations06b83a9": "Geen gesprekken.",
-    "selectAConversationToViewMessagesaf2cf2c": "Selecteer een gesprek om berichten te bekijken.",
     "availablePackages48a5129": "Beschikbare pakketten",
     "closebf5d9ce": "✕ Sluiten",
     "noPackagesAvailable14160fb": "Geen pakketten beschikbaar.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": ".ics downloaden",
     "loadingCalendarLinks1dad320": "Agendalinks laden…",
     "writeAMessage24bf2a3": "Schrijf een bericht…",
-    "chat67305ee": "← Chatten",
     "searchOrStartAConversationabb1d82": "Zoek of start een gesprek…",
     "noConversationsYetSearchToStartOne1a91cf7": "Nog geen gesprekken. Zoek om er een te starten.",
     "hideConversationdfb77ca": "Gesprek verbergen",
@@ -730,8 +726,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Je consistentie- en doorzettingsvermogenscores zijn exclusief je geplande rustdagen, maar we weten nog niet welke dagen dat zijn.",
     "setYourRestDaysInProfilefd0fbe4": "Stel uw rustdagen in in Profiel →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Vandaag is uw geplande rustdag; herstel maakt deel uit van het programma.",
-    "dayStreakca360c4": "dagstreep",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Voltooi je eerste training om je eerste badge te verdienen.",
     "loadingYourTrainingOverview39806c7": "Je trainingsoverzicht laden...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Je trainingsoverzicht is niet beschikbaar.",
     "refreshSessionf2ed411": "Sessie vernieuwen",
@@ -743,7 +737,6 @@
     "showLeaderboardOptIna95255e": "Toon leaderboard-opt-in",
     "optInRanking04c1cd3": "Opt-in-ranglijst",
     "joinLeaderboardad480b1": "Sluit je aan bij het klassement",
-    "noRankedUsersYetForThisPeriod2fa66a4": "Nog geen gerangschikte gebruikers voor deze periode.",
     "leaveLeaderboard834f047": "Verlaat het klassement",
     "coachNotes2ea7a97": "Aantekeningen van de coach",
     "latestGuidance58da2dc": "Nieuwste richtlijnen",
@@ -1294,9 +1287,6 @@
     "coaches181feb6": "Coaches",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Programmeer, communiceer en begrijp de trainingsvoortgang zonder toezicht of advertenties.",
     "directMessagefc7f864": "Direct bericht",
-    "workoutThreada03f1e1": "Training draad",
-    "classThreadf030236": "Klasse draad",
-    "thread7863f75": "Draad",
     "eurd06e073": "€",
     "downloada479c9c": "Downloaden",
     "billed763fe55": "Gefactureerd",
@@ -1546,15 +1536,10 @@
     "executionNotAvailablea9817d4": "Uitvoering niet beschikbaar.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "De landingspagina kon niet worden geladen.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Trainingsfrequentie versus wekelijks doel – afgelopen 10 weken",
-    "noWorkoutsYet85a9204": "Nog geen trainingen",
-    "setAWeeklyTargetdd70e51": "Stel een wekelijks doel in",
-    "calculatingc573779": "Berekenen…",
     "howCloselyYouFollowedPrescribedExercises760e833": "Hoe nauwgezet u de voorgeschreven oefeningen volgde",
     "prs80e1569": "PR's ·",
     "whatAreChallengesfdf13a8": "Wat zijn uitdagingen?",
     "howDoesTheLeaderboardWork74f2b8a": "Hoe werkt het klassement?",
-    "theLeaderboardIsCurrentlyUnavailableYourOptIn96132c6": "Het klassement is momenteel niet beschikbaar. Uw aanmeldingsvoorkeur wordt opgeslagen.",
-    "theLeaderboardStaysPrivateUntilYouExplicitlyOpt9e982f1": "Het klassement blijft privé totdat u zich expliciet aanmeldt.",
     "workoutsThisWeek0268fc5": "trainingen deze week",
     "prsThisMonthd85bc56": "PR's deze maand",
     "noWorkoutsInThisPeriodc124c5e": "Geen trainingen in deze periode",
@@ -1751,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "bijv. 4 rondes + 3 herhalingen",
     "fail2758e32": "Mislukt",
     "capa8fba29": "· Kap",
-    "directbc81524": "Direct",
-    "class41ff354": "Klasse",
-    "directChat3892e2c": "Directe chat",
     "createAndManagePromotionalOffers46d33bb": "Promotie-aanbiedingen maken en beheren.",
     "reviewReferralActivityAndRewardActions8ea1271": "Beoordeel verwijzingsactiviteiten en beloningsacties.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Beheer de pakketten die worden gebruikt door lidmaatschappen en rechten.",
@@ -3642,8 +3624,6 @@
     "clVideoUnavailable": "Link niet beschikbaar",
     "clMinutesShort": "{count} min",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "Mijn voortgang",
-    "clProgressIntro": "Je training van de afgelopen 12 weken.",
     "clProgressSessions": "Sessies",
     "clProgressMinutes": "Minuten",
     "clProgressWorkouts": "Verschillende workouts",
@@ -3687,7 +3667,6 @@
     "clFormReviewWithdraw": "Intrekken",
     "clFormReviewWithdrawConfirm": "Deze aanvraag intrekken? De beoordeling gaat terug naar je pakket.",
     "clNutritionTitle": "Voedingsplan",
-    "clNutritionEmpty": "Je coach heeft nog geen voedingsplan gedeeld.",
     "clNutritionUpdated": "Bijgewerkt op {date}",
     "clNutritionCalories": "Calorieën",
     "clNutritionProtein": "Eiwit",
@@ -4313,7 +4292,6 @@
     "msgTopicFacility": "Faciliteiten",
     "msgSendAsCoaching": "Als coachingbericht",
     "msgSendAsCoachingHint": "Telt als coachingcontact met je klant.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Je box",
     "coachLatestTitle": "Laatste van je coach",
     "coachLatestEmpty": "Nog geen berichten van je coach.",
@@ -4461,7 +4439,36 @@
     "apiErrorAccountNotFound": "Geen account gevonden.",
     "apiErrorUnknownDemoSection": "Er zijn geen demogegevens voor dit scherm.",
     "ntfBusinessDemoIdleTitle": "Je demobedrijf wacht op je",
-    "ntfBusinessDemoIdleBody": "{business} is al een tijd niet gebruikt. Als niemand het in de komende {days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen."
+    "ntfBusinessDemoIdleBody": "{business} is al een tijd niet gebruikt. Als niemand het in de komende {days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen.",
+    "clApptFiltersTitle": "Afspraakfilters",
+    "clApptFilterKind": "Soort",
+    "clApptFilterFormat": "Vorm",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Niets voor deze filters.",
+    "reviewsFiltersTitle": "Reviewfilters",
+    "reviewsFilterTarget": "Over",
+    "reviewsFilterSentiment": "Gevoel",
+    "reviewsNoMatch": "Geen reviews voor deze filters.",
+    "workoutsFiltersTitle": "Workoutfilters",
+    "workoutsFilterStatus": "Status",
+    "workoutsStatusDone": "Gedaan",
+    "workoutsStatusPending": "Te doen",
+    "workoutsFilterKind": "Soort",
+    "workoutsKindPersonal": "Persoonlijk",
+    "workoutsFilterSeason": "Seizoen",
+    "clProgressOnTargetWeeks": "{onTarget} van {weeks} weken op doel",
+    "clProgressStreakDays": "{count, plural, one {# dag} other {# dagen}}",
+    "clProgressTarget": "Doel {count}/week",
+    "clProgressHeatmap": "Trainingsdagen",
+    "clProgressHeatWeek": "Week van {date}: {count, plural, one {# sessie} other {# sessies}}{onTarget, select, true {, op doel} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {geen training} one {# sessie} other {# sessies}}",
+    "clProgressBadges": "Badges",
+    "prTrendEstimated": "Geschat 1RM {value} {unit}",
+    "prTrendRetest": "Tijd om opnieuw te testen?",
+    "clNutritionMacros": "Macro's",
+    "clNutritionMacrosHidden": "Cijfers verborgen",
+    "clNutritionHideMacros": "Cijfers verbergen",
+    "clNutritionShowMacros": "Cijfers tonen"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -5064,7 +5071,6 @@
     "signOut": "Afmelden",
     "todayWorkout": "Training van vandaag",
     "todaySources": "Trainingen van vandaag per bron",
-    "todayEmpty": "Niets gepland voor vandaag. Boek een les of leg je eigen training vast.",
     "classChip": "Les {time}",
     "programmeChip": "{title} · van je coach",
     "logWorkout": "Vastleggen",
@@ -5072,8 +5078,6 @@
     "startWorkout": "Starten",
     "resumeWorkout": "Hervatten",
     "nextSession": "Je volgende sessie",
-    "noBooking": "Nog geen boeking.",
-    "bookClass": "Les boeken",
     "manageBooking": "Boeking openen",
     "todayLabel": "Vandaag",
     "boxActions": "Box-acties",
@@ -5082,7 +5086,6 @@
     "actionVideos": "Video’s",
     "actionCoach": "Coach",
     "membership": "Lidmaatschap",
-    "membershipNone": "Geen actief pakket.",
     "meProfileTabs": "Je profiel",
     "meAllPosts": "Al je berichten",
     "meAllPrs": "Alle PR's",
@@ -5097,14 +5100,12 @@
     "meSharingHint": "Wat je coach en anderen kunnen zien",
     "mePayments": "Betalingen en bonnen",
     "mePaymentsHint": "Facturen, terugbetalingen en je pakket",
-    "meChats": "Gesprekken",
     "meSettings": "Instellingen",
     "meSettingsHint": "Profiel, taal, thema, account",
     "meTour": "Rondleiding",
     "meChecklist": "Aan de slag",
     "meConsole": "Beheer",
     "meConsoleHint": "Personeelsconsole openen",
-    "meMyBoxes": "Mijn boxen",
     "bookingStatus": {
       "approved": "Geboekt",
       "pending": "In afwachting",
@@ -5135,7 +5136,7 @@
       "measure": "Gewicht, omtrekken, foto's",
       "wellness": "Een glas, afgelopen nacht, een maaltijd",
       "craving": "Noteer het of vraag om steun",
-      "support": "Een snel bericht aan je buddy",
+      "support": "Een snel bericht aan je steunmaatje",
       "voice": "Zeg wat je deed"
     },
     "homeTitle": "Feed",
@@ -5282,7 +5283,7 @@
         "glasses": "{filled} van {goal} glazen",
         "added": "Glas toegevoegd ({ml} ml)",
         "dropsLabel": "Glazen vandaag",
-        "remove": "Dit glas verwijderen"
+        "remove": "Laatste glas verwijderen"
       },
       "sleep": {
         "title": "Slaap",
@@ -5364,9 +5365,6 @@
         "noPortions": "Het plan van je coach heeft nog geen dagporties."
       },
       "mood": {
-        "mood": "Stemming {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Hoe voel je je?",
         "open": "Beantwoord «Hoe voel ik me»"
       },
       "craving": {
@@ -5376,7 +5374,7 @@
         "count": "{count, plural, one {# vandaag} other {# vandaag}}",
         "edit": "Bewerken",
         "support": "Ik heb steun nodig",
-        "supportNoBuddy": "Zodra je een buddy kiest, krijgt die een kort bericht. Nooit de details.",
+        "supportNoBuddy": "Zodra je een steunmaatje kiest, krijgt die een kort bericht. Nooit de details.",
         "intensity": "Hoe sterk?",
         "trigger": "Wat zette het in gang?",
         "outcome": "Wat gebeurde er?",
@@ -5463,7 +5461,45 @@
         "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Hulp & rondleiding",
+    "meHelpHint": "Rondleiding, eerste stappen, contact",
+    "meHelpResetsWaiting": "{count, plural, one {# wachtwoordherstel wacht} other {# wachtwoordherstellen wachten}}",
+    "helpVisibility": "Zo werkt zichtbaarheid",
+    "helpVisibilityPrivate": "Alles wat je in het Dagboek vastlegt is van jou: alleen jij ziet het, tenzij je iets anders kiest.",
+    "helpVisibilityCoach": "Je coach ziet alleen wat je toestaat bij Delen. Blessures ziet hij altijd, voor je veiligheid.",
+    "helpVisibilityPosts": "Je berichten zijn zichtbaar voor wie je kiest bij het plaatsen: de club, je volgers of iedereen.",
+    "helpContactBox": "Contact met je gym",
+    "helpContactBoxHint": "Stuur je gym een bericht via Berichten",
+    "helpReport": "Probleem melden",
+    "helpReportSubject": "Een probleem in Palee",
+    "helpStaffOnly": "Alleen voor medewerkers",
+    "settingsUnitsHint": "Hoe gewicht, lengte en omtrekken worden getoond.",
+    "settingsSectionsHint": "Welke onderdelen je Dagboek heeft en hoe je gewicht wordt getoond.",
+    "mePrsPrivate": "{count, plural, one {Nog één PR is privé.} other {De andere # PR’s zijn privé.}} Kies bij Delen en zichtbaarheid welke zichtbaar zijn.",
+    "mePrsNoneShown": "Je toont nog geen PR’s op je profiel.",
+    "sharing": {
+      "coachSeesTitle": "Mijn coach ziet",
+      "coachSeesHint": "Wat je coaches bereikt zonder dat je het elke keer stuurt.",
+      "injuriesAlways": "Blessures zijn altijd zichtbaar voor je coach, voor je veiligheid.",
+      "communityTitle": "Community",
+      "communityHint": "Waar je verschijnt in clubs en voor anderen.",
+      "prCelebrations": "PR-vieringen",
+      "prCelebrationsHint": "Een automatische kaart in je club als je een PR zet",
+      "challenges": "Challenges",
+      "challengesHint": "Je naam in de ranglijsten van challenges",
+      "profilePrsTitle": "PR’s op je profiel",
+      "profilePrsHint": "Je volgers zien alleen de PR’s die je aanzet. De rest blijft privé.",
+      "profilePrsEmpty": "Je hebt nog geen PR’s.",
+      "defaultsTitle": "Standaard voor nieuwe items",
+      "defaultsHint": "Waar elk nieuw item begint. Je kunt elk item altijd apart aanpassen.",
+      "defaultKind": {
+        "workout": "Trainingen",
+        "note": "Notities",
+        "check_in": "Check-ins"
+      },
+      "saveError": "Dat is niet opgeslagen. Probeer het opnieuw."
+    }
   },
   "Community": {
     "all": "Alles",
@@ -5536,7 +5572,6 @@
       "announcements": "Alleen mededelingen",
       "none": "Gedempt"
     },
-    "wodNoWorkout": "Vandaag geen les-WOD.",
     "wodScoreCount": "Scores vandaag: {count}",
     "wodLeaderboard": "Ranglijst",
     "wodYou": "Jij",
@@ -5546,7 +5581,6 @@
     "wodOptInLink": "Aanzetten",
     "announcementsEmpty": "Nog geen aankondigingen.",
     "announcementsOpen": "Alle aankondigingen",
-    "channelShowAll": "Alle kanalen",
     "channelSuggested": "Aanbevolen",
     "channelSuggestedHint": "je boekt deze les vaak",
     "channelsOfBox": "Van de box",
@@ -5573,7 +5607,19 @@
     "more": "Meer",
     "report": "Melden",
     "commentHidden": "Verborgen",
-    "channelsOfClub": "Kanalen van de club"
+    "channelsOfClub": "Kanalen van de club",
+    "postFiltersTitle": "Berichtfilters",
+    "filterClub": "Club",
+    "filterChannel": "Kanaal",
+    "filterType": "Soort",
+    "postType": {
+      "announcement": "Aankondigingen",
+      "pr": "Persoonlijke records",
+      "event": "Evenementen"
+    },
+    "filterCoachesOnly": "Alleen coaches",
+    "filterAuthor": "Auteur",
+    "postsNoMatch": "Geen berichten voor deze filters."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filters} other {Filters (#)}}",
@@ -5581,7 +5627,8 @@
     "clear": "Wissen",
     "back": "Terug",
     "showResults": "{count, plural, =0 {Geen resultaten} other {Toon #}}",
-    "show": "Toon"
+    "show": "Toon",
+    "all": "Alle"
   },
   "BoxSchedule": {
     "title": "Rooster",
@@ -5940,16 +5987,10 @@
     "requestsRowHint": "Accepteer of weiger",
     "notifications": "Meldingen",
     "notificationsUnread": "{count, plural, one {# ongelezen melding} other {# ongelezen meldingen}}",
-    "countsLine": "{followers, plural, one {# volger} other {# volgers}} · {following} volgend",
-    "countsLineOther": "{followers, plural, one {# volger} other {# volgers}} · {following} volgend",
     "connectionsTitle": "Connecties",
-    "tabFollowers": "{count, plural, one {# volger} other {# volgers}}",
-    "tabFollowing": "Volgend {count}",
     "tabBoxes": "Boxen",
     "tabClubs": "Clubs",
     "tabPrs": "PR's",
-    "followersEmpty": "Nog niemand volgt je.",
-    "followingEmpty": "Je volgt nog niemand.",
     "boxesEmpty": "Je volgt nog geen box.",
     "clubsEmpty": "Je zit nog in geen club.",
     "remove": "Verwijderen",
@@ -5988,7 +6029,48 @@
     "searchPeople": "Personen zoeken",
     "searchBoxes": "Boxen zoeken",
     "searchClubs": "Clubs zoeken",
-    "searchNoMatch": "Geen resultaten voor deze zoekopdracht."
+    "searchNoMatch": "Geen resultaten voor deze zoekopdracht.",
+    "countBuddies": "{count, plural, one {# Maatje} other {# Maatjes}}",
+    "countFollowYou": "{count, plural, one {# volgt jou} other {# volgen jou}}",
+    "countYouFollow": "jij volgt {count}",
+    "countFollowers": "{count, plural, one {# volger} other {# volgers}}",
+    "countFollowing": "{count} volgend",
+    "tabBuddies": "Maatjes {count}",
+    "tabFollowYou": "Volgen jou {count}",
+    "tabYouFollow": "Jij volgt {count}",
+    "buddyBadge": "Maatje",
+    "relationClub": "In je club",
+    "relationNearby": "In de buurt",
+    "relationYouFollow": "Je volgt",
+    "findPeople": "Mensen vinden",
+    "findClubsAndPeople": "Clubs en mensen zoeken",
+    "peopleTitle": "Mensen",
+    "peopleNoMatch": "Niemand gevonden. Privéaccounts verschijnen alleen voor mensen die ze al kennen.",
+    "peopleSearchFailed": "Zoeken lukte niet. Probeer het opnieuw.",
+    "searchBuddies": "Maatjes zoeken",
+    "buddiesEmpty": "Nog geen maatjes. Als iemand die jij volgt jou terugvolgt, zijn jullie maatjes.",
+    "followYouEmpty": "Niemand hier. Hier staan mensen die jou volgen maar die jij niet volgt.",
+    "youFollowEmpty": "Niemand hier. Hier staan mensen die jij volgt maar die jou niet volgen.",
+    "unfollowBuddyConfirm": "Niet meer volgen? Jullie zijn dan geen maatjes meer en je ziet geen berichten alleen voor volgers meer.",
+    "lockedPrivate": "Privéaccount. Stuur een volgverzoek om ook berichten alleen voor volgers te zien; elk verzoek wordt apart goedgekeurd.",
+    "privacyTitle": "Privéaccount en zoeken",
+    "privacyHint": "Wie jou kan volgen en wie jou kan vinden.",
+    "privateAccountToggle": "Privéaccount",
+    "privateAccountOn": "Alleen mensen die jij goedkeurt volgen je. Zet je het uit, dan wordt je account openbaar: iedereen kan je meteen volgen en wachtende verzoeken worden geaccepteerd.",
+    "privateAccountOff": "Je account is openbaar: iedereen kan je meteen volgen. Zet het weer aan om elke nieuwe volger zelf goed te keuren; huidige volgers blijven.",
+    "goPublicConfirm": "{count, plural, one {Openbaar maken? Het # wachtende verzoek wordt nu geaccepteerd.} other {Openbaar maken? De # wachtende verzoeken worden nu geaccepteerd.}}",
+    "goPublic": "Openbaar maken",
+    "keepPrivate": "Privé houden",
+    "searchableToggle": "Toon me in zoekresultaten",
+    "searchableOn": "Iedereen op Palee kan je vinden op naam of @handle.",
+    "searchablePrivate": "Mensen uit je clubs en je volgrelaties vinden je op naam of @handle. Anderen zodra je account openbaar is.",
+    "searchableOff": "In zoekresultaten vinden alleen mensen die je al kent je, uit je clubs of je volgrelaties.",
+    "notifNewFollowerTitle": "Nieuwe volger",
+    "notifNewFollowerBody": "{name} volgt je nu.",
+    "notifFollowRequestedTitle": "Volgverzoek",
+    "notifFollowRequestedBody": "{name} wil je volgen.",
+    "notifFollowAcceptedTitle": "Verzoek geaccepteerd",
+    "notifFollowAcceptedBody": "{name} heeft je volgverzoek geaccepteerd."
   },
   "BoxPage": {
     "allWeek": "Hele week",
@@ -6309,7 +6391,6 @@
     "clubLeaveBody": "De berichten verdwijnen uit je feed. Je kunt opnieuw meedoen via Vinden.",
     "find": "Vinden",
     "findTitle": "Clubs vinden",
-    "findSearch": "Clubs en groepen zoeken",
     "findOpenClubs": "Open clubs",
     "findGroups": "Groepen in je boxen",
     "findNoClubs": "De boxen waar je lid van bent of die je volgt hebben nog geen open clubs.",
@@ -6363,7 +6444,10 @@
     "notif_event_cohost_answered_title": "Antwoord over mede-organisatie",
     "notif_event_cohost_answered_accepted_body": "{box} organiseert „{event}” ({when}) mee.",
     "notif_event_cohost_answered_declined_body": "{box} wil „{event}” niet mee organiseren.",
-    "notif_event_cohost_answered_removed_body": "{box} organiseert „{event}” niet meer mee."
+    "notif_event_cohost_answered_removed_body": "{box} organiseert „{event}” niet meer mee.",
+    "filterKind": "Soort",
+    "filterBox": "Box",
+    "findFiltersTitle": "Zoekfilters"
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6638,7 +6722,14 @@
     "err_already_refunded": "Deze betaling is al terugbetaald.",
     "err_invalid_refund": "Betaal een bedrag terug boven nul en niet meer dan er betaald is.",
     "err_invalid_cohosts": "Die adressen van co-organisatoren zijn niet te lezen. Controleer elk pagina-adres.",
-    "err_duplicate_cohost": "Hetzelfde bedrijf wordt twee keer gevraagd."
+    "err_duplicate_cohost": "Hetzelfde bedrijf wordt twee keer gevraagd.",
+    "filtersTitle": "Eventfilters",
+    "filterClub": "Club",
+    "filterFree": "Gratis",
+    "filterPrice": "Prijs",
+    "filterGoing": "Ik ga",
+    "filterMine": "Ik",
+    "filtersNoMatch": "Geen events voor deze filters."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",
@@ -6779,7 +6870,7 @@
   },
   "Around": {
     "scopeLabel": "Wat de feed laat zien",
-    "scopeClubs": "Mijn clubs",
+    "scopeClubs": "Mijn mensen",
     "scopeAround": "In de buurt",
     "loading": "Laden…",
     "updating": "Resultaten bijwerken…",
@@ -6892,10 +6983,6 @@
     "section_boxes": "Boxen bij jou in de buurt",
     "section_clubs": "Open clubs",
     "section_posts": "Berichten",
-    "empty_events": "Geen open events binnen {distance}.",
-    "empty_boxes": "Geen boxen binnen {distance}.",
-    "empty_clubs": "Geen open clubs binnen {distance}.",
-    "empty_posts": "Geen openbare berichten binnen {distance}.",
     "seeAll": "{count, plural, one {Bekijken} other {Alles bekijken (#)}}",
     "otherBoxes": "Andere boxen in de buurt ({count})",
     "trialBadge": "Proefles",
@@ -6924,8 +7011,6 @@
     "pin_posts": "Bericht",
     "open": "Openen",
     "closeCard": "Sluiten",
-    "backToAround": "In de buurt",
-    "kindCount": "{count, plural, =0 {Geen} one {#} other {#}} binnen {distance}",
     "loadMore": "Meer",
     "loadingMore": "Laden…",
     "needArea": "Kies eerst waar we moeten zoeken.",
@@ -6949,7 +7034,9 @@
     "dateTo": "Tot",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Laagste prijs",
-    "priceTo": "Hoogste prijs"
+    "priceTo": "Hoogste prijs",
+    "sectionLevel": "Niveau",
+    "levelHint": "Boxen met lessen op dit niveau"
   },
   "CheckIn": {
     "loading": "Laden…",
@@ -7431,7 +7518,7 @@
     "helpIntro": "Met een zacht meetlint, op de huid, nauwsluitend maar niet strak. Meet op hetzelfde moment van de dag, liefst 's ochtends.",
     "helpPhotos": "Voor foto's: dezelfde plek, hetzelfde licht, dezelfde afstand. De timer geeft je 10 seconden om achteruit te stappen.",
     "settingsTitle": "Lichaam-instellingen",
-    "settingsHubHint": "Eenheden, gewicht, foto's, herinnering",
+    "settingsHubHint": "Foto’s, meetherinnering",
     "settingsIntro": "Je lichaamsgegevens zijn standaard privé. Hier kies je hoe ze worden getoond en wie ze ziet.",
     "unitsLabel": "Eenheden",
     "sectionsLabel": "Onderdelen van het dagboek",
@@ -7602,7 +7689,8 @@
       "share_photo_missing": "Beide metingen hebben een klare foto van die houding nodig.",
       "media_not_ready": "Een foto wordt nog verwerkt. Probeer het zo opnieuw."
     },
-    "fromGarmin": "via Garmin"
+    "fromGarmin": "via Garmin",
+    "unitsAndSectionsLink": "Eenheden & onderdelen in Instellingen"
   },
   "Referrals": {
     "title": "Neem een vriend mee",
@@ -7925,10 +8013,6 @@
     "return_garmin_account_in_use": "Dat Garmin-account is al gekoppeld aan een ander Palee-account.",
     "return_garmin_connect_failed": "Garmin kon de verbinding niet afronden. Probeer het opnieuw.",
     "restingTitle": "Rusthartslag",
-    "restingRange": "Periode",
-    "restingRange_1m": "1 maand",
-    "restingRange_3m": "3 maanden",
-    "restingRange_1y": "1 jaar",
     "bpmValue": "{value} bpm",
     "restingLatest": "Laatste meting · {date}",
     "restingAverage": "Gemiddeld {value} bpm over {days, plural, one {# dag} other {# dagen}}",
@@ -7965,18 +8049,18 @@
     "error_phone_health_not_connected": "Het is niet gekoppeld. Koppel het via de app op je telefoon."
   },
   "Buddy": {
-    "title": "Buddy voor steun",
+    "title": "Steunmaatje",
     "rowHint": "Een of twee mensen voor moeilijke momenten",
     "backToMe": "Ik",
     "intro": "Een of twee mensen die je vertrouwt: partner, vriend of je coach. Ze krijgen alleen wat je stuurt met «Ik heb steun nodig». Niets automatisch.",
-    "myBuddies": "Mijn buddy's",
-    "noBuddies": "Nog geen buddy. Nodig iemand uit die je vertrouwt.",
+    "myBuddies": "Mijn steunmaatjes",
+    "noBuddies": "Nog geen steunmaatje. Nodig iemand uit die je vertrouwt.",
     "add": "Persoon of je coach toevoegen",
-    "full": "Je hebt {max} buddy's of uitnodigingen, het maximum.",
+    "full": "Je hebt {max} steunmaatjes of uitnodigingen, het maximum.",
     "needSupport": "Ik heb steun nodig",
     "ask": "Vragen",
     "invitationsTitle": "Uitnodigingen voor jou",
-    "invitationBody": "{name} vraagt je buddy voor steun te zijn. Je hoort alleen iets als die persoon erom vraagt.",
+    "invitationBody": "{name} vraagt je steunmaatje te zijn. Je hoort alleen iets als die persoon erom vraagt.",
     "accept": "Accepteren",
     "acceptName": "Uitnodiging van {name} accepteren",
     "decline": "Niet nu",
@@ -8009,9 +8093,9 @@
     "withdraw": "Uitnodiging intrekken",
     "withdrawConfirm": "Uitnodiging aan {name} intrekken?",
     "stop": "Stoppen",
-    "stopConfirm": "Stoppen als buddy's met {name}?",
+    "stopConfirm": "Stoppen als steunmaatjes met {name}?",
     "stopSupportingConfirm": "Stoppen met het steunen van {name}?",
-    "stopQuiet": "De ander ziet het op de Buddy-pagina; er gaat geen melding uit.",
+    "stopQuiet": "De ander ziet het op de Steunmaatje-pagina; er gaat geen melding uit.",
     "stopYes": "Ja, stoppen",
     "cancel": "Annuleren",
     "close": "Sluiten",
@@ -8025,11 +8109,11 @@
     "quietFrom": "Van",
     "quietTo": "Tot",
     "quietSaved": "Rusttijden: {range}",
-    "sharePhone": "Mijn telefoonnummer delen met mijn buddy's",
-    "sharePhoneHint": "Alleen voor «Bel me», alleen met je actieve buddy's. Uit tenzij je het aanzet.",
+    "sharePhone": "Mijn telefoonnummer delen met mijn steunmaatjes",
+    "sharePhoneHint": "Alleen voor «Bel me», alleen met je actieve steunmaatjes. Uit tenzij je het aanzet.",
     "phone": "Telefoonnummer",
     "footer": "Jullie kunnen allebei op elk moment stoppen. De ander ziet het hier, zonder melding.",
-    "addTitle": "Nieuwe buddy",
+    "addTitle": "Nieuw steunmaatje",
     "addIntro": "Je coach, mensen uit je clubs of mensen die je volgt. Er begint niets voordat ze accepteren.",
     "searchLabel": "Zoeken",
     "searchPlaceholder": "Naam of bijnaam",
@@ -8042,20 +8126,20 @@
     },
     "candidateStatus": {
       "pending": "Uitgenodigd",
-      "active": "Al je buddy"
+      "active": "Al je steunmaatje"
     },
     "invite": "Uitnodigen",
     "inviteName": "{name} uitnodigen",
     "sendLink": "Een link sturen naar iemand buiten Palee",
     "sendLinkHint": "De link werkt {days} dagen en maar één keer. Er begint niets voordat die persoon accepteert.",
-    "shareTitle": "Word mijn buddy voor steun",
-    "shareText": "Ik zou graag willen dat je mijn buddy voor steun op Palee wordt. Je hoort alleen van me als ik erom vraag.",
+    "shareTitle": "Word mijn steunmaatje",
+    "shareText": "Ik zou graag willen dat je mijn steunmaatje op Palee wordt. Je hoort alleen van me als ik erom vraag.",
     "linkReady": "Je link is klaar om te delen.",
     "linkCopied": "Link gekopieerd. Plak hem in een bericht.",
     "linkLabel": "Uitnodigingslink",
-    "noBuddyYet": "Je hebt nog geen actieve buddy. Zodra iemand accepteert, gaat «Ik heb steun nodig» naar die persoon.",
-    "noBuddyYetShort": "Kies een buddy en het gaat met één tik naar hem of haar.",
-    "setUpBuddy": "Buddy kiezen",
+    "noBuddyYet": "Je hebt nog geen actief steunmaatje. Zodra iemand accepteert, gaat «Ik heb steun nodig» naar die persoon.",
+    "noBuddyYetShort": "Kies een steunmaatje en het gaat met één tik naar hem of haar.",
+    "setUpBuddy": "Steunmaatje kiezen",
     "messageLabel": "Bericht (optioneel)",
     "messagePlaceholder": "bijv. Zware avond.",
     "goesTo": "Gaat naar: {names}",
@@ -8114,29 +8198,29 @@
     "chatWith": "Gesprek met {name}",
     "chatEmpty": "Nog geen berichten.",
     "chatPlaceholder": "Schrijf een bericht",
-    "chatReadOnly": "Deze buddy-band is gestopt. Het gesprek blijft leesbaar; niemand kan schrijven.",
+    "chatReadOnly": "Deze steunmaatjesband is gestopt. Het gesprek blijft leesbaar; niemand kan schrijven.",
     "earlier": "Eerdere berichten",
     "read": "Gelezen",
-    "threadsTitle": "Buddy-gesprekken",
-    "threadMyBuddy": "Je buddy",
+    "threadsTitle": "Gesprekken met steunmaatjes",
+    "threadMyBuddy": "Je steunmaatje",
     "threadISupport": "Jij steunt deze persoon",
-    "inviteHeading": "Een buddy-uitnodiging",
-    "inviteFrom": "{name} wil jou graag als buddy voor steun",
-    "inviteFromSomeone": "Iemand wil jou graag als buddy voor steun",
-    "whatIsBuddy": "Wat een buddy is",
-    "whatOnly": "Een buddy krijgt alleen wat de ander stuurt met «Ik heb steun nodig». Niets automatisch, nooit details.",
+    "inviteHeading": "Een uitnodiging als steunmaatje",
+    "inviteFrom": "{name} wil jou graag als steunmaatje",
+    "inviteFromSomeone": "Iemand wil jou graag als steunmaatje",
+    "whatIsBuddy": "Wat een steunmaatje is",
+    "whatOnly": "Een steunmaatje krijgt alleen wat de ander stuurt met «Ik heb steun nodig». Niets automatisch, nooit details.",
     "whatReplies": "Je antwoordt met één tik: Ik ben er · Zullen we een stukje lopen? · Bel me, of in je eigen woorden.",
     "whatQuiet": "Je kunt rusttijden instellen; verzoeken komen dan stil binnen.",
     "whatStop": "Jullie kunnen allebei op elk moment stoppen.",
     "inviteSignUp": "Account aanmaken en accepteren",
     "inviteSignIn": "Inloggen en accepteren",
     "notNow": "Niet nu",
-    "inviteAccepted": "Je bent nu buddy voor steun van {name}.",
-    "inviteAcceptedNoName": "Je bent nu buddy voor steun.",
-    "openBuddy": "Buddy openen",
+    "inviteAccepted": "Je bent nu het steunmaatje van {name}.",
+    "inviteAcceptedNoName": "Je bent nu steunmaatje.",
+    "openBuddy": "Steunmaatje openen",
     "inviteExpired": "Deze uitnodiging is verlopen. Vraag om een nieuwe link.",
     "inviteUnavailable": "Deze uitnodigingslink werkt niet meer.",
-    "inviteFooter": "Palee is geen medische dienst en geen hulpdienst. Een buddy is iemand die je kent, voor een moeilijk moment.",
+    "inviteFooter": "Palee is geen medische dienst en geen hulpdienst. Een steunmaatje is iemand die je kent, voor een moeilijk moment.",
     "linesTitle": "Hulplijnen",
     "linesIntro": "Als het meer is dan een moeilijk moment, kunnen deze diensten helpen. Dit is informatie, geen advies; Palee is geen medische dienst en geen hulpdienst.",
     "linesGreece": "In Griekenland",
@@ -8152,7 +8236,7 @@
     },
     "linesNote": "Buiten Griekenland is het alarmnummer in de hele EU 112, of dat van je eigen land.",
     "cravingGoesTo": "Een kort bericht gaat naar {names}. Nooit de details.",
-    "cravingSupportSent": "Verstuurd naar je buddy's. De stand zie je bij Welzijn.",
+    "cravingSupportSent": "Verstuurd naar je steunmaatjes. De stand zie je bij Welzijn.",
     "sharingSectionTitle": "Wekelijks welzijnsoverzicht voor de coach",
     "sharingSectionHint": "Wat je coach van Welzijn ziet, alleen als je het toestaat",
     "shareWellness": "Welzijn · weekoverzicht",
@@ -8179,11 +8263,11 @@
     "coachAllowedSince": "{name} heeft dit overzicht op {date} toegestaan. Elke keer dat je het opent, ziet die persoon dat.",
     "notif": {
       "buddy_invite": {
-        "title": "Een buddy-uitnodiging",
-        "body": "{name} vraagt je buddy voor steun te zijn."
+        "title": "Een uitnodiging als steunmaatje",
+        "body": "{name} vraagt je steunmaatje te zijn."
       },
       "buddy_accepted": {
-        "title": "Je hebt een buddy voor steun",
+        "title": "Je hebt een steunmaatje",
         "body": "{name} heeft geaccepteerd en hoort alleen van je als je erom vraagt."
       },
       "support_request": {
@@ -8203,7 +8287,7 @@
         "body": "{moments} moeilijke momenten, {overcome} doorstaan, {requests} verzoeken om steun."
       },
       "buddy_message": {
-        "title": "Buddy-bericht",
+        "title": "Bericht van je steunmaatje",
         "body": "{name} heeft je een bericht gestuurd."
       },
       "coach_wellness_summary": {
@@ -8212,18 +8296,18 @@
       }
     },
     "errors": {
-      "buddy_limit_reached": "Je kunt tot twee buddy's of uitnodigingen hebben.",
+      "buddy_limit_reached": "Je kunt tot twee steunmaatjes of uitnodigingen hebben.",
       "buddy_already_invited": "Je hebt deze persoon al uitgenodigd.",
       "buddy_invite_expired": "Deze uitnodiging is verlopen.",
-      "buddy_link_closed": "Deze buddy-band is al gestopt.",
+      "buddy_link_closed": "Deze steunmaatjesband is al gestopt.",
       "buddy_invite_unavailable": "Deze uitnodigingslink werkt niet meer.",
-      "cannot_buddy_self": "Je kunt niet je eigen buddy zijn.",
+      "cannot_buddy_self": "Je kunt niet je eigen steunmaatje zijn.",
       "not_eligible_for_buddy": "Nodig je coach, iemand uit je clubs of iemand die je volgt uit, of stuur een link.",
       "message_too_long": "Het bericht is hooguit 280 tekens.",
-      "support_rate_limited": "Je hebt het dit uur al een paar keer gevraagd; je buddy's hebben het.",
-      "no_active_buddies": "Voeg eerst een buddy toe.",
+      "support_rate_limited": "Je hebt het dit uur al een paar keer gevraagd; je steunmaatjes hebben het.",
+      "no_active_buddies": "Voeg eerst een steunmaatje toe.",
       "already_undone": "Dit verzoek is al teruggenomen.",
-      "undo_window_passed": "Je buddy's hebben het al gehoord.",
+      "undo_window_passed": "Je steunmaatjes hebben het al gehoord.",
       "reply_text_required": "Schrijf een paar woorden.",
       "reply_too_long": "Een antwoord is hooguit 500 tekens.",
       "invalid_quiet_hours": "Rusttijden hebben twee verschillende tijden nodig.",
@@ -8232,7 +8316,7 @@
       "summary_required": "Zet eerst het weekoverzicht aan.",
       "message_body_required": "Schrijf een bericht.",
       "message_too_long_body": "Een bericht is hooguit 2000 tekens.",
-      "buddy_link_read_only": "Deze buddy-band is gestopt; het gesprek is alleen-lezen."
+      "buddy_link_read_only": "Deze steunmaatjesband is gestopt; het gesprek is alleen-lezen."
     }
   },
   "Providers": {
@@ -8253,7 +8337,6 @@
     "formerHint": "Wat je met hen hebt gedaan, blijft in je logboek, Vault en voortgang. Ze zien je items niet meer.",
     "formerSince": "Gestopt op {date} · ziet je items niet meer",
     "todayTitle": "Vandaag",
-    "todayEmpty": "Vandaag staat er niets gepland bij je aanbieders.",
     "todayPartial": "Kon vandaag niet laden van {names}.",
     "todayKind": {
       "class": "Les",
@@ -8841,7 +8924,6 @@
     "editProfile": "Mijn profiel bewerken",
     "safetyLine": "Alleen leden van deze club. Voor een match zijn jullie allebei nodig. Je kunt altijd iemand melden of blokkeren.",
     "filters": "Filters",
-    "filtersCount": "Filters ({count})",
     "swipesLeft": "{count, plural, one {Nog # keuze vandaag} other {Nog # keuzes vandaag}}",
     "loading": "Laden…",
     "limitReached": "Genoeg voor vandaag. Morgen nieuwe mensen.",
@@ -8875,7 +8957,7 @@
     "endConfirm": "Beëindigen",
     "blockConfirm": "Blokkeren",
     "endBody": "{name} krijgt geen melding. Het gesprek blijft leesbaar maar sluit, en jullie zien elkaar niet meer in de stapel.",
-    "blockBody": "{name} krijgt geen melding. Jullie samenwerking en elke buddy-koppeling eindigen, en jullie zien elkaar niet meer in Partners. Deblokkeren kan bij Delen en zichtbaarheid.",
+    "blockBody": "{name} krijgt geen melding. Jullie samenwerking en elke steunmaatjeskoppeling eindigen, en jullie zien elkaar niet meer in Partners. Deblokkeren kan bij Delen en zichtbaarheid.",
     "planEyebrow": "Samen boeken",
     "planClass": "Les",
     "planBook": "Open de les om te boeken",
@@ -8899,7 +8981,7 @@
     "settingsSwitch": "Toon mij in Partners",
     "settingsSwitchHint": "{count, plural, one {Je profiel in # club} other {Je profielen in # clubs}}. Uit pauzeert ze; er wordt niets verwijderd.",
     "blockedTitle": "Geblokkeerde mensen",
-    "blockedHint": "Ze vinden je niet in Partners, en buddy-koppelingen met hen zijn beëindigd.",
+    "blockedHint": "Ze vinden je niet in Partners, en steunmaatjeskoppelingen met hen zijn beëindigd.",
     "blockedEmpty": "Je hebt niemand geblokkeerd.",
     "blockedSince": "Geblokkeerd op {date}",
     "unblock": "Deblokkeren",
@@ -8922,7 +9004,14 @@
     "error_partner_match_read_only": "Dit gesprek is beëindigd.",
     "error_partner_plans_unavailable": "Lesvoorstellen zijn er alleen in de eigen clubs van een sportschool.",
     "error_message_body_required": "Schrijf eerst iets.",
-    "error_cannot_block_self": "Je kunt jezelf niet blokkeren."
+    "error_cannot_block_self": "Je kunt jezelf niet blokkeren.",
+    "disciplineLabel": "Sport",
+    "disciplinesLabel": "Wat jullie samen trainen (max. {max})",
+    "allDisciplines": "Alle sporten",
+    "fewerDisciplines": "Minder",
+    "distanceLabel": "Afstand",
+    "withinKm": "Binnen {km} km",
+    "distanceNeedsArea": "Om op afstand te filteren, verschijn in «Om me heen» met je buurt."
   },
   "Squads": {
     "title": "Squads",
@@ -9078,8 +9167,6 @@
       "minutes": "{minutes} min",
       "join": "Deelnemen aan gesprek",
       "manage": "Beheren",
-      "noSession": "Nog geen sessie geboekt.",
-      "bookSession": "Sessie boeken",
       "noPackage": "Nog geen sessiepakket. Vraag het je coach.",
       "sessionsLeft": "Nog {remaining} van {limit} sessies",
       "sessionsUnlimited": "Onbeperkt sessies"
@@ -9549,7 +9636,8 @@
     "backToMe": "Terug naar Ik",
     "saveInterests": "Opslaan",
     "interestsSaved": "Opgeslagen.",
-    "interestsHubHint": "Sporten en niveau, voor suggesties"
+    "interestsHubHint": "Sporten en niveau, voor suggesties",
+    "photoAddLabel": "Foto toevoegen"
   },
   "Business": {
     "common": {
@@ -10801,5 +10889,397 @@
     "reviewNoLimit": "Geen limiet",
     "reviewCohosts": "Verzoeken aan co-organisatoren: {names}",
     "reviewNoCohosts": "Geen co-organisatoren"
+  },
+  "Conversations": {
+    "title": "Berichten",
+    "requests": "Verzoeken",
+    "requestsEntry": "Berichtverzoeken ({count})",
+    "buddy": "Maatje",
+    "you": "Jij: {text}",
+    "someone": "Iemand",
+    "unread": "Ongelezen",
+    "emptyInbox": "Nog geen gesprekken. Zoek iemand om te schrijven.",
+    "emptyRequests": "Geen berichtverzoeken.",
+    "loading": "Laden…",
+    "loadMore": "Meer tonen",
+    "earlier": "Eerdere berichten",
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "requestTitle": "Berichtverzoek",
+    "requestBanner": "{name} wil je een bericht sturen.",
+    "requestBannerHint": "Accepteer om het naar je inbox te verplaatsen. Als je weigert, verdwijnt het en hoort {name} er niets van.",
+    "placeholder": "Schrijf een bericht…",
+    "send": "Versturen",
+    "sending": "Versturen…",
+    "failed": "Niet verstuurd.",
+    "retry": "Opnieuw",
+    "discard": "Weggooien",
+    "tooLong": "Een bericht mag maximaal {max} tekens lang zijn.",
+    "chatWith": "Gesprek met {name}",
+    "chatEmpty": "Zeg hoi tegen {name}.",
+    "unavailable": "Dit gesprek is niet beschikbaar.",
+    "back": "Berichten",
+    "message": "Bericht",
+    "messageA11y": "{name} een bericht sturen",
+    "viewProfile": "Profiel van {name} bekijken",
+    "searchEmpty": "Niemand gevonden.",
+    "notif_person_message_title": "Bericht van {name}",
+    "notif_person_message_body": "{name} heeft je een bericht gestuurd.",
+    "notif_message_request_title": "Berichtverzoek",
+    "notif_message_request_body": "{name} wil je een bericht sturen."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Gidsen",
+      "listIntro": "Korte rondleidingen op de echte schermen. Doe mee; er wordt niets opgeslagen tenzij jij het opslaat.",
+      "forStaff": "Voor je bedrijf",
+      "forYou": "Voor jou",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Starten",
+      "resume": "Verdergaan",
+      "replay": "Opnieuw",
+      "state_new": "Nieuw",
+      "state_started": "Bezig",
+      "state_completed": "Klaar",
+      "state_dismissed": "Niet gestart",
+      "state_outdated": "Bijgewerkt",
+      "openGuide": "Rondleiding",
+      "openGuideAria": "Start de rondleiding: {title}",
+      "next": "Volgende",
+      "back": "Terug",
+      "finish": "Klaar",
+      "close": "Rondleiding sluiten",
+      "stepOf": "{current} van {total}",
+      "doIt": "Doe het voor mij",
+      "tapHint": "Tik op de gemarkeerde plek",
+      "notHere": "Staat nu niet op dit scherm, dus hier in het kort.",
+      "fillDemo": "Eerst vullen met demogegevens",
+      "filling": "Bezig met vullen…",
+      "demoFilled": "Demogegevens toegevoegd",
+      "offerEyebrow": "Nieuw hier?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Laat zien",
+      "offerLater": "Niet nu",
+      "meRow": "Gidsen",
+      "meRowHint": "Rondleidingen door de winkel, evenementen, aanbiedingen en je eigen club",
+      "loadFailed": "De gidsen zijn niet geladen. Probeer het opnieuw."
+    },
+    "shop_staff": {
+      "title": "Je winkel runnen",
+      "summary": "Voeg producten toe, verkoop in de app en aan de kassa, houd de voorraad op orde.",
+      "chapters": {
+        "setup": "Instellen",
+        "sell": "Verkopen",
+        "track": "Bijhouden"
+      },
+      "welcome": {
+        "title": "De winkel van je box",
+        "body": "Leden bestellen in de app en halen op bij de balie. Jij verkoopt ook aan de kassa."
+      },
+      "newProduct": {
+        "title": "Product toevoegen",
+        "body": "Tik op „{label}”."
+      },
+      "photos": {
+        "title": "Foto's verkopen",
+        "body": "Voeg een paar duidelijke foto's toe. De eerste is de omslag."
+      },
+      "price": {
+        "title": "Prijs en varianten",
+        "body": "Eén prijs, of maten en smaken met elk hun eigen voorraad.",
+        "tip": "Voorraad telt per variant, dus „M” en „L” raken nooit door elkaar."
+      },
+      "selling": {
+        "title": "Waar het verkocht wordt",
+        "body": "In de app, aan de kassa of allebei. Alleen leden, of iedereen."
+      },
+      "save": {
+        "title": "Opslaan, dan publiceren",
+        "body": "Een nieuw product is een concept. Publiceer het om de winkel te openen.",
+        "tip": "Leden zien de Winkel-kaart in Box pas als er iets gepubliceerd is."
+      },
+      "ordersTab": {
+        "title": "Bestellingen",
+        "body": "Tik op „{label}”."
+      },
+      "orders": {
+        "title": "Klaarzetten en overhandigen",
+        "body": "Markeer een bestelling als klaar en het lid hoort waar die op te halen is.",
+        "tip": "Niet opgehaalde bestellingen vervallen na 7 dagen vanzelf en de voorraad komt vrij."
+      },
+      "pos": {
+        "title": "De kassa",
+        "body": "Verkoop in seconden aan de balie, direct betaald of op de rekening van het lid."
+      },
+      "stock": {
+        "title": "Voorraad",
+        "body": "Elke verkoop, levering en telling wordt vastgelegd. Bij lage voorraad krijg je een melding."
+      },
+      "analytics": {
+        "title": "Wat verkoopt",
+        "body": "Wekelijkse verkoop, marges en je toppers.",
+        "tip": "Winkelverkopen staan ook in Financiën als eigen inkomstenbron."
+      },
+      "done": {
+        "title": "Je bent klaar",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "events_organising": {
+      "title": "Evenementen organiseren",
+      "summary": "Plan in 7 korte stappen, verkoop plekken, check mensen in, bekijk de cijfers.",
+      "chapters": {
+        "plan": "Plannen",
+        "run": "Uitvoeren"
+      },
+      "welcome": {
+        "title": "Evenementen van begin tot eind",
+        "body": "Plannen, vullen, uitvoeren en zien hoe het ging, op één plek."
+      },
+      "new": {
+        "title": "Evenement starten",
+        "body": "Tik op „{label}”."
+      },
+      "steps": {
+        "title": "Zeven korte stappen",
+        "body": "Organisator, basis, wanneer, waar, wie en prijs, plekken, controle. Tik op een afgeronde stap om terug te gaan."
+      },
+      "screen": {
+        "title": "Eén keuze per scherm",
+        "body": "Vul dit in en tik dan op Volgende.",
+        "tip": "Je concept blijft op dit apparaat bewaard, dus je kunt stoppen en later verdergaan."
+      },
+      "next": {
+        "title": "Volgende weet wat er ontbreekt",
+        "body": "Mist er nog iets, dan zegt het wat."
+      },
+      "cohosts": {
+        "title": "Samen organiseren",
+        "body": "Vraag bij „{label}” een box of coach via hun pagina-adres om mee te organiseren.",
+        "tip": "Zodra ze accepteren, staat het evenement op hun pagina en bereikt het hun leden."
+      },
+      "manage": {
+        "title": "Beheren",
+        "body": "Per evenement: deelnemers, inchecken, betalingen bij de box, terugbetalingen en berichten."
+      },
+      "finances": {
+        "title": "Financiën",
+        "body": "Tik op „{label}”: inkomsten, terugbetalingen en wat nog openstaat."
+      },
+      "analytics": {
+        "title": "Analyses",
+        "body": "Tik op „{label}”: weergaven, aanmeldingen, wachtlijst en wie er kwam.",
+        "tip": "Conversie laat zien hoeveel kijkers zich aanmeldden."
+      },
+      "done": {
+        "title": "Klaar om te organiseren",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "finance_offers": {
+      "title": "Aanbiedingen, partners en verwijzingen",
+      "summary": "Campagnes en coupons, partnervoordelen en een programma om vrienden mee te nemen.",
+      "chapters": {
+        "campaigns": "Campagnes",
+        "partners": "Partners",
+        "referrals": "Verwijzingen"
+      },
+      "welcome": {
+        "title": "Groei met aanbiedingen",
+        "body": "Je eigen campagnes en coupons, voordelen van partnerwinkels en beloningen voor het meenemen van vrienden."
+      },
+      "campaignNew": {
+        "title": "Campagne starten",
+        "body": "Tik op „{label}”."
+      },
+      "campaignForm": {
+        "title": "Naam en data",
+        "body": "Een campagne bundelt je aanbiedingen, bijv. „Zomer”. Kies wanneer die loopt."
+      },
+      "coupons": {
+        "title": "Coupons",
+        "body": "Open een campagne om codes toe te voegen: een percentage of bedrag korting, met een gebruikslimiet.",
+        "tip": "Elke code toont hoe vaak die is gebruikt, zo zie je welke aanbieding werkt."
+      },
+      "partners": {
+        "title": "Partnervoordelen",
+        "body": "Tik op „{label}”."
+      },
+      "perkNew": {
+        "title": "Partnerdeal toevoegen",
+        "body": "Tik op „{label}”."
+      },
+      "perkPartner": {
+        "title": "De partner",
+        "body": "Naam, link en logo."
+      },
+      "perkBenefit": {
+        "title": "Wat leden krijgen",
+        "body": "Een percentage, een bedrag of iets anders, zoals gratis koffie."
+      },
+      "perkMethod": {
+        "title": "Hoe de winkel het controleert",
+        "body": "Een gedeelde code, een link met de code erin, of een actief lidmaatschap laten zien.",
+        "tip": "Lekt een code uit, wijzig hem hier en het geldt meteen."
+      },
+      "perkRules": {
+        "title": "Voorwaarden",
+        "body": "Data, wie het krijgt en hoe vaak. Sla een concept op en publiceer zodra het rond is."
+      },
+      "referrals": {
+        "title": "Neem een vriend mee",
+        "body": "Een programma beloont leden die iemand meenemen die lid wordt."
+      },
+      "referralsFlow": {
+        "title": "Goedkeuren en belonen",
+        "body": "Verwijzingen komen hier binnen. Keur er een goed en de beloning gaat eruit.",
+        "tip": "Beloningen kunnen naar allebei: het lid en de vriend."
+      },
+      "done": {
+        "title": "Helemaal klaar",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "member_club_event": {
+      "title": "Je eigen club en evenement",
+      "summary": "Start een groep in de club van je box en plan een evenement, alleen of met een box.",
+      "chapters": {
+        "club": "Je club",
+        "event": "Je evenement"
+      },
+      "welcome": {
+        "title": "Maak het van jou",
+        "body": "Start een groep met je mensen en plan je eigen evenementen."
+      },
+      "channels": {
+        "title": "De club van je box",
+        "body": "Tik op „{label}”."
+      },
+      "groups": {
+        "title": "Groepen",
+        "body": "Kleine clubs binnen de box: met eigen chat en evenementen."
+      },
+      "propose": {
+        "title": "Groep starten",
+        "body": "Tik op „{label}”."
+      },
+      "groupSheet": {
+        "title": "Geef een naam, kies wie erbij mag",
+        "body": "Open voor iedereen, of op aanvraag.",
+        "tip": "Sommige boxen keuren nieuwe groepen eerst goed; je krijgt een melding zodra hij live is."
+      },
+      "noBox": {
+        "title": "Groepen horen bij een box",
+        "body": "Word eerst lid van een box en start dan een groep in de club. Evenementen kun je meteen plannen."
+      },
+      "eventNew": {
+        "title": "Evenement plannen",
+        "body": "Tik op „{label}”."
+      },
+      "hostAs": {
+        "title": "Wie organiseert",
+        "body": "Jij, of een groep of bedrijf dat je beheert.",
+        "tip": "Voor „{label}” heb je helemaal geen box nodig."
+      },
+      "alone": {
+        "title": "Zelfstandig",
+        "body": "Open voor iedereen in de buurt, of alleen op uitnodiging met je link."
+      },
+      "withBox": {
+        "title": "Met een box",
+        "body": "Vraag bij „{label}” de box via het pagina-adres om mee te organiseren.",
+        "tip": "Zodra de box accepteert, staat het evenement ook op de pagina van de box."
+      },
+      "hosting": {
+        "title": "Uitvoeren",
+        "body": "Na het publiceren vind je bij „{label}” deelnemers, inchecken en de cijfers."
+      },
+      "done": {
+        "title": "Nu ben jij aan zet",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "Mijn klanten",
+    "replies": "Wachten op antwoord",
+    "reviews": "Techniekbeoordeling",
+    "desk": "Check-in vandaag",
+    "clients": "Klanten",
+    "sentAt": "Verstuurd {time}",
+    "overdue": "Te laat",
+    "dueSoon": "Bijna verlopen",
+    "unknownClient": "Lid",
+    "openVideo": "Bekijk de video",
+    "checkedIn": "{count} van {total} ingecheckt",
+    "attended": "Aanwezig",
+    "noShow": "Niet gekomen",
+    "attendanceOf": "Aanwezigheid van {name}",
+    "markError": "Niet opgeslagen. Probeer het opnieuw.",
+    "showAll": "Alles tonen ({count})",
+    "showFewer": "Minder tonen",
+    "moreInConsole": "Alles in de beheeromgeving"
+  },
+  "Inbox": {
+    "title": "Berichten",
+    "segmentsLabel": "Welke berichten je ziet",
+    "segment": {
+      "all": "Alles",
+      "coach": "Coach",
+      "clubs": "Clubs",
+      "partners": "Partners"
+    },
+    "loading": "Berichten laden…",
+    "emptySegment": "Hier zijn nog geen gesprekken.",
+    "workoutThread": "Trainingsgesprek",
+    "classThread": "Lesgesprek",
+    "searchAtGym": "Bij jouw gym"
+  },
+  "NotificationSettings": {
+    "title": "Meldingen",
+    "description": "Wat je bereikt, in de app en als push",
+    "loading": "Laden…",
+    "loadError": "De meldingsinstellingen zijn nu niet beschikbaar.",
+    "saveError": "De wijziging is niet opgeslagen. Probeer het opnieuw.",
+    "locked": "Altijd aan",
+    "perClub": "Per club, bij Mijn boxen en clubs",
+    "channel": {
+      "in_app": "In de app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Boekingen en lessen",
+        "hint": "Goedkeuringen, wachtlijst, proeflessen, afspraken en seizoenen"
+      },
+      "messages": {
+        "title": "Berichten",
+        "hint": "Chats, berichtverzoeken en berichten van je box en coach"
+      },
+      "community": {
+        "title": "Clubs en community",
+        "hint": "Volgers, evenementen, challenges, groepen en uitnodigingen."
+      },
+      "coach": {
+        "title": "Coach",
+        "hint": "Programma’s, trainingsnotities, techniekbeoordelingen en voeding"
+      },
+      "partners": {
+        "title": "Partners en buddy’s",
+        "hint": "Matches, je steunbuddy en hun berichten"
+      },
+      "journal": {
+        "title": "Dagboekherinneringen",
+        "hint": "Water, metingen, check-ins over trek en apparaatsynchronisatie"
+      },
+      "staff": {
+        "title": "Box beheren",
+        "hint": "Nieuwe boekingen, proeflessen, bezoekers, voorraad en meldingen"
+      },
+      "account": {
+        "title": "Account en betalingen",
+        "hint": "Beveiliging, facturen, verlengingen en bestellingen"
+      }
+    }
   }
 }

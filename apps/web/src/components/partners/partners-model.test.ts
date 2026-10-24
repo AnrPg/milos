@@ -34,6 +34,7 @@ const overview = (patch: Partial<PartnersClubOverview>): PartnersClubOverview =>
   member: true,
   profile: null,
   swipes_remaining: 200,
+  distance: null,
   options,
   ...patch,
 });
@@ -49,6 +50,7 @@ const profile = (patch: Partial<NonNullable<PartnersClubOverview["profile"]>> = 
   about: null,
   gender: null,
   gender_preference: "any" as const,
+  disciplines: [] as string[],
   ...patch,
 });
 

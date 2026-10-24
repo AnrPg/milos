@@ -3,6 +3,18 @@ import { describe, expect, it } from "vitest";
 import { notificationTargetUrl } from "./notification-links";
 
 describe("notificationTargetUrl", () => {
+  it("opens a person's message in its conversation and a message request in Requests (ADR-193)", () => {
+    for (const role of ["member", "admin", null]) {
+      expect(
+        notificationTargetUrl({ type: "person_message", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
+      ).toBe("/messages/c-1");
+      expect(
+        notificationTargetUrl({ type: "message_request", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
+      ).toBe("/messages?folder=requests");
+    }
+    expect(notificationTargetUrl({ type: "person_message", payload: {} }, "member")).toBe("/messages");
+  });
+
   it("opens the desk's visitors on the visitor who scanned the door", () => {
     expect(
       notificationTargetUrl({ type: "check_in_visitor", payload: { scan_id: "scan-1", url: "/admin/check-in?visitor=scan-1" } }, "admin"),
@@ -23,8 +35,8 @@ describe("notificationTargetUrl", () => {
   });
 
   it("opens Settings after the person's password was reset", () => {
-    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings");
-    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings#security");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings#security");
   });
 
   it("opens the demo's console from the idle-demo reminder", () => {

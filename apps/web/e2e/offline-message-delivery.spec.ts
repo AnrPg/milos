@@ -50,8 +50,11 @@ test("an offline message survives page close and synchronizes exactly once", asy
   await mockAuthenticatedApi(page, deliveredMessages);
 
   await page.goto("/");
-  await page.getByRole("button", { name: "Messages", exact: true }).click();
+  // ADR-196: ✈ opens the one inbox; a thread opens in place, in the URL.
+  await page.getByRole("link", { name: "Messages", exact: true }).click();
+  await expect(page).toHaveURL(/\/messages$/);
   await page.getByRole("button", { name: new RegExp(recipient.nickname, "i") }).click();
+  await expect(page).toHaveURL(new RegExp(`/messages\\?thread=${thread.id}$`));
 
   await context.setOffline(true);
   await page.getByRole("textbox", { name: "Write a message" }).fill("Queued while offline");
@@ -72,7 +75,8 @@ test("an offline message survives page close and synchronizes exactly once", asy
   await reopened.goto("/");
   await expect.poll(() => deliveredMessages.length).toBe(1);
 
-  await reopened.getByRole("button", { name: "Messages", exact: true }).click();
+  await reopened.getByRole("link", { name: "Messages", exact: true }).click();
+  await expect(reopened).toHaveURL(/\/messages$/);
   await reopened.getByRole("button", { name: new RegExp(recipient.nickname, "i") }).click();
   await expect(reopened.getByText("Queued while offline")).toBeVisible();
   await expect(reopened.getByText(/Sending/)).toHaveCount(0);

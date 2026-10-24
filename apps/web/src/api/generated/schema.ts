@@ -1407,6 +1407,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/buddies-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-193: your Buddies, the people you and they follow each other */
+        get: operations["PaleeWeb.FollowController.buddies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/buddies/candidates": {
         parameters: {
             query?: never;
@@ -1973,6 +1990,127 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your conversations in the inbox (default) or in message requests, latest first */
+        get: operations["PaleeWeb.PersonConversationController.index"];
+        put?: never;
+        /** Open (or find) your conversation with a person */
+        post: operations["PaleeWeb.PersonConversationController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How many conversations hold unread messages, in the inbox and in requests */
+        get: operations["PaleeWeb.PersonConversationController.unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One conversation as you see it */
+        get: operations["PaleeWeb.PersonConversationController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a message request (it moves to the inbox) */
+        post: operations["PaleeWeb.PersonConversationController.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a message request (you never see it again; the sender is not told) */
+        post: operations["PaleeWeb.PersonConversationController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The conversation's messages, newest first (cursor paging) */
+        get: operations["PaleeWeb.PersonConversationController.messages"];
+        put?: never;
+        /** Write a message (a retry with the same client_operation_id is answered once) */
+        post: operations["PaleeWeb.PersonConversationController.send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the conversation read up to now */
+        post: operations["PaleeWeb.PersonConversationController.read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/daily-stats": {
         parameters: {
             query?: never;
@@ -2517,7 +2655,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Follow a person (a request they accept) or a published box (at once) */
+        /** Follow a person (a request when they are private, ADR-193) or a published box (at once) */
         post: operations["PaleeWeb.FollowController.create"];
         delete?: never;
         options?: never;
@@ -2538,6 +2676,41 @@ export interface paths {
         post?: never;
         /** Unfollow, or withdraw a request */
         delete: operations["PaleeWeb.FollowController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/guides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your progress in every walkthrough you have opened */
+        get: operations["PaleeWeb.GuideProgressController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/guides/{guide_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record a step reached, a finish or a «not now» in one walkthrough */
+        put: operations["PaleeWeb.GuideProgressController.update"];
+        post?: never;
+        /** Forget one walkthrough's progress, so it is offered again */
+        delete: operations["PaleeWeb.GuideProgressController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2765,6 +2938,24 @@ export interface paths {
         head?: never;
         /** Edit one of your notes */
         patch: operations["PaleeWeb.JournalController.update_note"];
+        trace?: never;
+    };
+    "/api/me/journal/visibility-defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who sees my new journal entries, per kind (ADR-196) */
+        get: operations["PaleeWeb.JournalController.visibility_defaults"];
+        /** Set who sees my new entries of one kind (workout, note, check_in; ADR-196) */
+        put: operations["PaleeWeb.JournalController.put_visibility_default"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/me/media/capabilities": {
@@ -3247,7 +3438,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Your counts for Εγώ: posts, followers, following, waiting requests */
+        /** Your counts for Εγώ: posts, followers, following, Buddies, waiting requests */
         get: operations["PaleeWeb.FollowController.summary"];
         put?: never;
         post?: never;
@@ -3301,6 +3492,23 @@ export interface paths {
         get?: never;
         /** Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1) */
         put: operations["PaleeWeb.FollowController.member_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ADR-193: private account (follows become requests) and showing in people search */
+        put: operations["PaleeWeb.FollowController.privacy"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3844,6 +4052,40 @@ export interface paths {
          * @description ADR-171: the token travels in the body so it never lands in URLs or logs.
          */
         post: operations["PaleeWeb.NotificationController.delete_native_push_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your notification choices, per category and channel */
+        get: operations["PaleeWeb.NotificationPreferenceController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/preferences/{category}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Switch channels of one notification category on or off */
+        put: operations["PaleeWeb.NotificationPreferenceController.update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -11244,6 +11486,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/people-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-193: find people by @handle or name (shared clubs, Buddies, follows, nearby, public) */
+        get: operations["PaleeWeb.PeopleController.search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/people/{id}": {
         parameters: {
             query?: never;
@@ -12024,6 +12283,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Score history of all my PRs, oldest first (ADR-194) */
+        get: operations["PaleeWeb.PRController.all_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prs/profile/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The PRs a person shows on their profile, as a follower sees them (ADR-196) */
+        get: operations["PaleeWeb.PRController.profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs/{id}": {
         parameters: {
             query?: never;
@@ -12069,6 +12362,23 @@ export interface paths {
         /** Get score history for a PR */
         get: operations["PaleeWeb.PRController.history"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prs/{id}/profile-audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Show a PR on my profile to followers, or keep it private (ADR-196) */
+        put: operations["PaleeWeb.PRController.profile_audience"];
         post?: never;
         delete?: never;
         options?: never;
@@ -12469,6 +12779,12 @@ export interface components {
             consistency: {
                 [key: string]: unknown;
             };
+            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             filter: {
                 [key: string]: unknown;
             };
@@ -12549,6 +12865,12 @@ export interface components {
                 consistency: {
                     [key: string]: unknown;
                 };
+                /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                days: {
+                    /** Format: date */
+                    date: string;
+                    sessions: number;
+                }[];
                 filter: {
                     [key: string]: unknown;
                 };
@@ -13365,6 +13687,8 @@ export interface components {
             /** @description Default events, boxes, clubs */
             kinds?: ("events" | "boxes" | "clubs" | "posts")[];
             languages?: string[];
+            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+            levels?: ("beginner" | "all_levels" | "advanced")[];
             max_price_cents?: number | null;
             min_price_cents?: number | null;
             /** @description Gazetteer places to search from, at most 5 */
@@ -13396,6 +13720,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -14001,6 +14327,8 @@ export interface components {
             /** @description Default events, boxes, clubs */
             kinds: ("events" | "boxes" | "clubs" | "posts")[];
             languages: string[];
+            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+            levels: ("beginner" | "all_levels" | "advanced")[];
             max_price_cents: number | null;
             min_price_cents: number | null;
             /** @description Gazetteer places to search from, at most 5 */
@@ -14080,6 +14408,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -14712,6 +15042,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -14767,6 +15099,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds: ("events" | "boxes" | "clubs" | "posts")[];
                 languages: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents: number | null;
                 min_price_cents: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -23467,6 +23801,14 @@ export interface components {
             title: string;
             video_url: string;
         };
+        /** ConversationPerson */
+        ConversationPerson: {
+            avatar_url?: string | null;
+            handle?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
         /** CorporateClient */
         CorporateClient: {
             active_seats: number;
@@ -23745,7 +24087,7 @@ export interface components {
                 value: number;
             }[];
             /** @enum {string} */
-            range: "1m" | "3m" | "1y";
+            range: "1m" | "3m" | "6m" | "1y";
             sources: string[];
             /** Format: date */
             to: string;
@@ -24933,6 +25275,9 @@ export interface components {
             follow_id: string;
             person?: {
                 avatar_url?: string | null;
+                /** @description ADR-193: you follow each other */
+                buddy: boolean;
+                handle?: string | null;
                 /** Format: uuid */
                 id: string;
                 /** @description Whether you follow them */
@@ -24943,6 +25288,15 @@ export interface components {
             since: string;
             /** @enum {string} */
             status: "none" | "requested" | "active";
+        };
+        /**
+         * FollowGroups
+         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+         */
+        FollowGroups: {
+            buddies: number;
+            followers_only: number;
+            following_only: number;
         };
         /** FollowPage */
         FollowPage: {
@@ -24960,6 +25314,9 @@ export interface components {
                 follow_id: string;
                 person?: {
                     avatar_url?: string | null;
+                    /** @description ADR-193: you follow each other */
+                    buddy: boolean;
+                    handle?: string | null;
                     /** Format: uuid */
                     id: string;
                     /** @description Whether you follow them */
@@ -24976,6 +25333,9 @@ export interface components {
         /** FollowPerson */
         FollowPerson: {
             avatar_url?: string | null;
+            /** @description ADR-193: you follow each other */
+            buddy: boolean;
+            handle?: string | null;
             /** Format: uuid */
             id: string;
             /** @description Whether you follow them */
@@ -25372,6 +25732,62 @@ export interface components {
             id: string;
             /** @enum {string} */
             role: "primary" | "secondary" | "stabilizer";
+        };
+        /** GuideProgress */
+        GuideProgress: {
+            /**
+             * Format: date-time
+             * @description The first finish of the current run.
+             */
+            completed_at: string | null;
+            /** @description The web app's guide id, e.g. `shop_staff`. */
+            guide_id: string;
+            /** @description How many times it was started. */
+            runs: number;
+            /** Format: date-time */
+            started_at: string;
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @description The step reached in the current run, from 0. */
+            step: number;
+            /** Format: date-time */
+            updated_at: string;
+            version: number;
+        };
+        /** GuideProgressList */
+        GuideProgressList: {
+            guides: {
+                /**
+                 * Format: date-time
+                 * @description The first finish of the current run.
+                 */
+                completed_at: string | null;
+                /** @description The web app's guide id, e.g. `shop_staff`. */
+                guide_id: string;
+                /** @description How many times it was started. */
+                runs: number;
+                /** Format: date-time */
+                started_at: string;
+                /** @enum {string} */
+                status: "started" | "completed" | "dismissed";
+                /** @description The step reached in the current run, from 0. */
+                step: number;
+                /** Format: date-time */
+                updated_at: string;
+                version: number;
+            }[];
+        };
+        /** GuideProgressUpdate */
+        GuideProgressUpdate: {
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @default 0 */
+            step: number;
+            /**
+             * @description A newer version than the stored one starts a new run.
+             * @default 1
+             */
+            version: number;
         };
         /** GymAiSettings */
         GymAiSettings: {
@@ -27369,6 +27785,59 @@ export interface components {
              */
             remote: "ok" | "unavailable" | "skipped";
         };
+        /** NotificationPreference */
+        NotificationPreference: {
+            /**
+             * @description `staff`: only box staff get these, so only they need the switch.
+             * @enum {string}
+             */
+            audience: "everyone" | "staff";
+            /**
+             * @description A notification category, in the order the switches are shown.
+             * @enum {string}
+             */
+            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+            channels: {
+                email?: boolean;
+                in_app?: boolean;
+                push?: boolean;
+            };
+            /** @description Always delivered (account, security, payments); cannot be changed. */
+            locked: boolean;
+        };
+        /** NotificationPreferenceList */
+        NotificationPreferenceList: {
+            preferences: {
+                /**
+                 * @description `staff`: only box staff get these, so only they need the switch.
+                 * @enum {string}
+                 */
+                audience: "everyone" | "staff";
+                /**
+                 * @description A notification category, in the order the switches are shown.
+                 * @enum {string}
+                 */
+                category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                channels: {
+                    email?: boolean;
+                    in_app?: boolean;
+                    push?: boolean;
+                };
+                /** @description Always delivered (account, security, payments); cannot be changed. */
+                locked: boolean;
+            }[];
+        };
+        /**
+         * NotificationPreferenceUpdate
+         * @description One or more channels of the category to switch on or off.
+         */
+        NotificationPreferenceUpdate: {
+            email?: boolean;
+            in_app?: boolean;
+            push?: boolean;
+        };
         /** NutritionPlan */
         NutritionPlan: {
             body: string;
@@ -27530,6 +27999,23 @@ export interface components {
                 updated_at: string;
             }[];
         };
+        /** PRHistoryList */
+        PRHistoryList: {
+            history: {
+                /** Format: date */
+                beaten_on: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: uuid */
+                pr_record_id: string;
+                score: number;
+                supporting_metrics: {
+                    [key: string]: unknown;
+                };
+            }[];
+        };
         /** PRTimelineEntry */
         PRTimelineEntry: {
             /** Format: date */
@@ -27548,6 +28034,7 @@ export interface components {
         /** PartnerCard */
         PartnerCard: {
             about: string | null;
+            disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
             level: "beginner" | "intermediate" | "advanced";
@@ -27562,6 +28049,7 @@ export interface components {
             profile_id: string;
             /** PartnerShared */
             shared: {
+                disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 same_level: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -27572,6 +28060,7 @@ export interface components {
         PartnerDeck: {
             cards: {
                 about: string | null;
+                disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
@@ -27586,6 +28075,7 @@ export interface components {
                 profile_id: string;
                 /** PartnerShared */
                 shared: {
+                    disciplines: string[];
                     goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                     same_level: boolean;
                     times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -27775,10 +28265,15 @@ export interface components {
         PartnerOptions: {
             about_max: number;
             daily_swipes: number;
+            /** @description Box vocabulary keys a profile may name (ADR-197) */
+            disciplines: string[];
+            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+            distances_km: number[];
             gender_preferences: ("any" | "women" | "men")[];
             genders: ("woman" | "man" | "other")[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             levels: ("beginner" | "intermediate" | "advanced")[];
+            max_disciplines: number;
             max_goals: number;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
@@ -27810,6 +28305,7 @@ export interface components {
             active: boolean;
             /** Format: uuid */
             club_id: string;
+            disciplines: string[];
             /**
              * @description Only used to honour preferences; never shown to anyone
              * @enum {string|null}
@@ -27832,6 +28328,7 @@ export interface components {
         PartnerProfileRequest: {
             about?: string | null;
             active?: boolean;
+            disciplines?: string[];
             /** @enum {string|null} */
             gender?: "woman" | "man" | "other" | null;
             /** @enum {string} */
@@ -27849,6 +28346,7 @@ export interface components {
                 active: boolean;
                 /** Format: uuid */
                 club_id: string;
+                disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
                  * @enum {string|null}
@@ -27914,6 +28412,7 @@ export interface components {
         };
         /** PartnerShared */
         PartnerShared: {
+            disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             same_level: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -27976,6 +28475,11 @@ export interface components {
         PartnersClubOverview: {
             /** Format: uuid */
             club_id: string;
+            /**
+             * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
+             * @enum {string|null}
+             */
+            distance: "available" | "needs_area" | null;
             /** @description Whether the viewer is a member of the club now */
             member: boolean;
             offered: boolean;
@@ -27983,10 +28487,15 @@ export interface components {
             options: {
                 about_max: number;
                 daily_swipes: number;
+                /** @description Box vocabulary keys a profile may name (ADR-197) */
+                disciplines: string[];
+                /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                distances_km: number[];
                 gender_preferences: ("any" | "women" | "men")[];
                 genders: ("woman" | "man" | "other")[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 levels: ("beginner" | "intermediate" | "advanced")[];
+                max_disciplines: number;
                 max_goals: number;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             };
@@ -27995,6 +28504,7 @@ export interface components {
                 active: boolean;
                 /** Format: uuid */
                 club_id: string;
+                disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
                  * @enum {string|null}
@@ -28016,6 +28526,34 @@ export interface components {
             swipes_remaining: number;
             /** @enum {string|null} */
             unavailable_reason: "disabled" | "not_offered" | null;
+        };
+        /** PeopleSearchPerson */
+        PeopleSearchPerson: {
+            avatar_url?: string | null;
+            buddy: boolean;
+            handle?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            my_status: "none" | "requested" | "active";
+            nickname?: string | null;
+            /** @enum {string} */
+            relation: "club" | "buddy" | "follow" | "nearby" | "public";
+        };
+        /** PeopleSearchResponse */
+        PeopleSearchResponse: {
+            people: {
+                avatar_url?: string | null;
+                buddy: boolean;
+                handle?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                my_status: "none" | "requested" | "active";
+                nickname?: string | null;
+                /** @enum {string} */
+                relation: "club" | "buddy" | "follow" | "nearby" | "public";
+            }[];
         };
         /**
          * PerkBenefit
@@ -28530,6 +29068,181 @@ export interface components {
         PerkVersionList: {
             versions: components["schemas"]["PerkVersion"][];
         };
+        /** PersonConversation */
+        PersonConversation: {
+            /** @description You and they follow each other */
+            buddy: boolean;
+            /** @enum {string} */
+            folder: "inbox" | "requests";
+            /** Format: uuid */
+            id: string;
+            last_message?: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            } | null;
+            last_message_at?: string | null;
+            /** ConversationPerson */
+            person: {
+                avatar_url?: string | null;
+                handle?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            started_by_me: boolean;
+            unread: boolean;
+        };
+        /** PersonConversationOpenRequest */
+        PersonConversationOpenRequest: {
+            /** Format: uuid */
+            person_id: string;
+        };
+        /** PersonConversationPage */
+        PersonConversationPage: {
+            conversations: {
+                /** @description You and they follow each other */
+                buddy: boolean;
+                /** @enum {string} */
+                folder: "inbox" | "requests";
+                /** Format: uuid */
+                id: string;
+                last_message?: {
+                    /** Format: uuid */
+                    author_id: string;
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    conversation_id: string;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    mine: boolean;
+                } | null;
+                last_message_at?: string | null;
+                /** ConversationPerson */
+                person: {
+                    avatar_url?: string | null;
+                    handle?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                started_by_me: boolean;
+                unread: boolean;
+            }[];
+            next_cursor?: string | null;
+        };
+        /** PersonConversationResponse */
+        PersonConversationResponse: {
+            /** PersonConversation */
+            conversation: {
+                /** @description You and they follow each other */
+                buddy: boolean;
+                /** @enum {string} */
+                folder: "inbox" | "requests";
+                /** Format: uuid */
+                id: string;
+                last_message?: {
+                    /** Format: uuid */
+                    author_id: string;
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    conversation_id: string;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    mine: boolean;
+                } | null;
+                last_message_at?: string | null;
+                /** ConversationPerson */
+                person: {
+                    avatar_url?: string | null;
+                    handle?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                started_by_me: boolean;
+                unread: boolean;
+            };
+        };
+        /** PersonConversationUnreadCount */
+        PersonConversationUnreadCount: {
+            inbox: number;
+            requests: number;
+        };
+        /** PersonMessage */
+        PersonMessage: {
+            /** Format: uuid */
+            author_id: string;
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string | null;
+            /** Format: uuid */
+            conversation_id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            mine: boolean;
+        };
+        /** PersonMessagePage */
+        PersonMessagePage: {
+            messages: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            }[];
+            next_cursor?: string | null;
+        };
+        /** PersonMessageRequest */
+        PersonMessageRequest: {
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string;
+        };
+        /** PersonMessageResponse */
+        PersonMessageResponse: {
+            /** PersonMessage */
+            message: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            };
+        };
         /** PersonPostsResponse */
         PersonPostsResponse: {
             next_cursor?: string | null;
@@ -28817,15 +29530,29 @@ export interface components {
         /** PersonProfile */
         PersonProfile: {
             avatar_url?: string | null;
+            /** @description ADR-193: you follow each other */
+            buddy: boolean;
+            /**
+             * FollowGroups
+             * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+             */
+            follow_groups: {
+                buddies: number;
+                followers_only: number;
+                following_only: number;
+            };
             followers_count: number;
             following_count: number;
             follows_me: boolean;
+            handle?: string | null;
             /** Format: uuid */
             id: string;
             is_me: boolean;
             /** @enum {string} */
             my_status: "none" | "requested" | "active";
             nickname?: string | null;
+            /** @description ADR-193: following them is a request */
+            private: boolean;
         };
         /** PersonRef */
         PersonRef: {
@@ -29318,6 +30045,12 @@ export interface components {
                 percent: number;
                 weeks: number;
             };
+            /** @description Sessions per day with training in the weekly span, oldest first */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             pr_timeline: {
                 /** Format: date */
                 beaten_on: string;
@@ -30957,7 +31690,7 @@ export interface components {
                 };
             }[];
             /** @enum {string} */
-            surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+            surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
         };
         /** ScalingSuggestion */
         ScalingSuggestion: {
@@ -32945,6 +33678,19 @@ export interface components {
             on_hand: number;
             reserved: number;
         };
+        /**
+         * SocialPrivacy
+         * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+         */
+        SocialPrivacy: {
+            private_account: boolean;
+            searchable: boolean;
+        };
+        /** SocialPrivacyRequest */
+        SocialPrivacyRequest: {
+            private_account?: boolean;
+            searchable?: boolean;
+        };
         /** SocialSummary */
         SocialSummary: {
             /**
@@ -32964,6 +33710,15 @@ export interface components {
                 enabled: boolean;
                 offered: boolean;
             };
+            /**
+             * FollowGroups
+             * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+             */
+            follow_groups: {
+                buddies: number;
+                followers_only: number;
+                following_only: number;
+            };
             followers_count: number;
             following_count: number;
             /**
@@ -32974,6 +33729,14 @@ export interface components {
                 hidden: boolean;
             };
             posts_count: number;
+            /**
+             * SocialPrivacy
+             * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+             */
+            privacy: {
+                private_account: boolean;
+                searchable: boolean;
+            };
             requests_count: number;
         };
         /** StaffCommunityEvent */
@@ -36438,6 +37201,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -36463,6 +37228,8 @@ export interface components {
         WellnessPreferencesRequest: {
             glass_ml?: number;
             hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+            hide_macros?: boolean;
             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
             item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
             sleep_goal_minutes?: number;
@@ -36475,6 +37242,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -36934,6 +37703,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -37004,6 +37775,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -37067,6 +37840,8 @@ export interface operations {
                             /** @description Default events, boxes, clubs */
                             kinds: ("events" | "boxes" | "clubs" | "posts")[];
                             languages: string[];
+                            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                            levels: ("beginner" | "all_levels" | "advanced")[];
                             max_price_cents: number | null;
                             min_price_cents: number | null;
                             /** @description Gazetteer places to search from, at most 5 */
@@ -37699,6 +38474,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -41377,8 +42154,12 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
+                    /** @description ADR-196: appear in challenge rankings (on by default) */
+                    challenge_rankings?: boolean;
                     /** @description Day-of-week indices (0=Sun..6=Sat) treated as rest days */
                     off_days?: number[];
+                    /** @description ADR-196: an automatic card in my clubs when I set a PR (off by default) */
+                    pr_celebrations?: boolean;
                 };
             };
         };
@@ -44022,6 +44803,60 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.FollowController.buddies": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                /** @description Keep only names containing this (case and accents ignored) */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddies */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            /** Format: uuid */
+                            follow_id: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Whether you follow them */
+                                my_status: "none" | "requested" | "active";
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: date-time */
+                            since: string;
+                            /** @enum {string} */
+                            status: "none" | "requested" | "active";
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyBuddiesController.candidates": {
         parameters: {
             query?: {
@@ -44883,6 +45718,11 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         club_id: string;
+                        /**
+                         * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
+                         * @enum {string|null}
+                         */
+                        distance: "available" | "needs_area" | null;
                         /** @description Whether the viewer is a member of the club now */
                         member: boolean;
                         offered: boolean;
@@ -44890,10 +45730,15 @@ export interface operations {
                         options: {
                             about_max: number;
                             daily_swipes: number;
+                            /** @description Box vocabulary keys a profile may name (ADR-197) */
+                            disciplines: string[];
+                            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                            distances_km: number[];
                             gender_preferences: ("any" | "women" | "men")[];
                             genders: ("woman" | "man" | "other")[];
                             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                             levels: ("beginner" | "intermediate" | "advanced")[];
+                            max_disciplines: number;
                             max_goals: number;
                             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                         };
@@ -44902,6 +45747,7 @@ export interface operations {
                             active: boolean;
                             /** Format: uuid */
                             club_id: string;
+                            disciplines: string[];
                             /**
                              * @description Only used to honour preferences; never shown to anyone
                              * @enum {string|null}
@@ -44934,6 +45780,10 @@ export interface operations {
                 time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
                 level?: "beginner" | "intermediate" | "advanced";
                 goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
+                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
+                discipline?: string;
+                /** @description Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours */
+                within_km?: 2 | 5 | 10 | 25;
             };
             header?: never;
             path: {
@@ -44952,6 +45802,7 @@ export interface operations {
                     "application/json": {
                         cards: {
                             about: string | null;
+                            disciplines: string[];
                             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                             /** @enum {string} */
                             level: "beginner" | "intermediate" | "advanced";
@@ -44966,6 +45817,7 @@ export interface operations {
                             profile_id: string;
                             /** PartnerShared */
                             shared: {
+                                disciplines: string[];
                                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                                 same_level: boolean;
                                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -44994,6 +45846,7 @@ export interface operations {
                 "application/json": {
                     about?: string | null;
                     active?: boolean;
+                    disciplines?: string[];
                     /** @enum {string|null} */
                     gender?: "woman" | "man" | "other" | null;
                     /** @enum {string} */
@@ -45019,6 +45872,7 @@ export interface operations {
                             active: boolean;
                             /** Format: uuid */
                             club_id: string;
+                            disciplines: string[];
                             /**
                              * @description Only used to honour preferences; never shown to anyone
                              * @enum {string|null}
@@ -47519,11 +48373,435 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PersonConversationController.index": {
+        parameters: {
+            query?: {
+                folder?: "inbox" | "requests";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        conversations: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    person_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.unread_count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        inbox: number;
+                        requests: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Declined */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.messages": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Messages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            /** Format: uuid */
+                            author_id: string;
+                            body: string;
+                            /** Format: uuid */
+                            client_operation_id?: string | null;
+                            /** Format: uuid */
+                            conversation_id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            mine: boolean;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.send_message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonMessage */
+                        message: {
+                            /** Format: uuid */
+                            author_id: string;
+                            body: string;
+                            /** Format: uuid */
+                            client_operation_id?: string | null;
+                            /** Format: uuid */
+                            conversation_id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            mine: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.DevicesController.daily_stats": {
         parameters: {
             query?: {
                 metric?: "resting_hr" | "steps";
-                range?: "1m" | "1y" | "3m";
+                range?: "1m" | "1y" | "3m" | "6m";
             };
             header?: never;
             path?: never;
@@ -47567,7 +48845,7 @@ export interface operations {
                             value: number;
                         }[];
                         /** @enum {string} */
-                        range: "1m" | "3m" | "1y";
+                        range: "1m" | "3m" | "6m" | "1y";
                         sources: string[];
                         /** Format: date */
                         to: string;
@@ -50155,6 +51433,10 @@ export interface operations {
                 channel_id?: string;
                 /** @description Only your own posts */
                 mine?: boolean;
+                /** @description Only club posts of these kinds (ADR-197): `announcement` (#ανακοινώσεις), `pr`, `event` */
+                types?: ("announcement" | "pr" | "event")[];
+                /** @description Only club posts by the gym's staff (ADR-197) */
+                coaches_only?: boolean;
                 cursor?: string;
                 limit?: number;
             };
@@ -50742,7 +52024,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -50773,7 +52055,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -50784,7 +52066,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -50825,7 +52107,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -50836,7 +52118,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -50876,7 +52158,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -50887,7 +52169,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                 id: string;
             };
             cookie?: never;
@@ -50919,7 +52201,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -50930,7 +52212,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                 id: string;
             };
             cookie?: never;
@@ -50968,7 +52250,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -51006,6 +52288,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -51101,6 +52386,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -51175,6 +52463,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -51271,6 +52562,145 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         status: "none" | "requested" | "active";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "started" | "completed" | "dismissed";
+                    /** @default 0 */
+                    step?: number;
+                    /**
+                     * @description A newer version than the stored one starts a new run.
+                     * @default 1
+                     */
+                    version?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: date-time
+                         * @description The first finish of the current run.
+                         */
+                        completed_at: string | null;
+                        /** @description The web app's guide id, e.g. `shop_staff`. */
+                        guide_id: string;
+                        /** @description How many times it was started. */
+                        runs: number;
+                        /** Format: date-time */
+                        started_at: string;
+                        /** @enum {string} */
+                        status: "started" | "completed" | "dismissed";
+                        /** @description The step reached in the current run, from 0. */
+                        step: number;
+                        /** Format: date-time */
+                        updated_at: string;
+                        version: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
                     };
                 };
             };
@@ -52178,6 +53608,88 @@ export interface operations {
                     "application/json": {
                         note: components["schemas"]["JournalNote"];
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.JournalController.visibility_defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The rung a new entry of each kind starts on (ADR-139 §3) */
+                        defaults: {
+                            /** @enum {string} */
+                            check_in: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            note: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            pr: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            workout: "private" | "coach_can_view";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.JournalController.put_visibility_default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "workout" | "note" | "check_in";
+                    /** @enum {string} */
+                    visibility: "private" | "coach_can_view";
+                };
+            };
+        };
+        responses: {
+            /** @description Defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The rung a new entry of each kind starts on (ADR-139 §3) */
+                        defaults: {
+                            /** @enum {string} */
+                            check_in: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            note: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            pr: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            workout: "private" | "coach_can_view";
+                        };
+                    };
+                };
+            };
+            /** @description Unknown kind or rung */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -53450,6 +54962,12 @@ export interface operations {
                             consistency: {
                                 [key: string]: unknown;
                             };
+                            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             filter: {
                                 [key: string]: unknown;
                             };
@@ -53836,6 +55354,15 @@ export interface operations {
                             enabled: boolean;
                             offered: boolean;
                         };
+                        /**
+                         * FollowGroups
+                         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+                         */
+                        follow_groups: {
+                            buddies: number;
+                            followers_only: number;
+                            following_only: number;
+                        };
                         followers_count: number;
                         following_count: number;
                         /**
@@ -53846,6 +55373,14 @@ export interface operations {
                             hidden: boolean;
                         };
                         posts_count: number;
+                        /**
+                         * SocialPrivacy
+                         * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+                         */
+                        privacy: {
+                            private_account: boolean;
+                            searchable: boolean;
+                        };
                         requests_count: number;
                     };
                 };
@@ -53934,6 +55469,36 @@ export interface operations {
                 content: {
                     "application/json": {
                         hidden: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.FollowController.privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    private_account?: boolean;
+                    searchable?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        private_account: boolean;
+                        searchable: boolean;
                     };
                 };
             };
@@ -55349,6 +56914,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -56011,6 +57578,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -56035,6 +57604,8 @@ export interface operations {
                 "application/json": {
                     glass_ml?: number;
                     hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                    /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                    hide_macros?: boolean;
                     /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                     item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                     sleep_goal_minutes?: number;
@@ -56055,6 +57626,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -56543,6 +58116,98 @@ export interface operations {
                 content: {
                     "application/json": {
                         deleted: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.NotificationPreferenceController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            /**
+                             * @description `staff`: only box staff get these, so only they need the switch.
+                             * @enum {string}
+                             */
+                            audience: "everyone" | "staff";
+                            /**
+                             * @description A notification category, in the order the switches are shown.
+                             * @enum {string}
+                             */
+                            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                            channels: {
+                                email?: boolean;
+                                in_app?: boolean;
+                                push?: boolean;
+                            };
+                            /** @description Always delivered (account, security, payments); cannot be changed. */
+                            locked: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.NotificationPreferenceController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: boolean;
+                    in_app?: boolean;
+                    push?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Notification preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            /**
+                             * @description `staff`: only box staff get these, so only they need the switch.
+                             * @enum {string}
+                             */
+                            audience: "everyone" | "staff";
+                            /**
+                             * @description A notification category, in the order the switches are shown.
+                             * @enum {string}
+                             */
+                            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                            channels: {
+                                email?: boolean;
+                                in_app?: boolean;
+                                push?: boolean;
+                            };
+                            /** @description Always delivered (account, security, payments); cannot be changed. */
+                            locked: boolean;
+                        }[];
                     };
                 };
             };
@@ -84377,6 +86042,12 @@ export interface operations {
                                 percent: number;
                                 weeks: number;
                             };
+                            /** @description Sessions per day with training in the weekly span, oldest first */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             pr_timeline: {
                                 /** Format: date */
                                 beaten_on: string;
@@ -95767,6 +97438,41 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PeopleController.search": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description People */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            avatar_url?: string | null;
+                            buddy: boolean;
+                            handle?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            my_status: "none" | "requested" | "active";
+                            nickname?: string | null;
+                            /** @enum {string} */
+                            relation: "club" | "buddy" | "follow" | "nearby" | "public";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PeopleController.show": {
         parameters: {
             query?: never;
@@ -95786,15 +97492,29 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
+                        /** @description ADR-193: you follow each other */
+                        buddy: boolean;
+                        /**
+                         * FollowGroups
+                         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+                         */
+                        follow_groups: {
+                            buddies: number;
+                            followers_only: number;
+                            following_only: number;
+                        };
                         followers_count: number;
                         following_count: number;
                         follows_me: boolean;
+                        handle?: string | null;
                         /** Format: uuid */
                         id: string;
                         is_me: boolean;
                         /** @enum {string} */
                         my_status: "none" | "requested" | "active";
                         nickname?: string | null;
+                        /** @description ADR-193: following them is a request */
+                        private: boolean;
                     };
                 };
             };
@@ -98976,6 +100696,78 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PRController.all_history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        history: {
+                            /** Format: date */
+                            beaten_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: uuid */
+                            pr_record_id: string;
+                            score: number;
+                            supporting_metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PRController.profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile PRs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        prs: {
+                            /** Format: date */
+                            beaten_on: string;
+                            current_score: number;
+                            higher_is_better: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            supporting_metrics?: Record<string, never>;
+                            /** @enum {string} */
+                            unit: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PRController.delete": {
         parameters: {
             query?: never;
@@ -99145,6 +100937,55 @@ export interface operations {
             };
             /** @description Error */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PRController.profile_audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Audience */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "private" | "followers";
+                };
+            };
+        };
+        responses: {
+            /** @description PR */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
