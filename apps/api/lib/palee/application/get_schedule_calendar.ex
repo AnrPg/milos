@@ -96,8 +96,16 @@ defmodule Palee.Application.GetScheduleCalendar do
         Map.put(acc, workout_id, Workouts.get_workout(context, workout_id))
       end)
 
+    slot_ids = Enum.map(slots, & &1.id)
+
     # TD-105: the member's own check-in state on each class they booked.
-    my_attendance = Scheduling.list_user_attendance(context, actor.id, Enum.map(slots, & &1.id))
+    my_attendance = Scheduling.list_user_attendance(context, actor.id, slot_ids)
+
+    # ADR-198: staff see everyone's on the roster (the coach's check-in desk).
+    roster_attendance =
+      if admin_role?(context, actor),
+        do: Scheduling.list_class_attendance(context, slot_ids),
+        else: %{}
 
     Enum.map(slots, fn slot ->
       workout = Map.get(workout_cache, slot.master_workout_id)
@@ -140,7 +148,10 @@ defmodule Palee.Application.GetScheduleCalendar do
 
       if admin_role?(context, actor) do
         base
-        |> Map.put(:bookings, Enum.map(slot.bookings, &enrich_booking(&1, nickname_cache)))
+        |> Map.put(
+          :bookings,
+          Enum.map(slot.bookings, &roster_booking(&1, slot.id, nickname_cache, roster_attendance))
+        )
         |> Map.put(:member_versions, staff_versions(variants, slot.id))
       else
         base
@@ -372,6 +383,25 @@ defmodule Palee.Application.GetScheduleCalendar do
       admin_message: booking.admin_message,
       inserted_at: booking.inserted_at
     }
+  end
+
+  # Attendance is per member and class; a guest seat has none of its own.
+  defp roster_booking(booking, slot_id, nickname_cache, attendance) do
+    status =
+      if Map.get(booking, :guest_name),
+        do: nil,
+        else: attendance_status(attendance, slot_id, booking.user_id)
+
+    booking
+    |> enrich_booking(nickname_cache)
+    |> Map.put(:attendance_status, status)
+  end
+
+  defp attendance_status(attendance, slot_id, user_id) do
+    case Map.get(attendance, {slot_id, user_id}) do
+      nil -> nil
+      status -> to_string(status)
+    end
   end
 
   # Takes the already-resolved decision rather than re-deriving it from the

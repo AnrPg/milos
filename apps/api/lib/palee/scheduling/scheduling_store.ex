@@ -172,6 +172,10 @@ defmodule Palee.Scheduling.SchedulingStore do
     do: tenant_call(context, :list_user_attendance, [user_id, slot_ids])
 
   @impl true
+  def list_class_attendance(context, slot_ids),
+    do: tenant_call(context, :list_class_attendance, [slot_ids])
+
+  @impl true
   def get_attendance_for_user_class(context, user_id, scheduled_class_id),
     do: tenant_call(context, :get_attendance_for_user_class, [user_id, scheduled_class_id])
 

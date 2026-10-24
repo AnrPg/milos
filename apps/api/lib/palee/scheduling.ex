@@ -125,6 +125,13 @@ defmodule Palee.Scheduling do
   def list_user_attendance(%{organization_id: _} = context, user_id, slot_ids),
     do: Palee.Scheduling.SchedulingStore.list_user_attendance(context, user_id, slot_ids)
 
+  @doc """
+  ADR-198: everyone's attendance on the classes given, keyed by
+  `{slot_id, user_id}`, for the staff roster (the coach's check-in desk).
+  """
+  def list_class_attendance(%{organization_id: _} = context, slot_ids),
+    do: Palee.Scheduling.SchedulingStore.list_class_attendance(context, slot_ids)
+
   @doc "ADR-155: one attendance record by id (undoing a scan)."
   def get_attendance(%{organization_id: _} = context, id),
     do: Palee.Scheduling.SchedulingStore.get_attendance(context, id)
