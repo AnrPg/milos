@@ -117,7 +117,7 @@ test.describe("notification settings", () => {
       ],
     });
     await page.goto("/me/settings");
-    await page.getByRole("navigation", { name: "Main sections" }).getByRole("button", { name: "1 unread notification" }).click();
+    await page.getByTestId("member-top-bar").getByRole("button", { name: "1 unread notification" }).click();
     await page.getByText("Your password was reset").click();
 
     await expect(page).toHaveURL(/\/me\/settings#security$/);
