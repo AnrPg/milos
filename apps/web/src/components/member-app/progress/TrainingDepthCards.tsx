@@ -52,24 +52,47 @@ function Note({ children }: { children: React.ReactNode }) {
   return <p className="mt-3 self-stretch text-xs" style={{ color: "var(--dim)" }}>{children}</p>;
 }
 
+/** No workouts behind it yet: a member's Πρόοδος hides such a card (ANR 2026-10-24). */
+export const depthEmpty = {
+  coverage: (coverage: DepthCoverage | undefined) => !coverage?.sessions,
+  qualities: (qualities: DepthQualities | undefined) =>
+    !qualities?.sessions || qualityScores(qualities.qualities).every((row) => row.score === 0),
+  load: (load: DepthLoad | undefined) => !load || (!load.unrated_sessions && loadBars(load.weeks).every((bar) => bar.load === 0)),
+};
+
+/** Whether a section is shown: always for the coach, for the member only once it holds something. */
+function shown<T>(section: Section<T>, hideEmpty: boolean, empty: (data: T | undefined) => boolean): boolean {
+  if (!hideEmpty) return true;
+  if (section.error) return true;
+  return !section.pending && !empty(section.data ?? undefined);
+}
+
 export function TrainingDepthCards({
   coverage,
   qualities,
   load,
   audience = "member",
+  hideEmpty = false,
 }: {
   coverage: Section<DepthCoverage>;
   qualities: Section<DepthQualities>;
   load: Section<DepthLoad>;
   audience?: "member" | "coach";
+  hideEmpty?: boolean;
 }) {
+  const showCoverage = shown(coverage, hideEmpty, depthEmpty.coverage);
+  const showQualities = shown(qualities, hideEmpty, depthEmpty.qualities);
+  const showLoad = shown(load, hideEmpty, depthEmpty.load);
+  if (!showCoverage && !showQualities && !showLoad) return null;
   return (
     <div className="flex flex-col gap-4" data-testid="training-depth">
-      <CoverageCard section={coverage} audience={audience} />
-      <div className="grid gap-4 md:grid-cols-2">
-        <QualitiesCard section={qualities} />
-        <LoadCard section={load} />
-      </div>
+      {showCoverage ? <CoverageCard section={coverage} audience={audience} /> : null}
+      {showQualities || showLoad ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          {showQualities ? <QualitiesCard section={qualities} /> : null}
+          {showLoad ? <LoadCard section={load} /> : null}
+        </div>
+      ) : null}
     </div>
   );
 }
