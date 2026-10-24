@@ -259,7 +259,7 @@ defmodule Palee.Identity.DemoPeoplePrivacyTest do
           SELECT author_id FROM palee_around_match_posts(
             palee_geo_point(38.0, 23.73), 5000,
             ST_Expand(palee_geo_point(38.0, 23.73)::geometry, 1)::geography,
-            now() - interval '1 day', NULL, NULL, NULL, NULL, NULL, NULL)
+            now() - interval '1 day', NULL, NULL, NULL, NULL, NULL, NULL, NULL)
           WHERE source = 'profile'
           """,
           []
