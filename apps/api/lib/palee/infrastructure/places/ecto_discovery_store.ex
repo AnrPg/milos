@@ -275,6 +275,13 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     end)
   end
 
+  @impl true
+  def people_within(_context, user_ids, radius_m) do
+    "SELECT palee_partner_people_within($1::uuid[], $2::float8)"
+    |> query([uuids(user_ids), radius_m * 1.0])
+    |> Enum.map(fn [id] -> load(id) end)
+  end
+
   defp query(sql, params), do: Repo.query!(sql, params).rows
 
   defp page(rows, fun) do

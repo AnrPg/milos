@@ -114,4 +114,5 @@ defmodule Palee.Places do
   defdelegate search(context, kind, area, plan, cursor, limit), to: DiscoveryStore
   defdelegate counts(context, area, plan, radii_m), to: DiscoveryStore
   defdelegate pins(context, area, plan, limit), to: DiscoveryStore
+  defdelegate people_within(context, user_ids, radius_m), to: DiscoveryStore
 end

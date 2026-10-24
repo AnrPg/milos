@@ -6,7 +6,7 @@ defmodule PaleeWeb.Schemas.Partners do
   before it is mutual, and a person's gender never leaves their own profile.
   """
 
-  alias Palee.Partners
+  alias Palee.{Organizations, Partners}
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   @uuid %Schema{type: :string, format: :uuid}
@@ -24,6 +24,7 @@ defmodule PaleeWeb.Schemas.Partners do
   defp list(schema), do: %Schema{type: :array, items: schema}
   defp enum(values), do: %Schema{type: :string, enum: values}
   defp enum_list(values), do: list(enum(values))
+  defp disciplines, do: enum_list(Organizations.box_disciplines())
 
   def person do
     object(
@@ -47,6 +48,17 @@ defmodule PaleeWeb.Schemas.Partners do
         genders: enum_list(Partners.genders()),
         gender_preferences: enum_list(Partners.gender_preferences()),
         max_goals: %Schema{type: :integer},
+        disciplines: %Schema{
+          type: :array,
+          items: %Schema{type: :string},
+          description: "Box vocabulary keys a profile may name (ADR-197)"
+        },
+        max_disciplines: %Schema{type: :integer},
+        distances_km: %Schema{
+          type: :array,
+          items: %Schema{type: :integer},
+          description: "The «Απόσταση» choices of an open club's deck (ADR-197)"
+        },
         about_max: %Schema{type: :integer},
         daily_swipes: %Schema{type: :integer}
       },
@@ -57,6 +69,9 @@ defmodule PaleeWeb.Schemas.Partners do
         :genders,
         :gender_preferences,
         :max_goals,
+        :disciplines,
+        :max_disciplines,
+        :distances_km,
         :about_max,
         :daily_swipes
       ]
@@ -74,6 +89,7 @@ defmodule PaleeWeb.Schemas.Partners do
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
+        disciplines: disciplines(),
         about: %Schema{type: :string, nullable: true},
         gender: %Schema{
           type: :string,
@@ -92,6 +108,7 @@ defmodule PaleeWeb.Schemas.Partners do
         :level,
         :times,
         :goals,
+        :disciplines,
         :about,
         :gender,
         :gender_preference
@@ -116,9 +133,25 @@ defmodule PaleeWeb.Schemas.Partners do
         },
         profile: %Schema{allOf: [profile()], nullable: true},
         swipes_remaining: %Schema{type: :integer},
+        distance: %Schema{
+          type: :string,
+          enum: ["available", "needs_area"],
+          nullable: true,
+          description:
+            "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου"
+        },
         options: options()
       },
-      [:club_id, :offered, :unavailable_reason, :member, :profile, :swipes_remaining, :options]
+      [
+        :club_id,
+        :offered,
+        :unavailable_reason,
+        :member,
+        :profile,
+        :swipes_remaining,
+        :distance,
+        :options
+      ]
     )
   end
 
@@ -130,6 +163,7 @@ defmodule PaleeWeb.Schemas.Partners do
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
+        disciplines: %{disciplines() | maxItems: Partners.max_disciplines()},
         about: %Schema{type: :string, nullable: true, maxLength: Partners.about_max()},
         gender: %Schema{type: :string, enum: Partners.genders(), nullable: true},
         gender_preference: enum(Partners.gender_preferences())
@@ -146,9 +180,10 @@ defmodule PaleeWeb.Schemas.Partners do
       %{
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
+        disciplines: disciplines(),
         same_level: %Schema{type: :boolean}
       },
-      [:times, :goals, :same_level]
+      [:times, :goals, :disciplines, :same_level]
     )
   end
 
@@ -161,10 +196,11 @@ defmodule PaleeWeb.Schemas.Partners do
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
+        disciplines: disciplines(),
         about: %Schema{type: :string, nullable: true},
         shared: shared()
       },
-      [:profile_id, :person, :level, :times, :goals, :about, :shared]
+      [:profile_id, :person, :level, :times, :goals, :disciplines, :about, :shared]
     )
   end
 

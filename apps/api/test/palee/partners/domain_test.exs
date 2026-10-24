@@ -158,7 +158,13 @@ defmodule Palee.Partners.DomainTest do
 
       assert Enum.map(deck, fn {p, _shared} -> p.user_id end) == ["b", "a", "c"]
       {_best, shared} = hd(deck)
-      assert shared == %{times: ["early", "evening"], goals: ["strength"], same_level: true}
+
+      assert shared == %{
+               times: ["early", "evening"],
+               goals: ["strength"],
+               disciplines: [],
+               same_level: true
+             }
     end
 
     test "filters narrow by time, level and goal; unknown filter values are ignored" do
@@ -176,6 +182,26 @@ defmodule Palee.Partners.DomainTest do
 
       assert Enum.map(deck, fn {p, _} -> p.user_id end) == ["a"]
       assert DeckPolicy.filters(%{"level" => "pro"}).level == nil
+    end
+
+    test "disciplines narrow and weigh like goals; distances are fixed steps (ADR-197)" do
+      viewer = profile("v", %{disciplines: ["running"]})
+      runner = profile("a", %{disciplines: ["running", "yoga"]})
+      lifter = profile("b", %{disciplines: ["powerlifting"]})
+
+      assert [{%{user_id: "a"}, %{disciplines: ["running"]}}, {%{user_id: "b"}, _}] =
+               DeckPolicy.deck(viewer, [lifter, runner], MapSet.new(), DeckPolicy.filters(%{}))
+
+      assert [{%{user_id: "b"}, _}] =
+               DeckPolicy.deck(
+                 viewer,
+                 [lifter, runner],
+                 MapSet.new(),
+                 DeckPolicy.filters(%{"discipline" => "powerlifting"})
+               )
+
+      assert DeckPolicy.filters(%{"within_km" => "5"}).within_km == 5
+      assert DeckPolicy.filters(%{"within_km" => 3}).within_km == nil
     end
 
     test "likes stay out for good, passes for 30 days" do

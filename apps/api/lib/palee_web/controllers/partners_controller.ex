@@ -69,6 +69,21 @@ defmodule PaleeWeb.PartnersController do
         in: :query,
         required: false,
         schema: %Schema{type: :string, enum: Palee.Partners.goals()}
+      },
+      %Parameter{
+        name: :discipline,
+        in: :query,
+        required: false,
+        description: "People who named this discipline (ADR-197)",
+        schema: %Schema{type: :string, enum: Palee.Organizations.box_disciplines()}
+      },
+      %Parameter{
+        name: :within_km,
+        in: :query,
+        required: false,
+        description:
+          "Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours",
+        schema: %Schema{type: :integer, enum: Palee.Partners.distances_km()}
       }
     ],
     responses: [ok: {"Deck", "application/json", S.deck()}]
@@ -77,7 +92,7 @@ defmodule PaleeWeb.PartnersController do
   def deck(conn, %{club_id: club_id} = params) do
     filters =
       params
-      |> Map.take([:time, :level, :goal])
+      |> Map.take([:time, :level, :goal, :discipline, :within_km])
       |> Map.new(fn {k, v} -> {Atom.to_string(k), v} end)
 
     with {:ok, deck} <- Partners.deck(ctx(conn), club_id, filters), do: json(conn, deck)

@@ -24,4 +24,12 @@ defmodule Palee.Places.Ports.DiscoveryStore do
   @callback pins(context :: map(), area :: map(), plan :: map(), limit :: pos_integer()) :: [
               row()
             ]
+
+  @doc """
+  Which of `user_ids` show in Γύρω μου with a main neighbourhood within
+  `radius_m` of the context user's own (Partners distance, ADR-197).
+  """
+  @callback people_within(context :: map(), user_ids :: [binary()], radius_m :: number()) :: [
+              binary()
+            ]
 end
