@@ -85,6 +85,7 @@ defmodule Palee.Analytics do
   defdelegate progress_filter_params(filter), to: ProgressFilter, as: :to_params
   defdelegate progress_filter_active_count(filter), to: ProgressFilter, as: :active_count
   defdelegate progress_since(filter, today), to: ProgressFilter, as: :since
+  defdelegate progress_weeks(filter, today, first_day), to: ProgressFilter, as: :weeks
 
   # ADR-165: training load (session RPE, acute:chronic) as an indicator.
   alias Palee.Analytics.Domain.TrainingLoad

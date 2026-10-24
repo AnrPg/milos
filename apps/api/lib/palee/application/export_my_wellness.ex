@@ -47,7 +47,8 @@ defmodule Palee.Application.ExportMyWellness do
       :sleep_goal_minutes,
       :hidden_items,
       :item_order,
-      :water_reminder
+      :water_reminder,
+      :hide_macros
     ])
   end
 end

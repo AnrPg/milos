@@ -12024,6 +12024,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Score history of all my PRs, oldest first (ADR-194) */
+        get: operations["PaleeWeb.PRController.all_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs/{id}": {
         parameters: {
             query?: never;
@@ -12469,6 +12486,12 @@ export interface components {
             consistency: {
                 [key: string]: unknown;
             };
+            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             filter: {
                 [key: string]: unknown;
             };
@@ -12549,6 +12572,12 @@ export interface components {
                 consistency: {
                     [key: string]: unknown;
                 };
+                /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                days: {
+                    /** Format: date */
+                    date: string;
+                    sessions: number;
+                }[];
                 filter: {
                     [key: string]: unknown;
                 };
@@ -27530,6 +27559,23 @@ export interface components {
                 updated_at: string;
             }[];
         };
+        /** PRHistoryList */
+        PRHistoryList: {
+            history: {
+                /** Format: date */
+                beaten_on: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: uuid */
+                pr_record_id: string;
+                score: number;
+                supporting_metrics: {
+                    [key: string]: unknown;
+                };
+            }[];
+        };
         /** PRTimelineEntry */
         PRTimelineEntry: {
             /** Format: date */
@@ -29318,6 +29364,12 @@ export interface components {
                 percent: number;
                 weeks: number;
             };
+            /** @description Sessions per day with training in the weekly span, oldest first */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             pr_timeline: {
                 /** Format: date */
                 beaten_on: string;
@@ -36438,6 +36490,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -36463,6 +36517,8 @@ export interface components {
         WellnessPreferencesRequest: {
             glass_ml?: number;
             hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+            hide_macros?: boolean;
             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
             item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
             sleep_goal_minutes?: number;
@@ -36475,6 +36531,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -53435,6 +53493,12 @@ export interface operations {
                             consistency: {
                                 [key: string]: unknown;
                             };
+                            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             filter: {
                                 [key: string]: unknown;
                             };
@@ -55334,6 +55398,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -55996,6 +56062,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -56020,6 +56088,8 @@ export interface operations {
                 "application/json": {
                     glass_ml?: number;
                     hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                    /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                    hide_macros?: boolean;
                     /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                     item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                     sleep_goal_minutes?: number;
@@ -56040,6 +56110,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -84362,6 +84434,12 @@ export interface operations {
                                 percent: number;
                                 weeks: number;
                             };
+                            /** @description Sessions per day with training in the weekly span, oldest first */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             pr_timeline: {
                                 /** Format: date */
                                 beaten_on: string;
@@ -98957,6 +99035,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PRController.all_history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        history: {
+                            /** Format: date */
+                            beaten_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: uuid */
+                            pr_record_id: string;
+                            score: number;
+                            supporting_metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
                 };
             };
         };

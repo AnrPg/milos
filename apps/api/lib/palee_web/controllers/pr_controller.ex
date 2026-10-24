@@ -159,6 +159,41 @@ defmodule PaleeWeb.PRController do
     end
   end
 
+  operation(:all_history,
+    summary: "Score history of all my PRs, oldest first (ADR-194)",
+    responses: [
+      ok:
+        {"PR history", "application/json",
+         %Schema{
+           title: "PRHistoryList",
+           type: :object,
+           required: [:history],
+           properties: %{
+             history: %Schema{
+               type: :array,
+               items: %Schema{
+                 type: :object,
+                 required: [:id, :pr_record_id, :score, :beaten_on, :supporting_metrics],
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   pr_record_id: %Schema{type: :string, format: :uuid},
+                   score: %Schema{type: :number},
+                   beaten_on: %Schema{type: :string, format: :date},
+                   supporting_metrics: %Schema{type: :object, additionalProperties: true},
+                   inserted_at: %Schema{type: :string, format: :"date-time"}
+                 }
+               }
+             }
+           }
+         }}
+    ]
+  )
+
+  def all_history(conn, _params) do
+    {:ok, entries} = GetPRHistory.all(conn.assigns.user_context)
+    json(conn, %{history: entries})
+  end
+
   operation(:share,
     summary: "Get a shareable text for a PR",
     parameters: [@id_param],

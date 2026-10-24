@@ -8,7 +8,8 @@ defmodule Palee.Application.GetAccountProgress do
   done at two providers is one line. Points and PRs carry their source;
   `by_source` counts sessions per source.
 
-  Filters (`ProgressFilter`): `range`, `sources`, `exercise`. The
+  Filters (`ProgressFilter`): `range`, `sources`, `exercise`. The weekly
+  chart, consistency and its day grid span the range (ADR-194). The
   per-provider page stays gated by its package (ADR-098); this account view
   is the member's own data across providers and is not, like PRs.
   """
@@ -32,10 +33,12 @@ defmodule Palee.Application.GetAccountProgress do
 
       labels = Map.new(executions, &{&1.id, &1.source_label})
 
+      weeks = Analytics.progress_weeks(filter, today, first_day(executions))
+
       stats =
         executions
         |> Enum.map(&Map.put(&1, :master_workout_id, &1.workout_key))
-        |> ProgressStats.build(today)
+        |> ProgressStats.build(today, weeks)
 
       {:ok,
        stats
@@ -45,6 +48,13 @@ defmodule Palee.Application.GetAccountProgress do
        |> Map.put(:filter, Analytics.progress_filter_params(filter))
        |> Map.put(:active_filter_count, Analytics.progress_filter_active_count(filter))}
     end
+  end
+
+  defp first_day(executions) do
+    executions
+    |> Enum.filter(&(&1.status == "completed" and &1.completed_at_utc))
+    |> Enum.map(&DateTime.to_date(&1.completed_at_utc))
+    |> Enum.min(Date, fn -> nil end)
   end
 
   defp label_points(history, labels) do

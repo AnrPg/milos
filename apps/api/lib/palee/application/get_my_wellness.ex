@@ -96,13 +96,22 @@ defmodule Palee.Application.GetMyWellness do
     |> Wellbeing.list_check_ins_between(lower, upper)
     |> Enum.reduce(%{}, fn check_in, acc ->
       case Wellness.local_day(check_in.recorded_at, check_in.recorded_tz) do
-        {:ok, day} when day >= from and day <= to -> Map.put(acc, day, mood(check_in))
-        _outside -> acc
+        {:ok, day} when day >= from and day <= to ->
+          latest = mood(check_in)
+          Map.update(acc, day, latest, &merge_mood(&1, latest))
+
+        _outside ->
+          acc
       end
     end)
   end
 
-  # Oldest first, so the latest submission of a day wins.
+  # Oldest first, so the latest answer to each question of a day wins: a
+  # one-tap stress answer (ADR-194) keeps the mood answered earlier that day.
+  defp merge_mood(earlier, latest),
+    do:
+      Map.merge(earlier, latest, fn _key, before, now -> if is_nil(now), do: before, else: now end)
+
   defp mood(check_in) do
     answers = Map.new(check_in.answers, &{&1.question_key, &1.value})
 
