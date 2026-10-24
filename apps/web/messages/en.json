@@ -11130,5 +11130,25 @@
         "body": "Replay this any time from Guides."
       }
     }
+  },
+  "CoachClients": {
+    "title": "My clients",
+    "replies": "Awaiting your reply",
+    "reviews": "Form reviews",
+    "desk": "Check-in today",
+    "clients": "Clients",
+    "sentAt": "Sent {time}",
+    "overdue": "Overdue",
+    "dueSoon": "Due soon",
+    "unknownClient": "Member",
+    "openVideo": "Watch the video",
+    "checkedIn": "{count} of {total} checked in",
+    "attended": "Here",
+    "noShow": "No-show",
+    "attendanceOf": "Attendance of {name}",
+    "markError": "Not saved. Try again.",
+    "showAll": "Show all ({count})",
+    "showFewer": "Show fewer",
+    "moreInConsole": "See all in the console"
   }
 }

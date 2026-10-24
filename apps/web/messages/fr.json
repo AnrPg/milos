@@ -11130,5 +11130,25 @@
         "body": "Revois ce guide quand tu veux depuis Guides."
       }
     }
+  },
+  "CoachClients": {
+    "title": "Mes clients",
+    "replies": "En attente de réponse",
+    "reviews": "Analyse technique",
+    "desk": "Check-in du jour",
+    "clients": "Clients",
+    "sentAt": "Envoyé {time}",
+    "overdue": "En retard",
+    "dueSoon": "Bientôt dû",
+    "unknownClient": "Membre",
+    "openVideo": "Voir la vidéo",
+    "checkedIn": "{count} sur {total} arrivés",
+    "attended": "Présent",
+    "noShow": "Absent",
+    "attendanceOf": "Présence de {name}",
+    "markError": "Non enregistré. Réessayez.",
+    "showAll": "Tout afficher ({count})",
+    "showFewer": "Afficher moins",
+    "moreInConsole": "Tout voir dans la console"
   }
 }

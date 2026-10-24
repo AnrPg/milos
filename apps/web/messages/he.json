@@ -11130,5 +11130,25 @@
         "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
       }
     }
+  },
+  "CoachClients": {
+    "title": "הלקוחות שלי",
+    "replies": "ממתינים לתשובה",
+    "reviews": "בדיקת טכניקה",
+    "desk": "צ׳ק-אין היום",
+    "clients": "לקוחות",
+    "sentAt": "נשלח {time}",
+    "overdue": "באיחור",
+    "dueSoon": "מועד קרוב",
+    "unknownClient": "חבר/ה",
+    "openVideo": "צפה בסרטון",
+    "checkedIn": "הגיעו {count} מתוך {total}",
+    "attended": "הגיע/ה",
+    "noShow": "לא הגיע/ה",
+    "attendanceOf": "נוכחות של {name}",
+    "markError": "לא נשמר. נסה שוב.",
+    "showAll": "הצג הכול ({count})",
+    "showFewer": "הצג פחות",
+    "moreInConsole": "הכול בממשק הניהול"
   }
 }
