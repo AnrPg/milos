@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "full";
 
@@ -89,6 +90,7 @@ export function Dialog({
   labelledBy,
   titleId: titleIdProp,
   testId,
+  guide,
 }: {
   onClose: () => void;
   title?: ReactNode;
@@ -124,6 +126,8 @@ export function Dialog({
   /** A fixed id for the title element (tests and aria references). */
   titleId?: string;
   testId?: string;
+  /** The walkthrough anchor of the panel (ADR-193), e.g. "events.wizard". */
+  guide?: GuideAnchor;
 }) {
   const generatedId = useId();
   const titleId = titleIdProp ?? `${generatedId}-title`;
@@ -172,6 +176,7 @@ export function Dialog({
       aria-describedby={description ? descriptionId : undefined}
       tabIndex={-1}
       data-testid={testId}
+      data-guide={guide}
       onSubmit={onSubmit}
       onClick={(event) => event.stopPropagation()}
       className={`relative flex min-h-0 w-full flex-col outline-none ${/\boverflow-/.test(panelClassName) ? "" : "overflow-hidden"} ${
@@ -309,6 +314,7 @@ export function DialogButton({
   type = "button",
   form,
   className = "",
+  testId,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -317,6 +323,7 @@ export function DialogButton({
   type?: "button" | "submit";
   form?: string;
   className?: string;
+  testId?: string;
 }) {
   const style: CSSProperties =
     tone === "primary"
@@ -332,6 +339,7 @@ export function DialogButton({
       form={form}
       onClick={onClick}
       disabled={disabled}
+      data-testid={testId}
       className={`min-h-11 rounded-full px-5 text-sm font-semibold transition-opacity disabled:opacity-50 ${className}`}
       style={style}
     >

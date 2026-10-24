@@ -31,6 +31,8 @@ import { Select } from "@/components/ui/Select";
 import { DateBlock, useEventError, useGoingLabel, usePriceLabel } from "./EventParts";
 import { formatPrice, formatWhen } from "./events";
 import { HostedEventSheet, useEventHosts } from "./HostedEventSheet";
+import { guideAnchor } from "@/lib/guides/anchors";
+import { GuideButton } from "@/components/guides/GuideButton";
 
 type Tab = "manage" | "finances" | "analytics";
 const TABS: Tab[] = ["manage", "finances", "analytics"];
@@ -59,9 +61,12 @@ export function HostingConsole({ org = null, tab = null, event = null }: { org?:
     <HubPage
       title={t("title")}
       actions={
-        <button type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-          {tEvents("newEvent")}
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <GuideButton guide="events_organising" className="min-h-11 rounded-full px-3 text-sm font-semibold" />
+          <button {...guideAnchor("events.new")} type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+            {tEvents("newEvent")}
+          </button>
+        </div>
       }
     >
       <Link href="/events" className="text-sm font-semibold" style={{ color: "var(--dim)" }}>‹ {t("backToEvents")}</Link>
@@ -84,7 +89,7 @@ export function HostingConsole({ org = null, tab = null, event = null }: { org?:
               </Select>
             </Field>
           ) : null}
-          <SegmentPicker ariaLabel={t("tabsAria")} variant="track" stretch value={current} onChange={setCurrent} options={TABS.map((value) => ({ value, label: t(`tab_${value}`) }))} />
+          <SegmentPicker guide="events.tabs" ariaLabel={t("tabsAria")} variant="track" stretch value={current} onChange={setCurrent} options={TABS.map((value) => ({ value, label: t(`tab_${value}`) }))} />
           {current === "manage" ? (
             <ManageTab key={host.organization_id} host={host} initialEvent={host.organization_id === org ? event : null} />
           ) : current === "finances" ? (
@@ -127,7 +132,7 @@ function ManageTab({ host, initialEvent }: { host: EventHostChoice; initialEvent
   return (
     <>
       <SegmentPicker ariaLabel={tEvents("scopeAria")} stretch value={scope} onChange={setScope} options={LIST_SCOPES.map((value) => ({ value, label: tEvents(value) }))} />
-      <HubCard>
+      <HubCard guide="events.list">
         {events.isPending ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
         ) : (events.data ?? []).length === 0 ? (
@@ -306,7 +311,7 @@ function FinancesTab({ slug }: { slug: string }) {
   const rows = (finances.data?.events ?? []).filter((row) => row.price_cents > 0 || row.paid_count > 0 || row.refunded_count > 0);
 
   return (
-    <>
+    <div {...guideAnchor("events.finances")} className="flex flex-col gap-4">
       <ScopePicker value={scope} onChange={setScope} />
       {finances.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
@@ -347,7 +352,7 @@ function FinancesTab({ slug }: { slug: string }) {
           </HubCard>
         </>
       )}
-    </>
+    </div>
   );
 }
 
@@ -364,7 +369,7 @@ function AnalyticsTab({ slug }: { slug: string }) {
   const rows = analytics.data?.events ?? [];
 
   return (
-    <>
+    <div {...guideAnchor("events.analytics")} className="flex flex-col gap-4">
       <ScopePicker value={scope} onChange={setScope} />
       {analytics.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
@@ -410,6 +415,6 @@ function AnalyticsTab({ slug }: { slug: string }) {
           </HubCard>
         </>
       )}
-    </>
+    </div>
   );
 }

@@ -10858,5 +10858,277 @@
     "notif_person_message_body": "{name} hat dir eine Nachricht geschickt.",
     "notif_message_request_title": "Nachrichtenanfrage",
     "notif_message_request_body": "{name} möchte dir eine Nachricht schicken."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Anleitungen",
+      "listIntro": "Kurze Rundgänge auf den echten Bildschirmen. Tipp einfach mit; gespeichert wird nur, was du selbst speicherst.",
+      "forStaff": "Für dein Unternehmen",
+      "forYou": "Für dich",
+      "minutes": "{count, plural, one {# Min.} other {# Min.}}",
+      "start": "Starten",
+      "resume": "Fortsetzen",
+      "replay": "Wiederholen",
+      "state_new": "Neu",
+      "state_started": "Läuft",
+      "state_completed": "Erledigt",
+      "state_dismissed": "Nicht gestartet",
+      "state_outdated": "Aktualisiert",
+      "openGuide": "Rundgang",
+      "openGuideAria": "Rundgang starten: {title}",
+      "next": "Weiter",
+      "back": "Zurück",
+      "finish": "Fertig",
+      "close": "Rundgang schließen",
+      "stepOf": "{current} von {total}",
+      "doIt": "Mach es für mich",
+      "tapHint": "Tippe auf die markierte Stelle",
+      "notHere": "Gerade nicht auf diesem Bildschirm, darum hier das Wichtigste.",
+      "fillDemo": "Zuerst mit Demodaten füllen",
+      "filling": "Wird gefüllt…",
+      "demoFilled": "Demodaten hinzugefügt",
+      "offerEyebrow": "Neu hier?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Zeig's mir",
+      "offerLater": "Nicht jetzt",
+      "meRow": "Anleitungen",
+      "meRowHint": "Rundgänge durch Shop, Events, Angebote und deinen eigenen Club",
+      "loadFailed": "Die Anleitungen wurden nicht geladen. Versuch es erneut."
+    },
+    "shop_staff": {
+      "title": "Führe deinen Shop",
+      "summary": "Produkte anlegen, in der App und an der Kasse verkaufen, den Bestand im Griff behalten.",
+      "chapters": {
+        "setup": "Einrichten",
+        "sell": "Verkaufen",
+        "track": "Im Blick behalten"
+      },
+      "welcome": {
+        "title": "Der Shop deiner Box",
+        "body": "Mitglieder bestellen in der App und holen an der Rezeption ab. Du verkaufst auch an der Kasse."
+      },
+      "newProduct": {
+        "title": "Produkt hinzufügen",
+        "body": "Tippe auf „{label}“."
+      },
+      "photos": {
+        "title": "Fotos verkaufen",
+        "body": "Füge ein paar klare Fotos hinzu. Das erste ist das Titelbild."
+      },
+      "price": {
+        "title": "Preis und Optionen",
+        "body": "Ein Preis oder Größen und Geschmacksrichtungen mit eigenem Bestand.",
+        "tip": "Der Bestand zählt pro Option, so werden „M“ und „L“ nie verwechselt."
+      },
+      "selling": {
+        "title": "Wo es verkauft wird",
+        "body": "In der App, an der Kasse oder beides. Nur für Mitglieder oder für alle."
+      },
+      "save": {
+        "title": "Speichern, dann veröffentlichen",
+        "body": "Ein neues Produkt ist ein Entwurf. Veröffentliche es, um den Shop zu öffnen.",
+        "tip": "Mitglieder sehen die Shop-Karte in der Box erst, wenn etwas veröffentlicht ist."
+      },
+      "ordersTab": {
+        "title": "Bestellungen",
+        "body": "Tippe auf „{label}“."
+      },
+      "orders": {
+        "title": "Vorbereiten, dann übergeben",
+        "body": "Markiere eine Bestellung als bereit, und das Mitglied erfährt, wo es sie abholt.",
+        "tip": "Nicht abgeholte Bestellungen werden nach 7 Tagen automatisch storniert und geben den Bestand frei."
+      },
+      "pos": {
+        "title": "Die Kasse",
+        "body": "Verkaufe an der Kasse in Sekunden, sofort bezahlt oder aufs Konto des Mitglieds."
+      },
+      "stock": {
+        "title": "Bestand",
+        "body": "Jeder Verkauf, jede Lieferung und jede Zählung wird erfasst. Bei niedrigem Bestand wirst du gewarnt."
+      },
+      "analytics": {
+        "title": "Was sich verkauft",
+        "body": "Verkäufe pro Woche, Margen und deine Top-Produkte.",
+        "tip": "Shop-Verkäufe erscheinen auch in Finanzen als eigene Einnahmequelle."
+      },
+      "done": {
+        "title": "Alles bereit",
+        "body": "Wiederhole das jederzeit unter Anleitungen."
+      }
+    },
+    "events_organising": {
+      "title": "Events organisieren",
+      "summary": "In 7 kurzen Schritten planen, Plätze verkaufen, Leute einchecken, Zahlen sehen.",
+      "chapters": {
+        "plan": "Planen",
+        "run": "Durchführen"
+      },
+      "welcome": {
+        "title": "Events von A bis Z",
+        "body": "Planen, füllen, durchführen und sehen, wie es lief, alles an einem Ort."
+      },
+      "new": {
+        "title": "Event starten",
+        "body": "Tippe auf „{label}“."
+      },
+      "steps": {
+        "title": "Sieben kurze Schritte",
+        "body": "Veranstalter, Grundlagen, wann, wo, wer und Preis, Plätze, Prüfen. Tippe auf einen erledigten Schritt, um zurückzugehen."
+      },
+      "screen": {
+        "title": "Eine Entscheidung pro Bildschirm",
+        "body": "Füll das aus, dann Weiter.",
+        "tip": "Dein Entwurf bleibt auf diesem Gerät, du kannst also aufhören und später weitermachen."
+      },
+      "next": {
+        "title": "Weiter weiß, was fehlt",
+        "body": "Fehlt noch etwas, sagt es dir, was."
+      },
+      "cohosts": {
+        "title": "Mit anderen veranstalten",
+        "body": "Unter „{label}“ fragst du eine Box oder einen Coach über die Seitenadresse als Mitveranstalter an.",
+        "tip": "Sobald sie zusagen, erscheint das Event auf ihrer Seite und erreicht ihre Mitglieder."
+      },
+      "manage": {
+        "title": "Verwalten",
+        "body": "Für jedes Event: Teilnehmende, Check-in, Zahlungen in der Box, Erstattungen und Nachrichten."
+      },
+      "finances": {
+        "title": "Finanzen",
+        "body": "Tippe auf „{label}“: Einnahmen, Erstattungen und was noch offen ist."
+      },
+      "analytics": {
+        "title": "Analysen",
+        "body": "Tippe auf „{label}“: Aufrufe, Anmeldungen, Warteliste und wer da war.",
+        "tip": "Die Konversion zeigt, wie viele Besucher sich angemeldet haben."
+      },
+      "done": {
+        "title": "Bereit zum Veranstalten",
+        "body": "Wiederhole das jederzeit unter Anleitungen."
+      }
+    },
+    "finance_offers": {
+      "title": "Angebote, Partner und Empfehlungen",
+      "summary": "Kampagnen und Rabattcodes, Partnervorteile und ein Programm „Freund mitbringen“.",
+      "chapters": {
+        "campaigns": "Kampagnen",
+        "partners": "Partner",
+        "referrals": "Empfehlungen"
+      },
+      "welcome": {
+        "title": "Mit Angeboten wachsen",
+        "body": "Eigene Kampagnen und Rabattcodes, Vorteile bei Partnergeschäften und Prämien fürs Mitbringen von Freunden."
+      },
+      "campaignNew": {
+        "title": "Kampagne starten",
+        "body": "Tippe auf „{label}“."
+      },
+      "campaignForm": {
+        "title": "Name und Zeitraum",
+        "body": "Eine Kampagne bündelt deine Angebote, z. B. „Sommer“. Wähle, wann sie läuft."
+      },
+      "coupons": {
+        "title": "Rabattcodes",
+        "body": "Öffne eine Kampagne, um Codes hinzuzufügen: Rabatt in Prozent oder als Betrag, mit Nutzungslimit.",
+        "tip": "Jeder Code zeigt, wie oft er genutzt wurde, so siehst du, welches Angebot wirkt."
+      },
+      "partners": {
+        "title": "Partnervorteile",
+        "body": "Tippe auf „{label}“."
+      },
+      "perkNew": {
+        "title": "Partnerangebot hinzufügen",
+        "body": "Tippe auf „{label}“."
+      },
+      "perkPartner": {
+        "title": "Der Partner",
+        "body": "Name, Link und Logo."
+      },
+      "perkBenefit": {
+        "title": "Was Mitglieder bekommen",
+        "body": "Prozente, ein Betrag oder etwas anderes, etwa ein Gratis-Kaffee."
+      },
+      "perkMethod": {
+        "title": "Wie der Laden es prüft",
+        "body": "Ein gemeinsamer Code, ein Link mit eingesetztem Code oder die live gezeigte Mitgliedschaft.",
+        "tip": "Wird ein Code weitergegeben, änderst du ihn hier, und er gilt sofort."
+      },
+      "perkRules": {
+        "title": "Bedingungen",
+        "body": "Zeitraum, wer es bekommt und wie oft. Als Entwurf speichern, veröffentlichen, wenn alles abgesprochen ist."
+      },
+      "referrals": {
+        "title": "Freund mitbringen",
+        "body": "Ein Programm belohnt Mitglieder, die jemanden mitbringen, der beitritt."
+      },
+      "referralsFlow": {
+        "title": "Freigeben und belohnen",
+        "body": "Empfehlungen landen hier. Gib eine frei, und ihre Prämie geht raus.",
+        "tip": "Prämien können an beide gehen: an das Mitglied und an den Freund."
+      },
+      "done": {
+        "title": "Alles bereit",
+        "body": "Wiederhole das jederzeit unter Anleitungen."
+      }
+    },
+    "member_club_event": {
+      "title": "Dein eigener Club und dein Event",
+      "summary": "Gründe eine Gruppe im Club deiner Box und plane ein Event, allein oder mit einer Box.",
+      "chapters": {
+        "club": "Dein Club",
+        "event": "Dein Event"
+      },
+      "welcome": {
+        "title": "Mach es zu deinem",
+        "body": "Gründe eine Gruppe mit deinen Leuten und plane eigene Events."
+      },
+      "channels": {
+        "title": "Der Club deiner Box",
+        "body": "Tippe auf „{label}“."
+      },
+      "groups": {
+        "title": "Gruppen",
+        "body": "Kleine Clubs in der Box, mit eigenem Chat und eigenen Events."
+      },
+      "propose": {
+        "title": "Gruppe gründen",
+        "body": "Tippe auf „{label}“."
+      },
+      "groupSheet": {
+        "title": "Benennen, Beitritt festlegen",
+        "body": "Offen für alle oder auf Anfrage.",
+        "tip": "Manche Boxen geben neue Gruppen erst frei; du bekommst Bescheid, sobald sie live ist."
+      },
+      "noBox": {
+        "title": "Gruppen gehören zu einer Box",
+        "body": "Tritt zuerst einer Box bei, dann gründe eine Gruppe in ihrem Club. Events kannst du sofort planen."
+      },
+      "eventNew": {
+        "title": "Event planen",
+        "body": "Tippe auf „{label}“."
+      },
+      "hostAs": {
+        "title": "Wer veranstaltet",
+        "body": "Du, oder eine Gruppe oder ein Unternehmen, das du führst.",
+        "tip": "„{label}“ braucht gar keine Box."
+      },
+      "alone": {
+        "title": "Auf eigene Faust",
+        "body": "Offen für alle in der Nähe oder nur mit Einladung über deinen Link."
+      },
+      "withBox": {
+        "title": "Mit einer Box",
+        "body": "Unter „{label}“ fragst du die Box über ihre Seitenadresse als Mitveranstalter an.",
+        "tip": "Sobald sie zusagt, erscheint das Event auch auf der Seite der Box."
+      },
+      "hosting": {
+        "title": "Durchführen",
+        "body": "Nach dem Veröffentlichen findest du unter „{label}“ Teilnehmende, Check-in und die Zahlen."
+      },
+      "done": {
+        "title": "Jetzt bist du dran",
+        "body": "Wiederhole das jederzeit unter Anleitungen."
+      }
+    }
   }
 }

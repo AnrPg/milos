@@ -4,6 +4,7 @@ import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, typ
 
 import { chooseSegmentLayout, fittingColumns, type SegmentLayout } from "@/lib/segment-layout";
 import { Select } from "@/components/ui/Select";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // One control for every set of mutually exclusive options shown as tabs or
 // chips (user types, list tabs, sources, boxes). It never scrolls sideways:
@@ -64,6 +65,7 @@ export function SegmentPicker<T extends string>({
   variant = "chips",
   stretch = false,
   className = "",
+  guide,
 }: {
   options: SegmentOption<T>[];
   value: T;
@@ -80,6 +82,8 @@ export function SegmentPicker<T extends string>({
   /** Stretch the chips of a single row over the full width. */
   stretch?: boolean;
   className?: string;
+  /** A walkthrough anchor (ADR-193); each chip also carries `data-segment`. */
+  guide?: GuideAnchor;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const measurer = useRef<HTMLDivElement>(null);
@@ -148,7 +152,7 @@ export function SegmentPicker<T extends string>({
     variant === "track" ? { background: "var(--panel-muted)", border: "1px solid var(--border)", padding: 2, borderRadius: "1.25rem" } : undefined;
 
   return (
-    <div ref={container} className={`relative min-w-0 ${className}`}>
+    <div ref={container} className={`relative min-w-0 ${className}`} data-guide={guide}>
       {/* Off-screen copy at natural widths: what the layout is chosen from. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-0 overflow-hidden" style={{ visibility: "hidden" }}>
         <div ref={measurer} className="flex w-max">
@@ -199,6 +203,7 @@ export function SegmentPicker<T extends string>({
                 type="button"
                 role={itemRole}
                 id={idPrefix ? `${idPrefix}-tab-${option.value}` : undefined}
+                data-segment={option.value}
                 aria-selected={semantics === "tablist" ? selected : undefined}
                 aria-checked={semantics === "radiogroup" ? selected : undefined}
                 aria-controls={semantics === "tablist" ? panelId : undefined}

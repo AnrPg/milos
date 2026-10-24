@@ -10858,5 +10858,277 @@
     "notif_person_message_body": "{name} ti ha mandato un messaggio.",
     "notif_message_request_title": "Richiesta di messaggio",
     "notif_message_request_body": "{name} vuole mandarti un messaggio."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Guide",
+      "listIntro": "Brevi tour guidati sulle schermate vere. Tocca e segui; non si salva nulla se non lo salvi tu.",
+      "forStaff": "Per la tua attività",
+      "forYou": "Per te",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Inizia",
+      "resume": "Riprendi",
+      "replay": "Rivedi",
+      "state_new": "Nuova",
+      "state_started": "In corso",
+      "state_completed": "Completata",
+      "state_dismissed": "Non iniziata",
+      "state_outdated": "Aggiornata",
+      "openGuide": "Tour guidato",
+      "openGuideAria": "Avvia il tour guidato: {title}",
+      "next": "Avanti",
+      "back": "Indietro",
+      "finish": "Fatto",
+      "close": "Chiudi il tour guidato",
+      "stepOf": "{current} di {total}",
+      "doIt": "Fallo per me",
+      "tapHint": "Tocca il punto evidenziato",
+      "notHere": "Ora non è in questa schermata, quindi ecco l'essenziale.",
+      "fillDemo": "Riempi prima con dati demo",
+      "filling": "Riempimento…",
+      "demoFilled": "Dati demo aggiunti",
+      "offerEyebrow": "Prima volta qui?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Mostrami",
+      "offerLater": "Non ora",
+      "meRow": "Guide",
+      "meRowHint": "Tour guidati di negozio, eventi, offerte e del tuo club",
+      "loadFailed": "Le guide non si sono caricate. Riprova."
+    },
+    "shop_staff": {
+      "title": "Gestisci il tuo negozio",
+      "summary": "Aggiungi prodotti, vendi nell'app e in cassa, tieni le scorte in ordine.",
+      "chapters": {
+        "setup": "Configura",
+        "sell": "Vendi",
+        "track": "Tieni traccia"
+      },
+      "welcome": {
+        "title": "Il negozio del tuo box",
+        "body": "I membri ordinano nell'app e ritirano alla reception. Tu vendi anche in cassa."
+      },
+      "newProduct": {
+        "title": "Aggiungi un prodotto",
+        "body": "Tocca «{label}»."
+      },
+      "photos": {
+        "title": "Le foto vendono",
+        "body": "Aggiungi qualche foto nitida. La prima è la copertina."
+      },
+      "price": {
+        "title": "Prezzo e opzioni",
+        "body": "Un solo prezzo, oppure taglie e gusti con scorte proprie.",
+        "tip": "Le scorte si contano per opzione, così «M» e «L» non si confondono mai."
+      },
+      "selling": {
+        "title": "Dove si vende",
+        "body": "Nell'app, in cassa o in entrambi. Solo per i membri o per tutti."
+      },
+      "save": {
+        "title": "Salva, poi pubblica",
+        "body": "Un nuovo prodotto è una bozza. Pubblicalo per aprire il negozio.",
+        "tip": "I membri vedono la scheda Negozio nel Box solo quando c'è qualcosa di pubblicato."
+      },
+      "ordersTab": {
+        "title": "Ordini",
+        "body": "Tocca «{label}»."
+      },
+      "orders": {
+        "title": "Prepara, poi consegna",
+        "body": "Segna un ordine come pronto e il membro sa dove ritirarlo.",
+        "tip": "Gli ordini non ritirati si annullano da soli dopo 7 giorni e liberano le scorte."
+      },
+      "pos": {
+        "title": "La cassa",
+        "body": "Vendi in cassa in pochi secondi, pagato subito o sul conto del membro."
+      },
+      "stock": {
+        "title": "Magazzino",
+        "body": "Ogni vendita, consegna e conteggio viene registrato. Ti avvisa quando le scorte sono basse."
+      },
+      "analytics": {
+        "title": "Cosa vende",
+        "body": "Vendite settimanali, margini e i tuoi prodotti migliori.",
+        "tip": "Le vendite del negozio compaiono anche in Finanze come fonte di ricavi a sé."
+      },
+      "done": {
+        "title": "Tutto pronto",
+        "body": "Rivedi questa guida quando vuoi da Guide."
+      }
+    },
+    "events_organising": {
+      "title": "Organizza eventi",
+      "summary": "Pianifica in 7 brevi passi, vendi posti, fai il check-in, guarda i numeri.",
+      "chapters": {
+        "plan": "Pianifica",
+        "run": "Gestisci"
+      },
+      "welcome": {
+        "title": "Eventi, dall'inizio alla fine",
+        "body": "Pianificalo, riempilo, gestiscilo e guarda com'è andata, in un unico posto."
+      },
+      "new": {
+        "title": "Crea un evento",
+        "body": "Tocca «{label}»."
+      },
+      "steps": {
+        "title": "Sette brevi passi",
+        "body": "Organizzatore, dati base, quando, dove, chi e prezzo, posti, riepilogo. Tocca un passo fatto per tornarci."
+      },
+      "screen": {
+        "title": "Una scelta per schermata",
+        "body": "Compila qui, poi Avanti.",
+        "tip": "La bozza resta su questo dispositivo, così puoi fermarti e tornare dopo."
+      },
+      "next": {
+        "title": "Avanti sa cosa manca",
+        "body": "Se manca qualcosa, ti dice cosa."
+      },
+      "cohosts": {
+        "title": "Co-organizza con altri",
+        "body": "In «{label}», chiedi a un box o a un coach di co-organizzare tramite l'indirizzo della sua pagina.",
+        "tip": "Quando accetta, l'evento compare sulla sua pagina e raggiunge i suoi membri."
+      },
+      "manage": {
+        "title": "Gestisci",
+        "body": "Per ogni evento: partecipanti, check-in, pagamenti al box, rimborsi e messaggi."
+      },
+      "finances": {
+        "title": "Finanze",
+        "body": "Tocca «{label}»: entrate, rimborsi e quanto resta da incassare."
+      },
+      "analytics": {
+        "title": "Analisi",
+        "body": "Tocca «{label}»: visualizzazioni, iscrizioni, lista d'attesa e chi è venuto.",
+        "tip": "La conversione mostra quanti visitatori si sono iscritti."
+      },
+      "done": {
+        "title": "Tutto pronto per l'evento",
+        "body": "Rivedi questa guida quando vuoi da Guide."
+      }
+    },
+    "finance_offers": {
+      "title": "Offerte, partner e referral",
+      "summary": "Campagne e codici sconto, vantaggi dei partner e un programma Porta un amico.",
+      "chapters": {
+        "campaigns": "Campagne",
+        "partners": "Partner",
+        "referrals": "Referral"
+      },
+      "welcome": {
+        "title": "Cresci con le offerte",
+        "body": "Le tue campagne e i tuoi codici sconto, vantaggi dai negozi partner e premi per chi porta amici."
+      },
+      "campaignNew": {
+        "title": "Crea una campagna",
+        "body": "Tocca «{label}»."
+      },
+      "campaignForm": {
+        "title": "Nome e date",
+        "body": "Una campagna raggruppa le tue offerte, es. «Estate». Scegli quando è attiva."
+      },
+      "coupons": {
+        "title": "Codici sconto",
+        "body": "Apri una campagna per aggiungere codici: uno sconto in percentuale o in importo, con un limite di utilizzi.",
+        "tip": "Ogni codice mostra quante volte è stato usato, così vedi quale offerta funziona."
+      },
+      "partners": {
+        "title": "Vantaggi dei partner",
+        "body": "Tocca «{label}»."
+      },
+      "perkNew": {
+        "title": "Aggiungi un'offerta partner",
+        "body": "Tocca «{label}»."
+      },
+      "perkPartner": {
+        "title": "Il partner",
+        "body": "Nome, link e logo."
+      },
+      "perkBenefit": {
+        "title": "Cosa ricevono i membri",
+        "body": "Una percentuale, un importo o altro, come un caffè gratis."
+      },
+      "perkMethod": {
+        "title": "Come lo verifica il negozio",
+        "body": "Un codice condiviso, un link con il codice dentro o l'abbonamento mostrato dal vivo.",
+        "tip": "Se un codice circola, cambialo qui e vale subito."
+      },
+      "perkRules": {
+        "title": "Condizioni",
+        "body": "Date, chi ne ha diritto e quanto spesso. Salva una bozza, pubblica quando è tutto concordato."
+      },
+      "referrals": {
+        "title": "Porta un amico",
+        "body": "Un programma premia i membri che portano qualcuno che si iscrive."
+      },
+      "referralsFlow": {
+        "title": "Approva e premia",
+        "body": "I referral arrivano qui. Approvane uno e parte il suo premio.",
+        "tip": "I premi possono andare a entrambi: al membro e all'amico."
+      },
+      "done": {
+        "title": "Tutto pronto",
+        "body": "Rivedi questa guida quando vuoi da Guide."
+      }
+    },
+    "member_club_event": {
+      "title": "Il tuo club e il tuo evento",
+      "summary": "Crea un gruppo nel club del tuo box e organizza un evento, in autonomia o con un box.",
+      "chapters": {
+        "club": "Il tuo club",
+        "event": "Il tuo evento"
+      },
+      "welcome": {
+        "title": "Fallo tuo",
+        "body": "Crea un gruppo con la tua gente e organizza i tuoi eventi."
+      },
+      "channels": {
+        "title": "Il club del tuo box",
+        "body": "Tocca «{label}»."
+      },
+      "groups": {
+        "title": "Gruppi",
+        "body": "Piccoli club dentro il box, con chat ed eventi propri."
+      },
+      "propose": {
+        "title": "Crea un gruppo",
+        "body": "Tocca «{label}»."
+      },
+      "groupSheet": {
+        "title": "Dagli un nome, scegli chi entra",
+        "body": "Aperto a tutti o su richiesta.",
+        "tip": "Alcuni box approvano prima i nuovi gruppi; ricevi un avviso quando è attivo."
+      },
+      "noBox": {
+        "title": "I gruppi stanno in un box",
+        "body": "Prima entra in un box, poi crea un gruppo nel suo club. Gli eventi puoi organizzarli subito."
+      },
+      "eventNew": {
+        "title": "Organizza un evento",
+        "body": "Tocca «{label}»."
+      },
+      "hostAs": {
+        "title": "Chi organizza",
+        "body": "Tu, oppure un gruppo o un'attività che gestisci.",
+        "tip": "«{label}» non richiede nessun box."
+      },
+      "alone": {
+        "title": "In autonomia",
+        "body": "Aperto a chiunque nei dintorni, o solo su invito con il tuo link."
+      },
+      "withBox": {
+        "title": "Con un box",
+        "body": "In «{label}», chiedi al box di co-organizzare tramite l'indirizzo della sua pagina.",
+        "tip": "Quando accetta, l'evento compare anche sulla pagina del box."
+      },
+      "hosting": {
+        "title": "Gestiscilo",
+        "body": "Dopo la pubblicazione, in «{label}» trovi partecipanti, check-in e numeri."
+      },
+      "done": {
+        "title": "Ora tocca a te",
+        "body": "Rivedi questa guida quando vuoi da Guide."
+      }
+    }
   }
 }

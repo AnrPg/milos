@@ -1858,6 +1858,13 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: "The upload or profile was rejected."})
   end
 
+  # ADR-193: at most Palee.Guides.max_guides/0 walkthroughs per person.
+  def call(conn, {:error, :too_many_guides}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "too_many_guides", error: "Too many walkthroughs."})
+  end
+
   def call(conn, {:error, :media_not_found}) do
     conn
     |> put_status(:not_found)

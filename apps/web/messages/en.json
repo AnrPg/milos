@@ -10858,5 +10858,277 @@
     "notif_person_message_body": "{name} sent you a message.",
     "notif_message_request_title": "Message request",
     "notif_message_request_body": "{name} wants to send you a message."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Guides",
+      "listIntro": "Short walkthroughs on the real screens. Tap along; nothing is saved unless you save it.",
+      "forStaff": "For your business",
+      "forYou": "For you",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Start",
+      "resume": "Resume",
+      "replay": "Replay",
+      "state_new": "New",
+      "state_started": "In progress",
+      "state_completed": "Done",
+      "state_dismissed": "Not started",
+      "state_outdated": "Updated",
+      "openGuide": "Walkthrough",
+      "openGuideAria": "Start the walkthrough: {title}",
+      "next": "Next",
+      "back": "Back",
+      "finish": "Done",
+      "close": "Close the walkthrough",
+      "stepOf": "{current} of {total}",
+      "doIt": "Do it for me",
+      "tapHint": "Tap the highlighted spot",
+      "notHere": "Not on this screen right now, so here is the gist.",
+      "fillDemo": "Fill with demo data first",
+      "filling": "Filling…",
+      "demoFilled": "Demo data added",
+      "offerEyebrow": "New here?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Show me",
+      "offerLater": "Not now",
+      "meRow": "Guides",
+      "meRowHint": "Walkthroughs of the shop, events, offers and your own club",
+      "loadFailed": "The guides did not load. Try again."
+    },
+    "shop_staff": {
+      "title": "Run your shop",
+      "summary": "Add products, sell in the app and at the desk, keep stock right.",
+      "chapters": {
+        "setup": "Set up",
+        "sell": "Sell",
+        "track": "Keep track"
+      },
+      "welcome": {
+        "title": "Your box's shop",
+        "body": "Members order in the app and collect at the desk. You sell from the till too."
+      },
+      "newProduct": {
+        "title": "Add a product",
+        "body": "Tap «{label}»."
+      },
+      "photos": {
+        "title": "Photos sell",
+        "body": "Add a few clear photos. The first one is the cover."
+      },
+      "price": {
+        "title": "Price and options",
+        "body": "One price, or sizes and flavours with their own stock.",
+        "tip": "Stock is counted per option, so «M» and «L» never mix up."
+      },
+      "selling": {
+        "title": "Where it sells",
+        "body": "In the app, at the desk or both. Members only, or anyone."
+      },
+      "save": {
+        "title": "Save, then publish",
+        "body": "A new product is a draft. Publish it to open the shop.",
+        "tip": "Members see the Shop card in Box only once something is published."
+      },
+      "ordersTab": {
+        "title": "Orders",
+        "body": "Tap «{label}»."
+      },
+      "orders": {
+        "title": "Prepare, then hand over",
+        "body": "Mark an order ready and the member is told where to collect it.",
+        "tip": "Uncollected orders cancel on their own after 7 days and free the stock."
+      },
+      "pos": {
+        "title": "The desk till",
+        "body": "Sell at the desk in seconds, paid now or on the member's account."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Every sale, delivery and count is logged. Low stock warns you."
+      },
+      "analytics": {
+        "title": "What sells",
+        "body": "Weekly sales, margins and your top products.",
+        "tip": "Shop sales also show in Finance as their own revenue stream."
+      },
+      "done": {
+        "title": "You're set",
+        "body": "Replay this any time from Guides."
+      }
+    },
+    "events_organising": {
+      "title": "Organise events",
+      "summary": "Plan in 7 short steps, sell places, check people in, see the numbers.",
+      "chapters": {
+        "plan": "Plan",
+        "run": "Run"
+      },
+      "welcome": {
+        "title": "Events, start to finish",
+        "body": "Plan it, fill it, run it and see how it went, in one place."
+      },
+      "new": {
+        "title": "Start an event",
+        "body": "Tap «{label}»."
+      },
+      "steps": {
+        "title": "Seven short steps",
+        "body": "Host, basics, when, where, who and price, places, review. Tap a done step to go back."
+      },
+      "screen": {
+        "title": "One decision per screen",
+        "body": "Fill this in, then Next.",
+        "tip": "Your draft is kept on this device, so you can stop and come back."
+      },
+      "next": {
+        "title": "Next knows what's missing",
+        "body": "If something is left, it tells you what."
+      },
+      "cohosts": {
+        "title": "Co-host with others",
+        "body": "On «{label}», ask a box or coach to co-host by their page address.",
+        "tip": "Once they accept, the event shows on their page and reaches their members."
+      },
+      "manage": {
+        "title": "Manage",
+        "body": "Each event: attendees, check-in, payments at the box, refunds and messages."
+      },
+      "finances": {
+        "title": "Finances",
+        "body": "Tap «{label}»: income, refunds and what is still owed."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "body": "Tap «{label}»: views, sign-ups, waitlist and who came.",
+        "tip": "Conversion shows how many viewers signed up."
+      },
+      "done": {
+        "title": "Ready to host",
+        "body": "Replay this any time from Guides."
+      }
+    },
+    "finance_offers": {
+      "title": "Offers, partners and referrals",
+      "summary": "Campaigns and coupons, partner perks, and a bring-a-friend program.",
+      "chapters": {
+        "campaigns": "Campaigns",
+        "partners": "Partners",
+        "referrals": "Referrals"
+      },
+      "welcome": {
+        "title": "Grow with offers",
+        "body": "Your own campaigns and coupons, perks from partner stores, and rewards for bringing friends."
+      },
+      "campaignNew": {
+        "title": "Start a campaign",
+        "body": "Tap «{label}»."
+      },
+      "campaignForm": {
+        "title": "Name and dates",
+        "body": "A campaign groups your offers, e.g. «Summer». Pick when it runs."
+      },
+      "coupons": {
+        "title": "Coupons",
+        "body": "Open a campaign to add codes: a percent or an amount off, with a use limit.",
+        "tip": "Each code shows how often it was used, so you see which offer works."
+      },
+      "partners": {
+        "title": "Partner perks",
+        "body": "Tap «{label}»."
+      },
+      "perkNew": {
+        "title": "Add a partner deal",
+        "body": "Tap «{label}»."
+      },
+      "perkPartner": {
+        "title": "The partner",
+        "body": "Their name, link and logo."
+      },
+      "perkBenefit": {
+        "title": "What members get",
+        "body": "A percent, an amount, or anything else, like a free coffee."
+      },
+      "perkMethod": {
+        "title": "How the store checks it",
+        "body": "A shared code, a link with the code in it, or showing a live membership.",
+        "tip": "If a code leaks, change it here and it applies at once."
+      },
+      "perkRules": {
+        "title": "Terms",
+        "body": "Dates, who gets it and how often. Save a draft, publish when agreed."
+      },
+      "referrals": {
+        "title": "Bring a friend",
+        "body": "A program rewards members who bring someone who joins."
+      },
+      "referralsFlow": {
+        "title": "Approve and reward",
+        "body": "Referrals land here. Approve one and its reward goes out.",
+        "tip": "Rewards can go to both people: the member and the friend."
+      },
+      "done": {
+        "title": "All set",
+        "body": "Replay this any time from Guides."
+      }
+    },
+    "member_club_event": {
+      "title": "Your own club and event",
+      "summary": "Start a group in your box's club and plan an event, alone or with a box.",
+      "chapters": {
+        "club": "Your club",
+        "event": "Your event"
+      },
+      "welcome": {
+        "title": "Make it yours",
+        "body": "Start a group with your people and plan your own events."
+      },
+      "channels": {
+        "title": "Your box's club",
+        "body": "Tap «{label}»."
+      },
+      "groups": {
+        "title": "Groups",
+        "body": "Small clubs inside the box: their own chat and events."
+      },
+      "propose": {
+        "title": "Start a group",
+        "body": "Tap «{label}»."
+      },
+      "groupSheet": {
+        "title": "Name it, pick who joins",
+        "body": "Open to all, or by request.",
+        "tip": "Some boxes approve new groups first; you get a note when it is live."
+      },
+      "noBox": {
+        "title": "Groups live in a box",
+        "body": "Join a box first, then start a group in its club. Events you can plan right away."
+      },
+      "eventNew": {
+        "title": "Plan an event",
+        "body": "Tap «{label}»."
+      },
+      "hostAs": {
+        "title": "Who hosts",
+        "body": "You, or a group or business you run.",
+        "tip": "«{label}» needs no box at all."
+      },
+      "alone": {
+        "title": "On your own",
+        "body": "Open to anyone nearby, or invite-only with your link."
+      },
+      "withBox": {
+        "title": "With a box",
+        "body": "On «{label}», ask the box to co-host by its page address.",
+        "tip": "Once it accepts, the event shows on the box's page too."
+      },
+      "hosting": {
+        "title": "Run it",
+        "body": "After you publish, «{label}» has attendees, check-in and the numbers."
+      },
+      "done": {
+        "title": "Over to you",
+        "body": "Replay this any time from Guides."
+      }
+    }
   }
 }

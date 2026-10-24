@@ -2681,6 +2681,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/guides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your progress in every walkthrough you have opened */
+        get: operations["PaleeWeb.GuideProgressController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/guides/{guide_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record a step reached, a finish or a «not now» in one walkthrough */
+        put: operations["PaleeWeb.GuideProgressController.update"];
+        post?: never;
+        /** Forget one walkthrough's progress, so it is offered again */
+        delete: operations["PaleeWeb.GuideProgressController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/history": {
         parameters: {
             query?: never;
@@ -25570,6 +25605,62 @@ export interface components {
             id: string;
             /** @enum {string} */
             role: "primary" | "secondary" | "stabilizer";
+        };
+        /** GuideProgress */
+        GuideProgress: {
+            /**
+             * Format: date-time
+             * @description The first finish of the current run.
+             */
+            completed_at: string | null;
+            /** @description The web app's guide id, e.g. `shop_staff`. */
+            guide_id: string;
+            /** @description How many times it was started. */
+            runs: number;
+            /** Format: date-time */
+            started_at: string;
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @description The step reached in the current run, from 0. */
+            step: number;
+            /** Format: date-time */
+            updated_at: string;
+            version: number;
+        };
+        /** GuideProgressList */
+        GuideProgressList: {
+            guides: {
+                /**
+                 * Format: date-time
+                 * @description The first finish of the current run.
+                 */
+                completed_at: string | null;
+                /** @description The web app's guide id, e.g. `shop_staff`. */
+                guide_id: string;
+                /** @description How many times it was started. */
+                runs: number;
+                /** Format: date-time */
+                started_at: string;
+                /** @enum {string} */
+                status: "started" | "completed" | "dismissed";
+                /** @description The step reached in the current run, from 0. */
+                step: number;
+                /** Format: date-time */
+                updated_at: string;
+                version: number;
+            }[];
+        };
+        /** GuideProgressUpdate */
+        GuideProgressUpdate: {
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @default 0 */
+            step: number;
+            /**
+             * @description A newer version than the stored one starts a new run.
+             * @default 1
+             */
+            version: number;
         };
         /** GymAiSettings */
         GymAiSettings: {
@@ -52188,6 +52279,145 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         status: "none" | "requested" | "active";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "started" | "completed" | "dismissed";
+                    /** @default 0 */
+                    step?: number;
+                    /**
+                     * @description A newer version than the stored one starts a new run.
+                     * @default 1
+                     */
+                    version?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: date-time
+                         * @description The first finish of the current run.
+                         */
+                        completed_at: string | null;
+                        /** @description The web app's guide id, e.g. `shop_staff`. */
+                        guide_id: string;
+                        /** @description How many times it was started. */
+                        runs: number;
+                        /** Format: date-time */
+                        started_at: string;
+                        /** @enum {string} */
+                        status: "started" | "completed" | "dismissed";
+                        /** @description The step reached in the current run, from 0. */
+                        step: number;
+                        /** Format: date-time */
+                        updated_at: string;
+                        version: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
                     };
                 };
             };

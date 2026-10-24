@@ -30,6 +30,7 @@
   --z-drawer: 60;     /* side panels and full-page pickers over the app */
   --z-modal: 70;      /* dialogs and bottom sheets */
   --z-fullscreen: 80; /* camera, media viewer, cast view */
+  --z-tour: 85;       /* an in-app walkthrough (ADR-193): over dialogs, under their menus */
   --z-popover: 90;    /* menus, dropdowns, tooltips: above whatever opened them */
   --z-toast: 100;     /* session and system notices */
 
@@ -500,6 +501,22 @@ input[type="number"] {
   border: 0;
   border-radius: 9999px;
   background: var(--text);
+}
+
+/* ADR-193: the spot a walkthrough asks the person to tap. */
+@keyframes guide-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 55%, transparent); }
+  100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--primary) 0%, transparent); }
+}
+.guide-pulse {
+  animation: guide-pulse 1.6s ease-out infinite;
+}
+.guide-move {
+  transition: left 0.22s ease, top 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .guide-pulse { animation: none; }
+  .guide-move { transition: none; }
 }
 
 /* ADR-155: the door kiosk's green flash on each check-in. */

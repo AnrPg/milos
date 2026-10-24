@@ -136,6 +136,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
       "Inventory and cleaning log",
       "Reports: overview, finance, training, coaching, engagement, health and marketing",
       "Demo mode: a new business tries everything with sample data before activation",
+      "Interactive walkthroughs over the real screens for the shop, event organising and offers (campaigns, coupons, partner perks, referrals), with a demo-data fill for new businesses",
     ],
   },
   {

@@ -41377,6 +41377,166 @@
         "title": "GoalMuscle",
         "type": "object"
       },
+      "GuideProgress": {
+        "properties": {
+          "completed_at": {
+            "description": "The first finish of the current run.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "guide_id": {
+            "description": "The web app's guide id, e.g. `shop_staff`.",
+            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+            "type": "string"
+          },
+          "runs": {
+            "description": "How many times it was started.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "description": "The step reached in the current run, from 0.",
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "completed_at",
+          "guide_id",
+          "runs",
+          "started_at",
+          "status",
+          "step",
+          "updated_at",
+          "version"
+        ],
+        "title": "GuideProgress",
+        "type": "object"
+      },
+      "GuideProgressList": {
+        "properties": {
+          "guides": {
+            "items": {
+              "properties": {
+                "completed_at": {
+                  "description": "The first finish of the current run.",
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "guide_id": {
+                  "description": "The web app's guide id, e.g. `shop_staff`.",
+                  "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                  "type": "string"
+                },
+                "runs": {
+                  "description": "How many times it was started.",
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "started",
+                    "completed",
+                    "dismissed"
+                  ],
+                  "type": "string"
+                },
+                "step": {
+                  "description": "The step reached in the current run, from 0.",
+                  "maximum": 99,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "version": {
+                  "maximum": 1000,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "completed_at",
+                "guide_id",
+                "runs",
+                "started_at",
+                "status",
+                "step",
+                "updated_at",
+                "version"
+              ],
+              "title": "GuideProgress",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "guides"
+        ],
+        "title": "GuideProgressList",
+        "type": "object"
+      },
+      "GuideProgressUpdate": {
+        "properties": {
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "default": 0,
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "default": 1,
+            "description": "A newer version than the stored one starts a new run.",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "GuideProgressUpdate",
+        "type": "object"
+      },
       "GymAiSettings": {
         "properties": {
           "default_model": {
@@ -119089,6 +119249,339 @@
         "summary": "Whether you follow a person or box",
         "tags": [
           "Follows"
+        ]
+      }
+    },
+    "/api/me/guides": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your progress in every walkthrough you have opened",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/guides/{guide_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Forget one walkthrough's progress, so it is offered again",
+        "tags": [
+          "Me"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "started",
+                      "completed",
+                      "dismissed"
+                    ],
+                    "type": "string"
+                  },
+                  "step": {
+                    "default": 0,
+                    "maximum": 99,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "version": {
+                    "default": 1,
+                    "description": "A newer version than the stored one starts a new run.",
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "title": "GuideProgressUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_at": {
+                      "description": "The first finish of the current run.",
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "guide_id": {
+                      "description": "The web app's guide id, e.g. `shop_staff`.",
+                      "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                      "type": "string"
+                    },
+                    "runs": {
+                      "description": "How many times it was started.",
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "started_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "started",
+                        "completed",
+                        "dismissed"
+                      ],
+                      "type": "string"
+                    },
+                    "step": {
+                      "description": "The step reached in the current run, from 0.",
+                      "maximum": 99,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "version": {
+                      "maximum": 1000,
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "completed_at",
+                    "guide_id",
+                    "runs",
+                    "started_at",
+                    "status",
+                    "step",
+                    "updated_at",
+                    "version"
+                  ],
+                  "title": "GuideProgress",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record a step reached, a finish or a «not now» in one walkthrough",
+        "tags": [
+          "Me"
         ]
       }
     },

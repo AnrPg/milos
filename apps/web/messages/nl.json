@@ -10858,5 +10858,277 @@
     "notif_person_message_body": "{name} heeft je een bericht gestuurd.",
     "notif_message_request_title": "Berichtverzoek",
     "notif_message_request_body": "{name} wil je een bericht sturen."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Gidsen",
+      "listIntro": "Korte rondleidingen op de echte schermen. Doe mee; er wordt niets opgeslagen tenzij jij het opslaat.",
+      "forStaff": "Voor je bedrijf",
+      "forYou": "Voor jou",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Starten",
+      "resume": "Verdergaan",
+      "replay": "Opnieuw",
+      "state_new": "Nieuw",
+      "state_started": "Bezig",
+      "state_completed": "Klaar",
+      "state_dismissed": "Niet gestart",
+      "state_outdated": "Bijgewerkt",
+      "openGuide": "Rondleiding",
+      "openGuideAria": "Start de rondleiding: {title}",
+      "next": "Volgende",
+      "back": "Terug",
+      "finish": "Klaar",
+      "close": "Rondleiding sluiten",
+      "stepOf": "{current} van {total}",
+      "doIt": "Doe het voor mij",
+      "tapHint": "Tik op de gemarkeerde plek",
+      "notHere": "Staat nu niet op dit scherm, dus hier in het kort.",
+      "fillDemo": "Eerst vullen met demogegevens",
+      "filling": "Bezig met vullen…",
+      "demoFilled": "Demogegevens toegevoegd",
+      "offerEyebrow": "Nieuw hier?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Laat zien",
+      "offerLater": "Niet nu",
+      "meRow": "Gidsen",
+      "meRowHint": "Rondleidingen door de winkel, evenementen, aanbiedingen en je eigen club",
+      "loadFailed": "De gidsen zijn niet geladen. Probeer het opnieuw."
+    },
+    "shop_staff": {
+      "title": "Je winkel runnen",
+      "summary": "Voeg producten toe, verkoop in de app en aan de kassa, houd de voorraad op orde.",
+      "chapters": {
+        "setup": "Instellen",
+        "sell": "Verkopen",
+        "track": "Bijhouden"
+      },
+      "welcome": {
+        "title": "De winkel van je box",
+        "body": "Leden bestellen in de app en halen op bij de balie. Jij verkoopt ook aan de kassa."
+      },
+      "newProduct": {
+        "title": "Product toevoegen",
+        "body": "Tik op „{label}”."
+      },
+      "photos": {
+        "title": "Foto's verkopen",
+        "body": "Voeg een paar duidelijke foto's toe. De eerste is de omslag."
+      },
+      "price": {
+        "title": "Prijs en varianten",
+        "body": "Eén prijs, of maten en smaken met elk hun eigen voorraad.",
+        "tip": "Voorraad telt per variant, dus „M” en „L” raken nooit door elkaar."
+      },
+      "selling": {
+        "title": "Waar het verkocht wordt",
+        "body": "In de app, aan de kassa of allebei. Alleen leden, of iedereen."
+      },
+      "save": {
+        "title": "Opslaan, dan publiceren",
+        "body": "Een nieuw product is een concept. Publiceer het om de winkel te openen.",
+        "tip": "Leden zien de Winkel-kaart in Box pas als er iets gepubliceerd is."
+      },
+      "ordersTab": {
+        "title": "Bestellingen",
+        "body": "Tik op „{label}”."
+      },
+      "orders": {
+        "title": "Klaarzetten en overhandigen",
+        "body": "Markeer een bestelling als klaar en het lid hoort waar die op te halen is.",
+        "tip": "Niet opgehaalde bestellingen vervallen na 7 dagen vanzelf en de voorraad komt vrij."
+      },
+      "pos": {
+        "title": "De kassa",
+        "body": "Verkoop in seconden aan de balie, direct betaald of op de rekening van het lid."
+      },
+      "stock": {
+        "title": "Voorraad",
+        "body": "Elke verkoop, levering en telling wordt vastgelegd. Bij lage voorraad krijg je een melding."
+      },
+      "analytics": {
+        "title": "Wat verkoopt",
+        "body": "Wekelijkse verkoop, marges en je toppers.",
+        "tip": "Winkelverkopen staan ook in Financiën als eigen inkomstenbron."
+      },
+      "done": {
+        "title": "Je bent klaar",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "events_organising": {
+      "title": "Evenementen organiseren",
+      "summary": "Plan in 7 korte stappen, verkoop plekken, check mensen in, bekijk de cijfers.",
+      "chapters": {
+        "plan": "Plannen",
+        "run": "Uitvoeren"
+      },
+      "welcome": {
+        "title": "Evenementen van begin tot eind",
+        "body": "Plannen, vullen, uitvoeren en zien hoe het ging, op één plek."
+      },
+      "new": {
+        "title": "Evenement starten",
+        "body": "Tik op „{label}”."
+      },
+      "steps": {
+        "title": "Zeven korte stappen",
+        "body": "Organisator, basis, wanneer, waar, wie en prijs, plekken, controle. Tik op een afgeronde stap om terug te gaan."
+      },
+      "screen": {
+        "title": "Eén keuze per scherm",
+        "body": "Vul dit in en tik dan op Volgende.",
+        "tip": "Je concept blijft op dit apparaat bewaard, dus je kunt stoppen en later verdergaan."
+      },
+      "next": {
+        "title": "Volgende weet wat er ontbreekt",
+        "body": "Mist er nog iets, dan zegt het wat."
+      },
+      "cohosts": {
+        "title": "Samen organiseren",
+        "body": "Vraag bij „{label}” een box of coach via hun pagina-adres om mee te organiseren.",
+        "tip": "Zodra ze accepteren, staat het evenement op hun pagina en bereikt het hun leden."
+      },
+      "manage": {
+        "title": "Beheren",
+        "body": "Per evenement: deelnemers, inchecken, betalingen bij de box, terugbetalingen en berichten."
+      },
+      "finances": {
+        "title": "Financiën",
+        "body": "Tik op „{label}”: inkomsten, terugbetalingen en wat nog openstaat."
+      },
+      "analytics": {
+        "title": "Analyses",
+        "body": "Tik op „{label}”: weergaven, aanmeldingen, wachtlijst en wie er kwam.",
+        "tip": "Conversie laat zien hoeveel kijkers zich aanmeldden."
+      },
+      "done": {
+        "title": "Klaar om te organiseren",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "finance_offers": {
+      "title": "Aanbiedingen, partners en verwijzingen",
+      "summary": "Campagnes en coupons, partnervoordelen en een programma om vrienden mee te nemen.",
+      "chapters": {
+        "campaigns": "Campagnes",
+        "partners": "Partners",
+        "referrals": "Verwijzingen"
+      },
+      "welcome": {
+        "title": "Groei met aanbiedingen",
+        "body": "Je eigen campagnes en coupons, voordelen van partnerwinkels en beloningen voor het meenemen van vrienden."
+      },
+      "campaignNew": {
+        "title": "Campagne starten",
+        "body": "Tik op „{label}”."
+      },
+      "campaignForm": {
+        "title": "Naam en data",
+        "body": "Een campagne bundelt je aanbiedingen, bijv. „Zomer”. Kies wanneer die loopt."
+      },
+      "coupons": {
+        "title": "Coupons",
+        "body": "Open een campagne om codes toe te voegen: een percentage of bedrag korting, met een gebruikslimiet.",
+        "tip": "Elke code toont hoe vaak die is gebruikt, zo zie je welke aanbieding werkt."
+      },
+      "partners": {
+        "title": "Partnervoordelen",
+        "body": "Tik op „{label}”."
+      },
+      "perkNew": {
+        "title": "Partnerdeal toevoegen",
+        "body": "Tik op „{label}”."
+      },
+      "perkPartner": {
+        "title": "De partner",
+        "body": "Naam, link en logo."
+      },
+      "perkBenefit": {
+        "title": "Wat leden krijgen",
+        "body": "Een percentage, een bedrag of iets anders, zoals gratis koffie."
+      },
+      "perkMethod": {
+        "title": "Hoe de winkel het controleert",
+        "body": "Een gedeelde code, een link met de code erin, of een actief lidmaatschap laten zien.",
+        "tip": "Lekt een code uit, wijzig hem hier en het geldt meteen."
+      },
+      "perkRules": {
+        "title": "Voorwaarden",
+        "body": "Data, wie het krijgt en hoe vaak. Sla een concept op en publiceer zodra het rond is."
+      },
+      "referrals": {
+        "title": "Neem een vriend mee",
+        "body": "Een programma beloont leden die iemand meenemen die lid wordt."
+      },
+      "referralsFlow": {
+        "title": "Goedkeuren en belonen",
+        "body": "Verwijzingen komen hier binnen. Keur er een goed en de beloning gaat eruit.",
+        "tip": "Beloningen kunnen naar allebei: het lid en de vriend."
+      },
+      "done": {
+        "title": "Helemaal klaar",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    },
+    "member_club_event": {
+      "title": "Je eigen club en evenement",
+      "summary": "Start een groep in de club van je box en plan een evenement, alleen of met een box.",
+      "chapters": {
+        "club": "Je club",
+        "event": "Je evenement"
+      },
+      "welcome": {
+        "title": "Maak het van jou",
+        "body": "Start een groep met je mensen en plan je eigen evenementen."
+      },
+      "channels": {
+        "title": "De club van je box",
+        "body": "Tik op „{label}”."
+      },
+      "groups": {
+        "title": "Groepen",
+        "body": "Kleine clubs binnen de box: met eigen chat en evenementen."
+      },
+      "propose": {
+        "title": "Groep starten",
+        "body": "Tik op „{label}”."
+      },
+      "groupSheet": {
+        "title": "Geef een naam, kies wie erbij mag",
+        "body": "Open voor iedereen, of op aanvraag.",
+        "tip": "Sommige boxen keuren nieuwe groepen eerst goed; je krijgt een melding zodra hij live is."
+      },
+      "noBox": {
+        "title": "Groepen horen bij een box",
+        "body": "Word eerst lid van een box en start dan een groep in de club. Evenementen kun je meteen plannen."
+      },
+      "eventNew": {
+        "title": "Evenement plannen",
+        "body": "Tik op „{label}”."
+      },
+      "hostAs": {
+        "title": "Wie organiseert",
+        "body": "Jij, of een groep of bedrijf dat je beheert.",
+        "tip": "Voor „{label}” heb je helemaal geen box nodig."
+      },
+      "alone": {
+        "title": "Zelfstandig",
+        "body": "Open voor iedereen in de buurt, of alleen op uitnodiging met je link."
+      },
+      "withBox": {
+        "title": "Met een box",
+        "body": "Vraag bij „{label}” de box via het pagina-adres om mee te organiseren.",
+        "tip": "Zodra de box accepteert, staat het evenement ook op de pagina van de box."
+      },
+      "hosting": {
+        "title": "Uitvoeren",
+        "body": "Na het publiceren vind je bij „{label}” deelnemers, inchecken en de cijfers."
+      },
+      "done": {
+        "title": "Nu ben jij aan zet",
+        "body": "Bekijk dit altijd opnieuw via Gidsen."
+      }
+    }
   }
 }
