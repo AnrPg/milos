@@ -17,6 +17,7 @@ type Fetcher = (kind: TrainingHistoryKind, offset: number) => Promise<TrainingHi
  * Collapsed-by-default history of workouts (with performance) and booked
  * classes (with the class workout and performance). Pages load as the coach
  * or member scrolls, inside a bounded scroll area, so the profile stays tidy.
+ * `footer` sits under the list once open (the member's export, Vault).
  */
 export function TrainingHistory({
   id,
@@ -24,12 +25,14 @@ export function TrainingHistory({
   fetchPage,
   defaultKind,
   title,
+  footer,
 }: {
   id?: string;
   queryKey: readonly unknown[];
   fetchPage: Fetcher;
   defaultKind: TrainingHistoryKind;
   title?: string;
+  footer?: React.ReactNode;
 }) {
   const i18n = useUiTranslations();
   const [open, setOpen] = useState(false);
@@ -68,6 +71,7 @@ export function TrainingHistory({
             ))}
           </div>
           <LogList key={kind} kind={kind} queryKey={queryKey} fetchPage={fetchPage} />
+          {footer ? <div className="mt-4">{footer}</div> : null}
         </div>
       ) : null}
     </section>

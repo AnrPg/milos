@@ -84,7 +84,7 @@ describe("client navigation", () => {
     for (const path of ["/box", "/box/workouts", "/box/schedule", "/box/appointments", "/box/videos", "/box/coach", "/workouts", "/class-timer/s1/display"]) {
       expect(owner(path)).toBe("box");
     }
-    for (const path of ["/journal", "/journal/vault", "/journal/progress", "/journal/pantheon", "/journal/wellbeing", "/journal/reviews"]) {
+    for (const path of ["/journal", "/journal/vault", "/journal/progress", "/journal/atlas", "/journal/wellbeing", "/journal/reviews"]) {
       expect(owner(path)).toBe("journal");
     }
     for (const path of ["/me", "/me/settings", "/me/payments", "/me/activity/chats"]) {
@@ -119,9 +119,9 @@ describe("sectionGroupFor", () => {
   it("shows only entitled Box sub-pages, and every Journal segment to everyone", () => {
     const box = sectionGroupFor("/box/schedule", { surface: "member", staffItems: [], features: ["videos"] });
     expect(box?.tabs.map((tab) => tab.id)).toEqual(["boxToday", "myWorkouts", "classes", "videos"]);
-    const journal = sectionGroupFor("/journal/pantheon", { surface: "athlete", staffItems: [], features: [] });
+    const journal = sectionGroupFor("/journal/progress", { surface: "athlete", staffItems: [], features: [] });
     expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "body", "wellbeing", "progress"]);
-    expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/pantheon");
+    expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/progress");
     // ADR-164: the anatomy atlas lives under Πρόοδος.
     expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/atlas");
     expect(sectionGroupFor("/box", { surface: "member", staffItems: [], features: ["videos"] })).toBeNull();

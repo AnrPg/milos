@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { listMyExecutions } from "@/api/executions";
-import { ClientCard } from "@/components/client/ClientPage";
 import { useSession } from "@/components/session-provider";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
@@ -12,8 +11,11 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { buildExecutionHistoryDocument } from "@/lib/document-export";
 
-/** Export of every completed workout as text, PDF or a share (Πρόοδος). */
-export function HistoryExportCard() {
+/**
+ * Export of every completed workout as text, PDF or a share. It lives under
+ * Vault's training history, the one place the history is (ANR 2026-10-24).
+ */
+export function HistoryExportButton() {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   const shareExport = useShareExport();
@@ -28,7 +30,7 @@ export function HistoryExportCard() {
   const working = open && history.isPending;
 
   return (
-    <ClientCard title={i18n("workoutHistory4c84737")}>
+    <>
       <button
         type="button"
         className="rounded-full px-4 py-2 text-sm font-semibold disabled:cursor-wait disabled:opacity-50"
@@ -45,6 +47,6 @@ export function HistoryExportCard() {
           onClose={() => setOpen(false)}
         />
       ) : null}
-    </ClientCard>
+    </>
   );
 }

@@ -406,11 +406,11 @@ test.describe("photos and video in posts", () => {
       return route.fulfill(json({ post: post("post-pr") }, 201));
     });
 
-    await page.goto("/journal/pantheon");
-    await page.getByRole("button", { name: "+ New PR" }).first().click();
+    await page.goto("/journal/progress");
+    await page.getByRole("button", { name: "+ Add PR" }).first().click();
     await page.getByPlaceholder("e.g. Back Squat 1RM").fill("Clean");
     await page.getByRole("spinbutton").first().fill("90");
-    await page.getByRole("button", { name: "Add PR" }).click();
+    await page.getByRole("button", { name: "Add PR", exact: true }).click();
 
     const logged = page.getByRole("dialog", { name: "New PR!" });
     await expect(logged).toBeVisible();

@@ -12,7 +12,10 @@ import { semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-/** ADR-129: read-only PRs other accounts explicitly shared with me. */
+/**
+ * ADR-129: read-only PRs other accounts explicitly shared with me, under my
+ * own in «Personal Records». Shown only when someone shared some.
+ */
 export function SharedPRsSection() {
   const t = useTranslations("PrSharing");
   const { tokens } = useSession();
@@ -25,42 +28,31 @@ export function SharedPRsSection() {
   });
 
   const shared = sharedQuery.data?.shared ?? [];
+  if (sharedQuery.isError || shared.length === 0) return null;
 
   return (
-    <section className="space-y-4" aria-labelledby="shared-prs-title">
+    <section className="mt-5 space-y-3 border-t pt-4" style={{ borderColor: "var(--border)" }} aria-labelledby="shared-prs-title">
       <div>
-        <h2 id="shared-prs-title" className="text-xl font-black" style={{ color: "var(--text)" }}>
+        <h3 id="shared-prs-title" className="text-base font-bold" style={{ color: "var(--text)" }}>
           {t("sharedWithMeTitle")}
-        </h2>
+        </h3>
         <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{t("sharedWithMeDescription")}</p>
       </div>
 
-      {sharedQuery.isError ? (
-        <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("loadError")}</p>
-      ) : shared.length === 0 ? (
-        sharedQuery.isPending ? null : (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("sharedWithMeEmpty")}</p>
-        )
-      ) : (
-        shared.map((collection) => (
-          <div
-            key={collection.grant_id}
-            className="space-y-3 rounded-[1.8rem] p-5"
-            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-          >
-            <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-              {t("sharedBy", { name: collection.owner.display_nickname })}
-            </p>
-            {collection.prs.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--dim)" }}>{t("ownerHasNoPrs")}</p>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {collection.prs.map((pr) => <SharedPRCard key={pr.id} pr={pr} />)}
-              </div>
-            )}
-          </div>
-        ))
-      )}
+      {shared.map((collection) => (
+        <div key={collection.grant_id} className="space-y-3">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+            {t("sharedBy", { name: collection.owner.display_nickname })}
+          </p>
+          {collection.prs.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{t("ownerHasNoPrs")}</p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {collection.prs.map((pr) => <SharedPRCard key={pr.id} pr={pr} />)}
+            </div>
+          )}
+        </div>
+      ))}
     </section>
   );
 }

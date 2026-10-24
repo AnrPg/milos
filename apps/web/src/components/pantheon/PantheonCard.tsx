@@ -236,10 +236,12 @@ function CompactCard({
   pr,
   onEdit,
   onShare,
+  onDelete,
 }: {
   pr: PRRecord;
   onEdit?: (pr: PRRecord) => void;
   onShare?: (pr: PRRecord) => void;
+  onDelete?: (pr: PRRecord) => void;
 }) {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
@@ -269,24 +271,24 @@ function CompactCard({
     >
       <Particles prId={pr.id} />
 
-      {onShare && (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onShare(pr);
-          }}
-          className="absolute top-3 end-3 rounded-lg px-2 py-1 text-[10px] font-semibold opacity-50 hover:opacity-90 transition-opacity"
-          style={{ background: "var(--border)", color: "var(--dim)" }}
-          title={i18n("sharePrf54c0df")}
-        >
-          🔗
-        </button>
-      )}
+      {onShare || onDelete ? (
+        <div className="absolute top-2 end-2 flex gap-1">
+          {onShare ? (
+            <CardIconButton label={i18n("sharePrf54c0df")} onClick={() => onShare(pr)}>
+              <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" />
+            </CardIconButton>
+          ) : null}
+          {onDelete ? (
+            <CardIconButton label={i18n("deletef6fdbe4")} onClick={() => onDelete(pr)}>
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+            </CardIconButton>
+          ) : null}
+        </div>
+      ) : null}
 
       <PRHistoryTooltip pr={pr}>
         <div>
-          <p className="text-sm font-semibold truncate pe-8" style={{ color: "var(--text)" }}>{pr.name}</p>
+          <p className="text-sm font-semibold truncate pe-20" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--heat)" }}>{scoreStr}</span>
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
@@ -301,6 +303,27 @@ function CompactCard({
         </div>
       </PRHistoryTooltip>
     </div>
+  );
+}
+
+/** A small line-icon action in a card's corner that doesn't open the card. */
+function CardIconButton({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      aria-label={label}
+      title={label}
+      className="flex h-9 w-9 items-center justify-center rounded-full"
+      style={{ color: "var(--dim)" }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {children}
+      </svg>
+    </button>
   );
 }
 
@@ -429,6 +452,6 @@ export function PantheonCard({
   onDelete?: (pr: PRRecord) => void;
   onShare?: (pr: PRRecord) => void;
 }) {
-  if (compact) return <CompactCard pr={pr} onEdit={onEdit} onShare={onShare} />;
+  if (compact) return <CompactCard pr={pr} onEdit={onEdit} onShare={onShare} onDelete={onDelete} />;
   return <FullCard pr={pr} onEdit={onEdit} onDelete={onDelete} onShare={onShare} />;
 }

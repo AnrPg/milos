@@ -64,6 +64,7 @@ export function JournalFlow() {
   const i18n = useUiTranslations();
   const t = useTranslations("MemberApp.journal");
   const tProviders = useTranslations("Providers");
+  const tNav = useTranslations("Navigation");
   const locale = useUiLocale();
   const queryClient = useQueryClient();
   const { tokens } = useSession();
@@ -132,17 +133,8 @@ export function JournalFlow() {
 
   return (
     <ClientPage
-      title={i18n("workoutHistory4c84737")}
+      title={tNav("journalFlow")}
       intro={i18n("clHistoryIntro")}
-      actions={
-        <Link
-          href="/journal/vault"
-          className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "var(--border)", color: "var(--text)" }}
-        >
-          {i18n("clOpenVault")}
-        </Link>
-      }
     >
       <DeviceJournalCard token={token} locale={locale} />
 
