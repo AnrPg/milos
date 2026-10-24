@@ -331,7 +331,7 @@ test.describe("community", () => {
     await page.goto("/");
     await page.goto("/clubs/find");
 
-    await expect(page.getByRole("heading", { name: "Find clubs" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Find clubs and people" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Hyrox crew/ })).toContainText("CrossFit Gazi · 14 members");
     await expect(page.getByText("Groups in your gyms")).toBeVisible();
 

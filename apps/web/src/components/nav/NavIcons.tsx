@@ -3,7 +3,7 @@ import type { SVGProps } from "react";
 // Navigation icons: outline (stroke) SVGs in currentColor, so they take the
 // theme's colours. Never emoji.
 
-export type NavIconName = "feed" | "box" | "journal" | "bell" | "me" | "messages";
+export type NavIconName = "feed" | "box" | "journal" | "bell" | "me" | "messages" | "search";
 
 export function NavIcon({ name, size = 24, strokeWidth = 1.8, ...rest }: { name: NavIconName; size?: number; strokeWidth?: number } & SVGProps<SVGSVGElement>) {
   const common = {
@@ -62,6 +62,14 @@ export function NavIcon({ name, size = 24, strokeWidth = 1.8, ...rest }: { name:
       return (
         <svg {...common}>
           <path d="M21 14.5a2 2 0 0 1-2 2H8l-5 4v-14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+        </svg>
+      );
+    case "search":
+      // «Βρες» in the club bar: a magnifying glass (ANR 2026-10-24).
+      return (
+        <svg {...common}>
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="m20 20-4.4-4.4" />
         </svg>
       );
   }
