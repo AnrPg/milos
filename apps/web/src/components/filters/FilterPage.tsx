@@ -24,12 +24,18 @@ export function FilterPage({
   const t = useTranslations("Filters");
   const headingId = useId();
   const page = useRef<HTMLDivElement>(null);
+  // Callers pass a new onClose on every render; focus moves in only on open,
+  // never again while a filter changes (that would pull it off the slider).
+  const close = useRef(onClose);
+  useEffect(() => {
+    close.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     page.current?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") close.current();
     };
     document.addEventListener("keydown", onKey);
     const overflow = document.body.style.overflow;
@@ -39,7 +45,7 @@ export function FilterPage({
       document.body.style.overflow = overflow;
       previous?.focus();
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <Layer>
