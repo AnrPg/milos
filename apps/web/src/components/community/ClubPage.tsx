@@ -30,6 +30,7 @@ import { useClubRealtime, useMyClubs } from "@/components/community/use-communit
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type ClubTab = "feed" | "channels" | "events" | "members";
 const TABS: ClubTab[] = ["feed", "channels", "events", "members"];
@@ -88,12 +89,13 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
       {club.kind === "open" && club.description ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{club.description}</p>
       ) : null}
-      <div role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
+      <div {...guideAnchor("club.tabs")} role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
         {TABS.map((id) => (
           <button
             key={id}
             type="button"
             role="tab"
+            data-segment={id}
             aria-selected={tab === id}
             onClick={() => setTab(id)}
             className="min-h-11 rounded-2xl px-1 text-sm font-semibold"

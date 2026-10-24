@@ -1,4 +1,5 @@
 
+import { Suspense } from "react";
 import {getUiTranslations} from "@/i18n/ui-server";
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
@@ -17,6 +18,9 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { ScreenPreloader } from "@/components/nav/ScreenPreloader";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { DemoModeHost } from "@/components/business/DemoModeHost";
+import { GuideOffer } from "@/components/guides/GuideOffer";
+import { GuideOverlay } from "@/components/guides/GuideOverlay";
+import { GuideProvider } from "@/components/guides/GuideProvider";
 import { ReferralClaimBridge } from "@/components/referrals/ReferralClaimBridge";
 import { NativeAppBridge } from "@/components/platform/NativeAppBridge";
 import { PhoneHealthSyncBridge } from "@/components/platform/PhoneHealthSyncBridge";
@@ -140,12 +144,19 @@ export default async function RootLayout({
                 <NativeAppBridge />
                 <PhoneHealthSyncBridge />
                 <WidgetsGeofenceBridge />
-                <TopNav />
-                {children}
-                <BottomNav />
-                <ScreenPreloader />
-                <OnboardingHost />
-                <DemoModeHost />
+                {/* ADR-193: in-app walkthroughs; the overlay survives page changes. */}
+                <GuideProvider>
+                  <TopNav />
+                  {children}
+                  <BottomNav />
+                  <ScreenPreloader />
+                  <OnboardingHost />
+                  <DemoModeHost />
+                  <Suspense fallback={null}>
+                    <GuideOffer />
+                    <GuideOverlay />
+                  </Suspense>
+                </GuideProvider>
                 <HydrationMarker />
               </SessionProvider>
             </ThemeProvider>

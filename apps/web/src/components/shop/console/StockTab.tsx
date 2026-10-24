@@ -19,6 +19,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { movementFor, stockDelta, type StockFormKind } from "@/lib/shop/console";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type View = "attention" | "all";
 type Kind = StockFormKind;
@@ -40,7 +41,7 @@ export function StockTab({ locationIds, branchFilter }: { locationIds?: string; 
   const branchOf = (id: string | null) => (branchFilter.visible ? branchName(branchFilter, id) : null);
 
   return (
-    <section className="flex flex-col gap-4" aria-label={t("title")}>
+    <section {...guideAnchor("shop.stock")} className="flex flex-col gap-4" aria-label={t("title")}>
       <SegmentPicker
         ariaLabel={t("filter")}
         semantics="radiogroup"

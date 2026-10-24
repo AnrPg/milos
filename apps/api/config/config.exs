@@ -350,6 +350,10 @@ config :palee,
        Palee.Infrastructure.Insights.EctoInsightStore
 
 config :palee,
+       :guide_progress_store,
+       Palee.Infrastructure.Guides.EctoGuideProgressStore
+
+config :palee,
        :messaging_thread_store,
        Palee.Infrastructure.Messaging.EctoThreadStore
 

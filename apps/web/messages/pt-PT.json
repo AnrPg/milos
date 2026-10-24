@@ -10789,5 +10789,277 @@
     "reviewNoLimit": "Sem limite",
     "reviewCohosts": "Pedidos de coorganização a: {names}",
     "reviewNoCohosts": "Sem coorganizadores"
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Guias",
+      "listIntro": "Visitas curtas pelos ecrãs reais. Acompanha os passos; nada fica guardado se não o guardares.",
+      "forStaff": "Para o teu negócio",
+      "forYou": "Para ti",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Começar",
+      "resume": "Continuar",
+      "replay": "Rever",
+      "state_new": "Novo",
+      "state_started": "Em curso",
+      "state_completed": "Concluído",
+      "state_dismissed": "Por começar",
+      "state_outdated": "Atualizado",
+      "openGuide": "Visita guiada",
+      "openGuideAria": "Começar a visita guiada: {title}",
+      "next": "Seguinte",
+      "back": "Voltar",
+      "finish": "Concluir",
+      "close": "Fechar a visita guiada",
+      "stepOf": "{current} de {total}",
+      "doIt": "Faz por mim",
+      "tapHint": "Toca na zona destacada",
+      "notHere": "Não está neste ecrã agora, por isso fica o resumo.",
+      "fillDemo": "Preencher primeiro com dados de demonstração",
+      "filling": "A preencher…",
+      "demoFilled": "Dados de demonstração adicionados",
+      "offerEyebrow": "És novo por aqui?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Mostra-me",
+      "offerLater": "Agora não",
+      "meRow": "Guias",
+      "meRowHint": "Visitas guiadas à loja, aos eventos, às ofertas e ao teu próprio clube",
+      "loadFailed": "Os guias não carregaram. Tenta novamente."
+    },
+    "shop_staff": {
+      "title": "Gere a tua loja",
+      "summary": "Adiciona produtos, vende na app e na caixa, mantém o stock certo.",
+      "chapters": {
+        "setup": "Configurar",
+        "sell": "Vender",
+        "track": "Acompanhar"
+      },
+      "welcome": {
+        "title": "A loja da tua box",
+        "body": "Os membros encomendam na app e levantam na receção. Também vendes na caixa."
+      },
+      "newProduct": {
+        "title": "Adiciona um produto",
+        "body": "Toca em «{label}»."
+      },
+      "photos": {
+        "title": "As fotos vendem",
+        "body": "Adiciona algumas fotos nítidas. A primeira é a capa."
+      },
+      "price": {
+        "title": "Preço e variantes",
+        "body": "Um só preço, ou tamanhos e sabores com stock próprio.",
+        "tip": "O stock conta-se por variante, por isso «M» e «L» nunca se misturam."
+      },
+      "selling": {
+        "title": "Onde se vende",
+        "body": "Na app, na caixa ou em ambas. Só membros, ou qualquer pessoa."
+      },
+      "save": {
+        "title": "Guarda e depois publica",
+        "body": "Um produto novo é um rascunho. Publica-o para abrir a loja.",
+        "tip": "Os membros só veem o cartão Loja na Box quando houver algo publicado."
+      },
+      "ordersTab": {
+        "title": "Encomendas",
+        "body": "Toca em «{label}»."
+      },
+      "orders": {
+        "title": "Prepara e entrega",
+        "body": "Marca uma encomenda como pronta e o membro fica a saber onde a levantar.",
+        "tip": "As encomendas não levantadas são canceladas sozinhas ao fim de 7 dias e libertam o stock."
+      },
+      "pos": {
+        "title": "A caixa",
+        "body": "Vende na receção em segundos, pago logo ou na conta do membro."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Cada venda, entrega e contagem fica registada. Avisamos-te quando o stock está baixo."
+      },
+      "analytics": {
+        "title": "O que vende",
+        "body": "Vendas semanais, margens e os teus produtos mais vendidos.",
+        "tip": "As vendas da loja também aparecem em Finanças como fonte de receita própria."
+      },
+      "done": {
+        "title": "Está tudo pronto",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "events_organising": {
+      "title": "Organiza eventos",
+      "summary": "Planeia em 7 passos curtos, vende lugares, faz o check-in e vê os números.",
+      "chapters": {
+        "plan": "Planear",
+        "run": "Gerir"
+      },
+      "welcome": {
+        "title": "Eventos, do início ao fim",
+        "body": "Planeia, enche, gere e vê como correu, tudo num só sítio."
+      },
+      "new": {
+        "title": "Cria um evento",
+        "body": "Toca em «{label}»."
+      },
+      "steps": {
+        "title": "Sete passos curtos",
+        "body": "Organizador, dados básicos, quando, onde, quem e preço, lugares, revisão. Toca num passo feito para voltar."
+      },
+      "screen": {
+        "title": "Uma decisão por ecrã",
+        "body": "Preenche isto e depois Seguinte.",
+        "tip": "O teu rascunho fica guardado neste dispositivo, por isso podes parar e voltar."
+      },
+      "next": {
+        "title": "Seguinte sabe o que falta",
+        "body": "Se faltar algo, diz-te o quê."
+      },
+      "cohosts": {
+        "title": "Coorganiza com outros",
+        "body": "Em «{label}», pede a uma box ou a um coach para coorganizar pelo endereço da página.",
+        "tip": "Quando aceitarem, o evento aparece na página deles e chega aos seus membros."
+      },
+      "manage": {
+        "title": "Gerir",
+        "body": "Cada evento: participantes, check-in, pagamentos na box, reembolsos e mensagens."
+      },
+      "finances": {
+        "title": "Finanças",
+        "body": "Toca em «{label}»: receitas, reembolsos e o que ainda está por pagar."
+      },
+      "analytics": {
+        "title": "Análises",
+        "body": "Toca em «{label}»: visualizações, inscrições, lista de espera e quem apareceu.",
+        "tip": "A conversão mostra quantos visitantes se inscreveram."
+      },
+      "done": {
+        "title": "Pronto para organizar",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "finance_offers": {
+      "title": "Ofertas, parceiros e indicações",
+      "summary": "Campanhas e cupões, vantagens de parceiros e um programa Traz um amigo.",
+      "chapters": {
+        "campaigns": "Campanhas",
+        "partners": "Parceiros",
+        "referrals": "Indicações"
+      },
+      "welcome": {
+        "title": "Cresce com ofertas",
+        "body": "As tuas campanhas e cupões, vantagens de lojas parceiras e recompensas por trazer amigos."
+      },
+      "campaignNew": {
+        "title": "Cria uma campanha",
+        "body": "Toca em «{label}»."
+      },
+      "campaignForm": {
+        "title": "Nome e datas",
+        "body": "Uma campanha agrupa as tuas ofertas, p. ex. «Verão». Escolhe quando decorre."
+      },
+      "coupons": {
+        "title": "Cupões",
+        "body": "Abre uma campanha para adicionar códigos: uma percentagem ou um valor de desconto, com limite de utilizações.",
+        "tip": "Cada código mostra quantas vezes foi usado, por isso vês que oferta resulta."
+      },
+      "partners": {
+        "title": "Vantagens de parceiros",
+        "body": "Toca em «{label}»."
+      },
+      "perkNew": {
+        "title": "Adiciona uma oferta de parceiro",
+        "body": "Toca em «{label}»."
+      },
+      "perkPartner": {
+        "title": "O parceiro",
+        "body": "O nome, o link e o logótipo."
+      },
+      "perkBenefit": {
+        "title": "O que os membros recebem",
+        "body": "Uma percentagem, um valor ou outra coisa, como um café grátis."
+      },
+      "perkMethod": {
+        "title": "Como a loja confirma",
+        "body": "Um código partilhado, um link com o código ou mostrar uma subscrição ativa.",
+        "tip": "Se um código for divulgado, muda-o aqui e aplica-se logo."
+      },
+      "perkRules": {
+        "title": "Condições",
+        "body": "Datas, quem recebe e com que frequência. Guarda um rascunho e publica quando estiver acordado."
+      },
+      "referrals": {
+        "title": "Traz um amigo",
+        "body": "Um programa que recompensa os membros que trazem alguém que se inscreve."
+      },
+      "referralsFlow": {
+        "title": "Aprova e recompensa",
+        "body": "As indicações chegam aqui. Aprova uma e a recompensa é enviada.",
+        "tip": "A recompensa pode ir para os dois: o membro e o amigo."
+      },
+      "done": {
+        "title": "Está tudo pronto",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    },
+    "member_club_event": {
+      "title": "O teu próprio clube e evento",
+      "summary": "Cria um grupo no clube da tua box e planeia um evento, sozinho ou com uma box.",
+      "chapters": {
+        "club": "O teu clube",
+        "event": "O teu evento"
+      },
+      "welcome": {
+        "title": "Torna-o teu",
+        "body": "Cria um grupo com a tua malta e planeia os teus próprios eventos."
+      },
+      "channels": {
+        "title": "O clube da tua box",
+        "body": "Toca em «{label}»."
+      },
+      "groups": {
+        "title": "Grupos",
+        "body": "Pequenos clubes dentro da box: com chat e eventos próprios."
+      },
+      "propose": {
+        "title": "Cria um grupo",
+        "body": "Toca em «{label}»."
+      },
+      "groupSheet": {
+        "title": "Dá-lhe um nome e escolhe quem entra",
+        "body": "Aberto a todos, ou por pedido.",
+        "tip": "Algumas boxes aprovam primeiro os grupos novos; recebes um aviso quando estiver ativo."
+      },
+      "noBox": {
+        "title": "Os grupos vivem numa box",
+        "body": "Junta-te primeiro a uma box e depois cria um grupo no clube dela. Eventos podes planear já."
+      },
+      "eventNew": {
+        "title": "Planeia um evento",
+        "body": "Toca em «{label}»."
+      },
+      "hostAs": {
+        "title": "Quem organiza",
+        "body": "Tu, ou um grupo ou negócio que geres.",
+        "tip": "«{label}» não precisa de box nenhuma."
+      },
+      "alone": {
+        "title": "Por tua conta",
+        "body": "Aberto a qualquer pessoa por perto, ou só por convite com o teu link."
+      },
+      "withBox": {
+        "title": "Com uma box",
+        "body": "Em «{label}», pede à box para coorganizar pelo endereço da página dela.",
+        "tip": "Quando aceitar, o evento também aparece na página da box."
+      },
+      "hosting": {
+        "title": "Gere-o",
+        "body": "Depois de publicares, em «{label}» tens participantes, check-in e os números."
+      },
+      "done": {
+        "title": "Agora é contigo",
+        "body": "Revê isto quando quiseres em Guias."
+      }
+    }
   }
 }

@@ -325,7 +325,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
-- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin.
+- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
 
 ---
 

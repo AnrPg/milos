@@ -103,6 +103,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     seasons/season_store
     media/media_store
     identity/saved_filter_store
+    guides/guide_progress_store
     organizations/public_profile_store
     organizations/location_scope_store
     ai_usage/ai_usage_store

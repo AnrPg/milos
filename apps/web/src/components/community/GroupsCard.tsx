@@ -24,6 +24,7 @@ import { Badge } from "./MembersTab";
 import { ProposeGroupSheet } from "./ProposeGroupSheet";
 import { ErrorLine } from "./Sheet";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 /**
  * Κανάλια › Ομάδες μελών (board 7 Q2): the gym club's live groups with an
@@ -49,7 +50,7 @@ export function GroupsCard({ club }: { club: CommunityClub }) {
   if (!groups.data || (settings?.member_groups === "none" && live.length === 0 && pending.length === 0)) return null;
 
   return (
-    <HubCard eyebrow={t("groupsTitle")}>
+    <HubCard eyebrow={t("groupsTitle")} guide="club.groups">
       {live.length === 0 && pending.length === 0 ? (
         <p className="mb-3 text-sm" style={{ color: "var(--text-soft)" }}>{t("groupsEmpty")}</p>
       ) : (
@@ -77,6 +78,7 @@ export function GroupsCard({ club }: { club: CommunityClub }) {
       ) : null}
       {settings?.can_propose ? (
         <button
+          {...guideAnchor("club.proposeGroup")}
           type="button"
           onClick={() => setProposing(true)}
           className="min-h-11 w-full rounded-2xl text-sm font-bold"
