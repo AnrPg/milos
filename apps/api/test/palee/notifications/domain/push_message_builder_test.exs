@@ -27,7 +27,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilderTest do
 
     assert message.title == "Class bookings approved"
     assert message.body =~ "one or more"
-    assert message.url == "/schedule"
+    assert message.url == "/box/schedule"
   end
 
   test "builds consolidated workout assignment copy with athlete route" do
@@ -35,7 +35,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilderTest do
 
     assert message.title == "New workouts assigned"
     assert message.body =~ "one or more"
-    assert message.url == "/my-workouts"
+    assert message.url == "/box/workouts"
   end
 
   test "builds workout assignment request copy with personal coaching route" do
@@ -95,5 +95,18 @@ defmodule Palee.Notifications.Domain.PushMessageBuilderTest do
 
     assert message.title == "el:Message from Νίκη"
     assert message.body == "User-authored body"
+  end
+
+  # ADR-196: fallbacks name pages that exist on the web.
+  test "fallback urls open current web routes" do
+    assert PushMessageBuilder.build("partner_match", %{}).url == "/messages?filter=partners"
+    assert PushMessageBuilder.build("partner_message", %{}).url == "/messages?filter=partners"
+
+    assert PushMessageBuilder.build("journal_export_ready", %{}).url ==
+             "/me/settings#journal-export"
+
+    assert PushMessageBuilder.build("package_expiring", %{}).url == "/me/payments"
+    assert PushMessageBuilder.build("form_review_completed", %{}).url == "/box/coach"
+    assert PushMessageBuilder.build("appointment_cancelled", %{}).url == "/box/appointments"
   end
 end

@@ -93,7 +93,7 @@ defmodule PaleeWeb.AdminCoachingControllerTest do
         dedupe_key: "coaching_message:#{response["message"]["id"]}"
       )
 
-    assert notification.payload["url"] == "/account/activity/chats?thread=#{thread.id}"
+    assert notification.payload["url"] == "/messages?thread=#{thread.id}"
     assert [%{id: inbox_id}] = Notifications.list_for_user(athlete.id)
     assert inbox_id == notification.id
     assert Messaging.count_unread_threads(athlete.id) == 1

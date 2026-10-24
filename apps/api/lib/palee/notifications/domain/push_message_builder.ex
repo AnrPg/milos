@@ -12,7 +12,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("New booking request", %{}),
       body: payload["body"] || booking_body(payload, localize),
-      url: payload["url"] || "/schedule"
+      url: payload["url"] || "/box/schedule"
     }
   end
 
@@ -22,7 +22,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       body:
         payload["body"] ||
           localize.("Your coach approved one or more class booking requests.", %{}),
-      url: payload["url"] || "/schedule"
+      url: payload["url"] || "/box/schedule"
     }
   end
 
@@ -30,7 +30,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("New workouts assigned", %{}),
       body: payload["body"] || localize.("Your coach assigned one or more workouts to you.", %{}),
-      url: payload["url"] || "/my-workouts"
+      url: payload["url"] || "/box/workouts"
     }
   end
 
@@ -38,7 +38,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Booking rejected", %{}),
       body: payload["body"] || booking_body(payload, localize),
-      url: payload["url"] || "/schedule"
+      url: payload["url"] || "/box/schedule"
     }
   end
 
@@ -46,7 +46,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Booking timed out", %{}),
       body: payload["body"] || booking_body(payload, localize),
-      url: payload["url"] || "/schedule"
+      url: payload["url"] || "/box/schedule"
     }
   end
 
@@ -91,7 +91,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       body:
         payload["body"] ||
           localize.("%{nickname} rejected %{title}.", %{nickname: nickname, title: title}),
-      url: payload["url"] || "/my-workouts"
+      url: payload["url"] || "/box/workouts"
     }
   end
 
@@ -99,7 +99,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Workout rescheduled", %{}),
       body: payload["body"] || localize.("An athlete rescheduled their workout.", %{}),
-      url: payload["url"] || "/my-workouts"
+      url: payload["url"] || "/box/workouts"
     }
   end
 
@@ -684,7 +684,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
           "Until then, something small: two minutes of breathing, a glass of water, a short walk.",
           %{}
         ),
-      url: payload["url"] || "/journal/wellness"
+      url: payload["url"] || "/journal/wellbeing"
     }
   end
 
@@ -724,7 +724,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
         localize.("You and %{nickname} both want to train together. Say hi.", %{
           nickname: payload["nickname"] || ""
         }),
-      url: payload["url"] || "/partners"
+      url: payload["url"] || "/messages?filter=partners"
     }
   end
 
@@ -732,7 +732,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Training partner message", %{}),
       body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
-      url: payload["url"] || "/partners"
+      url: payload["url"] || "/messages?filter=partners"
     }
   end
 
@@ -770,7 +770,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your journal export is ready", %{}),
       body: localize.("Download it within seven days from Settings.", %{}),
-      url: payload["url"] || "/me/settings/export"
+      url: payload["url"] || "/me/settings#journal-export"
     }
   end
 
@@ -839,7 +839,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
           localize.("Invoice %{invoice_number} has been issued for your account.", %{
             invoice_number: invoice_number
           }),
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
@@ -852,7 +852,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       body:
         payload["body"] ||
           localize.("You have an outstanding balance of %{amount} due.", %{amount: amount}),
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
@@ -866,7 +866,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
             class: payload["class_name"] || ""
           }
         ),
-      url: payload["url"] || "/schedule"
+      url: payload["url"] || "/box/schedule"
     }
   end
 
@@ -878,7 +878,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
           package: payload["package_name"] || "",
           date: payload["ends_on"] || ""
         }),
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
@@ -897,7 +897,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
             "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes.",
             params
           ),
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
@@ -916,7 +916,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your form review is ready", %{}),
       body: localize.("Your coach left feedback on your video.", %{}),
-      url: payload["url"] || "/coaching"
+      url: payload["url"] || "/box/coach"
     }
   end
 
@@ -1001,7 +1001,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your nutrition plan was updated", %{}),
       body: localize.("Open it to see what changed.", %{}),
-      url: payload["url"] || "/coaching"
+      url: payload["url"] || "/box/coach"
     }
   end
 
@@ -1024,7 +1024,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
         localize.("The session on %{time} was cancelled.", %{
           time: payload["starts_when"] || payload["starts_at"] || ""
         }),
-      url: payload["url"] || "/appointments"
+      url: payload["url"] || "/box/appointments"
     }
   end
 
@@ -1189,7 +1189,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
             "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes.",
             params
           ),
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
@@ -1217,7 +1217,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your access has ended", %{}),
       body: payload["body"] || body,
-      url: payload["url"] || "/account/billing"
+      url: payload["url"] || "/me/payments"
     }
   end
 
