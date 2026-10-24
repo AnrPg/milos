@@ -76,6 +76,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     wellbeing/wellbeing_store
     notifications/notification_store
     notifications/native_push_token_store
+    notifications/notification_preference_store
     widgets/widget_token_store
     coaching/coaching_store
     pantheon/pr_store

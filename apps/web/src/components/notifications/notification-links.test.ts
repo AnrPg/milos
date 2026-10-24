@@ -35,8 +35,8 @@ describe("notificationTargetUrl", () => {
   });
 
   it("opens Settings after the person's password was reset", () => {
-    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings");
-    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings#security");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings#security");
   });
 
   it("opens the demo's console from the idle-demo reminder", () => {

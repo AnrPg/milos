@@ -11234,5 +11234,52 @@
     "workoutThread": "Conversa do treino",
     "classThread": "Conversa da aula",
     "searchAtGym": "No teu ginásio"
+  },
+  "NotificationSettings": {
+    "title": "Notificações",
+    "description": "O que te chega, na app e como push",
+    "loading": "A carregar…",
+    "loadError": "As definições de notificações não estão disponíveis neste momento.",
+    "saveError": "A alteração não foi guardada. Tenta novamente.",
+    "locked": "Sempre ativas",
+    "perClub": "Por clube, em As minhas boxes e clubes",
+    "channel": {
+      "in_app": "Na app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Reservas e aulas",
+        "hint": "Aprovações, lista de espera, aulas experimentais, marcações e temporadas"
+      },
+      "messages": {
+        "title": "Mensagens",
+        "hint": "Conversas, pedidos de mensagem e mensagens da box e do treinador"
+      },
+      "community": {
+        "title": "Clubes e comunidade",
+        "hint": "Seguidores, eventos, desafios, grupos e convites."
+      },
+      "coach": {
+        "title": "Treinador",
+        "hint": "Programas, notas de treino, revisões de técnica e nutrição"
+      },
+      "partners": {
+        "title": "Parceiros e buddies",
+        "hint": "Correspondências, o teu buddy de apoio e as mensagens deles"
+      },
+      "journal": {
+        "title": "Lembretes do diário",
+        "hint": "Água, medições, acompanhamento de desejos e sincronização de dispositivos"
+      },
+      "staff": {
+        "title": "Gestão da box",
+        "hint": "Novas reservas, aulas experimentais, visitantes, stock e denúncias"
+      },
+      "account": {
+        "title": "Conta e pagamentos",
+        "hint": "Segurança, faturas, renovações e encomendas"
+      }
+    }
   }
 }

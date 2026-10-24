@@ -11234,5 +11234,52 @@
     "workoutThread": "Trainings-Chat",
     "classThread": "Kurs-Chat",
     "searchAtGym": "In deinem Studio"
+  },
+  "NotificationSettings": {
+    "title": "Benachrichtigungen",
+    "description": "Was dich erreicht, in der App und als Push",
+    "loading": "Wird geladen…",
+    "loadError": "Die Benachrichtigungseinstellungen sind gerade nicht verfügbar.",
+    "saveError": "Die Änderung wurde nicht gespeichert. Versuch es noch einmal.",
+    "locked": "Immer an",
+    "perClub": "Pro Club, unter Meine Boxen und Clubs",
+    "channel": {
+      "in_app": "In der App",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Buchungen & Kurse",
+        "hint": "Bestätigungen, Warteliste, Probetrainings, Termine und Saisons"
+      },
+      "messages": {
+        "title": "Nachrichten",
+        "hint": "Chats, Nachrichtenanfragen und Nachrichten von Box und Coach"
+      },
+      "community": {
+        "title": "Clubs & Community",
+        "hint": "Follower, Events, Challenges, Gruppen und Einladungen."
+      },
+      "coach": {
+        "title": "Coach",
+        "hint": "Programme, Trainingsnotizen, Technik-Reviews und Ernährung"
+      },
+      "partners": {
+        "title": "Partner & Buddys",
+        "hint": "Matches, dein Support-Buddy und ihre Nachrichten"
+      },
+      "journal": {
+        "title": "Journal-Erinnerungen",
+        "hint": "Wasser, Messungen, Heißhunger-Nachfragen und Gerätesynchronisierung"
+      },
+      "staff": {
+        "title": "Box-Betrieb",
+        "hint": "Neue Buchungen, Probetrainings, Besucher, Bestand und Meldungen"
+      },
+      "account": {
+        "title": "Konto & Zahlungen",
+        "hint": "Sicherheit, Rechnungen, Verlängerungen und Bestellungen"
+      }
+    }
   }
 }

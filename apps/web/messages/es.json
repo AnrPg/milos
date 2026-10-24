@@ -11234,5 +11234,52 @@
     "workoutThread": "Conversación del entrenamiento",
     "classThread": "Conversación de la clase",
     "searchAtGym": "En tu gimnasio"
+  },
+  "NotificationSettings": {
+    "title": "Notificaciones",
+    "description": "Lo que te llega, en la app y como push",
+    "loading": "Cargando…",
+    "loadError": "Los ajustes de notificaciones no están disponibles ahora.",
+    "saveError": "El cambio no se guardó. Inténtalo de nuevo.",
+    "locked": "Siempre activas",
+    "perClub": "Por club, en Mis boxes y clubs",
+    "channel": {
+      "in_app": "En la app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Reservas y clases",
+        "hint": "Aprobaciones, lista de espera, pruebas, citas y temporadas"
+      },
+      "messages": {
+        "title": "Mensajes",
+        "hint": "Chats, solicitudes de mensajes y mensajes de tu box y tu coach"
+      },
+      "community": {
+        "title": "Clubs y comunidad",
+        "hint": "Seguidores, eventos, retos, grupos e invitaciones."
+      },
+      "coach": {
+        "title": "Coach",
+        "hint": "Programas, notas de entrenamiento, revisiones de técnica y nutrición"
+      },
+      "partners": {
+        "title": "Compañeros y buddies",
+        "hint": "Coincidencias, tu buddy de apoyo y sus mensajes"
+      },
+      "journal": {
+        "title": "Recordatorios del diario",
+        "hint": "Agua, medidas, seguimiento de antojos y sincronización de dispositivos"
+      },
+      "staff": {
+        "title": "Gestión del box",
+        "hint": "Nuevas reservas, pruebas, visitantes, stock e informes"
+      },
+      "account": {
+        "title": "Cuenta y pagos",
+        "hint": "Seguridad, facturas, renovaciones y pedidos"
+      }
+    }
   }
 }

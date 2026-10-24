@@ -10,6 +10,7 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Commands.MarkNotificationRead
   alias Palee.Notifications.Commands.SaveNativePushToken
   alias Palee.Notifications.Commands.SavePushSubscription
+  alias Palee.Notifications.Domain.NotificationCategories
   alias Palee.Notifications.Domain.NotificationDedupe
   alias Palee.Notifications.NativePush
   alias Palee.Notifications.NativePushTokenStore
@@ -19,6 +20,7 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Queries.ListInboxPage
   alias Palee.Notifications.Queries.GetPushSubscriptionStatus
   alias Palee.Notifications.Queries.ListPushSubscriptions
+  alias Palee.Notifications.NotificationPreferenceStore
   alias Palee.Notifications.NotificationStore
   alias Palee.Notifications.PushSubscriptionStore
   alias Palee.Notifications.Queries.ListNotifications
@@ -160,6 +162,23 @@ defmodule Palee.Notifications do
       _other -> nil
     end
   end
+
+  # ADR-199: a person's per-category notification choices.
+  def list_preferences(context) do
+    case NotificationPreferenceStore.list(context) do
+      choices when is_list(choices) -> {:ok, NotificationCategories.resolve(choices)}
+      {:error, _reason} = error -> error
+    end
+  end
+
+  def update_preference(context, category, params, now \\ DateTime.utc_now()) do
+    with {:ok, pairs} <- NotificationCategories.parse_change(category, params),
+         :ok <- NotificationPreferenceStore.put(context, category, pairs, now) do
+      list_preferences(context)
+    end
+  end
+
+  def notification_categories, do: NotificationCategories.category_ids()
 
   def get_push_settings, do: NotificationStore.get_push_settings()
 
@@ -646,7 +665,7 @@ defmodule Palee.Notifications do
       })
 
   def process_event("password_reset_completed", payload),
-    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings"})
+    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings#security"})
 
   # ADR-184 follow-up: a demo business nobody used for a while will be
   # archived; once per idle spell, to each owner.

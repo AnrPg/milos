@@ -26,6 +26,22 @@ defmodule PaleeWeb.FallbackController do
       {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
   }
 
+  # ADR-199: notification preferences.
+  @notification_preference_errors %{
+    unknown_category: {:not_found, "There is no such notification category"},
+    locked_category:
+      {:unprocessable_entity, "Account and payment notifications cannot be switched off"},
+    invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@notification_preference_errors, reason) do
+    {status, message} = Map.fetch!(@notification_preference_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, reason}) when is_map_key(@business_errors, reason) do
     {status, message} = Map.fetch!(@business_errors, reason)
 

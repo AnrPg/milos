@@ -976,7 +976,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
           "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
           %{}
         ),
-      url: payload["url"] || "/me/settings"
+      url: payload["url"] || "/me/settings#security"
     }
   end
 

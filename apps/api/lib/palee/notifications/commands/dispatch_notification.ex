@@ -5,6 +5,7 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
   alias Palee.Notifications.NotificationStore
   alias Palee.Notifications.Domain.{PayloadNormalizer, PayloadTimes, PushMessageBuilder}
   alias Palee.Notifications.PushConfig
+  alias Palee.Notifications.Queries.DeliversNotification
   alias Palee.Localization
   alias Palee.Organizations
   alias Palee.Organizations.OrganizationStore
@@ -68,8 +69,16 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
 
   defp maybe_enqueue_push(_notification, true), do: :ok
 
-  # ADR-171: the store apps' installs get the same push as the browser ones.
+  # ADR-199: every push starts here, so this is where the push preference is
+  # checked (the bell's is checked in CreateNotification).
   defp maybe_enqueue_push(notification, false) do
+    if DeliversNotification.call(notification.user_id, notification.type, "push"),
+      do: enqueue_push(notification),
+      else: :ok
+  end
+
+  # ADR-171: the store apps' installs get the same push as the browser ones.
+  defp enqueue_push(notification) do
     web = if PushConfig.enabled?(), do: EnqueuePushDispatch.call(notification), else: :ok
 
     case {web, EnqueueNativePushDispatch.call(notification)} do

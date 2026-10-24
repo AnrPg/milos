@@ -4058,6 +4058,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your notification choices, per category and channel */
+        get: operations["PaleeWeb.NotificationPreferenceController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/preferences/{category}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Switch channels of one notification category on or off */
+        put: operations["PaleeWeb.NotificationPreferenceController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications/push-config": {
         parameters: {
             query?: never;
@@ -27750,6 +27784,59 @@ export interface components {
              * @enum {string}
              */
             remote: "ok" | "unavailable" | "skipped";
+        };
+        /** NotificationPreference */
+        NotificationPreference: {
+            /**
+             * @description `staff`: only box staff get these, so only they need the switch.
+             * @enum {string}
+             */
+            audience: "everyone" | "staff";
+            /**
+             * @description A notification category, in the order the switches are shown.
+             * @enum {string}
+             */
+            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+            channels: {
+                email?: boolean;
+                in_app?: boolean;
+                push?: boolean;
+            };
+            /** @description Always delivered (account, security, payments); cannot be changed. */
+            locked: boolean;
+        };
+        /** NotificationPreferenceList */
+        NotificationPreferenceList: {
+            preferences: {
+                /**
+                 * @description `staff`: only box staff get these, so only they need the switch.
+                 * @enum {string}
+                 */
+                audience: "everyone" | "staff";
+                /**
+                 * @description A notification category, in the order the switches are shown.
+                 * @enum {string}
+                 */
+                category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                channels: {
+                    email?: boolean;
+                    in_app?: boolean;
+                    push?: boolean;
+                };
+                /** @description Always delivered (account, security, payments); cannot be changed. */
+                locked: boolean;
+            }[];
+        };
+        /**
+         * NotificationPreferenceUpdate
+         * @description One or more channels of the category to switch on or off.
+         */
+        NotificationPreferenceUpdate: {
+            email?: boolean;
+            in_app?: boolean;
+            push?: boolean;
         };
         /** NutritionPlan */
         NutritionPlan: {
@@ -58014,6 +58101,98 @@ export interface operations {
                 content: {
                     "application/json": {
                         deleted: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.NotificationPreferenceController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            /**
+                             * @description `staff`: only box staff get these, so only they need the switch.
+                             * @enum {string}
+                             */
+                            audience: "everyone" | "staff";
+                            /**
+                             * @description A notification category, in the order the switches are shown.
+                             * @enum {string}
+                             */
+                            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                            channels: {
+                                email?: boolean;
+                                in_app?: boolean;
+                                push?: boolean;
+                            };
+                            /** @description Always delivered (account, security, payments); cannot be changed. */
+                            locked: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.NotificationPreferenceController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: boolean;
+                    in_app?: boolean;
+                    push?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Notification preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            /**
+                             * @description `staff`: only box staff get these, so only they need the switch.
+                             * @enum {string}
+                             */
+                            audience: "everyone" | "staff";
+                            /**
+                             * @description A notification category, in the order the switches are shown.
+                             * @enum {string}
+                             */
+                            category: "bookings" | "messages" | "community" | "coach" | "partners" | "journal" | "staff" | "account";
+                            /** @description Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet). */
+                            channels: {
+                                email?: boolean;
+                                in_app?: boolean;
+                                push?: boolean;
+                            };
+                            /** @description Always delivered (account, security, payments); cannot be changed. */
+                            locked: boolean;
+                        }[];
                     };
                 };
             };
