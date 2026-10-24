@@ -46,7 +46,9 @@ export function ClubFeed({ club, onShowEvents }: { club: CommunityClub; onShowEv
   const posts = withoutPinned(pages.flatMap((page) => page.posts), pinned);
   const prs = posts.filter(isPrCelebration);
   const memberPosts = posts.filter((post) => !isPrCelebration(post));
-  const upcoming = events.data ?? [];
+  // An event already posted to the feed shows once, as its post card (with «Θα έρθω»).
+  const posted = new Set(posts.filter((post) => post.attachment_type === "event").map((post) => post.attachment_id));
+  const upcoming = (events.data ?? []).filter((event) => !posted.has(event.id));
 
   if (feed.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
 

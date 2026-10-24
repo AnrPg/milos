@@ -163,122 +163,122 @@ export function BoxToday({
   return (
     <>
       {showToday ? (
-      <HubCard eyebrow={t("todayWorkout")} highlighted>
-        {loading ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-        ) : !selected ? (
-          <button
-            type="button"
-            className="flex min-h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-bold"
-            style={SPARK_GO_STYLE}
-            onClick={() => launcher.resume(today.resumeExecutionId!)}
-          >
-            {t("resumeWorkout")} ▶
-          </button>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {today.items.length > 1 ? (
-              <SegmentPicker
-                ariaLabel={t("todaySources")}
-                value={selected.key}
-                onChange={setSelectedKey}
-                options={today.items.map((item) => ({ value: item.key, label: `${chipLabel(item)}${item.completed ? " ✓" : ""}` }))}
+        <HubCard eyebrow={t("todayWorkout")} highlighted>
+          {loading ? (
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
+          ) : !selected ? (
+            <button
+              type="button"
+              className="flex min-h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-bold"
+              style={SPARK_GO_STYLE}
+              onClick={() => launcher.resume(today.resumeExecutionId!)}
+            >
+              {t("resumeWorkout")} ▶
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {today.items.length > 1 ? (
+                <SegmentPicker
+                  ariaLabel={t("todaySources")}
+                  value={selected.key}
+                  onChange={setSelectedKey}
+                  options={today.items.map((item) => ({ value: item.key, label: `${chipLabel(item)}${item.completed ? " ✓" : ""}` }))}
+                />
+              ) : (
+                <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
+              )}
+
+              <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+              {selected.kind === "programme" && !selected.completed ? (
+                <Link
+                  href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
+                  className="self-start text-sm font-semibold"
+                  style={{ color: "var(--primary-strong)" }}
+                >
+                  {t("programmeManage")} ›
+                </Link>
+              ) : null}
+              <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
+              <WorkoutPreviewDetail
+                sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
+                initiallyExpanded={false}
+                authoringMode={selected.workout.authoring_mode}
+                freeTextBody={selected.workout.free_text_body}
+                freeTextDocument={selected.workout.free_text_document}
               />
-            ) : (
-              <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
-            )}
+              <WodGoalsStrip workoutId={selected.workout.id} />
 
-            <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
-            {selected.kind === "programme" && !selected.completed ? (
-              <Link
-                href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
-                className="self-start text-sm font-semibold"
-                style={{ color: "var(--primary-strong)" }}
-              >
-                {t("programmeManage")} ›
-              </Link>
-            ) : null}
-            <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
-            <WorkoutPreviewDetail
-              sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
-              initiallyExpanded={false}
-              authoringMode={selected.workout.authoring_mode}
-              freeTextBody={selected.workout.free_text_body}
-              freeTextDocument={selected.workout.free_text_document}
-            />
-            <WodGoalsStrip workoutId={selected.workout.id} />
+              {token ? (
+                <MyInjuryWarningsPanel
+                  accessToken={token}
+                  workoutId={selected.workout.id}
+                  surface={selected.injuryContext.surface}
+                  sourceContextId={selected.injuryContext.id}
+                />
+              ) : null}
+              {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
 
-            {token ? (
-              <MyInjuryWarningsPanel
-                accessToken={token}
-                workoutId={selected.workout.id}
-                surface={selected.injuryContext.surface}
-                sourceContextId={selected.injuryContext.id}
-              />
-            ) : null}
-            {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
+              {launcher.error ? (
+                <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+                  {localizeError(launcher.error, i18n)}
+                </p>
+              ) : null}
 
-            {launcher.error ? (
-              <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-                {localizeError(launcher.error, i18n)}
-              </p>
-            ) : null}
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-                onClick={() => openLog(selected)}
-                disabled={selected.completed}
-              >
-                {selected.completed ? t("logged") : t("logWorkout")}
-              </button>
-              <button
-                type="button"
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-                style={SPARK_GO_STYLE}
-                onClick={() => void start(selected)}
-                disabled={launcher.pendingKey !== null}
-              >
-                {today.resumeExecutionId ? t("resumeWorkout") : t("startWorkout")} ▶
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                  style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+                  onClick={() => openLog(selected)}
+                  disabled={selected.completed}
+                >
+                  {selected.completed ? t("logged") : t("logWorkout")}
+                </button>
+                <button
+                  type="button"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
+                  style={SPARK_GO_STYLE}
+                  onClick={() => void start(selected)}
+                  disabled={launcher.pendingKey !== null}
+                >
+                  {today.resumeExecutionId ? t("resumeWorkout") : t("startWorkout")} ▶
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </HubCard>
+          )}
+        </HubCard>
       ) : null}
 
       {nextSession ?? (booking ? (
-      <HubCard eyebrow={t("nextSession")}>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
-                {day(booking.scheduled_at)} {time(booking.scheduled_at)} · {booking.name || booking.class_type?.name}
-              </p>
-              <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{booking.workout?.title ?? ""}</p>
+        <HubCard eyebrow={t("nextSession")}>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
+                  {day(booking.scheduled_at)} {time(booking.scheduled_at)} · {booking.name || booking.class_type?.name}
+                </p>
+                <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{booking.workout?.title ?? ""}</p>
+              </div>
+              <span
+                className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
+              >
+                {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
+              </span>
             </div>
-            <span
-              className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
-              style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
-            >
-              {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
-            </span>
+            <NextBookingActions slot={booking} />
+            <div className="flex gap-2">
+              <Link
+                href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                {t("manageBooking")}
+              </Link>
+              <QrCheckInLink label={tCheckIn("qrCheckIn")} />
+            </div>
           </div>
-          <NextBookingActions slot={booking} />
-          <div className="flex gap-2">
-            <Link
-              href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
-              className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            >
-              {t("manageBooking")}
-            </Link>
-            <QrCheckInLink label={tCheckIn("qrCheckIn")} />
-          </div>
-        </div>
-      </HubCard>
+        </HubCard>
       ) : token && !schedule.isPending ? (
         <OpenGymCheckIn accessToken={token} entitlement={entitlement} extra={<QrCheckInLink label={tCheckIn("qrCheckIn")} />} />
       ) : null)}

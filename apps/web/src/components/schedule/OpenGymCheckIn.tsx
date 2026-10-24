@@ -109,7 +109,7 @@ export function OpenGymCheckIn({
             </Select>
           ) : null}
           <button
-            className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
+            className="min-h-11 rounded-full px-5 text-sm font-semibold disabled:opacity-50"
             style={SPARK_GO_STYLE}
             disabled={busy}
             onClick={() => void handleCheckIn()}

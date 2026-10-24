@@ -395,7 +395,7 @@ test.describe("member app shell", () => {
     await page.goto("/box");
 
     await expect(page.getByText("Open gym", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Check-in", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Check in", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "QR check-in" })).toHaveAttribute("href", "/box/check-in");
   });
 
