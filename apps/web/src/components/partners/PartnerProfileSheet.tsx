@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { PARTNERS_KEY, putPartnerProfile, type PartnersClubOverview } from "@/api/partners";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { useMyInterests } from "@/components/interests/InterestsEditor";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { PartnerChip } from "./PartnerBits";
@@ -15,7 +16,8 @@ import { usePartnersToken } from "./use-partners";
 
 /**
  * The opt-in profile for one club (ADR-169 §2): level, when you train, up to
- * three goals and a short line. Gender and a preference are optional and only
+ * three goals, the disciplines you'd train together (ADR-197; your interests
+ * first) and a short line. Gender and a preference are optional and only
  * used to honour preferences; nobody sees them. Saving switches it on;
  * «Παύση» keeps it but takes you out of every deck.
  */
@@ -35,6 +37,12 @@ export function PartnerProfileSheet({
   const { options, profile } = overview;
   const [draft, setDraft] = useState<ProfileDraft>(() => profileDraft(profile));
   const [more, setMore] = useState(Boolean(profile?.gender));
+  const tags = useTranslations("BoxTags");
+  const interests = useMyInterests().data?.disciplines ?? [];
+  const [allDisciplines, setAllDisciplines] = useState(false);
+  const offered = new Set(options.disciplines);
+  const shortList = Array.from(new Set([...draft.disciplines, ...interests])).filter((key) => offered.has(key));
+  const disciplineKeys = allDisciplines || shortList.length === 0 ? options.disciplines : shortList;
   const set = (patch: Partial<ProfileDraft>) => setDraft((current) => ({ ...current, ...patch }));
 
   const save = useMutation({
@@ -104,6 +112,35 @@ export function PartnerProfileSheet({
               );
             })}
           </div>
+        </Field>
+
+        <Field label={t("disciplinesLabel", { max: options.max_disciplines })}>
+          <div role="group" aria-label={t("disciplinesLabel", { max: options.max_disciplines })} className="flex flex-wrap gap-2">
+            {disciplineKeys.map((key) => {
+              const pressed = draft.disciplines.includes(key);
+              return (
+                <PartnerChip
+                  key={key}
+                  pressed={pressed}
+                  disabled={!pressed && draft.disciplines.length >= options.max_disciplines}
+                  onToggle={() => set({ disciplines: toggleIn(draft.disciplines, key, options.disciplines, options.max_disciplines) })}
+                >
+                  {tags(`discipline.${key}`)}
+                </PartnerChip>
+              );
+            })}
+          </div>
+          {shortList.length > 0 && shortList.length < options.disciplines.length ? (
+            <button
+              type="button"
+              aria-expanded={allDisciplines}
+              onClick={() => setAllDisciplines((value) => !value)}
+              className="min-h-11 self-start text-sm font-semibold"
+              style={{ color: "var(--primary)" }}
+            >
+              {allDisciplines ? t("fewerDisciplines") : t("allDisciplines")}
+            </button>
+          ) : null}
         </Field>
 
         <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
