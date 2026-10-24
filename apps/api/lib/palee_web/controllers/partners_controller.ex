@@ -74,8 +74,8 @@ defmodule PaleeWeb.PartnersController do
         name: :discipline,
         in: :query,
         required: false,
-        description: "People who named this discipline (ADR-197)",
-        schema: %Schema{type: :string, enum: Palee.Organizations.box_disciplines()}
+        description: "People who named this discipline, a box vocabulary key (ADR-197)",
+        schema: %Schema{type: :string, maxLength: 60}
       },
       %Parameter{
         name: :within_km,

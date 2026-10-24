@@ -6,7 +6,7 @@ defmodule PaleeWeb.Schemas.Partners do
   before it is mutual, and a person's gender never leaves their own profile.
   """
 
-  alias Palee.{Organizations, Partners}
+  alias Palee.Partners
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   @uuid %Schema{type: :string, format: :uuid}
@@ -24,7 +24,8 @@ defmodule PaleeWeb.Schemas.Partners do
   defp list(schema), do: %Schema{type: :array, items: schema}
   defp enum(values), do: %Schema{type: :string, enum: values}
   defp enum_list(values), do: list(enum(values))
-  defp disciplines, do: enum_list(Organizations.box_disciplines())
+  # Keys of the box vocabulary (`GET /box-vocabulary`), checked on write.
+  defp disciplines, do: list(%Schema{type: :string})
 
   def person do
     object(
