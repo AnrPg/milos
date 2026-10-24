@@ -23774,7 +23774,7 @@ export interface components {
                 value: number;
             }[];
             /** @enum {string} */
-            range: "1m" | "3m" | "1y";
+            range: "1m" | "3m" | "6m" | "1y";
             sources: string[];
             /** Format: date */
             to: string;
@@ -47566,7 +47566,7 @@ export interface operations {
         parameters: {
             query?: {
                 metric?: "resting_hr" | "steps";
-                range?: "1m" | "1y" | "3m";
+                range?: "1m" | "1y" | "3m" | "6m";
             };
             header?: never;
             path?: never;
@@ -47610,7 +47610,7 @@ export interface operations {
                             value: number;
                         }[];
                         /** @enum {string} */
-                        range: "1m" | "3m" | "1y";
+                        range: "1m" | "3m" | "6m" | "1y";
                         sources: string[];
                         /** Format: date */
                         to: string;
