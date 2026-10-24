@@ -139,7 +139,7 @@ function Prs({ profile }: { profile: PersonProfile }) {
   });
   if (profile.is_me)
     return (
-      <Link href="/journal/pantheon" className="rounded-3xl p-4 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
+      <Link href="/journal/progress#prs" className="rounded-3xl p-4 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
         {t("myPrsLink")}
       </Link>
     );

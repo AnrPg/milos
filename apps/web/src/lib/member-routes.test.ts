@@ -6,7 +6,8 @@ describe("currentMemberPath", () => {
   it("maps every moved page to its new home", () => {
     expect(currentMemberPath("/my-workouts")).toBe("/box/workouts");
     expect(currentMemberPath("/my-workouts/history")).toBe("/journal");
-    expect(currentMemberPath("/my-workouts/pantheon")).toBe("/journal/pantheon");
+    expect(currentMemberPath("/my-workouts/pantheon")).toBe("/journal/progress");
+    expect(currentMemberPath("/journal/pantheon")).toBe("/journal/progress");
     expect(currentMemberPath("/schedule")).toBe("/box/schedule");
     expect(currentMemberPath("/coaching")).toBe("/box/coach");
     expect(currentMemberPath("/profile")).toBe("/me/settings");

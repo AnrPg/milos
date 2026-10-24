@@ -76,7 +76,7 @@ function useNavigationParams() {
     path: `${nav("utility")} → ${nav("appConfigurations")}`,
     schedule: nav("schedule"),
     myWorkouts: nav("myWorkouts"),
-    pantheon: nav("pantheon"),
+    pantheon: `${nav("journal")} › ${nav("progress")}`,
     billing: nav("billing"),
   };
 }

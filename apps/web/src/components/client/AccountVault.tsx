@@ -24,6 +24,7 @@ import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipR
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { TrainingHistory } from "@/components/history/TrainingHistory";
+import { HistoryExportButton } from "@/components/member-app/progress/HistoryExportButton";
 import { LocalizedScore } from "@/components/localized-score";
 import { SourceLabel } from "@/components/providers/SourceLabel";
 import { useMyProviders, useSourceDirectory } from "@/components/providers/use-providers";
@@ -111,6 +112,7 @@ export function AccountVault() {
           queryKey={["me", "account", currentUser.id]}
           fetchPage={async (kind, offset) => asTrainingHistoryPage(await fetchAccountHistory(token, { kind, offset, limit: 10 }))}
           defaultKind={defaultHistoryKind(currentUser.role)}
+          footer={<HistoryExportButton />}
         />
       ) : null}
 

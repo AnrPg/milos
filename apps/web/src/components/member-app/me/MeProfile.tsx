@@ -157,7 +157,7 @@ function PrList({ prs, pending }: { prs: PRRecord[] | undefined; pending: boolea
       <p className="text-xs" style={{ color: "var(--dim)" }}>
         <Link href="/me/sharing" className="underline">{tMe("mePrsWho")}</Link>
       </p>
-      <MoreLink href="/journal/pantheon" label={tMe("meAllPrs")} />
+      <MoreLink href="/journal/progress#prs" label={tMe("meAllPrs")} />
     </div>
   );
 }
