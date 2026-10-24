@@ -14,6 +14,7 @@ import { CountBadge } from "@/components/buddy/BuddyBits";
 import { activeBuddies, recipientNames, unreadTotal } from "@/components/buddy/buddy-model";
 import { useBuddies } from "@/components/buddy/use-buddies";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
+import { MeProfile } from "@/components/member-app/me/MeProfile";
 import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useHasBillingProviders } from "@/lib/billing-providers";
@@ -24,7 +25,8 @@ import { clientExtraLinks, hasStaffRole } from "@/lib/role-navigation";
 import { setView } from "@/lib/view-mode";
 
 /**
- * Εγώ (brief §6.1, §7.11, mockup 24): who I am to others, then a fixed list of
+ * Εγώ (brief §6.1, §7.11, mockup 24): who I am to others (the profile with
+ * «Αναρτήσεις · PRs · Clubs» tabs, `MeProfile`), then a fixed list of
  * everything secondary, so the app needs no "More" drawer (brief §4.8).
  * Under the name, «ακόλουθοι · ακολουθείς» opens the connections screen
  * (plan §5a Q12).
@@ -103,6 +105,8 @@ export function MeHub() {
         </div>
       </HubCard>
 
+      <MeProfile postsCount={summary.data?.posts_count ?? 0} />
+
       {(currentUser?.profile_count ?? 1) > 1 ? (
         <section className="overflow-hidden rounded-3xl" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <ProfileSwitcherMenu />
@@ -117,9 +121,7 @@ export function MeHub() {
           detail={buddyNames || tBuddy("rowHint")}
           badge={<CountBadge count={buddyUnread} label={tBuddy("unreadCount", { count: buddyUnread })} />}
         />
-        <HubListRow href="/me/posts" label={t("mePosts")} detail={t("mePostsHint")} />
         <HubListRow href="/me/clubs" label={t("meClubs")} detail={t("meClubsHint")} />
-        <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
         <HubListRow href="/me/sharing" label={t("meSharing")} detail={t("meSharingHint")} />
         <HubListRow href="/me/devices" label={tCheckIn("devicesTitle")} detail={tCheckIn("devicesNavHint")} />
         {/* Only for clients of a gym or coach; staff use the console. */}

@@ -11,6 +11,7 @@ export function LeaderboardSetting() {
   const toggle = useLeaderboardOptIn();
   const optedIn = landing.data?.gamification?.leaderboard.opted_in ?? false;
 
+  if (landing.noGym) return null;
   if (landing.isPending) return <LoadingLine />;
 
   return (
