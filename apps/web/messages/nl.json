@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Eén privé, door uzelf gehost huis voor groepslessen, gepersonaliseerde programmering, uitvoering van live trainingen, coachinggesprekken en voortgang die toebehoort aan de atleet.",
     "createAnAccount3f4f547": "Maak een account aan",
     "signInada2e9e": "Log in",
-    "conversationHistory0f18fb3": "Gespreksgeschiedenis",
     "loading33ce417": "Laden…",
-    "noConversations06b83a9": "Geen gesprekken.",
-    "selectAConversationToViewMessagesaf2cf2c": "Selecteer een gesprek om berichten te bekijken.",
     "availablePackages48a5129": "Beschikbare pakketten",
     "closebf5d9ce": "✕ Sluiten",
     "noPackagesAvailable14160fb": "Geen pakketten beschikbaar.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": ".ics downloaden",
     "loadingCalendarLinks1dad320": "Agendalinks laden…",
     "writeAMessage24bf2a3": "Schrijf een bericht…",
-    "chat67305ee": "← Chatten",
     "searchOrStartAConversationabb1d82": "Zoek of start een gesprek…",
     "noConversationsYetSearchToStartOne1a91cf7": "Nog geen gesprekken. Zoek om er een te starten.",
     "hideConversationdfb77ca": "Gesprek verbergen",
@@ -1294,9 +1290,6 @@
     "coaches181feb6": "Coaches",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Programmeer, communiceer en begrijp de trainingsvoortgang zonder toezicht of advertenties.",
     "directMessagefc7f864": "Direct bericht",
-    "workoutThreada03f1e1": "Training draad",
-    "classThreadf030236": "Klasse draad",
-    "thread7863f75": "Draad",
     "eurd06e073": "€",
     "downloada479c9c": "Downloaden",
     "billed763fe55": "Gefactureerd",
@@ -1751,9 +1744,6 @@
     "eG4Rounds3Reps688d025": "bijv. 4 rondes + 3 herhalingen",
     "fail2758e32": "Mislukt",
     "capa8fba29": "· Kap",
-    "directbc81524": "Direct",
-    "class41ff354": "Klasse",
-    "directChat3892e2c": "Directe chat",
     "createAndManagePromotionalOffers46d33bb": "Promotie-aanbiedingen maken en beheren.",
     "reviewReferralActivityAndRewardActions8ea1271": "Beoordeel verwijzingsactiviteiten en beloningsacties.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Beheer de pakketten die worden gebruikt door lidmaatschappen en rechten.",
@@ -4313,7 +4303,6 @@
     "msgTopicFacility": "Faciliteiten",
     "msgSendAsCoaching": "Als coachingbericht",
     "msgSendAsCoachingHint": "Telt als coachingcontact met je klant.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Je box",
     "coachLatestTitle": "Laatste van je coach",
     "coachLatestEmpty": "Nog geen berichten van je coach.",
@@ -5097,14 +5086,12 @@
     "meSharingHint": "Wat je coach en anderen kunnen zien",
     "mePayments": "Betalingen en bonnen",
     "mePaymentsHint": "Facturen, terugbetalingen en je pakket",
-    "meChats": "Gesprekken",
     "meSettings": "Instellingen",
     "meSettingsHint": "Profiel, taal, thema, account",
     "meTour": "Rondleiding",
     "meChecklist": "Aan de slag",
     "meConsole": "Beheer",
     "meConsoleHint": "Personeelsconsole openen",
-    "meMyBoxes": "Mijn boxen",
     "bookingStatus": {
       "approved": "Geboekt",
       "pending": "In afwachting",
@@ -5463,7 +5450,45 @@
         "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Hulp & rondleiding",
+    "meHelpHint": "Rondleiding, eerste stappen, contact",
+    "meHelpResetsWaiting": "{count, plural, one {# wachtwoordherstel wacht} other {# wachtwoordherstellen wachten}}",
+    "helpVisibility": "Zo werkt zichtbaarheid",
+    "helpVisibilityPrivate": "Alles wat je in het Dagboek vastlegt is van jou: alleen jij ziet het, tenzij je iets anders kiest.",
+    "helpVisibilityCoach": "Je coach ziet alleen wat je toestaat bij Delen. Blessures ziet hij altijd, voor je veiligheid.",
+    "helpVisibilityPosts": "Je berichten zijn zichtbaar voor wie je kiest bij het plaatsen: de club, je volgers of iedereen.",
+    "helpContactBox": "Contact met je gym",
+    "helpContactBoxHint": "Stuur je gym een bericht via Berichten",
+    "helpReport": "Probleem melden",
+    "helpReportSubject": "Een probleem in Palee",
+    "helpStaffOnly": "Alleen voor medewerkers",
+    "settingsUnitsHint": "Hoe gewicht, lengte en omtrekken worden getoond.",
+    "settingsSectionsHint": "Welke onderdelen je Dagboek heeft en hoe je gewicht wordt getoond.",
+    "mePrsPrivate": "{count, plural, one {Nog één PR is privé.} other {De andere # PR’s zijn privé.}} Kies bij Delen en zichtbaarheid welke zichtbaar zijn.",
+    "mePrsNoneShown": "Je toont nog geen PR’s op je profiel.",
+    "sharing": {
+      "coachSeesTitle": "Mijn coach ziet",
+      "coachSeesHint": "Wat je coaches bereikt zonder dat je het elke keer stuurt.",
+      "injuriesAlways": "Blessures zijn altijd zichtbaar voor je coach, voor je veiligheid.",
+      "communityTitle": "Community",
+      "communityHint": "Waar je verschijnt in clubs en voor anderen.",
+      "prCelebrations": "PR-vieringen",
+      "prCelebrationsHint": "Een automatische kaart in je club als je een PR zet",
+      "challenges": "Challenges",
+      "challengesHint": "Je naam in de ranglijsten van challenges",
+      "profilePrsTitle": "PR’s op je profiel",
+      "profilePrsHint": "Je volgers zien alleen de PR’s die je aanzet. De rest blijft privé.",
+      "profilePrsEmpty": "Je hebt nog geen PR’s.",
+      "defaultsTitle": "Standaard voor nieuwe items",
+      "defaultsHint": "Waar elk nieuw item begint. Je kunt elk item altijd apart aanpassen.",
+      "defaultKind": {
+        "workout": "Trainingen",
+        "note": "Notities",
+        "check_in": "Check-ins"
+      },
+      "saveError": "Dat is niet opgeslagen. Probeer het opnieuw."
+    }
   },
   "Community": {
     "all": "Alles",
@@ -7465,7 +7490,7 @@
     "helpIntro": "Met een zacht meetlint, op de huid, nauwsluitend maar niet strak. Meet op hetzelfde moment van de dag, liefst 's ochtends.",
     "helpPhotos": "Voor foto's: dezelfde plek, hetzelfde licht, dezelfde afstand. De timer geeft je 10 seconden om achteruit te stappen.",
     "settingsTitle": "Lichaam-instellingen",
-    "settingsHubHint": "Eenheden, gewicht, foto's, herinnering",
+    "settingsHubHint": "Foto’s, meetherinnering",
     "settingsIntro": "Je lichaamsgegevens zijn standaard privé. Hier kies je hoe ze worden getoond en wie ze ziet.",
     "unitsLabel": "Eenheden",
     "sectionsLabel": "Onderdelen van het dagboek",
@@ -7636,7 +7661,8 @@
       "share_photo_missing": "Beide metingen hebben een klare foto van die houding nodig.",
       "media_not_ready": "Een foto wordt nog verwerkt. Probeer het zo opnieuw."
     },
-    "fromGarmin": "via Garmin"
+    "fromGarmin": "via Garmin",
+    "unitsAndSectionsLink": "Eenheden & onderdelen in Instellingen"
   },
   "Referrals": {
     "title": "Neem een vriend mee",
@@ -10838,9 +10864,7 @@
   },
   "Conversations": {
     "title": "Berichten",
-    "inbox": "Inbox",
     "requests": "Verzoeken",
-    "foldersLabel": "Mappen",
     "requestsEntry": "Berichtverzoeken ({count})",
     "buddy": "Maatje",
     "you": "Jij: {text}",
@@ -10870,11 +10894,25 @@
     "message": "Bericht",
     "messageA11y": "{name} een bericht sturen",
     "viewProfile": "Profiel van {name} bekijken",
-    "searchPlaceholder": "Zoek mensen op naam of @handle",
     "searchEmpty": "Niemand gevonden.",
     "notif_person_message_title": "Bericht van {name}",
     "notif_person_message_body": "{name} heeft je een bericht gestuurd.",
     "notif_message_request_title": "Berichtverzoek",
     "notif_message_request_body": "{name} wil je een bericht sturen."
+  },
+  "Inbox": {
+    "title": "Berichten",
+    "segmentsLabel": "Welke berichten je ziet",
+    "segment": {
+      "all": "Alles",
+      "coach": "Coach",
+      "clubs": "Clubs",
+      "partners": "Partners"
+    },
+    "loading": "Berichten laden…",
+    "emptySegment": "Hier zijn nog geen gesprekken.",
+    "workoutThread": "Trainingsgesprek",
+    "classThread": "Lesgesprek",
+    "searchAtGym": "Bij jouw gym"
   }
 }

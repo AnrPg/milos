@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "בית פרטי אחד באירוח עצמי לשיעורים קבוצתיים, תכנות מותאם אישית, ביצוע אימון חי, שיחות אימון והתקדמות ששייכת לספורטאי.",
     "createAnAccount3f4f547": "צור חשבון",
     "signInada2e9e": "היכנס",
-    "conversationHistory0f18fb3": "היסטוריית שיחות",
     "loading33ce417": "טוען...",
-    "noConversations06b83a9": "אין שיחות.",
-    "selectAConversationToViewMessagesaf2cf2c": "בחר שיחה כדי להציג הודעות.",
     "availablePackages48a5129": "חבילות זמינות",
     "closebf5d9ce": "✕ סגור",
     "noPackagesAvailable14160fb": "אין חבילות זמינות.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "הורד את .ics",
     "loadingCalendarLinks1dad320": "טוען קישורי יומן...",
     "writeAMessage24bf2a3": "כתוב הודעה…",
-    "chat67305ee": "← צ'אט",
     "searchOrStartAConversationabb1d82": "חפש או התחל שיחה...",
     "noConversationsYetSearchToStartOne1a91cf7": "עדיין אין שיחות. חפש כדי להתחיל אחד.",
     "hideConversationdfb77ca": "הסתר שיחה",
@@ -1294,9 +1290,6 @@
     "coaches181feb6": "מאמנים",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "תכנת, תקשר והבין את התקדמות ההדרכה ללא מעקב או מודעות.",
     "directMessagefc7f864": "הודעה ישירה",
-    "workoutThreada03f1e1": "חוט אימון",
-    "classThreadf030236": "חוט כיתתי",
-    "thread7863f75": "חוט",
     "eurd06e073": "יורו",
     "downloada479c9c": "הורד",
     "billed763fe55": "מחויב",
@@ -1751,9 +1744,6 @@
     "eG4Rounds3Reps688d025": "למשל 4 סיבובים + 3 חזרות",
     "fail2758e32": "נכשל",
     "capa8fba29": "· כובע",
-    "directbc81524": "ישיר",
-    "class41ff354": "כיתה",
-    "directChat3892e2c": "צ'אט ישיר",
     "createAndManagePromotionalOffers46d33bb": "צור ונהל הצעות קידום מכירות.",
     "reviewReferralActivityAndRewardActions8ea1271": "סקור פעילות הפניה ופעולות תגמול.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "נהל את החבילות המשמשות את החברות והזכויות.",
@@ -4313,7 +4303,6 @@
     "msgTopicFacility": "מתקנים",
     "msgSendAsCoaching": "כהודעת אימון",
     "msgSendAsCoachingHint": "נספר כנקודת מגע אימונית עם הלקוח.",
-    "chatsTabBox": "המכון",
     "chatsBoxThread": "המכון שלך",
     "coachLatestTitle": "האחרון מהמאמן",
     "coachLatestEmpty": "עדיין אין הודעות מהמאמן שלך.",
@@ -5097,14 +5086,12 @@
     "meSharingHint": "מה המאמן ואחרים יכולים לראות",
     "mePayments": "תשלומים וקבלות",
     "mePaymentsHint": "חשבוניות, החזרים והחבילה שלכם",
-    "meChats": "שיחות",
     "meSettings": "הגדרות",
     "meSettingsHint": "פרופיל, שפה, ערכת נושא, חשבון",
     "meTour": "סיור במערכת",
     "meChecklist": "צעדים ראשונים",
     "meConsole": "ניהול",
     "meConsoleHint": "פתיחת מסוף הצוות",
-    "meMyBoxes": "הבוקסים שלי",
     "bookingStatus": {
       "approved": "מוזמן",
       "pending": "ממתין",
@@ -5463,7 +5450,45 @@
         "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "עזרה וסיור",
+    "meHelpHint": "סיור, צעדים ראשונים, יצירת קשר",
+    "meHelpResetsWaiting": "{count, plural, one {איפוס סיסמה אחד ממתין} two {שני איפוסי סיסמה ממתינים} other {# איפוסי סיסמה ממתינים}}",
+    "helpVisibility": "איך עובדת הנראות",
+    "helpVisibilityPrivate": "כל מה שאתה רושם ביומן שייך לך: רק אתה רואה אותו, אלא אם תבחר אחרת.",
+    "helpVisibilityCoach": "המאמן שלך רואה רק את מה שאתה מתיר בשיתוף. פציעות הוא רואה תמיד, למען בטיחותך.",
+    "helpVisibilityPosts": "הפוסטים שלך מוצגים למי שתבחר בעת הפרסום: המועדון, העוקבים שלך או כולם.",
+    "helpContactBox": "יצירת קשר עם המכון",
+    "helpContactBoxHint": "כתוב למכון דרך ההודעות",
+    "helpReport": "דיווח על בעיה",
+    "helpReportSubject": "בעיה ב-Palee",
+    "helpStaffOnly": "לצוות בלבד",
+    "settingsUnitsHint": "איך מוצגים משקל, גובה והיקפים.",
+    "settingsSectionsHint": "אילו מקטעים יש ביומן שלך ואיך מוצג המשקל.",
+    "mePrsPrivate": "{count, plural, one {שיא אישי נוסף פרטי.} two {עוד שני שיאים אישיים פרטיים.} other {עוד # שיאים אישיים פרטיים.}} בחר אילו מוצגים בשיתוף ונראות.",
+    "mePrsNoneShown": "עדיין אינך מציג שיאים אישיים בפרופיל.",
+    "sharing": {
+      "coachSeesTitle": "המאמן שלי רואה",
+      "coachSeesHint": "מה מגיע למאמנים שלך בלי שתשלח בכל פעם.",
+      "injuriesAlways": "פציעות תמיד גלויות למאמן, למען בטיחותך.",
+      "communityTitle": "קהילה",
+      "communityHint": "היכן אתה מופיע במועדונים ולאחרים.",
+      "prCelebrations": "חגיגת שיאים",
+      "prCelebrationsHint": "כרטיס אוטומטי במועדון כשאתה שובר שיא",
+      "challenges": "אתגרים",
+      "challengesHint": "השם שלך בדירוג האתגרים",
+      "profilePrsTitle": "שיאים בפרופיל שלך",
+      "profilePrsHint": "העוקבים שלך רואים רק את מה שתפעיל. השאר נשארים פרטיים.",
+      "profilePrsEmpty": "אין לך שיאים עדיין.",
+      "defaultsTitle": "ברירת מחדל לרשומות חדשות",
+      "defaultsHint": "מאיפה מתחילה כל רשומה חדשה. אפשר לשנות כל אחת מתי שתרצה.",
+      "defaultKind": {
+        "workout": "אימונים",
+        "note": "הערות",
+        "check_in": "צ׳ק-אין"
+      },
+      "saveError": "השינוי לא נשמר. נסה שוב."
+    }
   },
   "Community": {
     "all": "הכול",
@@ -7465,7 +7490,7 @@
     "helpIntro": "בסרט מדידה רך, על העור, צמוד אבל לא הדוק. מדוד באותה שעה ביום, רצוי בבוקר.",
     "helpPhotos": "לתמונות: אותו מקום, אותה תאורה, אותו מרחק. הטיימר נותן לך 10 שניות להתרחק.",
     "settingsTitle": "הגדרות גוף",
-    "settingsHubHint": "יחידות, משקל, תמונות, תזכורת",
+    "settingsHubHint": "תמונות, תזכורת מדידה",
     "settingsIntro": "נתוני הגוף שלך פרטיים כברירת מחדל. כאן בוחרים איך הם מוצגים ומי רואה אותם.",
     "unitsLabel": "יחידות",
     "sectionsLabel": "אזורי היומן",
@@ -7636,7 +7661,8 @@
       "share_photo_missing": "שתי המדידות צריכות תמונה מוכנה של התנוחה הזו.",
       "media_not_ready": "תמונה עדיין בעיבוד. נסה שוב בעוד רגע."
     },
-    "fromGarmin": "מ-Garmin"
+    "fromGarmin": "מ-Garmin",
+    "unitsAndSectionsLink": "יחידות ומקטעים בהגדרות"
   },
   "Referrals": {
     "title": "הבא חבר",
@@ -10838,9 +10864,7 @@
   },
   "Conversations": {
     "title": "הודעות",
-    "inbox": "תיבת הדואר",
     "requests": "בקשות",
-    "foldersLabel": "תיקיות",
     "requestsEntry": "בקשות הודעה ({count})",
     "buddy": "חבר",
     "you": "את/ה: {text}",
@@ -10870,11 +10894,25 @@
     "message": "הודעה",
     "messageA11y": "שליחת הודעה ל־{name}",
     "viewProfile": "הפרופיל של {name}",
-    "searchPlaceholder": "חיפוש אנשים לפי שם או @כינוי",
     "searchEmpty": "לא נמצא אף אחד.",
     "notif_person_message_title": "הודעה מ־{name}",
     "notif_person_message_body": "{name} שלח/ה לך הודעה.",
     "notif_message_request_title": "בקשת הודעה",
     "notif_message_request_body": "{name} רוצה לשלוח לך הודעה."
+  },
+  "Inbox": {
+    "title": "הודעות",
+    "segmentsLabel": "אילו הודעות להציג",
+    "segment": {
+      "all": "הכול",
+      "coach": "מאמן",
+      "clubs": "מועדונים",
+      "partners": "שותפים"
+    },
+    "loading": "טוען הודעות…",
+    "emptySegment": "אין כאן שיחות עדיין.",
+    "workoutThread": "שיחת אימון",
+    "classThread": "שיחת שיעור",
+    "searchAtGym": "במכון שלך"
   }
 }

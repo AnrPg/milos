@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Το δικό σου training space για group classes, personal workouts, άμεσο chat με τον coach και progress που σου ταιριάζει.",
     "createAnAccount3f4f547": "Δημιουργήσε έναν λογαριασμό",
     "signInada2e9e": "Συνδέσου",
-    "conversationHistory0f18fb3": "Ιστορικό συνομιλιών",
     "loading33ce417": "Φόρτωση…",
-    "noConversations06b83a9": "Καμία συνομιλία.",
-    "selectAConversationToViewMessagesaf2cf2c": "Επιλέξτε μια συνομιλία για προβολή μηνυμάτων.",
     "availablePackages48a5129": "Διαθέσιμα πακέτα συνδρομής",
     "closebf5d9ce": "✕ Κλείσιμο",
     "noPackagesAvailable14160fb": "Δεν υπάρχουν διαθέσιμα πακέτα συνδρομής.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Λήψη .ics",
     "loadingCalendarLinks1dad320": "Φόρτωση συνδέσμων ημερολογίου…",
     "writeAMessage24bf2a3": "Γράψτε ένα μήνυμα…",
-    "chat67305ee": "← Συνομιλία",
     "searchOrStartAConversationabb1d82": "Αναζήτηση ή έναρξη συνομιλίας…",
     "noConversationsYetSearchToStartOne1a91cf7": "Δεν υπάρχουν ακόμη συνομιλίες. Αναζήτηση για να ξεκινήσετε ένα.",
     "hideConversationdfb77ca": "Απόκρυψη συνομιλίας",
@@ -1294,9 +1290,6 @@
     "coaches181feb6": "Προπονητές",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Προγραμματίστε, επικοινωνήστε και κατανοήστε την πρόοδο της εκπαίδευσης χωρίς επιτήρηση ή διαφημίσεις.",
     "directMessagefc7f864": "Άμεσο μήνυμα",
-    "workoutThreada03f1e1": "νήμα προπόνησης",
-    "classThreadf030236": "νήμα τάξης",
-    "thread7863f75": "Νήμα",
     "eurd06e073": "ευρώ",
     "downloada479c9c": "Λήψη",
     "billed763fe55": "Τιμολογήθηκε",
@@ -1751,9 +1744,6 @@
     "eG4Rounds3Reps688d025": "π.χ. 4 γύροι + 3 επαναλήψεις",
     "fail2758e32": "Αποτυχία",
     "capa8fba29": "· Καπ",
-    "directbc81524": "Άμεση",
-    "class41ff354": "Τάξη",
-    "directChat3892e2c": "Απευθείας συνομιλία",
     "createAndManagePromotionalOffers46d33bb": "Δημιουργήστε και διαχειριστείτε προωθητικές προσφορές.",
     "reviewReferralActivityAndRewardActions8ea1271": "Ελέγξτε τη δραστηριότητα παραπομπής και τις ενέργειες επιβράβευσης.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Διαχειριστείτε τα πακέτα που χρησιμοποιούνται από τις συνδρομές και τα δικαιώματα.",
@@ -4313,7 +4303,6 @@
     "msgTopicFacility": "Χώρος",
     "msgSendAsCoaching": "Ως μήνυμα coaching",
     "msgSendAsCoachingHint": "Μετράει στις επαφές coaching του πελάτη.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Το box",
     "coachLatestTitle": "Τελευταία από τον coach",
     "coachLatestEmpty": "Δεν υπάρχουν ακόμη μηνύματα από τον coach σου.",
@@ -5097,14 +5086,12 @@
     "meSharingHint": "Τι βλέπει ο coach και οι άλλοι",
     "mePayments": "Πληρωμές & αποδείξεις",
     "mePaymentsHint": "Τιμολόγια, επιστροφές και το πακέτο σου",
-    "meChats": "Συνομιλίες",
     "meSettings": "Ρυθμίσεις",
     "meSettingsHint": "Προφίλ, γλώσσα, θέμα, λογαριασμός",
     "meTour": "Ξενάγηση",
     "meChecklist": "Πρώτα βήματα",
     "meConsole": "Διαχείριση",
     "meConsoleHint": "Άνοιγμα της κονσόλας προσωπικού",
-    "meMyBoxes": "Τα box μου",
     "bookingStatus": {
       "approved": "Κλεισμένο",
       "pending": "Σε αναμονή έγκρισης",
@@ -5463,7 +5450,45 @@
         "invalid_media": "Η φωτογραφία δεν είναι έτοιμη. Διάλεξέ τη ξανά."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Βοήθεια & ξενάγηση",
+    "meHelpHint": "Ξενάγηση, πρώτα βήματα, επικοινωνία",
+    "meHelpResetsWaiting": "{count, plural, one {# επαναφορά κωδικού περιμένει} other {# επαναφορές κωδικού περιμένουν}}",
+    "helpVisibility": "Πώς λειτουργεί η ορατότητα",
+    "helpVisibilityPrivate": "Ό,τι καταγράφεις στο Ημερολόγιο είναι δικό σου: το βλέπεις μόνο εσύ, εκτός αν επιλέξεις αλλιώς.",
+    "helpVisibilityCoach": "Ο coach σου βλέπει μόνο ό,τι του επιτρέπεις στην Κοινοποίηση. Τους τραυματισμούς τους βλέπει πάντα, για την ασφάλειά σου.",
+    "helpVisibilityPosts": "Οι αναρτήσεις σου φαίνονται σε όσους διαλέξεις όταν τις δημοσιεύεις: το club, τους followers σου ή όλους.",
+    "helpContactBox": "Επικοινωνία με το box",
+    "helpContactBoxHint": "Γράψε στο box από τα Μηνύματα",
+    "helpReport": "Αναφορά προβλήματος",
+    "helpReportSubject": "Πρόβλημα στο Palee",
+    "helpStaffOnly": "Μόνο για staff",
+    "settingsUnitsHint": "Πώς δείχνονται βάρος, ύψος και περίμετροι.",
+    "settingsSectionsHint": "Ποιες ενότητες έχει το Ημερολόγιό σου και πώς φαίνεται το βάρος.",
+    "mePrsPrivate": "{count, plural, one {Ένα ακόμα PR είναι ιδιωτικό.} other {Τα υπόλοιπα # PRs είναι ιδιωτικά.}} Ορίζεις ποια φαίνονται από Κοινοποίηση & ορατότητα.",
+    "mePrsNoneShown": "Δεν δείχνεις ακόμα κανένα PR στο προφίλ σου.",
+    "sharing": {
+      "coachSeesTitle": "Ο coach μου βλέπει",
+      "coachSeesHint": "Τι φτάνει στους coaches σου χωρίς να το στείλεις κάθε φορά.",
+      "injuriesAlways": "Οι τραυματισμοί φαίνονται πάντα στον coach, για την ασφάλειά σου.",
+      "communityTitle": "Κοινότητα",
+      "communityHint": "Πού εμφανίζεσαι στα clubs και στους άλλους.",
+      "prCelebrations": "PR celebrations",
+      "prCelebrationsHint": "Αυτόματη κάρτα στο club όταν σπας ένα PR",
+      "challenges": "Challenges",
+      "challengesHint": "Το όνομά σου στην κατάταξη των challenges",
+      "profilePrsTitle": "PRs στο προφίλ σου",
+      "profilePrsHint": "Όσοι σε ακολουθούν βλέπουν μόνο όσα ενεργοποιήσεις. Τα υπόλοιπα μένουν ιδιωτικά.",
+      "profilePrsEmpty": "Δεν έχεις PRs ακόμα.",
+      "defaultsTitle": "Προεπιλογή νέων καταχωρήσεων",
+      "defaultsHint": "Από πού ξεκινά κάθε νέα καταχώρηση. Την αλλάζεις όποτε θέλεις, μία μία.",
+      "defaultKind": {
+        "workout": "Προπονήσεις",
+        "note": "Σημειώσεις",
+        "check_in": "Check-in"
+      },
+      "saveError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά."
+    }
   },
   "Community": {
     "all": "Όλα",
@@ -7465,7 +7490,7 @@
     "helpIntro": "Με μαλακή μεζούρα, πάνω στο δέρμα, εφαρμοστά αλλά όχι σφιχτά. Μέτρα την ίδια ώρα της ημέρας, ιδανικά το πρωί.",
     "helpPhotos": "Για τις φωτογραφίες: ίδιο σημείο, ίδιο φως, ίδια απόσταση. Το χρονόμετρο σου δίνει 10 δευτερόλεπτα να απομακρυνθείς.",
     "settingsTitle": "Ρυθμίσεις Σώματος",
-    "settingsHubHint": "Μονάδες, εμφάνιση βάρους, φωτογραφίες, υπενθύμιση",
+    "settingsHubHint": "Φωτογραφίες, υπενθύμιση μέτρησης",
     "settingsIntro": "Τα δεδομένα του σώματός σου είναι ιδιωτικά από προεπιλογή. Εδώ διαλέγεις πώς φαίνονται και ποιος τα βλέπει.",
     "unitsLabel": "Μονάδες",
     "sectionsLabel": "Ενότητες ημερολογίου",
@@ -7636,7 +7661,8 @@
       "share_photo_missing": "Και οι δύο μετρήσεις χρειάζονται έτοιμη φωτογραφία αυτής της στάσης.",
       "media_not_ready": "Μια φωτογραφία επεξεργάζεται ακόμα. Δοκίμασε σε λίγο."
     },
-    "fromGarmin": "από Garmin"
+    "fromGarmin": "από Garmin",
+    "unitsAndSectionsLink": "Μονάδες & ενότητες στις Ρυθμίσεις"
   },
   "Referrals": {
     "title": "Φέρε φίλο",
@@ -10838,9 +10864,7 @@
   },
   "Conversations": {
     "title": "Μηνύματα",
-    "inbox": "Εισερχόμενα",
     "requests": "Αιτήματα",
-    "foldersLabel": "Φάκελοι",
     "requestsEntry": "Αιτήματα μηνυμάτων ({count})",
     "buddy": "Φιλαράκι",
     "you": "Εσύ: {text}",
@@ -10870,11 +10894,25 @@
     "message": "Μήνυμα",
     "messageA11y": "Μήνυμα στον/στην {name}",
     "viewProfile": "Προφίλ: {name}",
-    "searchPlaceholder": "Βρες άτομα με όνομα ή @handle",
     "searchEmpty": "Δεν βρέθηκε κανείς.",
     "notif_person_message_title": "Μήνυμα από {name}",
     "notif_person_message_body": "Ο/Η {name} σου έστειλε μήνυμα.",
     "notif_message_request_title": "Αίτημα μηνύματος",
     "notif_message_request_body": "Ο/Η {name} θέλει να σου στείλει μήνυμα."
+  },
+  "Inbox": {
+    "title": "Μηνύματα",
+    "segmentsLabel": "Ποια μηνύματα βλέπεις",
+    "segment": {
+      "all": "Όλα",
+      "coach": "Coach",
+      "clubs": "Clubs",
+      "partners": "Partners"
+    },
+    "loading": "Φόρτωση μηνυμάτων…",
+    "emptySegment": "Δεν υπάρχουν συνομιλίες εδώ ακόμα.",
+    "workoutThread": "Συνομιλία προπόνησης",
+    "classThread": "Συνομιλία μαθήματος",
+    "searchAtGym": "Στο box σου"
   }
 }

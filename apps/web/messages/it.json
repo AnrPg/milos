@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Una casa privata ospitata autonomamente per lezioni di gruppo, programmazione personalizzata, esecuzione di allenamenti dal vivo, conversazioni di coaching e progressi che appartengono all'atleta.",
     "createAnAccount3f4f547": "Crea un account",
     "signInada2e9e": "Accedi",
-    "conversationHistory0f18fb3": "Cronologia delle conversazioni",
     "loading33ce417": "Caricamento…",
-    "noConversations06b83a9": "Nessuna conversazione.",
-    "selectAConversationToViewMessagesaf2cf2c": "Seleziona una conversazione per visualizzare i messaggi.",
     "availablePackages48a5129": "Pacchetti disponibili",
     "closebf5d9ce": "✕ Chiudi",
     "noPackagesAvailable14160fb": "Nessun pacchetto disponibile.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Scarica .ics",
     "loadingCalendarLinks1dad320": "Caricamento dei collegamenti al calendario…",
     "writeAMessage24bf2a3": "Scrivi un messaggio...",
-    "chat67305ee": "← Chiacchiera",
     "searchOrStartAConversationabb1d82": "Cerca o avvia una conversazione…",
     "noConversationsYetSearchToStartOne1a91cf7": "Nessuna conversazione ancora. Cerca per avviarne uno.",
     "hideConversationdfb77ca": "Nascondi conversazione",
@@ -1294,9 +1290,6 @@
     "coaches181feb6": "Allenatori",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Programma, comunica e comprendi i progressi della formazione senza sorveglianza o pubblicità.",
     "directMessagefc7f864": "Messaggio diretto",
-    "workoutThreada03f1e1": "Filo di allenamento",
-    "classThreadf030236": "Discussione della classe",
-    "thread7863f75": "Filo",
     "eurd06e073": "euro",
     "downloada479c9c": "Scarica",
     "billed763fe55": "Fatturato",
@@ -1751,9 +1744,6 @@
     "eG4Rounds3Reps688d025": "ad es. 4 giri + 3 ripetizioni",
     "fail2758e32": "Fallire",
     "capa8fba29": "· Cap",
-    "directbc81524": "Diretto",
-    "class41ff354": "Classe",
-    "directChat3892e2c": "Chat diretta",
     "createAndManagePromotionalOffers46d33bb": "Creare e gestire offerte promozionali.",
     "reviewReferralActivityAndRewardActions8ea1271": "Esaminare l'attività di riferimento e le azioni di ricompensa.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Gestisci i pacchetti utilizzati da abbonamenti e diritti.",
@@ -4313,7 +4303,6 @@
     "msgTopicFacility": "Struttura",
     "msgSendAsCoaching": "Come messaggio di coaching",
     "msgSendAsCoachingHint": "Conta come contatto di coaching con il tuo cliente.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Il tuo box",
     "coachLatestTitle": "Le ultime dal tuo coach",
     "coachLatestEmpty": "Ancora nessun messaggio dal tuo coach.",
@@ -5097,14 +5086,12 @@
     "meSharingHint": "Cosa vedono il tuo coach e gli altri",
     "mePayments": "Pagamenti e ricevute",
     "mePaymentsHint": "Fatture, rimborsi e il tuo pacchetto",
-    "meChats": "Conversazioni",
     "meSettings": "Impostazioni",
     "meSettingsHint": "Profilo, lingua, tema, account",
     "meTour": "Fai il tour",
     "meChecklist": "Primi passi",
     "meConsole": "Gestione",
     "meConsoleHint": "Apri la console dello staff",
-    "meMyBoxes": "I miei box",
     "bookingStatus": {
       "approved": "Prenotato",
       "pending": "In attesa",
@@ -5463,7 +5450,45 @@
         "invalid_media": "La foto non è pronta. Sceglila di nuovo."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Aiuto e tour",
+    "meHelpHint": "Tour, primi passi, contatti",
+    "meHelpResetsWaiting": "{count, plural, one {# reimpostazione password in attesa} other {# reimpostazioni password in attesa}}",
+    "helpVisibility": "Come funziona la visibilità",
+    "helpVisibilityPrivate": "Tutto ciò che registri nel Diario è tuo: lo vedi solo tu, a meno che tu non scelga diversamente.",
+    "helpVisibilityCoach": "Il tuo coach vede solo ciò che consenti in Condivisione. Gli infortuni li vede sempre, per la tua sicurezza.",
+    "helpVisibilityPosts": "I tuoi post li vede chi scegli quando li pubblichi: il club, i tuoi follower o tutti.",
+    "helpContactBox": "Contatta la tua palestra",
+    "helpContactBoxHint": "Scrivi alla palestra da Messaggi",
+    "helpReport": "Segnala un problema",
+    "helpReportSubject": "Un problema in Palee",
+    "helpStaffOnly": "Solo per lo staff",
+    "settingsUnitsHint": "Come vengono mostrati peso, altezza e circonferenze.",
+    "settingsSectionsHint": "Quali sezioni ha il tuo Diario e come si vede il peso.",
+    "mePrsPrivate": "{count, plural, one {Un altro PR è privato.} other {Gli altri # PR sono privati.}} Scegli quali mostrare in Condivisione e visibilità.",
+    "mePrsNoneShown": "Non mostri ancora nessun PR sul tuo profilo.",
+    "sharing": {
+      "coachSeesTitle": "Il mio coach vede",
+      "coachSeesHint": "Cosa arriva ai tuoi coach senza doverlo inviare ogni volta.",
+      "injuriesAlways": "Gli infortuni sono sempre visibili al coach, per la tua sicurezza.",
+      "communityTitle": "Community",
+      "communityHint": "Dove compari nei club e agli altri.",
+      "prCelebrations": "Celebrazione dei PR",
+      "prCelebrationsHint": "Una scheda automatica nel club quando fai un PR",
+      "challenges": "Sfide",
+      "challengesHint": "Il tuo nome nelle classifiche delle sfide",
+      "profilePrsTitle": "PR sul tuo profilo",
+      "profilePrsHint": "Chi ti segue vede solo quelli che attivi. Gli altri restano privati.",
+      "profilePrsEmpty": "Non hai ancora PR.",
+      "defaultsTitle": "Predefinito per le nuove voci",
+      "defaultsHint": "Da dove parte ogni nuova voce. Puoi cambiarle una per una quando vuoi.",
+      "defaultKind": {
+        "workout": "Allenamenti",
+        "note": "Note",
+        "check_in": "Check-in"
+      },
+      "saveError": "Non è stato salvato. Riprova."
+    }
   },
   "Community": {
     "all": "Tutti",
@@ -7465,7 +7490,7 @@
     "helpIntro": "Con un metro morbido, sulla pelle, aderente ma non stretto. Misurati alla stessa ora del giorno, meglio al mattino.",
     "helpPhotos": "Per le foto: stesso posto, stessa luce, stessa distanza. Il timer ti dà 10 secondi per allontanarti.",
     "settingsTitle": "Impostazioni Corpo",
-    "settingsHubHint": "Unità, peso, foto, promemoria",
+    "settingsHubHint": "Foto, promemoria misurazione",
     "settingsIntro": "I tuoi dati corporei sono privati per impostazione predefinita. Qui scegli come appaiono e chi li vede.",
     "unitsLabel": "Unità",
     "sectionsLabel": "Sezioni del diario",
@@ -7636,7 +7661,8 @@
       "share_photo_missing": "Entrambe le misurazioni devono avere una foto pronta di quella posa.",
       "media_not_ready": "Una foto è ancora in elaborazione. Riprova tra poco."
     },
-    "fromGarmin": "da Garmin"
+    "fromGarmin": "da Garmin",
+    "unitsAndSectionsLink": "Unità e sezioni nelle Impostazioni"
   },
   "Referrals": {
     "title": "Porta un amico",
@@ -10838,9 +10864,7 @@
   },
   "Conversations": {
     "title": "Messaggi",
-    "inbox": "In arrivo",
     "requests": "Richieste",
-    "foldersLabel": "Cartelle",
     "requestsEntry": "Richieste di messaggi ({count})",
     "buddy": "Amicone",
     "you": "Tu: {text}",
@@ -10870,11 +10894,25 @@
     "message": "Messaggio",
     "messageA11y": "Scrivi a {name}",
     "viewProfile": "Vedi il profilo di {name}",
-    "searchPlaceholder": "Cerca persone per nome o @handle",
     "searchEmpty": "Nessuno trovato.",
     "notif_person_message_title": "Messaggio da {name}",
     "notif_person_message_body": "{name} ti ha mandato un messaggio.",
     "notif_message_request_title": "Richiesta di messaggio",
     "notif_message_request_body": "{name} vuole mandarti un messaggio."
+  },
+  "Inbox": {
+    "title": "Messaggi",
+    "segmentsLabel": "Quali messaggi mostrare",
+    "segment": {
+      "all": "Tutti",
+      "coach": "Coach",
+      "clubs": "Club",
+      "partners": "Partner"
+    },
+    "loading": "Caricamento dei messaggi…",
+    "emptySegment": "Ancora nessuna conversazione qui.",
+    "workoutThread": "Conversazione dell’allenamento",
+    "classThread": "Conversazione della lezione",
+    "searchAtGym": "Nella tua palestra"
   }
 }

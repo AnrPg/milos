@@ -172,7 +172,7 @@ function ChartCard({ settings, snapshots }: { settings: BodySettingsResponse; sn
           hiddenNote={
             <>
               {t("chartHiddenBody")}{" "}
-              <Link href="/me/settings/body" className="font-semibold underline">{t("changeInSettings")}</Link>
+              <Link href="/me/settings#journal-sections" className="font-semibold underline">{t("changeInSettings")}</Link>
             </>
           }
         />

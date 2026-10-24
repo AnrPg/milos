@@ -230,3 +230,28 @@ export async function fetchJournalExports(token: string) {
   const data = await apiRequest<components["schemas"]["JournalExports"]>("/me/journal/exports", { token });
   return (data.exports ?? []) as JournalExport[];
 }
+
+/**
+ * «Προεπιλογή για νέες καταχωρήσεις» (ADR-196): the rung a new entry of each
+ * kind starts on. PRs read theirs from the PR sharing setting (ADR-139 §3),
+ * so only workouts, notes and check-ins are set here.
+ */
+export type DefaultRung = "private" | "coach_can_view";
+export type DefaultKind = "workout" | "note" | "check_in";
+export type EntryDefaults = Record<DefaultKind | "pr", DefaultRung>;
+export const ENTRY_DEFAULT_KINDS: readonly DefaultKind[] = ["workout", "note", "check_in"];
+export const ENTRY_DEFAULTS_KEY = ["my", "journal", "visibility-defaults"] as const;
+
+export async function fetchEntryDefaults(token: string) {
+  const data = await apiRequest<{ defaults: EntryDefaults }>("/me/journal/visibility-defaults", { token });
+  return data.defaults;
+}
+
+export async function saveEntryDefault(token: string, kind: DefaultKind, visibility: DefaultRung) {
+  const data = await apiRequest<{ defaults: EntryDefaults }>("/me/journal/visibility-defaults", {
+    method: "PUT",
+    token,
+    body: { kind, visibility },
+  });
+  return data.defaults;
+}

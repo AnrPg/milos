@@ -29,9 +29,10 @@ export function MeProfile({ postsCount }: { postsCount: number }) {
   const [tab, setTab] = useState<Tab>("posts");
   const clubs = useMyClubs();
   const prs = useMyPrs();
+  const shown = profilePrs(prs.data);
   const counts: Record<Tab, number> = {
     posts: postsCount,
-    prs: prs.data?.length ?? 0,
+    prs: shown.length,
     clubs: clubs.data?.length ?? 0,
   };
 
@@ -60,7 +61,7 @@ export function MeProfile({ postsCount }: { postsCount: number }) {
       </div>
       <div role="tabpanel" id="me-tabpanel" aria-labelledby={`me-tab-${tab}`}>
         {tab === "posts" ? <PostsGrid /> : null}
-        {tab === "prs" ? <PrList prs={prs.data} pending={prs.isPending} /> : null}
+        {tab === "prs" ? <PrList shown={shown} hidden={(prs.data?.length ?? 0) - shown.length} pending={prs.isPending} /> : null}
         {tab === "clubs" ? <ClubList /> : null}
       </div>
     </section>
@@ -72,6 +73,11 @@ function useMyPrs() {
   const token = tokens?.access_token ?? null;
   // Same key as the Pantheon's unfiltered list, so both share one cache entry.
   return useQuery({ queryKey: ["prs", ""], enabled: Boolean(token), queryFn: () => listPRs(token!) });
+}
+
+/** ADR-196: the profile shows only the PRs I chose to show the people who follow me. */
+function profilePrs(prs: PRRecord[] | undefined): PRRecord[] {
+  return (prs ?? []).filter((pr) => pr.profile_audience === "followers");
 }
 
 function PostsGrid() {
@@ -127,18 +133,19 @@ function attachmentTitle(post: CommunityPost): string | null {
   return typeof title === "string" ? title : null;
 }
 
-function PrList({ prs, pending }: { prs: PRRecord[] | undefined; pending: boolean }) {
+function PrList({ shown, hidden, pending }: { shown: PRRecord[]; hidden: number; pending: boolean }) {
   const t = useTranslations("Social");
   const tMe = useTranslations("MemberApp");
   const locale = useUiLocale();
   if (pending) return null;
-  const latest = [...(prs ?? [])].sort((a, b) => b.beaten_on.localeCompare(a.beaten_on)).slice(0, SHOWN_PRS);
-  if (latest.length === 0) return <Note text={t("prsNone")} />;
+  const latest = [...shown].sort((a, b) => b.beaten_on.localeCompare(a.beaten_on)).slice(0, SHOWN_PRS);
+  if (latest.length === 0 && hidden === 0) return <Note text={t("prsNone")} />;
   const date = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
   return (
     <div className="flex flex-col gap-2">
-      <ul className="flex flex-col rounded-3xl px-4 py-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      {latest.length === 0 ? <Note text={tMe("mePrsNoneShown")} /> : null}
+      <ul className="flex flex-col rounded-3xl px-4 py-1 empty:hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {latest.map((pr) => (
           <li key={pr.id} className="flex min-h-12 items-center gap-3 border-b last:border-b-0" style={{ borderColor: "var(--border)" }}>
             <span aria-hidden="true" style={{ color: "var(--warning)" }}>
@@ -155,7 +162,9 @@ function PrList({ prs, pending }: { prs: PRRecord[] | undefined; pending: boolea
         ))}
       </ul>
       <p className="text-xs" style={{ color: "var(--dim)" }}>
-        <Link href="/me/sharing" className="underline">{tMe("mePrsWho")}</Link>
+        <Link href="/me/sharing#profile-prs" className="underline">
+          {hidden > 0 ? tMe("mePrsPrivate", { count: hidden }) : tMe("mePrsWho")}
+        </Link>
       </p>
       <MoreLink href="/journal/progress#prs" label={tMe("meAllPrs")} />
     </div>

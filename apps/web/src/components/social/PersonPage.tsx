@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { fetchProfilePRs } from "@/api/gamification";
 import { fetchPRsSharedWithMe } from "@/api/pr-sharing";
 import { fetchPerson, fetchPersonPosts, personKey, type PersonProfile } from "@/api/social";
 import { PostCard } from "@/components/community/PostCard";
@@ -23,7 +24,8 @@ type Tab = (typeof TABS)[number];
  * A person's profile (vision §3: «Αναρτήσεις · PRs · Clubs»; plan §5a Q9,
  * board 5 Q3). Followers posts stay hidden until you follow: at once for a
  * public account, once they accept you for a private one (ADR-193 §2). PRs
- * show only when they share them with you (ADR-129).
+ * show when they share them with you (ADR-129) or show them to their
+ * followers on the profile (ADR-196).
  */
 export function PersonPage({ id }: { id: string }) {
   const t = useTranslations("Social");
@@ -151,19 +153,26 @@ function Prs({ profile }: { profile: PersonProfile }) {
     enabled: Boolean(token) && !profile.is_me,
     queryFn: () => fetchPRsSharedWithMe(token!),
   });
+  // ADR-196: the PRs they show the people who follow them, on top of any grant (ADR-129).
+  const onProfile = useQuery({
+    queryKey: ["prs", "profile", profile.id],
+    enabled: Boolean(token) && !profile.is_me,
+    queryFn: () => fetchProfilePRs(token!, profile.id),
+  });
   if (profile.is_me)
     return (
       <Link href="/journal/progress#prs" className="rounded-3xl p-4 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
         {t("myPrsLink")}
       </Link>
     );
+  if (shared.isPending || onProfile.isPending) return <p style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   const collection = shared.data?.shared.find((entry) => entry.owner.id === profile.id);
-  if (shared.isPending) return <p style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (!collection) return <Empty text={t("prsNotShared")} />;
-  if (collection.prs.length === 0) return <Empty text={t("prsNone")} />;
+  const granted = collection?.prs ?? [];
+  const prs = [...granted, ...(onProfile.data ?? []).filter((pr) => !granted.some((own) => own.id === pr.id)).map((pr) => ({ ...pr, history: [] }))];
+  if (prs.length === 0) return <Empty text={collection ? t("prsNone") : t("prsNotShared")} />;
   return (
     <div className="flex flex-col gap-2">
-      {collection.prs.map((pr) => (
+      {prs.map((pr) => (
         <SharedPRCard key={pr.id} pr={pr} />
       ))}
     </div>
