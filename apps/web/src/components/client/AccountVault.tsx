@@ -23,6 +23,7 @@ import { formatElapsed } from "@/components/client/vault";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
+import { VaultBrowser } from "@/components/client/VaultBrowser";
 import { TrainingHistory } from "@/components/history/TrainingHistory";
 import { HistoryExportButton } from "@/components/member-app/progress/HistoryExportButton";
 import { LocalizedScore } from "@/components/localized-score";
@@ -42,7 +43,8 @@ import { DateInput } from "@/components/ui/DateInput";
  * Ημερολόγιο › Vault across providers (ADR-162, board 17 Q4): the same
  * workout done anywhere (Fran at the box and Fran with the coach) is one
  * trend, every attempt labelled with its source. Filters: discipline,
- * benchmark, exercise, source and dates, remembered on the account.
+ * benchmark, exercise, source and dates, remembered on the account. The
+ * workouts show in folders or as a tree (`VaultBrowser`, ANR 2026-10-24).
  */
 export function AccountVault() {
   const i18n = useUiTranslations();
@@ -89,8 +91,9 @@ export function AccountVault() {
           ) : null}
         </div>
       ) : (
-        <ul className="grid gap-3 lg:grid-cols-2">
-          {groups.map((group) => (
+        <VaultBrowser
+          groups={groups}
+          renderGroup={(group) => (
             <VaultGroupCard
               key={group.identity}
               group={group}
@@ -102,8 +105,8 @@ export function AccountVault() {
               }
               pendingId={pendingId}
             />
-          ))}
-        </ul>
+          )}
+        />
       )}
 
       {token && currentUser ? (

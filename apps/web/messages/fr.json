@@ -8301,7 +8301,13 @@
     },
     "vault": {
       "intro": "Chaque séance que tu as terminée, avec chaque structure. La même séance faite à différents endroits forme une seule tendance.",
-      "sources": "Fait avec"
+      "sources": "Fait avec",
+      "view": "Affichage",
+      "path": "Chemin du dossier",
+      "all": "Tout",
+      "tree": "Entraînements par dossier",
+      "otherType": "Autres",
+      "count": "{count, plural, one {# entraînement} other {# entraînements}}"
     },
     "audience": {
       "title": "«Mes coachs» signifie",
