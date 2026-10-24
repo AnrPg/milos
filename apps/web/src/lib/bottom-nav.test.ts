@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  BELL_IN_BOTTOM_NAV,
   bottomNavEntries,
   bottomNavHiddenRoute,
   nextScrollHidden,
@@ -10,18 +9,13 @@ import {
 } from "@/lib/bottom-nav";
 import { surfaceRole } from "@/lib/role-navigation";
 
-const ids = (bell?: boolean) => bottomNavEntries(bell).map((entry) => (entry.kind === "notifications" ? "bell" : entry.item.id));
+const ids = () => bottomNavEntries().map((entry) => (entry.kind === "messages" ? "messages" : entry.item.id));
 
 describe("bottomNavEntries", () => {
-  it("holds Feed · Box · Journal · bell · avatar, with the bell next to the avatar", () => {
-    expect(BELL_IN_BOTTOM_NAV).toBe(true);
-    expect(ids()).toEqual(["home", "box", "journal", "bell", "me"]);
-    const labels = bottomNavEntries().flatMap((entry) => (entry.kind === "notifications" ? [] : [entry.item.labelKey]));
+  it("holds Feed · Box · Journal · Μηνύματα · avatar, with Μηνύματα next to the avatar", () => {
+    expect(ids()).toEqual(["home", "box", "journal", "messages", "me"]);
+    const labels = bottomNavEntries().flatMap((entry) => (entry.kind === "messages" ? [] : [entry.item.labelKey]));
     expect(labels).toEqual(["feed", "box", "journal", "me"]);
-  });
-
-  it("falls back to four tabs when the bell goes back to the Feed header", () => {
-    expect(ids(false)).toEqual(["home", "box", "journal", "me"]);
   });
 });
 

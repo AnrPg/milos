@@ -406,7 +406,7 @@ function WorkoutsPageContent() {
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div
-          className="sticky top-0 z-10 px-4 py-4"
+          className="sticky top-(--top-bar-space) z-10 px-4 py-4"
           style={{
             background:
               "linear-gradient(180deg, color-mix(in srgb, var(--bg) 98%, transparent), color-mix(in srgb, var(--bg) 88%, transparent))",

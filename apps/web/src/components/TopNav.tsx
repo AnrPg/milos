@@ -32,6 +32,7 @@ import { PriorityNav } from "@/components/nav/PriorityNav";
 import { SectionTabs } from "@/components/nav/SectionTabs";
 import { MobileNavMenu } from "@/components/nav/MobileNavMenu";
 import { useMemberShell } from "@/components/nav/BottomNav";
+import { MemberTopBar } from "@/components/nav/MemberTopBar";
 import { NavIcon } from "@/components/nav/NavIcons";
 import { openNotifications } from "@/components/notifications/NotificationBell";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -206,21 +207,18 @@ export function TopNav() {
 
   if (!currentUser) return null;
 
-  // Members and athletes navigate with the floating bottom bar instead
-  // (components/nav/BottomNav.tsx): no top bar, only the inbox it opens and
-  // the page group's tab strip. Messages sit in the Feed header, the account
-  // menu's links in Εγώ. Vendors keep the top bar for the platform console.
+  // Members and athletes navigate with the floating bottom bar and the member
+  // top bar instead (components/nav/BottomNav.tsx, MemberTopBar.tsx): the
+  // logo and the bell on top, the page group's tab strip under them, the
+  // account menu's links in Εγώ. Vendors keep this bar for the platform console.
   if ((memberShell && !isVendor) || membershipsQuery.isLoading) {
     return (
       <>
         <NotificationBell onUnreadChange={setUnreadNotifications} hideTrigger />
-        {memberShell && sectionGroup ? (
-          <div
-            className="sticky z-(--z-nav) overflow-x-clip pt-2"
-            style={{ top: "var(--safe-top, 0px)", background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
-          >
-            <SectionTabs group={sectionGroup} pathname={pathname} hrefFor={hrefFor} labelFor={(key) => t(key)} />
-          </div>
+        {memberShell ? (
+          <MemberTopBar>
+            {sectionGroup ? <SectionTabs group={sectionGroup} pathname={pathname} hrefFor={hrefFor} labelFor={(key) => t(key)} /> : null}
+          </MemberTopBar>
         ) : null}
       </>
     );
