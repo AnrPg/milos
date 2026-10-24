@@ -22,6 +22,9 @@ import { FeatureGate } from "@/components/client/FeatureGate";
 import { formatDay, formatTime } from "@/components/client/format";
 import { CLIENT_ENTITLEMENT_QUERY_KEY, useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { entryDay } from "@/components/client/vault";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { distinctOptions, listFilterCount, picked, type ListFilter } from "@/components/filters/list-filter";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
@@ -31,6 +34,27 @@ const SLOTS_KEY = ["me", "appointments", "slots"] as const;
 const MINE_KEY = ["me", "appointments", "mine"] as const;
 
 type Translate = ReturnType<typeof useUiTranslations>;
+
+/** Kind, format and coach (vision §7.2 «Appointments»), remembered on `box_appointments`; both lists follow it. */
+const APPOINTMENTS_SHAPE = { kind: "one", format: "one", coach: "many" } as const;
+type AppointmentsFilter = ListFilter<typeof APPOINTMENTS_SHAPE>;
+
+/** A slot's kind, or a booking's allowance, as one value. */
+function kindKey(kind: string | undefined) {
+  if (kind === "assessment" || kind === "assessments") return "assessment";
+  if (kind === "pt_session" || kind === "pt_sessions") return "pt_session";
+  return null;
+}
+
+type Facets = { kind?: string; format?: string; coach_id?: string; coach_nickname?: string | null };
+
+const passes = (filter: AppointmentsFilter, item: Facets) =>
+  picked(filter.kind, kindKey(item.kind)) && picked(filter.format, item.format) && picked(filter.coach, item.coach_id);
+
+const bookingFacets = (booking: AppointmentBooking): Facets => {
+  const slot = bookingSlot(booking);
+  return { ...slot, kind: slot?.kind ?? booking.allowance ?? undefined };
+};
 
 /** Slot kind, or the booking's allowance when the slot is missing. */
 function kindLabel(kind: string | undefined, i18n: Translate) {
@@ -95,6 +119,12 @@ function AppointmentsContent() {
     mutationFn: (id: string) => cancelAppointment(tokens!.access_token, id),
     onSuccess: refresh,
   });
+  const { filter, setFilter, empty } = useListFilter("box_appointments", APPOINTMENTS_SHAPE);
+  const active = filter ?? empty;
+  const facets: Facets[] = [...(slots.data ?? []), ...(mine.data ?? []).map(bookingFacets)];
+  const shownSlots = (slots.data ?? []).filter((slot) => passes(active, slot));
+  const shownBookings = (mine.data ?? []).filter((booking) => passes(active, bookingFacets(booking)));
+  const narrowed = listFilterCount(active) > 0;
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,6 +147,20 @@ function AppointmentsContent() {
         {cutoffHours ? i18n("clApptCutoffInfo", { hours: cutoffHours }) : i18n("clApptCutoffGeneric")}
       </p>
 
+      {filter ? (
+        <ListFilters
+          shape={APPOINTMENTS_SHAPE}
+          fields={[
+            { key: "kind", label: i18n("clApptFilterKind"), options: distinctOptions(facets, (item) => kindKey(item.kind), (item) => kindLabel(item.kind, i18n)) },
+            { key: "format", label: i18n("clApptFilterFormat"), options: distinctOptions(facets, (item) => item.format, (item) => formatLabel(item.format, i18n)) },
+            { key: "coach", label: i18n("clApptFilterCoach"), options: distinctOptions(facets, (item) => item.coach_id, (item) => item.coach_nickname ?? "") },
+          ]}
+          filter={filter}
+          onChange={setFilter}
+          title={i18n("clApptFiltersTitle")}
+        />
+      ) : null}
+
       <ClientCard title={i18n("clApptMine")}>
         {cancel.isError ? (
           <p role="alert" className="mb-2 text-sm" style={{ color: "var(--danger)" }}>
@@ -129,7 +173,8 @@ function AppointmentsContent() {
           <QueryProblem error={mine.error} onRetry={() => void mine.refetch()} />
         ) : (
           <MyAppointments
-            bookings={mine.data}
+            bookings={shownBookings}
+            narrowed={narrowed}
             cutoffHours={cutoffHours}
             cancellingId={cancel.isPending ? (cancel.variables ?? null) : null}
             onCancel={(id) => cancel.mutate(id)}
@@ -149,7 +194,8 @@ function AppointmentsContent() {
           <QueryProblem error={slots.error} onRetry={() => void slots.refetch()} />
         ) : (
           <OfferedSlots
-            slots={slots.data}
+            slots={shownSlots}
+            narrowed={narrowed}
             bookingId={book.isPending ? (book.variables ?? null) : null}
             onBook={(id) => book.mutate(id)}
           />
@@ -161,10 +207,12 @@ function AppointmentsContent() {
 
 function OfferedSlots({
   slots,
+  narrowed,
   bookingId,
   onBook,
 }: {
   slots: OfferedSlot[];
+  narrowed: boolean;
   bookingId: string | null;
   onBook: (slotId: string) => void;
 }) {
@@ -173,7 +221,7 @@ function OfferedSlots({
   // ADR-179: the practice's days and clock, wherever the client is.
   const zone = useOrganizationTimeZone();
   const days = useMemo(() => groupSlotsByDay(slots, zone ?? undefined), [slots, zone]);
-  if (days.length === 0) return <EmptyLine>{i18n("clApptNoSlots")}</EmptyLine>;
+  if (days.length === 0) return <EmptyLine>{narrowed ? i18n("clApptNoMatch") : i18n("clApptNoSlots")}</EmptyLine>;
 
   return (
     <ol className="flex flex-col gap-4">
@@ -233,11 +281,13 @@ function OfferedSlots({
 
 function MyAppointments({
   bookings,
+  narrowed,
   cutoffHours,
   cancellingId,
   onCancel,
 }: {
   bookings: AppointmentBooking[];
+  narrowed: boolean;
   cutoffHours: number | null;
   cancellingId: string | null;
   onCancel: (id: string) => void;
@@ -254,7 +304,7 @@ function MyAppointments({
           {i18n("semanticUpcoming")}
         </h3>
         {upcoming.length === 0 ? (
-          <EmptyLine>{i18n("clApptNoUpcoming")}</EmptyLine>
+          <EmptyLine>{narrowed ? i18n("clApptNoMatch") : i18n("clApptNoUpcoming")}</EmptyLine>
         ) : (
           <ul className="flex flex-col gap-2">
             {upcoming.map((booking) => (

@@ -12,6 +12,9 @@ import { gymClubFor } from "@/components/community/community";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { feedHasPosts } from "@/components/community/community";
+import { FEED_POSTS_SHAPE, PostFilters, narrowsPosts, postsFeedFilter } from "@/components/community/PostFilters";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
+import type { CommunityClub } from "@/api/community";
 import {
   useClubRealtime,
   useFeed,
@@ -88,16 +91,21 @@ export function HomeHub() {
       {gamification && membership ? (
         <LeaderboardCard leaderboard={gamification.leaderboard} />
       ) : null}
-      <ClubPosts />
+      <ClubPosts clubs={clubs.data ?? []} />
     </FeedPage>
   );
 }
 
-/** «Από το club σου»: the clubs' posts, shown only once there is one. */
-function ClubPosts() {
+/**
+ * «Από το club σου»: the clubs' posts, shown only once there is one, with
+ * the Feed/club filters (vision §7.2), remembered in the `feed` surface.
+ */
+function ClubPosts({ clubs }: { clubs: CommunityClub[] }) {
   const t = useTranslations("MemberApp");
+  const tCommunity = useTranslations("Community");
   const feed = useFeed(HOME_FEED);
-  if (!feedHasPosts(feed.data)) return null;
+  const { filter, setFilter } = useListFilter("feed", FEED_POSTS_SHAPE, "posts");
+  if (!feedHasPosts(feed.data) || filter === null) return null;
 
   return (
     <section aria-label={t("feedPosts")} className="flex flex-col gap-3">
@@ -107,7 +115,11 @@ function ClubPosts() {
       >
         {t("feedPosts")}
       </p>
-      <FeedList filter={HOME_FEED} />
+      <PostFilters shape={FEED_POSTS_SHAPE} filter={filter} onChange={setFilter} clubs={clubs} />
+      <FeedList
+        filter={narrowsPosts(filter) ? postsFeedFilter(filter, clubs) : HOME_FEED}
+        empty={narrowsPosts(filter) ? tCommunity("postsNoMatch") : undefined}
+      />
     </section>
   );
 }

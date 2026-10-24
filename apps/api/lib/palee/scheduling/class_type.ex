@@ -8,6 +8,8 @@ defmodule Palee.Scheduling.ClassType do
   @levels ~w(beginner all_levels advanced)
   @audiences ~w(women_only teens kids over_40 seniors prenatal_postnatal adaptive)
 
+  def levels, do: @levels
+
   schema "class_types" do
     field :organization_id, :binary_id
     field :name, :string

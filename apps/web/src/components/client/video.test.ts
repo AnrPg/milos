@@ -33,7 +33,7 @@ describe("on-demand video helpers", () => {
   it("collects tags once and filters by tag ignoring case", () => {
     const videos = [video("a", ["Mobility", "core"]), video("b", ["mobility "]), video("c", [])];
     expect(videoTags(videos, "en")).toEqual(["core", "Mobility"]);
-    expect(filterVideosByTag(videos, "MOBILITY").map((v) => v.id)).toEqual(["a", "b"]);
-    expect(filterVideosByTag(videos, null)).toHaveLength(3);
+    expect(filterVideosByTag(videos, ["MOBILITY"]).map((v) => v.id)).toEqual(["a", "b"]);
+    expect(filterVideosByTag(videos, [])).toHaveLength(3);
   });
 });

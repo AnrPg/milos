@@ -16,10 +16,11 @@ defmodule Palee.Application.Partners do
     ClubScope,
     CommunityPeople,
     PartnerMatches,
-    PartnerRealtime
+    PartnerRealtime,
+    SocialProfile
   }
 
-  alias Palee.{Community, Identity, Notifications, Partners}
+  alias Palee.{Community, Identity, Notifications, Organizations, Partners, Places}
 
   # ------------------------------------------------------------- the club
 
@@ -38,10 +39,23 @@ defmodule Palee.Application.Partners do
          member: member?(scope, club, user_id),
          profile: profile && present_profile(profile),
          swipes_remaining: Partners.swipes_remaining(used),
+         distance: distance(context, club),
          options: options()
        }}
     end
   end
+
+  # ADR-197: «Απόσταση» only in open clubs (a gym's club is one place), and
+  # only for someone who shows in Γύρω μου themselves, since the filter
+  # reads others' neighbourhoods the same way.
+  defp distance(%{user_id: user_id} = context, %{kind: "open"}) do
+    case SocialProfile.around_visibility(context, user_id) do
+      %{visible: true, has_area: true} -> "available"
+      _hidden -> "needs_area"
+    end
+  end
+
+  defp distance(_context, _club), do: nil
 
   @doc "Creates or updates the viewer's profile in the club (opting in)."
   def put_profile(%{user_id: user_id} = context, club_id, params) do
@@ -49,7 +63,8 @@ defmodule Palee.Application.Partners do
          :ok <- offered(club, scope),
          :ok <- member(scope, club, user_id),
          current = Partners.get_profile(scope, club.id, user_id),
-         {:ok, attrs} <- Partners.normalize_profile(params, current),
+         {:ok, attrs} <-
+           Partners.normalize_profile(params, current, Organizations.box_disciplines()),
          :ok <- Partners.check_activation(current || %{}, attrs.active),
          {:ok, profile} <- save_profile(scope, club, user_id, current, attrs) do
       {:ok, present_profile(profile)}
@@ -70,8 +85,10 @@ defmodule Palee.Application.Partners do
       # ADR-184: mock people only ever reach their demo business's staff.
       members = Identity.visible_user_ids(eligible_ids(scope, club) -- [user_id], user_id)
       excluded = excluded_ids(scope, club, user_id, now)
+      filters = Partners.deck_filters(params)
+      members = within(context, club, members, filters.within_km)
       candidates = Partners.list_live_profiles(scope, club.id, members)
-      cards = Partners.deck(viewer, candidates, excluded, Partners.deck_filters(params))
+      cards = Partners.deck(viewer, candidates, excluded, filters)
 
       people =
         CommunityPeople.by_ids(Enum.map(cards, fn {profile, _shared} -> profile.user_id end))
@@ -85,6 +102,15 @@ defmodule Palee.Application.Partners do
          swipes_remaining: Partners.swipes_remaining(used)
        }}
     end
+  end
+
+  # «Απόσταση» narrows an open club's deck to people near the viewer.
+  defp within(_context, _club, members, nil), do: members
+
+  defp within(context, club, members, km) do
+    if distance(context, club) == "available",
+      do: Places.people_within(context, members, km * 1000),
+      else: members
   end
 
   @doc """
@@ -267,6 +293,9 @@ defmodule Palee.Application.Partners do
       genders: Partners.genders(),
       gender_preferences: Partners.gender_preferences(),
       max_goals: Partners.max_goals(),
+      disciplines: Organizations.box_disciplines(),
+      max_disciplines: Partners.max_disciplines(),
+      distances_km: Partners.distances_km(),
       about_max: Partners.about_max(),
       daily_swipes: Partners.swipe_daily_limit()
     }
@@ -374,6 +403,7 @@ defmodule Palee.Application.Partners do
       level: profile.level,
       times: profile.times,
       goals: profile.goals,
+      disciplines: profile.disciplines,
       about: profile.about,
       gender: profile.gender,
       gender_preference: profile.gender_preference,
@@ -388,6 +418,7 @@ defmodule Palee.Application.Partners do
       level: profile.level,
       times: profile.times,
       goals: profile.goals,
+      disciplines: profile.disciplines,
       about: profile.about,
       shared: shared
     }

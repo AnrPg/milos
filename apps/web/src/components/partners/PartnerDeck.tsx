@@ -11,18 +11,20 @@ import {
   swipePartner,
   undoPartnerSwipe,
   type PartnerCard,
-  type PartnerFilters,
   type PartnerMatch,
   type PartnerOptions,
+  type PartnersClubOverview,
   type SwipeDirection,
 } from "@/api/partners";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useUiTranslations } from "@/i18n/ui";
 
-import { PartnerChip, PartnerTag } from "./PartnerBits";
+import { PartnerTag } from "./PartnerBits";
 import { partnerErrorMessage } from "./errors";
-import { activeFilters, withoutCard } from "./partners-model";
+import { PARTNER_DECK_SHAPE, activeFilters, partnerFilters, withoutCard, type PartnerDeckFilter } from "./partners-model";
 import { usePartnerDeck, usePartnersToken } from "./use-partners";
 
 const DRAG_THRESHOLD = 90;
@@ -34,15 +36,60 @@ type LastSwipe = { card: PartnerCard; direction: SwipeDirection };
  * The deck (ADR-169 §3): one person at a time, best fit first, with what you
  * both share on top. ✕ is «Όχι τώρα», ✓ is «Να προπονηθούμε»; a drag does the
  * same. The last swipe can be taken back unless it made a match. A match
- * opens «Βρήκατε partner» with the way into the conversation.
+ * opens «Βρήκατε partner» with the way into the conversation. Its filters
+ * are the chip row + «Φίλτρα (n)» of every list, remembered per club.
  */
-export function PartnerDeck({ clubId, options, swipesRemaining }: { clubId: string; options: PartnerOptions; swipesRemaining: number }) {
+export function PartnerDeck({
+  clubId,
+  options,
+  swipesRemaining,
+  distance,
+}: {
+  clubId: string;
+  options: PartnerOptions;
+  swipesRemaining: number;
+  /** ADR-197: «available» in an open club when you show in Γύρω μου with an area. */
+  distance: PartnersClubOverview["distance"];
+}) {
+  const { filter, setFilter, empty } = useListFilter("partners", PARTNER_DECK_SHAPE, clubId);
   const t = useTranslations("Partners");
+  if (!filter) return <p className="text-sm" role="status" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
+  return (
+    <Deck
+      clubId={clubId}
+      options={options}
+      swipesRemaining={swipesRemaining}
+      distance={distance}
+      filter={filter}
+      onFilter={setFilter}
+      empty={empty}
+    />
+  );
+}
+
+function Deck({
+  clubId,
+  options,
+  swipesRemaining,
+  distance,
+  filter,
+  onFilter,
+  empty,
+}: {
+  clubId: string;
+  options: PartnerOptions;
+  swipesRemaining: number;
+  distance: PartnersClubOverview["distance"];
+  filter: PartnerDeckFilter;
+  onFilter: (next: PartnerDeckFilter) => void;
+  empty: PartnerDeckFilter;
+}) {
+  const t = useTranslations("Partners");
+  const tags = useTranslations("BoxTags");
   const tUi = useUiTranslations();
   const token = usePartnersToken();
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<PartnerFilters>({});
-  const [showFilters, setShowFilters] = useState(false);
+  const filters = partnerFilters(filter, options, distance === "available");
   const [gone, setGone] = useState<string[]>([]);
   const [last, setLast] = useState<LastSwipe | null>(null);
   const [match, setMatch] = useState<PartnerMatch | null>(null);
@@ -82,31 +129,40 @@ export function PartnerDeck({ clubId, options, swipesRemaining }: { clubId: stri
   const act = (direction: SwipeDirection) => {
     if (card && !swipe.isPending) swipe.mutate({ target: card, direction });
   };
-  const changeFilters = (next: PartnerFilters) => {
-    setFilters(next);
+  const changeFilters = (next: PartnerDeckFilter) => {
+    onFilter(next);
     setGone([]);
     setLast(null);
   };
   const count = activeFilters(filters);
+  const choices = <T extends string | number>(values: readonly T[], label: (value: T) => string) =>
+    values.map((value) => ({ value: String(value), label: label(value) }));
 
   return (
     <div className="flex flex-col gap-3" data-testid="partner-deck">
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          aria-expanded={showFilters}
-          onClick={() => setShowFilters((open) => !open)}
-          className="min-h-10 rounded-full px-3.5 text-sm font-semibold"
-          style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
-        >
-          {count > 0 ? t("filtersCount", { count }) : t("filters")}
-        </button>
-        {left <= LOW_SWIPES ? (
-          <span className="text-xs" style={{ color: "var(--dim)" }}>{t("swipesLeft", { count: left })}</span>
-        ) : null}
+      <div data-testid="partner-filters">
+        <ListFilters
+          shape={PARTNER_DECK_SHAPE}
+          fields={[
+            { key: "time", label: t("timesLabelShort"), options: choices(options.times, (time) => t(`time_${time}`)) },
+            { key: "level", label: t("levelLabel"), options: choices(options.levels, (level) => t(`level_${level}`)) },
+            { key: "goal", label: t("goalLabelShort"), options: choices(options.goals, (goal) => t(`goal_${goal}`)), chip: false },
+            { key: "discipline", label: t("disciplineLabel"), options: choices(options.disciplines, (key) => tags(`discipline.${key}`)), chip: false },
+            ...(distance === "available"
+              ? [{ key: "within" as const, label: t("distanceLabel"), options: choices(options.distances_km, (km) => t("withinKm", { km })) }]
+              : []),
+          ]}
+          filter={filter}
+          onChange={changeFilters}
+          title={t("filters")}
+        />
       </div>
-
-      {showFilters ? <Filters options={options} filters={filters} onChange={changeFilters} /> : null}
+      {distance === "needs_area" ? (
+        <p className="text-xs" style={{ color: "var(--dim)" }}>{t("distanceNeedsArea")}</p>
+      ) : null}
+      {left <= LOW_SWIPES ? (
+        <span className="text-xs" style={{ color: "var(--dim)" }}>{t("swipesLeft", { count: left })}</span>
+      ) : null}
 
       {deck.isPending ? (
         <p className="text-sm" role="status" style={{ color: "var(--dim)" }}>{t("loading")}</p>
@@ -117,7 +173,7 @@ export function PartnerDeck({ clubId, options, swipesRemaining }: { clubId: stri
       ) : (
         <Empty text={count > 0 ? t("deckEmptyFiltered") : t("deckEmpty")}>
           {count > 0 ? (
-            <button type="button" onClick={() => changeFilters({})} className="min-h-11 text-sm font-semibold" style={{ color: "var(--primary)" }}>
+            <button type="button" onClick={() => changeFilters(empty)} className="min-h-11 text-sm font-semibold" style={{ color: "var(--primary)" }}>
               {t("clearFilters")}
             </button>
           ) : null}
@@ -145,6 +201,7 @@ export function PartnerDeck({ clubId, options, swipesRemaining }: { clubId: stri
 
 function SwipeCard({ card, onSwipe, busy }: { card: PartnerCard; onSwipe: (direction: SwipeDirection) => void; busy: boolean }) {
   const t = useTranslations("Partners");
+  const tags = useTranslations("BoxTags");
   const name = card.person.nickname ?? t("someone");
   const start = useRef<number | null>(null);
   const [dx, setDx] = useState(0);
@@ -152,6 +209,7 @@ function SwipeCard({ card, onSwipe, busy }: { card: PartnerCard; onSwipe: (direc
     ...(card.shared.same_level ? [t(`level_${card.level}`)] : []),
     ...card.shared.times.map((time) => t(`time_${time}`)),
     ...card.shared.goals.map((goal) => t(`goal_${goal}`)),
+    ...(card.shared.disciplines ?? []).map((key) => tags(`discipline.${key}`)),
   ];
 
   const down = (event: PointerEvent<HTMLElement>) => {
@@ -206,6 +264,9 @@ function SwipeCard({ card, onSwipe, busy }: { card: PartnerCard; onSwipe: (direc
         {card.goals.map((goal) => (
           <PartnerTag key={goal} strong={card.shared.goals.includes(goal)}>{t(`goal_${goal}`)}</PartnerTag>
         ))}
+        {(card.disciplines ?? []).map((key) => (
+          <PartnerTag key={key} strong={(card.shared.disciplines ?? []).includes(key)}>{tags(`discipline.${key}`)}</PartnerTag>
+        ))}
       </div>
       {card.about ? <p className="text-sm" style={{ color: "var(--text)" }}>{card.about}</p> : null}
       <div className="flex gap-3 pt-1">
@@ -231,33 +292,6 @@ function SwipeCard({ card, onSwipe, busy }: { card: PartnerCard; onSwipe: (direc
         </button>
       </div>
     </article>
-  );
-}
-
-function Filters({ options, filters, onChange }: { options: PartnerOptions; filters: PartnerFilters; onChange: (next: PartnerFilters) => void }) {
-  const t = useTranslations("Partners");
-  const row = <K extends keyof PartnerFilters>(field: K, label: string, values: readonly NonNullable<PartnerFilters[K]>[], prefix: string) => (
-    <div className="flex flex-col gap-1.5">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{label}</p>
-      <div className="flex flex-wrap gap-1.5">
-        {values.map((value) => (
-          <PartnerChip
-            key={value}
-            pressed={filters[field] === value}
-            onToggle={() => onChange({ ...filters, [field]: filters[field] === value ? null : value })}
-          >
-            {t([prefix, value].join("_"))}
-          </PartnerChip>
-        ))}
-      </div>
-    </div>
-  );
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl p-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} data-testid="partner-filters">
-      {row("time", t("timesLabelShort"), options.times, "time")}
-      {row("level", t("levelLabel"), options.levels, "level")}
-      {row("goal", t("goalLabelShort"), options.goals, "goal")}
-    </div>
   );
 }
 

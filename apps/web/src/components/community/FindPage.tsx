@@ -18,6 +18,9 @@ import {
 } from "@/api/community";
 import { NearbyClubs } from "@/components/around/Nearby";
 import { clientErrorMessage } from "@/components/client/errors";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { distinctOptions, picked } from "@/components/filters/list-filter";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { PersonResultRow, usePeopleSearch } from "@/components/social/PeopleSearch";
@@ -31,6 +34,9 @@ import { SmallButton } from "./GroupPage";
 import { Badge } from "./MembersTab";
 import { ErrorLine } from "./Sheet";
 import { useMyClubs } from "./use-community";
+
+/** Kind and box (vision §7.2 «Find»), remembered on `find_clubs`; client-side, the list is one page. */
+const FIND_SHAPE = { kind: "one", box: "many" } as const;
 
 /**
  * «+ Βρες» (board 7 Q7): open clubs of the boxes you belong to or follow, and
@@ -52,8 +58,22 @@ export function FindPage() {
     queryFn: () => fetchDiscover(token!, q),
     placeholderData: keepPreviousData,
   });
-  const openClubs = found.data?.clubs ?? [];
-  const groups = (found.data?.groups ?? []).filter((group) => group.membership !== "member");
+  const allClubs = found.data?.clubs ?? [];
+  const allGroups = (found.data?.groups ?? []).filter((group) => group.membership !== "member");
+  const { filter, setFilter } = useListFilter("find_clubs", FIND_SHAPE);
+  const kind = filter?.kind[0] ?? null;
+  const boxes = filter?.box ?? [];
+  const openClubs = kind === "groups" ? [] : allClubs.filter((club) => picked(boxes, club.box?.slug));
+  const groups = kind === "clubs" ? [] : allGroups.filter((group) => picked(boxes, group.club?.organization_slug));
+  const narrowed = kind !== null || boxes.length > 0;
+  const kinds = [
+    ...(allClubs.length > 0 ? [{ value: "clubs", label: t("findOpenClubs") }] : []),
+    ...(allGroups.length > 0 ? [{ value: "groups", label: t("findGroups") }] : []),
+  ];
+  const boxOptions = [
+    ...distinctOptions(allClubs, (club) => club.box?.slug, (club) => club.box?.name ?? ""),
+    ...distinctOptions(allGroups, (group) => group.club?.organization_slug, (group) => group.club?.name ?? ""),
+  ].filter((option, index, all) => all.findIndex((other) => other.value === option.value) === index);
   // ADR-193 §4: the same field finds people too, from two characters on.
   const peopleTerm = useDebounced(q, 250);
   const people = usePeopleSearch(peopleTerm);
@@ -72,21 +92,38 @@ export function FindPage() {
         className="min-h-11 w-full rounded-2xl px-3 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
       />
+      {filter && !found.isPending ? (
+        <ListFilters
+          shape={FIND_SHAPE}
+          fields={[
+            { key: "kind", label: t("filterKind"), options: kinds },
+            { key: "box", label: t("filterBox"), options: boxOptions },
+          ]}
+          filter={filter}
+          onChange={setFilter}
+          title={t("findFiltersTitle")}
+          resultCount={openClubs.length + groups.length}
+        />
+      ) : null}
       {found.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : (
         <>
-          <HubCard eyebrow={t("findOpenClubs")}>
-            {openClubs.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--text-soft)" }}>{q ? t("findNoMatch") : t("findNoClubs")}</p>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {openClubs.map((club) => (
-                  <OpenClubRow key={club.id} club={club} />
-                ))}
-              </ul>
-            )}
-          </HubCard>
+          {kind !== "groups" ? (
+            <HubCard eyebrow={t("findOpenClubs")}>
+              {openClubs.length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--text-soft)" }}>{q || narrowed ? t("findNoMatch") : t("findNoClubs")}</p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {openClubs.map((club) => (
+                    <OpenClubRow key={club.id} club={club} />
+                  ))}
+                </ul>
+              )}
+            </HubCard>
+          ) : groups.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("findNoMatch")}</p>
+          ) : null}
           {groups.length > 0 ? (
             <HubCard eyebrow={t("findGroups")}>
               <ul className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>

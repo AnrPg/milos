@@ -3194,6 +3194,18 @@
             },
             "type": "array"
           },
+          "levels": {
+            "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+            "items": {
+              "enum": [
+                "beginner",
+                "all_levels",
+                "advanced"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
           "max_price_cents": {
             "minimum": 0,
             "nullable": true,
@@ -3311,6 +3323,18 @@
               "languages": {
                 "items": {
                   "pattern": "^[a-z]{2}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
                   "type": "string"
                 },
                 "type": "array"
@@ -5190,6 +5214,18 @@
             },
             "type": "array"
           },
+          "levels": {
+            "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+            "items": {
+              "enum": [
+                "beginner",
+                "all_levels",
+                "advanced"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
           "max_price_cents": {
             "minimum": 0,
             "nullable": true,
@@ -5256,7 +5292,8 @@
           "max_price_cents",
           "audiences",
           "languages",
-          "amenities"
+          "amenities",
+          "levels"
         ],
         "title": "AroundNormalizedFilter",
         "type": "object"
@@ -5462,6 +5499,18 @@
               "languages": {
                 "items": {
                   "pattern": "^[a-z]{2}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
                   "type": "string"
                 },
                 "type": "array"
@@ -7384,6 +7433,18 @@
                 },
                 "type": "array"
               },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "max_price_cents": {
                 "minimum": 0,
                 "nullable": true,
@@ -7554,6 +7615,18 @@
                 },
                 "type": "array"
               },
+              "levels": {
+                "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "all_levels",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "max_price_cents": {
                 "minimum": 0,
                 "nullable": true,
@@ -7620,7 +7693,8 @@
               "max_price_cents",
               "audiences",
               "languages",
-              "amenities"
+              "amenities",
+              "levels"
             ],
             "title": "AroundNormalizedFilter",
             "type": "object"
@@ -48996,6 +49070,12 @@
             "nullable": true,
             "type": "string"
           },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "goals": {
             "items": {
               "enum": [
@@ -49047,6 +49127,12 @@
           },
           "shared": {
             "properties": {
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "goals": {
                 "items": {
                   "enum": [
@@ -49081,6 +49167,7 @@
             "required": [
               "times",
               "goals",
+              "disciplines",
               "same_level"
             ],
             "title": "PartnerShared",
@@ -49106,6 +49193,7 @@
           "level",
           "times",
           "goals",
+          "disciplines",
           "about",
           "shared"
         ],
@@ -49120,6 +49208,12 @@
                 "about": {
                   "nullable": true,
                   "type": "string"
+                },
+                "disciplines": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 },
                 "goals": {
                   "items": {
@@ -49172,6 +49266,12 @@
                 },
                 "shared": {
                   "properties": {
+                    "disciplines": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "goals": {
                       "items": {
                         "enum": [
@@ -49206,6 +49306,7 @@
                   "required": [
                     "times",
                     "goals",
+                    "disciplines",
                     "same_level"
                   ],
                   "title": "PartnerShared",
@@ -49231,6 +49332,7 @@
                 "level",
                 "times",
                 "goals",
+                "disciplines",
                 "about",
                 "shared"
               ],
@@ -49857,6 +49959,20 @@
           "daily_swipes": {
             "type": "integer"
           },
+          "disciplines": {
+            "description": "Box vocabulary keys a profile may name (ADR-197)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "distances_km": {
+            "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
           "gender_preferences": {
             "items": {
               "enum": [
@@ -49904,6 +50020,9 @@
             },
             "type": "array"
           },
+          "max_disciplines": {
+            "type": "integer"
+          },
           "max_goals": {
             "type": "integer"
           },
@@ -49928,6 +50047,9 @@
           "genders",
           "gender_preferences",
           "max_goals",
+          "disciplines",
+          "max_disciplines",
+          "distances_km",
           "about_max",
           "daily_swipes"
         ],
@@ -50016,6 +50138,12 @@
             "format": "uuid",
             "type": "string"
           },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "gender": {
             "description": "Only used to honour preferences; never shown to anyone",
             "enum": [
@@ -50090,6 +50218,7 @@
           "level",
           "times",
           "goals",
+          "disciplines",
           "about",
           "gender",
           "gender_preference"
@@ -50106,6 +50235,13 @@
           },
           "active": {
             "type": "boolean"
+          },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5,
+            "type": "array"
           },
           "gender": {
             "enum": [
@@ -50177,6 +50313,12 @@
               "club_id": {
                 "format": "uuid",
                 "type": "string"
+              },
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
               },
               "gender": {
                 "description": "Only used to honour preferences; never shown to anyone",
@@ -50252,6 +50394,7 @@
               "level",
               "times",
               "goals",
+              "disciplines",
               "about",
               "gender",
               "gender_preference"
@@ -50417,6 +50560,12 @@
       },
       "PartnerShared": {
         "properties": {
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "goals": {
             "items": {
               "enum": [
@@ -50451,6 +50600,7 @@
         "required": [
           "times",
           "goals",
+          "disciplines",
           "same_level"
         ],
         "title": "PartnerShared",
@@ -50634,6 +50784,15 @@
             "format": "uuid",
             "type": "string"
           },
+          "distance": {
+            "description": "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου",
+            "enum": [
+              "available",
+              "needs_area"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "member": {
             "description": "Whether the viewer is a member of the club now",
             "type": "boolean"
@@ -50648,6 +50807,20 @@
               },
               "daily_swipes": {
                 "type": "integer"
+              },
+              "disciplines": {
+                "description": "Box vocabulary keys a profile may name (ADR-197)",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "distances_km": {
+                "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
               },
               "gender_preferences": {
                 "items": {
@@ -50696,6 +50869,9 @@
                 },
                 "type": "array"
               },
+              "max_disciplines": {
+                "type": "integer"
+              },
               "max_goals": {
                 "type": "integer"
               },
@@ -50720,6 +50896,9 @@
               "genders",
               "gender_preferences",
               "max_goals",
+              "disciplines",
+              "max_disciplines",
+              "distances_km",
               "about_max",
               "daily_swipes"
             ],
@@ -50740,6 +50919,12 @@
                   "club_id": {
                     "format": "uuid",
                     "type": "string"
+                  },
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
                   },
                   "gender": {
                     "description": "Only used to honour preferences; never shown to anyone",
@@ -50815,6 +51000,7 @@
                   "level",
                   "times",
                   "goals",
+                  "disciplines",
                   "about",
                   "gender",
                   "gender_preference"
@@ -50844,6 +51030,7 @@
           "member",
           "profile",
           "swipes_remaining",
+          "distance",
           "options"
         ],
         "title": "PartnersClubOverview",
@@ -60723,7 +60910,14 @@
               "journal",
               "vault",
               "progress",
-              "partners"
+              "partners",
+              "box_workouts",
+              "box_videos",
+              "box_appointments",
+              "events",
+              "find_clubs",
+              "my_posts",
+              "reviews"
             ],
             "type": "string"
           }
@@ -79881,6 +80075,18 @@
                         },
                         "type": "array"
                       },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
                       "max_price_cents": {
                         "minimum": 0,
                         "nullable": true,
@@ -80098,6 +80304,18 @@
                         },
                         "type": "array"
                       },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
                       "max_price_cents": {
                         "minimum": 0,
                         "nullable": true,
@@ -80276,6 +80494,18 @@
                           },
                           "type": "array"
                         },
+                        "levels": {
+                          "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                          "items": {
+                            "enum": [
+                              "beginner",
+                              "all_levels",
+                              "advanced"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "max_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -80342,7 +80572,8 @@
                         "max_price_cents",
                         "audiences",
                         "languages",
-                        "amenities"
+                        "amenities",
+                        "levels"
                       ],
                       "title": "AroundNormalizedFilter",
                       "type": "object"
@@ -82268,6 +82499,18 @@
                       "languages": {
                         "items": {
                           "pattern": "^[a-z]{2}$",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "levels": {
+                        "description": "Class levels (ADR-197): hosts running a current class type at one of them",
+                        "items": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
+                          ],
                           "type": "string"
                         },
                         "type": "array"
@@ -100880,6 +101123,15 @@
                       "format": "uuid",
                       "type": "string"
                     },
+                    "distance": {
+                      "description": "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου",
+                      "enum": [
+                        "available",
+                        "needs_area"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "member": {
                       "description": "Whether the viewer is a member of the club now",
                       "type": "boolean"
@@ -100894,6 +101146,20 @@
                         },
                         "daily_swipes": {
                           "type": "integer"
+                        },
+                        "disciplines": {
+                          "description": "Box vocabulary keys a profile may name (ADR-197)",
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "distances_km": {
+                          "description": "The «Απόσταση» choices of an open club's deck (ADR-197)",
+                          "items": {
+                            "type": "integer"
+                          },
+                          "type": "array"
                         },
                         "gender_preferences": {
                           "items": {
@@ -100942,6 +101208,9 @@
                           },
                           "type": "array"
                         },
+                        "max_disciplines": {
+                          "type": "integer"
+                        },
                         "max_goals": {
                           "type": "integer"
                         },
@@ -100966,6 +101235,9 @@
                         "genders",
                         "gender_preferences",
                         "max_goals",
+                        "disciplines",
+                        "max_disciplines",
+                        "distances_km",
                         "about_max",
                         "daily_swipes"
                       ],
@@ -100986,6 +101258,12 @@
                             "club_id": {
                               "format": "uuid",
                               "type": "string"
+                            },
+                            "disciplines": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
                             },
                             "gender": {
                               "description": "Only used to honour preferences; never shown to anyone",
@@ -101061,6 +101339,7 @@
                             "level",
                             "times",
                             "goals",
+                            "disciplines",
                             "about",
                             "gender",
                             "gender_preference"
@@ -101090,6 +101369,7 @@
                     "member",
                     "profile",
                     "swipes_remaining",
+                    "distance",
                     "options"
                   ],
                   "title": "PartnersClubOverview",
@@ -101168,6 +101448,31 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "description": "People who named this discipline, a box vocabulary key (ADR-197)",
+            "in": "query",
+            "name": "discipline",
+            "required": false,
+            "schema": {
+              "maxLength": 60,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours",
+            "in": "query",
+            "name": "within_km",
+            "required": false,
+            "schema": {
+              "enum": [
+                2,
+                5,
+                10,
+                25
+              ],
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -101182,6 +101487,12 @@
                           "about": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "disciplines": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
                           },
                           "goals": {
                             "items": {
@@ -101234,6 +101545,12 @@
                           },
                           "shared": {
                             "properties": {
+                              "disciplines": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
                               "goals": {
                                 "items": {
                                   "enum": [
@@ -101268,6 +101585,7 @@
                             "required": [
                               "times",
                               "goals",
+                              "disciplines",
                               "same_level"
                             ],
                             "title": "PartnerShared",
@@ -101293,6 +101611,7 @@
                           "level",
                           "times",
                           "goals",
+                          "disciplines",
                           "about",
                           "shared"
                         ],
@@ -101360,6 +101679,13 @@
                   },
                   "active": {
                     "type": "boolean"
+                  },
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 5,
+                    "type": "array"
                   },
                   "gender": {
                     "enum": [
@@ -101440,6 +101766,12 @@
                           "format": "uuid",
                           "type": "string"
                         },
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "gender": {
                           "description": "Only used to honour preferences; never shown to anyone",
                           "enum": [
@@ -101514,6 +101846,7 @@
                         "level",
                         "times",
                         "goals",
+                        "disciplines",
                         "about",
                         "gender",
                         "gender_preference"
@@ -116177,6 +116510,34 @@
             }
           },
           {
+            "description": "Only club posts of these kinds (ADR-197): `announcement` (#ανακοινώσεις), `pr`, `event`",
+            "explode": true,
+            "in": "query",
+            "name": "types",
+            "required": false,
+            "schema": {
+              "items": {
+                "enum": [
+                  "announcement",
+                  "pr",
+                  "event"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Only club posts by the gym's staff (ADR-197)",
+            "in": "query",
+            "name": "coaches_only",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "in": "query",
             "name": "cursor",
             "required": false,
@@ -117935,7 +118296,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -117998,7 +118366,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -118043,7 +118418,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -118133,7 +118515,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -118180,7 +118569,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -118264,7 +118660,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -118311,7 +118714,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -118383,7 +118793,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }
@@ -118431,7 +118848,14 @@
                 "journal",
                 "vault",
                 "progress",
-                "partners"
+                "partners",
+                "box_workouts",
+                "box_videos",
+                "box_appointments",
+                "events",
+                "find_clubs",
+                "my_posts",
+                "reviews"
               ],
               "type": "string"
             }
@@ -118522,7 +118946,14 @@
                         "journal",
                         "vault",
                         "progress",
-                        "partners"
+                        "partners",
+                        "box_workouts",
+                        "box_videos",
+                        "box_appointments",
+                        "events",
+                        "find_clubs",
+                        "my_posts",
+                        "reviews"
                       ],
                       "type": "string"
                     }

@@ -33,8 +33,9 @@ export function videoTags(videos: OnDemandVideo[], locale?: string): string[] {
   return [...tags.values()].sort((a, b) => a.localeCompare(b, locale));
 }
 
-export function filterVideosByTag(videos: OnDemandVideo[], tag: string | null): OnDemandVideo[] {
-  if (!tag) return videos;
-  const needle = tag.toLocaleLowerCase();
-  return videos.filter((video) => video.tags.some((value) => value.trim().toLocaleLowerCase() === needle));
+/** The videos with any of `tags` (case-insensitive); every video when none is picked. */
+export function filterVideosByTag(videos: OnDemandVideo[], tags: readonly string[]): OnDemandVideo[] {
+  if (tags.length === 0) return videos;
+  const needles = new Set(tags.map((tag) => tag.toLocaleLowerCase()));
+  return videos.filter((video) => video.tags.some((value) => needles.has(value.trim().toLocaleLowerCase())));
 }

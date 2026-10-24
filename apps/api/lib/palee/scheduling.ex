@@ -36,6 +36,8 @@ defmodule Palee.Scheduling do
   }
 
   defdelegate transaction(context, fun), to: Palee.Scheduling.SchedulingStore
+  @doc "The class levels a class type can have (ADR-197 reads them for Γύρω μου)."
+  defdelegate class_levels(), to: Palee.Scheduling.ClassType, as: :levels
   defdelegate create_slot(context, params), to: CreateSlot, as: :call
   defdelegate create_slot(params), to: CreateSlot, as: :call
   defdelegate create_class_series(context, params), to: CreateClassSeries, as: :call

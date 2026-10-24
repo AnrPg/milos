@@ -7,7 +7,7 @@ defmodule Palee.Places.Domain.AroundPlan do
     keeps events inside it, and clubs while it starts at free; «Δοκιμαστικό»
     keeps boxes that take trial guests. Posts have no cost and ignore it.
     «Δωρεάν» with a range reads as the range reaching down to free.
-  * **Tags** (discipline, audience, language, amenities) narrow every kind
+  * **Tags** (discipline, audience, language, amenities) and **level** narrow every kind
     through the host box's published profile; a person's post has no host
     and drops out when any tag is chosen.
   * **When** narrows events only.
@@ -64,6 +64,7 @@ defmodule Palee.Places.Domain.AroundPlan do
       audiences: nil_if_empty(filter.audiences),
       languages: nil_if_empty(filter.languages),
       amenities: nil_if_empty(filter.amenities),
+      levels: nil_if_empty(filter.levels),
       boxes_placement: if(has_gym?, do: "collapsed", else: "category"),
       created_after: nil
     }
@@ -81,10 +82,15 @@ defmodule Palee.Places.Domain.AroundPlan do
   end
 
   defp priced_allows?("boxes", filter), do: "trial" in filter.cost
-  defp priced_allows?("events", filter), do: "free" in filter.cost or AroundFilter.price_range?(filter)
+
+  defp priced_allows?("events", filter),
+    do: "free" in filter.cost or AroundFilter.price_range?(filter)
+
   # Clubs are always free: they stay while the price range starts at free.
   defp priced_allows?("clubs", filter),
-    do: "free" in filter.cost or (AroundFilter.price_range?(filter) and is_nil(min_price_cents(filter)))
+    do:
+      "free" in filter.cost or
+        (AroundFilter.price_range?(filter) and is_nil(min_price_cents(filter)))
 
   # Events: «Δωρεάν» alone means 0; with a range it pulls the range down to free.
   defp min_price_cents(%{cost: cost, min_price_cents: min}) do

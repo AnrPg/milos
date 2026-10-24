@@ -13601,6 +13601,8 @@ export interface components {
             /** @description Default events, boxes, clubs */
             kinds?: ("events" | "boxes" | "clubs" | "posts")[];
             languages?: string[];
+            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+            levels?: ("beginner" | "all_levels" | "advanced")[];
             max_price_cents?: number | null;
             min_price_cents?: number | null;
             /** @description Gazetteer places to search from, at most 5 */
@@ -13632,6 +13634,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -14237,6 +14241,8 @@ export interface components {
             /** @description Default events, boxes, clubs */
             kinds: ("events" | "boxes" | "clubs" | "posts")[];
             languages: string[];
+            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+            levels: ("beginner" | "all_levels" | "advanced")[];
             max_price_cents: number | null;
             min_price_cents: number | null;
             /** @description Gazetteer places to search from, at most 5 */
@@ -14316,6 +14322,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -14948,6 +14956,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels?: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents?: number | null;
                 min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -15003,6 +15013,8 @@ export interface components {
                 /** @description Default events, boxes, clubs */
                 kinds: ("events" | "boxes" | "clubs" | "posts")[];
                 languages: string[];
+                /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                levels: ("beginner" | "all_levels" | "advanced")[];
                 max_price_cents: number | null;
                 min_price_cents: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
@@ -27883,6 +27895,7 @@ export interface components {
         /** PartnerCard */
         PartnerCard: {
             about: string | null;
+            disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
             level: "beginner" | "intermediate" | "advanced";
@@ -27897,6 +27910,7 @@ export interface components {
             profile_id: string;
             /** PartnerShared */
             shared: {
+                disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 same_level: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -27907,6 +27921,7 @@ export interface components {
         PartnerDeck: {
             cards: {
                 about: string | null;
+                disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
@@ -27921,6 +27936,7 @@ export interface components {
                 profile_id: string;
                 /** PartnerShared */
                 shared: {
+                    disciplines: string[];
                     goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                     same_level: boolean;
                     times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -28110,10 +28126,15 @@ export interface components {
         PartnerOptions: {
             about_max: number;
             daily_swipes: number;
+            /** @description Box vocabulary keys a profile may name (ADR-197) */
+            disciplines: string[];
+            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+            distances_km: number[];
             gender_preferences: ("any" | "women" | "men")[];
             genders: ("woman" | "man" | "other")[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             levels: ("beginner" | "intermediate" | "advanced")[];
+            max_disciplines: number;
             max_goals: number;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
@@ -28145,6 +28166,7 @@ export interface components {
             active: boolean;
             /** Format: uuid */
             club_id: string;
+            disciplines: string[];
             /**
              * @description Only used to honour preferences; never shown to anyone
              * @enum {string|null}
@@ -28167,6 +28189,7 @@ export interface components {
         PartnerProfileRequest: {
             about?: string | null;
             active?: boolean;
+            disciplines?: string[];
             /** @enum {string|null} */
             gender?: "woman" | "man" | "other" | null;
             /** @enum {string} */
@@ -28184,6 +28207,7 @@ export interface components {
                 active: boolean;
                 /** Format: uuid */
                 club_id: string;
+                disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
                  * @enum {string|null}
@@ -28249,6 +28273,7 @@ export interface components {
         };
         /** PartnerShared */
         PartnerShared: {
+            disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             same_level: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -28311,6 +28336,11 @@ export interface components {
         PartnersClubOverview: {
             /** Format: uuid */
             club_id: string;
+            /**
+             * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
+             * @enum {string|null}
+             */
+            distance: "available" | "needs_area" | null;
             /** @description Whether the viewer is a member of the club now */
             member: boolean;
             offered: boolean;
@@ -28318,10 +28348,15 @@ export interface components {
             options: {
                 about_max: number;
                 daily_swipes: number;
+                /** @description Box vocabulary keys a profile may name (ADR-197) */
+                disciplines: string[];
+                /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                distances_km: number[];
                 gender_preferences: ("any" | "women" | "men")[];
                 genders: ("woman" | "man" | "other")[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 levels: ("beginner" | "intermediate" | "advanced")[];
+                max_disciplines: number;
                 max_goals: number;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             };
@@ -28330,6 +28365,7 @@ export interface components {
                 active: boolean;
                 /** Format: uuid */
                 club_id: string;
+                disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
                  * @enum {string|null}
@@ -31515,7 +31551,7 @@ export interface components {
                 };
             }[];
             /** @enum {string} */
-            surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+            surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
         };
         /** ScalingSuggestion */
         ScalingSuggestion: {
@@ -37528,6 +37564,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -37598,6 +37636,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -37661,6 +37701,8 @@ export interface operations {
                             /** @description Default events, boxes, clubs */
                             kinds: ("events" | "boxes" | "clubs" | "posts")[];
                             languages: string[];
+                            /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                            levels: ("beginner" | "all_levels" | "advanced")[];
                             max_price_cents: number | null;
                             min_price_cents: number | null;
                             /** @description Gazetteer places to search from, at most 5 */
@@ -38293,6 +38335,8 @@ export interface operations {
                         /** @description Default events, boxes, clubs */
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
+                        /** @description Class levels (ADR-197): hosts running a current class type at one of them */
+                        levels?: ("beginner" | "all_levels" | "advanced")[];
                         max_price_cents?: number | null;
                         min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
@@ -45516,6 +45560,11 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         club_id: string;
+                        /**
+                         * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
+                         * @enum {string|null}
+                         */
+                        distance: "available" | "needs_area" | null;
                         /** @description Whether the viewer is a member of the club now */
                         member: boolean;
                         offered: boolean;
@@ -45523,10 +45572,15 @@ export interface operations {
                         options: {
                             about_max: number;
                             daily_swipes: number;
+                            /** @description Box vocabulary keys a profile may name (ADR-197) */
+                            disciplines: string[];
+                            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                            distances_km: number[];
                             gender_preferences: ("any" | "women" | "men")[];
                             genders: ("woman" | "man" | "other")[];
                             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                             levels: ("beginner" | "intermediate" | "advanced")[];
+                            max_disciplines: number;
                             max_goals: number;
                             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                         };
@@ -45535,6 +45589,7 @@ export interface operations {
                             active: boolean;
                             /** Format: uuid */
                             club_id: string;
+                            disciplines: string[];
                             /**
                              * @description Only used to honour preferences; never shown to anyone
                              * @enum {string|null}
@@ -45567,6 +45622,10 @@ export interface operations {
                 time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
                 level?: "beginner" | "intermediate" | "advanced";
                 goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
+                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
+                discipline?: string;
+                /** @description Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours */
+                within_km?: 2 | 5 | 10 | 25;
             };
             header?: never;
             path: {
@@ -45585,6 +45644,7 @@ export interface operations {
                     "application/json": {
                         cards: {
                             about: string | null;
+                            disciplines: string[];
                             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                             /** @enum {string} */
                             level: "beginner" | "intermediate" | "advanced";
@@ -45599,6 +45659,7 @@ export interface operations {
                             profile_id: string;
                             /** PartnerShared */
                             shared: {
+                                disciplines: string[];
                                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                                 same_level: boolean;
                                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
@@ -45627,6 +45688,7 @@ export interface operations {
                 "application/json": {
                     about?: string | null;
                     active?: boolean;
+                    disciplines?: string[];
                     /** @enum {string|null} */
                     gender?: "woman" | "man" | "other" | null;
                     /** @enum {string} */
@@ -45652,6 +45714,7 @@ export interface operations {
                             active: boolean;
                             /** Format: uuid */
                             club_id: string;
+                            disciplines: string[];
                             /**
                              * @description Only used to honour preferences; never shown to anyone
                              * @enum {string|null}
@@ -51212,6 +51275,10 @@ export interface operations {
                 channel_id?: string;
                 /** @description Only your own posts */
                 mine?: boolean;
+                /** @description Only club posts of these kinds (ADR-197): `announcement` (#ανακοινώσεις), `pr`, `event` */
+                types?: ("announcement" | "pr" | "event")[];
+                /** @description Only club posts by the gym's staff (ADR-197) */
+                coaches_only?: boolean;
                 cursor?: string;
                 limit?: number;
             };
@@ -51799,7 +51866,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -51830,7 +51897,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -51841,7 +51908,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -51882,7 +51949,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -51893,7 +51960,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
             };
             cookie?: never;
         };
@@ -51933,7 +52000,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -51944,7 +52011,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                 id: string;
             };
             cookie?: never;
@@ -51976,7 +52043,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };
@@ -51987,7 +52054,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                 id: string;
             };
             cookie?: never;
@@ -52025,7 +52092,7 @@ export interface operations {
                             };
                         }[];
                         /** @enum {string} */
-                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners" | "box_workouts" | "box_videos" | "box_appointments" | "events" | "find_clubs" | "my_posts" | "reviews";
                     };
                 };
             };

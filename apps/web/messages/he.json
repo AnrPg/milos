@@ -4451,6 +4451,22 @@
     "apiErrorUnknownDemoSection": "אין נתוני הדגמה למסך הזה.",
     "ntfBusinessDemoIdleTitle": "העסק לדוגמה שלך מחכה לך",
     "ntfBusinessDemoIdleBody": "אף אחד לא השתמש ב-{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת.",
+    "clApptFiltersTitle": "סינון פגישות",
+    "clApptFilterKind": "סוג",
+    "clApptFilterFormat": "פורמט",
+    "clApptFilterCoach": "מאמן",
+    "clApptNoMatch": "אין התאמות לסינון.",
+    "reviewsFiltersTitle": "סינון ביקורות",
+    "reviewsFilterTarget": "על מה",
+    "reviewsFilterSentiment": "תחושה",
+    "reviewsNoMatch": "אין ביקורות שתואמות לסינון.",
+    "workoutsFiltersTitle": "סינון אימונים",
+    "workoutsFilterStatus": "מצב",
+    "workoutsStatusDone": "בוצעו",
+    "workoutsStatusPending": "לביצוע",
+    "workoutsFilterKind": "סוג",
+    "workoutsKindPersonal": "אישיים",
+    "workoutsFilterSeason": "עונה",
     "clProgressOnTargetWeeks": "{onTarget} מתוך {weeks} שבועות ביעד",
     "clProgressStreakDays": "{count, plural, one {יום אחד} other {# ימים}}",
     "clProgressTarget": "יעד {count}/שבוע",
@@ -5540,7 +5556,6 @@
     "wodOptInLink": "הפעלה",
     "announcementsEmpty": "אין עדיין הודעות.",
     "announcementsOpen": "כל ההודעות",
-    "channelShowAll": "כל הערוצים",
     "channelSuggested": "מומלץ",
     "channelSuggestedHint": "את/ה מזמינים את השיעור הזה לעיתים קרובות",
     "channelsOfBox": "מהמכון",
@@ -5567,7 +5582,19 @@
     "more": "עוד",
     "report": "דיווח",
     "commentHidden": "מוסתר",
-    "channelsOfClub": "ערוצי המועדון"
+    "channelsOfClub": "ערוצי המועדון",
+    "postFiltersTitle": "סינון פוסטים",
+    "filterClub": "מועדון",
+    "filterChannel": "ערוץ",
+    "filterType": "סוג",
+    "postType": {
+      "announcement": "הודעות",
+      "pr": "שיאים אישיים",
+      "event": "אירועים"
+    },
+    "filterCoachesOnly": "מאמנים בלבד",
+    "filterAuthor": "כותב",
+    "postsNoMatch": "אין פוסטים שתואמים לסינון."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {מסננים} other {מסננים (#)}}",
@@ -5575,7 +5602,8 @@
     "clear": "ניקוי",
     "back": "חזרה",
     "showResults": "{count, plural, =0 {אין תוצאות} other {הצגת #}}",
-    "show": "הצג"
+    "show": "הצג",
+    "all": "הכול"
   },
   "BoxSchedule": {
     "title": "לוח שיעורים",
@@ -6391,7 +6419,10 @@
     "notif_event_cohost_answered_title": "תשובה לאירוח משותף",
     "notif_event_cohost_answered_accepted_body": "{box} מארח/ת יחד את «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} סירב/ה לארח יחד את «{event}».",
-    "notif_event_cohost_answered_removed_body": "{box} כבר לא מארח/ת יחד את «{event}»."
+    "notif_event_cohost_answered_removed_body": "{box} כבר לא מארח/ת יחד את «{event}».",
+    "filterKind": "סוג",
+    "filterBox": "מכון",
+    "findFiltersTitle": "סינון חיפוש"
   },
   "CommunityAdmin": {
     "title": "קהילה",
@@ -6666,7 +6697,14 @@
     "err_already_refunded": "התשלום הזה כבר הוחזר.",
     "err_invalid_refund": "סכום ההחזר צריך להיות מעל אפס ולא יותר ממה ששולם.",
     "err_invalid_cohosts": "אי אפשר לקרוא את כתובות המארגנים השותפים האלה. בדוק כל כתובת דף.",
-    "err_duplicate_cohost": "אותו עסק מוזמן פעמיים."
+    "err_duplicate_cohost": "אותו עסק מוזמן פעמיים.",
+    "filtersTitle": "סינון אירועים",
+    "filterClub": "מועדון",
+    "filterFree": "בחינם",
+    "filterPrice": "מחיר",
+    "filterGoing": "אני מגיע/ה",
+    "filterMine": "אני",
+    "filtersNoMatch": "אין אירועים שתואמים לסינון."
   },
   "EventsAdmin": {
     "emptyUpcoming": "אין אירועים קרובים. צרו אחד עם «+ אירוע חדש».",
@@ -6971,7 +7009,9 @@
     "dateTo": "עד",
     "priceOpenEnd": "{price}+",
     "priceFrom": "מחיר מינימלי",
-    "priceTo": "מחיר מקסימלי"
+    "priceTo": "מחיר מקסימלי",
+    "sectionLevel": "רמה",
+    "levelHint": "מכונים עם שיעורים ברמה הזו"
   },
   "CheckIn": {
     "loading": "טוען…",
@@ -8858,7 +8898,6 @@
     "editProfile": "עריכת הפרופיל",
     "safetyLine": "רק חברי המועדון הזה. התאמה דורשת את שניכם. אפשר לדווח או לחסום בכל עת.",
     "filters": "מסננים",
-    "filtersCount": "מסננים ({count})",
     "swipesLeft": "{count, plural, one {נותרה בחירה אחת להיום} other {נותרו # בחירות להיום}}",
     "loading": "טוען…",
     "limitReached": "מספיק להיום. מחר יהיו אנשים חדשים.",
@@ -8939,7 +8978,14 @@
     "error_partner_match_read_only": "השיחה הזו הסתיימה.",
     "error_partner_plans_unavailable": "הצעות שיעור זמינות רק במועדונים של חדר הכושר עצמו.",
     "error_message_body_required": "כתבו משהו קודם.",
-    "error_cannot_block_self": "אי אפשר לחסום את עצמך."
+    "error_cannot_block_self": "אי אפשר לחסום את עצמך.",
+    "disciplineLabel": "ענף",
+    "disciplinesLabel": "מה תתאמנו יחד (עד {max})",
+    "allDisciplines": "כל הענפים",
+    "fewerDisciplines": "פחות",
+    "distanceLabel": "מרחק",
+    "withinKm": "עד {km} ק״מ",
+    "distanceNeedsArea": "כדי לסנן לפי מרחק, הופיעו ב«סביבי» עם האזור שלכם."
   },
   "Squads": {
     "title": "סקוואדים",

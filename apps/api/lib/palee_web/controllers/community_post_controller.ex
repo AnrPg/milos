@@ -5,6 +5,7 @@ defmodule PaleeWeb.CommunityPostController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.{CommunityPosts, GetCommunityFeed}
+  alias Palee.Community
   alias PaleeWeb.Schemas.Community, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -27,6 +28,26 @@ defmodule PaleeWeb.CommunityPostController do
         in: :query,
         required: false,
         description: "Only your own posts",
+        schema: %Schema{type: :boolean}
+      },
+      %Parameter{
+        name: :types,
+        in: :query,
+        required: false,
+        description:
+          "Only club posts of these kinds (ADR-197): `announcement` (#ανακοινώσεις), `pr`, `event`",
+        schema: %Schema{
+          type: :array,
+          items: %Schema{type: :string, enum: Community.feed_post_types()}
+        },
+        style: :form,
+        explode: true
+      },
+      %Parameter{
+        name: :coaches_only,
+        in: :query,
+        required: false,
+        description: "Only club posts by the gym's staff (ADR-197)",
         schema: %Schema{type: :boolean}
       },
       %Parameter{name: :cursor, in: :query, required: false, schema: %Schema{type: :string}},

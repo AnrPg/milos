@@ -2238,6 +2238,7 @@ defmodule PaleeWeb.FallbackController do
     invalid_partner_level: {:unprocessable_entity, "Choose your level"},
     invalid_partner_times: {:unprocessable_entity, "Choose when you train"},
     invalid_partner_goals: {:unprocessable_entity, "Choose one to three goals"},
+    invalid_partner_disciplines: {:unprocessable_entity, "Choose up to five disciplines"},
     invalid_partner_gender: {:unprocessable_entity, "Unknown gender"},
     invalid_partner_gender_preference: {:unprocessable_entity, "Unknown preference"},
     invalid_partner_active: {:unprocessable_entity, "active must be true or false"},

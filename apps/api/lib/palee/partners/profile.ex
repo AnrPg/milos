@@ -24,6 +24,7 @@ defmodule Palee.Partners.Profile do
     field :level, :string
     field :times, {:array, :string}, default: []
     field :goals, {:array, :string}, default: []
+    field :disciplines, {:array, :string}, default: []
     field :about, :string
     field :gender, :string
     field :gender_preference, :string, default: "any"
@@ -33,7 +34,7 @@ defmodule Palee.Partners.Profile do
     timestamps(type: :utc_datetime_usec)
   end
 
-  @editable ~w(active level times goals about gender gender_preference)a
+  @editable ~w(active level times goals disciplines about gender gender_preference)a
 
   def create_changeset(attrs) do
     %__MODULE__{}
@@ -57,6 +58,7 @@ defmodule Palee.Partners.Profile do
     |> validate_subset(:goals, ProfilePolicy.goals())
     |> validate_length(:times, min: 1, max: length(ProfilePolicy.times()))
     |> validate_length(:goals, min: 1, max: ProfilePolicy.max_goals())
+    |> validate_length(:disciplines, max: ProfilePolicy.max_disciplines())
     |> validate_length(:about, max: ProfilePolicy.about_max())
     |> validate_inclusion(:gender, ProfilePolicy.genders())
     |> validate_inclusion(:gender_preference, ProfilePolicy.gender_preferences())
