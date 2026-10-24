@@ -8301,7 +8301,13 @@
     },
     "vault": {
       "intro": "Elke workout die je hebt afgerond, bij elke aanbieder. Dezelfde workout op verschillende plekken vormt één trend.",
-      "sources": "Gedaan bij"
+      "sources": "Gedaan bij",
+      "view": "Weergave",
+      "path": "Mappad",
+      "all": "Alles",
+      "tree": "Trainingen per map",
+      "otherType": "Overig",
+      "count": "{count, plural, one {# training} other {# trainingen}}"
     },
     "audience": {
       "title": "Mijn coaches betekent",

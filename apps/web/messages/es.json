@@ -8301,7 +8301,13 @@
     },
     "vault": {
       "intro": "Cada entrenamiento que has terminado, con cada proveedor. El mismo entrenamiento hecho en sitios distintos es una sola tendencia.",
-      "sources": "Hecho con"
+      "sources": "Hecho con",
+      "view": "Vista",
+      "path": "Ruta de la carpeta",
+      "all": "Todo",
+      "tree": "Entrenamientos por carpeta",
+      "otherType": "Otros",
+      "count": "{count, plural, one {# entrenamiento} other {# entrenamientos}}"
     },
     "audience": {
       "title": "«Mis entrenadores» significa",

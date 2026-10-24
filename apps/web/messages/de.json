@@ -8301,7 +8301,13 @@
     },
     "vault": {
       "intro": "Jedes Workout, das du abgeschlossen hast, bei jedem Anbieter. Dasselbe Workout an verschiedenen Orten ergibt einen gemeinsamen Verlauf.",
-      "sources": "Gemacht bei"
+      "sources": "Gemacht bei",
+      "view": "Ansicht",
+      "path": "Ordnerpfad",
+      "all": "Alle",
+      "tree": "Workouts nach Ordner",
+      "otherType": "Sonstige",
+      "count": "{count, plural, one {# Workout} other {# Workouts}}"
     },
     "audience": {
       "title": "Meine Coaches heißt",

@@ -387,6 +387,46 @@ test.describe("member app shell", () => {
     await expect(page.getByText("The requested item was not found.")).toHaveCount(0);
   });
 
+  test("Vault shows done workouts in folders or as a tree list", async ({ page }) => {
+    await stubMemberApi(page);
+    const box = { kind: "organization", organization_id: "org-1", name: "Box Kypseli", former: false };
+    const coach = { kind: "organization", organization_id: "org-2", name: "Nikos P.", former: false };
+    const group = (identity: string, type: string, sources: object[]) => ({
+      identity,
+      title: identity,
+      workout_type: type,
+      sources,
+      attempts: [],
+      attempt_count: 1,
+      last_at: "2026-10-20T08:00:00Z",
+    });
+    await page.route("**/api/me/vault**", (route) =>
+      route.fulfill(
+        json({
+          active_filter_count: 0,
+          filter: {},
+          groups: [group("Fran", "for_time", [box, coach]), group("Cindy", "amrap", [box])],
+        }),
+      ),
+    );
+    await page.goto("/journal/vault");
+
+    const view = page.getByRole("tablist", { name: "View" });
+    await expect(view.getByRole("tab", { name: "Folders" })).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("button", { name: /Box Kypseli/ }).click();
+    await expect(page.getByRole("navigation", { name: "Folder path" })).toContainText("Box Kypseli");
+    await page.getByRole("button", { name: /For time/i }).click();
+    await expect(page.getByText("Fran").first()).toBeVisible();
+    await expect(page.getByText("Cindy")).toHaveCount(0);
+
+    await view.getByRole("tab", { name: "List" }).click();
+    const tree = page.getByRole("tree", { name: "Workouts by folder" });
+    await tree.getByRole("button", { name: /Nikos P\./ }).click();
+    await tree.getByRole("button", { name: /For time/i }).click();
+    await expect(tree.getByText("Fran").first()).toBeVisible();
+    await page.screenshot({ path: "test-results/member-app/vault-tree.png", fullPage: true });
+  });
+
   test("Me holds every secondary link, and old URLs land on the new pages", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/me");
