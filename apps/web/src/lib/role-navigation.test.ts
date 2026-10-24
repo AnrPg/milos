@@ -81,7 +81,7 @@ describe("client navigation", () => {
     const items = clientNavItems();
     const owner = (path: string) => activeItemId(path, items);
     expect(owner("/")).toBe("home");
-    // ADR-196: the inbox's home is the Feed (✈).
+    // ADR-196: the inbox's home is the Feed (Μηνύματα).
     expect(owner("/messages")).toBe("home");
     for (const path of ["/box", "/box/workouts", "/box/schedule", "/box/appointments", "/box/videos", "/box/coach", "/workouts", "/class-timer/s1/display"]) {
       expect(owner(path)).toBe("box");

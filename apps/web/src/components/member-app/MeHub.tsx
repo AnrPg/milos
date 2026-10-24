@@ -24,7 +24,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * them (ADR-196): interests, body settings and the business request in
  * Ρυθμίσεις; the box switcher in Τα box και τα clubs μου; the tour, first
  * steps, coach practice and the staff entries in Βοήθεια & ξενάγηση; the
- * chats in the one inbox (Feed ✈). No "More" drawer (brief §4.8).
+ * chats in the one inbox (Feed Μηνύματα). No "More" drawer (brief §4.8).
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");

@@ -130,7 +130,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 
 | Tab | Answers | Landing content |
 |---|---|---|
-| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · ✈ messages (notifications: the bar's bell). Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Οι δικοί μου \| Γύρω μου**. Feed. |
+| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · Μηνύματα as a line speech-bubble icon (ANR 2026-10-24: no paper plane, icons are line icons, never emoji); notifications: the bar's bell. Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Οι δικοί μου \| Γύρω μου**. Feed. |
 | **Box** | "Where and with whom do I train?" | Today's workout card (**Καταγραφή / Έναρξη ▶**), next booking (+ QR check-in), actions (Πρόγραμμα · Ραντεβού · Βίντεο · Coach), membership, announcements. |
 | **Journal** | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
 | 🔔 **Ειδοποιήσεις** | "What needs me?" | Not a tab: opens the inbox over the current screen; unread badge. |
@@ -142,7 +142,7 @@ Messages live top-right in the Feed. `Box › Coach` opens the same inbox filter
 ```
 Αρχική
 ├─ ⊕ Νέα ανάρτηση (audience: club›channel | followers | public; attach workout from journal)
-├─ ♡ Ειδοποιήσεις · ✈ Μηνύματα (Όλα | Coach | Clubs | Partners)
+├─ ♡ Ειδοποιήσεις · Μηνύματα (Όλα | Coach | Clubs | Partners)
 ├─ Club bar → Club page (member):  Ροή · Κανάλια · Events · Μέλη(Partners)
 ├─ Box page (non-member):          Σχετικά · Πρόγραμμα(read-only, trial slots) · Events · Δημόσια · [Ζήτα δοκιμαστικό] [Ακολούθησε]
 └─ Γύρω μου: events · open clubs · boxes with trials · public posts · Φίλτρα(n) · saved filters
@@ -178,7 +178,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Club, channel | Αρχική › club bar | Εγώ › Τα clubs μου |
 | Event | Club › Events | Feed card, Γύρω μου |
 | Partner match | Club › Μέλη › Partners | Messages |
-| Messages | Αρχική › ✈ (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
+| Messages | Αρχική › Μηνύματα (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
 | Class, booking, check-in | Box | Journal (after training) |
 | WOD of the day | Box | Feed (#wod-σήμερα + leaderboard) |
 | Membership/package | Box | Εγώ › Πληρωμές |
@@ -221,7 +221,7 @@ Owner setting for member groups: **Όχι · Με έγκριση (default) · Ε
 - **One concept: following.** People you follow who follow you back are **Buddies** (el «Φιλαράκια», de Kumpels, es Colegas, fr Potes, it Amiconi, nl Maatjes, pt Amigalhaços, ru Приятели, bg Приятелчета, ar رفاق, he החבר'ה). Derived, never managed separately; unfollowing ends it.
 - **Counts line** under the name (Εγώ and every profile), Buddies first, three groups that never overlap: «35 Φιλαράκια · 85 σε ακολουθούν · 45 ακολουθείς» ("follow you" = not followed back; "you follow" = not following you back, requests included). Each part opens the matching Connections tab: Φιλαράκια · Σε ακολουθούν · Ακολουθείς · Boxes · Clubs · PRs. A «Buddy» badge on profiles and rows.
 - **Private by default.** `Κοινοποίηση & ορατότητα › Ιδιωτικός λογαριασμός` (on): a follow is a request. Off: people follow at once, and turning it off accepts waiting requests. `Εμφάνιση στην αναζήτηση` (on).
-- **Messages between people** need no shared gym. Buddies, people in a shared gym/open club, and people who follow you reach your inbox; anyone else lands in **Αιτήματα μηνυμάτων** (accept, reply or decline; a decline is silent). Blocks apply everywhere. A «Μήνυμα» button on every profile. The gym's own threads (box, coach, class) stay separate (Club ≠ Box). They show together in the one inbox (✈).
+- **Messages between people** need no shared gym. Buddies, people in a shared gym/open club, and people who follow you reach your inbox; anyone else lands in **Αιτήματα μηνυμάτων** (accept, reply or decline; a decline is silent). Blocks apply everywhere. A «Μήνυμα» button on every profile. The gym's own threads (box, coach, class) stay separate (Club ≠ Box). They show together in the one inbox (Μηνύματα).
 - **People search** across Palee by @handle or name: shared clubs first, then Buddies, follows, public people nearby, then anyone public. Private people, or people who turned search off, show only to people they already know.
 
 ### 7.2 Γύρω μου & filters [NEW / PARTIAL]
@@ -358,7 +358,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
     | Box switcher | Τα box και τα clubs μου |
     | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff console and extras, password resets | Βοήθεια & ξενάγηση (`/me/help`) |
 
-  - Chats have no row: the one inbox is Αρχική › ✈.
+  - Chats have no row: the one inbox is Αρχική › Μηνύματα.
   - Κοινοποίηση follows the mockup's blocks, plus a per-PR "show on profile" list.
 
 ---
@@ -379,7 +379,7 @@ Every member-facing capability in today's code has a surface. The full ~50-row t
 | Class timer display (`/class-timer/[slotId]/display`) | Box: next-class card becomes "Timer τάξης" while running |
 | Guest pass, waitlist, open-gym check-in, locations, ICS export | Box › Πρόγραμμα |
 | Entitlements, corporate enrollment, invoices, refund receipts | Box › Συνδρομή; Εγώ › Πληρωμές |
-| Chat/threads, notifications/web push | Αρχική ✈ / ♡ |
+| Chat/threads, notifications/web push | Αρχική Μηνύματα / ♡ |
 | Gamification preferences, PR sharing grants & coach visibility | Εγώ › Κοινοποίηση & ορατότητα |
 | Offline outbox, onboarding/tours, profile/avatar/language/theme | Εγώ › Ρυθμίσεις / Βοήθεια |
 
