@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
 import {
@@ -18,16 +17,15 @@ import { PRHistoryModal } from "@/components/pantheon/PRHistoryModal";
 import { formatPRScore, groupPRTimelineByMonth, prImprovement } from "@/components/client/pr-timeline";
 import { semanticLabel } from "@/i18n/presentation";
 import { useSession } from "@/components/session-provider";
-import { ClientCard, ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
+import { ClientCard, ClientPage, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
-import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
 import { InsightsCard } from "@/components/member-app/progress/InsightsCard";
 import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
 import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
-import { PantheonSection } from "@/components/pantheon/PantheonSection";
+import { PersonalRecordsSection } from "@/components/pantheon/PersonalRecordsSection";
 import { formatDay } from "@/components/client/format";
 import { scaleWeekly, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
 import { SourceLabel } from "@/components/providers/SourceLabel";
@@ -41,11 +39,13 @@ import { useTranslations } from "next-intl";
 /**
  * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
  * resting heart rate from a connected device (ADR-161, only with data),
- * then personal records, the history export and the statistics across every
+ * then personal records and the statistics across every
  * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
  * the time range narrows it. The depth slots follow in a fixed order
  * (ADR-165): Μυϊκή κάλυψη (into the atlas), Ποιότητες, Φορτίο, then the
- * single Insights slot (ADR-166).
+ * single Insights slot (ADR-166). A card with nothing in it is hidden
+ * (ANR 2026-10-24); PRs are the «Personal Records» section (`#prs`), not a
+ * page of their own; the history export lives in Vault.
  */
 export function ProgressConsole() {
   const i18n = useUiTranslations();
@@ -53,8 +53,7 @@ export function ProgressConsole() {
     <ClientPage title={i18n("clProgressTitle")} intro={i18n("clProgressIntro")}>
       <ProgressOverview />
       <RestingHeartRateCard />
-      <PantheonSection />
-      <HistoryExportCard />
+      <PersonalRecordsSection />
       <ProgressContent />
     </ClientPage>
   );
@@ -293,48 +292,42 @@ function BySource({ progress }: { progress: AccountProgress }) {
   const directory = useSourceDirectory();
   const bySource = progress.by_source ?? [];
   const total = bySource.reduce((sum, row) => sum + row.sessions, 0);
+  if (bySource.length === 0 || total === 0) return null;
   return (
     <ClientCard title={t("progress.bySource")}>
-      {bySource.length === 0 || total === 0 ? (
-        <EmptyLine>{i18n("clProgressSourcesEmpty")}</EmptyLine>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {bySource.map((row) => {
-            const percent = Math.round((row.sessions / total) * 100);
-            return (
-              <li key={sourceToken(row.source)}>
-                <div className="flex items-center justify-between gap-2 text-sm">
-                  <SourceLabel source={row.source} directory={directory} always />
-                  <span className="tabular-nums" style={{ color: "var(--dim)" }}>
-                    {row.sessions} · {i18n("clPercentValue", { value: percent })}
-                  </span>
-                </div>
-                <div aria-hidden="true" className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${percent}%`, background: sourceColor(row.source, directory) }} />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <ul className="flex flex-col gap-2">
+        {bySource.map((row) => {
+          const percent = Math.round((row.sessions / total) * 100);
+          return (
+            <li key={sourceToken(row.source)}>
+              <div className="flex items-center justify-between gap-2 text-sm">
+                <SourceLabel source={row.source} directory={directory} always />
+                <span className="tabular-nums" style={{ color: "var(--dim)" }}>
+                  {row.sessions} · {i18n("clPercentValue", { value: percent })}
+                </span>
+              </div>
+              <div aria-hidden="true" className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
+                <div className="h-full rounded-full" style={{ width: `${percent}%`, background: sourceColor(row.source, directory) }} />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </ClientCard>
   );
 }
 
 function ScoreHistory({ series }: { series: AccountScoreSeries[] }) {
   const i18n = useUiTranslations();
+  if (series.length === 0) return null;
   return (
     <ClientCard title={i18n("clProgressScores")}>
       <p className="mb-3 text-sm" style={{ color: "var(--muted)" }}>{i18n("clProgressScoresIntro")}</p>
-      {series.length === 0 ? (
-        <EmptyLine>{i18n("clProgressScoresEmpty")}</EmptyLine>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {series.map((item) => (
-            <ScoreSeries key={`${item.workout_id}:${item.section_id ?? ""}`} series={item} />
-          ))}
-        </ul>
-      )}
+      <ul className="flex flex-col gap-3">
+        {series.map((item) => (
+          <ScoreSeries key={`${item.workout_id}:${item.section_id ?? ""}`} series={item} />
+        ))}
+      </ul>
     </ClientCard>
   );
 }
@@ -407,7 +400,7 @@ function PRTimeline({ entries }: { entries: AccountProgress["pr_timeline"] }) {
   const { tokens } = useSession();
   const [openPr, setOpenPr] = useState<PRRecord | null>(null);
   const months = useMemo(() => groupPRTimelineByMonth(entries), [entries]);
-  // Same cache as the Pantheon's full PR list; the modal needs the PR record.
+  // The full PR list; the modal needs the PR record.
   const prs = useQuery({
     queryKey: ["prs", "export-all"],
     enabled: Boolean(tokens?.access_token) && entries.length > 0,
@@ -415,82 +408,70 @@ function PRTimeline({ entries }: { entries: AccountProgress["pr_timeline"] }) {
   });
   const prById = useMemo(() => new Map((prs.data ?? []).map((pr) => [pr.id, pr])), [prs.data]);
 
+  if (months.length === 0) return null;
   return (
     <ClientCard title={i18n("clPrTimelineTitle")}>
-      {months.length === 0 ? (
-        <div className="flex flex-col items-start gap-3">
-          <EmptyLine>{i18n("clPrTimelineEmpty")}</EmptyLine>
-          <Link
-            href="/journal/pantheon"
-            className="rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: "var(--border)", color: "var(--text)" }}
-          >
-            {i18n("clPrOpenPantheon")}
-          </Link>
-        </div>
-      ) : (
-        <ol className="flex flex-col gap-4">
-          {months.map((month) => (
-            <li key={month.month}>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                <time dateTime={month.month}>
-                  {formatDay(`${month.month}-01`, locale, { weekday: undefined, day: undefined })}
-                </time>
-              </h3>
-              <ol className="flex flex-col border-s-2 ps-4" style={{ borderColor: "var(--border)" }}>
-                {month.entries.map((entry) => {
-                  const pr = prById.get(entry.pr_record_id) ?? null;
-                  const unit =
-                    entry.unit === "mins_secs"
-                      ? ""
-                      : ` ${entry.unit === "kg" ? i18n("kilogramsUnit") : semanticLabel(entry.unit, i18n)}`;
-                  const improvement = prImprovement(entry);
-                  const improvementText =
-                    improvement.kind === "first"
-                      ? i18n("clPrFirstRecord")
-                      : improvement.kind === "time_saved"
-                        ? i18n("clPrTimeSaved", { time: improvement.text })
-                        : `${improvement.text}${unit}`;
-                  return (
-                    <li key={entry.id} className="relative py-1">
+      <ol className="flex flex-col gap-4">
+        {months.map((month) => (
+          <li key={month.month}>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+              <time dateTime={month.month}>
+                {formatDay(`${month.month}-01`, locale, { weekday: undefined, day: undefined })}
+              </time>
+            </h3>
+            <ol className="flex flex-col border-s-2 ps-4" style={{ borderColor: "var(--border)" }}>
+              {month.entries.map((entry) => {
+                const pr = prById.get(entry.pr_record_id) ?? null;
+                const unit =
+                  entry.unit === "mins_secs"
+                    ? ""
+                    : ` ${entry.unit === "kg" ? i18n("kilogramsUnit") : semanticLabel(entry.unit, i18n)}`;
+                const improvement = prImprovement(entry);
+                const improvementText =
+                  improvement.kind === "first"
+                    ? i18n("clPrFirstRecord")
+                    : improvement.kind === "time_saved"
+                      ? i18n("clPrTimeSaved", { time: improvement.text })
+                      : `${improvement.text}${unit}`;
+                return (
+                  <li key={entry.id} className="relative py-1">
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-3 h-2.5 w-2.5 rounded-full"
+                      style={{ insetInlineStart: "calc(-1rem - 6px)", background: "var(--primary)" }}
+                    />
+                    <button
+                      type="button"
+                      disabled={!pr}
+                      onClick={() => pr && setOpenPr(pr)}
+                      aria-label={i18n("clPrOpenHistory", { name: entry.name })}
+                      className="w-full rounded-lg px-2 py-1.5 text-start text-sm transition-colors enabled:hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
+                    >
+                      <span style={{ color: "var(--dim)" }}>
+                        <time dateTime={entry.beaten_on}>
+                          {formatDay(entry.beaten_on, locale, { weekday: undefined, year: undefined, month: "short" })}
+                        </time>
+                        {" · "}
+                      </span>
+                      <span className="font-semibold" style={{ color: "var(--text)" }}>
+                        {entry.name}{" "}
+                        <bdi className="tabular-nums">{`${formatPRScore(entry.score, entry.unit)}${unit}`}</bdi>
+                      </span>{" "}
                       <span
-                        aria-hidden="true"
-                        className="absolute top-3 h-2.5 w-2.5 rounded-full"
-                        style={{ insetInlineStart: "calc(-1rem - 6px)", background: "var(--primary)" }}
-                      />
-                      <button
-                        type="button"
-                        disabled={!pr}
-                        onClick={() => pr && setOpenPr(pr)}
-                        aria-label={i18n("clPrOpenHistory", { name: entry.name })}
-                        className="w-full rounded-lg px-2 py-1.5 text-start text-sm transition-colors enabled:hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
+                        className="tabular-nums"
+                        style={{ color: improvement.kind === "first" ? "var(--dim)" : "var(--success)" }}
                       >
-                        <span style={{ color: "var(--dim)" }}>
-                          <time dateTime={entry.beaten_on}>
-                            {formatDay(entry.beaten_on, locale, { weekday: undefined, year: undefined, month: "short" })}
-                          </time>
-                          {" · "}
-                        </span>
-                        <span className="font-semibold" style={{ color: "var(--text)" }}>
-                          {entry.name}{" "}
-                          <bdi className="tabular-nums">{`${formatPRScore(entry.score, entry.unit)}${unit}`}</bdi>
-                        </span>{" "}
-                        <span
-                          className="tabular-nums"
-                          style={{ color: improvement.kind === "first" ? "var(--dim)" : "var(--success)" }}
-                        >
-                          (<bdi>{improvementText}</bdi>)
-                        </span>{" "}
-                        <SourceLabel source={entry.source} />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </li>
-          ))}
-        </ol>
-      )}
+                        (<bdi>{improvementText}</bdi>)
+                      </span>{" "}
+                      <SourceLabel source={entry.source} />
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </li>
+        ))}
+      </ol>
       {openPr ? <PRHistoryModal pr={openPr} onClose={() => setOpenPr(null)} /> : null}
     </ClientCard>
   );

@@ -4,7 +4,9 @@
 // first: the first matching prefix wins.
 export const MEMBER_ROUTE_MOVES: ReadonlyArray<readonly [from: string, to: string]> = [
   ["/my-workouts/history", "/journal"],
-  ["/my-workouts/pantheon", "/journal/pantheon"],
+  // PRs are a section of Πρόοδος, not «Pantheon» (ANR 2026-10-24).
+  ["/journal/pantheon", "/journal/progress"],
+  ["/my-workouts/pantheon", "/journal/progress"],
   ["/my-workouts", "/box/workouts"],
   ["/schedule", "/box/schedule"],
   ["/appointments", "/box/appointments"],

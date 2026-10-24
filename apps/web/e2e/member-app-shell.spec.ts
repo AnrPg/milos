@@ -421,14 +421,17 @@ test.describe("member app shell", () => {
     await expect(flow.getByText("Fran")).toBeVisible();
     await expect(flow.getByText("Park run")).toBeVisible();
     await expect(flow.getByText("Love the new journal")).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Body", "Wellbeing", "Progress"]);
+    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Timeline", "Vault", "Body", "Wellbeing", "Progress"]);
     await expect(flow.getByRole("button", { name: /Share in Palee: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 
     await page.goto("/journal/progress");
     await expect(page.getByText("76%")).toBeVisible();
     await expect(page.getByText("10 workouts")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Export workout history" })).toBeVisible();
+    // ANR 2026-10-24: PRs are one section of Progress; the history export lives in Vault.
+    await expect(page.getByRole("region", { name: "Personal Records" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View all" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Export workout history" })).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/progress.png", fullPage: true });
   });
 

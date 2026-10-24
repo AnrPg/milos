@@ -35,6 +35,7 @@ export function ProgressDepthSections({ filter }: { filter: ProgressQuery }) {
       coverage={{ ...base, data: query.data?.coverage }}
       qualities={{ ...base, data: query.data?.qualities }}
       load={{ ...base, data: query.data?.load }}
+      hideEmpty
     />
   );
 }

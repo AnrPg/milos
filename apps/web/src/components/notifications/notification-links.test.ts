@@ -181,7 +181,7 @@ describe("notificationTargetUrl after the member-app move", () => {
     ).toBe("/box/workouts?open=a1");
     expect(
       notificationTargetUrl({ type: "pr_shared", payload: { url: "/my-workouts/pantheon" } }, "athlete"),
-    ).toBe("/journal/pantheon");
+    ).toBe("/journal/progress");
   });
   it("opens the event page for event notifications and the trial sheet for the trial offer (ADR-153)", () => {
     expect(

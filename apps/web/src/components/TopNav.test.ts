@@ -95,6 +95,6 @@ describe("pathActive for my workouts", () => {
   it("keeps My Workouts inactive on the journal pages that used to sit under it", () => {
     expect(pathActive("/box/workouts", "/box/workouts")).toBe(true);
     expect(pathActive("/journal", "/box/workouts")).toBe(false);
-    expect(pathActive("/journal/pantheon", "/box/workouts")).toBe(false);
+    expect(pathActive("/journal/progress", "/box/workouts")).toBe(false);
   });
 });
