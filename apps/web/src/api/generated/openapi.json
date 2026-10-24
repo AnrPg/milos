@@ -3157,6 +3157,11 @@
             "nullable": true,
             "type": "integer"
           },
+          "min_price_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
           "neighbourhood_ids": {
             "description": "Gazetteer places to search from, at most 5",
             "items": {
@@ -3269,6 +3274,11 @@
                 "type": "array"
               },
               "max_price_cents": {
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
+              "min_price_cents": {
                 "minimum": 0,
                 "nullable": true,
                 "type": "integer"
@@ -5143,6 +5153,11 @@
             "nullable": true,
             "type": "integer"
           },
+          "min_price_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
           "neighbourhood_ids": {
             "description": "Gazetteer places to search from, at most 5",
             "items": {
@@ -5195,6 +5210,7 @@
           "date_to",
           "times",
           "cost",
+          "min_price_cents",
           "max_price_cents",
           "audiences",
           "languages",
@@ -5409,6 +5425,11 @@
                 "type": "array"
               },
               "max_price_cents": {
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
+              "min_price_cents": {
                 "minimum": 0,
                 "nullable": true,
                 "type": "integer"
@@ -7326,6 +7347,11 @@
                 "nullable": true,
                 "type": "integer"
               },
+              "min_price_cents": {
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
               "neighbourhood_ids": {
                 "description": "Gazetteer places to search from, at most 5",
                 "items": {
@@ -7491,6 +7517,11 @@
                 "nullable": true,
                 "type": "integer"
               },
+              "min_price_cents": {
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
               "neighbourhood_ids": {
                 "description": "Gazetteer places to search from, at most 5",
                 "items": {
@@ -7543,6 +7574,7 @@
               "date_to",
               "times",
               "cost",
+              "min_price_cents",
               "max_price_cents",
               "audiences",
               "languages",
@@ -79569,6 +79601,11 @@
                         "nullable": true,
                         "type": "integer"
                       },
+                      "min_price_cents": {
+                        "minimum": 0,
+                        "nullable": true,
+                        "type": "integer"
+                      },
                       "neighbourhood_ids": {
                         "description": "Gazetteer places to search from, at most 5",
                         "items": {
@@ -79781,6 +79818,11 @@
                         "nullable": true,
                         "type": "integer"
                       },
+                      "min_price_cents": {
+                        "minimum": 0,
+                        "nullable": true,
+                        "type": "integer"
+                      },
                       "neighbourhood_ids": {
                         "description": "Gazetteer places to search from, at most 5",
                         "items": {
@@ -79954,6 +79996,11 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "min_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "neighbourhood_ids": {
                           "description": "Gazetteer places to search from, at most 5",
                           "items": {
@@ -80006,6 +80053,7 @@
                         "date_to",
                         "times",
                         "cost",
+                        "min_price_cents",
                         "max_price_cents",
                         "audiences",
                         "languages",
@@ -81940,6 +81988,11 @@
                         "type": "array"
                       },
                       "max_price_cents": {
+                        "minimum": 0,
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "min_price_cents": {
                         "minimum": 0,
                         "nullable": true,
                         "type": "integer"

@@ -6977,7 +6977,13 @@
     "notifTitle": "New near you",
     "notifBody": "New for “{name}”: {count}",
     "myDisciplines": "My sports",
-    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)",
+    "dates": "Dates",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Lowest price",
+    "priceTo": "Highest price"
   },
   "CheckIn": {
     "loading": "Loading…",
@@ -8335,7 +8341,13 @@
     },
     "vault": {
       "intro": "Every workout you have finished, with every provider. The same workout done in different places is one trend.",
-      "sources": "Done with"
+      "sources": "Done with",
+      "view": "View",
+      "path": "Folder path",
+      "all": "All",
+      "tree": "Workouts by folder",
+      "otherType": "Other",
+      "count": "{count, plural, one {# workout} other {# workouts}}"
     },
     "audience": {
       "title": "My coaches means",

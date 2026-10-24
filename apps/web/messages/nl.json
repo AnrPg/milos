@@ -6977,7 +6977,13 @@
     "notifTitle": "Nieuw bij jou in de buurt",
     "notifBody": "Nieuw voor ‘{name}’: {count}",
     "myDisciplines": "Mijn sporten",
-    "placesAttribution": "Plaatsen: © OpenStreetMap-bijdragers, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Plaatsen: © OpenStreetMap-bijdragers, GeoNames (CC BY 4.0)",
+    "dates": "Datums",
+    "dateFrom": "Van",
+    "dateTo": "Tot",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Laagste prijs",
+    "priceTo": "Hoogste prijs"
   },
   "CheckIn": {
     "loading": "Laden…",
@@ -8335,7 +8341,13 @@
     },
     "vault": {
       "intro": "Elke workout die je hebt afgerond, bij elke aanbieder. Dezelfde workout op verschillende plekken vormt één trend.",
-      "sources": "Gedaan bij"
+      "sources": "Gedaan bij",
+      "view": "Weergave",
+      "path": "Mappad",
+      "all": "Alles",
+      "tree": "Trainingen per map",
+      "otherType": "Overig",
+      "count": "{count, plural, one {# training} other {# trainingen}}"
     },
     "audience": {
       "title": "Mijn coaches betekent",

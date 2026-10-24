@@ -1,7 +1,8 @@
 defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
   @moduledoc """
   Discovery through the `palee_around_*` SECURITY DEFINER functions
-  (ADR-154, migration `20261024100000_around_me`). The origin goes in as a
+  (ADR-154, migration `20261024100000_around_me`; the price range since
+  `20261214100000_around_price_range`). The origin goes in as a
   geography multipoint and the search area's bounding box as an envelope,
   so the spatial predicates in the functions use the GiST indexes.
   """
@@ -19,8 +20,8 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     """
     SELECT id, organization_id, latitude, longitude, distance_m, starts_at, total
     FROM palee_around_events(#{@area}, $7::timestamptz, $8::timestamptz[], $9::timestamptz[],
-      $10::integer, $11::text[], $12::text[], $13::text[], $14::text[], $15::timestamptz, $16::timestamptz, $17::uuid,
-      $18::integer)
+      $10::integer, $11::integer, $12::text[], $13::text[], $14::text[], $15::text[], $16::timestamptz,
+      $17::timestamptz, $18::uuid, $19::integer)
     """
     |> query(
       area_params(area) ++
@@ -29,6 +30,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           from,
           to,
           plan.max_price_cents,
+          plan.min_price_cents,
           plan.disciplines,
           plan.audiences,
           plan.languages,
@@ -189,9 +191,9 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     FROM palee_around_counts(
       ST_GeogFromText($1), $2::float8[], $3::float8,
       ST_MakeEnvelope($4::float8, $5::float8, $6::float8, $7::float8, 4326)::geography,
-      $8::text[], $9::timestamptz, $10::timestamptz[], $11::timestamptz[], $12::integer,
-      $13::boolean, $14::uuid[], $15::timestamptz, $16::uuid, $17::text[], $18::text[], $19::text[], $20::text[],
-      $21::timestamptz)
+      $8::text[], $9::timestamptz, $10::timestamptz[], $11::timestamptz[], $12::integer, $13::integer,
+      $14::boolean, $15::uuid[], $16::timestamptz, $17::uuid, $18::text[], $19::text[], $20::text[], $21::text[],
+      $22::timestamptz)
     """
     |> query([
       multipoint(area.points),
@@ -206,6 +208,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
       from,
       to,
       plan.max_price_cents,
+      plan.min_price_cents,
       plan.trial_only,
       uuids(plan.exclude_ids),
       plan.since,
@@ -230,8 +233,8 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
     """
     SELECT kind, id, latitude, longitude, title, slug, distance_m
     FROM palee_around_pins(#{@area}, $7::text[], $8::timestamptz, $9::timestamptz[],
-      $10::timestamptz[], $11::integer, $12::boolean, $13::uuid[], $14::timestamptz, $15::uuid,
-      $16::text[], $17::text[], $18::text[], $19::text[], $20::integer)
+      $10::timestamptz[], $11::integer, $12::integer, $13::boolean, $14::uuid[], $15::timestamptz,
+      $16::uuid, $17::text[], $18::text[], $19::text[], $20::text[], $21::integer)
     """
     |> query(
       area_params(area) ++
@@ -241,6 +244,7 @@ defmodule Palee.Infrastructure.Places.EctoDiscoveryStore do
           from,
           to,
           plan.max_price_cents,
+          plan.min_price_cents,
           plan.trial_only,
           uuids(plan.exclude_ids),
           plan.since,

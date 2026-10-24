@@ -121,7 +121,36 @@ describe("AroundChipRow", () => {
     expect(screen.getByRole("button", { name: "Trial" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Posts" })).toBeTruthy();
     expect(screen.getByRole("group", { name: en.Around.sectionDiscipline })).toBeTruthy();
-    expect(screen.getByRole("slider")).toBeTruthy();
+    expect(screen.getByRole("slider", { name: en.Around.radius })).toBeTruthy();
+  });
+
+  it("puts date pickers above the When shortcuts and a price range above the Cost shortcuts", () => {
+    state.filter = { ...DEFAULT_FILTER, when: "range", date_from: "2030-05-02", date_to: "2030-05-04" };
+    fakeLayout({ container: 600, chip: 90 });
+    renderRow(<AroundChipRow resultCount={3} />);
+    fireEvent.click(screen.getByRole("button", { name: "Filters (1)" }));
+
+    const dates = screen.getByRole("group", { name: en.Around.dates });
+    const from = within(dates).getByRole("button", { name: en.Around.dateFrom });
+    expect(from.getAttribute("data-value")).toBe("2030-05-02");
+    expect(within(dates).getByRole("button", { name: en.Around.dateTo }).getAttribute("data-value")).toBe("2030-05-04");
+    const today = screen.getByRole("button", { name: en.Around.when_today });
+    expect(dates.compareDocumentPosition(today) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    const lowest = screen.getByRole("slider", { name: en.Around.priceFrom });
+    const free = screen.getAllByRole("button", { name: "Free" }).at(-1)!;
+    expect(lowest.compareDocumentPosition(free) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.change(lowest, { target: { value: "500" } });
+    expect(state.setFilter).toHaveBeenLastCalledWith({ ...state.filter, min_price_cents: 500, max_price_cents: null });
+  });
+
+  it("makes Free and Up to €15 shortcuts that replace each other", () => {
+    state.filter = { ...DEFAULT_FILTER, cost: ["free"] };
+    fakeLayout({ container: 600, chip: 90 });
+    renderRow(<AroundChipRow resultCount={3} />);
+    fireEvent.click(screen.getByRole("button", { name: "Filters (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Up to €15" }));
+    expect(state.setFilter).toHaveBeenLastCalledWith({ ...DEFAULT_FILTER, max_price_cents: 1500 });
   });
 });
 

@@ -35,6 +35,7 @@ export function ScopeToggle({ current }: { current: HomeScope }) {
   };
   return (
     <nav
+      data-tabs
       aria-label={t("scopeLabel")}
       className="flex gap-1 rounded-full p-1"
       style={{ background: "var(--panel)", border: "1px solid var(--border)" }}

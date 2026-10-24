@@ -21,6 +21,7 @@ export function SectionTabs({
   const active = activeItemId(pathname, group.tabs);
   return (
     <nav
+      data-tabs
       aria-label={labelFor(group.id)}
       className="flex w-full items-center gap-1 overflow-x-auto px-2 pb-1.5 sm:px-5"
       style={{ scrollbarWidth: "none" }}

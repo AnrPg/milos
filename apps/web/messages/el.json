@@ -6977,7 +6977,13 @@
     "notifTitle": "Νέα γύρω σου",
     "notifBody": "Νέα για «{name}»: {count}",
     "myDisciplines": "Τα αθλήματά μου",
-    "placesAttribution": "Τοποθεσίες: © συντελεστές OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Τοποθεσίες: © συντελεστές OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Ημερομηνίες",
+    "dateFrom": "Από",
+    "dateTo": "Έως",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Χαμηλότερη τιμή",
+    "priceTo": "Υψηλότερη τιμή"
   },
   "CheckIn": {
     "loading": "Φόρτωση…",
@@ -8335,7 +8341,13 @@
     },
     "vault": {
       "intro": "Κάθε προπόνηση που ολοκλήρωσες, με κάθε πάροχο. Η ίδια προπόνηση σε διαφορετικά μέρη είναι μία πορεία.",
-      "sources": "Έγινε με"
+      "sources": "Έγινε με",
+      "view": "Προβολή",
+      "path": "Διαδρομή φακέλου",
+      "all": "Όλα",
+      "tree": "Προπονήσεις ανά φάκελο",
+      "otherType": "Άλλο",
+      "count": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}"
     },
     "audience": {
       "title": "«Οι coach μου» σημαίνει",

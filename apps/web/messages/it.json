@@ -6977,7 +6977,13 @@
     "notifTitle": "Novità intorno a te",
     "notifBody": "Novità per «{name}»: {count}",
     "myDisciplines": "I miei sport",
-    "placesAttribution": "Luoghi: © collaboratori di OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Luoghi: © collaboratori di OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Date",
+    "dateFrom": "Dal",
+    "dateTo": "Al",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Prezzo minimo",
+    "priceTo": "Prezzo massimo"
   },
   "CheckIn": {
     "loading": "Caricamento…",
@@ -8335,7 +8341,13 @@
     },
     "vault": {
       "intro": "Ogni allenamento che hai completato, con ogni provider. Lo stesso allenamento fatto in posti diversi è un unico andamento.",
-      "sources": "Fatto con"
+      "sources": "Fatto con",
+      "view": "Vista",
+      "path": "Percorso cartella",
+      "all": "Tutto",
+      "tree": "Allenamenti per cartella",
+      "otherType": "Altro",
+      "count": "{count, plural, one {# allenamento} other {# allenamenti}}"
     },
     "audience": {
       "title": "«I miei coach» significa",

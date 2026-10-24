@@ -110,7 +110,8 @@ function ItemBody({ icon, label, current }: { icon: ReactNode; label: string; cu
     <>
       <span
         className="relative flex h-8 w-12 items-center justify-center rounded-full transition-colors motion-reduce:transition-none"
-        style={{ background: current ? "color-mix(in srgb, var(--primary) 16%, transparent)" : "transparent" }}
+        // The current tab is Spark (ANR 2026-10-24), the icon dark on it.
+        style={current ? { background: "var(--spark)", color: "var(--spark-contrast)" } : { background: "transparent" }}
       >
         {icon}
       </span>
@@ -224,7 +225,7 @@ export function BottomNav() {
 
           const item = entry.item;
           const current = item.id === active;
-          const color = current ? "var(--primary-strong)" : "var(--dim)";
+          const color = current ? "var(--text)" : "var(--dim)";
 
           if (entry.kind === "me") {
             return (
@@ -265,7 +266,7 @@ export function BottomNav() {
                           alt=""
                           draggable={false}
                           className="h-7 w-7 rounded-full object-cover"
-                          style={{ boxShadow: current ? "0 0 0 2px var(--primary-strong)" : "0 0 0 1px var(--border)" }}
+                          style={{ boxShadow: current ? "0 0 0 2px var(--spark)" : "0 0 0 1px var(--border)" }}
                         />
                       ) : (
                         <span
@@ -274,7 +275,7 @@ export function BottomNav() {
                           style={{
                             background: "var(--primary)",
                             color: "var(--primary-contrast)",
-                            boxShadow: current ? "0 0 0 2px var(--bg), 0 0 0 4px var(--primary-strong)" : "none",
+                            boxShadow: current ? "0 0 0 2px var(--bg), 0 0 0 4px var(--spark)" : "none",
                           }}
                         >
                           {initials}
@@ -323,5 +324,5 @@ export function BottomNav() {
 
 /** A small dot under the active tab, so the state never rests on colour alone. */
 function CurrentMark() {
-  return <span aria-hidden="true" className="absolute bottom-0.5 h-1 w-1 rounded-full" style={{ background: "var(--primary-strong)" }} />;
+  return <span aria-hidden="true" className="absolute bottom-0.5 h-1 w-1 rounded-full" style={{ background: "var(--text)" }} />;
 }

@@ -12,6 +12,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { buildPRListDocument } from "@/lib/document-export";
+import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
 import { PantheonCard } from "./PantheonCard";
 import { NewPRFormModal, PRFormModal } from "./PRFormModal";
@@ -72,7 +73,7 @@ export function PersonalRecordsSection() {
             type="button"
             onClick={() => setFormPR("new")}
             className="min-h-9 rounded-full px-3 text-sm font-semibold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            style={SPARK_CREATE_STYLE}
           >
             {i18n("addPr0a5ecff")}
           </button>

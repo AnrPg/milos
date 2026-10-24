@@ -6977,7 +6977,13 @@
     "notifTitle": "Ново около теб",
     "notifBody": "Ново за „{name}“: {count}",
     "myDisciplines": "Моите спортове",
-    "placesAttribution": "Места: © сътрудници на OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Места: © сътрудници на OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Дати",
+    "dateFrom": "От",
+    "dateTo": "До",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Най-ниска цена",
+    "priceTo": "Най-висока цена"
   },
   "CheckIn": {
     "loading": "Зареждане…",
@@ -8335,7 +8341,13 @@
     },
     "vault": {
       "intro": "Всяка тренировка, която си завършил, при всеки доставчик. Една и съща тренировка на различни места е една тенденция.",
-      "sources": "Направено с"
+      "sources": "Направено с",
+      "view": "Изглед",
+      "path": "Път на папката",
+      "all": "Всички",
+      "tree": "Тренировки по папки",
+      "otherType": "Други",
+      "count": "{count, plural, one {# тренировка} other {# тренировки}}"
     },
     "audience": {
       "title": "«Моите треньори» означава",

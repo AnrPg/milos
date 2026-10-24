@@ -505,6 +505,37 @@ test.describe("Γύρω μου", () => {
     await expect(page.getByRole("button", { name: "≤ 10 km" })).toBeVisible();
   });
 
+  test("«Πότε» opens with date pickers and «Κόστος» with a price range, above their shortcuts, on a 320 px phone", async ({ page }) => {
+    const calls = await stub(page);
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto("/around");
+    await page.getByRole("button", { name: "Φίλτρα", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Φίλτρα" });
+
+    const dates = sheet.getByRole("group", { name: "Ημερομηνίες" });
+    await dates.scrollIntoViewIfNeeded();
+    const [datesBox, todayBox] = [await dates.boundingBox(), await sheet.getByRole("button", { name: "Σήμερα" }).boundingBox()];
+    expect(datesBox && todayBox && datesBox.y < todayBox.y).toBe(true);
+    await dates.getByRole("button", { name: "Από" }).click();
+    const calendar = page.getByRole("dialog", { name: "Επιλέξτε ημερομηνία" });
+    await calendar.locator("button[data-day]:not([disabled])").nth(1).click();
+    await expect.poll(() => lastSearch(calls).filter).toMatchObject({ when: "range" });
+    const range = lastSearch(calls).filter as unknown as { date_from: string; date_to: string };
+    expect(range.date_to).toBe(range.date_from);
+
+    const lowest = sheet.getByRole("slider", { name: "Χαμηλότερη τιμή" });
+    await lowest.scrollIntoViewIfNeeded();
+    const [sliderBox, freeBox] = [await lowest.boundingBox(), await sheet.getByRole("button", { name: "Δωρεάν" }).boundingBox()];
+    expect(sliderBox && freeBox && sliderBox.y < freeBox.y).toBe(true);
+    // Keyboard steps: focus stays on the thumb while each step re-searches.
+    await lowest.focus();
+    for (let step = 0; step < 5; step += 1) await page.keyboard.press("ArrowRight");
+    await expect.poll(() => lastSearch(calls).filter).toMatchObject({ min_price_cents: 500, max_price_cents: null });
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await page.screenshot({ path: test.info().outputPath("around-when-cost-pickers-320.png") });
+  });
+
   test("the chip row fits a 320 px phone without scrolling sideways, in the longest languages", async ({ page }) => {
     await stub(page);
     // «Τα αθλήματά μου» shows only for someone with interests (ADR-183): the widest row.

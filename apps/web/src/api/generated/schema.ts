@@ -13538,6 +13538,7 @@ export interface components {
             kinds?: ("events" | "boxes" | "clubs" | "posts")[];
             languages?: string[];
             max_price_cents?: number | null;
+            min_price_cents?: number | null;
             /** @description Gazetteer places to search from, at most 5 */
             neighbourhood_ids?: string[];
             /** @description Default 3 */
@@ -13568,6 +13569,7 @@ export interface components {
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
                 max_price_cents?: number | null;
+                min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
                 neighbourhood_ids?: string[];
                 /** @description Default 3 */
@@ -14172,6 +14174,7 @@ export interface components {
             kinds: ("events" | "boxes" | "clubs" | "posts")[];
             languages: string[];
             max_price_cents: number | null;
+            min_price_cents: number | null;
             /** @description Gazetteer places to search from, at most 5 */
             neighbourhood_ids: string[];
             /** @description Default 3 */
@@ -14250,6 +14253,7 @@ export interface components {
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
                 max_price_cents?: number | null;
+                min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
                 neighbourhood_ids?: string[];
                 /** @description Default 3 */
@@ -14881,6 +14885,7 @@ export interface components {
                 kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                 languages?: string[];
                 max_price_cents?: number | null;
+                min_price_cents?: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
                 neighbourhood_ids?: string[];
                 /** @description Default 3 */
@@ -14935,6 +14940,7 @@ export interface components {
                 kinds: ("events" | "boxes" | "clubs" | "posts")[];
                 languages: string[];
                 max_price_cents: number | null;
+                min_price_cents: number | null;
                 /** @description Gazetteer places to search from, at most 5 */
                 neighbourhood_ids: string[];
                 /** @description Default 3 */
@@ -37374,6 +37380,7 @@ export interface operations {
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
                         max_price_cents?: number | null;
+                        min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
                         neighbourhood_ids?: string[];
                         /** @description Default 3 */
@@ -37443,6 +37450,7 @@ export interface operations {
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
                         max_price_cents?: number | null;
+                        min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
                         neighbourhood_ids?: string[];
                         /** @description Default 3 */
@@ -37505,6 +37513,7 @@ export interface operations {
                             kinds: ("events" | "boxes" | "clubs" | "posts")[];
                             languages: string[];
                             max_price_cents: number | null;
+                            min_price_cents: number | null;
                             /** @description Gazetteer places to search from, at most 5 */
                             neighbourhood_ids: string[];
                             /** @description Default 3 */
@@ -38136,6 +38145,7 @@ export interface operations {
                         kinds?: ("events" | "boxes" | "clubs" | "posts")[];
                         languages?: string[];
                         max_price_cents?: number | null;
+                        min_price_cents?: number | null;
                         /** @description Gazetteer places to search from, at most 5 */
                         neighbourhood_ids?: string[];
                         /** @description Default 3 */
