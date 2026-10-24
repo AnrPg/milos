@@ -95,7 +95,7 @@ gyms, just like `buddy_messages` (ADR-160) does.
   `POST /api/me/conversations/:id/decline`.
 
 ### 4. People search
-`GET /api/me/people/search?q=` (personal session, search rate limit). The
+`GET /api/people-search?q=` (personal session, search rate limit). The
 definer function `palee_people_search(handle_term, name_term, lim)` matches
 the handle by prefix and the folded display name (`users.search_text`,
 trigram index) and returns `(user_id, relation)`:
