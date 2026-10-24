@@ -58,10 +58,7 @@ export function BoxHub() {
       <TodayAcrossCard />
       {layout === "coach" ? (
         <>
-          <BoxToday
-            nextSession={<NextCoachSession />}
-            emptyAction={{ href: "/box/appointments", label: tCoach("box.bookSession") }}
-          />
+          <BoxToday nextSession={<NextCoachSession />} />
           <CoachActions entitlement={entitlement} />
         </>
       ) : (
@@ -75,11 +72,7 @@ export function BoxHub() {
         <div className="mb-4 flex flex-col gap-3">
           <AccessNotice entitlement={entitlement} />
           {layout === "coach" ? <SessionPackageSummary entitlement={entitlement} /> : null}
-          {entitlement?.plan ? (
-            <EntitlementCard entitlement={entitlement} />
-          ) : layout === "gym" ? (
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("membershipNone")}</p>
-          ) : null}
+          {entitlement?.plan ? <EntitlementCard entitlement={entitlement} /> : null}
           <Suspense fallback={null}>
             <SeasonsEntry />
           </Suspense>

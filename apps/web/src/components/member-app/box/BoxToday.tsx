@@ -10,7 +10,8 @@ import { listMyExecutions } from "@/api/executions";
 import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { fetchTrainingLogSources } from "@/api/training-log";
 import { useWorkoutLauncher } from "@/components/client/use-workout-launcher";
-import { HubButton, HubCard } from "@/components/member-app/HubParts";
+import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { HubCard } from "@/components/member-app/HubParts";
 import { NextBookingActions } from "@/components/member-app/box/NextBookingActions";
 import {
   buildTodayTraining,
@@ -25,6 +26,7 @@ import {
   TrainingLogDialog,
   type TrainingLogDialogState,
 } from "@/components/training-log/TrainingLog";
+import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
@@ -66,16 +68,17 @@ export function nextBooking(slots: ScheduleSlot[], now: Date) {
 
 /**
  * Box's first two slots (brief §7.4, mockup 08): today's workout with
- * Καταγραφή / Έναρξη ▶, then the next booking. Both keep their place with an
- * empty state, so the screen never reflows (brief §4.2).
+ * Καταγραφή / Έναρξη ▶, then the next booking with its QR check-in. A slot
+ * with nothing in it is hidden, never an empty state (vision §4.2, §8.5):
+ * booking stays one tap away in the action row's «Πρόγραμμα». Without a
+ * booking, a package that covers open gym gets the open-gym check-in in the
+ * booking's place (vision §6.2 «Next booking → Check-in (QR) · Open gym»).
  */
 export function BoxToday({
   nextSession,
-  emptyAction,
 }: {
   /** ADR-170: an independent coach's Box shows the next session, not a class. */
   nextSession?: ReactNode;
-  emptyAction?: { href: string; label: string };
 } = {}) {
   const t = useTranslations("MemberApp");
   const tCheckIn = useTranslations("CheckIn");
@@ -88,6 +91,7 @@ export function BoxToday({
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const launcher = useWorkoutLauncher();
+  const { entitlement } = useClientEntitlement(!nextSession);
 
   const schedule = useBoxSchedule(token, now);
   const assignments = useQuery({
@@ -153,28 +157,24 @@ export function BoxToday({
     });
   }
 
+  // Nothing today and nothing to resume: no card (vision §4.2).
+  const showToday = loading || Boolean(selected) || Boolean(today.resumeExecutionId);
+
   return (
     <>
+      {showToday ? (
       <HubCard eyebrow={t("todayWorkout")} highlighted>
         {loading ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
         ) : !selected ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
-            <div className="flex gap-2">
-              <HubButton href={emptyAction?.href ?? "/box/schedule"}>{emptyAction?.label ?? t("bookClass")}</HubButton>
-              {today.resumeExecutionId ? (
-                <button
-                  type="button"
-                  className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                  onClick={() => launcher.resume(today.resumeExecutionId!)}
-                >
-                  {t("resumeWorkout")} ▶
-                </button>
-              ) : null}
-            </div>
-          </div>
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-bold"
+            style={SPARK_GO_STYLE}
+            onClick={() => launcher.resume(today.resumeExecutionId!)}
+          >
+            {t("resumeWorkout")} ▶
+          </button>
         ) : (
           <div className="flex flex-col gap-3">
             {today.items.length > 1 ? (
@@ -247,54 +247,41 @@ export function BoxToday({
           </div>
         )}
       </HubCard>
+      ) : null}
 
-      {nextSession ?? (
+      {nextSession ?? (booking ? (
       <HubCard eyebrow={t("nextSession")}>
-        {schedule.isPending ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-        ) : booking ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
-                  {day(booking.scheduled_at)} {time(booking.scheduled_at)} · {booking.name || booking.class_type?.name}
-                </p>
-                <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{booking.workout?.title ?? ""}</p>
-              </div>
-              <span
-                className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
-                style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
-              >
-                {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
-              </span>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
+                {day(booking.scheduled_at)} {time(booking.scheduled_at)} · {booking.name || booking.class_type?.name}
+              </p>
+              <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{booking.workout?.title ?? ""}</p>
             </div>
-            <NextBookingActions slot={booking} />
-            <div className="flex gap-2">
-              <Link
-                href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-              >
-                {t("manageBooking")}
-              </Link>
-              <Link
-                href="/box/check-in"
-                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-              >
-                <QrGlyph />
-                {tCheckIn("qrCheckIn")}
-              </Link>
-            </div>
+            <span
+              className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+              style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
+            >
+              {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
+            </span>
           </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("noBooking")}</p>
-            <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
+          <NextBookingActions slot={booking} />
+          <div className="flex gap-2">
+            <Link
+              href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
+              className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+            >
+              {t("manageBooking")}
+            </Link>
+            <QrCheckInLink label={tCheckIn("qrCheckIn")} />
           </div>
-        )}
+        </div>
       </HubCard>
-      )}
+      ) : token && !schedule.isPending ? (
+        <OpenGymCheckIn accessToken={token} entitlement={entitlement} extra={<QrCheckInLink label={tCheckIn("qrCheckIn")} />} />
+      ) : null)}
 
       {logDialog.mode !== "closed" && token ? (
         <TrainingLogDialog
@@ -305,6 +292,20 @@ export function BoxToday({
         />
       ) : null}
     </>
+  );
+}
+
+/** «QR check-in» (ADR-155, vision §7.5): the member's own code for the desk. */
+function QrCheckInLink({ label }: { label: string }) {
+  return (
+    <Link
+      href="/box/check-in"
+      className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
+      style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+    >
+      <QrGlyph />
+      {label}
+    </Link>
   );
 }
 
