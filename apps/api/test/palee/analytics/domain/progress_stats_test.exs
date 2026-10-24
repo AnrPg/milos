@@ -47,4 +47,60 @@ defmodule Palee.Analytics.Domain.ProgressStatsTest do
              %{name: "Back squat", score: 100.0, previous_score: nil}
            ] = timeline
   end
+
+  defp session(id, at),
+    do: %{
+      id: id,
+      status: "completed",
+      completed_at_utc: at,
+      master_workout_id: "w",
+      total_elapsed_ms: 600_000
+    }
+
+  test "the weekly span follows the given weeks and days lists each day with training" do
+    # 2026-10-22 is a Thursday; the 4-week span starts Monday 2026-09-28.
+    today = ~D[2026-10-22]
+
+    stats =
+      ProgressStats.build(
+        [
+          session("a", ~U[2026-10-21 08:00:00Z]),
+          session("b", ~U[2026-10-21 18:00:00Z]),
+          session("c", ~U[2026-10-05 08:00:00Z]),
+          session("d", ~U[2026-09-01 08:00:00Z]),
+          %{session("e", ~U[2026-10-20 08:00:00Z]) | status: "abandoned"}
+        ],
+        today,
+        4
+      )
+
+    assert Enum.map(stats.weekly, & &1.week_start) ==
+             [~D[2026-09-28], ~D[2026-10-05], ~D[2026-10-12], ~D[2026-10-19]]
+
+    assert stats.days == [
+             %{date: ~D[2026-10-05], sessions: 1},
+             %{date: ~D[2026-10-21], sessions: 2}
+           ]
+
+    assert %{weeks: 4, active_weeks: 2, percent: 50, current_streak_weeks: 1} = stats.consistency
+    assert %{weeks: 12} = ProgressStats.build([], today).consistency
+  end
+
+  test "the range sets the weeks; all spans from the first session, bounded" do
+    alias Palee.Analytics.Domain.ProgressFilter
+
+    today = ~D[2026-10-22]
+
+    weeks = fn range, first ->
+      ProgressFilter.weeks(%ProgressFilter{range: range}, today, first)
+    end
+
+    assert weeks.("4w", nil) == 4
+    assert weeks.("6m", nil) == 26
+    assert weeks.("1y", nil) == 52
+    assert weeks.("all", nil) == 12
+    assert weeks.("all", ~D[2026-10-01]) == 12
+    assert weeks.("all", ~D[2026-01-05]) == 42
+    assert weeks.("all", ~D[2020-01-01]) == 156
+  end
 end

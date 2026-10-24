@@ -306,6 +306,26 @@
             "additionalProperties": true,
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "filter": {
             "additionalProperties": true,
             "type": "object"
@@ -454,6 +474,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -523,6 +544,26 @@
               "consistency": {
                 "additionalProperties": true,
                 "type": "object"
+              },
+              "days": {
+                "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                "items": {
+                  "properties": {
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "sessions": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "sessions"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
               "filter": {
                 "additionalProperties": true,
@@ -672,6 +713,7 @@
             "required": [
               "totals",
               "weekly",
+              "days",
               "consistency",
               "sources",
               "score_history",
@@ -36050,6 +36092,7 @@
             "enum": [
               "1m",
               "3m",
+              "6m",
               "1y"
             ],
             "type": "string"
@@ -48854,6 +48897,53 @@
         "title": "OrganizationPlatformSubscriptions",
         "type": "object"
       },
+      "PRHistoryList": {
+        "properties": {
+          "history": {
+            "items": {
+              "properties": {
+                "beaten_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "pr_record_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "supporting_metrics": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "pr_record_id",
+                "score",
+                "beaten_on",
+                "supporting_metrics"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "history"
+        ],
+        "title": "PRHistoryList",
+        "type": "object"
+      },
       "PRTimelineEntry": {
         "properties": {
           "beaten_on": {
@@ -55399,6 +55489,26 @@
             ],
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training in the weekly span, oldest first",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "pr_timeline": {
             "items": {
               "properties": {
@@ -55563,6 +55673,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -78044,6 +78155,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -78079,7 +78194,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           },
@@ -78157,6 +78273,10 @@
             },
             "type": "array"
           },
+          "hide_macros": {
+            "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+            "type": "boolean"
+          },
           "item_order": {
             "description": "Tile order; every item appears once (unplaced ones follow in default order)",
             "items": {
@@ -78212,6 +78332,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -78247,7 +78371,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           }
@@ -109481,7 +109606,8 @@
               "enum": [
                 "1m",
                 "1y",
-                "3m"
+                "3m",
+                "6m"
               ],
               "type": "string"
             }
@@ -109573,6 +109699,7 @@
                       "enum": [
                         "1m",
                         "3m",
+                        "6m",
                         "1y"
                       ],
                       "type": "string"
@@ -125181,6 +125308,26 @@
                           "additionalProperties": true,
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "filter": {
                           "additionalProperties": true,
                           "type": "object"
@@ -125329,6 +125476,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -130590,6 +130738,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -130625,7 +130777,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     },
@@ -132111,6 +132264,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -132146,7 +132303,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -132200,6 +132358,10 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "hide_macros": {
+                    "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                    "type": "boolean"
                   },
                   "item_order": {
                     "description": "Tile order; every item appears once (unplaced ones follow in default order)",
@@ -132264,6 +132426,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -132299,7 +132465,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -208132,6 +208299,26 @@
                           ],
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training in the weekly span, oldest first",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "pr_timeline": {
                           "items": {
                             "properties": {
@@ -208296,6 +208483,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -249544,6 +249732,78 @@
           }
         ],
         "summary": "Create a PR record",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/prs/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.all_history",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "history": {
+                      "items": {
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "pr_record_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "supporting_metrics": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "pr_record_id",
+                          "score",
+                          "beaten_on",
+                          "supporting_metrics"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "history"
+                  ],
+                  "title": "PRHistoryList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR history"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Score history of all my PRs, oldest first (ADR-194)",
         "tags": [
           "Pantheon"
         ]

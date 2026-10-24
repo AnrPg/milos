@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "لا تتضمن درجات الاتساق والمثابرة الخاصة بك أيام الراحة المجدولة - ولكننا لا نعرف أي أيام هذه الأيام بعد.",
     "setYourRestDaysInProfilefd0fbe4": "قم بتعيين أيام الراحة الخاصة بك في ملف التعريف →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "اليوم هو يوم الراحة المقرر لك، والتعافي جزء من البرنامج.",
-    "dayStreakca360c4": "خط اليوم",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "أكمل تمرينك الأول لتحصل على شارتك الأولى.",
     "loadingYourTrainingOverview39806c7": "جارٍ تحميل نظرة عامة على التدريب الخاص بك...",
     "yourTrainingOverviewIsUnavailable0a82b18": "نظرة عامة على التدريب الخاص بك غير متوفرة.",
     "refreshSessionf2ed411": "تحديث الجلسة",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "التنفيذ غير متاح.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "تعذر تحميل الصفحة المقصودة.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "تكرار التمرين مقابل الهدف الأسبوعي – آخر 10 أسابيع",
-    "noWorkoutsYet85a9204": "لا التدريبات بعد",
-    "setAWeeklyTargetdd70e51": "حدد هدفًا أسبوعيًا",
-    "calculatingc573779": "جارٍ الحساب…",
     "howCloselyYouFollowedPrescribedExercises760e833": "مدى التزامك بالتمارين الموصوفة",
     "prs80e1569": "العلاقات العامة ·",
     "whatAreChallengesfdf13a8": "ما هي التحديات؟",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "الرابط غير متاح",
     "clMinutesShort": "{count} د",
     "clPercentValue": "{value}٪",
-    "clProgressTitle": "تقدّمي",
-    "clProgressIntro": "تدريبك خلال آخر 12 أسبوعًا.",
     "clProgressSessions": "الجلسات",
     "clProgressMinutes": "الدقائق",
     "clProgressWorkouts": "تمارين مختلفة",
@@ -4457,7 +4450,20 @@
     "apiErrorAccountNotFound": "لا يوجد حساب مطابق.",
     "apiErrorUnknownDemoSection": "لا توجد بيانات تجريبية لهذه الشاشة.",
     "ntfBusinessDemoIdleTitle": "نشاطك التجريبي بانتظارك",
-    "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت."
+    "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت.",
+    "clProgressOnTargetWeeks": "{onTarget} من {weeks} أسابيع ضمن الهدف",
+    "clProgressStreakDays": "{count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+    "clProgressTarget": "الهدف {count}/أسبوع",
+    "clProgressHeatmap": "أيام التمرين",
+    "clProgressHeatWeek": "أسبوع {date}: {count, plural, zero {لا حصص} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}{onTarget, select, true {، ضمن الهدف} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {بلا تمرين} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}",
+    "clProgressBadges": "الشارات",
+    "prTrendEstimated": "1RM تقديري {value} {unit}",
+    "prTrendRetest": "حان وقت إعادة الاختبار؟",
+    "clNutritionMacros": "المغذيات الكبرى",
+    "clNutritionMacrosHidden": "الأرقام مخفية",
+    "clNutritionHideMacros": "إخفاء الأرقام",
+    "clNutritionShowMacros": "إظهار الأرقام"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -5274,7 +5280,7 @@
         "glasses": "{filled} من {goal} أكواب",
         "added": "أُضيف كوب ({ml} مل)",
         "dropsLabel": "أكواب اليوم",
-        "remove": "إزالة هذا الكوب"
+        "remove": "إزالة آخر كوب"
       },
       "sleep": {
         "title": "النوم",
@@ -5356,9 +5362,6 @@
         "noPortions": "خطة مدربك لا تحتوي بعد على حصص يومية."
       },
       "mood": {
-        "mood": "المزاج {value}/4",
-        "stress": "التوتر {value}/4",
-        "empty": "كيف تشعر؟",
         "open": "أجب عن «كيف أشعر»"
       },
       "craving": {
@@ -7944,10 +7947,6 @@
     "return_garmin_account_in_use": "حساب Garmin هذا مرتبط بالفعل بحساب Palee آخر.",
     "return_garmin_connect_failed": "تعذّر على Garmin إكمال الربط. حاول مجددًا.",
     "restingTitle": "نبض الراحة",
-    "restingRange": "الفترة",
-    "restingRange_1m": "شهر",
-    "restingRange_3m": "3 أشهر",
-    "restingRange_1y": "سنة",
     "bpmValue": "{value} ن/د",
     "restingLatest": "آخر قراءة · {date}",
     "restingAverage": "المتوسط {value} ن/د خلال {days, plural, one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
@@ -9565,7 +9564,8 @@
     "backToMe": "العودة إلى أنا",
     "saveInterests": "حفظ",
     "interestsSaved": "تم الحفظ.",
-    "interestsHubHint": "الرياضات والمستوى، للاقتراحات"
+    "interestsHubHint": "الرياضات والمستوى، للاقتراحات",
+    "photoAddLabel": "إضافة صورة"
   },
   "Business": {
     "common": {

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -10,21 +9,20 @@ import { useSession } from "@/components/session-provider";
 import { restingHrView } from "@/components/devices/resting-hr";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-const RANGES: DailyStatsRange[] = ["1m", "3m", "1y"];
 const WIDTH = 240;
 const HEIGHT = 48;
 
 /**
  * Πρόοδος › Ρυθμός ηρεμίας (ADR-161, board 16 Q4 A): the member's own
  * resting heart rate from a connected device, as an indicator. Shown only
- * when there is data; neutral words, no targets, never advice.
+ * when there is data; neutral words, no targets, never advice. The period
+ * is Πρόοδος's one time range (ADR-194), not a picker of its own.
  */
-export function RestingHeartRateCard() {
+export function RestingHeartRateCard({ range }: { range: DailyStatsRange }) {
   const t = useTranslations("Devices");
   const locale = useUiLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const [range, setRange] = useState<DailyStatsRange>("3m");
   const stats = useQuery({
     queryKey: dailyStatsKey(range),
     enabled: Boolean(token),
@@ -40,27 +38,7 @@ export function RestingHeartRateCard() {
 
   return (
     <section className="flex flex-col gap-3 rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} data-testid="resting-hr-card">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{t("restingTitle")}</p>
-        <div role="group" aria-label={t("restingRange")} className="flex gap-1">
-          {RANGES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={range === option}
-              onClick={() => setRange(option)}
-              className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{
-                background: range === option ? "var(--primary)" : "var(--panel-raised)",
-                color: range === option ? "var(--primary-contrast)" : "var(--text)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              {t(["restingRange", option].join("_"))}
-            </button>
-          ))}
-        </div>
-      </div>
+      <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{t("restingTitle")}</p>
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-3xl font-semibold tracking-tight tabular-nums" style={{ color: "var(--text)" }}>

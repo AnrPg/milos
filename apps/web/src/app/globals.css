@@ -573,3 +573,19 @@ html[data-platform]::before {
   border-color: var(--spark) !important;
   box-shadow: none !important;
 }
+
+/* ADR-194 (WCAG 2.5.5): a 44px touch target around a compact control. The
+   control keeps its small look; an invisible square centred on it takes the
+   tap. Use it where `min-h-11 min-w-11` would change the layout. */
+@utility hit-area {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}

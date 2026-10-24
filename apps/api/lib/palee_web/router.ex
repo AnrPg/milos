@@ -1849,6 +1849,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/", PRController, :index)
+    get("/history", PRController, :all_history)
     post("/", PRController, :create)
     patch("/:id/edit", PRController, :edit)
     patch("/:id", PRController, :update)

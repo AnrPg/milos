@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Your Consistency and Perseverance scores exclude your scheduled rest days — but we don't know which days those are yet.",
     "setYourRestDaysInProfilefd0fbe4": "Set your rest days in Profile →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Today is your scheduled rest day — recovery is part of the programme.",
-    "dayStreakca360c4": "day streak",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Complete your first workout to earn your first badge.",
     "loadingYourTrainingOverview39806c7": "Loading your training overview...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Your training overview is unavailable.",
     "refreshSessionf2ed411": "Refresh session",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "Execution not available.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "The landing page could not be loaded.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Workout frequency vs weekly target — last 10 weeks",
-    "noWorkoutsYet85a9204": "No workouts yet",
-    "setAWeeklyTargetdd70e51": "Set a weekly target",
-    "calculatingc573779": "Calculating…",
     "howCloselyYouFollowedPrescribedExercises760e833": "How closely you followed prescribed exercises",
     "prs80e1569": "PRs ·",
     "whatAreChallengesfdf13a8": "What are challenges?",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "Link unavailable",
     "clMinutesShort": "{count} min",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "My progress",
-    "clProgressIntro": "Your training over the last 12 weeks.",
     "clProgressSessions": "Sessions",
     "clProgressMinutes": "Minutes",
     "clProgressWorkouts": "Different workouts",
@@ -4457,7 +4450,20 @@
     "apiErrorAccountNotFound": "No account matches.",
     "apiErrorUnknownDemoSection": "There is no demo data for this screen.",
     "ntfBusinessDemoIdleTitle": "Your demo business is waiting for you",
-    "ntfBusinessDemoIdleBody": "Nobody has used {business} for a while. If nobody opens it in the next {days} days, its demo data is removed and it is archived. You can reopen it any time."
+    "ntfBusinessDemoIdleBody": "Nobody has used {business} for a while. If nobody opens it in the next {days} days, its demo data is removed and it is archived. You can reopen it any time.",
+    "clProgressOnTargetWeeks": "{onTarget} of {weeks} weeks on target",
+    "clProgressStreakDays": "{count, plural, one {# day} other {# days}}",
+    "clProgressTarget": "Target {count}/week",
+    "clProgressHeatmap": "Training days",
+    "clProgressHeatWeek": "Week of {date}: {count, plural, one {# session} other {# sessions}}{onTarget, select, true {, on target} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {no training} one {# session} other {# sessions}}",
+    "clProgressBadges": "Badges",
+    "prTrendEstimated": "Est. 1RM {value} {unit}",
+    "prTrendRetest": "Time to retest?",
+    "clNutritionMacros": "Macros",
+    "clNutritionMacrosHidden": "Numbers hidden",
+    "clNutritionHideMacros": "Hide numbers",
+    "clNutritionShowMacros": "Show numbers"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -5274,7 +5280,7 @@
         "glasses": "{filled} of {goal} glasses",
         "added": "Added a glass ({ml} ml)",
         "dropsLabel": "Glasses today",
-        "remove": "Remove this glass"
+        "remove": "Remove the last glass"
       },
       "sleep": {
         "title": "Sleep",
@@ -5356,9 +5362,6 @@
         "noPortions": "Your coach's plan has no daily portions yet."
       },
       "mood": {
-        "mood": "Mood {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "How do you feel?",
         "open": "Answer «How I feel»"
       },
       "craving": {
@@ -7944,10 +7947,6 @@
     "return_garmin_account_in_use": "That Garmin account is already linked to another Palee account.",
     "return_garmin_connect_failed": "Garmin couldn't finish connecting. Try again.",
     "restingTitle": "Resting heart rate",
-    "restingRange": "Period",
-    "restingRange_1m": "1 month",
-    "restingRange_3m": "3 months",
-    "restingRange_1y": "1 year",
     "bpmValue": "{value} bpm",
     "restingLatest": "Latest reading · {date}",
     "restingAverage": "Average {value} bpm over {days, plural, one {# day} other {# days}}",
@@ -9565,7 +9564,8 @@
     "backToMe": "Back to Me",
     "saveInterests": "Save",
     "interestsSaved": "Saved.",
-    "interestsHubHint": "Disciplines and level, for suggestions"
+    "interestsHubHint": "Disciplines and level, for suggestions",
+    "photoAddLabel": "Add photo"
   },
   "Business": {
     "common": {

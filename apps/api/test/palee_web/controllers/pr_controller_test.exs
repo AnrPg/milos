@@ -39,6 +39,19 @@ defmodule PaleeWeb.PRControllerTest do
              |> get("/api/prs/#{id}/history")
              |> json_response(200)
 
+    # ADR-194: every PR's history in one read, only the owner's.
+    assert %{"history" => [%{"pr_record_id" => ^id, "score" => 180.0}]} =
+             build_conn()
+             |> put_bearer_token(user)
+             |> get("/api/prs/history")
+             |> json_response(200)
+
+    assert %{"history" => []} =
+             build_conn()
+             |> put_bearer_token(user_fixture())
+             |> get("/api/prs/history")
+             |> json_response(200)
+
     assert %{"message" => message} =
              build_conn()
              |> put_bearer_token(user)

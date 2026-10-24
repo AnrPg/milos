@@ -72,6 +72,18 @@ defmodule PaleeWeb.Schemas.Content do
           required: [:sessions, :minutes, :workouts]
         },
         weekly: %Schema{type: :array, items: week},
+        days: %Schema{
+          type: :array,
+          description: "Sessions per day with training in the weekly span, oldest first",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              date: %Schema{type: :string, format: :date},
+              sessions: %Schema{type: :integer}
+            },
+            required: [:date, :sessions]
+          }
+        },
         consistency: %Schema{
           type: :object,
           properties: %{
@@ -118,7 +130,7 @@ defmodule PaleeWeb.Schemas.Content do
           }
         }
       },
-      required: [:totals, :weekly, :consistency, :sources, :score_history, :pr_timeline]
+      required: [:totals, :weekly, :days, :consistency, :sources, :score_history, :pr_timeline]
     }
   end
 end

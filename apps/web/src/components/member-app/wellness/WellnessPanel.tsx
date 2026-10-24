@@ -16,6 +16,9 @@ import {
   type WellnessItem,
   type WellnessOverview,
 } from "@/api/wellness";
+import { submitCheckIn } from "@/api/wellbeing";
+import { CHECK_IN_FACES, CHECK_IN_VALUES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
+import { prGymSlugForSubmit, usePRGymOptions } from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -198,7 +201,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
         onToggleNumbers={() => setShowNumbers(!showNumbers)}
       />
     ) : null,
-    mood: <MoodTile mood={summary?.mood ?? null} />,
+    mood: <MoodTile mood={summary?.mood ?? null} isToday={day === today} />,
   };
 
   return (
@@ -216,7 +219,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
             <button
               type="button"
               onClick={() => setSheet({ kind: "customize" })}
-              className="min-h-9 rounded-full px-3 text-xs font-semibold"
+              className="min-h-11 rounded-full px-3 text-xs font-semibold"
               style={{ border: "1px solid var(--border)", color: "var(--text)" }}
             >
               {t("customize")}
@@ -227,7 +230,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
         <ul className="grid grid-cols-2 gap-3" data-testid="wellness-tiles">
           {items.map((item) =>
             tiles[item] ? (
-              <li key={item} className={item === "meals" || item === "plan" ? "col-span-2" : undefined}>
+              <li key={item} className={item === "meals" || item === "plan" || item === "mood" ? "col-span-2" : undefined}>
                 {tiles[item]}
               </li>
             ) : null,
@@ -359,10 +362,10 @@ function DayStepper({
   const style = { border: "1px solid var(--border)", color: "var(--text)" };
   return (
     <div className="flex items-center gap-1">
-      <button type="button" aria-label={t("previousDay")} disabled={!canBack} onClick={onBack} className="h-9 w-9 rounded-full disabled:opacity-40" style={style}>
+      <button type="button" aria-label={t("previousDay")} disabled={!canBack} onClick={onBack} className="hit-area h-9 w-9 rounded-full disabled:opacity-40" style={style}>
         ‹
       </button>
-      <button type="button" aria-label={t("nextDay")} disabled={!canForward} onClick={onForward} className="h-9 w-9 rounded-full disabled:opacity-40" style={style}>
+      <button type="button" aria-label={t("nextDay")} disabled={!canForward} onClick={onForward} className="hit-area h-9 w-9 rounded-full disabled:opacity-40" style={style}>
         ›
       </button>
     </div>
@@ -430,34 +433,40 @@ function WaterTile({
       color="var(--info)"
       value={t("water.glasses", { filled, goal })}
       detail={
-        <span className="flex flex-wrap gap-1" aria-label={t("water.dropsLabel")}>
-          {Array.from({ length: drops }, (_, index) => {
-            const entry = entries[index];
-            return entry ? (
-              <button
-                key={entry.id}
-                type="button"
-                aria-label={t("water.remove")}
-                onClick={() => onRemove(entry.id)}
-                className="h-3.5 w-3.5 rounded-full"
-                style={{ background: "var(--info)" }}
-              />
-            ) : (
-              <span key={`empty-${index}`} className="h-3.5 w-3.5 rounded-full" style={{ border: "1px solid var(--border)" }} />
-            );
-          })}
+        <span className="flex flex-wrap gap-1" role="img" aria-label={t("water.dropsLabel")}>
+          {Array.from({ length: drops }, (_, index) => (
+            <span
+              key={entries[index]?.id ?? `empty-${index}`}
+              className="h-3.5 w-3.5 rounded-full"
+              style={entries[index] ? { background: "var(--info)" } : { border: "1px solid var(--border)" }}
+            />
+          ))}
         </span>
       }
       action={
-        <button
-          type="button"
-          onClick={onAdd}
-          disabled={pending}
-          className="min-h-11 rounded-2xl text-base font-extrabold disabled:opacity-60"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-        >
-          {t("water.add")}
-        </button>
+        // ADR-194: the drops are a picture; removing a glass is its own 44px button.
+        <span className="flex gap-2">
+          <button
+            type="button"
+            onClick={onAdd}
+            disabled={pending}
+            className="min-h-11 flex-1 rounded-2xl text-base font-extrabold disabled:opacity-60"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {t("water.add")}
+          </button>
+          {entries.length > 0 ? (
+            <button
+              type="button"
+              aria-label={t("water.remove")}
+              onClick={() => onRemove(entries[entries.length - 1].id)}
+              className="min-h-11 min-w-11 rounded-2xl text-base font-extrabold"
+              style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              <span aria-hidden="true">−</span>
+            </button>
+          ) : null}
+        </span>
       }
     />
   );
@@ -523,7 +532,7 @@ function MealsTile({
           <button
             type="button"
             onClick={() => onOpen("snack", null)}
-            className="min-h-10 rounded-full px-3 text-sm font-semibold"
+            className="min-h-11 rounded-full px-3 text-sm font-semibold"
             style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
           >
             {t("meal.addSnack")}
@@ -564,7 +573,7 @@ function SlotChip({
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-10 flex-col items-start justify-center rounded-2xl px-3 py-1 text-start text-sm font-semibold"
+      className="flex min-h-11 flex-col items-start justify-center rounded-2xl px-3 py-1 text-start text-sm font-semibold"
       style={{ border: `2px solid ${border}`, color: "var(--text)", borderStyle: fit === "optional" ? "dashed" : "solid" }}
     >
       {label}
@@ -592,7 +601,7 @@ function PlanTile({
           {t("plan.title", { title })}
         </span>
         {bars.length ? (
-          <button type="button" onClick={onToggleNumbers} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+          <button type="button" onClick={onToggleNumbers} className="hit-area text-xs font-semibold" style={{ color: "var(--primary)" }}>
             {showNumbers ? t("plan.hideNumbers") : t("plan.showNumbers")}
           </button>
         ) : null}
@@ -626,19 +635,83 @@ function PlanTile({
   );
 }
 
-function MoodTile({ mood }: { mood: WellnessDay["mood"] | null }) {
-  const t = useTranslations("MemberApp.wellness");
-  const parts = [
-    typeof mood?.mood === "number" ? t("mood.mood", { value: mood.mood }) : null,
-    typeof mood?.stress === "number" ? t("mood.stress", { value: mood.stress }) : null,
-  ].filter(Boolean);
+const ONE_TAP_QUESTIONS = ["mood", "stress"] as const;
+
+/**
+ * Πώς νιώθω inside «Σήμερα» (ADR-194, mockup `wellness`): mood and stress
+ * are one tap each, saved as a Πώς νιώθω answer; the full form (sleep,
+ * energy, body, notes) stays below. Past days are read-only: a check-in is
+ * stamped with the moment it is given.
+ */
+function MoodTile({ mood, isToday }: { mood: WellnessDay["mood"] | null; isToday: boolean }) {
+  const tw = useTranslations("MemberApp.wellness");
+  const t = useTranslations("MemberApp.checkIn");
+  const { tokens } = useSession();
+  const queryClient = useQueryClient();
+  const { defaultGymSlug } = usePRGymOptions();
+  const answer = useMutation({
+    mutationFn: ({ key, value }: { key: (typeof ONE_TAP_QUESTIONS)[number]; value: CheckInValue }) =>
+      submitCheckIn(tokens!.access_token, {
+        answers: [{ question_key: key, value }],
+        organization_slug: prGymSlugForSubmit(defaultGymSlug),
+        recorded_tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: WELLNESS_KEY });
+      void queryClient.invalidateQueries({ queryKey: ["my", "wellbeing", "check-ins"] });
+    },
+  });
+  const current = (key: (typeof ONE_TAP_QUESTIONS)[number]) =>
+    answer.isPending && answer.variables.key === key ? answer.variables.value : mood?.[key];
+
   return (
-    <Tile
-      label={t("item.mood")}
-      color="var(--warning)"
-      value={parts.length ? parts.join(" · ") : t("mood.empty")}
-      detail={<a href="#check-in" style={{ color: "var(--primary)" }}>{t("mood.open")}</a>}
-    />
+    <div className="flex flex-col gap-3 rounded-2xl p-4" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
+      <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--warning)" }}>{tw("item.mood")}</span>
+      {ONE_TAP_QUESTIONS.map((key) => {
+        const value = current(key);
+        return (
+          <div key={key} role="group" aria-label={t(`question.${key}`)} className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm font-bold" style={{ color: "var(--text)" }}>
+              {t(`short.${key}`)}
+              {typeof value === "number" ? (
+                <span className="ms-2 text-xs font-normal" style={{ color: "var(--dim)" }}>{t(`answer.${key}.${value}`)}</span>
+              ) : null}
+            </span>
+            {isToday ? (
+              <span className="flex gap-1">
+                {CHECK_IN_VALUES.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={value === option}
+                    aria-label={t(`answer.${key}.${option}`)}
+                    disabled={answer.isPending}
+                    onClick={() => answer.mutate({ key, value: option })}
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-xl disabled:opacity-60"
+                    style={{
+                      background: value === option ? "color-mix(in srgb, var(--primary) 16%, var(--panel))" : "transparent",
+                      border: `1px solid ${value === option ? "var(--primary)" : "var(--border)"}`,
+                    }}
+                  >
+                    <span aria-hidden="true">{CHECK_IN_FACES[option]}</span>
+                  </button>
+                ))}
+              </span>
+            ) : typeof value === "number" ? (
+              <span aria-hidden="true" className="text-xl">{CHECK_IN_FACES[value as CheckInValue]}</span>
+            ) : (
+              <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
+            )}
+          </div>
+        );
+      })}
+      {answer.isError ? (
+        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{t("saveFailed")}</p>
+      ) : null}
+      <a href="#check-in" className="flex min-h-11 items-center text-xs font-semibold" style={{ color: "var(--primary)" }}>
+        {tw("mood.open")}
+      </a>
+    </div>
   );
 }
 
@@ -670,7 +743,7 @@ function CravingTile({
       {open.map((craving) => (
         <div key={craving.id} className="flex flex-col gap-2">
           <HowDidItGo craving={craving} onSaved={onAnswered} />
-          <button type="button" onClick={() => onOpen(craving)} className="self-start text-xs font-semibold" style={{ color: "var(--primary)" }}>
+          <button type="button" onClick={() => onOpen(craving)} className="min-h-11 self-start text-xs font-semibold" style={{ color: "var(--primary)" }}>
             {t("craving.edit")}
           </button>
         </div>
@@ -739,10 +812,10 @@ function WeekCard({
             : t("week.title")}
         </p>
         <div className="flex gap-1">
-          <button type="button" aria-label={t("week.previous")} onClick={() => onShift(-1)} className="h-8 w-8 rounded-full" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          <button type="button" aria-label={t("week.previous")} onClick={() => onShift(-1)} className="hit-area h-8 w-8 rounded-full" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
             ‹
           </button>
-          <button type="button" aria-label={t("week.next")} disabled={!canForward} onClick={() => onShift(1)} className="h-8 w-8 rounded-full disabled:opacity-40" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          <button type="button" aria-label={t("week.next")} disabled={!canForward} onClick={() => onShift(1)} className="hit-area h-8 w-8 rounded-full disabled:opacity-40" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
             ›
           </button>
         </div>
@@ -754,7 +827,7 @@ function WeekCard({
               <th className="sr-only">{t("week.item")}</th>
               {week.dates.map((date) => (
                 <th key={date} scope="col" className="text-center text-[11px] font-semibold" style={{ color: date === selected ? "var(--primary)" : "var(--dim)" }}>
-                  <button type="button" onClick={() => onSelect(date)} disabled={!editable(date, today)} className="disabled:cursor-default">
+                  <button type="button" onClick={() => onSelect(date)} disabled={!editable(date, today)} className="hit-area disabled:cursor-default">
                     {format.dateTime(new Date(`${date}T12:00:00`), { weekday: "narrow" })}
                   </button>
                 </th>

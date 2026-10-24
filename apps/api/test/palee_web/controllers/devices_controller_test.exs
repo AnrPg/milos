@@ -208,6 +208,10 @@ defmodule PaleeWeb.DevicesControllerTest do
 
     assert length(points) == 3
 
+    # ADR-194: Πρόοδος › 6 months reads the same series.
+    assert %{"range" => "6m", "points" => [_, _, _]} =
+             conn |> again(user) |> get("/api/me/daily-stats?range=6m") |> json_response(200)
+
     # Someone else sees none of it.
     other = user_fixture(%{role: :member})
 

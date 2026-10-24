@@ -120,9 +120,44 @@ defmodule PaleeWeb.WellnessControllerTest do
              |> json_response(422)
   end
 
+  test "one-tap mood then stress keeps both answers of the day", %{conn: conn, user: user} do
+    today = Date.utc_today() |> Date.to_iso8601()
+
+    for {key, value} <- [{"mood", 3}, {"stress", 2}] do
+      conn
+      |> recycle()
+      |> put_bearer_token(user)
+      |> post("/api/wellbeing/check-ins", %{
+        answers: [%{question_key: key, value: value}],
+        recorded_tz: "Etc/UTC"
+      })
+      |> json_response(201)
+    end
+
+    assert %{"days" => [%{"mood" => %{"mood" => 3, "stress" => 2}}]} =
+             conn
+             |> recycle()
+             |> put_bearer_token(user)
+             |> get("/api/me/wellness", %{from: today, to: today})
+             |> json_response(200)
+  end
+
   test "preferences and erase", %{conn: conn, user: user} do
-    assert %{"preferences" => %{"water_goal_ml" => 2000, "hidden_items" => []}} =
-             conn |> get("/api/me/wellness/preferences") |> json_response(200)
+    assert %{
+             "preferences" => %{
+               "water_goal_ml" => 2000,
+               "hidden_items" => [],
+               "hide_macros" => false
+             }
+           } = conn |> get("/api/me/wellness/preferences") |> json_response(200)
+
+    # ADR-194: the plan's macros can be hidden, and stay hidden.
+    assert %{"preferences" => %{"hide_macros" => true, "water_goal_ml" => 2000}} =
+             conn
+             |> recycle()
+             |> put_bearer_token(user)
+             |> put("/api/me/wellness/preferences", %{hide_macros: true})
+             |> json_response(200)
 
     assert %{"preferences" => %{"water_goal_ml" => 2500, "hidden_items" => ["meals"]}} =
              conn

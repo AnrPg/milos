@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "I tuoi punteggi di Coerenza e Perseveranza escludono i giorni di riposo programmati, ma non sappiamo ancora quali siano questi giorni.",
     "setYourRestDaysInProfilefd0fbe4": "Imposta i tuoi giorni di riposo nel Profilo →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Oggi è il tuo giorno di riposo programmato: il recupero fa parte del programma.",
-    "dayStreakca360c4": "serie di giorni",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Completa il tuo primo allenamento per guadagnare il tuo primo badge.",
     "loadingYourTrainingOverview39806c7": "Caricamento della panoramica della formazione...",
     "yourTrainingOverviewIsUnavailable0a82b18": "La panoramica della tua formazione non è disponibile.",
     "refreshSessionf2ed411": "Aggiorna sessione",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "Esecuzione non disponibile.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Impossibile caricare la pagina di destinazione.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Frequenza di allenamento rispetto all'obiettivo settimanale: ultime 10 settimane",
-    "noWorkoutsYet85a9204": "Nessun allenamento ancora",
-    "setAWeeklyTargetdd70e51": "Stabilisci un obiettivo settimanale",
-    "calculatingc573779": "Calcolo…",
     "howCloselyYouFollowedPrescribedExercises760e833": "Quanto attentamente hai seguito gli esercizi prescritti",
     "prs80e1569": "PR ·",
     "whatAreChallengesfdf13a8": "Cosa sono le sfide?",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "Link non disponibile",
     "clMinutesShort": "{count} min",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "I miei progressi",
-    "clProgressIntro": "Il tuo allenamento nelle ultime 12 settimane.",
     "clProgressSessions": "Sessioni",
     "clProgressMinutes": "Minuti",
     "clProgressWorkouts": "Allenamenti diversi",
@@ -4457,7 +4450,20 @@
     "apiErrorAccountNotFound": "Nessun account corrisponde.",
     "apiErrorUnknownDemoSection": "Non ci sono dati demo per questa schermata.",
     "ntfBusinessDemoIdleTitle": "La tua attività demo ti aspetta",
-    "ntfBusinessDemoIdleBody": "Nessuno usa {business} da un po'. Se nessuno la apre nei prossimi {days} giorni, i dati demo verranno rimossi e sarà archiviata. Puoi riaprirla quando vuoi."
+    "ntfBusinessDemoIdleBody": "Nessuno usa {business} da un po'. Se nessuno la apre nei prossimi {days} giorni, i dati demo verranno rimossi e sarà archiviata. Puoi riaprirla quando vuoi.",
+    "clProgressOnTargetWeeks": "{onTarget} settimane su {weeks} in obiettivo",
+    "clProgressStreakDays": "{count, plural, one {# giorno} other {# giorni}}",
+    "clProgressTarget": "Obiettivo {count}/settimana",
+    "clProgressHeatmap": "Giorni di allenamento",
+    "clProgressHeatWeek": "Settimana del {date}: {count, plural, one {# sessione} other {# sessioni}}{onTarget, select, true {, in obiettivo} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {nessun allenamento} one {# sessione} other {# sessioni}}",
+    "clProgressBadges": "Badge",
+    "prTrendEstimated": "1RM stimato {value} {unit}",
+    "prTrendRetest": "Ora di ritestare?",
+    "clNutritionMacros": "Macro",
+    "clNutritionMacrosHidden": "Numeri nascosti",
+    "clNutritionHideMacros": "Nascondi numeri",
+    "clNutritionShowMacros": "Mostra numeri"
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -5274,7 +5280,7 @@
         "glasses": "{filled} di {goal} bicchieri",
         "added": "Bicchiere aggiunto ({ml} ml)",
         "dropsLabel": "Bicchieri di oggi",
-        "remove": "Togli questo bicchiere"
+        "remove": "Togli l’ultimo bicchiere"
       },
       "sleep": {
         "title": "Sonno",
@@ -5356,9 +5362,6 @@
         "noPortions": "Il piano del tuo coach non ha ancora porzioni giornaliere."
       },
       "mood": {
-        "mood": "Umore {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Come ti senti?",
         "open": "Rispondi a «Come mi sento»"
       },
       "craving": {
@@ -7944,10 +7947,6 @@
     "return_garmin_account_in_use": "Questo account Garmin è già collegato a un altro account Palee.",
     "return_garmin_connect_failed": "Garmin non è riuscito a completare il collegamento. Riprova.",
     "restingTitle": "Frequenza a riposo",
-    "restingRange": "Periodo",
-    "restingRange_1m": "1 mese",
-    "restingRange_3m": "3 mesi",
-    "restingRange_1y": "1 anno",
     "bpmValue": "{value} bpm",
     "restingLatest": "Ultima misurazione · {date}",
     "restingAverage": "Media {value} bpm su {days, plural, one {# giorno} other {# giorni}}",
@@ -9565,7 +9564,8 @@
     "backToMe": "Torna a Io",
     "saveInterests": "Salva",
     "interestsSaved": "Salvato.",
-    "interestsHubHint": "Sport e livello, per i suggerimenti"
+    "interestsHubHint": "Sport e livello, per i suggerimenti",
+    "photoAddLabel": "Aggiungi foto"
   },
   "Business": {
     "common": {

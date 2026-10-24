@@ -1,10 +1,10 @@
 defmodule Palee.Application.SetWellnessPreferences do
-  @moduledoc "The member sets their own water goal, glass, sleep goal, hidden items, tile order and the water reminder (ADR-159 §4)."
+  @moduledoc "The member sets their own water goal, glass, sleep goal, hidden items, tile order, the water reminder (ADR-159 §4) and whether the coach plan's macros are hidden (ADR-194)."
 
   alias Palee.Application.{BroadcastUserSync, WellnessInput}
   alias Palee.Wellness
 
-  @fields ~w(water_goal_ml glass_ml sleep_goal_minutes hidden_items item_order water_reminder)a
+  @fields ~w(water_goal_ml glass_ml sleep_goal_minutes hidden_items item_order water_reminder hide_macros)a
 
   def call(%{user_id: user_id} = context, params) do
     attrs =

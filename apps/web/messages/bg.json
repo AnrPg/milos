@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Вашите резултати за последователност и постоянство изключват планираните ви почивни дни — но все още не знаем кои са те.",
     "setYourRestDaysInProfilefd0fbe4": "Задайте вашите почивни дни в Профил →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Днес е вашият планиран почивен ден — възстановяването е част от програмата.",
-    "dayStreakca360c4": "дневна поредица",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Завършете първата си тренировка, за да спечелите първата си значка.",
     "loadingYourTrainingOverview39806c7": "Зарежда се преглед на вашето обучение...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Вашият преглед на обучението не е наличен.",
     "refreshSessionf2ed411": "Опресняване на сесията",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "Не е налично изпълнение.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Целевата страница не можа да се зареди.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Честота на тренировка срещу седмична цел — последните 10 седмици",
-    "noWorkoutsYet85a9204": "Все още няма тренировки",
-    "setAWeeklyTargetdd70e51": "Поставете седмична цел",
-    "calculatingc573779": "Изчислява се...",
     "howCloselyYouFollowedPrescribedExercises760e833": "Колко точно сте следвали предписаните упражнения",
     "prs80e1569": "PR-и ·",
     "whatAreChallengesfdf13a8": "Какво представляват предизвикателствата?",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "Връзката не е налична",
     "clMinutesShort": "{count} мин",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "Моят напредък",
-    "clProgressIntro": "Тренировките ти през последните 12 седмици.",
     "clProgressSessions": "Тренировки",
     "clProgressMinutes": "Минути",
     "clProgressWorkouts": "Различни тренировки",
@@ -4457,7 +4450,20 @@
     "apiErrorAccountNotFound": "Няма съвпадащ акаунт.",
     "apiErrorUnknownDemoSection": "Няма демо данни за този екран.",
     "ntfBusinessDemoIdleTitle": "Демо бизнесът ти те очаква",
-    "ntfBusinessDemoIdleBody": "Никой не е използвал {business} от известно време. Ако никой не го отвори в следващите {days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време."
+    "ntfBusinessDemoIdleBody": "Никой не е използвал {business} от известно време. Ако никой не го отвори в следващите {days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време.",
+    "clProgressOnTargetWeeks": "{onTarget} от {weeks} седмици в целта",
+    "clProgressStreakDays": "{count, plural, one {# ден} other {# дни}}",
+    "clProgressTarget": "Цел {count}/седм.",
+    "clProgressHeatmap": "Тренировъчни дни",
+    "clProgressHeatWeek": "Седмица {date}: {count, plural, one {# тренировка} other {# тренировки}}{onTarget, select, true {, в целта} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {без тренировка} one {# тренировка} other {# тренировки}}",
+    "clProgressBadges": "Значки",
+    "prTrendEstimated": "Прибл. 1RM {value} {unit}",
+    "prTrendRetest": "Време за нов опит?",
+    "clNutritionMacros": "Макронутриенти",
+    "clNutritionMacrosHidden": "Числата са скрити",
+    "clNutritionHideMacros": "Скрий числата",
+    "clNutritionShowMacros": "Покажи числата"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -5274,7 +5280,7 @@
         "glasses": "{filled} от {goal} чаши",
         "added": "Добавена чаша ({ml} мл)",
         "dropsLabel": "Чаши днес",
-        "remove": "Премахни тази чаша"
+        "remove": "Премахни последната чаша"
       },
       "sleep": {
         "title": "Сън",
@@ -5356,9 +5362,6 @@
         "noPortions": "Планът на треньора ти още няма дневни порции."
       },
       "mood": {
-        "mood": "Настроение {value}/4",
-        "stress": "Стрес {value}/4",
-        "empty": "Как се чувстваш?",
         "open": "Отговори на «Как се чувствам»"
       },
       "craving": {
@@ -7944,10 +7947,6 @@
     "return_garmin_account_in_use": "Този профил в Garmin вече е свързан с друг профил в Palee.",
     "return_garmin_connect_failed": "Garmin не успя да завърши свързването. Опитай пак.",
     "restingTitle": "Пулс в покой",
-    "restingRange": "Период",
-    "restingRange_1m": "1 месец",
-    "restingRange_3m": "3 месеца",
-    "restingRange_1y": "1 година",
     "bpmValue": "{value} уд/мин",
     "restingLatest": "Последно измерване · {date}",
     "restingAverage": "Средно {value} уд/мин за {days, plural, one {# ден} other {# дни}}",
@@ -9565,7 +9564,8 @@
     "backToMe": "Назад към Аз",
     "saveInterests": "Запази",
     "interestsSaved": "Запазено.",
-    "interestsHubHint": "Спортове и ниво, за предложения"
+    "interestsHubHint": "Спортове и ниво, за предложения",
+    "photoAddLabel": "Добави снимка"
   },
   "Business": {
     "common": {

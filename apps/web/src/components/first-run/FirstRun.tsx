@@ -164,7 +164,11 @@ function PhotoStep({ onNext }: { onNext: () => void }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span aria-hidden="true" className="text-3xl" style={{ color: "var(--dim)" }}>+</span>
+            // ADR-194: the "+" carries a visible label, not only an aria-label.
+            <span aria-hidden="true" className="flex flex-col items-center gap-1 px-3 text-center" style={{ color: "var(--dim)" }}>
+              <span className="text-3xl leading-none">+</span>
+              <span className="text-xs font-semibold leading-tight">{t("photoAddLabel")}</span>
+            </span>
           )}
         </button>
         <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{currentUser?.nickname}</p>

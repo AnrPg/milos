@@ -20,6 +20,8 @@ defmodule Palee.Wellness.Preferences do
     field(:item_order, {:array, :string}, default: [])
     field(:water_reminder, :boolean, default: true)
     field(:water_reminded_on, :date)
+    # ADR-194 (vision §8.6): the coach plan's macros, hidden at the member's wish.
+    field(:hide_macros, :boolean, default: false)
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -33,7 +35,8 @@ defmodule Palee.Wellness.Preferences do
       :sleep_goal_minutes,
       :hidden_items,
       :item_order,
-      :water_reminder
+      :water_reminder,
+      :hide_macros
     ])
     |> validate_required([:user_id, :water_goal_ml, :glass_ml, :sleep_goal_minutes])
     |> validate_number(:water_goal_ml,
