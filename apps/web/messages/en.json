@@ -11234,5 +11234,52 @@
     "workoutThread": "Workout thread",
     "classThread": "Class thread",
     "searchAtGym": "At your gym"
+  },
+  "NotificationSettings": {
+    "title": "Notifications",
+    "description": "What reaches you, in the app and as push",
+    "loading": "Loading…",
+    "loadError": "Notification settings are unavailable right now.",
+    "saveError": "That change was not saved. Try again.",
+    "locked": "Always on",
+    "perClub": "Per club, in My boxes and clubs",
+    "channel": {
+      "in_app": "In app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Bookings & classes",
+        "hint": "Approvals, waitlist, trials, appointments and seasons"
+      },
+      "messages": {
+        "title": "Messages",
+        "hint": "Chats, message requests and messages from your box and coach"
+      },
+      "community": {
+        "title": "Clubs & community",
+        "hint": "Followers, events, challenges, groups and invites."
+      },
+      "coach": {
+        "title": "Coach",
+        "hint": "Programs, workout notes, form reviews and nutrition"
+      },
+      "partners": {
+        "title": "Partners & buddies",
+        "hint": "Matches, your support buddy and their messages"
+      },
+      "journal": {
+        "title": "Journal reminders",
+        "hint": "Water, measurements, cravings check-ins and device sync"
+      },
+      "staff": {
+        "title": "Running the box",
+        "hint": "New bookings, trials, visitors, stock and reports"
+      },
+      "account": {
+        "title": "Account & payments",
+        "hint": "Security, invoices, renewals and orders"
+      }
+    }
   }
 }

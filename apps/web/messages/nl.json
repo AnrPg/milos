@@ -11234,5 +11234,52 @@
     "workoutThread": "Trainingsgesprek",
     "classThread": "Lesgesprek",
     "searchAtGym": "Bij jouw gym"
+  },
+  "NotificationSettings": {
+    "title": "Meldingen",
+    "description": "Wat je bereikt, in de app en als push",
+    "loading": "Laden…",
+    "loadError": "De meldingsinstellingen zijn nu niet beschikbaar.",
+    "saveError": "De wijziging is niet opgeslagen. Probeer het opnieuw.",
+    "locked": "Altijd aan",
+    "perClub": "Per club, bij Mijn boxen en clubs",
+    "channel": {
+      "in_app": "In de app",
+      "push": "Push"
+    },
+    "category": {
+      "bookings": {
+        "title": "Boekingen en lessen",
+        "hint": "Goedkeuringen, wachtlijst, proeflessen, afspraken en seizoenen"
+      },
+      "messages": {
+        "title": "Berichten",
+        "hint": "Chats, berichtverzoeken en berichten van je box en coach"
+      },
+      "community": {
+        "title": "Clubs en community",
+        "hint": "Volgers, evenementen, challenges, groepen en uitnodigingen."
+      },
+      "coach": {
+        "title": "Coach",
+        "hint": "Programma’s, trainingsnotities, techniekbeoordelingen en voeding"
+      },
+      "partners": {
+        "title": "Partners en buddy’s",
+        "hint": "Matches, je steunbuddy en hun berichten"
+      },
+      "journal": {
+        "title": "Dagboekherinneringen",
+        "hint": "Water, metingen, check-ins over trek en apparaatsynchronisatie"
+      },
+      "staff": {
+        "title": "Box beheren",
+        "hint": "Nieuwe boekingen, proeflessen, bezoekers, voorraad en meldingen"
+      },
+      "account": {
+        "title": "Account en betalingen",
+        "hint": "Beveiliging, facturen, verlengingen en bestellingen"
+      }
+    }
   }
 }

@@ -52,7 +52,7 @@ function preferredUrl(notification: LinkableNotification) {
       ? `/password-resets?request=${encodeURIComponent(requestId)}`
       : "/password-resets";
   }
-  if (notification.type === "password_reset_completed") return "/me/settings";
+  if (notification.type === "password_reset_completed") return "/me/settings#security";
   // ADR-184 follow-up: the idle-demo reminder opens the demo's console (opening it keeps it).
   if (notification.type === "business_demo_idle") return "/admin";
   // ADR-155: a visitor at the door opens the desk on that visitor.
