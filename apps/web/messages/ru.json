@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Отозвать",
     "clFormReviewWithdrawConfirm": "Отозвать запрос? Разбор вернётся в ваш пакет.",
     "clNutritionTitle": "План питания",
-    "clNutritionEmpty": "Тренер ещё не поделился планом питания.",
     "clNutritionUpdated": "Обновлено {date}",
     "clNutritionCalories": "Калории",
     "clNutritionProtein": "Белки",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {без тренировки} one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}",
     "clProgressBadges": "Значки",
     "prTrendEstimated": "Расч. 1ПМ {value} {unit}",
-    "prTrendRetest": "Пора повторить тест?"
+    "prTrendRetest": "Пора повторить тест?",
+    "clNutritionMacros": "БЖУ",
+    "clNutritionMacrosHidden": "Цифры скрыты",
+    "clNutritionHideMacros": "Скрыть цифры",
+    "clNutritionShowMacros": "Показать цифры"
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",

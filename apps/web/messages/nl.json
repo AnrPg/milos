@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Intrekken",
     "clFormReviewWithdrawConfirm": "Deze aanvraag intrekken? De beoordeling gaat terug naar je pakket.",
     "clNutritionTitle": "Voedingsplan",
-    "clNutritionEmpty": "Je coach heeft nog geen voedingsplan gedeeld.",
     "clNutritionUpdated": "Bijgewerkt op {date}",
     "clNutritionCalories": "Calorieën",
     "clNutritionProtein": "Eiwit",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {geen training} one {# sessie} other {# sessies}}",
     "clProgressBadges": "Badges",
     "prTrendEstimated": "Geschat 1RM {value} {unit}",
-    "prTrendRetest": "Tijd om opnieuw te testen?"
+    "prTrendRetest": "Tijd om opnieuw te testen?",
+    "clNutritionMacros": "Macro's",
+    "clNutritionMacrosHidden": "Cijfers verborgen",
+    "clNutritionHideMacros": "Cijfers verbergen",
+    "clNutritionShowMacros": "Cijfers tonen"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

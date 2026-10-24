@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "ביטול הבקשה",
     "clFormReviewWithdrawConfirm": "לבטל את הבקשה? הבדיקה תוחזר לחבילה שלך.",
     "clNutritionTitle": "תוכנית תזונה",
-    "clNutritionEmpty": "המאמן שלך עדיין לא שיתף תוכנית תזונה.",
     "clNutritionUpdated": "עודכן {date}",
     "clNutritionCalories": "קלוריות",
     "clNutritionProtein": "חלבון",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {ללא אימון} one {אימון אחד} other {# אימונים}}",
     "clProgressBadges": "תגים",
     "prTrendEstimated": "1RM משוער {value} {unit}",
-    "prTrendRetest": "הגיע הזמן לבדיקה חוזרת?"
+    "prTrendRetest": "הגיע הזמן לבדיקה חוזרת?",
+    "clNutritionMacros": "מאקרו",
+    "clNutritionMacrosHidden": "המספרים מוסתרים",
+    "clNutritionHideMacros": "הסתר מספרים",
+    "clNutritionShowMacros": "הצג מספרים"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

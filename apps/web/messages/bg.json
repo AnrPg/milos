@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Оттегли",
     "clFormReviewWithdrawConfirm": "Да оттеглим ли заявката? Прегледът се връща в пакета ти.",
     "clNutritionTitle": "Хранителен план",
-    "clNutritionEmpty": "Треньорът ти все още не е споделил хранителен план.",
     "clNutritionUpdated": "Обновено на {date}",
     "clNutritionCalories": "Калории",
     "clNutritionProtein": "Протеин",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {без тренировка} one {# тренировка} other {# тренировки}}",
     "clProgressBadges": "Значки",
     "prTrendEstimated": "Прибл. 1RM {value} {unit}",
-    "prTrendRetest": "Време за нов опит?"
+    "prTrendRetest": "Време за нов опит?",
+    "clNutritionMacros": "Макронутриенти",
+    "clNutritionMacrosHidden": "Числата са скрити",
+    "clNutritionHideMacros": "Скрий числата",
+    "clNutritionShowMacros": "Покажи числата"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",

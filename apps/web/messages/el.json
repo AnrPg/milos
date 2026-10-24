@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Απόσυρση",
     "clFormReviewWithdrawConfirm": "Να αποσυρθεί αυτό το αίτημα; Η αξιολόγηση επιστρέφει στο πακέτο σου.",
     "clNutritionTitle": "Διατροφικό πλάνο",
-    "clNutritionEmpty": "Ο προπονητής σου δεν έχει μοιραστεί ακόμη διατροφικό πλάνο.",
     "clNutritionUpdated": "Ενημερώθηκε {date}",
     "clNutritionCalories": "Θερμίδες",
     "clNutritionProtein": "Πρωτεΐνη",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {χωρίς προπόνηση} one {# προπόνηση} other {# προπονήσεις}}",
     "clProgressBadges": "Διακρίσεις",
     "prTrendEstimated": "Εκτ. 1RM {value} {unit}",
-    "prTrendRetest": "Ώρα για νέα δοκιμή;"
+    "prTrendRetest": "Ώρα για νέα δοκιμή;",
+    "clNutritionMacros": "Μακροθρεπτικά",
+    "clNutritionMacrosHidden": "Κρυμμένοι αριθμοί",
+    "clNutritionHideMacros": "Απόκρυψη αριθμών",
+    "clNutritionShowMacros": "Εμφάνιση αριθμών"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",

@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Zurückziehen",
     "clFormReviewWithdrawConfirm": "Anfrage zurückziehen? Der Check wird deinem Paket wieder gutgeschrieben.",
     "clNutritionTitle": "Ernährungsplan",
-    "clNutritionEmpty": "Dein Coach hat noch keinen Ernährungsplan geteilt.",
     "clNutritionUpdated": "Aktualisiert am {date}",
     "clNutritionCalories": "Kalorien",
     "clNutritionProtein": "Eiweiß",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {kein Training} one {# Einheit} other {# Einheiten}}",
     "clProgressBadges": "Abzeichen",
     "prTrendEstimated": "Gesch. 1RM {value} {unit}",
-    "prTrendRetest": "Zeit für einen neuen Test?"
+    "prTrendRetest": "Zeit für einen neuen Test?",
+    "clNutritionMacros": "Makros",
+    "clNutritionMacrosHidden": "Zahlen ausgeblendet",
+    "clNutritionHideMacros": "Zahlen ausblenden",
+    "clNutritionShowMacros": "Zahlen anzeigen"
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",

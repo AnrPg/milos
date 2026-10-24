@@ -3680,7 +3680,6 @@
     "clFormReviewWithdraw": "Retirar",
     "clFormReviewWithdrawConfirm": "¿Retirar esta solicitud? La revisión vuelve a tu paquete.",
     "clNutritionTitle": "Plan de nutrición",
-    "clNutritionEmpty": "Tu entrenador aún no ha compartido un plan de nutrición.",
     "clNutritionUpdated": "Actualizado el {date}",
     "clNutritionCalories": "Calorías",
     "clNutritionProtein": "Proteínas",
@@ -4463,7 +4462,11 @@
     "clProgressHeatDay": "{date}: {count, plural, =0 {sin entrenamiento} one {# sesión} other {# sesiones}}",
     "clProgressBadges": "Insignias",
     "prTrendEstimated": "1RM est. {value} {unit}",
-    "prTrendRetest": "¿Toca volver a probar?"
+    "prTrendRetest": "¿Toca volver a probar?",
+    "clNutritionMacros": "Macros",
+    "clNutritionMacrosHidden": "Números ocultos",
+    "clNutritionHideMacros": "Ocultar números",
+    "clNutritionShowMacros": "Mostrar números"
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
