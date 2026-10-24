@@ -298,6 +298,15 @@ Coach notes about an athlete (`/staff/clients/{id}/coach-notes`, read-audited) s
 
 Show correlations only after enough data (e.g. ≥4 weeks), and always as **indicators, not medical advice.**
 
+**ADR-194 (Πρόοδος / Ευεξία polish):**
+- Πρόοδος has no page title. The range chips come first and drive every card, including resting HR, which has no chips of its own.
+- Consistency is a single card holding the heatmap, the target and weeks on target. There is one streak only (a gym day streak, otherwise weeks).
+- Cards with no data are hidden, never shown as placeholders.
+- PR trends show estimated 1RM (Epley, ≤12 reps) and a retest hint after 84 days. Both come from one pure lib.
+- The member can hide the macros of the coach's plan. This is stored server-side (`hide_macros`). With no plan, no card is shown.
+- In Ευεξία, mood and stress are one tap each. The injury form opens from a button in a dialog. There is no second title.
+- Every touch target is at least 44px; the `hit-area` utility enlarges small controls.
+
 ### 7.8 Buddy για στήριξη [NEW]
 One or two trusted people (a partner, friend, or the coach), set in `Εγώ › Buddy`, with mutual acceptance. They receive **only what the user explicitly sends** via "Χρειάζομαι στήριξη" (nothing automatic). Notification with quick replies ("Είμαι εδώ", "Πάμε βόλτα;", "Πάρε με τηλέφωνο"). Optionally a weekly summary with counts only. Either side can leave at any time. The coach can get a **weekly summary** only with permission.
 
