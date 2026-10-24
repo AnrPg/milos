@@ -8,6 +8,7 @@ import { activeBuddies, recipientNames, unreadTotal } from "@/components/buddy/b
 import { useBuddies } from "@/components/buddy/use-buddies";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
 import { MeProfile } from "@/components/member-app/me/MeProfile";
+import { useOpenConsole } from "@/components/member-app/me/use-open-console";
 import { usePasswordResets } from "@/components/member-app/me/use-password-resets";
 import { useSession } from "@/components/session-provider";
 import { CountsLine } from "@/components/social/SocialBits";
@@ -20,10 +21,10 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * profile with «Αναρτήσεις · PRs · Clubs» tabs, `MeProfile`), then the fixed
  * list, in the mockup's order: Φέρε φίλο · Buddy · Τα box και τα clubs μου ·
  * Κοινοποίηση & ορατότητα · Συνδεδεμένες συσκευές · Πληρωμές & αποδείξεις ·
- * Ρυθμίσεις · Βοήθεια & ξενάγηση. Everything else has a home inside one of
- * them (ADR-196): interests, body settings and the business request in
- * Ρυθμίσεις; the box switcher in Τα box και τα clubs μου; the tour, first
- * steps, coach practice and the staff entries in Βοήθεια & ξενάγηση; the
+ * Ρυθμίσεις · Βοήθεια & ξενάγηση · (staff) Διαχείριση. Everything else has a
+ * home inside one of them (ADR-196): interests, body settings and the business
+ * request in Ρυθμίσεις; the box switcher in Τα box και τα clubs μου; the tour,
+ * first steps, coach practice and the staff extras in Βοήθεια & ξενάγηση; the
  * chats in the one inbox (Feed Μηνύματα). No "More" drawer (brief §4.8).
  */
 export function MeHub() {
@@ -38,6 +39,7 @@ export function MeHub() {
   const { memberships } = useSelectedMembershipRole();
   const { hasBillingProviders } = useHasBillingProviders();
   const resets = usePasswordResets();
+  const openConsole = useOpenConsole();
   const nickname = currentUser?.nickname ?? "";
   const initials = nickname.slice(0, 2).toUpperCase() || "?";
   const clubs = memberships.map((entry) => entry.settings?.brand_name?.trim() || entry.organization.name);
@@ -99,6 +101,8 @@ export function MeHub() {
           detail={t("meHelpHint")}
           badge={resets.toAct > 0 ? <CountBadge count={resets.toAct} label={t("meHelpResetsWaiting", { count: resets.toAct })} /> : null}
         />
+        {/* ADR-196 (amended): staff switch back to the console in one tap. */}
+        {openConsole ? <HubListRow onClick={openConsole} label={t("meConsole")} detail={t("meConsoleHint")} /> : null}
       </HubList>
 
       <button
