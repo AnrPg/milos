@@ -16,6 +16,7 @@ import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function isCompletedExecution(execution: WorkoutExecution) {
   return execution.status === "completed" || Boolean(execution.completed_at_utc);
@@ -24,7 +25,7 @@ export function isCompletedExecution(execution: WorkoutExecution) {
 function ErrorText({ error }: { error: unknown }) {
   const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
+  return <ErrorNotice>{localizeError(error, i18n)}</ErrorNotice>;
 }
 
 export function ReviewForm() {

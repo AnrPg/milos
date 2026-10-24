@@ -11,6 +11,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 import { DEFAULT_RULES, modeChangeNeedsConfirm, ROTATION_CHOICES, validateRules, type RulesDraft } from "./check-in";
 import { checkInErrorKey } from "./errors";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Ρυθμίσεις › Check-in (ADR-155 §9): the window around a class, open gym,
@@ -25,7 +26,7 @@ export function CheckInSettings() {
   const token = tokens?.access_token ?? "";
   const rules = useQuery({ queryKey: CHECK_IN_RULES_KEY, enabled: Boolean(token), queryFn: () => fetchCheckInRules(token) });
   if (rules.isPending) return <p className="p-6 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (rules.isError) return <p role="alert" className="p-6 text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(rules.error))}</p>;
+  if (rules.isError) return <ErrorNotice className="m-6">{t(checkInErrorKey(rules.error))}</ErrorNotice>;
   const initial = { ...DEFAULT_RULES, ...Object.fromEntries(Object.entries(rules.data).filter(([, value]) => value !== undefined && value !== null)) } as RulesDraft;
   // Not keyed on the saved rules: saving updates `initial` (what a mode switch is measured
   // from) without throwing away the form and its «Αποθηκεύτηκε».
@@ -165,7 +166,7 @@ function Form({ token, initial }: { token: string; initial: RulesDraft }) {
               </div>
             </div>
           ) : null}
-          {save.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(save.error))}</p> : null}
+          {save.isError ? <ErrorNotice>{t(checkInErrorKey(save.error))}</ErrorNotice> : null}
           {saved ? <p role="status" className="text-sm" style={{ color: "var(--success)" }}>{t("saved")}</p> : null}
           {confirming ? null : (
             <button type="submit" disabled={save.isPending || errors.length > 0} className="min-h-12 rounded-2xl text-sm font-bold disabled:opacity-60" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
@@ -232,7 +233,7 @@ function MinutesRow({
           style={style}
         />
       </span>
-      {invalid ? <span className="text-xs" style={{ color: "var(--danger)" }}>{error}</span> : null}
+      {invalid ? <ErrorNotice variant="field">{error}</ErrorNotice> : null}
     </label>
   );
 }

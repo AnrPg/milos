@@ -35,6 +35,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import type { PRRecord } from "@/api/gamification";
 import { pollDelay } from "@/lib/post-media";
 import { Popover } from "@/components/ui/Popover";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * One post (vision §7.1): its origin (`Club › #channel`) on top, then the
@@ -124,7 +125,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
           {tMedia("processingHint")}
         </p>
       ) : post.media_status === "failed" ? (
-        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{tMedia("failed")}</p>
+        <ErrorNotice variant="field">{tMedia("failed")}</ErrorNotice>
       ) : null}
       {media.length > 0 ? <PostMediaView media={media} author={author} onOpen={setViewing} /> : null}
       {post.body ? (
@@ -197,7 +198,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
         ) : null}
         {post.can_report ? <ReportButton label={t("report")} onClick={() => setReporting(true)} className="-me-2" /> : null}
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
       {showComments ? <Comments post={post} /> : null}
       {viewing !== null ? (
         <MediaViewer
@@ -462,7 +463,7 @@ function Comments({ post }: { post: CommunityPost }) {
           {t("send")}
         </button>
       </form>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
       {reporting ? (
         <ReportSheet target="comment" targetId={reporting} onClose={() => setReporting(null)} onReported={() => void refresh()} />
       ) : null}

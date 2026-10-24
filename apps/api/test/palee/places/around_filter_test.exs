@@ -135,7 +135,9 @@ defmodule Palee.Places.Domain.AroundFilterTest do
     end
 
     test "a price range keeps events inside it, clubs only while it starts at free" do
-      ranged = plan(%{kinds: ~w(events boxes clubs posts), min_price_cents: 500, max_price_cents: 2000})
+      ranged =
+        plan(%{kinds: ~w(events boxes clubs posts), min_price_cents: 500, max_price_cents: 2000})
+
       assert ranged.kinds == ~w(events posts)
       assert {ranged.min_price_cents, ranged.max_price_cents} == {500, 2000}
 
@@ -150,7 +152,9 @@ defmodule Palee.Places.Domain.AroundFilterTest do
     end
 
     test "a minimum of 0 is no minimum, and the range round-trips" do
-      {:ok, filter} = AroundFilter.parse(%{min_price_cents: 0, max_price_cents: 1500}, @vocabulary)
+      {:ok, filter} =
+        AroundFilter.parse(%{min_price_cents: 0, max_price_cents: 1500}, @vocabulary)
+
       assert filter.min_price_cents == nil
 
       {:ok, filter} = AroundFilter.parse(%{min_price_cents: 500}, @vocabulary)

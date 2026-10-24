@@ -38,6 +38,7 @@ import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
 import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -228,9 +229,9 @@ export function ProfilePage() {
             </p>
           ) : null}
           {languageError ? (
-            <p className="mt-3 text-sm font-semibold" style={{ color: "var(--danger)" }}>
+            <ErrorNotice className="mt-3">
               {languageError}
-            </p>
+            </ErrorNotice>
           ) : null}
         </CollapsibleSection>
 
@@ -275,7 +276,7 @@ export function ProfilePage() {
                     </button>
                   ) : null}
                 </div>
-                {push.error ? <p className="mt-3 text-xs font-semibold" style={{ color: "var(--danger)" }}>{push.error}</p> : null}
+                {push.error ? <ErrorNotice variant="field" className="mt-3">{push.error}</ErrorNotice> : null}
               </div>
             )}
             <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
@@ -290,7 +291,7 @@ export function ProfilePage() {
             >
               {securityPending ? i18n("revokingSessions8eee998") : i18n("signOutAllDevicesf14a071")}
             </button>
-            {securityError ? <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{securityError}</p> : null}
+            {securityError ? <ErrorNotice>{securityError}</ErrorNotice> : null}
           </div>
         </CollapsibleSection>
 
@@ -371,9 +372,9 @@ export function ProfilePage() {
             </div>
 
             {avatarError && (
-              <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
+              <ErrorNotice>
                 {avatarError}
-              </p>
+              </ErrorNotice>
             )}
           </div>
         </CollapsibleSection>

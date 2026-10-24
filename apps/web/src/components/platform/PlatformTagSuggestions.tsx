@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ApiError } from "@/api/client";
 import { listTagSuggestions, resolveTagSuggestion, type TagSuggestion } from "@/api/public-profile";
 import { useSession } from "@/components/session-provider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Platform review of tags gym owners could not find (board 3b Q5). «Added»
@@ -45,10 +46,10 @@ export function PlatformTagSuggestions() {
       </header>
 
       {forbidden ? <p className="mt-6 text-[var(--text-soft)]">{t("forbidden")}</p> : null}
-      {suggestions.isError && !forbidden ? <p className="mt-6 text-[var(--danger)]">{t("loadError")}</p> : null}
+      {suggestions.isError && !forbidden ? <ErrorNotice className="mt-6">{t("loadError")}</ErrorNotice> : null}
       {suggestions.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}
       {suggestions.data?.length === 0 ? <p className="mt-6 text-[var(--text-soft)]">{t("empty")}</p> : null}
-      {resolve.isError ? <p className="mt-6 text-[var(--danger)]">{t("resolveError")}</p> : null}
+      {resolve.isError ? <ErrorNotice className="mt-6">{t("resolveError")}</ErrorNotice> : null}
 
       {(["disciplines", "services", "audiences", "amenities"] as const).map((list) =>
         inList(list).length ? (

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** The bottom sheet every Ευεξία form opens in (centered on wider screens). */
 export function WellnessSheet({
@@ -120,9 +121,5 @@ export function QuietButton({
 
 export function ErrorLine({ message }: { message: string | null }) {
   if (!message) return null;
-  return (
-    <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-      {message}
-    </p>
-  );
+  return <ErrorNotice>{message}</ErrorNotice>;
 }

@@ -55,6 +55,7 @@ import { sharedSubscriptions } from "@/components/staff/staff-helpers";
 import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBeneficiaries";
 import { Select as ThemedSelect } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -1390,7 +1391,7 @@ function InvoiceFileActions({
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-sm text-[var(--text)]"
             />
           </div>
-          {saveError && <p className="text-xs text-[var(--danger)]">{saveError}</p>}
+          {saveError && <ErrorNotice variant="field">{saveError}</ErrorNotice>}
           <div className="flex gap-2">
             <button
               type="button"
@@ -1437,7 +1438,7 @@ function InvoiceFileActions({
             <span className="text-xs text-[var(--muted)] truncate max-w-[160px]">{invoiceParams.file_name}</span>
           )}
         </div>
-        {uploadError && <p className="text-xs text-[var(--danger)]">{uploadError}</p>}
+        {uploadError && <ErrorNotice variant="field">{uploadError}</ErrorNotice>}
       </div>
     </div>
   );
@@ -1467,7 +1468,7 @@ function SubmitButton({
 function ErrorText({ error }: { error: unknown }) {
   const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
+  return <ErrorNotice>{localizeError(error, i18n)}</ErrorNotice>;
 }
 
 function History({

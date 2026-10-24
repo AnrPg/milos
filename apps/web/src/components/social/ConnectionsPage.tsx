@@ -28,6 +28,7 @@ import { useSocialSummary } from "@/components/social/use-social";
 import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const TABS = ["followers", "following", "boxes", "clubs", "prs"] as const;
 type Tab = (typeof TABS)[number];
@@ -252,7 +253,7 @@ function RemoveFollower({ followId }: { followId: string }) {
       >
         {confirming ? t("removeConfirm") : t("remove")}
       </button>
-      {error ? <span role="alert" className="sr-only">{error}</span> : null}
+      {error ? <ErrorNotice variant="text">{error}</ErrorNotice> : null}
     </>
   );
 }

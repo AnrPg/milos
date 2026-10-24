@@ -10,6 +10,7 @@ import { HandleField } from "@/components/account/HandleField";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export const IDENTITY_FORM_ID = "profile-personal-form";
 
@@ -168,7 +169,7 @@ export function IdentitySettings() {
         ) : null}
       </div>
 
-      {error ? <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
       {success ? <p className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{success}</p> : null}
 
       <button

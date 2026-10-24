@@ -20,6 +20,7 @@ import {
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can, membershipRoles } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STAFF: RoleName[] = ["owner", "admin", "coach", "front_desk", "accountant", "janitor"];
 
@@ -188,9 +189,9 @@ export function MemberRolesEditor({
         </div>
       ) : null}
       {saveMutation.isError ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+        <ErrorNotice>
           {localizeError(saveMutation.error, i18n)}
-        </p>
+        </ErrorNotice>
       ) : null}
 
       {showHeadCoach ? (

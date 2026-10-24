@@ -12,6 +12,7 @@ import { formAudience, formatPrice, localInstant, parsePriceCents } from "../eve
 import type { StepProps } from "./types";
 import { useDurationLabel } from "./WhenStep";
 import { useAudienceOptions } from "./WhoStep";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Step 7: everything on one screen, grouped as the steps asked it, each
@@ -143,9 +144,9 @@ export function ReviewStep({
                 ))}
               </div>
               {issues.map((problem) => (
-                <p key={problem} className="text-sm" style={{ color: "var(--danger)" }}>
+                <ErrorNotice key={problem} variant="field">
                   {t(["problem", problem].join("_"))}
-                </p>
+                </ErrorNotice>
               ))}
             </section>
           );

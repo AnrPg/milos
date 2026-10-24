@@ -47,10 +47,11 @@ defmodule Palee.Identity.User do
     params = default_display_name(params)
 
     user
-    |> cast(params, [:handle, :display_name, :role])
+    |> cast(params, [:handle, :display_name, :role, :preferred_locale])
     |> put_change(:login_id, login_id)
-    |> validate_required([:handle, :display_name, :role])
+    |> validate_required([:handle, :display_name, :role, :preferred_locale])
     |> validate_inclusion(:role, RegistrationPolicy.self_register_roles())
+    |> validate_inclusion(:preferred_locale, Locale.supported(), message: "is not supported")
     |> validate_handle()
     |> validate_display_name()
     |> put_search_text()

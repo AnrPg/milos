@@ -13,6 +13,7 @@ import { codeKey, inviteChannel, rememberReferral } from "@/lib/referral-claim";
 
 import { claimPendingReferrals } from "./claim";
 import { giftText } from "./referrals";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type ClaimState =
   | { kind: "idle" }
@@ -154,9 +155,7 @@ function ClaimResult({ state, invite, eventId }: { state: ClaimState; invite: Re
   }
   if (state.kind === "failed") {
     return (
-      <HubCard>
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("invite.failed")}</p>
-      </HubCard>
+      <ErrorNotice>{t("invite.failed")}</ErrorNotice>
     );
   }
 

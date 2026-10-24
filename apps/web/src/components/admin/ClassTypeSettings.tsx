@@ -24,6 +24,7 @@ import {
 } from "@/api/schedule";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type ArchiveMapping = {
   source: ClassTypeRecord;
@@ -227,7 +228,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
         </details>
       ) : null}
 
-      {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
 
       {archiveMapping ? (
         <Dialog

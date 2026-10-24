@@ -191,3 +191,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-190 | E-shop: catalog, inventory, orders and revenue lineage | Accepted |
 | ADR-191 | Partner perks: redemption methods, an open policy model and versioned terms | Accepted |
 | ADR-192 | Shop analytics, revenue by stream and revenue lineage reporting | Accepted |
+| ADR-195 | One red error notice everywhere, and a language picker on the signed-out pages | Accepted |

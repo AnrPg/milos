@@ -27,6 +27,7 @@ import {
   useInvitableStaffRoles,
   type StaffInvite,
 } from "@/components/invites/StaffInviteFields";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Tab = "link" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -278,7 +279,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
           ))}
         </Select>
       </label>
-      {issue.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(issue.error, uiT)}</p> : null}
+      {issue.error ? <ErrorNotice>{localizeError(issue.error, uiT)}</ErrorNotice> : null}
       <button type="submit" disabled={issue.isPending || staffIncomplete} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
         {issue.isPending ? t("creating") : t("createLink")}
       </button>
@@ -300,7 +301,7 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
   if (joinLink.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("loading")}</p>;
-  if (joinLink.error) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(joinLink.error, uiT)}</p>;
+  if (joinLink.error) return <ErrorNotice>{localizeError(joinLink.error, uiT)}</ErrorNotice>;
 
   const data = joinLink.data!;
   const url = joinUrl(origin, slug);
@@ -334,7 +335,7 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
       ) : (
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("publicOff")}</p>
       )}
-      {save.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(save.error, uiT)}</p> : null}
+      {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
     </div>
   );
 }

@@ -27,6 +27,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { giftText, invitePill, inviteUrl, qualifyingText, rewardText, stageText, type Tone } from "./referrals";
 import { QrCode } from "./QrCode";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type ReferralsTab = "invite" | "invites";
 
@@ -88,9 +89,7 @@ export function ReferralsPage() {
       ) : overview.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : overview.isError ? (
-        <HubCard>
-          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("loadFailed")}</p>
-        </HubCard>
+        <ErrorNotice>{t("loadFailed")}</ErrorNotice>
       ) : (
         <Overview
           data={overview.data}

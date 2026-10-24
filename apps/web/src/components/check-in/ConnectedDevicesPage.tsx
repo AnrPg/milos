@@ -20,6 +20,7 @@ import { integrationStatusKey, visibleIntegrations } from "@/lib/platform/device
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Εγώ › Συνδεδεμένες συσκευές (ADR-155 §11, vision §7.11): the Wallet cards
@@ -39,14 +40,28 @@ export function ConnectedDevicesPage() {
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
       <BackToMe />
       <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("devicesTitle")}</h1>
-      {toast.message ? (
+      {toast.message && !toast.ok ? (
+        <div data-testid="garmin-return">
+          <ErrorNotice
+            live="polite"
+            action={
+              <button type="button" onClick={toast.dismiss} className="font-bold" style={{ color: "var(--danger-strong)" }}>
+                {toast.dismissLabel}
+              </button>
+            }
+          >
+            {toast.message}
+          </ErrorNotice>
+        </div>
+      ) : null}
+      {toast.message && toast.ok ? (
         <div
           role="status"
           data-testid="garmin-return"
           className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm"
           style={{
-            background: toast.ok ? "color-mix(in srgb, var(--success) 14%, var(--panel))" : "color-mix(in srgb, var(--danger) 12%, var(--panel))",
-            border: `1px solid ${toast.ok ? "var(--success)" : "var(--danger)"}`,
+            background: "color-mix(in srgb, var(--success) 14%, var(--panel))",
+            border: "1px solid var(--success)",
             color: "var(--text)",
           }}
         >
@@ -57,7 +72,7 @@ export function ConnectedDevicesPage() {
         </div>
       ) : null}
       {devices.isPending ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-      {devices.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(devices.error))}</p> : null}
+      {devices.isError ? <ErrorNotice>{t(checkInErrorKey(devices.error))}</ErrorNotice> : null}
       {devices.data ? (
         <>
           <WalletSection token={token} wallet={devices.data.wallet} />
@@ -193,7 +208,7 @@ function CalendarSection({ token, calendar }: { token: string; calendar: Connect
         pending={regenerate.isPending}
         onConfirm={() => regenerate.mutate()}
       />
-      {regenerate.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(regenerate.error))}</p> : null}
+      {regenerate.isError ? <ErrorNotice>{t(checkInErrorKey(regenerate.error))}</ErrorNotice> : null}
     </Card>
   );
 }

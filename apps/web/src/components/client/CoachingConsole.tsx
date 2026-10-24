@@ -22,6 +22,7 @@ import { safeVideoUrl } from "@/components/client/video";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const FORM_REVIEWS_KEY = ["me", "form-reviews"] as const;
 
@@ -180,9 +181,7 @@ function FormReviews() {
         {i18n("clFormReviewHistory")}
       </h3>
       {withdraw.isError ? (
-        <p role="alert" className="mb-2 text-sm" style={{ color: "var(--danger)" }}>
-          {clientErrorMessage(withdraw.error, i18n)}
-        </p>
+        <ErrorNotice className="mb-2">{clientErrorMessage(withdraw.error, i18n)}</ErrorNotice>
       ) : null}
       {query.isPending ? (
         <LoadingLine />
@@ -266,9 +265,15 @@ function FormReviewForm({ onSubmitted }: { onSubmitted: () => void }) {
           className={inputClass}
           style={inputStyle}
         />
-        <p id={`${id}-url-help`} className="mt-1 text-xs" style={{ color: invalidUrl ? "var(--danger)" : "var(--dim)" }}>
-          {invalidUrl ? i18n("clFormReviewInvalidUrl") : i18n("clFormReviewVideoHelp")}
-        </p>
+        {invalidUrl ? (
+          <ErrorNotice id={`${id}-url-help`} variant="field" className="mt-1">
+            {i18n("clFormReviewInvalidUrl")}
+          </ErrorNotice>
+        ) : (
+          <p id={`${id}-url-help`} className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+            {i18n("clFormReviewVideoHelp")}
+          </p>
+        )}
       </div>
       <div>
         <label htmlFor={`${id}-exercise`} className="mb-1 block text-xs font-semibold" style={{ color: "var(--muted)" }}>
@@ -306,9 +311,13 @@ function FormReviewForm({ onSubmitted }: { onSubmitted: () => void }) {
         >
           {submit.isPending ? i18n("clSending") : i18n("clFormReviewSubmit")}
         </button>
-        <span role="status" className="text-sm" style={{ color: submit.isError ? "var(--danger)" : "var(--success)" }}>
-          {submit.isError ? clientErrorMessage(submit.error, i18n) : sent ? i18n("clFormReviewSubmitted") : ""}
-        </span>
+        {submit.isError ? (
+          <ErrorNotice variant="text">{clientErrorMessage(submit.error, i18n)}</ErrorNotice>
+        ) : (
+          <span role="status" className="text-sm" style={{ color: "var(--success)" }}>
+            {sent ? i18n("clFormReviewSubmitted") : ""}
+          </span>
+        )}
       </div>
     </form>
   );

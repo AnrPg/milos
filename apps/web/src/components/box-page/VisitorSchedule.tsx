@@ -15,6 +15,7 @@ import { YourTime } from "@/components/zoned-time";
 import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Slot = PublicBoxSchedule["slots"][number];
 const ALL = "";
@@ -119,12 +120,16 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
 
       {schedule.isPending ? <p className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
       {schedule.isError ? (
-        <p className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>
-          {tSchedule("loadFailed")}{" "}
-          <button type="button" onClick={() => void schedule.refetch()} className="font-bold underline">
-            {tSchedule("retry")}
-          </button>
-        </p>
+        <ErrorNotice
+          className="my-6"
+          action={
+            <button type="button" onClick={() => void schedule.refetch()} className="font-bold underline">
+              {tSchedule("retry")}
+            </button>
+          }
+        >
+          {tSchedule("loadFailed")}
+        </ErrorNotice>
       ) : null}
       {schedule.isSuccess && day.length === 0 ? (
         <p className="rounded-2xl p-5 text-center text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>

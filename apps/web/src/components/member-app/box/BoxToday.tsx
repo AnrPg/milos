@@ -37,6 +37,7 @@ import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -219,9 +220,7 @@ export function BoxToday({
             {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
 
             {launcher.error ? (
-              <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-                {localizeError(launcher.error, i18n)}
-              </p>
+              <ErrorNotice>{localizeError(launcher.error, i18n)}</ErrorNotice>
             ) : null}
 
             <div className="flex gap-2">

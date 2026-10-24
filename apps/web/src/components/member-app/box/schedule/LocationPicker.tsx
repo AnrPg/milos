@@ -15,6 +15,7 @@ import { rememberSelectedOrganization } from "@/lib/organization-slug";
 import type { MapBounds } from "./PlacesMap";
 import { useRememberScheduleLocation } from "./use-schedule-preferences";
 import { Layer } from "@/components/ui/Layer";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const PlacesMap = dynamic(() => import("./PlacesMap"), {
   ssr: false,
@@ -233,9 +234,7 @@ export function LocationPicker() {
             className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6"
           >
             {error ? (
-              <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-                {error}
-              </p>
+              <ErrorNotice>{error}</ErrorNotice>
             ) : null}
             {gymLocationCount > 1 ? (
               <button

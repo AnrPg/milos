@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 // Small presentational pieces shared by the staff screens, styled like the
@@ -67,9 +68,10 @@ export function StaffPanel({
 }
 
 export function StatusText({ tone, children }: { tone: "error" | "success" | "muted"; children: ReactNode }) {
-  const color = tone === "error" ? "var(--danger)" : tone === "success" ? "var(--success)" : "var(--muted)";
+  if (tone === "error") return <ErrorNotice>{children}</ErrorNotice>;
+  const color = tone === "success" ? "var(--success)" : "var(--muted)";
   return (
-    <p className="text-sm" role={tone === "error" ? "alert" : "status"} style={{ color }}>
+    <p className="text-sm" role="status" style={{ color }}>
       {children}
     </p>
   );

@@ -10,6 +10,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 import { QrCode } from "./QrCode";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * The printed poster (ADR-155 §5, board 10 Q1 extra) for a box without a
@@ -46,7 +47,7 @@ export function PosterPage({ locationId }: { locationId: string }) {
       </nav>
 
       {poster.isPending ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-      {poster.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("errorGeneric")}</p> : null}
+      {poster.isError ? <ErrorNotice>{t("errorGeneric")}</ErrorNotice> : null}
       {poster.data && !poster.data.enabled ? (
         <div className="checkin-print-hide flex max-w-md flex-col gap-3 text-center">
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("posterOff")}</p>

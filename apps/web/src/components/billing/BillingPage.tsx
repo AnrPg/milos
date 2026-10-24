@@ -25,6 +25,7 @@ import { billingTab, sessionsLeft, validityProgress, type BillingTab } from "./b
 import { OffersSegment } from "./OffersSegment";
 import { Detail, Empty, Row } from "./parts";
 import { TransactionsSegment } from "./TransactionsSegment";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Εγώ › Πληρωμές (vision §6.3, §7.11): per gym or coach the person is a
@@ -108,9 +109,7 @@ export function BillingPage() {
       {billing.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : billing.isError ? (
-        <HubCard>
-          <p className="text-sm" role="alert" style={{ color: "var(--text-soft)" }}>{t("loadFailed")}</p>
-        </HubCard>
+        <ErrorNotice>{t("loadFailed")}</ErrorNotice>
       ) : current ? (
         <ProviderBilling
           key={current.organization_id}

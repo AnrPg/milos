@@ -12,6 +12,7 @@ import { feltHighlights, goalHighlights, toggleValue } from "@/lib/wod-goals/goa
 import { MuscleChip, RoleLegend, ToggleChip } from "./GoalChips";
 import { MusclePickerSheet } from "./MusclePickerSheet";
 import { useGoalFeedback, useSaveGoalFeedback } from "./use-wod-goals";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Layout = "page" | "inline";
 
@@ -103,7 +104,7 @@ function FeltForm({
       footer={
         <>
           {save.isError ? (
-            <p role="alert" className="text-center text-sm" style={{ color: "var(--danger)" }}>{t("felt.error")}</p>
+            <ErrorNotice>{t("felt.error")}</ErrorNotice>
           ) : null}
           <div className="flex gap-2">
             <button

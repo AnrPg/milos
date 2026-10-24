@@ -10,6 +10,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const field = "w-full rounded-2xl px-4 py-3 text-sm";
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
@@ -59,7 +60,7 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
         <button type="submit" className={button} disabled={create.isPending || name.trim().length < 2} style={{ background: "var(--text)", color: "var(--bg)" }}>
           {i18n("orgCreateAction")}
         </button>
-        {create.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(create.error, i18n)}</p> : null}
+        {create.isError ? <ErrorNotice>{localizeError(create.error, i18n)}</ErrorNotice> : null}
       </form>
 
       <form
@@ -81,7 +82,7 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
           {i18n("orgTransferAction")}
         </button>
         {transfer.isSuccess ? <p className="text-sm" style={{ color: "var(--success, var(--primary))" }}>{i18n("orgTransferDone")}</p> : null}
-        {transfer.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(transfer.error, i18n)}</p> : null}
+        {transfer.isError ? <ErrorNotice>{localizeError(transfer.error, i18n)}</ErrorNotice> : null}
       </form>
 
       <form
@@ -98,7 +99,7 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
         <button type="submit" className={button} disabled={confirm.trim() !== slug || archive.isPending} style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
           {i18n("orgArchiveAction")}
         </button>
-        {archive.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(archive.error, i18n)}</p> : null}
+        {archive.isError ? <ErrorNotice>{localizeError(archive.error, i18n)}</ErrorNotice> : null}
       </form>
     </div>
   );

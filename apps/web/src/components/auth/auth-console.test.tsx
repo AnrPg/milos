@@ -3,19 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AuthConsole } from "@/components/auth-console";
 import { ApiError } from "@/api/client";
+import { chooseValue } from "@/components/ui/select-test-utils";
 
 const replace = vi.fn();
+const refresh = vi.fn();
 const signIn = vi.fn();
 const signUp = vi.fn();
 const session = { status: "guest" as string };
 let search = "";
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace }),
+  useRouter: () => ({ replace, refresh }),
   useSearchParams: () => new URLSearchParams(search),
 }));
 
 vi.mock("next-intl", () => ({
+  useLocale: () => "en",
   useTranslations: () => (key: string, values?: Record<string, unknown>) =>
     values ? `${key}:${JSON.stringify(values)}` : key,
 }));
@@ -48,6 +51,30 @@ describe("AuthConsole", () => {
     vi.clearAllMocks();
     session.status = "guest";
     search = "";
+  });
+
+  it("switches the page language from the sign-in screen (ADR-195)", async () => {
+    render(<AuthConsole />);
+
+    await chooseValue(screen.getByRole("combobox", { name: "languageLabel" }), "el");
+
+    expect(document.cookie).toContain("palee_locale=el");
+    expect(document.documentElement.lang).toBe("el");
+    await waitFor(() => expect(refresh).toHaveBeenCalled());
+  });
+
+  it("shows a failed sign-in as a red alert", async () => {
+    signIn.mockRejectedValue(new Error("Invalid credentials"));
+    render(<AuthConsole />);
+
+    fireEvent.change(screen.getByLabelText("identifierLabel"), { target: { value: "maria_k" } });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "wrong" } });
+    fireEvent.click(screen.getByRole("button", { name: "signInada2e9e" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Invalid credentials");
+    expect(alert).toHaveAttribute("data-error-notice", "banner");
+    expect(alert.getAttribute("style")).toContain("var(--danger-strong)");
   });
 
   it("signs in with one email-or-handle identifier and links to the forgot-password page", async () => {

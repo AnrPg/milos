@@ -38,6 +38,7 @@ import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -265,18 +266,22 @@ export function PlatformOrganizationsPage() {
       </header>
 
       {error ? (
-        <div className="mt-5 flex items-center justify-between gap-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
-          <span>{error}</span>
-          <button type="button" className="font-semibold underline" onClick={() => void organizationsQuery.refetch()}>
-            {copy.retry}
-          </button>
-        </div>
+        <ErrorNotice
+          className="mt-5"
+          action={
+            <button type="button" className="font-semibold underline" onClick={() => void organizationsQuery.refetch()}>
+              {copy.retry}
+            </button>
+          }
+        >
+          {error}
+        </ErrorNotice>
       ) : null}
 
       {!error && organizationsQuery.isError && !forbidden ? (
-        <div className="mt-5 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
+        <ErrorNotice className="mt-5">
           {copy.loadError}
-        </div>
+        </ErrorNotice>
       ) : null}
 
       {invitation ? (
@@ -336,7 +341,7 @@ export function PlatformOrganizationsPage() {
                     ? copy.sendingEmail
                     : `${copy.sendEmail} ${invitationEmail}`}
               </button>
-              {emailSendError ? <p className="mt-2 text-sm text-[var(--danger)]">{emailSendError}</p> : null}
+              {emailSendError ? <ErrorNotice variant="field" className="mt-2">{emailSendError}</ErrorNotice> : null}
             </div>
           ) : null}
         </section>
@@ -687,8 +692,8 @@ function AccessDialog({
       showClose={false}
       headerActions={<button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">{copy.cancel}</button>}
     >
-        {error ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
-        {accessQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.accessError}</p> : null}
+        {error ? <ErrorNotice className="mt-4">{error}</ErrorNotice> : null}
+        {accessQuery.isError ? <ErrorNotice className="mt-4">{copy.accessError}</ErrorNotice> : null}
 
         <form className="mt-5 grid gap-3 border-y border-[var(--border)] py-5 sm:grid-cols-[1fr_1fr_1fr_auto]" onSubmit={invite}>
           <label className="text-sm font-medium text-[var(--text)]">

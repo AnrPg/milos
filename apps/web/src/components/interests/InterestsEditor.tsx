@@ -8,6 +8,7 @@ import { INTEREST_LEVELS, fetchMyInterests, saveMyInterests, type AccountInteres
 import { getBoxVocabulary } from "@/api/public-profile";
 import { ChoiceChips } from "@/components/filters/FilterPage";
 import { useSession } from "@/components/session-provider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export const MY_INTERESTS_KEY = ["my-interests"] as const;
 const MAX_DISCIPLINES = 12;
@@ -87,7 +88,7 @@ export function InterestsEditor({
         </div>
       ))}
       {vocabulary.isError ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("loadFailed")}</p>
+        <ErrorNotice>{t("loadFailed")}</ErrorNotice>
       ) : null}
       <div className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("levelTitle")}</h2>
@@ -100,7 +101,7 @@ export function InterestsEditor({
         />
       </div>
       {save.isError ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("saveFailed")}</p>
+        <ErrorNotice>{t("saveFailed")}</ErrorNotice>
       ) : null}
       {renderActions({ save: submit, busy: save.isPending, dirty })}
     </div>

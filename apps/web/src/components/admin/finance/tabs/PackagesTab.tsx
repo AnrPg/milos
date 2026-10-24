@@ -24,6 +24,7 @@ import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
 import type { FacilityLocation } from "@/api/facility";
 import { BranchCoverageBadge } from "@/components/admin/BranchFilter";
 import type { LocationScope } from "@/lib/location-scope";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -161,7 +162,11 @@ export function PackagesTab({ locationIds }: { locationIds?: string } = {}) {
               />
             </div>
           ) : (
-            <p className="px-6 py-6 text-sm" style={{ color: "var(--dim)" }}>{catalogError ? i18n("pkgCatalogUnavailable") : i18n("loading33ce417")}</p>
+            catalogError ? (
+            <div className="px-6 py-6"><ErrorNotice>{i18n("pkgCatalogUnavailable")}</ErrorNotice></div>
+          ) : (
+            <p className="px-6 py-6 text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+          )
           )}
         </SidePanel>
       ) : null}

@@ -21,6 +21,7 @@ import { buddyErrorMessage } from "./errors";
 import { NeedSupportSheet } from "./SupportSend";
 import { useBuddies, useBuddyToken } from "./use-buddies";
 import { TimeInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Εγώ › Buddy για στήριξη (ADR-160, board 15, mockup «buddy»): up to two
@@ -354,8 +355,8 @@ function MySettings({ settings }: { settings: BuddySettings | null }) {
           </label>
         ) : null}
       </div>
-      {!timesValid ? <p className="text-xs" role="alert" style={{ color: "var(--danger)" }}>{t("errors.invalid_quiet_hours")}</p> : null}
-      {phoneMissing ? <p className="text-xs" style={{ color: "var(--dim)" }}>{t("errors.phone_required")}</p> : null}
+      {!timesValid ? <ErrorNotice variant="field">{t("errors.invalid_quiet_hours")}</ErrorNotice> : null}
+      {phoneMissing ? <ErrorNotice variant="field">{t("errors.phone_required")}</ErrorNotice> : null}
       <div>
         <PillButton primary disabled={save.isPending || !timesValid || phoneMissing} onClick={() => save.mutate()}>
           {save.isPending ? t("saving") : t("save")}

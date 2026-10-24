@@ -25,6 +25,7 @@ import { StateChip } from "@/components/password-resets/StateChip";
 import { relativeTime } from "@/components/password-resets/reset-email";
 import { canTakeOver, claimerName, sourceLabels } from "@/components/password-resets/request-labels";
 import { useNow } from "@/components/password-resets/use-now";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const primaryButton =
   "rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-40";
@@ -155,9 +156,9 @@ export function RequestView({ id, request, loading }: { id: string; request: Pas
       </header>
 
       {notice ? (
-        <p role="alert" className="text-sm text-[var(--danger)]">
+        <ErrorNotice>
           {notice}
-        </p>
+        </ErrorNotice>
       ) : null}
 
       {issued ? (

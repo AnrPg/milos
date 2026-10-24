@@ -60,6 +60,7 @@ import {
   type QuotaValue,
 } from "./package-catalog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STORAGE_KEY = "palee.package-wizard.draft.v1";
 const TYPE_ICONS: Record<string, string> = {
@@ -288,10 +289,10 @@ export function PackageWizard({
           {!showAdvanced && draft && step !== "type" && step !== "review" ? <MemberPreview draft={draft} classTypes={classTypes} compact {...previewContext(catalog, draft, packages)} /> : null}
 
           {createMutation.error ? (
-            <p role="alert" className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}>
+            <ErrorNotice>
               {localizeError(createMutation.error, t)}
               {serverError ? ` (${t(fieldLabelKey(serverError.split(".").slice(0, 2).join(".")))})` : ""}
-            </p>
+            </ErrorNotice>
           ) : null}
         </div>
       </div>
@@ -744,7 +745,7 @@ export function IncludedStep({
         </ServiceCard>
       ) : null}
 
-      {serviceError ? <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{serviceError}</p> : null}
+      {serviceError ? <ErrorNotice>{serviceError}</ErrorNotice> : null}
     </div>
   );
 }
@@ -778,7 +779,7 @@ function ServiceCard({
         {locked ? null : <Toggle label={title} checked={checked} onChange={onToggle} />}
       </div>
       {checked && children ? <div className="space-y-5 px-4 pb-4">{children}</div> : null}
-      {error ? <p role="alert" className="px-4 pb-4 text-xs font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice variant="field" className="mx-4 mb-4">{error}</ErrorNotice> : null}
     </fieldset>
   );
 }
@@ -848,9 +849,11 @@ function ReviewStep({
         </div>
       </dl>
       {issues.length > 0 ? (
-        <ul role="alert" className="space-y-1 rounded-2xl p-4 text-sm" style={{ background: "color-mix(in srgb, var(--danger) 8%, transparent)", color: "var(--danger)" }}>
-          {issues.map((issue) => <li key={issue.field}>{t(issue.message)}</li>)}
-        </ul>
+        <ErrorNotice>
+          <ul className="space-y-1">
+            {issues.map((issue) => <li key={issue.field}>{t(issue.message)}</li>)}
+          </ul>
+        </ErrorNotice>
       ) : null}
       {type ? <LockStrip type={type} /> : null}
     </div>

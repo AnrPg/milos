@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import type { FacilityLocation } from "@/api/facility";
 import { coversLocation, type LocationScope } from "@/lib/location-scope";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Above this many branches the picker gets a search field. */
 const SEARCH_FROM = 8;
@@ -104,7 +105,7 @@ export function BranchScopePicker({
         ) : null}
       </div>
       {value !== "all" && value.length === 0 ? (
-        <p className="mt-2 text-xs" style={{ color: "var(--danger)" }}>{t("chooseOneBranch")}</p>
+        <ErrorNotice variant="field" className="mt-2">{t("chooseOneBranch")}</ErrorNotice>
       ) : null}
     </fieldset>
   );

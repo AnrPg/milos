@@ -10,6 +10,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { useSocialSummary } from "./use-social";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Κοινοποίηση & ορατότητα › «Μέλη» (board 7 Q1 extra): stay off the members
@@ -45,7 +46,7 @@ export function MemberVisibilitySetting() {
         {hidden ? t("visibilityShow") : t("visibilityHide")}
       </button>
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{clientErrorMessage(save.error, tUi)}</p>
+        <ErrorNotice>{clientErrorMessage(save.error, tUi)}</ErrorNotice>
       ) : null}
     </div>
   );

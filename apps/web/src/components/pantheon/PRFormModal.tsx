@@ -36,6 +36,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { PRShareFlow } from "@/components/pantheon/PRShareFlow";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -467,7 +468,7 @@ export function PRFormModal({
           </label>
 
           {error && (
-            <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p>
+            <ErrorNotice>{error}</ErrorNotice>
           )}
         </div>
     </Dialog>

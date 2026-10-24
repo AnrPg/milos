@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useAccountProfiles, useSwitchProfile } from "@/components/account/use-account-profiles";
 import { useSession } from "@/components/session-provider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * ADR-187: the account menu's quick switch to the login's other profiles.
@@ -46,7 +47,7 @@ export function ProfileSwitcherMenu() {
         </button>
       ))}
       {failed ? (
-        <p className="px-4 py-1 text-xs font-semibold" style={{ color: "var(--danger)" }}>{t("switchError")}</p>
+        <ErrorNotice variant="field" className="mx-4 my-1">{t("switchError")}</ErrorNotice>
       ) : null}
     </div>
   );

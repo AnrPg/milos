@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ApiError } from "@/api/client";
 import { PASSWORD_RESET_LOG_KEY, fetchPasswordResetLog } from "@/api/password-resets";
 import { useSession } from "@/components/session-provider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const EVENTS = new Set([
   "requested",
@@ -53,7 +54,7 @@ export function PasswordResetLogPage() {
       </header>
 
       {forbidden ? <p className="mt-6 text-[var(--text-soft)]">{t("logForbidden")}</p> : null}
-      {log.isError && !forbidden ? <p className="mt-6 text-[var(--danger)]">{t("loadError")}</p> : null}
+      {log.isError && !forbidden ? <ErrorNotice className="mt-6">{t("loadError")}</ErrorNotice> : null}
       {log.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}
       {log.isSuccess && entries.length === 0 ? <p className="mt-6 text-[var(--text-soft)]">{t("logEmpty")}</p> : null}
 

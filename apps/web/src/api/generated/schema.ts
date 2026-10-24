@@ -39028,6 +39028,11 @@ export interface operations {
                     /** @description Deprecated alias of handle */
                     nickname?: string;
                     password: string;
+                    /**
+                     * @description ADR-195: the new profile's UI language; defaults to en
+                     * @enum {string}
+                     */
+                    preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                     /** @enum {string} */
                     role: "member" | "athlete";
                 };
@@ -39128,6 +39133,11 @@ export interface operations {
                     /** @description Deprecated alias of handle */
                     nickname?: string;
                     password: string;
+                    /**
+                     * @description ADR-195: the new profile's UI language; defaults to en
+                     * @enum {string}
+                     */
+                    preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                 };
             };
         };
@@ -39199,6 +39209,11 @@ export interface operations {
                     /** @description Deprecated alias of handle */
                     nickname?: string;
                     password: string;
+                    /**
+                     * @description ADR-195: the new profile's UI language; defaults to en
+                     * @enum {string}
+                     */
+                    preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                 };
             };
         };

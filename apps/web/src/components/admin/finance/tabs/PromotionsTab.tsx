@@ -26,6 +26,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useTranslations } from "next-intl";
 import { PartnerPerksPanel } from "@/components/admin/finance/perks/PartnerPerksPanel";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -259,7 +260,7 @@ function BoxPromotions({ locationIds }: { locationIds?: string }) {
             </label>
             <AppliesToBranches kind="covering" locations={locationsQuery.data} value={branches} onChange={setBranchDraft} />
             {createMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createMutation.error, i18n)}</p>
+              <ErrorNotice>{localizeError(createMutation.error, i18n)}</ErrorNotice>
             )}
           </div>
         </SidePanel>

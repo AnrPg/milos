@@ -15,6 +15,7 @@ import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Εγώ › Τα box και τα clubs μου (mockup «myClubs»): your gyms (and joining
@@ -77,7 +78,7 @@ function ClubRow({ club }: { club: CommunityClub }) {
           {club.name}
         </Link>
         <label htmlFor={selectId} className="text-xs" style={{ color: "var(--dim)" }}>{t("notifyLabel")}</label>
-        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice variant="text">{error}</ErrorNotice> : null}
       </div>
       <Select
         id={selectId}

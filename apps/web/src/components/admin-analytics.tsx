@@ -21,6 +21,7 @@ import { ExecutionKpiDashboard } from "@/components/admin/ExecutionKpiDashboard"
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -219,9 +220,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
         />
 
         {summaryQuery.error instanceof Error ? (
-          <p className="rounded-2xl border border-[color:var(--danger)] bg-[color-mix(in_srgb,var(--danger)_15%,transparent)] p-4 text-sm text-[var(--danger)]">
+          <ErrorNotice>
             {localizeError(summaryQuery.error, i18n)}
-          </p>
+          </ErrorNotice>
         ) : null}
 
         {section === "overview" ? <section className="grid gap-4 md:grid-cols-4">

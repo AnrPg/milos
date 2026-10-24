@@ -81,10 +81,15 @@ defmodule Palee.Places.Domain.AroundPlan do
   end
 
   defp priced_allows?("boxes", filter), do: "trial" in filter.cost
-  defp priced_allows?("events", filter), do: "free" in filter.cost or AroundFilter.price_range?(filter)
+
+  defp priced_allows?("events", filter),
+    do: "free" in filter.cost or AroundFilter.price_range?(filter)
+
   # Clubs are always free: they stay while the price range starts at free.
   defp priced_allows?("clubs", filter),
-    do: "free" in filter.cost or (AroundFilter.price_range?(filter) and is_nil(min_price_cents(filter)))
+    do:
+      "free" in filter.cost or
+        (AroundFilter.price_range?(filter) and is_nil(min_price_cents(filter)))
 
   # Events: «Δωρεάν» alone means 0; with a range it pulls the range down to free.
   defp min_price_cents(%{cost: cost, min_price_cents: min}) do

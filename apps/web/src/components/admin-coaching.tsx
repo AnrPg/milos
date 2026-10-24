@@ -25,6 +25,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, useBranchFilter } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -270,7 +271,7 @@ export function AdminCoaching() {
                       {drillDownQuery.isPending ? (
                         <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
                       ) : drillDownQuery.error instanceof Error ? (
-                        <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(drillDownQuery.error, i18n)}</p>
+                        <ErrorNotice>{localizeError(drillDownQuery.error, i18n)}</ErrorNotice>
                       ) : drillDownQuery.data?.drill_down ? (
                         <DrillDownPanel drillDown={drillDownQuery.data.drill_down} />
                       ) : null}

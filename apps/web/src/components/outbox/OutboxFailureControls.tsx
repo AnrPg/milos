@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useUiTranslations } from "@/i18n/ui";
 import { describeOutboxFailure, type OutboxFailure } from "@/lib/outbox-failure";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type OutboxFailureControlsProps = {
   failure?: OutboxFailure;
@@ -44,10 +45,10 @@ export function OutboxFailureControls({
 
   return (
     <div className={"flex flex-col gap-1.5 " + (align === "end" ? "items-end text-end" : "items-start")}>
-      <p className="text-xs leading-5" style={{ color: "var(--danger)" }}>
+      <ErrorNotice variant="field">
         {describeOutboxFailure(failure, i18n)}
         {failure?.category === "conflict" ? ` ${i18n("outboxConflictHint")}` : ""}
-      </p>
+      </ErrorNotice>
       {confirming ? (
         <div className="flex flex-wrap items-center gap-2" role="group" aria-live="polite">
           <span className="text-xs" style={{ color: "var(--text-soft)" }}>

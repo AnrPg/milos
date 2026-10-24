@@ -22,6 +22,7 @@ import { useSession } from "@/components/session-provider";
 import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type DemoBusiness = BusinessAccountsQueue["demo_businesses"][number];
 
@@ -155,7 +156,7 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
           </button>
         </div>
       )}
-      {decide.error ? <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(decide.error, i18n)}</p> : null}
+      {decide.error ? <ErrorNotice>{localizeError(decide.error, i18n)}</ErrorNotice> : null}
     </article>
   );
 }
@@ -243,7 +244,7 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
         </div>
       ) : null}
       {issue.error ?? revoke.error ? (
-        <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(issue.error ?? revoke.error, i18n)}</p>
+        <ErrorNotice>{localizeError(issue.error ?? revoke.error, i18n)}</ErrorNotice>
       ) : null}
     </article>
   );

@@ -16,6 +16,7 @@ import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const RECOVERY_CODES_QUERY_KEY = ["account", "recovery-codes"] as const;
 
@@ -48,7 +49,7 @@ export function RecoveryCodesSection() {
             {isSetUp ? t("codesUnused", { unused: status.unused, total: status.total }) : t("codesNotSetUp")}
           </p>
         ) : statusQuery.isError ? (
-          <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("codesLoadError")}</p>
+          <ErrorNotice>{t("codesLoadError")}</ErrorNotice>
         ) : null}
         <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>{t("codesExplainer")}</p>
         <button
@@ -250,7 +251,7 @@ function RecoveryCodesDialog({ regenerate, onClose }: { regenerate: boolean; onC
           />
         </div>
         {error ? (
-          <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p>
+          <ErrorNotice>{error}</ErrorNotice>
         ) : null}
       </div>
     </Dialog>

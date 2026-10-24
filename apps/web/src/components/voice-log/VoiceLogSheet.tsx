@@ -9,6 +9,7 @@ import { createBrowserVoiceRecorder, type VoiceRecorder } from "@/lib/platform/v
 
 import { elapsedLabel, voiceErrorKey, type VoiceErrorKey } from "./voice-log-model";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Phase = { name: "idle" } | { name: "recording"; startedAt: number } | { name: "working" } | { name: "error"; key: VoiceErrorKey };
 
@@ -156,7 +157,7 @@ export function VoiceLogSheet({
                   : t("tapToStart")}
           </p>
           {phase.name === "error" ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(`errors.${phase.key}`)}</p>
+            <ErrorNotice>{t(`errors.${phase.key}`)}</ErrorNotice>
           ) : null}
         </div>
 

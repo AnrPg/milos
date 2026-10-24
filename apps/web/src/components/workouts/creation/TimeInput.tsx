@@ -2,6 +2,7 @@
 
 import { useUiTranslations } from "@/i18n/ui";
 import { useId, useState } from "react";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   value: number | null;
@@ -85,9 +86,13 @@ export function TimeInput({ value, onChange, presets, ariaLabel }: Props) {
           color: "var(--text)",
         }}
       />
-      <span id={hintId} className="text-[11px]" style={{ color: invalid ? "var(--danger)" : "var(--dim)" }}>
-        {invalid ? i18n("durationInputInvalid") : i18n("durationInputHint")}
-      </span>
+      {invalid ? (
+        <ErrorNotice variant="field" id={hintId}>{i18n("durationInputInvalid")}</ErrorNotice>
+      ) : (
+        <span id={hintId} className="text-[11px]" style={{ color: "var(--dim)" }}>
+          {i18n("durationInputHint")}
+        </span>
+      )}
       {presets && presets.length > 0 ? (
         <div className="flex flex-wrap justify-end gap-1.5">
           {presets.map((preset) => (

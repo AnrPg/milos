@@ -21,6 +21,7 @@ import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const inputClass = "mt-1 w-full rounded-2xl px-4 py-3 text-base outline-none";
 const inputStyle = { background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" } as const;
@@ -108,7 +109,7 @@ function ArchivedDemoRow({ token, demo }: { token: string; demo: BusinessArchive
           {reopen.isPending ? t("settings.reopening") : t("settings.reopen")}
         </button>
       )}
-      {reopen.error ? <p role="alert" className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{localizeError(reopen.error, i18n)}</p> : null}
+      {reopen.error ? <ErrorNotice className="mt-2">{localizeError(reopen.error, i18n)}</ErrorNotice> : null}
     </li>
   );
 }
@@ -151,7 +152,7 @@ function RequestRow({ token, request }: { token: string; request: BusinessReques
           {t("settings.cancel")}
         </button>
       ) : null}
-      {cancel.error ? <p role="alert" className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{localizeError(cancel.error, i18n)}</p> : null}
+      {cancel.error ? <ErrorNotice className="mt-2">{localizeError(cancel.error, i18n)}</ErrorNotice> : null}
     </li>
   );
 }
@@ -213,7 +214,7 @@ function ConversionForm({ token }: { token: string }) {
         <textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength={1000} rows={3} className={inputClass} style={inputStyle} />
       </label>
       {send.isSuccess ? <p role="status" className="text-sm" style={{ color: "var(--success)" }}>{t("settings.sent")}</p> : null}
-      {send.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(send.error, i18n)}</p> : null}
+      {send.error ? <ErrorNotice>{localizeError(send.error, i18n)}</ErrorNotice> : null}
       <button
         type="submit"
         disabled={send.isPending || name.trim().length < 2}

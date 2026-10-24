@@ -13,6 +13,7 @@ import {
   regenerateCalendarExportLinks,
   type CalendarExportLinks as CalendarExportLinksPayload,
 } from "@/api/calendar";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   token: string | null | undefined;
@@ -99,7 +100,7 @@ export function CalendarExportLinks({ token, compact = false }: Props) {
           <p className="mt-1 text-sm font-semibold text-[var(--text-soft)]">
             {i18n("subscribeForAutomaticUpdatesCopyTheHttpsIcsed663fe")}
           </p>
-          {error ? <p className="mt-2 text-xs font-bold text-[var(--primary-strong)]">{error}</p> : null}
+          {error ? <ErrorNotice variant="field" className="mt-2">{error}</ErrorNotice> : null}
         </div>
 
         <div className="flex flex-wrap gap-2">

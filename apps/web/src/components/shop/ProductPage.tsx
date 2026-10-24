@@ -13,6 +13,7 @@ import { choose, initialSelection, isColourAxis, isSoldOut, orderableUnits, sele
 import { CartButton, ErrorNotice, Eyebrow, LoadingLine, Panel, ProductPhoto, ShopHeader } from "./ShopParts";
 import { PriceTag, QuantityStepper } from "./shared/ShopBits";
 import { shopHref, useBackInStock, useCart, useShopBox, useShopProduct, useStockAlerts, useStorefront } from "./use-shop";
+import { ErrorNotice as SharedErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * A product: photos, the price (and the member's price with their package),
@@ -177,7 +178,7 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
                   {t("notifyMe")}
                 </button>
               )}
-              {noticeFor === variant.id && backInStock.isError ? <span style={{ color: "var(--danger)" }}>{t("notifyFailed")}</span> : null}
+              {noticeFor === variant.id && backInStock.isError ? <SharedErrorNotice variant="text">{t("notifyFailed")}</SharedErrorNotice> : null}
             </div>
           ) : null}
         </Panel>

@@ -18,6 +18,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { Dialog } from "@/components/ui/Dialog";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   accessToken: string;
@@ -359,7 +360,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 ) : null}
 
                 {error ? (
-                  <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>
+                  <ErrorNotice>{error}</ErrorNotice>
                 ) : null}
               </>
             )}

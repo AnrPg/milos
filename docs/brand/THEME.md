@@ -98,7 +98,7 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | --- | --- |
 | Text inputs and textareas: fill / border / text / caret | `--control-bg` / `--control-border` / `--text` / `--primary` |
 | Placeholder | `--placeholder` |
-| Invalid field border and message | `--danger` |
+| Invalid field border / message | `--danger` / `ui/ErrorNotice variant="field"` |
 | Autofilled field (WebKit) | `--control-bg` fill, `--text` text |
 | Dropdown (`ui/Select`, ADR-182; native `<select>` is banned by a guard test): trigger / chevron | `--control-bg`, `--control-border`, `--text` / `--muted` |
 | Dropdown: open list / group header / hovered or keyboard-active option / chosen option and its ✓ | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--text` at 7% with a `--focus-ring` outline / `--primary` at 14% and `--primary` |
@@ -137,7 +137,8 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | --- | --- |
 | Success text, check-in welcome, door flash | `--success` (`--success-contrast` on fills) |
 | Warning text and banners | `--warning` (`--warning-contrast` on fills); banner fill `--warning` mixed into `--panel` |
-| Error text, destructive confirmations | `--danger` (`--danger-contrast` on fills) |
+| Error messages and boxes (`ui/ErrorNotice`, ADR-195; hand-made alerts fail a guard test): fill / border / text and icon | `--danger-surface` / `--danger-border` / `--danger-strong` |
+| Destructive buttons and confirmations | `--danger` (`--danger-contrast` on fills) |
 | Info | `--info` (`--info-contrast` on fills) |
 | Live indicator (class timer) | `--spark` |
 | Tinted badges | the status colour mixed into `transparent` or `--panel` with `color-mix()` |

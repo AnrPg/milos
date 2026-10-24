@@ -16,6 +16,7 @@ import {
 } from "@/api/pr-sharing";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Candidate = { id: string; nickname: string; handle?: string | null };
 
@@ -105,7 +106,7 @@ export function PRSharingSettings() {
   }
 
   if (sharingQuery.isError) {
-    return <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("loadError")}</p>;
+    return <ErrorNotice>{t("loadError")}</ErrorNotice>;
   }
 
   if (!sharing) return null;
@@ -224,7 +225,7 @@ export function PRSharingSettings() {
       </div>
 
       {saveFailed ? (
-        <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("saveError")}</p>
+        <ErrorNotice>{t("saveError")}</ErrorNotice>
       ) : null}
     </div>
   );

@@ -25,6 +25,7 @@ import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
 import { PageHeader } from "@/components/PageHeader";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Step = "type" | "week" | "preview";
 
@@ -454,16 +455,9 @@ function WorkoutsPageContent() {
 
         <div {...bindWeekSwipe()} className="mx-auto max-w-5xl p-4 touch-pan-y">
           {error && (
-            <div
-              className="mb-4 rounded-3xl border px-4 py-3 text-sm"
-              style={{
-                background: "color-mix(in srgb, var(--primary) 12%, transparent)",
-                borderColor: "color-mix(in srgb, var(--primary) 35%, transparent)",
-                color: "var(--primary-strong)",
-              }}
-            >
+            <ErrorNotice className="mb-4">
               {error}
-            </div>
+            </ErrorNotice>
           )}
 
           {loadingSlots ? (
@@ -615,16 +609,9 @@ function WorkoutsPageContent() {
         </div>
 
         {error && (
-          <div
-            className="mb-4 rounded-3xl border px-4 py-3 text-sm"
-            style={{
-              background: "color-mix(in srgb, var(--primary) 12%, transparent)",
-              borderColor: "color-mix(in srgb, var(--primary) 35%, transparent)",
-              color: "var(--primary-strong)",
-            }}
-          >
+          <ErrorNotice className="mb-4">
             {error}
-          </div>
+          </ErrorNotice>
         )}
 
         {renderWorkoutPreview(selectedWorkout)}

@@ -12,6 +12,7 @@ import { useBodyToken } from "@/components/body/use-body";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { METRICS, POSES, RANGES, defaultComparePair, formatDelta, formatMetric, metricDeltas, sharedPoses, snapshotChange, summaryMetrics, unitOf } from "@/lib/body";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * The coach's «Σώμα» tab of a client (ADR-158 §5, board 13 q7): only the
@@ -67,7 +68,7 @@ export function CoachBodyPanel({ userId, nickname }: { userId: string; nickname:
   );
 
   if (snapshots.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (snapshots.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("coachLoadError")}</p>;
+  if (snapshots.isError) return <ErrorNotice>{t("coachLoadError")}</ErrorNotice>;
   if (list.length === 0) {
     return (
       <div className="flex flex-col gap-2">
@@ -87,7 +88,7 @@ export function CoachBodyPanel({ userId, nickname }: { userId: string; nickname:
               {series.isPending ? (
                 <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
               ) : series.isError ? (
-                <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("coachLoadError")}</p>
+                <ErrorNotice>{t("coachLoadError")}</ErrorNotice>
               ) : (
                 <SeriesChart
                   display={series.data.display}

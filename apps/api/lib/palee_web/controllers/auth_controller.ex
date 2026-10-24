@@ -69,6 +69,14 @@ defmodule PaleeWeb.AuthController do
     ]
   }
 
+  # ADR-195: the language the signed-out pages were shown in becomes the new
+  # profile's language, so the first signed-in screen does not switch back.
+  @preferred_locale_param %Schema{
+    type: :string,
+    enum: Palee.Identity.supported_locales(),
+    description: "ADR-195: the new profile's UI language; defaults to en"
+  }
+
   @email_in_use_schema %Schema{
     type: :object,
     description:
@@ -115,7 +123,8 @@ defmodule PaleeWeb.AuthController do
               },
               password: %Schema{type: :string, minLength: 4},
               role: %Schema{type: :string, enum: ["member", "athlete"]},
-              email: %Schema{type: :string, format: :email}
+              email: %Schema{type: :string, format: :email},
+              preferred_locale: @preferred_locale_param
             },
             required: [:password, :role, :email]
           }
@@ -246,7 +255,8 @@ defmodule PaleeWeb.AuthController do
               display_name: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
               invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
-              email: %Schema{type: :string, format: :email}
+              email: %Schema{type: :string, format: :email},
+              preferred_locale: @preferred_locale_param
             },
             required: [:password, :invitation_token, :email]
           }
@@ -307,7 +317,8 @@ defmodule PaleeWeb.AuthController do
               display_name: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
               invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
-              email: %Schema{type: :string, format: :email}
+              email: %Schema{type: :string, format: :email},
+              preferred_locale: @preferred_locale_param
             },
             required: [:password, :invitation_token, :email]
           }

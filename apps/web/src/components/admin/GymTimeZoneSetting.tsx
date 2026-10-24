@@ -8,6 +8,7 @@ import { deviceTimeZone, timeZoneOptions as zoneOptions } from "@/lib/zoned-time
 import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const QUERY_KEY = ["admin", "time-zone"];
 
@@ -39,7 +40,7 @@ export function GymTimeZoneSetting({ token }: { token: string }) {
   });
 
   if (query.isError) {
-    return <p className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(query.error, i18n)}</p>;
+    return <ErrorNotice>{localizeError(query.error, i18n)}</ErrorNotice>;
   }
 
   if (query.isLoading) {
@@ -89,7 +90,7 @@ export function GymTimeZoneSetting({ token }: { token: string }) {
       </label>
 
       {mutation.isError ? (
-        <p className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(mutation.error, i18n)}</p>
+        <ErrorNotice>{localizeError(mutation.error, i18n)}</ErrorNotice>
       ) : null}
 
       <div className="flex justify-end">

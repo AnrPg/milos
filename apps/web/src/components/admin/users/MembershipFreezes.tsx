@@ -21,6 +21,7 @@ import {
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STATE_KEYS: Record<FreezeState, string> = {
   upcoming: "admFreezeStateUpcoming",
@@ -154,7 +155,7 @@ export function MembershipFreezes({
               {i18n("cancel77dfd21")}
             </button>
           </div>
-          {createError ? <p className="text-xs" style={{ color: "var(--danger)" }}>{createError}</p> : null}
+          {createError ? <ErrorNotice variant="field">{createError}</ErrorNotice> : null}
         </form>
       ) : null}
 
@@ -198,7 +199,7 @@ export function MembershipFreezes({
                     {i18n("admFreezeKeep")}
                   </button>
                 </div>
-                {cancel.error ? <p className="text-xs" style={{ color: "var(--danger)" }}>{localizeError(cancel.error, i18n)}</p> : null}
+                {cancel.error ? <ErrorNotice variant="field">{localizeError(cancel.error, i18n)}</ErrorNotice> : null}
               </div>
             ) : null}
           </div>

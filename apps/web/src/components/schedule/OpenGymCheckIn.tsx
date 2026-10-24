@@ -9,6 +9,7 @@ import { includesOpenGym, localizeMemberBookingError } from "@/components/schedu
 import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Open-gym self check-in (ADR-097). Renders nothing unless the member's
@@ -86,7 +87,7 @@ export function OpenGymCheckIn({
         ) : (
           <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{i18n("mbOpenGymHint")}</p>
         )}
-        {error ? <p className="mt-1 text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice variant="field" className="mt-1">{error}</ErrorNotice> : null}
       </div>
 
       {checkIn ? null : (

@@ -1,5 +1,7 @@
 "use client";
 
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
+
 type MessageComposerProps = {
   value: string;
   onChange: (value: string) => void;
@@ -30,9 +32,9 @@ export function MessageComposer({
   return (
     <div>
       {error ? (
-        <p className="mb-2 whitespace-pre-wrap text-xs" role="alert" style={{ color: "var(--danger)" }}>
+        <ErrorNotice className="mb-2 whitespace-pre-wrap">
           {error}
-        </p>
+        </ErrorNotice>
       ) : null}
       <div className="flex items-end gap-2">
         <textarea

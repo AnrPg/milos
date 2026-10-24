@@ -8,6 +8,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type UserResult = { id: string; nickname: string; handle?: string | null; role: string };
 
@@ -135,7 +136,7 @@ export function InAppShareDialog({
               </div>
             ) : null}
 
-            {error ? <p className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
+            {error ? <ErrorNotice>{error}</ErrorNotice> : null}
             <button
               className="w-full rounded-xl py-3 text-sm font-semibold disabled:opacity-40"
               disabled={selected.length === 0 || sending || !message}

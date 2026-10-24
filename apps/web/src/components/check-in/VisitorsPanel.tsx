@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { fetchVisitors, VISITORS_KEY, type Visitor } from "@/api/check-in";
 import { subscribeNever } from "@/lib/maps";
 import { subscribeToTopic } from "@/lib/realtime";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const readVisitor = () => new URLSearchParams(window.location.search).get("visitor");
 const serverVisitor = () => null;
@@ -61,7 +62,7 @@ export function VisitorsPanel({ token, organizationId, date }: { token: string; 
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("visitorsHint")}</p>
       </div>
       {visitors.isPending ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-      {visitors.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("errorGeneric")}</p> : null}
+      {visitors.isError ? <ErrorNotice>{t("errorGeneric")}</ErrorNotice> : null}
       {visitors.isSuccess && list.length === 0 ? <p className="text-sm" style={{ color: "var(--muted)" }}>{t("visitorsEmpty")}</p> : null}
       <ul className="space-y-2" aria-live="polite">
         {list.map((visitor) => {

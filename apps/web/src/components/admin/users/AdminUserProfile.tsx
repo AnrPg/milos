@@ -72,6 +72,7 @@ import { fetchUserTrainingHistory } from "@/api/training-history";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -269,7 +270,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
           </div>
           <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
           <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
-          {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
+          {grant.isError ? <ErrorNotice>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</ErrorNotice> : null}
         </form>
         <div className="mt-5 space-y-2">
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
@@ -353,7 +354,7 @@ function FinanceDetails({
             ))}
             <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />
             {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
-            {updateMembership.isError && !commitment ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+            {updateMembership.isError && !commitment ? <ErrorNotice variant="field">{i18n("quickTextSaveError")}</ErrorNotice> : null}
             {commitment ? (
               <CommitmentOverridePrompt
                 endsOn={commitment.endsOn}
@@ -603,7 +604,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   });
   if (mode === "loading") return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
   if (mode === "prs_only" && prs.data?.member) return <PRDossier member={prs.data.member} prs={prs.data.prs} />;
-  if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</main>;
+  if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)" }}><ErrorNotice>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</ErrorNotice></main>;
 
   const executions = training.data?.executions ?? [];
   const scores = training.data?.scores ?? [];
@@ -852,7 +853,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                       );
                     })}
                   </div>
-                  {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
+                  {roleMutation.isError ? <ErrorNotice className="mt-2">{i18n("roleUpdateFailed493da52")}</ErrorNotice> : null}
                 </div>
                 )}
                 <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
@@ -868,9 +869,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                     {deleteMutation.isPending ? i18n("loading33ce417") : i18n("deletef6fdbe4")}
                   </button>
                   {deleteMutation.isError ? (
-                    <p className="mt-2 text-sm" style={{ color: "var(--danger)" }}>
+                    <ErrorNotice className="mt-2">
                       {localizeError(deleteMutation.error, i18n)}
-                    </p>
+                    </ErrorNotice>
                   ) : null}
                 </div>
               </div>

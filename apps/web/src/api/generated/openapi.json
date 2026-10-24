@@ -84407,6 +84407,24 @@
                     "minLength": 4,
                     "type": "string"
                   },
+                  "preferred_locale": {
+                    "description": "ADR-195: the new profile's UI language; defaults to en",
+                    "enum": [
+                      "en",
+                      "el",
+                      "ar",
+                      "ru",
+                      "de",
+                      "es",
+                      "pt-PT",
+                      "he",
+                      "it",
+                      "bg",
+                      "nl",
+                      "fr"
+                    ],
+                    "type": "string"
+                  },
                   "role": {
                     "enum": [
                       "member",
@@ -84597,6 +84615,24 @@
                   "password": {
                     "minLength": 4,
                     "type": "string"
+                  },
+                  "preferred_locale": {
+                    "description": "ADR-195: the new profile's UI language; defaults to en",
+                    "enum": [
+                      "en",
+                      "el",
+                      "ar",
+                      "ru",
+                      "de",
+                      "es",
+                      "pt-PT",
+                      "he",
+                      "it",
+                      "bg",
+                      "nl",
+                      "fr"
+                    ],
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -84732,6 +84768,24 @@
                   },
                   "password": {
                     "minLength": 4,
+                    "type": "string"
+                  },
+                  "preferred_locale": {
+                    "description": "ADR-195: the new profile's UI language; defaults to en",
+                    "enum": [
+                      "en",
+                      "el",
+                      "ar",
+                      "ru",
+                      "de",
+                      "es",
+                      "pt-PT",
+                      "he",
+                      "it",
+                      "bg",
+                      "nl",
+                      "fr"
+                    ],
                     "type": "string"
                   }
                 },

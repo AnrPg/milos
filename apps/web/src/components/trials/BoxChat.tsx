@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/components/session-provider";
 
 import { newOperationId } from "./trial-ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const POLL_MS = 5_000;
 const PERIODS = ["monthly", "quarterly", "semiannual", "annual"] as const;
@@ -161,7 +162,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
           {t("send")}
         </button>
       </form>
-      {send.isError ? <p role="alert" className="px-4 pb-2 text-sm" style={{ color: "var(--danger)" }}>{t("sendFailed")}</p> : null}
+      {send.isError ? <ErrorNotice className="mx-4 mb-2">{t("sendFailed")}</ErrorNotice> : null}
     </main>
   );
 }

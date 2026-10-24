@@ -30,6 +30,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * «Οικονομικά › Συστάσεις», the invites (ADR-156): who brought whom, how far
@@ -309,7 +310,7 @@ function InvitePanel({ invite, onClose }: { invite: StaffReferralInvite; onClose
         ) : null}
 
         {action.error ? (
-          <p role="alert" className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(action.error, i18n)}</p>
+          <ErrorNotice>{localizeError(action.error, i18n)}</ErrorNotice>
         ) : null}
       </div>
     </SidePanel>

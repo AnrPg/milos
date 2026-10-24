@@ -13,6 +13,7 @@ import { adminHref } from "@/lib/organization-slug";
 
 import { clockOffset, nothingReasonKey, scanBody, scanView, undoSecondsLeft, type ScanSource } from "./check-in";
 import { checkInErrorKey } from "./errors";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** A trial without an approval rule books straight away. */
 const AUTO_APPROVAL = "auto" as const;
@@ -70,7 +71,7 @@ export function ScanLanding({ locationId, code, source }: { locationId: string; 
       {!current && scan.isError ? (
         <Card>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("scanFailedTitle")}</h1>
-          <p role="alert" className="text-sm" style={{ color: "var(--text-soft)" }}>{t(checkInErrorKey(scan.error))}</p>
+          <ErrorNotice>{t(checkInErrorKey(scan.error))}</ErrorNotice>
           <button type="button" onClick={() => void scan.refetch()} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {t("tryAgain")}
           </button>
@@ -155,7 +156,7 @@ function Outcome({
               </li>
             ))}
           </ul>
-          {chooseError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{chooseError}</p> : null}
+          {chooseError ? <ErrorNotice>{chooseError}</ErrorNotice> : null}
         </Card>
       );
     case "suggestions":
@@ -254,7 +255,7 @@ function CheckedIn({ token, result, receivedAt, onUndone }: { token: string; res
           {t("scanUndo", { seconds: left })}
         </button>
       ) : null}
-      {undo.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(undo.error))}</p> : null}
+      {undo.isError ? <ErrorNotice>{t(checkInErrorKey(undo.error))}</ErrorNotice> : null}
     </Card>
   );
 }

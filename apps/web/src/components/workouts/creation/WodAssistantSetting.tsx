@@ -6,6 +6,7 @@ import { fetchAdminSettings, updateAdminSettings, type AdminSettingsPayload } fr
 import { WOD_ASSISTANT_AVAILABILITY_KEY } from "@/api/workouts";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const SETTINGS_KEY = ["admin", "settings"] as const;
 
@@ -46,7 +47,7 @@ export function WodAssistantSetting({ token }: { token: string }) {
         />
       </label>
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(save.error, i18n)}</p>
+        <ErrorNotice>{localizeError(save.error, i18n)}</ErrorNotice>
       ) : null}
     </div>
   );

@@ -17,6 +17,7 @@ import { workoutPublishedHref } from "@/lib/workout-return";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -272,9 +273,9 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
       </div>
 
       {publishError ? (
-        <span className="text-xs" style={{ color: "var(--red)" }}>
+        <ErrorNotice variant="field">
           {publishError}
-        </span>
+        </ErrorNotice>
       ) : null}
     </div>
     </header>

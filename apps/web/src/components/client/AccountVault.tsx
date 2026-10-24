@@ -38,6 +38,7 @@ import { DEFAULT_VAULT_FILTER, parseVaultFilter, vaultFilterCount } from "@/lib/
 import { sourceOptions, sourceToken } from "@/lib/provider-sources";
 import { defaultHistoryKind } from "@/lib/training-history";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Ημερολόγιο › Vault across providers (ADR-162, board 17 Q4): the same
@@ -67,9 +68,7 @@ export function AccountVault() {
       {filter ? <VaultFilters filter={filter} onChange={setFilter} groups={groups} /> : null}
 
       {error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-          {clientErrorMessage(error, i18n)}
-        </p>
+        <ErrorNotice>{clientErrorMessage(error, i18n)}</ErrorNotice>
       ) : null}
 
       {filter === null || vault.isPending ? (

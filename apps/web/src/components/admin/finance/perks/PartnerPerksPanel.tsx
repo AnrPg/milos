@@ -12,6 +12,7 @@ import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { codesHandedOut, localToday, perkPhase } from "@/lib/perks/validity";
 
 import { PerkForm } from "./PerkForm";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const PHASE_TONE: Record<string, string> = {
   published: "var(--success)",
@@ -49,7 +50,7 @@ export function PartnerPerksPanel() {
         {perks.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
         ) : perks.isError ? (
-          <p role="alert" className="px-6 py-8 text-sm" style={{ color: "var(--danger)" }}>{t("loadFailed")}</p>
+          <div className="px-6 py-8"><ErrorNotice>{t("loadFailed")}</ErrorNotice></div>
         ) : list.length === 0 ? (
           <div className="flex flex-col gap-1 px-6 py-8">
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("emptyTitle")}</p>

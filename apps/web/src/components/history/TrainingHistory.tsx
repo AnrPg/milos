@@ -10,6 +10,7 @@ import { SourceLabel } from "@/components/providers/SourceLabel";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Fetcher = (kind: TrainingHistoryKind, offset: number) => Promise<TrainingHistoryPage>;
 
@@ -106,7 +107,7 @@ function LogList({ kind, queryKey, fetchPage }: { kind: TrainingHistoryKind; que
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (query.isLoading) return <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("historyLoading")}</p>;
-  if (query.isError) return <p className="text-sm" style={{ color: "var(--danger)" }}>{i18n("historyError")}</p>;
+  if (query.isError) return <ErrorNotice>{i18n("historyError")}</ErrorNotice>;
 
   const pages = query.data?.pages ?? [];
   const entries = pages.flatMap((page) => page.entries);

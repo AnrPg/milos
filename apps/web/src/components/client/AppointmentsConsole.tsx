@@ -26,6 +26,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { YourTime } from "@/components/zoned-time";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const SLOTS_KEY = ["me", "appointments", "slots"] as const;
 const MINE_KEY = ["me", "appointments", "mine"] as const;
@@ -119,9 +120,7 @@ function AppointmentsContent() {
 
       <ClientCard title={i18n("clApptMine")}>
         {cancel.isError ? (
-          <p role="alert" className="mb-2 text-sm" style={{ color: "var(--danger)" }}>
-            {clientErrorMessage(cancel.error, i18n)}
-          </p>
+          <ErrorNotice className="mb-2">{clientErrorMessage(cancel.error, i18n)}</ErrorNotice>
         ) : null}
         {mine.isPending ? (
           <LoadingLine />
@@ -139,9 +138,7 @@ function AppointmentsContent() {
 
       <ClientCard title={i18n("clApptAvailable")}>
         {book.isError ? (
-          <p role="alert" className="mb-2 text-sm" style={{ color: "var(--danger)" }}>
-            {clientErrorMessage(book.error, i18n)}
-          </p>
+          <ErrorNotice className="mb-2">{clientErrorMessage(book.error, i18n)}</ErrorNotice>
         ) : null}
         {slots.isPending ? (
           <LoadingLine />

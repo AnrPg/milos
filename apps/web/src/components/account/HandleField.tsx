@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { checkHandleAvailable, type HandleAvailability } from "@/api/auth";
 import { cleanHandleInput, looksLikeHandle } from "@/components/account/account-model";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Status =
   | { state: "idle" }
@@ -101,14 +102,14 @@ export function HandleField({
         {status.state === "checking" ? (
           <span style={{ color: "var(--dim)" }}>{t("handleChecking")}</span>
         ) : status.state === "invalid" ? (
-          <span style={{ color: "var(--danger)" }}>{t("handleRules")}</span>
+          <ErrorNotice variant="text" live="polite">{t("handleRules")}</ErrorNotice>
         ) : status.state === "result" && status.result.available ? (
           <span style={{ color: "var(--success)" }}>
             {folded ? t("handleAvailableAs", { handle: folded }) : t("handleAvailable")}
           </span>
         ) : status.state === "result" ? (
-          <span className="flex flex-wrap items-center gap-1.5">
-            <span style={{ color: "var(--danger)" }}>{t("handleTaken")}</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <ErrorNotice variant="text" live="polite">{t("handleTaken")}</ErrorNotice>
             {status.result.suggestions.map((suggestion) => (
               <button
                 key={suggestion}
@@ -121,7 +122,7 @@ export function HandleField({
                 @{suggestion}
               </button>
             ))}
-          </span>
+          </div>
         ) : hint ? (
           <span style={{ color: "var(--dim)" }}>{hint}</span>
         ) : null}

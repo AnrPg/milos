@@ -20,6 +20,7 @@ import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   workoutId: string;
@@ -213,12 +214,9 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
           {error ? (
-            <p
-              className="rounded-[1rem] px-4 py-3 text-sm"
-              style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary-strong)" }}
-            >
+            <ErrorNotice>
               {error}
-            </p>
+            </ErrorNotice>
           ) : null}
 
           {/* Workout summary */}

@@ -55,6 +55,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
 import { Popover } from "@/components/ui/Popover";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -1054,7 +1055,7 @@ export function AssignedWorkoutsConsole({
                               maxLength={500}
                             />
                             {requestError ? (
-                              <p className="text-[11px]" style={{ color: "var(--primary-strong)" }}>{requestError}</p>
+                              <ErrorNotice variant="field">{requestError}</ErrorNotice>
                             ) : null}
                             <div className="flex flex-wrap gap-2">
                               <button
@@ -1530,16 +1531,9 @@ export function AssignedWorkoutsConsole({
         ) : null}
 
         {error ? (
-          <section
-            className="rounded-[1.8rem] px-5 py-4 text-sm"
-            style={{
-              background: "color-mix(in srgb, var(--primary) 10%, transparent)",
-              border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
-              color: "var(--primary-strong)",
-            }}
-          >
+          <ErrorNotice>
             {error}
-          </section>
+          </ErrorNotice>
         ) : null}
 
         {!isAdmin && requestStatus ? (

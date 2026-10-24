@@ -301,7 +301,12 @@ defmodule PaleeWeb.AroundControllerTest do
       assert names(filtered.(%{max_price_cents: 500}), "events") == ["Open WOD"]
 
       assert %{"errors" => _} =
-               search(ctx, ctx.visitor, %{filter: %{min_price_cents: 2000, max_price_cents: 1000}}, 422)
+               search(
+                 ctx,
+                 ctx.visitor,
+                 %{filter: %{min_price_cents: 2000, max_price_cents: 1000}},
+                 422
+               )
 
       trial = filtered.(%{cost: ["trial"]})
       assert names(trial, "boxes") == ["Beta"]

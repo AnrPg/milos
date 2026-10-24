@@ -10,6 +10,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 import { ConfirmButton } from "./ConfirmButton";
 import { NfcTagRow } from "./NfcTagRow";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Check-in at one location (ADR-155): open its door screen, give the door a
@@ -114,8 +115,9 @@ export function LocationCheckIn({ token, locationId }: { token: string; location
 
       <NfcTagRow token={token} locationId={locationId} />
 
-      {notice ? (
-        <p role={notice.tone === "error" ? "alert" : "status"} className="text-sm" style={{ color: notice.tone === "error" ? "var(--danger)" : "var(--success)" }}>
+      {notice?.tone === "error" ? <ErrorNotice>{notice.text}</ErrorNotice> : null}
+      {notice?.tone === "ok" ? (
+        <p role="status" className="text-sm" style={{ color: "var(--success)" }}>
           {notice.text}
         </p>
       ) : null}

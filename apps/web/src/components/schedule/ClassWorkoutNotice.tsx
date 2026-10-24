@@ -7,6 +7,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { WodPicker } from "@/components/schedule/WodPicker";
 import { dateTimeLocalInZone } from "@/lib/zoned-time";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** ADR-176: which notice a class without its WOD shows staff, if any. */
 export function classWorkoutNoticeKind(slot: Pick<ScheduleSlot, "published" | "workout_status">) {
@@ -80,7 +81,7 @@ export function ClassWorkoutNotice({
         classTypeName={slot.class_type?.name ?? null}
       />
       {busy ? <p className="text-sm" role="status" style={{ color: "var(--muted)" }}>{i18n("classLinkWodSaving")}</p> : null}
-      {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </div>
   );
 }

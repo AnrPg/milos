@@ -12,6 +12,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Shape of the `execution` block of the admin analytics summary. */
 export type ExecutionKpiReport = {
@@ -131,7 +132,7 @@ export function ExecutionKpiDashboard() {
       </div>
 
       {query.error instanceof Error ? (
-        <p className="mt-4 text-sm text-[var(--danger)]">{localizeError(query.error, i18n)}</p>
+        <ErrorNotice className="mt-4">{localizeError(query.error, i18n)}</ErrorNotice>
       ) : null}
 
       {!report ? (

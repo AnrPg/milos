@@ -49,6 +49,7 @@ import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
 import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 import { Dialog } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -90,7 +91,7 @@ function SaveBar({
           {i18n("reset44c57ab")}
         </button>
       )}
-      {msg && <p className="text-sm" style={{ color: "var(--danger)" }}>{msg}</p>}
+      {msg && <ErrorNotice>{msg}</ErrorNotice>}
       {success && !dirty && <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("saved9d4af69")}</p>}
     </div>
   );
@@ -200,9 +201,9 @@ function BrandingSection({ token }: { token: string }) {
 
   if (brandingQuery.isError) {
     return (
-      <p className="text-sm" style={{ color: "var(--danger)" }}>
+      <ErrorNotice>
         {localizeError(brandingQuery.error, i18n)}
-      </p>
+      </ErrorNotice>
     );
   }
 
@@ -881,7 +882,7 @@ function FinanceCleanupSection({ token }: { token: string }) {
                     onChange={(event) => setPassword(event.target.value)}
                   />
                 </label>
-                {errorMessage ? <p className="text-sm" style={{ color: "var(--danger)" }}>{errorMessage}</p> : null}
+                {errorMessage ? <ErrorNotice>{errorMessage}</ErrorNotice> : null}
                 {purgeMutation.isSuccess ? (
                   <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("featureFinanceCleanupSuccess")}</p>
                 ) : null}
@@ -1153,7 +1154,7 @@ function NotificationsSection({ token }: { token: string }) {
           </button>
         ) : null}
       </div>
-      {generateError ? <p className="text-sm" style={{ color: "var(--danger)" }}>{generateError}</p> : null}
+      {generateError ? <ErrorNotice>{generateError}</ErrorNotice> : null}
 
       <label className="block space-y-2">
         <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>

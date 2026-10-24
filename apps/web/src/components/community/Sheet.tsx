@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * A bottom sheet (a centred dialog on wide screens): the shared dialog shell
@@ -107,7 +108,5 @@ export function ChoicePill({
 }
 
 export function ErrorLine({ message }: { message: string | null }) {
-  return message ? (
-    <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{message}</p>
-  ) : null;
+  return message ? <ErrorNotice>{message}</ErrorNotice> : null;
 }

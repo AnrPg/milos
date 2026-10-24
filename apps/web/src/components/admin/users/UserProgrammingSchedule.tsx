@@ -28,6 +28,7 @@ import {
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   token: string;
@@ -251,7 +252,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
       </div>
 
       {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
-      {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
 
       {assignmentModalOpen ? <Dialog onClose={() => setAssignmentModalOpen(false)} eyebrow={i18n("featureScheduleProgramming")} title={selectedDate} size="3xl" variant="center">
       {isMember ? <fieldset className="mb-4 rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
@@ -301,7 +302,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
         </div>
         {isMember ? <p className="mt-3 text-xs" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[memberMode])}</p> : null}
         {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
-        {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice className="mt-3">{error}</ErrorNotice> : null}
       </div>
       </Dialog> : null}
 

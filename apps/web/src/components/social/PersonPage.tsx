@@ -12,6 +12,7 @@ import { SharedPRCard } from "@/components/pantheon/SharedPRsSection";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const TABS = ["posts", "prs", "clubs"] as const;
 type Tab = (typeof TABS)[number];
@@ -35,7 +36,7 @@ export function PersonPage({ id }: { id: string }) {
   if (!person.data)
     return (
       <main className="mx-auto w-full max-w-xl p-4">
-        <p role="alert" style={{ color: "var(--text-soft)" }}>{t("personMissing")}</p>
+        <ErrorNotice>{t("personMissing")}</ErrorNotice>
       </main>
     );
   const profile = person.data;

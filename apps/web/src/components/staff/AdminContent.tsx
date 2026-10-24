@@ -30,6 +30,7 @@ import {
 import { PageHeader } from "@/components/PageHeader";
 import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const VIDEOS_KEY = ["admin", "videos"] as const;
 type Filter = "all" | VideoState;
@@ -107,9 +108,13 @@ function VideoForm({ video, onDone }: { video: ContentVideo | null; onDone: () =
           type="url"
           value={url}
         />
-        <p id={`${baseId}-url-hint`} className="text-xs" style={{ color: url.length > 0 && !urlValid ? "var(--danger)" : "var(--dim)" }}>
-          {i18n("stfVideoUrlHint")}
-        </p>
+        {url.length > 0 && !urlValid ? (
+          <ErrorNotice variant="field" id={`${baseId}-url-hint`}>{i18n("stfVideoUrlHint")}</ErrorNotice>
+        ) : (
+          <p id={`${baseId}-url-hint`} className="text-xs" style={{ color: "var(--dim)" }}>
+            {i18n("stfVideoUrlHint")}
+          </p>
+        )}
       </div>
       <div className="space-y-1 sm:col-span-2">
         <label className={captionClass} htmlFor={`${baseId}-description`} style={captionStyle}>

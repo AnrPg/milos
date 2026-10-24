@@ -25,6 +25,7 @@ import { listAdminLocations } from "@/api/facility";
 import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import { membershipLocationScope, type LocationScope } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type AssignWorkoutFormProps = {
   workoutId: string;
@@ -213,9 +214,9 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         </section>
 
         {error ? (
-          <section className="rounded-[1.8rem] px-5 py-4 text-sm" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary-strong)" }}>
+          <ErrorNotice>
             {error}
-          </section>
+          </ErrorNotice>
         ) : null}
 
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">

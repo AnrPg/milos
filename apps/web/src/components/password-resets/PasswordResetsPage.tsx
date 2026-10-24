@@ -19,6 +19,7 @@ import { StateChip } from "@/components/password-resets/StateChip";
 import { relativeTime } from "@/components/password-resets/reset-email";
 import { sourceLabels } from "@/components/password-resets/request-labels";
 import { useNow } from "@/components/password-resets/use-now";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Re-reads the list while it is open, so claims by others show up. */
 const POLL_MS = 30_000;
@@ -66,12 +67,16 @@ export function PasswordResetsPage() {
 
       {inbox.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}
       {inbox.isError ? (
-        <p className="mt-6 text-sm text-[var(--danger)]">
-          {t("loadError")}{" "}
-          <button type="button" className="font-semibold underline" onClick={() => void inbox.refetch()}>
-            {t("retry")}
-          </button>
-        </p>
+        <ErrorNotice
+          className="mt-6"
+          action={
+            <button type="button" className="font-semibold underline" onClick={() => void inbox.refetch()}>
+              {t("retry")}
+            </button>
+          }
+        >
+          {t("loadError")}
+        </ErrorNotice>
       ) : null}
       {inbox.isSuccess && requests.length === 0 ? <p className="mt-6 text-[var(--text-soft)]">{t("empty")}</p> : null}
 
@@ -122,7 +127,7 @@ function RequestRow({ request }: { request: PasswordResetRequest }) {
           <span className="mt-1">
             <StateChip request={request} now={now} />
           </span>
-          {hide.isError ? <span className="text-sm text-[var(--danger)]">{t("hideError")}</span> : null}
+          {hide.isError ? <ErrorNotice variant="text">{t("hideError")}</ErrorNotice> : null}
         </span>
       </Link>
       <button

@@ -19,6 +19,7 @@ import {
   type CanonicalWorkout,
   type ReviewState,
 } from "@/lib/free-text-analysis";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export type AnalysisStatus = "idle" | "loading" | "ready" | "error";
 
@@ -259,7 +260,7 @@ export function IssueCard({
               style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
             />
           </label>
-          {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger)" }}>{t("invalidTyped")}</p> : null}
+          {invalid ? <ErrorNotice variant="field" className="mt-1">{t("invalidTyped")}</ErrorNotice> : null}
         </div>
       ) : null}
 
@@ -342,7 +343,7 @@ function SuggestionCard({
         className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
       />
-      {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger)" }}>{t("invalidTyped")}</p> : null}
+      {invalid ? <ErrorNotice variant="field" className="mt-1">{t("invalidTyped")}</ErrorNotice> : null}
       {suggestion.text_insert ? (
         <label className="mt-2 flex items-start gap-2 text-xs" style={{ color: "var(--muted)" }}>
           <input type="checkbox" checked={alsoInText} onChange={(event) => setAlsoInText(event.target.checked)} />
@@ -449,16 +450,16 @@ function TipsCard({ t }: { t: Translate }) {
 }
 
 function Callout({ tone, children }: { tone: "info" | "warning" | "error" | "success"; children: ReactNode }) {
+  if (tone === "error") return <ErrorNotice>{children}</ErrorNotice>;
   const color = {
     info: "var(--primary)",
     warning: "var(--warning)",
-    error: "var(--danger)",
     success: "var(--success)",
   }[tone];
 
   return (
     <div
-      role={tone === "error" ? "alert" : "status"}
+      role="status"
       className="rounded-2xl border px-4 py-3 text-sm leading-6"
       style={{ borderColor: `color-mix(in srgb, ${color} 45%, transparent)`, background: `color-mix(in srgb, ${color} 10%, transparent)`, color: "var(--text)" }}
     >

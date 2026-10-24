@@ -16,6 +16,7 @@ import { ArrivalReminderRow } from "./ArrivalReminderRow";
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey, errorCode } from "./errors";
 import { QrCode } from "./QrCode";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Box › Check-in (ADR-155 §6, vision §7.5): the member's own QR for the desk
@@ -93,7 +94,7 @@ export function MemberCheckIn() {
             <QrCode value={data.code} label={t("memberQrLabel")} testId="member-qr" className="aspect-square w-full max-w-[22rem]" />
           ) : (
             <div className="flex aspect-square w-full max-w-[22rem] items-center justify-center text-sm" style={{ color: "var(--on-paper)", opacity: 0.65 }}>
-              {code.isError ? t(checkInErrorKey(code.error)) : t("loading")}
+              {code.isError ? <ErrorNotice variant="text">{t(checkInErrorKey(code.error))}</ErrorNotice> : t("loading")}
             </div>
           )}
           {secondsLeft !== null ? (
@@ -106,7 +107,7 @@ export function MemberCheckIn() {
         <button type="button" onClick={fullscreen} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
           {t("fullscreen")}
         </button>
-        {code.isError && data ? <p role="status" className="text-xs" style={{ color: "var(--danger)" }}>{t("memberOffline")}</p> : null}
+        {code.isError && data ? <ErrorNotice variant="field" live="polite">{t("memberOffline")}</ErrorNotice> : null}
       </section>
 
       {data?.mode === "static" ? (
@@ -131,7 +132,8 @@ export function MemberCheckIn() {
                   </button>
                 ))}
               </div>
-              {walletMessage ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{walletMessage}</p> : null}
+              {walletMessage && wallet.isError ? <ErrorNotice>{walletMessage}</ErrorNotice> : null}
+              {walletMessage && !wallet.isError ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{walletMessage}</p> : null}
             </section>
           ) : null}
 
@@ -147,7 +149,7 @@ export function MemberCheckIn() {
               testId="member-reset"
             />
             {reset.isSuccess ? <p role="status" className="text-sm" style={{ color: "var(--success)" }}>{t("memberResetDone")}</p> : null}
-            {reset.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(reset.error))}</p> : null}
+            {reset.isError ? <ErrorNotice>{t(checkInErrorKey(reset.error))}</ErrorNotice> : null}
           </section>
         </>
       ) : data ? (

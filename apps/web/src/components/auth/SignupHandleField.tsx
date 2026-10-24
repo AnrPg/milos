@@ -96,7 +96,7 @@ export function SignupHandleField({ value, onChange, errors }: SignupHandleField
         {t("handleAvailable", { handle: availability.handle })}
       </span>
     ) : availability.state === "taken" ? (
-      <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }} aria-live="polite">
+      <span className="text-xs font-semibold" style={{ color: "var(--danger-strong)" }} aria-live="polite">
         {t("handleTaken")}
       </span>
     ) : null;
@@ -112,7 +112,7 @@ export function SignupHandleField({ value, onChange, errors }: SignupHandleField
         {t("handleTryInstead", { handle: availability.suggestion })}
       </button>
     ) : availability.state === "invalid" ? (
-      <span style={{ color: "var(--primary-strong)" }}>{t("handleRule")}</span>
+      <span className="font-semibold" style={{ color: "var(--danger-strong)" }}>{t("handleRule")}</span>
     ) : (
       t("handleHint")
     );
