@@ -4457,7 +4457,23 @@
     "apiErrorAccountNotFound": "Δεν βρέθηκε λογαριασμός.",
     "apiErrorUnknownDemoSection": "Δεν υπάρχουν δεδομένα επίδειξης για αυτή την οθόνη.",
     "ntfBusinessDemoIdleTitle": "Η demo επιχείρησή σου σε περιμένει",
-    "ntfBusinessDemoIdleBody": "Κανείς δεν έχει χρησιμοποιήσει το {business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες {days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις."
+    "ntfBusinessDemoIdleBody": "Κανείς δεν έχει χρησιμοποιήσει το {business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες {days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις.",
+    "clApptFiltersTitle": "Φίλτρα ραντεβού",
+    "clApptFilterKind": "Είδος",
+    "clApptFilterFormat": "Μορφή",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Τίποτα με αυτά τα φίλτρα.",
+    "reviewsFiltersTitle": "Φίλτρα κριτικών",
+    "reviewsFilterTarget": "Για τι",
+    "reviewsFilterSentiment": "Εντύπωση",
+    "reviewsNoMatch": "Καμία κριτική με αυτά τα φίλτρα.",
+    "workoutsFiltersTitle": "Φίλτρα προπονήσεων",
+    "workoutsFilterStatus": "Κατάσταση",
+    "workoutsStatusDone": "Ολοκληρωμένες",
+    "workoutsStatusPending": "Εκκρεμείς",
+    "workoutsFilterKind": "Είδος",
+    "workoutsKindPersonal": "Προσωπικές",
+    "workoutsFilterSeason": "Σεζόν"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -5537,7 +5553,6 @@
     "wodOptInLink": "Ενεργοποίηση",
     "announcementsEmpty": "Δεν υπάρχουν ακόμη ανακοινώσεις.",
     "announcementsOpen": "Όλες οι ανακοινώσεις",
-    "channelShowAll": "Όλα τα κανάλια",
     "channelSuggested": "Προτείνεται",
     "channelSuggestedHint": "κάνεις συχνά κράτηση σε αυτή την τάξη",
     "channelsOfBox": "Του box",
@@ -5564,7 +5579,19 @@
     "more": "Περισσότερα",
     "report": "Αναφορά",
     "commentHidden": "Κρυμμένο",
-    "channelsOfClub": "Κανάλια του club"
+    "channelsOfClub": "Κανάλια του club",
+    "postFiltersTitle": "Φίλτρα αναρτήσεων",
+    "filterClub": "Club",
+    "filterChannel": "Κανάλι",
+    "filterType": "Είδος",
+    "postType": {
+      "announcement": "Ανακοινώσεις",
+      "pr": "Ρεκόρ",
+      "event": "Events"
+    },
+    "filterCoachesOnly": "Μόνο coaches",
+    "filterAuthor": "Συντάκτης",
+    "postsNoMatch": "Καμία ανάρτηση με αυτά τα φίλτρα."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Φίλτρα} other {Φίλτρα (#)}}",
@@ -5572,7 +5599,8 @@
     "clear": "Καθαρισμός",
     "back": "Πίσω",
     "showResults": "{count, plural, =0 {Κανένα αποτέλεσμα} other {Δείξε #}}",
-    "show": "Δείξε"
+    "show": "Δείξε",
+    "all": "Όλα"
   },
   "BoxSchedule": {
     "title": "Πρόγραμμα",
@@ -6388,7 +6416,10 @@
     "notif_event_cohost_answered_title": "Απάντηση συνδιοργάνωσης",
     "notif_event_cohost_answered_accepted_body": "Η {box} συνδιοργανώνει το «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "Η {box} αρνήθηκε να συνδιοργανώσει το «{event}».",
-    "notif_event_cohost_answered_removed_body": "Η {box} δεν συνδιοργανώνει πια το «{event}»."
+    "notif_event_cohost_answered_removed_body": "Η {box} δεν συνδιοργανώνει πια το «{event}».",
+    "filterKind": "Είδος",
+    "filterBox": "Box",
+    "findFiltersTitle": "Φίλτρα αναζήτησης"
   },
   "CommunityAdmin": {
     "title": "Κοινότητα",
@@ -6663,7 +6694,14 @@
     "err_already_refunded": "Αυτή η πληρωμή έχει ήδη επιστραφεί.",
     "err_invalid_refund": "Η επιστροφή πρέπει να είναι πάνω από μηδέν και όχι περισσότερη από όσα πλήρωσε.",
     "err_invalid_cohosts": "Δεν διαβάζονται αυτές οι διευθύνσεις συνδιοργανωτών. Έλεγξε κάθε διεύθυνση σελίδας.",
-    "err_duplicate_cohost": "Η ίδια επιχείρηση ζητείται δύο φορές."
+    "err_duplicate_cohost": "Η ίδια επιχείρηση ζητείται δύο φορές.",
+    "filtersTitle": "Φίλτρα events",
+    "filterClub": "Club",
+    "filterFree": "Δωρεάν",
+    "filterPrice": "Τιμή",
+    "filterGoing": "Θα πάω",
+    "filterMine": "Εγώ",
+    "filtersNoMatch": "Κανένα event με αυτά τα φίλτρα."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Κανένα επερχόμενο event. Φτιάξε ένα με «+ Νέο event».",
@@ -6968,7 +7006,9 @@
     "dateTo": "Έως",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Χαμηλότερη τιμή",
-    "priceTo": "Υψηλότερη τιμή"
+    "priceTo": "Υψηλότερη τιμή",
+    "sectionLevel": "Επίπεδο",
+    "levelHint": "Box με μαθήματα σε αυτό το επίπεδο"
   },
   "CheckIn": {
     "loading": "Φόρτωση…",
@@ -8859,7 +8899,6 @@
     "editProfile": "Αλλαγή προφίλ",
     "safetyLine": "Μόνο μέλη του club. Ταιριάζετε μόνο αν το θέλετε και οι δύο. Μπορείς πάντα να κάνεις αναφορά ή αποκλεισμό.",
     "filters": "Φίλτρα",
-    "filtersCount": "Φίλτρα ({count})",
     "swipesLeft": "{count, plural, one {Μένει # για σήμερα} other {Μένουν # για σήμερα}}",
     "loading": "Φόρτωση…",
     "limitReached": "Αρκετά για σήμερα. Νέα άτομα αύριο.",
@@ -8940,7 +8979,14 @@
     "error_partner_match_read_only": "Η συνομιλία έκλεισε.",
     "error_partner_plans_unavailable": "Τα μαθήματα προτείνονται μόνο στα clubs του ίδιου του γυμναστηρίου.",
     "error_message_body_required": "Γράψε κάτι πρώτα.",
-    "error_cannot_block_self": "Δεν μπορείς να αποκλείσεις τον εαυτό σου."
+    "error_cannot_block_self": "Δεν μπορείς να αποκλείσεις τον εαυτό σου.",
+    "disciplineLabel": "Άθλημα",
+    "disciplinesLabel": "Τι θα προπονηθείτε μαζί (έως {max})",
+    "allDisciplines": "Όλα τα αθλήματα",
+    "fewerDisciplines": "Λιγότερα",
+    "distanceLabel": "Απόσταση",
+    "withinKm": "Έως {km} χλμ",
+    "distanceNeedsArea": "Για φίλτρο απόστασης, εμφανίσου στο «Γύρω μου» με την περιοχή σου."
   },
   "Squads": {
     "title": "Squads",

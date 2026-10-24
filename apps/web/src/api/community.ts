@@ -1,5 +1,5 @@
 import { apiRequest } from "@/api/client";
-import type { components } from "@/api/generated/schema";
+import type { components, operations } from "@/api/generated/schema";
 
 /**
  * Community (ADR-138, ADR-143): the member's clubs, the feed of their posts,
@@ -45,7 +45,19 @@ export const membersKey = (clubId: string, q: string) => ["community", "members"
 export const openClubKey = (clubId: string) => ["community", "open-club", clubId] as const;
 export const discoverKey = (q: string) => ["community", "discover", q] as const;
 
-export type FeedFilter = { clubId?: string | null; channelId?: string | null; mine?: boolean };
+/** ADR-197: post kinds a feed narrows to. */
+export type FeedPostType = NonNullable<NonNullable<operations["PaleeWeb.CommunityPostController.feed"]["parameters"]["query"]>["types"]>[number];
+export const FEED_POST_TYPES: FeedPostType[] = ["announcement", "pr", "event"];
+
+export type FeedFilter = {
+  clubId?: string | null;
+  channelId?: string | null;
+  mine?: boolean;
+  /** Only club posts of these kinds (ADR-197). */
+  types?: readonly FeedPostType[];
+  /** Only club posts by the gym's staff (ADR-197). */
+  coachesOnly?: boolean;
+};
 
 export async function fetchMyClubs(token: string) {
   const data = await apiRequest<{ clubs: CommunityClub[] }>("/me/clubs", { token });
@@ -57,6 +69,8 @@ export function fetchFeed(token: string, filter: FeedFilter, cursor: string | nu
   if (filter.clubId) query.set("club_id", filter.clubId);
   if (filter.channelId) query.set("channel_id", filter.channelId);
   if (filter.mine) query.set("mine", "true");
+  filter.types?.forEach((type) => query.append("types[]", type));
+  if (filter.coachesOnly) query.set("coaches_only", "true");
   if (cursor) query.set("cursor", cursor);
   query.set("limit", String(limit));
   return apiRequest<CommunityFeedPage>(`/me/feed?${query.toString()}`, { token });

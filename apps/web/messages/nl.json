@@ -4457,7 +4457,23 @@
     "apiErrorAccountNotFound": "Geen account gevonden.",
     "apiErrorUnknownDemoSection": "Er zijn geen demogegevens voor dit scherm.",
     "ntfBusinessDemoIdleTitle": "Je demobedrijf wacht op je",
-    "ntfBusinessDemoIdleBody": "{business} is al een tijd niet gebruikt. Als niemand het in de komende {days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen."
+    "ntfBusinessDemoIdleBody": "{business} is al een tijd niet gebruikt. Als niemand het in de komende {days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen.",
+    "clApptFiltersTitle": "Afspraakfilters",
+    "clApptFilterKind": "Soort",
+    "clApptFilterFormat": "Vorm",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Niets voor deze filters.",
+    "reviewsFiltersTitle": "Reviewfilters",
+    "reviewsFilterTarget": "Over",
+    "reviewsFilterSentiment": "Gevoel",
+    "reviewsNoMatch": "Geen reviews voor deze filters.",
+    "workoutsFiltersTitle": "Workoutfilters",
+    "workoutsFilterStatus": "Status",
+    "workoutsStatusDone": "Gedaan",
+    "workoutsStatusPending": "Te doen",
+    "workoutsFilterKind": "Soort",
+    "workoutsKindPersonal": "Persoonlijk",
+    "workoutsFilterSeason": "Seizoen"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -5537,7 +5553,6 @@
     "wodOptInLink": "Aanzetten",
     "announcementsEmpty": "Nog geen aankondigingen.",
     "announcementsOpen": "Alle aankondigingen",
-    "channelShowAll": "Alle kanalen",
     "channelSuggested": "Aanbevolen",
     "channelSuggestedHint": "je boekt deze les vaak",
     "channelsOfBox": "Van de box",
@@ -5564,7 +5579,19 @@
     "more": "Meer",
     "report": "Melden",
     "commentHidden": "Verborgen",
-    "channelsOfClub": "Kanalen van de club"
+    "channelsOfClub": "Kanalen van de club",
+    "postFiltersTitle": "Berichtfilters",
+    "filterClub": "Club",
+    "filterChannel": "Kanaal",
+    "filterType": "Soort",
+    "postType": {
+      "announcement": "Aankondigingen",
+      "pr": "Persoonlijke records",
+      "event": "Evenementen"
+    },
+    "filterCoachesOnly": "Alleen coaches",
+    "filterAuthor": "Auteur",
+    "postsNoMatch": "Geen berichten voor deze filters."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filters} other {Filters (#)}}",
@@ -5572,7 +5599,8 @@
     "clear": "Wissen",
     "back": "Terug",
     "showResults": "{count, plural, =0 {Geen resultaten} other {Toon #}}",
-    "show": "Toon"
+    "show": "Toon",
+    "all": "Alle"
   },
   "BoxSchedule": {
     "title": "Rooster",
@@ -6388,7 +6416,10 @@
     "notif_event_cohost_answered_title": "Antwoord over mede-organisatie",
     "notif_event_cohost_answered_accepted_body": "{box} organiseert „{event}” ({when}) mee.",
     "notif_event_cohost_answered_declined_body": "{box} wil „{event}” niet mee organiseren.",
-    "notif_event_cohost_answered_removed_body": "{box} organiseert „{event}” niet meer mee."
+    "notif_event_cohost_answered_removed_body": "{box} organiseert „{event}” niet meer mee.",
+    "filterKind": "Soort",
+    "filterBox": "Box",
+    "findFiltersTitle": "Zoekfilters"
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6663,7 +6694,14 @@
     "err_already_refunded": "Deze betaling is al terugbetaald.",
     "err_invalid_refund": "Betaal een bedrag terug boven nul en niet meer dan er betaald is.",
     "err_invalid_cohosts": "Die adressen van co-organisatoren zijn niet te lezen. Controleer elk pagina-adres.",
-    "err_duplicate_cohost": "Hetzelfde bedrijf wordt twee keer gevraagd."
+    "err_duplicate_cohost": "Hetzelfde bedrijf wordt twee keer gevraagd.",
+    "filtersTitle": "Eventfilters",
+    "filterClub": "Club",
+    "filterFree": "Gratis",
+    "filterPrice": "Prijs",
+    "filterGoing": "Ik ga",
+    "filterMine": "Ik",
+    "filtersNoMatch": "Geen events voor deze filters."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",
@@ -6968,7 +7006,9 @@
     "dateTo": "Tot",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Laagste prijs",
-    "priceTo": "Hoogste prijs"
+    "priceTo": "Hoogste prijs",
+    "sectionLevel": "Niveau",
+    "levelHint": "Boxen met lessen op dit niveau"
   },
   "CheckIn": {
     "loading": "Laden…",
@@ -8859,7 +8899,6 @@
     "editProfile": "Mijn profiel bewerken",
     "safetyLine": "Alleen leden van deze club. Voor een match zijn jullie allebei nodig. Je kunt altijd iemand melden of blokkeren.",
     "filters": "Filters",
-    "filtersCount": "Filters ({count})",
     "swipesLeft": "{count, plural, one {Nog # keuze vandaag} other {Nog # keuzes vandaag}}",
     "loading": "Laden…",
     "limitReached": "Genoeg voor vandaag. Morgen nieuwe mensen.",
@@ -8940,7 +8979,14 @@
     "error_partner_match_read_only": "Dit gesprek is beëindigd.",
     "error_partner_plans_unavailable": "Lesvoorstellen zijn er alleen in de eigen clubs van een sportschool.",
     "error_message_body_required": "Schrijf eerst iets.",
-    "error_cannot_block_self": "Je kunt jezelf niet blokkeren."
+    "error_cannot_block_self": "Je kunt jezelf niet blokkeren.",
+    "disciplineLabel": "Sport",
+    "disciplinesLabel": "Wat jullie samen trainen (max. {max})",
+    "allDisciplines": "Alle sporten",
+    "fewerDisciplines": "Minder",
+    "distanceLabel": "Afstand",
+    "withinKm": "Binnen {km} km",
+    "distanceNeedsArea": "Om op afstand te filteren, verschijn in «Om me heen» met je buurt."
   },
   "Squads": {
     "title": "Squads",

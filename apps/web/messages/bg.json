@@ -4457,7 +4457,23 @@
     "apiErrorAccountNotFound": "Няма съвпадащ акаунт.",
     "apiErrorUnknownDemoSection": "Няма демо данни за този екран.",
     "ntfBusinessDemoIdleTitle": "Демо бизнесът ти те очаква",
-    "ntfBusinessDemoIdleBody": "Никой не е използвал {business} от известно време. Ако никой не го отвори в следващите {days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време."
+    "ntfBusinessDemoIdleBody": "Никой не е използвал {business} от известно време. Ако никой не го отвори в следващите {days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време.",
+    "clApptFiltersTitle": "Филтри за часове",
+    "clApptFilterKind": "Вид",
+    "clApptFilterFormat": "Формат",
+    "clApptFilterCoach": "Треньор",
+    "clApptNoMatch": "Нищо не отговаря на тези филтри.",
+    "reviewsFiltersTitle": "Филтри за отзиви",
+    "reviewsFilterTarget": "За какво",
+    "reviewsFilterSentiment": "Впечатление",
+    "reviewsNoMatch": "Няма отзиви по тези филтри.",
+    "workoutsFiltersTitle": "Филтри за тренировки",
+    "workoutsFilterStatus": "Състояние",
+    "workoutsStatusDone": "Направени",
+    "workoutsStatusPending": "Предстоящи",
+    "workoutsFilterKind": "Вид",
+    "workoutsKindPersonal": "Лични",
+    "workoutsFilterSeason": "Сезон"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -5537,7 +5553,6 @@
     "wodOptInLink": "Включи",
     "announcementsEmpty": "Все още няма съобщения.",
     "announcementsOpen": "Всички съобщения",
-    "channelShowAll": "Всички канали",
     "channelSuggested": "Предложено",
     "channelSuggestedHint": "често резервираш тази тренировка",
     "channelsOfBox": "От залата",
@@ -5564,7 +5579,19 @@
     "more": "Още",
     "report": "Сигнализирай",
     "commentHidden": "Скрито",
-    "channelsOfClub": "Канали на клуба"
+    "channelsOfClub": "Канали на клуба",
+    "postFiltersTitle": "Филтри за публикации",
+    "filterClub": "Клуб",
+    "filterChannel": "Канал",
+    "filterType": "Вид",
+    "postType": {
+      "announcement": "Обявления",
+      "pr": "Лични рекорди",
+      "event": "Събития"
+    },
+    "filterCoachesOnly": "Само треньори",
+    "filterAuthor": "Автор",
+    "postsNoMatch": "Няма публикации по тези филтри."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Филтри} other {Филтри (#)}}",
@@ -5572,7 +5599,8 @@
     "clear": "Изчистване",
     "back": "Назад",
     "showResults": "{count, plural, =0 {Няма резултати} other {Покажи #}}",
-    "show": "Покажи"
+    "show": "Покажи",
+    "all": "Всички"
   },
   "BoxSchedule": {
     "title": "График",
@@ -6388,7 +6416,10 @@
     "notif_event_cohost_answered_title": "Отговор за съорганизиране",
     "notif_event_cohost_answered_accepted_body": "{box} съорганизира „{event}“ ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} отказа да съорганизира „{event}“.",
-    "notif_event_cohost_answered_removed_body": "{box} вече не съорганизира „{event}“."
+    "notif_event_cohost_answered_removed_body": "{box} вече не съорганизира „{event}“.",
+    "filterKind": "Вид",
+    "filterBox": "Зала",
+    "findFiltersTitle": "Филтри за търсене"
   },
   "CommunityAdmin": {
     "title": "Общност",
@@ -6663,7 +6694,14 @@
     "err_already_refunded": "Това плащане вече е възстановено.",
     "err_invalid_refund": "Възстанови сума над нула и не повече от платената.",
     "err_invalid_cohosts": "Тези адреси на съорганизатори не могат да се прочетат. Провери всеки адрес на страница.",
-    "err_duplicate_cohost": "Един и същ бизнес е поканен два пъти."
+    "err_duplicate_cohost": "Един и същ бизнес е поканен два пъти.",
+    "filtersTitle": "Филтри за събития",
+    "filterClub": "Клуб",
+    "filterFree": "Безплатни",
+    "filterPrice": "Цена",
+    "filterGoing": "Ще отида",
+    "filterMine": "Аз",
+    "filtersNoMatch": "Няма събития по тези филтри."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Няма предстоящи събития. Създай едно с «+ Ново събитие».",
@@ -6968,7 +7006,9 @@
     "dateTo": "До",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Най-ниска цена",
-    "priceTo": "Най-висока цена"
+    "priceTo": "Най-висока цена",
+    "sectionLevel": "Ниво",
+    "levelHint": "Зали с часове на това ниво"
   },
   "CheckIn": {
     "loading": "Зареждане…",
@@ -8859,7 +8899,6 @@
     "editProfile": "Промени профила",
     "safetyLine": "Само членове на този клуб. Свързването изисква и двамата. Можеш да подадеш сигнал или да блокираш по всяко време.",
     "filters": "Филтри",
-    "filtersCount": "Филтри ({count})",
     "swipesLeft": "{count, plural, one {Остава # избор за днес} other {Остават # избора за днес}}",
     "loading": "Зареждане…",
     "limitReached": "Стига за днес. Утре ще има нови хора.",
@@ -8940,7 +8979,14 @@
     "error_partner_match_read_only": "Този разговор е приключил.",
     "error_partner_plans_unavailable": "Предложения за час има само в собствените клубове на залата.",
     "error_message_body_required": "Първо напиши нещо.",
-    "error_cannot_block_self": "Не можеш да блокираш себе си."
+    "error_cannot_block_self": "Не можеш да блокираш себе си.",
+    "disciplineLabel": "Спорт",
+    "disciplinesLabel": "Какво да тренирате заедно (до {max})",
+    "allDisciplines": "Всички спортове",
+    "fewerDisciplines": "По-малко",
+    "distanceLabel": "Разстояние",
+    "withinKm": "До {km} км",
+    "distanceNeedsArea": "За филтър по разстояние се покажи в «Около мен» с твоя квартал."
   },
   "Squads": {
     "title": "Скуадове",

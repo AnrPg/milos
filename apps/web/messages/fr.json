@@ -4457,7 +4457,23 @@
     "apiErrorAccountNotFound": "Aucun compte ne correspond.",
     "apiErrorUnknownDemoSection": "Il n’y a pas de données de démo pour cet écran.",
     "ntfBusinessDemoIdleTitle": "Votre entreprise de démonstration vous attend",
-    "ntfBusinessDemoIdleBody": "Personne n'a utilisé {business} depuis un moment. Si personne ne l'ouvre dans les {days} prochains jours, ses données de démonstration seront supprimées et elle sera archivée. Vous pourrez la rouvrir à tout moment."
+    "ntfBusinessDemoIdleBody": "Personne n'a utilisé {business} depuis un moment. Si personne ne l'ouvre dans les {days} prochains jours, ses données de démonstration seront supprimées et elle sera archivée. Vous pourrez la rouvrir à tout moment.",
+    "clApptFiltersTitle": "Filtres des rendez-vous",
+    "clApptFilterKind": "Type",
+    "clApptFilterFormat": "Format",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Rien ne correspond à ces filtres.",
+    "reviewsFiltersTitle": "Filtres des avis",
+    "reviewsFilterTarget": "Sujet",
+    "reviewsFilterSentiment": "Ressenti",
+    "reviewsNoMatch": "Aucun avis ne correspond à ces filtres.",
+    "workoutsFiltersTitle": "Filtres des séances",
+    "workoutsFilterStatus": "Statut",
+    "workoutsStatusDone": "Faits",
+    "workoutsStatusPending": "À faire",
+    "workoutsFilterKind": "Type",
+    "workoutsKindPersonal": "Personnelles",
+    "workoutsFilterSeason": "Saison"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -5537,7 +5553,6 @@
     "wodOptInLink": "Activer",
     "announcementsEmpty": "Pas encore d'annonce.",
     "announcementsOpen": "Toutes les annonces",
-    "channelShowAll": "Tous les canaux",
     "channelSuggested": "Suggéré",
     "channelSuggestedHint": "tu réserves souvent ce cours",
     "channelsOfBox": "De la box",
@@ -5564,7 +5579,19 @@
     "more": "Plus",
     "report": "Signaler",
     "commentHidden": "Masqué",
-    "channelsOfClub": "Canaux du club"
+    "channelsOfClub": "Canaux du club",
+    "postFiltersTitle": "Filtres des publications",
+    "filterClub": "Club",
+    "filterChannel": "Canal",
+    "filterType": "Type",
+    "postType": {
+      "announcement": "Annonces",
+      "pr": "Records personnels",
+      "event": "Événements"
+    },
+    "filterCoachesOnly": "Coachs uniquement",
+    "filterAuthor": "Auteur",
+    "postsNoMatch": "Aucune publication ne correspond à ces filtres."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filtres} other {Filtres (#)}}",
@@ -5572,7 +5599,8 @@
     "clear": "Effacer",
     "back": "Retour",
     "showResults": "{count, plural, =0 {Aucun résultat} other {Afficher #}}",
-    "show": "Afficher"
+    "show": "Afficher",
+    "all": "Tout"
   },
   "BoxSchedule": {
     "title": "Planning",
@@ -6388,7 +6416,10 @@
     "notif_event_cohost_answered_title": "Réponse de co-organisation",
     "notif_event_cohost_answered_accepted_body": "{box} co-organise « {event} » ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} a refusé de co-organiser « {event} ».",
-    "notif_event_cohost_answered_removed_body": "{box} ne co-organise plus « {event} »."
+    "notif_event_cohost_answered_removed_body": "{box} ne co-organise plus « {event} ».",
+    "filterKind": "Type",
+    "filterBox": "Box",
+    "findFiltersTitle": "Filtres de recherche"
   },
   "CommunityAdmin": {
     "title": "Communauté",
@@ -6663,7 +6694,14 @@
     "err_already_refunded": "Ce paiement a déjà été remboursé.",
     "err_invalid_refund": "Rembourse un montant supérieur à zéro et pas plus que ce qui a été payé.",
     "err_invalid_cohosts": "Ces adresses de co-organisateurs sont illisibles. Vérifie chaque adresse de page.",
-    "err_duplicate_cohost": "La même entreprise est sollicitée deux fois."
+    "err_duplicate_cohost": "La même entreprise est sollicitée deux fois.",
+    "filtersTitle": "Filtres des événements",
+    "filterClub": "Club",
+    "filterFree": "Gratuit",
+    "filterPrice": "Prix",
+    "filterGoing": "J'y vais",
+    "filterMine": "Moi",
+    "filtersNoMatch": "Aucun événement ne correspond à ces filtres."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Aucun événement à venir. Crée-en un avec «+ Nouvel événement».",
@@ -6968,7 +7006,9 @@
     "dateTo": "Au",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Prix minimum",
-    "priceTo": "Prix maximum"
+    "priceTo": "Prix maximum",
+    "sectionLevel": "Niveau",
+    "levelHint": "Box avec des cours de ce niveau"
   },
   "CheckIn": {
     "loading": "Chargement…",
@@ -8859,7 +8899,6 @@
     "editProfile": "Modifier mon profil",
     "safetyLine": "Uniquement les membres de ce club. Une association demande votre accord à tous les deux. Tu peux signaler ou bloquer à tout moment.",
     "filters": "Filtres",
-    "filtersCount": "Filtres ({count})",
     "swipesLeft": "{count, plural, one {Encore # choix aujourd'hui} other {Encore # choix aujourd'hui}}",
     "loading": "Chargement…",
     "limitReached": "Assez pour aujourd'hui. De nouvelles personnes demain.",
@@ -8940,7 +8979,14 @@
     "error_partner_match_read_only": "Cette conversation est terminée.",
     "error_partner_plans_unavailable": "Les propositions de cours sont réservées aux clubs de la salle.",
     "error_message_body_required": "Écris d'abord quelque chose.",
-    "error_cannot_block_self": "Tu ne peux pas te bloquer toi-même."
+    "error_cannot_block_self": "Tu ne peux pas te bloquer toi-même.",
+    "disciplineLabel": "Discipline",
+    "disciplinesLabel": "Ce que vous entraîneriez ensemble (jusqu'à {max})",
+    "allDisciplines": "Toutes les disciplines",
+    "fewerDisciplines": "Moins",
+    "distanceLabel": "Distance",
+    "withinKm": "À moins de {km} km",
+    "distanceNeedsArea": "Pour filtrer par distance, apparais dans « Autour de moi » avec ton quartier."
   },
   "Squads": {
     "title": "Squads",
