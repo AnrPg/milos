@@ -16,6 +16,7 @@ import {
 import { clientErrorMessage } from "@/components/client/errors";
 import { channelName, channelSections } from "@/components/community/community";
 import { ClubBar } from "@/components/community/ClubBar";
+import { ClubFeed } from "@/components/community/ClubFeed";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { GroupsCard } from "@/components/community/GroupsCard";
@@ -30,15 +31,16 @@ import { useClubRealtime, useMyClubs } from "@/components/community/use-communit
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type ClubTab = "feed" | "channels" | "events" | "members";
 const TABS: ClubTab[] = ["feed", "channels", "events", "members"];
 const TAB_KEYS: Record<ClubTab, string> = { feed: "tabFeed", channels: "tabChannels", events: "tabEvents", members: "tabMembers" };
 
 /**
- * A club's page (vision §7.1, mockup «club», board 7): Ροή (pinned
- * announcements, the #wod-σήμερα card, then every channel's posts; or one
- * channel's posts), Κανάλια (the box's channels, member groups, class groups
+ * A club's page (vision §7.1, mockup «club», board 7): Ροή (`ClubFeed`:
+ * pinned announcement → WOD and leaderboard → challenges → PR celebrations →
+ * events → members' posts; or one channel's posts), Κανάλια (the box's channels, member groups, class groups
  * with the ones offered to the member first), Events (ADR-153) and Μέλη. An open
  * club the member hasn't joined shows its landing with «Μπες».
  */
@@ -88,12 +90,13 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
       {club.kind === "open" && club.description ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{club.description}</p>
       ) : null}
-      <div role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
+      <div {...guideAnchor("club.tabs")} role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
         {TABS.map((id) => (
           <button
             key={id}
             type="button"
             role="tab"
+            data-segment={id}
             aria-selected={tab === id}
             onClick={() => setTab(id)}
             className="min-h-11 rounded-2xl px-1 text-sm font-semibold"
@@ -134,10 +137,7 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
           <FeedList filter={{ clubId: club.id, channelId: openChannel.id }} />
         </>
       ) : (
-        <>
-          {club.kind === "gym" ? <WodCard club={club} showOrigin={false} /> : null}
-          <FeedList filter={{ clubId: club.id }} />
-        </>
+        <ClubFeed club={club} onShowEvents={() => setTab("events")} />
       )}
     </HubPage>
   );

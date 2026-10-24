@@ -71,6 +71,8 @@ export function TodayAcrossCard() {
   const failed = (today.data?.failed_organization_ids ?? [])
     .map((id) => directory.active.get(id)?.name)
     .filter((name): name is string => Boolean(name));
+  // Nothing today anywhere: no card (vision §4.2, §8.5).
+  if (today.isSuccess && !today.data.items?.length && failed.length === 0) return null;
 
   async function open(item: TodayItem) {
     const href = todayItemHref(item);
@@ -84,9 +86,7 @@ export function TodayAcrossCard() {
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : today.isError ? (
         <ErrorLine message={clientErrorMessage(today.error, i18n)} />
-      ) : !today.data.items?.length ? (
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
-      ) : (
+      ) : !today.data.items?.length ? null : (
         <ul className="flex flex-col" aria-label={t("todayTitle")}>
           {today.data.items.map((item) => (
             <li key={`${item.kind}:${item.id}`} style={{ borderBottom: "1px solid var(--border)" }} className="last:border-0">

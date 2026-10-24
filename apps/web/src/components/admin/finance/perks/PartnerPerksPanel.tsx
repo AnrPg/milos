@@ -12,6 +12,7 @@ import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { codesHandedOut, localToday, perkPhase } from "@/lib/perks/validity";
 
 import { PerkForm } from "./PerkForm";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 const PHASE_TONE: Record<string, string> = {
   published: "var(--success)",
@@ -40,12 +41,12 @@ export function PartnerPerksPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{t("listTitle", { count: list.length })}</p>
-        <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={SPARK_CREATE_STYLE} onClick={() => setOpen("new")} data-testid="perk-new">
+        <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={SPARK_CREATE_STYLE} onClick={() => setOpen("new")} data-testid="perk-new" {...guideAnchor("finance.perks.new")}>
           {t("new")}
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div {...guideAnchor("finance.perks.list")} className="overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {perks.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
         ) : perks.isError ? (

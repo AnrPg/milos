@@ -435,6 +435,7 @@ export function NutritionPlanCard() {
       ].filter((macro): macro is typeof macro & { value: number } => typeof macro.value === "number")
     : [];
 
+  // No plan from the coach: no card (vision §4.2, §8.5).
   if (query.isSuccess && !plan) return null;
 
   return (

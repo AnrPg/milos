@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // Shared building blocks of the four member hubs (ADR-137). Hubs use fixed
 // slots: a card keeps its place and shows an empty state instead of moving
@@ -65,9 +66,10 @@ export function HubPage({
   );
 }
 
-export function HubCard({ eyebrow, children, highlighted }: { eyebrow?: string; children: ReactNode; highlighted?: boolean }) {
+export function HubCard({ eyebrow, children, highlighted, guide }: { eyebrow?: string; children: ReactNode; highlighted?: boolean; guide?: GuideAnchor }) {
   return (
     <section
+      data-guide={guide}
       className="rounded-3xl p-5"
       style={{
         background: highlighted ? "color-mix(in srgb, var(--primary) 8%, var(--panel))" : "var(--panel)",

@@ -235,10 +235,12 @@ defmodule PaleeWeb.Schemas.Social do
       properties: %{
         id: @uuid,
         nickname: %Schema{type: :string, nullable: true},
+        handle: %Schema{type: :string, nullable: true},
         avatar_url: %Schema{type: :string, nullable: true},
-        my_status: %Schema{allOf: [status()], description: "Whether you follow them"}
+        my_status: %Schema{allOf: [status()], description: "Whether you follow them"},
+        buddy: %Schema{type: :boolean, description: "ADR-193: you follow each other"}
       },
-      required: [:id, :my_status]
+      required: [:id, :my_status, :buddy]
     }
 
     entry = %Schema{
@@ -276,17 +278,85 @@ defmodule PaleeWeb.Schemas.Social do
         requests_count: %Schema{type: :integer},
         booking_sharing: booking_sharing(),
         member_visibility: member_visibility(),
-        around_visibility: PaleeWeb.Schemas.Around.around_visibility()
+        around_visibility: PaleeWeb.Schemas.Around.around_visibility(),
+        privacy: privacy(),
+        follow_groups: follow_groups()
       },
       required: [
-        :posts_count,
+        :around_visibility,
+        :booking_sharing,
+        :follow_groups,
         :followers_count,
         :following_count,
-        :requests_count,
-        :booking_sharing,
         :member_visibility,
-        :around_visibility
+        :posts_count,
+        :privacy,
+        :requests_count
       ]
+    }
+  end
+
+  def follow_groups do
+    %Schema{
+      title: "FollowGroups",
+      type: :object,
+      description:
+        "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+      properties: %{
+        buddies: %Schema{type: :integer},
+        followers_only: %Schema{type: :integer},
+        following_only: %Schema{type: :integer}
+      },
+      required: [:buddies, :followers_only, :following_only]
+    }
+  end
+
+  def privacy do
+    %Schema{
+      title: "SocialPrivacy",
+      type: :object,
+      description:
+        "ADR-193: a private account answers follow requests; searchable shows you in people search",
+      properties: %{
+        private_account: %Schema{type: :boolean},
+        searchable: %Schema{type: :boolean}
+      },
+      required: [:private_account, :searchable]
+    }
+  end
+
+  def privacy_request do
+    %Schema{
+      title: "SocialPrivacyRequest",
+      type: :object,
+      properties: %{
+        private_account: %Schema{type: :boolean},
+        searchable: %Schema{type: :boolean}
+      }
+    }
+  end
+
+  def people_search_response do
+    person = %Schema{
+      title: "PeopleSearchPerson",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        nickname: %Schema{type: :string, nullable: true},
+        handle: %Schema{type: :string, nullable: true},
+        avatar_url: %Schema{type: :string, nullable: true},
+        relation: %Schema{type: :string, enum: ~w(club buddy follow nearby public)},
+        my_status: status(),
+        buddy: %Schema{type: :boolean}
+      },
+      required: [:buddy, :id, :my_status, :relation]
+    }
+
+    %Schema{
+      title: "PeopleSearchResponse",
+      type: :object,
+      properties: %{people: %Schema{type: :array, items: person}},
+      required: [:people]
     }
   end
 
@@ -327,20 +397,27 @@ defmodule PaleeWeb.Schemas.Social do
       properties: %{
         id: @uuid,
         nickname: %Schema{type: :string, nullable: true},
+        handle: %Schema{type: :string, nullable: true},
         avatar_url: %Schema{type: :string, nullable: true},
         is_me: %Schema{type: :boolean},
+        private: %Schema{type: :boolean, description: "ADR-193: following them is a request"},
         followers_count: %Schema{type: :integer},
         following_count: %Schema{type: :integer},
+        follow_groups: follow_groups(),
         my_status: status(),
-        follows_me: %Schema{type: :boolean}
+        follows_me: %Schema{type: :boolean},
+        buddy: %Schema{type: :boolean, description: "ADR-193: you follow each other"}
       },
       required: [
         :id,
         :is_me,
+        :private,
         :followers_count,
         :following_count,
+        :follow_groups,
         :my_status,
-        :follows_me
+        :follows_me,
+        :buddy
       ]
     }
   end

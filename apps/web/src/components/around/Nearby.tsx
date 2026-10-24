@@ -9,7 +9,7 @@ import { ErrorLine } from "@/components/community/Sheet";
 import { EventList } from "@/components/events/EventParts";
 import { HubCard } from "@/components/member-app/HubParts";
 
-import { parseFilter } from "./around";
+import { aroundKindHref, parseFilter } from "./around";
 import { useAroundError } from "./AreaPicker";
 import { useKm } from "./AroundFilters";
 import { needsOrigin, useAroundKind, useSavedAroundFilters } from "./use-around";
@@ -60,7 +60,7 @@ export function NearbyEvents() {
       ) : (
         <NearbyState error={list.error} empty />
       )}
-      <Link href="/around/events" className="mt-2 flex min-h-11 items-center text-sm font-bold" style={{ color: "var(--primary-strong, var(--primary))" }}>
+      <Link href={aroundKindHref("events")} className="mt-2 flex min-h-11 items-center text-sm font-bold" style={{ color: "var(--primary-strong, var(--primary))" }}>
         {t("seeAllAround")}
       </Link>
     </HubCard>
@@ -88,7 +88,7 @@ export function NearbyClubs() {
       ) : (
         <NearbyState error={list.error} empty />
       )}
-      <Link href="/around/clubs" className="mt-2 flex min-h-11 items-center text-sm font-bold" style={{ color: "var(--primary-strong, var(--primary))" }}>
+      <Link href={aroundKindHref("clubs")} className="mt-2 flex min-h-11 items-center text-sm font-bold" style={{ color: "var(--primary-strong, var(--primary))" }}>
         {t("seeAllAround")}
       </Link>
     </HubCard>

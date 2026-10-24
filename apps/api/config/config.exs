@@ -156,6 +156,10 @@ config :palee,
        Palee.Infrastructure.Community.EctoSocialStore
 
 config :palee,
+       :conversation_store,
+       Palee.Infrastructure.Conversations.EctoConversationStore
+
+config :palee,
        :community_event_store,
        Palee.Infrastructure.Community.EctoEventStore
 
@@ -348,6 +352,10 @@ config :palee,
 config :palee,
        :insight_store,
        Palee.Infrastructure.Insights.EctoInsightStore
+
+config :palee,
+       :guide_progress_store,
+       Palee.Infrastructure.Guides.EctoGuideProgressStore
 
 config :palee,
        :messaging_thread_store,

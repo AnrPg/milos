@@ -359,7 +359,7 @@ test.describe("Γύρω μου", () => {
     await expect(page.getByRole("heading", { name: "Πού να ψάξουμε;" })).toBeVisible();
   });
 
-  test("the scope toggle opens Γύρω μου; sections link to «Δες όλα» with cursor paging", async ({ page }) => {
+  test("the scope toggle opens Γύρω μου; «Δες όλα» narrows «what» in place with cursor paging", async ({ page }) => {
     const calls = await stub(page);
     await page.goto("/");
     await page.getByRole("navigation", { name: "Τι δείχνει το Feed" }).getByRole("link", { name: "Γύρω μου" }).click();
@@ -375,13 +375,27 @@ test.describe("Γύρω μου", () => {
     await expect(page.getByRole("button", { name: "Θα έρθω" }).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "Αναρτήσεις" })).toHaveCount(0);
 
-    await page.getByRole("link", { name: "Δες όλα (12)" }).click();
-    await expect(page).toHaveURL(/\/around\/events$/);
-    await expect(page.getByRole("heading", { name: "Events", level: 1 })).toBeVisible();
-    await expect(page.getByText("Run 8 km Λυκαβηττός")).toBeVisible();
+    // Only a section with more than it shows offers «Δες όλα».
+    await expect(page.getByRole("button", { name: /^Δες/ })).toHaveCount(1);
+    await page.getByRole("button", { name: "Δες όλα (12)" }).click();
+    await expect(page).toHaveURL(/\/around$/);
+    await expect(page.getByRole("button", { name: "Φίλτρα (1)" })).toBeVisible();
+    await expect.poll(() => lastSearch(calls).filter.kinds).toEqual(["events"]);
+    await expect(page.getByRole("heading", { name: "Box κοντά σου" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Run 8 km Λυκαβηττός/ })).toBeVisible();
     await page.getByRole("button", { name: "Περισσότερα" }).click();
-    await expect(page.getByText("Hyrox simulation")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Hyrox simulation/ })).toBeVisible();
     expect(calls.kinds.map((body) => body.cursor ?? null)).toEqual([null, "page-2"]);
+  });
+
+  test("old «Δες όλα» links open Γύρω μου with that kind preselected", async ({ page }) => {
+    const calls = await stub(page);
+    await page.goto("/around/events");
+    await expect(page).toHaveURL(/\/around\?kind=events$/);
+    await expect.poll(() => lastSearch(calls)?.filter.kinds).toEqual(["events"]);
+    await expect(page.getByRole("button", { name: "Φίλτρα (1)" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Run 8 km Λυκαβηττός/ })).toBeVisible();
   });
 
   test("the filter sheet applies as you tap, saves «ΣΚ κοντά» and turns its alert on", async ({ page }) => {
@@ -407,7 +421,8 @@ test.describe("Γύρω μου", () => {
     await sheet.getByRole("button", { name: /Δείξε 14/ }).click();
     await expect(sheet).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Φίλτρα (3)" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Αναρτήσεις" })).toBeVisible();
+    // Posts are searched but none came back, so their section stays hidden (vision §4.2).
+    await expect(page.getByRole("heading", { name: "Αναρτήσεις" })).toHaveCount(0);
     // Saved combinations live in the sheet, so the chip row fits a phone.
     const row = page.getByRole("toolbar", { name: "Φίλτρα Γύρω μου" });
     await expect(row.getByRole("button", { name: "ΣΚ κοντά", exact: true })).toHaveCount(0);
@@ -497,7 +512,9 @@ test.describe("Γύρω μου", () => {
     const calls = await stub(page, { thin: true });
     await page.goto("/around");
     await expect(page.getByRole("heading", { name: "Τίποτα έως 3 km" })).toBeVisible();
-    await expect(page.getByText("Κανένα ανοιχτό event έως 3 km.")).toBeVisible();
+    // Empty sections are hidden (vision §4.2): the «Τίποτα» card speaks for them.
+    await expect(page.getByRole("heading", { name: "Events" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Box κοντά σου" })).toHaveCount(0);
     await page.getByRole("button", { name: "Έως 10 km · 4" }).click();
     await expect.poll(() => lastSearch(calls).filter.radius_km).toBe(10);
     expect(lastSearch(calls).remember).toBe(true);

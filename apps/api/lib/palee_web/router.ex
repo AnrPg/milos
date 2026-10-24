@@ -1472,6 +1472,10 @@ defmodule PaleeWeb.Router do
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)
+    # ADR-193: in-app walkthrough progress.
+    get("/me/guides", GuideProgressController, :index)
+    put("/me/guides/:guide_id", GuideProgressController, :update)
+    delete("/me/guides/:guide_id", GuideProgressController, :delete)
     get("/me/filters/:surface", SavedFilterController, :show)
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)
@@ -1527,6 +1531,18 @@ defmodule PaleeWeb.Router do
     get("/me/followers", FollowController, :followers)
     delete("/me/followers/:id", FollowController, :remove)
     get("/me/following", FollowController, :following)
+    # ADR-193: Buddies, privacy and person-to-person conversations.
+    get("/me/buddies-list", FollowController, :buddies)
+    put("/me/social/privacy", FollowController, :privacy)
+    get("/me/conversations", PersonConversationController, :index)
+    get("/me/conversations/unread-count", PersonConversationController, :unread_count)
+    post("/me/conversations", PersonConversationController, :create)
+    get("/me/conversations/:id", PersonConversationController, :show)
+    get("/me/conversations/:id/messages", PersonConversationController, :messages)
+    post("/me/conversations/:id/messages", PersonConversationController, :send_message)
+    post("/me/conversations/:id/read", PersonConversationController, :read)
+    post("/me/conversations/:id/accept", PersonConversationController, :accept)
+    post("/me/conversations/:id/decline", PersonConversationController, :decline)
     get("/me/post-attachments/:type/:id", PostAttachmentController, :show)
     post("/profile-posts", ProfilePostController, :create)
     delete("/profile-posts/:id", ProfilePostController, :delete)
@@ -1840,6 +1856,19 @@ defmodule PaleeWeb.Router do
     delete("/:id", PRController, :delete)
     get("/:id/history", PRController, :history)
     post("/:id/share", PRController, :share)
+  end
+
+  # ADR-193 §4: people search across Palee, in the personal session.
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :search_rate_limited
+    ])
+
+    get("/people-search", PeopleController, :search)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).

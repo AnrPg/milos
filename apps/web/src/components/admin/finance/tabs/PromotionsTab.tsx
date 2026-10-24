@@ -26,6 +26,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useTranslations } from "next-intl";
 import { PartnerPerksPanel } from "@/components/admin/finance/perks/PartnerPerksPanel";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -57,6 +58,7 @@ export function PromotionsTab({ locationIds }: { locationIds?: string } = {}) {
   return (
     <div className="space-y-4">
       <SegmentPicker
+        guide="finance.offers"
         ariaLabel={t("segment")}
         stretch
         className="max-w-md"
@@ -153,6 +155,7 @@ function BoxPromotions({ locationIds }: { locationIds?: string }) {
           {i18n("activeCampaignCount", {count: activeCampaigns.length})}
         </p>
         <button
+          {...guideAnchor("finance.campaigns.new")}
           className="rounded-full px-4 py-2 text-sm font-semibold"
           style={SPARK_CREATE_STYLE}
           onClick={() => setParam("new", "true")}
@@ -162,7 +165,7 @@ function BoxPromotions({ locationIds }: { locationIds?: string }) {
         </button>
       </div>
 
-      <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div {...guideAnchor("finance.campaigns.list")} className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {campaignsQuery.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
         ) : activeCampaigns.length === 0 ? (
@@ -189,6 +192,7 @@ function BoxPromotions({ locationIds }: { locationIds?: string }) {
 
       {showNew ? (
         <SidePanel
+          guide="finance.campaign.form"
           title={i18n("newCampaignaaf9a8a")}
           subtitle={i18n("promotions086e09b")}
           onClose={() => setParam("new", null)}
