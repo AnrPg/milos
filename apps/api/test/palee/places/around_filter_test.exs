@@ -92,6 +92,8 @@ defmodule Palee.Places.Domain.AroundFilterTest do
           {%{cost: ["cheap"]}, :cost},
           {%{max_price_cents: -1}, :max_price_cents},
           {%{max_price_cents: 9.5}, :max_price_cents},
+          {%{min_price_cents: -5}, :min_price_cents},
+          {%{min_price_cents: 2000, max_price_cents: 1000}, :min_price_cents},
           {%{neighbourhood_ids: ["kypseli"]}, :neighbourhood_ids},
           {%{neighbourhood_ids: Enum.map(1..6, &uuid/1)}, :neighbourhood_ids}
         ] do
@@ -130,6 +132,31 @@ defmodule Palee.Places.Domain.AroundFilterTest do
       capped = plan(%{cost: ["free"], max_price_cents: 1500})
       assert capped.kinds == ~w(events clubs)
       assert capped.max_price_cents == 1500
+    end
+
+    test "a price range keeps events inside it, clubs only while it starts at free" do
+      ranged = plan(%{kinds: ~w(events boxes clubs posts), min_price_cents: 500, max_price_cents: 2000})
+      assert ranged.kinds == ~w(events posts)
+      assert {ranged.min_price_cents, ranged.max_price_cents} == {500, 2000}
+
+      up_to = plan(%{kinds: ~w(events boxes clubs), max_price_cents: 2000})
+      assert up_to.kinds == ~w(events clubs)
+      assert up_to.min_price_cents == nil
+
+      # «Δωρεάν» with a range reaches the range down to free.
+      with_free = plan(%{cost: ["free"], min_price_cents: 500, max_price_cents: 2000})
+      assert with_free.kinds == ~w(events clubs)
+      assert {with_free.min_price_cents, with_free.max_price_cents} == {nil, 2000}
+    end
+
+    test "a minimum of 0 is no minimum, and the range round-trips" do
+      {:ok, filter} = AroundFilter.parse(%{min_price_cents: 0, max_price_cents: 1500}, @vocabulary)
+      assert filter.min_price_cents == nil
+
+      {:ok, filter} = AroundFilter.parse(%{min_price_cents: 500}, @vocabulary)
+      assert AroundFilter.to_params(filter)["min_price_cents"] == 500
+      assert AroundFilter.active_count(filter) == 1
+      assert {:ok, ^filter} = AroundFilter.parse(AroundFilter.to_params(filter), @vocabulary)
     end
 
     test "tags pass through as nil when empty, windows only when asked" do

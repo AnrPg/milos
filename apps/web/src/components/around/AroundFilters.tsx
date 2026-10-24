@@ -11,7 +11,9 @@ import type { SavedFilter } from "@/api/saved-filters";
 import { COMMON_LANGUAGES, languageNames } from "@/components/admin/public-page/languages";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { FilterChipRow, FilterMenuChip, type FilterChip } from "@/components/filters/FilterChipRow";
-import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
+import { ChoiceChips, FilterPage, FilterSection, RangeSlider } from "@/components/filters/FilterPage";
+import { DateInput } from "@/components/ui/DateInput";
+import { isoDay, todayYmd } from "@/lib/calendar-grid";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import {
@@ -23,21 +25,28 @@ import {
   KIND_ORDER,
   MAX_NEIGHBOURHOODS,
   PRICE_CAP_CENTS,
+  PRICE_SLIDER,
   RADIUS_STEPS,
   WHENS,
   activeFilterCount,
   applyChip,
   chipModel,
   isMine,
+  isPriceCap,
+  lastRangeDay,
+  priceSliderValue,
   radiusChip,
   sameFilter,
   toggleKind,
+  toggleFree,
   toggleMine,
+  togglePriceCap,
   toggleValue,
+  withDates,
+  withPriceRange,
   withWhen,
   parseFilter,
   type AroundFilter,
-  type Cost,
   type DayTime,
   type When,
 } from "./around";
@@ -426,6 +435,11 @@ function AroundFilterSheet({
     ? (vocabulary.data?.discipline_groups ?? []).flatMap((group) => group.items)
     : Array.from(new Set([...mine, ...CHIP_DISCIPLINES, ...filter.disciplines]));
   const accessible = filter.amenities.includes(ACCESSIBLE_AMENITY);
+  const euros = (cents: number) =>
+    new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(cents / 100);
+  const dateFrom = filter.when === "range" ? filter.date_from : null;
+  const dateTo = filter.when === "range" ? filter.date_to : null;
+  const today = isoDay(todayYmd());
 
   return (
     <FilterPage title={t("filtersTitle")} resultCount={resultCount} onClose={onClose} onClear={() => setFilter(DEFAULT_FILTER)}>
@@ -565,6 +579,25 @@ function AroundFilterSheet({
       </FilterSection>
 
       <FilterSection label={t("sectionWhen")} hint={t("whenHint")}>
+        <div role="group" aria-label={t("dates")} className="grid grid-cols-2 gap-2">
+          <DateInput
+            aria-label={t("dateFrom")}
+            placeholder={t("dateFrom")}
+            value={dateFrom ?? ""}
+            min={today}
+            onValueChange={(value) => setFilter(withDates(filter, value || null, value ? dateTo : null))}
+            className="min-h-11 w-full rounded-2xl px-3 text-sm"
+          />
+          <DateInput
+            aria-label={t("dateTo")}
+            placeholder={t("dateTo")}
+            value={dateTo && dateTo !== dateFrom ? dateTo : ""}
+            min={dateFrom ?? today}
+            max={dateFrom ? lastRangeDay(dateFrom) : undefined}
+            onValueChange={(value) => setFilter(withDates(filter, dateFrom, value || dateFrom))}
+            className="min-h-11 w-full rounded-2xl px-3 text-sm"
+          />
+        </div>
         <ChoiceChips<When>
           ariaLabel={t("sectionWhen")}
           multiple
@@ -582,21 +615,25 @@ function AroundFilterSheet({
       </FilterSection>
 
       <FilterSection label={t("sectionCost")}>
+        <RangeSlider
+          min={PRICE_SLIDER.min}
+          max={PRICE_SLIDER.max}
+          step={PRICE_SLIDER.step}
+          value={priceSliderValue(filter)}
+          format={(cents) => (cents >= PRICE_SLIDER.max ? t("priceOpenEnd", { price: euros(cents) }) : euros(cents))}
+          fromLabel={t("priceFrom")}
+          toLabel={t("priceTo")}
+          onChange={(range) => setFilter(withPriceRange(filter, range))}
+        />
         <div role="group" aria-label={t("sectionCost")} className="flex flex-wrap gap-2">
-          {(["free", "trial"] as Cost[]).map((cost) => (
-            <ToggleChip key={cost} on={filter.cost.includes(cost)} onClick={() => update({ cost: toggleValue(filter.cost, cost) })}>
-              {cost === "free" ? t("costFree") : t("costTrial")}
-            </ToggleChip>
-          ))}
-          <ToggleChip
-            on={filter.max_price_cents !== null}
-            onClick={() => update({ max_price_cents: filter.max_price_cents === null ? PRICE_CAP_CENTS : null })}
-          >
-            {t("priceCap", {
-              price: new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(
-                (filter.max_price_cents ?? PRICE_CAP_CENTS) / 100,
-              ),
-            })}
+          <ToggleChip on={filter.cost.includes("free")} onClick={() => setFilter(toggleFree(filter))}>
+            {t("costFree")}
+          </ToggleChip>
+          <ToggleChip on={isPriceCap(filter)} onClick={() => setFilter(togglePriceCap(filter))}>
+            {t("priceCap", { price: euros(PRICE_CAP_CENTS) })}
+          </ToggleChip>
+          <ToggleChip on={filter.cost.includes("trial")} onClick={() => update({ cost: toggleValue(filter.cost, "trial") })}>
+            {t("costTrial")}
           </ToggleChip>
         </div>
       </FilterSection>

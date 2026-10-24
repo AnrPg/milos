@@ -24,8 +24,12 @@ export const KIND_ORDER: AroundKind[] = ["events", "boxes", "clubs", "posts"];
 export const WHENS: When[] = ["today", "tomorrow", "weekend", "week"];
 export const DAY_TIMES: DayTime[] = ["morning", "midday", "evening"];
 export const COSTS: Cost[] = ["free", "trial"];
-/** «Έως €15». */
+/** «Έως €15», the price shortcut chip. */
 export const PRICE_CAP_CENTS = 1500;
+/** The price slider (cents): its top end means «no maximum». */
+export const PRICE_SLIDER = { min: 0, max: 10_000, step: 100 } as const;
+/** A date range spans at most this many days (AroundFilter, ADR-154). */
+export const MAX_RANGE_DAYS = 62;
 /** «Προσβάσιμο» is this amenity of the box-profile vocabulary. */
 export const ACCESSIBLE_AMENITY = "wheelchair_accessible";
 /** The radius slider's stops (km). */
@@ -50,6 +54,7 @@ export const DEFAULT_FILTER: AroundFilter = {
   date_to: null,
   times: [],
   cost: [],
+  min_price_cents: null,
   max_price_cents: null,
   audiences: [],
   languages: [],
@@ -76,7 +81,9 @@ export function parseFilter(params: unknown): AroundFilter {
   const when = typeof raw.when === "string" && [...WHENS, "range"].includes(raw.when) ? (raw.when as When) : null;
   const dateFrom = isoDate(raw.date_from);
   const dateTo = isoDate(raw.date_to);
-  const price = typeof raw.max_price_cents === "number" && raw.max_price_cents >= 0 ? Math.round(raw.max_price_cents) : null;
+  const cents = (value: unknown) => (typeof value === "number" && value >= 0 ? Math.round(value) : null);
+  const maxPrice = cents(raw.max_price_cents);
+  const minPrice = cents(raw.min_price_cents) || null;
   return {
     v: 1,
     radius_km: Math.min(MAX_RADIUS_KM, Math.max(MIN_RADIUS_KM, radius)),
@@ -88,7 +95,8 @@ export function parseFilter(params: unknown): AroundFilter {
     date_to: when === "range" ? dateTo : null,
     times: strings(raw.times, DAY_TIMES) as DayTime[],
     cost: strings(raw.cost, COSTS) as Cost[],
-    max_price_cents: price,
+    min_price_cents: minPrice !== null && maxPrice !== null && minPrice > maxPrice ? null : minPrice,
+    max_price_cents: maxPrice,
     audiences: strings(raw.audiences, undefined, 10),
     languages: strings(raw.languages, undefined, 10).filter((code) => /^[a-z]{2}$/.test(code)),
     amenities: strings(raw.amenities, undefined, 10),
@@ -115,7 +123,7 @@ function narrowingFacets(filter: AroundFilter) {
     !sameSet(filter.kinds, DEFAULT_KINDS),
     filter.disciplines.length > 0,
     filter.when !== null || filter.times.length > 0,
-    filter.cost.length > 0 || filter.max_price_cents !== null,
+    filter.cost.length > 0 || hasPriceRange(filter),
     filter.audiences.length > 0,
     filter.languages.length > 0,
     filter.amenities.length > 0,
@@ -151,6 +159,7 @@ export function filterKey(filter: AroundFilter) {
     filter.date_to,
     sorted(filter.times),
     sorted(filter.cost),
+    filter.min_price_cents,
     filter.max_price_cents,
     sorted(filter.audiences),
     sorted(filter.languages),
@@ -174,6 +183,78 @@ export function toggleKind(filter: AroundFilter, kind: AroundKind): AroundFilter
 
 export function withWhen(filter: AroundFilter, when: When | null): AroundFilter {
   return { ...filter, when, date_from: null, date_to: null };
+}
+
+const shiftDay = (iso: string, days: number) => {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+};
+
+/** The last day a range starting on `from` may reach. */
+export function lastRangeDay(from: string) {
+  return shiftDay(from, MAX_RANGE_DAYS - 1);
+}
+
+/**
+ * The date pickers above the «Πότε» shortcuts: one end picked is a single
+ * day, ends picked the wrong way round swap, and a range longer than the API
+ * allows is cut at its end. Both cleared means no date at all.
+ */
+export function withDates(filter: AroundFilter, from: string | null, to: string | null): AroundFilter {
+  const start = from || to;
+  if (!start) return filter.when === "range" ? withWhen(filter, null) : filter;
+  const [first, last] = [start, to || from || start].sort();
+  return { ...filter, when: "range", date_from: first, date_to: last > lastRangeDay(first) ? lastRangeDay(first) : last };
+}
+
+/** Whether the filter narrows by a price range (either end). */
+export function hasPriceRange(filter: AroundFilter) {
+  return filter.min_price_cents !== null || filter.max_price_cents !== null;
+}
+
+/** The price slider's thumbs for a filter: an open end sits at the slider's end. */
+export function priceSliderValue(filter: AroundFilter) {
+  const clamp = (cents: number) => Math.min(PRICE_SLIDER.max, Math.max(PRICE_SLIDER.min, cents));
+  return {
+    from: clamp(filter.min_price_cents ?? PRICE_SLIDER.min),
+    to: clamp(filter.max_price_cents ?? PRICE_SLIDER.max),
+  };
+}
+
+/**
+ * The price slider moved: a thumb at its end leaves that end open, and a
+ * range chosen by hand replaces «Δωρεάν» (which the slider cannot show).
+ */
+export function withPriceRange(filter: AroundFilter, range: { from: number; to: number }): AroundFilter {
+  const min = range.from > PRICE_SLIDER.min ? range.from : null;
+  const max = range.to < PRICE_SLIDER.max ? range.to : null;
+  return {
+    ...filter,
+    cost: min !== null || max !== null ? filter.cost.filter((cost) => cost !== "free") : filter.cost,
+    min_price_cents: min,
+    max_price_cents: max,
+  };
+}
+
+/** «Δωρεάν» is a shortcut: turning it on clears the hand-picked range. */
+export function toggleFree(filter: AroundFilter): AroundFilter {
+  const on = !filter.cost.includes("free");
+  return on
+    ? { ...filter, cost: COSTS.filter((cost) => cost === "free" || filter.cost.includes(cost)), min_price_cents: null, max_price_cents: null }
+    : { ...filter, cost: filter.cost.filter((cost) => cost !== "free") };
+}
+
+/** «Έως €15» is on when the range is exactly up to the cap. */
+export function isPriceCap(filter: AroundFilter) {
+  return filter.min_price_cents === null && filter.max_price_cents === PRICE_CAP_CENTS;
+}
+
+/** «Έως €15» tapped: that range (dropping «Δωρεάν»), or no range again. */
+export function togglePriceCap(filter: AroundFilter): AroundFilter {
+  return isPriceCap(filter)
+    ? { ...filter, min_price_cents: null, max_price_cents: null }
+    : withPriceRange(filter, { from: PRICE_SLIDER.min, to: PRICE_CAP_CENTS });
 }
 
 // ------------------------------------------------------------------ chips
@@ -231,7 +312,7 @@ export function applyChip(filter: AroundFilter, key: ChipKey, values?: string[])
       return withWhen(filter, when && (WHENS as string[]).includes(when) ? (when as When) : null);
     }
     case "free":
-      return { ...filter, cost: toggleValue(filter.cost, "free") };
+      return toggleFree(filter);
     case "trial":
       return { ...filter, cost: toggleValue(filter.cost, "trial") };
     case "discipline":

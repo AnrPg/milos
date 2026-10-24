@@ -292,6 +292,17 @@ defmodule PaleeWeb.AroundControllerTest do
                "Open WOD"
              ]
 
+      # A price range from €5 drops the free event and the (always free) clubs.
+      priced = filtered.(%{min_price_cents: 500, max_price_cents: 2000})
+      assert names(priced, "events") == ["Sunrise flow"]
+      assert priced["sections"]["clubs"] == nil
+      assert priced["filter"]["min_price_cents"] == 500
+      assert names(filtered.(%{min_price_cents: 1500}), "events") == []
+      assert names(filtered.(%{max_price_cents: 500}), "events") == ["Open WOD"]
+
+      assert %{"errors" => _} =
+               search(ctx, ctx.visitor, %{filter: %{min_price_cents: 2000, max_price_cents: 1000}}, 422)
+
       trial = filtered.(%{cost: ["trial"]})
       assert names(trial, "boxes") == ["Beta"]
       assert trial["sections"]["events"] == nil

@@ -6943,7 +6943,13 @@
     "notifTitle": "Novidades perto de ti",
     "notifBody": "Novidades para «{name}»: {count}",
     "myDisciplines": "Os meus desportos",
-    "placesAttribution": "Locais: © contribuidores do OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Locais: © contribuidores do OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Datas",
+    "dateFrom": "De",
+    "dateTo": "Até",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Preço mínimo",
+    "priceTo": "Preço máximo"
   },
   "CheckIn": {
     "loading": "A carregar…",
@@ -8301,7 +8307,13 @@
     },
     "vault": {
       "intro": "Todos os treinos que terminaste, com todos os prestadores. O mesmo treino feito em sítios diferentes é uma só tendência.",
-      "sources": "Feito com"
+      "sources": "Feito com",
+      "view": "Vista",
+      "path": "Caminho da pasta",
+      "all": "Tudo",
+      "tree": "Treinos por pasta",
+      "otherType": "Outros",
+      "count": "{count, plural, one {# treino} other {# treinos}}"
     },
     "audience": {
       "title": "«Os meus treinadores» significa",

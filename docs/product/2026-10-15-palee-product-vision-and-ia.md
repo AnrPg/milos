@@ -221,13 +221,15 @@ Owner setting for member groups: **Όχι · Με έγκριση (default) · Ε
 One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` first**, which opens a sheet. Filters are remembered. Combinations can be saved ("ΣΚ κοντά").
 | Surface | Filters |
 |---|---|
-| Γύρω μου | **radius, neighbourhood or map**, discipline, what (events/clubs/boxes/posts), when (today, weekend, morning, evening), cost (free, trial, price), level, language, audience (women, 40+, beginners), accessibility |
+| Γύρω μου | **radius, neighbourhood or map**, discipline, what (events/clubs/boxes/posts), when (a **From / To date picker** above the shortcut chips today, tomorrow, weekend, this week; plus morning, midday, evening), cost (a **price range slider** above the shortcut chips free, up to €15, trial), level, language, audience (women, 40+, beginners), accessibility |
 | Box › Πρόγραμμα [PARTIAL] | location, class type, coach, time, only with spots, only covered by my package |
 | Partners | level, time, goal, discipline, optional gender preference (safety), distance in open clubs |
 | Feed/club | club, channel, type (announcements, PRs, events), coaches only |
 | Journal | entry type, visibility, date range, source (box/coach/freeform), text search |
 | Vault | discipline, benchmark, exercise, date |
 | Πρόοδος | time range, provider, exercise |
+
+In the Γύρω μου sheet, «Πότε» and «Κόστος» each open with a picker and keep their chips underneath as shortcuts (ANR, 2026-10-24). The pickers and the chips edit one value: a chip replaces what the picker chose and the other way round (picking dates clears today/weekend; «Δωρεάν» or «Έως €15» replaces a hand-picked price range; «Δοκιμαστικό» is independent). A date range is at most 62 days; the price slider's ends mean «no limit». The chip row itself stays «Φίλτρα (n) · Τα αθλήματά μου · Πότε · Δωρεάν».
 
 ### 7.3 Partners (gym buddies) [NEW]
 Why swipe works for people and not for clubs: swipe makes sense when **both sides must agree**, options are many, and the decision is quick. Clubs fail all three. An open club needs no approval, a neighbourhood has 10–20 of them, and joining a gym is not a snap decision. Therefore:

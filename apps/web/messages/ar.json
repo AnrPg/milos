@@ -6943,7 +6943,13 @@
     "notifTitle": "جديد حولك",
     "notifBody": "جديد في «{name}»: {count}",
     "myDisciplines": "رياضاتي",
-    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)"
+    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)",
+    "dates": "التواريخ",
+    "dateFrom": "من",
+    "dateTo": "إلى",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "أدنى سعر",
+    "priceTo": "أعلى سعر"
   },
   "CheckIn": {
     "loading": "جارٍ التحميل…",
@@ -8301,7 +8307,13 @@
     },
     "vault": {
       "intro": "كل تمرين أنهيته، مع كل الجهات. التمرين نفسه في أماكن مختلفة يُعرض كمسار واحد.",
-      "sources": "أُنجز مع"
+      "sources": "أُنجز مع",
+      "view": "العرض",
+      "path": "مسار المجلد",
+      "all": "الكل",
+      "tree": "التمارين حسب المجلد",
+      "otherType": "أخرى",
+      "count": "{count, plural, one {تمرين واحد} other {# تمارين}}"
     },
     "audience": {
       "title": "«مدرّبيّ» تعني",
