@@ -675,3 +675,15 @@ msgstr "Weer op voorraad"
 
 msgid "%{item} is available again."
 msgstr "%{item} is weer beschikbaar."
+
+msgid "New follower"
+msgstr "Nieuwe volger"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} volgt je nu."
+
+msgid "Message request"
+msgstr "Berichtverzoek"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} wil je een bericht sturen."

@@ -675,3 +675,15 @@ msgstr "Отново в наличност"
 
 msgid "%{item} is available again."
 msgstr "%{item} отново е налично."
+
+msgid "New follower"
+msgstr "Нов последовател"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} започна да ви следва."
+
+msgid "Message request"
+msgstr "Заявка за съобщение"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} иска да ви изпрати съобщение."

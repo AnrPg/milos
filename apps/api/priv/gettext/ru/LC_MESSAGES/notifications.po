@@ -675,3 +675,15 @@ msgstr "Снова в наличии"
 
 msgid "%{item} is available again."
 msgstr "%{item} снова в наличии."
+
+msgid "New follower"
+msgstr "Новый подписчик"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} подписывается на вас."
+
+msgid "Message request"
+msgstr "Запрос на переписку"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} хочет отправить вам сообщение."

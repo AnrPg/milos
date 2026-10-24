@@ -4,7 +4,7 @@ defmodule PaleeWeb.PeopleController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.SocialProfile
+  alias Palee.Application.{PeopleSearch, SocialProfile}
   alias PaleeWeb.Schemas.Social, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -16,6 +16,25 @@ defmodule PaleeWeb.PeopleController do
   plug OpenApiSpex.Plug.CastAndValidate, json_render_error_v2: true
 
   @id %Parameter{name: :id, in: :path, required: true, schema: S.uuid()}
+
+  operation(:search,
+    summary:
+      "ADR-193: find people by @handle or name (shared clubs, Buddies, follows, nearby, public)",
+    parameters: [
+      %Parameter{
+        name: :q,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, minLength: 1, maxLength: 80}
+      }
+    ],
+    responses: [ok: {"People", "application/json", S.people_search_response()}]
+  )
+
+  def search(conn, %{q: query}) do
+    with {:ok, result} <- PeopleSearch.call(conn.assigns.user_context, query),
+         do: json(conn, result)
+  end
 
   operation(:show,
     summary: "A person: name, avatar, counts and both follow relationships",

@@ -675,3 +675,15 @@ msgstr "De novo disponível"
 
 msgid "%{item} is available again."
 msgstr "%{item} está de novo disponível."
+
+msgid "New follower"
+msgstr "Novo seguidor"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} começou a seguir-te."
+
+msgid "Message request"
+msgstr "Pedido de mensagem"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} quer enviar-te uma mensagem."

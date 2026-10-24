@@ -670,3 +670,15 @@ msgstr ""
 
 msgid "%{item} is available again."
 msgstr ""
+
+msgid "New follower"
+msgstr ""
+
+msgid "%{nickname} started following you."
+msgstr ""
+
+msgid "Message request"
+msgstr ""
+
+msgid "%{nickname} wants to send you a message."
+msgstr ""

@@ -239,6 +239,40 @@ defmodule Palee.Notifications do
         url: "/me/follow-requests"
       })
 
+  # ADR-193 §2: a public person was followed at once.
+  def process_event("new_follower", payload),
+    do:
+      enqueue_simple(:new_follower, payload, %{
+        follow_id: field(payload, :follow_id),
+        follower_id: field(payload, :follower_id),
+        follower_nickname: field(payload, :follower_nickname),
+        dedupe_key: "new_follower:#{field(payload, :follow_id)}",
+        url: "/people/#{field(payload, :follower_id)}"
+      })
+
+  # ADR-193 §3: a message in a person conversation (who wrote, never what);
+  # a conversation that landed in requests tells its recipient once.
+  def process_event("person_message", payload),
+    do:
+      enqueue_simple(:person_message, payload, %{
+        conversation_id: field(payload, :conversation_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/messages/#{field(payload, :conversation_id)}"
+      })
+
+  def process_event("message_request", payload),
+    do:
+      enqueue_simple(:message_request, payload, %{
+        conversation_id: field(payload, :conversation_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: "message_request:#{field(payload, :conversation_id)}",
+        url: "/me/messages/#{field(payload, :conversation_id)}"
+      })
+
   def process_event("follow_accepted", payload),
     do:
       enqueue_simple(:follow_accepted, payload, %{

@@ -1,17 +1,25 @@
 defmodule Palee.Community.Domain.FollowPolicy do
   @moduledoc """
-  How following works (ADR-142, D3): following a person is a request they
-  accept; a box or an open club is followed at once. Pure: callers pass the
-  facts about the target.
+  How following works (ADR-142, D3; ADR-193 §2): following a private person
+  is a request they accept, a public person is followed at once, and so is
+  a box or an open club. Pure: callers pass the facts about the target.
   """
 
   @target_types ~w(user organization club)
 
   def target_types, do: @target_types
 
-  @doc "The status a new follow starts in."
-  def initial_status("user"), do: "requested"
-  def initial_status(type) when type in @target_types, do: "active"
+  @doc "The status a new follow starts in; a person target says whether it is public."
+  def initial_status("user", %{public: true}), do: "active"
+  def initial_status("user", _target), do: "requested"
+  def initial_status(type, _target) when type in @target_types, do: "active"
+
+  @doc """
+  ADR-193 §1: two people are Buddies when each actively follows the other.
+  `mine` and `theirs` are the two statuses ("none" when there is no follow).
+  """
+  def buddies?("active", "active"), do: true
+  def buddies?(_mine, _theirs), do: false
 
   @doc """
   Whether `follower_id` may follow the target. `target` carries what the

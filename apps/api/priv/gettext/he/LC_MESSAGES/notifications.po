@@ -675,3 +675,15 @@ msgstr "שוב במלאי"
 
 msgid "%{item} is available again."
 msgstr "%{item} שוב זמין."
+
+msgid "New follower"
+msgstr "עוקב חדש"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} התחיל לעקוב אחריך."
+
+msgid "Message request"
+msgstr "בקשת הודעה"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} רוצה לשלוח לך הודעה."

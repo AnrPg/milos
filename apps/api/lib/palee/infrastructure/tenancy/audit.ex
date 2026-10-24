@@ -104,6 +104,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     body_snapshots body_snapshot_photos user_health_consents body_settings
     buddy_links buddy_settings support_requests support_request_deliveries support_replies
     buddy_messages
+    person_conversations person_messages
     wellness_summary_grants
     device_connections device_activities device_imports daily_stats
     account_provider_selections journal_coach_audience_exclusions journal_entry_audiences

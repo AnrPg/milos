@@ -36,7 +36,8 @@ defmodule PaleeWeb.FollowController do
   @no_content [no_content: {"Done", "application/json", %Schema{type: :object}}]
 
   operation(:create,
-    summary: "Follow a person (a request they accept) or a published box (at once)",
+    summary:
+      "Follow a person (a request when they are private, ADR-193) or a published box (at once)",
     request_body: S.body(S.follow_request()),
     responses: [ok: {"Status", "application/json", S.follow_status_response()}]
   )
@@ -131,8 +132,31 @@ defmodule PaleeWeb.FollowController do
     with {:ok, page} <- Follows.following(conn.assigns.user_context, params), do: json(conn, page)
   end
 
+  operation(:buddies,
+    summary: "ADR-193: your Buddies, the people you and they follow each other",
+    parameters: [@cursor, @search],
+    responses: [ok: {"Buddies", "application/json", S.people_page()}]
+  )
+
+  def buddies(conn, params) do
+    with {:ok, page} <- Follows.buddies(conn.assigns.user_context, params), do: json(conn, page)
+  end
+
+  operation(:privacy,
+    summary: "ADR-193: private account (follows become requests) and showing in people search",
+    request_body: S.body(S.privacy_request()),
+    responses: [ok: {"Setting", "application/json", S.privacy()}]
+  )
+
+  def privacy(conn, _params) do
+    with {:ok, setting} <-
+           SocialProfile.set_privacy(conn.assigns.user_context, conn.body_params) do
+      json(conn, setting)
+    end
+  end
+
   operation(:summary,
-    summary: "Your counts for Εγώ: posts, followers, following, waiting requests",
+    summary: "Your counts for Εγώ: posts, followers, following, Buddies, waiting requests",
     responses: [ok: {"Counts", "application/json", S.summary_response()}]
   )
 

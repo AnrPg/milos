@@ -675,3 +675,15 @@ msgstr "Back in stock"
 
 msgid "%{item} is available again."
 msgstr "%{item} is available again."
+
+msgid "New follower"
+msgstr "New follower"
+
+msgid "%{nickname} started following you."
+msgstr "%{nickname} started following you."
+
+msgid "Message request"
+msgstr "Message request"
+
+msgid "%{nickname} wants to send you a message."
+msgstr "%{nickname} wants to send you a message."

@@ -10,7 +10,8 @@ defmodule Palee.Community.Ports.SocialStore do
   @type page :: %{
           optional(:before) => {DateTime.t(), id()} | nil,
           optional(:limit) => pos_integer() | :all,
-          optional(:among) => [id()]
+          optional(:among) => [id()],
+          optional(:except) => [id()]
         }
 
   # Follows.
@@ -25,12 +26,30 @@ defmodule Palee.Community.Ports.SocialStore do
   @callback count_incoming(context(), String.t(), id(), String.t()) :: non_neg_integer()
   @callback count_outgoing(context(), id(), [String.t()], [String.t()]) :: non_neg_integer()
   @callback active_target_ids(context(), id(), String.t()) :: [id()]
+  @doc "ADR-193 §2: accepts every request waiting for the person; answers how many."
+  @callback accept_all_incoming(context(), id(), DateTime.t()) :: non_neg_integer()
+  @doc "ADR-193 §1: the people the person and they follow each other actively."
+  @callback buddy_ids(context(), id()) :: [id()]
+  @doc "ADR-193: facts between the session user and each person (definer function)."
+  @callback person_relations(context(), [id()]) :: %{id() => map()}
+  @doc "ADR-193 §4: ranked people search for the session user, as `{id, relation}`."
+  @callback search_people(context(), String.t(), String.t(), pos_integer()) :: [
+              {id(), String.t()}
+            ]
+  @doc "ADR-193 §2: whether each person is public (definer function)."
+  @callback public_user_ids([id()]) :: [id()]
   @callback follow_statuses(context(), id(), String.t(), [id()]) :: %{id() => String.t()}
   @callback get_social_settings(context(), id()) :: map() | nil
   @callback put_social_settings(context(), id(), map()) :: {:ok, map()} | {:error, term()}
   @callback booking_sharer_ids(context()) :: [id()]
   @callback follower_counts(String.t(), [id()]) :: %{id() => non_neg_integer()}
   @callback following_count(id()) :: non_neg_integer()
+  @doc "ADR-193 §1: Buddies, followers only and following only (people), never overlapping."
+  @callback follow_groups(id()) :: %{
+              buddies: non_neg_integer(),
+              followers_only: non_neg_integer(),
+              following_only: non_neg_integer()
+            }
   @callback hidden_member_ids([id()]) :: [id()]
 
   # Blocks (ADR-169 §5).
