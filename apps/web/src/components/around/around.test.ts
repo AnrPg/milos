@@ -20,9 +20,14 @@ import {
   sameFilter,
   scopeFromParams,
   thinResults,
+  toggleFree,
   toggleKind,
   toggleMine,
+  togglePriceCap,
   viewportDiagonalKm,
+  withDates,
+  withPriceRange,
+  priceSliderValue,
   type AroundFilter,
 } from "./around";
 
@@ -267,5 +272,43 @@ describe("«Τα αθλήματά μου» (ADR-183)", () => {
     const on = toggleMine(DEFAULT_FILTER, ["bjj_grappling", "yoga"]);
     expect(on.disciplines).toEqual(["bjj_grappling", "yoga"]);
     expect(toggleMine(on, ["bjj_grappling", "yoga"]).disciplines).toEqual([]);
+  });
+});
+
+describe("date range above «Πότε»", () => {
+  it("reads one end as a single day and swaps ends picked the wrong way round", () => {
+    expect(withDates(DEFAULT_FILTER, "2030-05-02", null)).toMatchObject({ when: "range", date_from: "2030-05-02", date_to: "2030-05-02" });
+    expect(withDates(DEFAULT_FILTER, "2030-05-09", "2030-05-02")).toMatchObject({ date_from: "2030-05-02", date_to: "2030-05-09" });
+  });
+
+  it("cuts a range at the API's 62 days and clears back to no date", () => {
+    expect(withDates(DEFAULT_FILTER, "2030-01-01", "2030-12-31").date_to).toBe("2030-03-03");
+    const ranged = withDates({ ...DEFAULT_FILTER, when: "weekend" }, "2030-05-02", "2030-05-04");
+    expect(withDates(ranged, null, null)).toMatchObject({ when: null, date_from: null, date_to: null });
+    expect(activeFilterCount(ranged)).toBe(1);
+  });
+});
+
+describe("price range above «Κόστος»", () => {
+  it("leaves an end open at the slider's end and drops «Δωρεάν» for a hand-picked range", () => {
+    const free: AroundFilter = { ...DEFAULT_FILTER, cost: ["free", "trial"] };
+    expect(withPriceRange(free, { from: 500, to: 10_000 })).toMatchObject({ cost: ["trial"], min_price_cents: 500, max_price_cents: null });
+    expect(withPriceRange(free, { from: 0, to: 10_000 })).toMatchObject({ cost: ["free", "trial"], min_price_cents: null, max_price_cents: null });
+    expect(priceSliderValue({ ...DEFAULT_FILTER, max_price_cents: 2000 })).toEqual({ from: 0, to: 2000 });
+  });
+
+  it("makes «Δωρεάν» and «Έως €15» shortcuts that replace the range", () => {
+    const ranged: AroundFilter = { ...DEFAULT_FILTER, min_price_cents: 500, max_price_cents: 3000 };
+    expect(toggleFree(ranged)).toMatchObject({ cost: ["free"], min_price_cents: null, max_price_cents: null });
+    expect(togglePriceCap(ranged)).toMatchObject({ min_price_cents: null, max_price_cents: 1500 });
+    expect(togglePriceCap(togglePriceCap(ranged))).toMatchObject({ min_price_cents: null, max_price_cents: null });
+    expect(activeFilterCount(ranged)).toBe(1);
+    expect(sameFilter(ranged, { ...ranged, min_price_cents: null })).toBe(false);
+  });
+
+  it("parses a stored minimum, dropping one above the maximum", () => {
+    expect(parseFilter({ min_price_cents: 500 }).min_price_cents).toBe(500);
+    expect(parseFilter({ min_price_cents: 0 }).min_price_cents).toBeNull();
+    expect(parseFilter({ min_price_cents: 900, max_price_cents: 500 }).min_price_cents).toBeNull();
   });
 });

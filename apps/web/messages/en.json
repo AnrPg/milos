@@ -6943,7 +6943,13 @@
     "notifTitle": "New near you",
     "notifBody": "New for “{name}”: {count}",
     "myDisciplines": "My sports",
-    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Places: © OpenStreetMap contributors, GeoNames (CC BY 4.0)",
+    "dates": "Dates",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Lowest price",
+    "priceTo": "Highest price"
   },
   "CheckIn": {
     "loading": "Loading…",

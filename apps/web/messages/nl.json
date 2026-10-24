@@ -6943,7 +6943,13 @@
     "notifTitle": "Nieuw bij jou in de buurt",
     "notifBody": "Nieuw voor ‘{name}’: {count}",
     "myDisciplines": "Mijn sporten",
-    "placesAttribution": "Plaatsen: © OpenStreetMap-bijdragers, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Plaatsen: © OpenStreetMap-bijdragers, GeoNames (CC BY 4.0)",
+    "dates": "Datums",
+    "dateFrom": "Van",
+    "dateTo": "Tot",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Laagste prijs",
+    "priceTo": "Hoogste prijs"
   },
   "CheckIn": {
     "loading": "Laden…",

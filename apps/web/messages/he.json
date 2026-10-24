@@ -6943,7 +6943,13 @@
     "notifTitle": "חדש סביבך",
     "notifBody": "חדש עבור «{name}»: {count}",
     "myDisciplines": "הספורט שלי",
-    "placesAttribution": "מקומות: © תורמי OpenStreetMap, ‏GeoNames (CC BY 4.0)"
+    "placesAttribution": "מקומות: © תורמי OpenStreetMap, ‏GeoNames (CC BY 4.0)",
+    "dates": "תאריכים",
+    "dateFrom": "מ־",
+    "dateTo": "עד",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "מחיר מינימלי",
+    "priceTo": "מחיר מקסימלי"
   },
   "CheckIn": {
     "loading": "טוען…",
