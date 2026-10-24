@@ -233,6 +233,24 @@ describe("apiRequest tenant headers", () => {
     expect(fetchMock).toHaveBeenCalledWith(expectedPath, expect.anything());
   });
 
+  // ADR-193: people search, Buddies and privacy live in the personal session.
+  it.each([
+    "/people-search?q=ma",
+    "/me/buddies-list?q=ma",
+    "/me/social/privacy",
+    "/me/followers",
+    "/me/following?type=user",
+  ])("keeps the account-scoped social path %s outside the gym", async (path) => {
+    window.history.replaceState(null, "", "/org/atlas-gym/schedule");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>(path, { token: "token" });
+
+    expect(fetchMock).toHaveBeenCalledWith(`/api${path}`, expect.anything());
+  });
+
   it("keeps the execution timer endpoint on its user-scoped route", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/workouts/workout-1");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

@@ -408,14 +408,15 @@ function NutritionPlanCard() {
       ].filter((macro): macro is typeof macro & { value: number } => typeof macro.value === "number")
     : [];
 
+  // No plan from the coach: no card (vision §4.2, §8.5).
+  if (query.isSuccess && !plan) return null;
+
   return (
     <ClientCard title={i18n("clNutritionTitle")}>
       {query.isPending ? (
         <LoadingLine />
-      ) : query.isError ? (
+      ) : query.isError || !plan ? (
         <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
-      ) : !plan ? (
-        <EmptyLine>{i18n("clNutritionEmpty")}</EmptyLine>
       ) : (
         <div className="flex flex-col gap-3">
           <div>

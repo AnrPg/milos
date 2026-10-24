@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { completeProductTour } from "@/api/onboarding";
 import { redeemInvitation } from "@/api/organizations";
 import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
+import { aroundKindHref } from "@/components/around/around";
 import { AreaPicker } from "@/components/around/AreaPicker";
 import { useAroundArea } from "@/components/around/use-around";
 import { InterestsEditor } from "@/components/interests/InterestsEditor";
@@ -283,7 +284,7 @@ function BoxQuestion() {
       ) : (
         <div className="flex flex-col gap-2">
           <Link
-            href="/around/boxes"
+            href={aroundKindHref("boxes")}
             className="flex min-h-11 items-center rounded-2xl px-3 text-sm font-semibold"
             style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
           >

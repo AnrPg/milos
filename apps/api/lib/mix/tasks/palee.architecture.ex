@@ -98,6 +98,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     nutrition/nutrition_store
     community/community_store
     community/social_store
+    conversations/conversation_store
     community/event_store
     trials/trial_store
     seasons/season_store

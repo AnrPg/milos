@@ -9,17 +9,21 @@ import { fetchPRsSharedWithMe } from "@/api/pr-sharing";
 import { fetchPerson, fetchPersonPosts, personKey, type PersonProfile } from "@/api/social";
 import { PostCard } from "@/components/community/PostCard";
 import { SharedPRCard } from "@/components/pantheon/SharedPRsSection";
+import { MessageButton } from "@/components/conversations/MessageButton";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { BuddyBadge, CountsLine } from "@/components/social/SocialBits";
+import { postsLockKey } from "@/components/social/social-model";
 
 const TABS = ["posts", "prs", "clubs"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
  * A person's profile (vision §3: «Αναρτήσεις · PRs · Clubs»; plan §5a Q9,
- * board 5 Q3). Followers posts stay hidden until they accept you; PRs show
- * only when they share them with you (ADR-129).
+ * board 5 Q3). Followers posts stay hidden until you follow: at once for a
+ * public account, once they accept you for a private one (ADR-193 §2). PRs
+ * show only when they share them with you (ADR-129).
  */
 export function PersonPage({ id }: { id: string }) {
   const t = useTranslations("Social");
@@ -45,17 +49,26 @@ export function PersonPage({ id }: { id: string }) {
       <header className="flex flex-col items-center gap-2 text-center">
         <PersonAvatar name={profile.nickname} url={profile.avatar_url} size={88} />
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{profile.nickname ?? "?"}</h1>
-        {profile.follows_me && !profile.is_me ? (
+        {profile.handle ? <p className="-mt-1 text-sm" style={{ color: "var(--dim)" }}>@{profile.handle}</p> : null}
+        {profile.is_me ? null : profile.buddy ? (
+          <BuddyBadge />
+        ) : profile.follows_me ? (
           <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}>
             {t("followsYou")}
           </span>
         ) : null}
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-          {t("countsLineOther", { followers: profile.followers_count, following: profile.following_count })}
-        </p>
+        <CountsLine groups={profile.follow_groups} mine={false} centered />
         {profile.is_me ? null : (
-          <FollowButton targetType="user" targetId={profile.id} initialStatus={profile.my_status} followsMe={profile.follows_me} wide />
+          <FollowButton
+            targetType="user"
+            targetId={profile.id}
+            initialStatus={profile.my_status}
+            followsMe={profile.follows_me}
+            buddy={profile.buddy}
+            wide
+          />
         )}
+        {profile.is_me ? null : <MessageButton personId={profile.id} name={profile.nickname} wide />}
       </header>
 
       <div role="tablist" aria-label={profile.nickname ?? ""} className="flex gap-6 border-b" style={{ borderColor: "var(--border)" }}>
@@ -97,7 +110,8 @@ function Posts({ profile }: { profile: PersonProfile }) {
     getNextPageParam: (page) => page.next_cursor ?? null,
   });
   const list = posts.data?.pages.flatMap((page) => page.posts) ?? [];
-  const locked = !profile.is_me && profile.my_status !== "active";
+  const lock = postsLockKey(profile);
+  const locked = lock !== null;
 
   return (
     <>
@@ -121,7 +135,7 @@ function Posts({ profile }: { profile: PersonProfile }) {
             <rect width="18" height="11" x="3" y="11" rx="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
-          {profile.my_status === "requested" ? t("lockedRequested") : t("lockedFollow")}
+          {t(lock)}
         </p>
       ) : null}
     </>

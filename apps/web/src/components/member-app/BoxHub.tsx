@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import type { OrganizationMembership } from "@/api/organizations";
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { aroundKindHref } from "@/components/around/around";
 import { AnnouncementsCard } from "@/components/community/AnnouncementsCard";
 import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
@@ -58,10 +59,7 @@ export function BoxHub() {
       <TodayAcrossCard />
       {layout === "coach" ? (
         <>
-          <BoxToday
-            nextSession={<NextCoachSession />}
-            emptyAction={{ href: "/box/appointments", label: tCoach("box.bookSession") }}
-          />
+          <BoxToday nextSession={<NextCoachSession />} />
           <CoachActions entitlement={entitlement} />
         </>
       ) : (
@@ -75,11 +73,7 @@ export function BoxHub() {
         <div className="mb-4 flex flex-col gap-3">
           <AccessNotice entitlement={entitlement} />
           {layout === "coach" ? <SessionPackageSummary entitlement={entitlement} /> : null}
-          {entitlement?.plan ? (
-            <EntitlementCard entitlement={entitlement} />
-          ) : layout === "gym" ? (
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("membershipNone")}</p>
-          ) : null}
+          {entitlement?.plan ? <EntitlementCard entitlement={entitlement} /> : null}
           <Suspense fallback={null}>
             <SeasonsEntry />
           </Suspense>
@@ -111,7 +105,7 @@ function FindABox() {
       <HubCard>
         <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>{t("boxFindTitle")}</h2>
         <p className="mb-4 mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("boxFindBody")}</p>
-        <HubButton href="/around/boxes" primary>{t("boxFindAction")}</HubButton>
+        <HubButton href={aroundKindHref("boxes")} primary>{t("boxFindAction")}</HubButton>
       </HubCard>
     </HubPage>
   );

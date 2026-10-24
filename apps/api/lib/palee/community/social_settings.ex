@@ -3,7 +3,9 @@ defmodule Palee.Community.SocialSettings do
   A member's social choices that follow them across gyms (ADR-142): whether
   followers see which classes they book (the «Φίλοι» chip), and whether they
   show in clubs' «Μέλη» lists (ADR-143, board 7 Q1), and whether their
-  public posts show in Γύρω μου at their neighbourhood (ADR-154).
+  public posts show in Γύρω μου at their neighbourhood (ADR-154), and
+  (ADR-193) whether the account is private (a follow is then a request; on
+  by default) and whether it shows in people search.
   """
 
   use Ecto.Schema
@@ -16,6 +18,8 @@ defmodule Palee.Community.SocialSettings do
     field :share_bookings_offered_at, :utc_datetime_usec
     field :hide_from_members, :boolean, default: false
     field :visible_around, :boolean, default: false
+    field :private_account, :boolean, default: true
+    field :searchable, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -27,7 +31,9 @@ defmodule Palee.Community.SocialSettings do
       :share_bookings,
       :share_bookings_offered_at,
       :hide_from_members,
-      :visible_around
+      :visible_around,
+      :private_account,
+      :searchable
     ])
     |> validate_required([:user_id, :share_bookings])
   end

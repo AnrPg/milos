@@ -16,11 +16,14 @@ defmodule Palee.Community.Commands.Follows do
     with :ok <- FollowPolicy.check(user_id, type, target) do
       case SocialStore.get_follow(context, user_id, type, target_id) do
         nil ->
+          status = FollowPolicy.initial_status(type, target)
+
           SocialStore.insert_follow(context, %{
             user_id: user_id,
             target_type: type,
             target_id: target_id,
-            status: FollowPolicy.initial_status(type)
+            status: status,
+            accepted_at: if(status == "active" and type == "user", do: DateTime.utc_now())
           })
           |> case do
             {:ok, follow} -> {:ok, follow, :created}
@@ -46,6 +49,10 @@ defmodule Palee.Community.Commands.Follows do
       _missing -> {:error, :not_found}
     end
   end
+
+  @doc "ADR-193 §2: a person who goes public accepts every request waiting for them."
+  def accept_all(%{user_id: user_id} = context, now),
+    do: SocialStore.accept_all_incoming(context, user_id, now)
 
   @doc "The person declines a request, or removes someone who follows them."
   def remove_incoming(%{user_id: user_id} = context, follow_id) do

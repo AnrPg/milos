@@ -39,6 +39,16 @@ defmodule Palee.Identity do
     do: visible_user_ids([user_id], viewer_id) == [user_id]
 
   def visible_to?(_user_id, _viewer_id), do: false
+
+  @doc """
+  ADR-193 §4: what people search matches for typed text: the handle form
+  (by prefix) and the folded display-name form (anywhere in the name).
+  """
+  def people_search_terms(query) when is_binary(query) do
+    {Palee.Identity.Domain.Handle.normalize(query) || "",
+     Palee.Identity.Domain.NameSearch.fold(query)}
+  end
+
   defdelegate find_by_nickname(nickname), to: FindUser, as: :by_nickname
   defdelegate find_by_handle(handle), to: FindUser, as: :by_nickname
 

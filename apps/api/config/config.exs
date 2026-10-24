@@ -156,6 +156,10 @@ config :palee,
        Palee.Infrastructure.Community.EctoSocialStore
 
 config :palee,
+       :conversation_store,
+       Palee.Infrastructure.Conversations.EctoConversationStore
+
+config :palee,
        :community_event_store,
        Palee.Infrastructure.Community.EctoEventStore
 
