@@ -82,7 +82,7 @@ export function HomeHub() {
       <SupportInbox />
       <WellnessStrip />
       <MyTrialsCard />
-      {gymClub ? <WodCard club={gymClub} hideWhenEmpty /> : null}
+      {gymClub ? <WodCard club={gymClub} /> : null}
       <MyEventsCard />
       <ChallengesCard challenges={gamification?.active_challenges ?? []} />
       {gamification && membership ? (

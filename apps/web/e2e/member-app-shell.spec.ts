@@ -354,6 +354,51 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Strength A" })).toBeVisible();
   });
 
+  test("Box hides empty cards: no workout or booking means no card, and «Schedule» stays in the action row", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.route("**/api/org/*/schedule?**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), days: 7, class_types: [], slots: [] })),
+    );
+    await page.route("**/api/org/*/my-workouts**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), assignments: [] })),
+    );
+    await page.route("**/api/org/*/me/entitlement", (route) => route.fulfill(json({ entitlement: null })));
+    await page.goto("/box");
+
+    await expect(page.getByRole("heading", { name: "Box Kypseli" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Schedule" })).toHaveAttribute("href", "/box/schedule");
+    await expect(page.getByText("Membership", { exact: true })).toBeVisible();
+    // Vision §4.2, §8.5: a card with nothing in it is hidden, never an empty state.
+    await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Your next session", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Open gym", { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/Nothing planned|No booking yet|No active package/)).toHaveCount(0);
+  });
+
+  test("Box offers open-gym check-in without a booking when the package covers it (§6.2)", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.route("**/api/org/*/schedule?**", (route) =>
+      route.fulfill(json({ start_date: localToday(), end_date: localToday(), days: 7, class_types: [], slots: [] })),
+    );
+    await page.route("**/api/org/*/me/entitlement", (route) =>
+      route.fulfill(
+        json({
+          entitlement: {
+            status: "active",
+            enforcement_mode: "enforce",
+            plan: { entitlement_version: 1, channels: [], capabilities: ["open_gym"] },
+            allowances: {},
+          },
+        }),
+      ),
+    );
+    await page.goto("/box");
+
+    await expect(page.getByText("Open gym", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Check-in", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "QR check-in" })).toHaveAttribute("href", "/box/check-in");
+  });
+
   test("Journal's one write action lists the entry kinds that exist", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/journal");
@@ -451,6 +496,8 @@ test.describe("member app shell", () => {
     await expect(page.getByText("From your club")).toHaveCount(0);
     await expect(page.getByText("My events", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Seasonal momentum")).toHaveCount(0);
+    // A ranking with no rows is no card; joining lives in Me › Sharing.
+    await expect(page.getByText("Opt-in ranking")).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
   });
 
