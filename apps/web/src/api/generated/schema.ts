@@ -1407,6 +1407,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/buddies-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-193: your Buddies, the people you and they follow each other */
+        get: operations["PaleeWeb.FollowController.buddies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/buddies/candidates": {
         parameters: {
             query?: never;
@@ -1973,6 +1990,127 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your conversations in the inbox (default) or in message requests, latest first */
+        get: operations["PaleeWeb.PersonConversationController.index"];
+        put?: never;
+        /** Open (or find) your conversation with a person */
+        post: operations["PaleeWeb.PersonConversationController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How many conversations hold unread messages, in the inbox and in requests */
+        get: operations["PaleeWeb.PersonConversationController.unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One conversation as you see it */
+        get: operations["PaleeWeb.PersonConversationController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a message request (it moves to the inbox) */
+        post: operations["PaleeWeb.PersonConversationController.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a message request (you never see it again; the sender is not told) */
+        post: operations["PaleeWeb.PersonConversationController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The conversation's messages, newest first (cursor paging) */
+        get: operations["PaleeWeb.PersonConversationController.messages"];
+        put?: never;
+        /** Write a message (a retry with the same client_operation_id is answered once) */
+        post: operations["PaleeWeb.PersonConversationController.send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/conversations/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the conversation read up to now */
+        post: operations["PaleeWeb.PersonConversationController.read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/daily-stats": {
         parameters: {
             query?: never;
@@ -2517,7 +2655,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Follow a person (a request they accept) or a published box (at once) */
+        /** Follow a person (a request when they are private, ADR-193) or a published box (at once) */
         post: operations["PaleeWeb.FollowController.create"];
         delete?: never;
         options?: never;
@@ -3247,7 +3385,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Your counts for Εγώ: posts, followers, following, waiting requests */
+        /** Your counts for Εγώ: posts, followers, following, Buddies, waiting requests */
         get: operations["PaleeWeb.FollowController.summary"];
         put?: never;
         post?: never;
@@ -3301,6 +3439,23 @@ export interface paths {
         get?: never;
         /** Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1) */
         put: operations["PaleeWeb.FollowController.member_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ADR-193: private account (follows become requests) and showing in people search */
+        put: operations["PaleeWeb.FollowController.privacy"];
         post?: never;
         delete?: never;
         options?: never;
@@ -11238,6 +11393,23 @@ export interface paths {
         put?: never;
         /** Let go of a claimed request */
         post: operations["PaleeWeb.PasswordRecoveryController.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-193: find people by @handle or name (shared clubs, Buddies, follows, nearby, public) */
+        get: operations["PaleeWeb.PeopleController.search"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -23467,6 +23639,14 @@ export interface components {
             title: string;
             video_url: string;
         };
+        /** ConversationPerson */
+        ConversationPerson: {
+            avatar_url?: string | null;
+            handle?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
         /** CorporateClient */
         CorporateClient: {
             active_seats: number;
@@ -24933,6 +25113,9 @@ export interface components {
             follow_id: string;
             person?: {
                 avatar_url?: string | null;
+                /** @description ADR-193: you follow each other */
+                buddy: boolean;
+                handle?: string | null;
                 /** Format: uuid */
                 id: string;
                 /** @description Whether you follow them */
@@ -24943,6 +25126,15 @@ export interface components {
             since: string;
             /** @enum {string} */
             status: "none" | "requested" | "active";
+        };
+        /**
+         * FollowGroups
+         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+         */
+        FollowGroups: {
+            buddies: number;
+            followers_only: number;
+            following_only: number;
         };
         /** FollowPage */
         FollowPage: {
@@ -24960,6 +25152,9 @@ export interface components {
                 follow_id: string;
                 person?: {
                     avatar_url?: string | null;
+                    /** @description ADR-193: you follow each other */
+                    buddy: boolean;
+                    handle?: string | null;
                     /** Format: uuid */
                     id: string;
                     /** @description Whether you follow them */
@@ -24976,6 +25171,9 @@ export interface components {
         /** FollowPerson */
         FollowPerson: {
             avatar_url?: string | null;
+            /** @description ADR-193: you follow each other */
+            buddy: boolean;
+            handle?: string | null;
             /** Format: uuid */
             id: string;
             /** @description Whether you follow them */
@@ -28017,6 +28215,34 @@ export interface components {
             /** @enum {string|null} */
             unavailable_reason: "disabled" | "not_offered" | null;
         };
+        /** PeopleSearchPerson */
+        PeopleSearchPerson: {
+            avatar_url?: string | null;
+            buddy: boolean;
+            handle?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            my_status: "none" | "requested" | "active";
+            nickname?: string | null;
+            /** @enum {string} */
+            relation: "club" | "buddy" | "follow" | "nearby" | "public";
+        };
+        /** PeopleSearchResponse */
+        PeopleSearchResponse: {
+            people: {
+                avatar_url?: string | null;
+                buddy: boolean;
+                handle?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                my_status: "none" | "requested" | "active";
+                nickname?: string | null;
+                /** @enum {string} */
+                relation: "club" | "buddy" | "follow" | "nearby" | "public";
+            }[];
+        };
         /**
          * PerkBenefit
          * @description percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.
@@ -28530,6 +28756,181 @@ export interface components {
         PerkVersionList: {
             versions: components["schemas"]["PerkVersion"][];
         };
+        /** PersonConversation */
+        PersonConversation: {
+            /** @description You and they follow each other */
+            buddy: boolean;
+            /** @enum {string} */
+            folder: "inbox" | "requests";
+            /** Format: uuid */
+            id: string;
+            last_message?: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            } | null;
+            last_message_at?: string | null;
+            /** ConversationPerson */
+            person: {
+                avatar_url?: string | null;
+                handle?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            started_by_me: boolean;
+            unread: boolean;
+        };
+        /** PersonConversationOpenRequest */
+        PersonConversationOpenRequest: {
+            /** Format: uuid */
+            person_id: string;
+        };
+        /** PersonConversationPage */
+        PersonConversationPage: {
+            conversations: {
+                /** @description You and they follow each other */
+                buddy: boolean;
+                /** @enum {string} */
+                folder: "inbox" | "requests";
+                /** Format: uuid */
+                id: string;
+                last_message?: {
+                    /** Format: uuid */
+                    author_id: string;
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    conversation_id: string;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    mine: boolean;
+                } | null;
+                last_message_at?: string | null;
+                /** ConversationPerson */
+                person: {
+                    avatar_url?: string | null;
+                    handle?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                started_by_me: boolean;
+                unread: boolean;
+            }[];
+            next_cursor?: string | null;
+        };
+        /** PersonConversationResponse */
+        PersonConversationResponse: {
+            /** PersonConversation */
+            conversation: {
+                /** @description You and they follow each other */
+                buddy: boolean;
+                /** @enum {string} */
+                folder: "inbox" | "requests";
+                /** Format: uuid */
+                id: string;
+                last_message?: {
+                    /** Format: uuid */
+                    author_id: string;
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    conversation_id: string;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    mine: boolean;
+                } | null;
+                last_message_at?: string | null;
+                /** ConversationPerson */
+                person: {
+                    avatar_url?: string | null;
+                    handle?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                started_by_me: boolean;
+                unread: boolean;
+            };
+        };
+        /** PersonConversationUnreadCount */
+        PersonConversationUnreadCount: {
+            inbox: number;
+            requests: number;
+        };
+        /** PersonMessage */
+        PersonMessage: {
+            /** Format: uuid */
+            author_id: string;
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string | null;
+            /** Format: uuid */
+            conversation_id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            mine: boolean;
+        };
+        /** PersonMessagePage */
+        PersonMessagePage: {
+            messages: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            }[];
+            next_cursor?: string | null;
+        };
+        /** PersonMessageRequest */
+        PersonMessageRequest: {
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string;
+        };
+        /** PersonMessageResponse */
+        PersonMessageResponse: {
+            /** PersonMessage */
+            message: {
+                /** Format: uuid */
+                author_id: string;
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                conversation_id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                mine: boolean;
+            };
+        };
         /** PersonPostsResponse */
         PersonPostsResponse: {
             next_cursor?: string | null;
@@ -28817,15 +29218,29 @@ export interface components {
         /** PersonProfile */
         PersonProfile: {
             avatar_url?: string | null;
+            /** @description ADR-193: you follow each other */
+            buddy: boolean;
+            /**
+             * FollowGroups
+             * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+             */
+            follow_groups: {
+                buddies: number;
+                followers_only: number;
+                following_only: number;
+            };
             followers_count: number;
             following_count: number;
             follows_me: boolean;
+            handle?: string | null;
             /** Format: uuid */
             id: string;
             is_me: boolean;
             /** @enum {string} */
             my_status: "none" | "requested" | "active";
             nickname?: string | null;
+            /** @description ADR-193: following them is a request */
+            private: boolean;
         };
         /** PersonRef */
         PersonRef: {
@@ -32945,6 +33360,19 @@ export interface components {
             on_hand: number;
             reserved: number;
         };
+        /**
+         * SocialPrivacy
+         * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+         */
+        SocialPrivacy: {
+            private_account: boolean;
+            searchable: boolean;
+        };
+        /** SocialPrivacyRequest */
+        SocialPrivacyRequest: {
+            private_account?: boolean;
+            searchable?: boolean;
+        };
         /** SocialSummary */
         SocialSummary: {
             /**
@@ -32964,6 +33392,15 @@ export interface components {
                 enabled: boolean;
                 offered: boolean;
             };
+            /**
+             * FollowGroups
+             * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+             */
+            follow_groups: {
+                buddies: number;
+                followers_only: number;
+                following_only: number;
+            };
             followers_count: number;
             following_count: number;
             /**
@@ -32974,6 +33411,14 @@ export interface components {
                 hidden: boolean;
             };
             posts_count: number;
+            /**
+             * SocialPrivacy
+             * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+             */
+            privacy: {
+                private_account: boolean;
+                searchable: boolean;
+            };
             requests_count: number;
         };
         /** StaffCommunityEvent */
@@ -44007,6 +44452,60 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.FollowController.buddies": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                /** @description Keep only names containing this (case and accents ignored) */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddies */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            /** Format: uuid */
+                            follow_id: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Whether you follow them */
+                                my_status: "none" | "requested" | "active";
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: date-time */
+                            since: string;
+                            /** @enum {string} */
+                            status: "none" | "requested" | "active";
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyBuddiesController.candidates": {
         parameters: {
             query?: {
@@ -47504,6 +48003,430 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PersonConversationController.index": {
+        parameters: {
+            query?: {
+                folder?: "inbox" | "requests";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        conversations: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    person_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.unread_count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        inbox: number;
+                        requests: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Declined */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.messages": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Messages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            /** Format: uuid */
+                            author_id: string;
+                            body: string;
+                            /** Format: uuid */
+                            client_operation_id?: string | null;
+                            /** Format: uuid */
+                            conversation_id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            mine: boolean;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.send_message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonMessage */
+                        message: {
+                            /** Format: uuid */
+                            author_id: string;
+                            body: string;
+                            /** Format: uuid */
+                            client_operation_id?: string | null;
+                            /** Format: uuid */
+                            conversation_id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            mine: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonConversationController.read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PersonConversation */
+                        conversation: {
+                            /** @description You and they follow each other */
+                            buddy: boolean;
+                            /** @enum {string} */
+                            folder: "inbox" | "requests";
+                            /** Format: uuid */
+                            id: string;
+                            last_message?: {
+                                /** Format: uuid */
+                                author_id: string;
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                conversation_id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                mine: boolean;
+                            } | null;
+                            last_message_at?: string | null;
+                            /** ConversationPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            started_by_me: boolean;
+                            unread: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.DevicesController.daily_stats": {
         parameters: {
             query?: {
@@ -50991,6 +51914,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -51086,6 +52012,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -51160,6 +52089,9 @@ export interface operations {
                             follow_id: string;
                             person?: {
                                 avatar_url?: string | null;
+                                /** @description ADR-193: you follow each other */
+                                buddy: boolean;
+                                handle?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Whether you follow them */
@@ -53821,6 +54753,15 @@ export interface operations {
                             enabled: boolean;
                             offered: boolean;
                         };
+                        /**
+                         * FollowGroups
+                         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+                         */
+                        follow_groups: {
+                            buddies: number;
+                            followers_only: number;
+                            following_only: number;
+                        };
                         followers_count: number;
                         following_count: number;
                         /**
@@ -53831,6 +54772,14 @@ export interface operations {
                             hidden: boolean;
                         };
                         posts_count: number;
+                        /**
+                         * SocialPrivacy
+                         * @description ADR-193: a private account answers follow requests; searchable shows you in people search
+                         */
+                        privacy: {
+                            private_account: boolean;
+                            searchable: boolean;
+                        };
                         requests_count: number;
                     };
                 };
@@ -53919,6 +54868,36 @@ export interface operations {
                 content: {
                     "application/json": {
                         hidden: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.FollowController.privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    private_account?: boolean;
+                    searchable?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        private_account: boolean;
+                        searchable: boolean;
                     };
                 };
             };
@@ -95752,6 +96731,41 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PeopleController.search": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description People */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            avatar_url?: string | null;
+                            buddy: boolean;
+                            handle?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            my_status: "none" | "requested" | "active";
+                            nickname?: string | null;
+                            /** @enum {string} */
+                            relation: "club" | "buddy" | "follow" | "nearby" | "public";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PeopleController.show": {
         parameters: {
             query?: never;
@@ -95771,15 +96785,29 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
+                        /** @description ADR-193: you follow each other */
+                        buddy: boolean;
+                        /**
+                         * FollowGroups
+                         * @description ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only
+                         */
+                        follow_groups: {
+                            buddies: number;
+                            followers_only: number;
+                            following_only: number;
+                        };
                         followers_count: number;
                         following_count: number;
                         follows_me: boolean;
+                        handle?: string | null;
                         /** Format: uuid */
                         id: string;
                         is_me: boolean;
                         /** @enum {string} */
                         my_status: "none" | "requested" | "active";
                         nickname?: string | null;
+                        /** @description ADR-193: following them is a request */
+                        private: boolean;
                     };
                 };
             };

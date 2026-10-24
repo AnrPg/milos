@@ -20,6 +20,9 @@ import { NearbyClubs } from "@/components/around/Nearby";
 import { clientErrorMessage } from "@/components/client/errors";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
+import { PersonResultRow, usePeopleSearch } from "@/components/social/PeopleSearch";
+import { isPeopleSearch } from "@/components/social/social-model";
+import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { ClubBar } from "./ClubBar";
@@ -32,10 +35,12 @@ import { useMyClubs } from "./use-community";
 /**
  * «+ Βρες» (board 7 Q7): open clubs of the boxes you belong to or follow, and
  * member groups of your gyms you're not in, with a search, and «Κοντά μου»:
- * open clubs near you from Γύρω μου (ADR-154).
+ * open clubs near you from Γύρω μου (ADR-154). The search finds people on
+ * Palee too (ADR-193 §4), in a card shown only when someone matches.
  */
 export function FindPage() {
   const t = useTranslations("Clubs");
+  const tSocial = useTranslations("Social");
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const clubs = useMyClubs();
@@ -49,17 +54,21 @@ export function FindPage() {
   });
   const openClubs = found.data?.clubs ?? [];
   const groups = (found.data?.groups ?? []).filter((group) => group.membership !== "member");
+  // ADR-193 §4: the same field finds people too, from two characters on.
+  const peopleTerm = useDebounced(q, 250);
+  const people = usePeopleSearch(peopleTerm);
+  const peopleFound = isPeopleSearch(q) && isPeopleSearch(peopleTerm) ? (people.data?.people ?? []) : [];
 
   return (
     <HubPage title={t("findTitle")}>
       <ClubBar clubs={clubs.data ?? []} findActive />
-      <label className="sr-only" htmlFor="find-clubs">{t("findSearch")}</label>
+      <label className="sr-only" htmlFor="find-clubs">{tSocial("findClubsAndPeople")}</label>
       <input
         id="find-clubs"
         type="search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder={t("findSearch")}
+        placeholder={tSocial("findClubsAndPeople")}
         className="min-h-11 w-full rounded-2xl px-3 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
       />
@@ -83,6 +92,16 @@ export function FindPage() {
               <ul className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
                 {groups.map((group) => (
                   <GroupResult key={group.id} group={group} />
+                ))}
+              </ul>
+            </HubCard>
+          ) : null}
+          {/* Only while a search finds someone: no empty card (vision §4 principle 2). */}
+          {peopleFound.length > 0 ? (
+            <HubCard eyebrow={tSocial("peopleTitle")}>
+              <ul className="flex flex-col gap-2">
+                {peopleFound.map((person) => (
+                  <PersonResultRow key={person.id} person={person} />
                 ))}
               </ul>
             </HubCard>

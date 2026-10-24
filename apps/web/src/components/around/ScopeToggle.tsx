@@ -7,7 +7,7 @@ import type { HomeScope } from "./around";
 import { useHomeScope } from "./use-around";
 
 /**
- * Αρχική's scope (vision §7.1, mockup `scope`): «Τα clubs μου | Γύρω μου».
+ * Αρχική's scope (vision §7.1, mockup `scope`): «Οι δικοί μου | Γύρω μου».
  * Each side is a link (Γύρω μου is the deep-linkable /around); the choice is
  * remembered so Αρχική opens where the person left it.
  */

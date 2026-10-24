@@ -5,10 +5,18 @@ defmodule Palee.Community.Domain.SocialPoliciesTest do
 
   alias Palee.Community.Domain.{AudiencePolicy, FollowPolicy}
 
-  test "a person is followed by request, a box or club at once" do
-    assert FollowPolicy.initial_status("user") == "requested"
-    assert FollowPolicy.initial_status("organization") == "active"
+  test "a private person is followed by request; a public one, a box or club at once" do
+    assert FollowPolicy.initial_status("user", %{id: "x", public: false}) == "requested"
+    assert FollowPolicy.initial_status("user", %{id: "x"}) == "requested"
+    assert FollowPolicy.initial_status("user", %{id: "x", public: true}) == "active"
+    assert FollowPolicy.initial_status("organization", %{}) == "active"
     assert FollowPolicy.status(nil) == "none"
+  end
+
+  test "Buddies follow each other actively (ADR-193)" do
+    assert FollowPolicy.buddies?("active", "active")
+    refute FollowPolicy.buddies?("active", "requested")
+    refute FollowPolicy.buddies?("none", "active")
   end
 
   test "follow targets are checked" do

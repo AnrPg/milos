@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useSession } from "@/components/session-provider";
+import { CONVERSATION_EVENT, CONVERSATIONS_RESYNC, applyConversationEvent } from "@/components/conversations/conversations-realtime";
 import { PARTNERS_EVENT, PARTNERS_RESYNC, applyPartnersEvent } from "@/components/partners/partners-realtime";
 import { subscribeToTopic } from "@/lib/realtime";
 
@@ -15,6 +16,7 @@ import { BUDDY_EVENT, BUDDY_RESYNC, applyBuddyEvent, applyCacheRefreshes, buddyT
  * After a reconnect everything Buddy is refreshed once, in case an event
  * was missed while offline. Partners' `partners:changed` (ADR-169) shares
  * the topic, so it is handled here too: one channel per topic per socket.
+ * So are person conversations' `conversation:changed` (ADR-193 §3).
  */
 export function BuddyRealtimeBridge() {
   const { currentUser, tokens } = useSession();
@@ -26,7 +28,12 @@ export function BuddyRealtimeBridge() {
   const handlePartners = useEffectEvent((payload: unknown) => {
     applyPartnersEvent(queryClient, payload);
   });
-  const handleRejoin = useEffectEvent(() => applyCacheRefreshes(queryClient, [...BUDDY_RESYNC, ...PARTNERS_RESYNC]));
+  const handleConversation = useEffectEvent((payload: unknown) => {
+    applyConversationEvent(queryClient, payload);
+  });
+  const handleRejoin = useEffectEvent(() =>
+    applyCacheRefreshes(queryClient, [...BUDDY_RESYNC, ...PARTNERS_RESYNC, ...CONVERSATIONS_RESYNC]),
+  );
 
   useEffect(() => {
     if (!tokens?.access_token || !currentUser?.id) return;
@@ -34,7 +41,7 @@ export function BuddyRealtimeBridge() {
     return subscribeToTopic(
       tokens.access_token,
       buddyTopic(currentUser.id),
-      { [BUDDY_EVENT]: handleEvent, [PARTNERS_EVENT]: handlePartners },
+      { [BUDDY_EVENT]: handleEvent, [PARTNERS_EVENT]: handlePartners, [CONVERSATION_EVENT]: handleConversation },
       {
         onJoin: () => {
           joins += 1;

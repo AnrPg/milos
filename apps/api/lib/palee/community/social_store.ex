@@ -60,6 +60,23 @@ defmodule Palee.Community.SocialStore do
     do: call(context, :active_target_ids, [follower_id, type])
 
   @impl true
+  def accept_all_incoming(context, user_id, now),
+    do: call(context, :accept_all_incoming, [user_id, now])
+
+  @impl true
+  def buddy_ids(context, user_id), do: call(context, :buddy_ids, [user_id])
+
+  @impl true
+  def person_relations(context, ids), do: call(context, :person_relations, [ids])
+
+  @impl true
+  def search_people(context, handle_term, name_term, limit),
+    do: call(context, :search_people, [handle_term, name_term, limit])
+
+  @impl true
+  def public_user_ids(ids), do: adapter().public_user_ids(ids)
+
+  @impl true
   def follow_statuses(context, follower_id, type, ids),
     do: call(context, :follow_statuses, [follower_id, type, ids])
 
@@ -127,6 +144,9 @@ defmodule Palee.Community.SocialStore do
 
   @impl true
   def following_count(user_id), do: adapter().following_count(user_id)
+
+  @impl true
+  def follow_groups(user_id), do: adapter().follow_groups(user_id)
 
   @impl true
   def hidden_member_ids(ids), do: adapter().hidden_member_ids(ids)
