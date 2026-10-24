@@ -380,6 +380,11 @@ test.describe("member app shell", () => {
 
     await page.goto("/");
     await expect(page.getByText("Today's WOD at the gym")).toHaveCount(0);
+
+    // The gym's landing payload doesn't exist without a gym: Progress skips it, no «not found».
+    await page.goto("/journal/progress");
+    await expect(page.getByRole("heading", { name: "My progress" })).toBeVisible();
+    await expect(page.getByText("The requested item was not found.")).toHaveCount(0);
   });
 
   test("Me holds every secondary link, and old URLs land on the new pages", async ({ page }) => {

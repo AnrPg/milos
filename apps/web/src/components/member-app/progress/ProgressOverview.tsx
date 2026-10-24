@@ -19,6 +19,7 @@ export function ProgressOverview() {
   const landing = useLanding();
   const [activeInfoModal, setActiveInfoModal] = useState<"streak" | "volume" | null>(null);
 
+  if (landing.noGym) return null;
   if (landing.isPending) return <LoadingLine />;
   if (landing.isError || !landing.data?.gamification) {
     return <QueryProblem error={landing.error} onRetry={() => void landing.refetch()} />;

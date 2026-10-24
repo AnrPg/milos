@@ -109,7 +109,7 @@ function LatestFromCoach() {
         ) : null
       }
     >
-      {landing.isPending ? (
+      {landing.isPending && !landing.noGym ? (
         <LoadingLine />
       ) : landing.isError ? (
         <QueryProblem error={landing.error} onRetry={() => void landing.refetch()} />
