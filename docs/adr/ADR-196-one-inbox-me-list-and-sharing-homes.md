@@ -38,9 +38,11 @@ The vision (§4, §6.3, §7.10, §7.11) gives messages one home (Αρχική �
    |---|---|
    | Interests, body settings, business, units, journal sections, rest days | Ρυθμίσεις |
    | The box switcher | Τα box και τα clubs μου |
-   | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff console, staff extras, password resets | `/me/help` (Βοήθεια & ξενάγηση) |
+   | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff extras, password resets | `/me/help` (Βοήθεια & ξενάγηση) |
 
    The count of password resets waiting stays on the Help row.
+
+   *Amended 2026-10-24:* the staff console switch («Διαχείριση») is the last row of Εγώ itself, as in the §6.2 tree, shown to anyone with a staff role at any provider (`useOpenConsole`). Inside Βοήθεια it was too hard to find the way back from the social app.
 6. **Push and notification links open current routes.** Old forms still redirect: exact moves in `MEMBER_EXACT_MOVES`, and the hash `/me/sharing#training-schedule` on the client.
 
 ## Rationale

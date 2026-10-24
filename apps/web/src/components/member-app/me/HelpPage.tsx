@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { CountBadge } from "@/components/buddy/BuddyBits";
@@ -14,8 +13,7 @@ import { openOnboardingChecklist, openProductTour } from "@/components/onboardin
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
 import { ownsCoachPractice } from "@/lib/solo-coach";
-import { clientExtraLinks, hasStaffRole } from "@/lib/role-navigation";
-import { setView } from "@/lib/view-mode";
+import { clientExtraLinks } from "@/lib/role-navigation";
 
 /** Where «Αναφορά προβλήματος» writes; without one configured the row stays out. */
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "";
@@ -24,8 +22,8 @@ const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "";
  * Εγώ › Βοήθεια & ξενάγηση (vision §7.11, mockup «help», ADR-196): the
  * product tour and first steps, how visibility works, contacting the box,
  * reporting a problem, opening a coach practice (ADR-170), and for staff
- * the way into the console (ADR-103), their extra logs and the password
- * resets they handle (ADR-187).
+ * their extra logs and the password resets they handle (ADR-187). The way
+ * back to the console is its own Εγώ row, «Διαχείριση» (ADR-196 amended).
  */
 export function HelpPage() {
   const t = useTranslations("MemberApp");
@@ -33,18 +31,10 @@ export function HelpPage() {
   const tGuides = useTranslations("Guides");
   const tCoach = useTranslations("SoloCoach");
   const tResets = useTranslations("passwordResets");
-  const router = useRouter();
   const { membership, memberships, selectedOrganizationSlug } = useSelectedMembershipRole();
   const resets = usePasswordResets();
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const extras = clientExtraLinks(membership);
-  const staff = hasStaffRole(membership);
-
-  // ADR-103 (amended): Διαχείριση switches back to the console, remembered per device.
-  function openConsole() {
-    setView("staff");
-    router.push(adminHref("/admin", selectedOrganizationSlug));
-  }
 
   return (
     <HubPage title={t("meHelp")} back={<BackToMe />}>
@@ -79,10 +69,9 @@ export function HelpPage() {
         </HubCard>
       ) : null}
 
-      {staff || extras.length > 0 || resets.shown ? (
+      {extras.length > 0 || resets.shown ? (
         <HubCard eyebrow={t("helpStaffOnly")}>
           <div className="-mx-5 -mb-5 [&>*:first-child]:border-t-0">
-            {staff ? <HubListRow onClick={openConsole} label={t("meConsole")} detail={t("meConsoleHint")} /> : null}
             {extras.map((item) => (
               <HubListRow key={item.id} href={adminHref(item.href, selectedOrganizationSlug)} label={tNav(item.labelKey)} />
             ))}

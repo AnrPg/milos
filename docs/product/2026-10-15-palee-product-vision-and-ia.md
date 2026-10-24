@@ -350,7 +350,8 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
   - *Notifications (ADR-199):* the card starts with push on this device, which moved here from Security. Below it is one row per category: bookings & classes, messages, clubs & community, coach, partners & buddies, journal reminders, and box operations (staff only). Each row has a switch for the bell and one for push. A push needs the bell on. Account & payments is always on and shown as locked. Everything is on until the person changes it. Each club's level is still set in Τα box και τα clubs μου.
-- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ › Βοήθεια & ξενάγηση, ADR-196), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
+- **(staff) Διαχείριση:** the last row of the list, shown to anyone with a staff role at any provider. One tap opens that provider's web console and remembers the console view on the device (ADR-103). *Decided 2026-10-24 (ANR asked how staff get back; ADR-196 amended):* it is its own row, not inside Βοήθεια, because the switch back must be findable.
+- **Βοήθεια & ξενάγηση:** product tours; staff extras. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ › Βοήθεια & ξενάγηση, ADR-196), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
 - *Decided 2026-10-24 (ADR-196):*
   - The list above is the whole list, in this order. Anything else moves into one of its pages:
 
@@ -358,7 +359,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
     |---|---|
     | Interests, Σώμα settings, business request, units, journal sections, rest days | Ρυθμίσεις |
     | Box switcher | Τα box και τα clubs μου |
-    | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff console and extras, password resets | Βοήθεια & ξενάγηση (`/me/help`) |
+    | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff extras, password resets | Βοήθεια & ξενάγηση (`/me/help`) |
 
   - Chats have no row: the one inbox is Μηνύματα in the bottom bar.
   - Κοινοποίηση follows the mockup's blocks, plus a per-PR "show on profile" list.
