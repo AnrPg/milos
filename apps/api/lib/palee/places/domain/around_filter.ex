@@ -16,7 +16,9 @@ defmodule Palee.Places.Domain.AroundFilter do
   * **Πότε:** `when` (`today tomorrow weekend week range`, with `date_from`
     and `date_to` for a range of at most 62 days) and `times`
     (`morning midday evening`); they narrow events only.
-  * **Κόστος:** `cost` (`free`, `trial`) and `max_price_cents`.
+  * **Κόστος:** `cost` (`free`, `trial`) and a price range,
+    `min_price_cents` and `max_price_cents` (either end open, min ≤ max);
+    the range narrows events only.
 
   Unknown keys are ignored, so an older client's saved filter still parses;
   a filter from a newer version (`v` above 1) is refused rather than
@@ -51,6 +53,7 @@ defmodule Palee.Places.Domain.AroundFilter do
             date_to: nil,
             times: [],
             cost: [],
+            min_price_cents: nil,
             max_price_cents: nil,
             audiences: [],
             languages: [],
@@ -90,7 +93,8 @@ defmodule Palee.Places.Domain.AroundFilter do
            when_(params["when"], params["date_from"], params["date_to"]),
          {:ok, times} <- subset(:times, params["times"], @times),
          {:ok, cost} <- subset(:cost, params["cost"], @costs),
-         {:ok, max_price_cents} <- max_price(params["max_price_cents"]) do
+         {:ok, {min_price_cents, max_price_cents}} <-
+           price_range(params["min_price_cents"], params["max_price_cents"]) do
       {:ok,
        %__MODULE__{
          radius_km: radius_km,
@@ -105,6 +109,7 @@ defmodule Palee.Places.Domain.AroundFilter do
          date_to: date_to,
          times: times,
          cost: cost,
+         min_price_cents: min_price_cents,
          max_price_cents: max_price_cents
        }}
     end
@@ -126,6 +131,7 @@ defmodule Palee.Places.Domain.AroundFilter do
       "date_to" => filter.date_to && Date.to_iso8601(filter.date_to),
       "times" => filter.times,
       "cost" => filter.cost,
+      "min_price_cents" => filter.min_price_cents,
       "max_price_cents" => filter.max_price_cents,
       "audiences" => filter.audiences,
       "languages" => filter.languages,
@@ -144,13 +150,17 @@ defmodule Palee.Places.Domain.AroundFilter do
       filter.kinds != @default_kinds,
       filter.disciplines != [],
       not is_nil(filter.when) or filter.times != [],
-      filter.cost != [] or not is_nil(filter.max_price_cents),
+      filter.cost != [] or price_range?(filter),
       filter.audiences != [],
       filter.languages != [],
       filter.amenities != []
     ]
     |> Enum.count(& &1)
   end
+
+  @doc "Whether the filter narrows by a price range (either end)."
+  def price_range?(%__MODULE__{min_price_cents: min, max_price_cents: max}),
+    do: not is_nil(min) or not is_nil(max)
 
   # ------------------------------------------------------------------ fields
 
@@ -267,10 +277,27 @@ defmodule Palee.Places.Domain.AroundFilter do
 
   defp date(field, _value), do: {:error, [{field, "must be a date (YYYY-MM-DD)"}]}
 
-  defp max_price(nil), do: {:ok, nil}
+  # A minimum of 0 is no minimum, so «€0–€30» and «up to €30» are one filter.
+  defp price_range(min, max) do
+    with {:ok, min} <- price(:min_price_cents, min),
+         {:ok, max} <- price(:max_price_cents, max) do
+      cond do
+        is_integer(min) and is_integer(max) and min > max ->
+          {:error, [min_price_cents: "must not be above max_price_cents"]}
 
-  defp max_price(value) when is_integer(value) and value >= 0 and value <= @max_price_cents,
+        min == 0 ->
+          {:ok, {nil, max}}
+
+        true ->
+          {:ok, {min, max}}
+      end
+    end
+  end
+
+  defp price(_field, nil), do: {:ok, nil}
+
+  defp price(_field, value) when is_integer(value) and value >= 0 and value <= @max_price_cents,
     do: {:ok, value}
 
-  defp max_price(_value), do: {:error, [max_price_cents: "must be a whole number of cents"]}
+  defp price(field, _value), do: {:error, [{field, "must be a whole number of cents"}]}
 end

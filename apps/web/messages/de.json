@@ -6950,7 +6950,13 @@
     "notifTitle": "Neu in deiner Nähe",
     "notifBody": "Neu für „{name}“: {count}",
     "myDisciplines": "Meine Sportarten",
-    "placesAttribution": "Orte: © OpenStreetMap-Mitwirkende, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Orte: © OpenStreetMap-Mitwirkende, GeoNames (CC BY 4.0)",
+    "dates": "Daten",
+    "dateFrom": "Von",
+    "dateTo": "Bis",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Niedrigster Preis",
+    "priceTo": "Höchster Preis"
   },
   "CheckIn": {
     "loading": "Wird geladen…",

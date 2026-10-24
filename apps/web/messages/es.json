@@ -6950,7 +6950,13 @@
     "notifTitle": "Novedades cerca de ti",
     "notifBody": "Novedades para «{name}»: {count}",
     "myDisciplines": "Mis deportes",
-    "placesAttribution": "Lugares: © colaboradores de OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Lugares: © colaboradores de OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Fechas",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Precio mínimo",
+    "priceTo": "Precio máximo"
   },
   "CheckIn": {
     "loading": "Cargando…",

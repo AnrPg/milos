@@ -6950,7 +6950,13 @@
     "notifTitle": "Du nouveau autour de toi",
     "notifBody": "Nouveau pour « {name} » : {count}",
     "myDisciplines": "Mes sports",
-    "placesAttribution": "Lieux : © contributeurs OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Lieux : © contributeurs OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Dates",
+    "dateFrom": "Du",
+    "dateTo": "Au",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Prix minimum",
+    "priceTo": "Prix maximum"
   },
   "CheckIn": {
     "loading": "Chargement…",

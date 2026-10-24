@@ -6950,7 +6950,13 @@
     "notifTitle": "جديد حولك",
     "notifBody": "جديد في «{name}»: {count}",
     "myDisciplines": "رياضاتي",
-    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)"
+    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)",
+    "dates": "التواريخ",
+    "dateFrom": "من",
+    "dateTo": "إلى",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "أدنى سعر",
+    "priceTo": "أعلى سعر"
   },
   "CheckIn": {
     "loading": "جارٍ التحميل…",

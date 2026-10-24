@@ -6950,7 +6950,13 @@
     "notifTitle": "Νέα γύρω σου",
     "notifBody": "Νέα για «{name}»: {count}",
     "myDisciplines": "Τα αθλήματά μου",
-    "placesAttribution": "Τοποθεσίες: © συντελεστές OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Τοποθεσίες: © συντελεστές OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Ημερομηνίες",
+    "dateFrom": "Από",
+    "dateTo": "Έως",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Χαμηλότερη τιμή",
+    "priceTo": "Υψηλότερη τιμή"
   },
   "CheckIn": {
     "loading": "Φόρτωση…",

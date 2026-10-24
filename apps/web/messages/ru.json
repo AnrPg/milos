@@ -6950,7 +6950,13 @@
     "notifTitle": "Новое рядом с вами",
     "notifBody": "Новое для «{name}»: {count}",
     "myDisciplines": "Мои виды спорта",
-    "placesAttribution": "Места: © участники OpenStreetMap, GeoNames (CC BY 4.0)"
+    "placesAttribution": "Места: © участники OpenStreetMap, GeoNames (CC BY 4.0)",
+    "dates": "Даты",
+    "dateFrom": "С",
+    "dateTo": "По",
+    "priceOpenEnd": "{price}+",
+    "priceFrom": "Минимальная цена",
+    "priceTo": "Максимальная цена"
   },
   "CheckIn": {
     "loading": "Загрузка…",
