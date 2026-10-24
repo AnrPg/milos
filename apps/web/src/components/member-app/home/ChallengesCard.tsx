@@ -10,11 +10,12 @@ import { useUiTranslations } from "@/i18n/ui";
 /**
  * The gym's live seasonal challenges. In Phase 1 this slot becomes the
  * club's #challenges channel card (ADR-138, M8); until then it reads the
- * landing payload.
+ * landing payload. Hidden while there are none (ANR 2026-10-24).
  */
 export function ChallengesCard({ challenges }: { challenges: ChallengeRecord[] }) {
   const i18n = useUiTranslations();
   const [activeInfoModal, setActiveInfoModal] = useState<"challenges" | null>(null);
+  if (challenges.length === 0) return null;
 
   return (
     <section id="challenges" className="rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -28,15 +29,9 @@ export function ChallengesCard({ challenges }: { challenges: ChallengeRecord[] }
         </div>
       </div>
       <div className="mt-5 space-y-4">
-        {challenges.length === 0 ? (
-          <p className="rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>
-            {i18n("noActiveSeasonalChallengesYetdcbdf9c")}
-          </p>
-        ) : (
-          challenges.map((challenge) => (
-            <ChallengeCard key={challenge.id} challenge={challenge} />
-          ))
-        )}
+        {challenges.map((challenge) => (
+          <ChallengeCard key={challenge.id} challenge={challenge} />
+        ))}
       </div>
       {activeInfoModal === "challenges" ? (
         <InfoModal title={i18n("seasonalChallengesfd69ec6")} onClose={() => setActiveInfoModal(null)}>

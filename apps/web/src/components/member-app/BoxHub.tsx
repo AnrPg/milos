@@ -33,12 +33,15 @@ import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
  * coach's words: «Νίκος Π. · Personal coach ▾», the next session instead of
  * the next class, Συνεδρίες · Βίντεο · Διατροφή · Μηνύματα, and the session
  * package; announcements come from the coach's «Team» club.
+ *
+ * Without a membership at any box or coach the cards mean nothing, so Box
+ * shows only «Βρες box» (ANR 2026-10-24).
  */
 export function BoxHub() {
   const t = useTranslations("MemberApp");
   const tProviders = useTranslations("Providers");
   const tCoach = useTranslations("SoloCoach");
-  const { membership } = useSelectedMembershipRole();
+  const { membership, memberships, isLoading } = useSelectedMembershipRole();
   const { hasBillingProviders } = useHasBillingProviders();
   const { entitlement } = useClientEntitlement();
   const clubs = useMyClubs();
@@ -46,6 +49,9 @@ export function BoxHub() {
   const layout = boxLayoutFor(membership?.organization.provider_kind);
   const name = membership?.settings?.brand_name?.trim() || membership?.organization.name || t("boxTitle");
   const title = boxTitle(name, layout, tProviders("kind.coach"));
+
+  if (isLoading) return <HubPage title={t("boxTitle")}>{null}</HubPage>;
+  if (memberships.length === 0) return <FindABox />;
 
   return (
     <HubPage title={<ProviderTitle title={title} />}>
@@ -93,6 +99,20 @@ export function BoxHub() {
       {membership ? <BoxExtensions membership={membership} layout={layout} /> : null}
 
       {gymClub ? <AnnouncementsCard club={gymClub} /> : null}
+    </HubPage>
+  );
+}
+
+/** Box for someone who is not in any box or with any coach yet. */
+function FindABox() {
+  const t = useTranslations("MemberApp");
+  return (
+    <HubPage title={t("boxTitle")}>
+      <HubCard>
+        <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>{t("boxFindTitle")}</h2>
+        <p className="mb-4 mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("boxFindBody")}</p>
+        <HubButton href="/around/boxes" primary>{t("boxFindAction")}</HubButton>
+      </HubCard>
     </HubPage>
   );
 }

@@ -18,7 +18,16 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
  * WOD, its classes, and the leaderboard of members who opted in, with the
  * member's own row and «Καταχώρησε το σκορ σου» until they log it.
  */
-export function WodCard({ club, showOrigin = true }: { club: CommunityClub; showOrigin?: boolean }) {
+export function WodCard({
+  club,
+  showOrigin = true,
+  hideWhenEmpty = false,
+}: {
+  club: CommunityClub;
+  showOrigin?: boolean;
+  /** Αρχική shows the card only when there is a workout today (ANR 2026-10-24). */
+  hideWhenEmpty?: boolean;
+}) {
   const t = useTranslations("Community");
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -35,6 +44,8 @@ export function WodCard({ club, showOrigin = true }: { club: CommunityClub; show
     setLogDialog({ mode: "closed" });
     void queryClient.invalidateQueries({ queryKey: WOD_KEY });
   }
+
+  if (hideWhenEmpty && !data?.workout) return null;
 
   return (
     <HubCard eyebrow={showOrigin && wod ? `${club.name} › #${channelName(wod, t)}` : `#${channelName({ kind: "wod" }, t)}`}>

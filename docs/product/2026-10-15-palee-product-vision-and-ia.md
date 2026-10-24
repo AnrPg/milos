@@ -81,7 +81,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 ## 4. Product principles (non-negotiable)
 
 1. **Every object has one home.** It is created and edited in exactly one tab. Elsewhere it appears only as a card that links home (§6.3).
-2. **Stable, predictable screens.** Content refreshes, but layout and card order never change. Empty states keep their slot ("Καμία κράτηση · Κλείσε θέση").
+2. **Stable, predictable screens.** Content refreshes, but card order never changes. A card with nothing in it is hidden, not shown as an empty state (ANR 2026-10-24): on Feed no WOD, no events, no challenges or no posts means no card. Box without a membership at any box or coach shows only «Βρες box».
 3. **⊕ means "post for others".** It exists only at the top-left of the Feed, as in Instagram's 2025 redesign. Writing for yourself is always a labelled button: `Νέα καταχώρηση`, `Καταγραφή`, `Έναρξη`. No unlabelled `+` anywhere else.
 4. **Comparison with others lives in clubs and is opt-in. Comparison with yourself lives in the Journal.**
 5. **Private by default.** Notes, body data, photos and cravings are private unless the user explicitly widens visibility (§8.2). Injuries are the one exception: coaches always see them, for safety.
@@ -362,7 +362,7 @@ Use a single enum across entry types: `private | coach_can_view | coach_reply_re
 - **Needs a native app or wrapper (e.g. Capacitor):** Apple Health / HealthKit and Android Health Connect (**no web APIs**), geofenced check-in, home-screen widgets (e.g. "+1 water"), NFC.
 
 ### 8.5 Stability & UX rules (for reviewers)
-- Never reorder cards based on time or context. Use fixed slots with empty states.
+- Never reorder cards based on time or context. Hide a card that has nothing in it; never show an empty-state card on Feed or Box.
 - No unlabelled `+` except the Feed's ⊕.
 - Every list uses the chip-row + `Φίλτρα (n)` pattern.
 - Every journal entry renders its visibility badge.
