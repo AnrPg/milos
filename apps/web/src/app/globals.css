@@ -544,3 +544,15 @@ html[data-platform]::before {
   z-index: calc(var(--z-toast) + 1);
   pointer-events: none;
 }
+
+/* ANR 2026-10-24: the selected tab of every tab switcher, on every screen, is
+   Spark (electric green) with dark text. One rule for all of them: a tab is a
+   [role="tab"] with aria-selected, or a link marked aria-current inside a
+   [data-tabs] bar. Inline per-component selected colours give way to it. */
+[role="tab"][aria-selected="true"],
+[data-tabs] [aria-current="page"] {
+  background: var(--spark) !important;
+  color: var(--spark-contrast) !important;
+  border-color: var(--spark) !important;
+  box-shadow: none !important;
+}
