@@ -461,13 +461,13 @@ msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "תמונת מצב חדשה עוזרת לך לראות את המגמה שלך. זה לוקח דקה."
 
 msgid "A buddy invitation"
-msgstr "הזמנה להיות באדי"
+msgstr "הזמנה להיות חבר לתמיכה"
 
 msgid "%{nickname} asks you to be their support buddy."
-msgstr "%{nickname} מבקש/ת שתהיה הבאדי התומך/ת שלו/ה."
+msgstr "%{nickname} מבקש/ת שתהיה החבר/ה לתמיכה שלו/ה."
 
 msgid "You have a support buddy"
-msgstr "יש לך באדי תומך/ת"
+msgstr "יש לך חבר/ה לתמיכה"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
 msgstr "%{nickname} אישר/ה. ישמע/תשמע ממך רק כשתבקש/י."
@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
 
 msgid "Buddy message"
-msgstr "הודעה מהבאדי"
+msgstr "הודעה מחבר/ה לתמיכה"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: רווחה שבועית"

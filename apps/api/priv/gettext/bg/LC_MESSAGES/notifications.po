@@ -461,13 +461,13 @@ msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Нов запис ти помага да видиш тенденцията си. Отнема минута."
 
 msgid "A buddy invitation"
-msgstr "Покана за бъди"
+msgstr "Покана за приятелче за подкрепа"
 
 msgid "%{nickname} asks you to be their support buddy."
-msgstr "%{nickname} те моли да бъдеш негов/неин бъди за подкрепа."
+msgstr "%{nickname} те моли да бъдеш негово/нейно приятелче за подкрепа."
 
 msgid "You have a support buddy"
-msgstr "Имаш бъди за подкрепа"
+msgstr "Имаш приятелче за подкрепа"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
 msgstr "%{nickname} прие. Ще научава за теб само когато поискаш."
@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "Следобедът е добър момент да наваксаш с водата."
 
 msgid "Buddy message"
-msgstr "Съобщение от бъди"
+msgstr "Съобщение от приятелче за подкрепа"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: седмично благосъстояние"

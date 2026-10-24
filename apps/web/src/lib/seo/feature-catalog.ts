@@ -18,7 +18,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
     titleKey: "socialTitle",
     summaryKey: "socialSummary",
     details: [
-      "Feed with a club bar; every post shows its origin (club and channel); scope toggle between My clubs and Around me",
+      "Feed with a club bar; every post shows its origin (club and channel); scope toggle between My people (clubs and people you follow) and Around me",
       "Posts with up to 4 photos or video, text-only posts, and an optional workout attached from the journal",
       "Audience picker per post: a club channel, followers or public",
       "Clubs with channels: announcements, today's WOD with leaderboard, challenges, time-slot groups, seasons, PT squads, member-created groups and open clubs that non-members can join",
@@ -36,7 +36,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
     details: [
       "Partners: opt-in training-partner profiles per club, a swipe deck only among verified members of the same club, mutual match, then message and book a class together",
       "Filters by level, time, goal and discipline; report and block; opt out at any time",
-      "Support buddy: one or two trusted people who receive only what the user sends with \"I need support\", with quick replies",
+      "Check-in buddy: one or two trusted people who receive only what the user sends with \"I need support\", with quick replies",
       "Optional weekly counts-only summary; a coach summary only with permission",
     ],
   },
@@ -106,7 +106,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
       "Camera ghost outline of the previous photo for the same pose; compare slider or side by side; charts per metric",
       "Photos always private unless explicitly shared with the coach, with a second confirmation and optional blur",
       "Wellbeing today: water, sleep, meals in or out of plan, mood, energy and stress",
-      "Craving log with intensity, trigger and outcome, linked to the support buddy",
+      "Craving log with intensity, trigger and outcome, linked to the check-in buddy",
       "Health-safe defaults: weight can be shown as a trend only, journal sections can be turned off, correlations shown as indicators, never medical advice",
     ],
   },
