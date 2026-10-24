@@ -168,11 +168,11 @@ function GroupRow({
             return (
               <li key={group.id}>
                 {audience === "member" ? (
-                  <Link href={atlasHref(group.id)} className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-sm" style={style}>
+                  <Link href={atlasHref(group.id)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm" style={style}>
                     {content}
                   </Link>
                 ) : (
-                  <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-sm" style={style}>
+                  <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm" style={style}>
                     {content}
                   </span>
                 )}

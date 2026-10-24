@@ -72,7 +72,7 @@ const ROUTES: Partial<Record<NewEntryKind, string>> = {
   craving: "/journal/wellbeing?craving=new",
   support: "/journal/wellbeing?support=new#support",
   checkIn: "/journal/wellbeing#check-in",
-  injury: "/journal/wellbeing#report-injury",
+  injury: "/journal/wellbeing?injury=new#report-injury",
   formReview: "/box/coach",
   review: "/journal/reviews#new-review",
 };

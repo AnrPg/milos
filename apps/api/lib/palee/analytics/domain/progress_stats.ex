@@ -3,17 +3,21 @@ defmodule Palee.Analytics.Domain.ProgressStats do
   Advanced progress statistics for a client's own training (ADR-098), built
   from completed executions: weekly volume, consistency, where sessions came
   from, and the score history of sections the client did more than once.
+  `weeks` (default 12) is how many calendar weeks, this one included, the
+  weekly chart, the consistency and `days` (sessions per day with training,
+  for the calendar heatmap, ADR-194) cover.
   """
 
-  @weeks 12
+  @default_weeks 12
 
-  def build(executions, %Date{} = today) do
+  def build(executions, %Date{} = today, weeks \\ @default_weeks)
+      when is_integer(weeks) and weeks > 0 do
     completed =
       executions
       |> Enum.filter(&(value(&1, :status) == "completed" and value(&1, :completed_at_utc)))
       |> Enum.map(&Map.put(&1, :completed_on, DateTime.to_date(value(&1, :completed_at_utc))))
 
-    weekly = weekly(completed, today)
+    weekly = weekly(completed, today, weeks)
     active_weeks = Enum.count(weekly, &(&1.sessions > 0))
 
     %{
@@ -23,10 +27,11 @@ defmodule Palee.Analytics.Domain.ProgressStats do
         workouts: completed |> Enum.map(&value(&1, :master_workout_id)) |> Enum.uniq() |> length()
       },
       weekly: weekly,
+      days: days(completed, hd(weekly).week_start, today),
       consistency: %{
-        weeks: @weeks,
+        weeks: weeks,
         active_weeks: active_weeks,
-        percent: round(active_weeks * 100 / @weeks),
+        percent: round(active_weeks * 100 / weeks),
         current_streak_weeks: streak(Enum.reverse(weekly))
       },
       sources: Enum.frequencies_by(completed, &to_string(value(&1, :source))),
@@ -34,11 +39,11 @@ defmodule Palee.Analytics.Domain.ProgressStats do
     }
   end
 
-  defp weekly(completed, today) do
+  defp weekly(completed, today, weeks) do
     this_week = Date.beginning_of_week(today)
     by_week = Enum.group_by(completed, &Date.beginning_of_week(&1.completed_on))
 
-    for offset <- (@weeks - 1)..0//-1 do
+    for offset <- (weeks - 1)..0//-1 do
       week_start = Date.add(this_week, -7 * offset)
       sessions = Map.get(by_week, week_start, [])
 
@@ -48,6 +53,16 @@ defmodule Palee.Analytics.Domain.ProgressStats do
         minutes: sessions |> Enum.map(&minutes/1) |> Enum.sum()
       }
     end
+  end
+
+  # Only days with a session, oldest first; the client fills the grid.
+  defp days(completed, first_day, today) do
+    completed
+    |> Enum.map(& &1.completed_on)
+    |> Enum.filter(&(Date.compare(&1, first_day) != :lt and Date.compare(&1, today) != :gt))
+    |> Enum.frequencies()
+    |> Enum.sort_by(&elem(&1, 0), Date)
+    |> Enum.map(fn {date, sessions} -> %{date: date, sessions: sessions} end)
   end
 
   # Consecutive weeks with training, counting back from this week; an empty

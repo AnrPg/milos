@@ -54,7 +54,7 @@ export function WellnessStrip() {
             type="button"
             onClick={() => add.mutate()}
             disabled={add.isPending}
-            className="min-h-10 rounded-2xl px-4 text-sm font-extrabold disabled:opacity-60"
+            className="min-h-11 rounded-2xl px-4 text-sm font-extrabold disabled:opacity-60"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("water.add")}
@@ -67,7 +67,7 @@ export function WellnessStrip() {
       )}
       <Link
         href="/journal/wellbeing?craving=new"
-        className="min-h-10 rounded-2xl px-3 py-2 text-sm font-semibold"
+        className="min-h-11 rounded-2xl px-3 py-2 text-sm font-semibold"
         style={{ border: "1px solid var(--border)", color: "var(--text)" }}
       >
         {t("item.cravings")}

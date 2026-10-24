@@ -191,4 +191,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-190 | E-shop: catalog, inventory, orders and revenue lineage | Accepted |
 | ADR-191 | Partner perks: redemption methods, an open policy model and versioned terms | Accepted |
 | ADR-192 | Shop analytics, revenue by stream and revenue lineage reporting | Accepted |
+| ADR-193 | In-app walkthroughs: one guide engine over real screens | Accepted |
 | ADR-197 | One filter pattern on every list; feed types, Around level, partner disciplines and distance | Accepted |
+| ADR-198 | Box › «Πελάτες μου»: the coach's home in the member app | Accepted |

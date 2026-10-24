@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "Vos scores de cohérence et de persévérance excluent vos jours de repos prévus, mais nous ne savons pas encore de quels jours il s'agit.",
     "setYourRestDaysInProfilefd0fbe4": "Définissez vos jours de repos dans Profil →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "Aujourd’hui est votre jour de repos prévu – la récupération fait partie du programme.",
-    "dayStreakca360c4": "séquence d'une journée",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "Terminez votre premier entraînement pour gagner votre premier badge.",
     "loadingYourTrainingOverview39806c7": "Chargement de votre aperçu de la formation...",
     "yourTrainingOverviewIsUnavailable0a82b18": "L’aperçu de votre formation n’est pas disponible.",
     "refreshSessionf2ed411": "Session de rafraîchissement",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "Exécution non disponible.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "La page de destination n'a pas pu être chargée.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Fréquence d’entraînement par rapport à l’objectif hebdomadaire – 10 dernières semaines",
-    "noWorkoutsYet85a9204": "Pas encore d'entraînement",
-    "setAWeeklyTargetdd70e51": "Fixez-vous un objectif hebdomadaire",
-    "calculatingc573779": "Calcul…",
     "howCloselyYouFollowedPrescribedExercises760e833": "Dans quelle mesure avez-vous suivi de près les exercices prescrits",
     "prs80e1569": "RP ·",
     "whatAreChallengesfdf13a8": "Quels sont les défis ?",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "Lien indisponible",
     "clMinutesShort": "{count} min",
     "clPercentValue": "{value} %",
-    "clProgressTitle": "Ma progression",
-    "clProgressIntro": "Ton entraînement des 12 dernières semaines.",
     "clProgressSessions": "Séances",
     "clProgressMinutes": "Minutes",
     "clProgressWorkouts": "Séances différentes",
@@ -4473,7 +4466,20 @@
     "workoutsStatusPending": "À faire",
     "workoutsFilterKind": "Type",
     "workoutsKindPersonal": "Personnelles",
-    "workoutsFilterSeason": "Saison"
+    "workoutsFilterSeason": "Saison",
+    "clProgressOnTargetWeeks": "{onTarget} semaines sur {weeks} dans l’objectif",
+    "clProgressStreakDays": "{count, plural, one {# jour} other {# jours}}",
+    "clProgressTarget": "Objectif {count}/semaine",
+    "clProgressHeatmap": "Jours d’entraînement",
+    "clProgressHeatWeek": "Semaine du {date} : {count, plural, one {# séance} other {# séances}}{onTarget, select, true {, dans l’objectif} other {}}",
+    "clProgressHeatDay": "{date} : {count, plural, =0 {pas d’entraînement} one {# séance} other {# séances}}",
+    "clProgressBadges": "Badges",
+    "prTrendEstimated": "1RM estimé {value} {unit}",
+    "prTrendRetest": "Le moment de retester ?",
+    "clNutritionMacros": "Macros",
+    "clNutritionMacrosHidden": "Chiffres masqués",
+    "clNutritionHideMacros": "Masquer les chiffres",
+    "clNutritionShowMacros": "Afficher les chiffres"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -5290,7 +5296,7 @@
         "glasses": "{filled} verres sur {goal}",
         "added": "Verre ajouté ({ml} ml)",
         "dropsLabel": "Verres aujourd'hui",
-        "remove": "Retirer ce verre"
+        "remove": "Retirer le dernier verre"
       },
       "sleep": {
         "title": "Sommeil",
@@ -5372,9 +5378,6 @@
         "noPortions": "Le plan de ton coach n'a pas encore de portions par jour."
       },
       "mood": {
-        "mood": "Humeur {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Comment te sens-tu ?",
         "open": "Répondre à « Comment je me sens »"
       },
       "craving": {
@@ -7984,10 +7987,6 @@
     "return_garmin_account_in_use": "Ce compte Garmin est déjà lié à un autre compte Palee.",
     "return_garmin_connect_failed": "Garmin n'a pas pu terminer la connexion. Réessaie.",
     "restingTitle": "Fréquence cardiaque au repos",
-    "restingRange": "Période",
-    "restingRange_1m": "1 mois",
-    "restingRange_3m": "3 mois",
-    "restingRange_1y": "1 an",
     "bpmValue": "{value} bpm",
     "restingLatest": "Dernière mesure · {date}",
     "restingAverage": "Moyenne {value} bpm sur {days, plural, one {# jour} other {# jours}}",
@@ -9611,7 +9610,8 @@
     "backToMe": "Retour à Moi",
     "saveInterests": "Enregistrer",
     "interestsSaved": "Enregistré.",
-    "interestsHubHint": "Sports et niveau, pour les suggestions"
+    "interestsHubHint": "Sports et niveau, pour les suggestions",
+    "photoAddLabel": "Ajouter une photo"
   },
   "Business": {
     "common": {
@@ -10904,5 +10904,297 @@
     "notif_person_message_body": "{name} vous a envoyé un message.",
     "notif_message_request_title": "Demande de message",
     "notif_message_request_body": "{name} souhaite vous envoyer un message."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "Guides",
+      "listIntro": "De courtes visites guidées sur les vrais écrans. Suis en touchant ; rien n'est enregistré si tu ne l'enregistres pas.",
+      "forStaff": "Pour ton entreprise",
+      "forYou": "Pour toi",
+      "minutes": "{count, plural, one {# min} other {# min}}",
+      "start": "Commencer",
+      "resume": "Reprendre",
+      "replay": "Revoir",
+      "state_new": "Nouveau",
+      "state_started": "En cours",
+      "state_completed": "Terminé",
+      "state_dismissed": "Pas commencé",
+      "state_outdated": "Mis à jour",
+      "openGuide": "Visite guidée",
+      "openGuideAria": "Lancer la visite guidée : {title}",
+      "next": "Suivant",
+      "back": "Retour",
+      "finish": "Terminé",
+      "close": "Fermer la visite guidée",
+      "stepOf": "{current} sur {total}",
+      "doIt": "Fais-le pour moi",
+      "tapHint": "Touche la zone en surbrillance",
+      "notHere": "Pas sur cet écran pour l'instant, alors voici l'essentiel.",
+      "fillDemo": "Remplir d'abord avec des données de démo",
+      "filling": "Remplissage…",
+      "demoFilled": "Données de démo ajoutées",
+      "offerEyebrow": "Première fois ici ?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "Montre-moi",
+      "offerLater": "Pas maintenant",
+      "meRow": "Guides",
+      "meRowHint": "Visites guidées de la boutique, des événements, des offres et de ton propre club",
+      "loadFailed": "Les guides ne se sont pas chargés. Réessaie."
+    },
+    "shop_staff": {
+      "title": "Gère ta boutique",
+      "summary": "Ajoute des produits, vends dans l'app et à la caisse, garde un stock juste.",
+      "chapters": {
+        "setup": "Configurer",
+        "sell": "Vendre",
+        "track": "Suivre"
+      },
+      "welcome": {
+        "title": "La boutique de ta box",
+        "body": "Les membres commandent dans l'app et récupèrent à l'accueil. Tu vends aussi à la caisse."
+      },
+      "newProduct": {
+        "title": "Ajouter un produit",
+        "body": "Touche « {label} »."
+      },
+      "photos": {
+        "title": "Les photos font vendre",
+        "body": "Ajoute quelques photos nettes. La première sert de couverture."
+      },
+      "price": {
+        "title": "Prix et options",
+        "body": "Un seul prix, ou des tailles et des saveurs avec leur propre stock.",
+        "tip": "Le stock est compté par option, donc « M » et « L » ne se mélangent jamais."
+      },
+      "selling": {
+        "title": "Où le vendre",
+        "body": "Dans l'app, à la caisse ou les deux. Réservé aux membres, ou ouvert à tous."
+      },
+      "save": {
+        "title": "Enregistre, puis publie",
+        "body": "Un nouveau produit est un brouillon. Publie-le pour ouvrir la boutique.",
+        "tip": "Les membres ne voient la carte Boutique dans Box qu'une fois un produit publié."
+      },
+      "ordersTab": {
+        "title": "Commandes",
+        "body": "Touche « {label} »."
+      },
+      "orders": {
+        "title": "Prépare, puis remets",
+        "body": "Marque une commande comme prête et le membre apprend où la récupérer.",
+        "tip": "Les commandes non récupérées s'annulent seules après 7 jours et libèrent le stock."
+      },
+      "pos": {
+        "title": "La caisse",
+        "body": "Vends à l'accueil en quelques secondes, payé tout de suite ou sur le compte du membre."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Chaque vente, livraison et inventaire est enregistré. Le stock bas t'alerte."
+      },
+      "analytics": {
+        "title": "Ce qui se vend",
+        "body": "Ventes de la semaine, marges et tes meilleurs produits.",
+        "tip": "Les ventes de la boutique apparaissent aussi dans Finances comme une source de revenus à part."
+      },
+      "done": {
+        "title": "C'est prêt",
+        "body": "Revois ce guide quand tu veux depuis Guides."
+      }
+    },
+    "events_organising": {
+      "title": "Organiser des événements",
+      "summary": "Planifie en 7 petites étapes, vends des places, fais le check-in, vois les chiffres.",
+      "chapters": {
+        "plan": "Planifier",
+        "run": "Gérer"
+      },
+      "welcome": {
+        "title": "Les événements de A à Z",
+        "body": "Planifie, remplis, gère et vois comment ça s'est passé, au même endroit."
+      },
+      "new": {
+        "title": "Créer un événement",
+        "body": "Touche « {label} »."
+      },
+      "steps": {
+        "title": "Sept petites étapes",
+        "body": "Organisateur, infos de base, quand, où, qui et prix, places, vérification. Touche une étape terminée pour y revenir."
+      },
+      "screen": {
+        "title": "Une décision par écran",
+        "body": "Remplis ceci, puis Suivant.",
+        "tip": "Ton brouillon reste sur cet appareil, tu peux donc t'arrêter et revenir plus tard."
+      },
+      "next": {
+        "title": "Suivant sait ce qui manque",
+        "body": "S'il reste quelque chose, il te dit quoi."
+      },
+      "cohosts": {
+        "title": "Co-organiser avec d'autres",
+        "body": "Dans « {label} », demande à une box ou à un coach de co-organiser via l'adresse de sa page.",
+        "tip": "Une fois la demande acceptée, l'événement apparaît sur sa page et touche ses membres."
+      },
+      "manage": {
+        "title": "Gérer",
+        "body": "Pour chaque événement : participants, check-in, paiements à la box, remboursements et messages."
+      },
+      "finances": {
+        "title": "Finances",
+        "body": "Touche « {label} » : revenus, remboursements et ce qui reste dû."
+      },
+      "analytics": {
+        "title": "Statistiques",
+        "body": "Touche « {label} » : vues, inscriptions, liste d'attente et qui est venu.",
+        "tip": "La conversion montre combien de visiteurs se sont inscrits."
+      },
+      "done": {
+        "title": "À toi d'organiser",
+        "body": "Revois ce guide quand tu veux depuis Guides."
+      }
+    },
+    "finance_offers": {
+      "title": "Offres, partenaires et parrainage",
+      "summary": "Campagnes et codes de réduction, avantages partenaires et un programme Amène un ami.",
+      "chapters": {
+        "campaigns": "Campagnes",
+        "partners": "Partenaires",
+        "referrals": "Parrainage"
+      },
+      "welcome": {
+        "title": "Grandis avec les offres",
+        "body": "Tes propres campagnes et codes, des avantages chez des magasins partenaires, et des récompenses pour qui amène des amis."
+      },
+      "campaignNew": {
+        "title": "Lancer une campagne",
+        "body": "Touche « {label} »."
+      },
+      "campaignForm": {
+        "title": "Nom et dates",
+        "body": "Une campagne regroupe tes offres, par ex. « Été ». Choisis quand elle a lieu."
+      },
+      "coupons": {
+        "title": "Codes de réduction",
+        "body": "Ouvre une campagne pour ajouter des codes : un pourcentage ou un montant de réduction, avec une limite d'utilisation.",
+        "tip": "Chaque code indique combien de fois il a servi, pour voir quelle offre marche."
+      },
+      "partners": {
+        "title": "Avantages partenaires",
+        "body": "Touche « {label} »."
+      },
+      "perkNew": {
+        "title": "Ajouter une offre partenaire",
+        "body": "Touche « {label} »."
+      },
+      "perkPartner": {
+        "title": "Le partenaire",
+        "body": "Son nom, son lien et son logo."
+      },
+      "perkBenefit": {
+        "title": "Ce que reçoivent les membres",
+        "body": "Un pourcentage, un montant ou autre chose, comme un café offert."
+      },
+      "perkMethod": {
+        "title": "Comment le magasin vérifie",
+        "body": "Un code commun, un lien avec le code inclus, ou un abonnement montré en direct.",
+        "tip": "Si un code circule, change-le ici et c'est appliqué tout de suite."
+      },
+      "perkRules": {
+        "title": "Conditions",
+        "body": "Dates, qui en profite et à quelle fréquence. Enregistre un brouillon, publie une fois d'accord."
+      },
+      "referrals": {
+        "title": "Amène un ami",
+        "body": "Un programme récompense les membres qui amènent quelqu'un qui s'inscrit."
+      },
+      "referralsFlow": {
+        "title": "Approuver et récompenser",
+        "body": "Les parrainages arrivent ici. Approuves-en un et sa récompense part.",
+        "tip": "Les récompenses peuvent aller aux deux : au membre et à l'ami."
+      },
+      "done": {
+        "title": "Tout est prêt",
+        "body": "Revois ce guide quand tu veux depuis Guides."
+      }
+    },
+    "member_club_event": {
+      "title": "Ton club et ton événement",
+      "summary": "Crée un groupe dans le club de ta box et organise un événement, en solo ou avec une box.",
+      "chapters": {
+        "club": "Ton club",
+        "event": "Ton événement"
+      },
+      "welcome": {
+        "title": "À ta façon",
+        "body": "Crée un groupe avec ta bande et organise tes propres événements."
+      },
+      "channels": {
+        "title": "Le club de ta box",
+        "body": "Touche « {label} »."
+      },
+      "groups": {
+        "title": "Groupes",
+        "body": "De petits clubs dans la box, avec leur propre chat et leurs événements."
+      },
+      "propose": {
+        "title": "Créer un groupe",
+        "body": "Touche « {label} »."
+      },
+      "groupSheet": {
+        "title": "Nomme-le, choisis qui entre",
+        "body": "Ouvert à tous, ou sur demande.",
+        "tip": "Certaines box approuvent d'abord les nouveaux groupes ; tu es prévenu quand le tien est en ligne."
+      },
+      "noBox": {
+        "title": "Les groupes vivent dans une box",
+        "body": "Rejoins d'abord une box, puis crée un groupe dans son club. Les événements, tu peux les organiser tout de suite."
+      },
+      "eventNew": {
+        "title": "Organiser un événement",
+        "body": "Touche « {label} »."
+      },
+      "hostAs": {
+        "title": "Qui organise",
+        "body": "Toi, ou un groupe ou une entreprise que tu gères.",
+        "tip": "« {label} » ne demande aucune box."
+      },
+      "alone": {
+        "title": "En solo",
+        "body": "Ouvert à tous près de chez toi, ou sur invitation avec ton lien."
+      },
+      "withBox": {
+        "title": "Avec une box",
+        "body": "Dans « {label} », demande à la box de co-organiser via l'adresse de sa page.",
+        "tip": "Une fois la demande acceptée, l'événement apparaît aussi sur la page de la box."
+      },
+      "hosting": {
+        "title": "Gère-le",
+        "body": "Après publication, « {label} » réunit participants, check-in et chiffres."
+      },
+      "done": {
+        "title": "À toi de jouer",
+        "body": "Revois ce guide quand tu veux depuis Guides."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "Mes clients",
+    "replies": "En attente de réponse",
+    "reviews": "Analyse technique",
+    "desk": "Check-in du jour",
+    "clients": "Clients",
+    "sentAt": "Envoyé {time}",
+    "overdue": "En retard",
+    "dueSoon": "Bientôt dû",
+    "unknownClient": "Membre",
+    "openVideo": "Voir la vidéo",
+    "checkedIn": "{count} sur {total} arrivés",
+    "attended": "Présent",
+    "noShow": "Absent",
+    "attendanceOf": "Présence de {name}",
+    "markError": "Non enregistré. Réessayez.",
+    "showAll": "Tout afficher ({count})",
+    "showFewer": "Afficher moins",
+    "moreInConsole": "Tout voir dans la console"
   }
 }

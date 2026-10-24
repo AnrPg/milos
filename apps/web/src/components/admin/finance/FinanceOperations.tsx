@@ -28,6 +28,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, BranchFilterNote, useBranchFilter } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { GuideButton } from "@/components/guides/GuideButton";
 
 type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
 
@@ -130,6 +131,7 @@ export function FinanceOperations() {
           actions={
             <>
               <BranchFilterControl filter={branchFilter} />
+              <GuideButton guide="finance_offers" />
               <Link href={adminHref("/admin/metrics/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
                 {i18n("financeAnalytics271fe3b")}
               </Link>
@@ -173,6 +175,7 @@ export function FinanceOperations() {
 
         {/* Tab switcher */}
         <SegmentPicker
+          guide="finance.tabs"
           ariaLabel={i18n("financeOperations60f9e5a")}
           variant="track"
           value={activeTab}

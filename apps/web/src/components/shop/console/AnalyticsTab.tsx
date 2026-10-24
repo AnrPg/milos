@@ -24,6 +24,7 @@ import {
   suggestionReasoning,
   weeklyBuckets,
 } from "@/lib/shop/console";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type Range = "28" | "84" | "365";
 const RANGES: Range[] = ["28", "84", "365"];
@@ -104,7 +105,7 @@ export function AnalyticsTab({ locationIds, branchFilter }: { locationIds?: stri
   if (sales.error) return <StatusText tone="muted">{t("unavailable")}</StatusText>;
 
   return (
-    <section className="flex flex-col gap-5" aria-label={t("title")} data-testid="shop-analytics">
+    <section {...guideAnchor("shop.analytics")} className="flex flex-col gap-5" aria-label={t("title")} data-testid="shop-analytics">
       <SegmentPicker ariaLabel={t("range")} semantics="radiogroup" value={range} onChange={setRange} options={RANGES.map((value) => ({ value, label: t(`ranges.${value}`) }))} />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

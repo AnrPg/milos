@@ -35,6 +35,7 @@ import { setView } from "@/lib/view-mode";
  * follows.
  */
 export function MeHub() {
+  const tGuides = useTranslations("Guides");
   const t = useTranslations("MemberApp");
   const tBody = useTranslations("Body");
   const tFirstRun = useTranslations("FirstRun");
@@ -129,6 +130,7 @@ export function MeHub() {
         <HubListRow href="/me/settings/interests" label={tFirstRun("interestsTitle")} detail={tFirstRun("interestsHubHint")} />
         <HubListRow href="/me/settings/body" label={tBody("settingsTitle")} detail={tBody("settingsHubHint")} />
         <HubListRow onClick={openProductTour} label={t("meTour")} />
+        <HubListRow href="/guides" label={tGuides("ui.meRow")} detail={tGuides("ui.meRowHint")} />
         <HubListRow onClick={openOnboardingChecklist} label={t("meChecklist")} />
         {extras.map((item) => (
           <HubListRow key={item.id} href={adminHref(item.href, selectedOrganizationSlug)} label={tNav(item.labelKey)} />

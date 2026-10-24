@@ -111,6 +111,10 @@ defmodule PaleeWeb.Schemas.Wellness do
       water_reminder: %Schema{
         type: :boolean,
         description: "Opt-in afternoon reminder while the day is under half the goal"
+      },
+      hide_macros: %Schema{
+        type: :boolean,
+        description: "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)"
       }
     },
     required: [
@@ -119,7 +123,8 @@ defmodule PaleeWeb.Schemas.Wellness do
       :sleep_goal_minutes,
       :hidden_items,
       :item_order,
-      :water_reminder
+      :water_reminder,
+      :hide_macros
     ],
     additionalProperties: false
   }

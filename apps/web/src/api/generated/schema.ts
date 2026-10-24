@@ -2681,6 +2681,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/guides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your progress in every walkthrough you have opened */
+        get: operations["PaleeWeb.GuideProgressController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/guides/{guide_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record a step reached, a finish or a «not now» in one walkthrough */
+        put: operations["PaleeWeb.GuideProgressController.update"];
+        post?: never;
+        /** Forget one walkthrough's progress, so it is offered again */
+        delete: operations["PaleeWeb.GuideProgressController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/history": {
         parameters: {
             query?: never;
@@ -12196,6 +12231,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Score history of all my PRs, oldest first (ADR-194) */
+        get: operations["PaleeWeb.PRController.all_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs/{id}": {
         parameters: {
             query?: never;
@@ -12641,6 +12693,12 @@ export interface components {
             consistency: {
                 [key: string]: unknown;
             };
+            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             filter: {
                 [key: string]: unknown;
             };
@@ -12721,6 +12779,12 @@ export interface components {
                 consistency: {
                     [key: string]: unknown;
                 };
+                /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                days: {
+                    /** Format: date */
+                    date: string;
+                    sessions: number;
+                }[];
                 filter: {
                     [key: string]: unknown;
                 };
@@ -23937,7 +24001,7 @@ export interface components {
                 value: number;
             }[];
             /** @enum {string} */
-            range: "1m" | "3m" | "1y";
+            range: "1m" | "3m" | "6m" | "1y";
             sources: string[];
             /** Format: date */
             to: string;
@@ -25582,6 +25646,62 @@ export interface components {
             id: string;
             /** @enum {string} */
             role: "primary" | "secondary" | "stabilizer";
+        };
+        /** GuideProgress */
+        GuideProgress: {
+            /**
+             * Format: date-time
+             * @description The first finish of the current run.
+             */
+            completed_at: string | null;
+            /** @description The web app's guide id, e.g. `shop_staff`. */
+            guide_id: string;
+            /** @description How many times it was started. */
+            runs: number;
+            /** Format: date-time */
+            started_at: string;
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @description The step reached in the current run, from 0. */
+            step: number;
+            /** Format: date-time */
+            updated_at: string;
+            version: number;
+        };
+        /** GuideProgressList */
+        GuideProgressList: {
+            guides: {
+                /**
+                 * Format: date-time
+                 * @description The first finish of the current run.
+                 */
+                completed_at: string | null;
+                /** @description The web app's guide id, e.g. `shop_staff`. */
+                guide_id: string;
+                /** @description How many times it was started. */
+                runs: number;
+                /** Format: date-time */
+                started_at: string;
+                /** @enum {string} */
+                status: "started" | "completed" | "dismissed";
+                /** @description The step reached in the current run, from 0. */
+                step: number;
+                /** Format: date-time */
+                updated_at: string;
+                version: number;
+            }[];
+        };
+        /** GuideProgressUpdate */
+        GuideProgressUpdate: {
+            /** @enum {string} */
+            status: "started" | "completed" | "dismissed";
+            /** @default 0 */
+            step: number;
+            /**
+             * @description A newer version than the stored one starts a new run.
+             * @default 1
+             */
+            version: number;
         };
         /** GymAiSettings */
         GymAiSettings: {
@@ -27740,6 +27860,23 @@ export interface components {
                 updated_at: string;
             }[];
         };
+        /** PRHistoryList */
+        PRHistoryList: {
+            history: {
+                /** Format: date */
+                beaten_on: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: uuid */
+                pr_record_id: string;
+                score: number;
+                supporting_metrics: {
+                    [key: string]: unknown;
+                };
+            }[];
+        };
         /** PRTimelineEntry */
         PRTimelineEntry: {
             /** Format: date */
@@ -29769,6 +29906,12 @@ export interface components {
                 percent: number;
                 weeks: number;
             };
+            /** @description Sessions per day with training in the weekly span, oldest first */
+            days: {
+                /** Format: date */
+                date: string;
+                sessions: number;
+            }[];
             pr_timeline: {
                 /** Format: date */
                 beaten_on: string;
@@ -36919,6 +37062,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -36944,6 +37089,8 @@ export interface components {
         WellnessPreferencesRequest: {
             glass_ml?: number;
             hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+            hide_macros?: boolean;
             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
             item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
             sleep_goal_minutes?: number;
@@ -36956,6 +37103,8 @@ export interface components {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                hide_macros: boolean;
                 /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                 item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
@@ -48494,7 +48643,7 @@ export interface operations {
         parameters: {
             query?: {
                 metric?: "resting_hr" | "steps";
-                range?: "1m" | "1y" | "3m";
+                range?: "1m" | "1y" | "3m" | "6m";
             };
             header?: never;
             path?: never;
@@ -48538,7 +48687,7 @@ export interface operations {
                             value: number;
                         }[];
                         /** @enum {string} */
-                        range: "1m" | "3m" | "1y";
+                        range: "1m" | "3m" | "6m" | "1y";
                         sources: string[];
                         /** Format: date */
                         to: string;
@@ -52260,6 +52409,145 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.GuideProgressController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "started" | "completed" | "dismissed";
+                    /** @default 0 */
+                    step?: number;
+                    /**
+                     * @description A newer version than the stored one starts a new run.
+                     * @default 1
+                     */
+                    version?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: date-time
+                         * @description The first finish of the current run.
+                         */
+                        completed_at: string | null;
+                        /** @description The web app's guide id, e.g. `shop_staff`. */
+                        guide_id: string;
+                        /** @description How many times it was started. */
+                        runs: number;
+                        /** Format: date-time */
+                        started_at: string;
+                        /** @enum {string} */
+                        status: "started" | "completed" | "dismissed";
+                        /** @description The step reached in the current run, from 0. */
+                        step: number;
+                        /** Format: date-time */
+                        updated_at: string;
+                        version: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.GuideProgressController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guide progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        guides: {
+                            /**
+                             * Format: date-time
+                             * @description The first finish of the current run.
+                             */
+                            completed_at: string | null;
+                            /** @description The web app's guide id, e.g. `shop_staff`. */
+                            guide_id: string;
+                            /** @description How many times it was started. */
+                            runs: number;
+                            /** Format: date-time */
+                            started_at: string;
+                            /** @enum {string} */
+                            status: "started" | "completed" | "dismissed";
+                            /** @description The step reached in the current run, from 0. */
+                            step: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AccountTrainingController.history": {
         parameters: {
             query?: {
@@ -54434,6 +54722,12 @@ export interface operations {
                             consistency: {
                                 [key: string]: unknown;
                             };
+                            /** @description Sessions per day with training over the range's weeks, oldest first (ADR-194) */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             filter: {
                                 [key: string]: unknown;
                             };
@@ -56380,6 +56674,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -57042,6 +57338,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -57066,6 +57364,8 @@ export interface operations {
                 "application/json": {
                     glass_ml?: number;
                     hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                    /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                    hide_macros?: boolean;
                     /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                     item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                     sleep_goal_minutes?: number;
@@ -57086,6 +57386,8 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194) */
+                            hide_macros: boolean;
                             /** @description Tile order; every item appears once (unplaced ones follow in default order) */
                             item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
@@ -85408,6 +85710,12 @@ export interface operations {
                                 percent: number;
                                 weeks: number;
                             };
+                            /** @description Sessions per day with training in the weekly span, oldest first */
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                sessions: number;
+                            }[];
                             pr_timeline: {
                                 /** Format: date */
                                 beaten_on: string;
@@ -100052,6 +100360,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PRController.all_history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        history: {
+                            /** Format: date */
+                            beaten_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: uuid */
+                            pr_record_id: string;
+                            score: number;
+                            supporting_metrics: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
                 };
             };
         };

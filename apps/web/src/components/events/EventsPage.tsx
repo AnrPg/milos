@@ -14,6 +14,7 @@ import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { EventList } from "./EventParts";
 import { HostedEventSheet, useEventHosts } from "./HostedEventSheet";
 import { useClubsEvents } from "./use-events";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type Segment = "clubs" | "near";
 
@@ -51,13 +52,13 @@ export function EventsPage({ nearFirst = false }: { nearFirst?: boolean }) {
     <HubPage
       title={t("eventsTitle")}
       actions={
-        <button type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+        <button {...guideAnchor("events.page.new")} type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
           {t("newEvent")}
         </button>
       }
     >
       {hosting ? (
-        <Link href="/events/hosting" className="flex min-h-11 items-center justify-between rounded-2xl px-4 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
+        <Link {...guideAnchor("events.hostingLink")} href="/events/hosting" className="flex min-h-11 items-center justify-between rounded-2xl px-4 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
           <span>{t("hostingConsole")}</span>
           <span aria-hidden="true" style={{ color: "var(--dim)" }}>›</span>
         </Link>

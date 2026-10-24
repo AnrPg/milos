@@ -730,8 +730,6 @@
     "yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7": "ציוני העקביות וההתמדה שלך אינם כוללים את ימי המנוחה המתוכננים שלך - אך איננו יודעים אילו ימים אלו עדיין.",
     "setYourRestDaysInProfilefd0fbe4": "הגדר את ימי המנוחה שלך בפרופיל →",
     "todayIsYourScheduledRestDayRecoveryIse1d7a10": "היום הוא יום המנוחה המתוכנן שלך - ההתאוששות היא חלק מהתוכנית.",
-    "dayStreakca360c4": "רצף ימים",
-    "completeYourFirstWorkoutToEarnYourFirst4d6cd86": "השלם את האימון הראשון שלך כדי לזכות בתג הראשון שלך.",
     "loadingYourTrainingOverview39806c7": "טוען את סקירת האימונים שלך...",
     "yourTrainingOverviewIsUnavailable0a82b18": "סקירת ההדרכה שלך אינה זמינה.",
     "refreshSessionf2ed411": "סשן רענון",
@@ -1545,9 +1543,6 @@
     "executionNotAvailablea9817d4": "ביצוע לא זמין.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "לא ניתן היה לטעון את דף הנחיתה.",
     "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "תדירות אימון מול יעד שבועי - 10 השבועות האחרונים",
-    "noWorkoutsYet85a9204": "עדיין אין אימונים",
-    "setAWeeklyTargetdd70e51": "הגדר יעד שבועי",
-    "calculatingc573779": "מחשב...",
     "howCloselyYouFollowedPrescribedExercises760e833": "עד כמה עקבת אחר התרגילים שנקבעו",
     "prs80e1569": "יחסי ציבור ·",
     "whatAreChallengesfdf13a8": "מהם אתגרים?",
@@ -3639,8 +3634,6 @@
     "clVideoUnavailable": "הקישור אינו זמין",
     "clMinutesShort": "{count} דק׳",
     "clPercentValue": "{value}%",
-    "clProgressTitle": "ההתקדמות שלי",
-    "clProgressIntro": "האימונים שלך ב-12 השבועות האחרונים.",
     "clProgressSessions": "אימונים",
     "clProgressMinutes": "דקות",
     "clProgressWorkouts": "אימונים שונים",
@@ -4473,7 +4466,20 @@
     "workoutsStatusPending": "לביצוע",
     "workoutsFilterKind": "סוג",
     "workoutsKindPersonal": "אישיים",
-    "workoutsFilterSeason": "עונה"
+    "workoutsFilterSeason": "עונה",
+    "clProgressOnTargetWeeks": "{onTarget} מתוך {weeks} שבועות ביעד",
+    "clProgressStreakDays": "{count, plural, one {יום אחד} other {# ימים}}",
+    "clProgressTarget": "יעד {count}/שבוע",
+    "clProgressHeatmap": "ימי אימון",
+    "clProgressHeatWeek": "שבוע {date}: {count, plural, one {אימון אחד} other {# אימונים}}{onTarget, select, true {, ביעד} other {}}",
+    "clProgressHeatDay": "{date}: {count, plural, =0 {ללא אימון} one {אימון אחד} other {# אימונים}}",
+    "clProgressBadges": "תגים",
+    "prTrendEstimated": "1RM משוער {value} {unit}",
+    "prTrendRetest": "הגיע הזמן לבדיקה חוזרת?",
+    "clNutritionMacros": "מאקרו",
+    "clNutritionMacrosHidden": "המספרים מוסתרים",
+    "clNutritionHideMacros": "הסתר מספרים",
+    "clNutritionShowMacros": "הצג מספרים"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -5290,7 +5296,7 @@
         "glasses": "{filled} מתוך {goal} כוסות",
         "added": "נוספה כוס ({ml} מ״ל)",
         "dropsLabel": "הכוסות של היום",
-        "remove": "הסרת הכוס הזו"
+        "remove": "הסר את הכוס האחרונה"
       },
       "sleep": {
         "title": "שינה",
@@ -5372,9 +5378,6 @@
         "noPortions": "בתוכנית של המאמן שלך עוד אין מנות יומיות."
       },
       "mood": {
-        "mood": "מצב רוח {value}/4",
-        "stress": "מתח {value}/4",
-        "empty": "איך את/ה מרגיש/ה?",
         "open": "ענה/י על «איך אני מרגיש/ה»"
       },
       "craving": {
@@ -7984,10 +7987,6 @@
     "return_garmin_account_in_use": "חשבון Garmin הזה כבר מקושר לחשבון Palee אחר.",
     "return_garmin_connect_failed": "Garmin לא הצליח להשלים את החיבור. נסה שוב.",
     "restingTitle": "דופק במנוחה",
-    "restingRange": "תקופה",
-    "restingRange_1m": "חודש",
-    "restingRange_3m": "3 חודשים",
-    "restingRange_1y": "שנה",
     "bpmValue": "{value} פעימות/דקה",
     "restingLatest": "מדידה אחרונה · {date}",
     "restingAverage": "ממוצע {value} פעימות/דקה {days, plural, one {ביום אחד} two {ביומיים} other {ב-# ימים}}",
@@ -9611,7 +9610,8 @@
     "backToMe": "חזרה לאני",
     "saveInterests": "שמירה",
     "interestsSaved": "נשמר.",
-    "interestsHubHint": "ענפי ספורט ורמה, להצעות"
+    "interestsHubHint": "ענפי ספורט ורמה, להצעות",
+    "photoAddLabel": "הוספת תמונה"
   },
   "Business": {
     "common": {
@@ -10904,5 +10904,297 @@
     "notif_person_message_body": "{name} שלח/ה לך הודעה.",
     "notif_message_request_title": "בקשת הודעה",
     "notif_message_request_body": "{name} רוצה לשלוח לך הודעה."
+  },
+  "Guides": {
+    "ui": {
+      "listTitle": "מדריכים",
+      "listIntro": "הדרכות קצרות על המסכים האמיתיים. לחצו יחד איתנו; שום דבר לא נשמר אלא אם תשמרו.",
+      "forStaff": "לעסק שלכם",
+      "forYou": "בשבילכם",
+      "minutes": "{count, plural, one {# דק׳} two {# דק׳} other {# דק׳}}",
+      "start": "התחלה",
+      "resume": "המשך",
+      "replay": "שוב מההתחלה",
+      "state_new": "חדש",
+      "state_started": "בתהליך",
+      "state_completed": "בוצע",
+      "state_dismissed": "לא התחיל",
+      "state_outdated": "עודכן",
+      "openGuide": "הדרכה",
+      "openGuideAria": "התחלת ההדרכה: {title}",
+      "next": "הבא",
+      "back": "הקודם",
+      "finish": "סיום",
+      "close": "סגירת ההדרכה",
+      "stepOf": "{current} מתוך {total}",
+      "doIt": "תעשו את זה בשבילי",
+      "tapHint": "לחצו על המקום המודגש",
+      "notHere": "זה לא מופיע במסך כרגע, אז הנה העיקר.",
+      "fillDemo": "קודם למלא בנתוני הדגמה",
+      "filling": "ממלאים…",
+      "demoFilled": "נתוני ההדגמה נוספו",
+      "offerEyebrow": "חדשים כאן?",
+      "offerBody": "{title} · {minutes}",
+      "offerStart": "הראו לי",
+      "offerLater": "לא עכשיו",
+      "meRow": "מדריכים",
+      "meRowHint": "הדרכות על החנות, האירועים, ההטבות והמועדון שלכם",
+      "loadFailed": "המדריכים לא נטענו. נסו שוב."
+    },
+    "shop_staff": {
+      "title": "ניהול החנות",
+      "summary": "הוסיפו מוצרים, מכרו באפליקציה ובקופה, ושמרו על מלאי מדויק.",
+      "chapters": {
+        "setup": "הגדרה",
+        "sell": "מכירה",
+        "track": "מעקב"
+      },
+      "welcome": {
+        "title": "החנות של הבוקס",
+        "body": "המנויים מזמינים באפליקציה ואוספים בדלפק. אתם מוכרים גם מהקופה."
+      },
+      "newProduct": {
+        "title": "הוספת מוצר",
+        "body": "לחצו על «{label}»."
+      },
+      "photos": {
+        "title": "תמונות מוכרות",
+        "body": "הוסיפו כמה תמונות ברורות. הראשונה היא תמונת השער."
+      },
+      "price": {
+        "title": "מחיר ואפשרויות",
+        "body": "מחיר אחד, או מידות וטעמים עם מלאי משלהם.",
+        "tip": "המלאי נספר לכל אפשרות, כך ש־«M» ו־«L» אף פעם לא מתבלבלים."
+      },
+      "selling": {
+        "title": "איפה זה נמכר",
+        "body": "באפליקציה, בקופה או בשניהם. למנויים בלבד, או לכולם."
+      },
+      "save": {
+        "title": "שומרים, ואז מפרסמים",
+        "body": "מוצר חדש הוא טיוטה. פרסמו אותו כדי לפתוח את החנות.",
+        "tip": "המנויים רואים את כרטיס החנות ב־Box רק אחרי שמשהו פורסם."
+      },
+      "ordersTab": {
+        "title": "הזמנות",
+        "body": "לחצו על «{label}»."
+      },
+      "orders": {
+        "title": "מכינים, ואז מוסרים",
+        "body": "סמנו הזמנה כמוכנה והמנוי יקבל הודעה איפה לאסוף אותה.",
+        "tip": "הזמנות שלא נאספו מתבטלות לבד אחרי 7 ימים, והמלאי משתחרר."
+      },
+      "pos": {
+        "title": "הקופה בדלפק",
+        "body": "מכירה בדלפק בשניות, בתשלום מיידי או על חשבון המנוי."
+      },
+      "stock": {
+        "title": "מלאי",
+        "body": "כל מכירה, משלוח וספירה נרשמים. מלאי נמוך מתריע לכם."
+      },
+      "analytics": {
+        "title": "מה נמכר",
+        "body": "מכירות שבועיות, רווחיות והמוצרים המובילים שלכם.",
+        "tip": "מכירות החנות מופיעות גם בכספים כמקור הכנסה נפרד."
+      },
+      "done": {
+        "title": "הכול מוכן",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "events_organising": {
+      "title": "ארגון אירועים",
+      "summary": "תכננו ב־7 צעדים קצרים, מכרו מקומות, עשו צ׳ק-אין וראו את המספרים.",
+      "chapters": {
+        "plan": "תכנון",
+        "run": "ניהול"
+      },
+      "welcome": {
+        "title": "אירועים מההתחלה ועד הסוף",
+        "body": "מתכננים, ממלאים, מנהלים ורואים איך היה, הכול במקום אחד."
+      },
+      "new": {
+        "title": "יצירת אירוע",
+        "body": "לחצו על «{label}»."
+      },
+      "steps": {
+        "title": "שבעה צעדים קצרים",
+        "body": "מארח, פרטים בסיסיים, מתי, איפה, למי ומחיר, מקומות, סקירה. לחצו על צעד שהושלם כדי לחזור אליו."
+      },
+      "screen": {
+        "title": "החלטה אחת בכל מסך",
+        "body": "מלאו את זה, ואז הבא.",
+        "tip": "הטיוטה נשמרת במכשיר הזה, כך שאפשר לעצור ולחזור."
+      },
+      "next": {
+        "title": "«הבא» יודע מה חסר",
+        "body": "אם משהו נשאר, הוא יגיד לכם מה."
+      },
+      "cohosts": {
+        "title": "אירוח יחד עם אחרים",
+        "body": "ב־«{label}», בקשו מבוקס או ממאמן לארח יחד לפי כתובת הדף שלהם.",
+        "tip": "אחרי שהם מאשרים, האירוע מופיע בדף שלהם ומגיע למנויים שלהם."
+      },
+      "manage": {
+        "title": "ניהול",
+        "body": "לכל אירוע: משתתפים, צ׳ק-אין, תשלומים בבוקס, החזרים והודעות."
+      },
+      "finances": {
+        "title": "כספים",
+        "body": "לחצו על «{label}»: הכנסות, החזרים ומה עוד לא שולם."
+      },
+      "analytics": {
+        "title": "נתונים",
+        "body": "לחצו על «{label}»: צפיות, הרשמות, רשימת המתנה ומי הגיע.",
+        "tip": "ההמרה מראה כמה מהצופים נרשמו."
+      },
+      "done": {
+        "title": "מוכנים לארח",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "finance_offers": {
+      "title": "מבצעים, שותפים והפניות",
+      "summary": "קמפיינים וקודים, הטבות שותפים ותוכנית «הבא חבר».",
+      "chapters": {
+        "campaigns": "קמפיינים",
+        "partners": "שותפים",
+        "referrals": "הפניות"
+      },
+      "welcome": {
+        "title": "צומחים עם מבצעים",
+        "body": "הקמפיינים והקודים שלכם, הטבות מחנויות שותפות ותגמולים על הבאת חברים."
+      },
+      "campaignNew": {
+        "title": "יצירת קמפיין",
+        "body": "לחצו על «{label}»."
+      },
+      "campaignForm": {
+        "title": "שם ותאריכים",
+        "body": "קמפיין מקבץ את המבצעים שלכם, למשל «קיץ». בחרו מתי הוא פעיל."
+      },
+      "coupons": {
+        "title": "קודים",
+        "body": "פתחו קמפיין כדי להוסיף קודים: הנחה באחוזים או בסכום, עם מגבלת שימוש.",
+        "tip": "ליד כל קוד רואים כמה פעמים השתמשו בו, כך שברור איזה מבצע עובד."
+      },
+      "partners": {
+        "title": "הטבות שותפים",
+        "body": "לחצו על «{label}»."
+      },
+      "perkNew": {
+        "title": "הוספת הטבת שותף",
+        "body": "לחצו על «{label}»."
+      },
+      "perkPartner": {
+        "title": "השותף",
+        "body": "השם, הקישור והלוגו שלו."
+      },
+      "perkBenefit": {
+        "title": "מה המנויים מקבלים",
+        "body": "אחוזים, סכום, או כל דבר אחר, כמו קפה חינם."
+      },
+      "perkMethod": {
+        "title": "איך החנות בודקת",
+        "body": "קוד משותף, קישור עם הקוד בתוכו, או הצגת מנוי פעיל.",
+        "tip": "אם קוד דלף, שנו אותו כאן והשינוי חל מיד."
+      },
+      "perkRules": {
+        "title": "תנאים",
+        "body": "תאריכים, מי מקבל וכמה פעמים. שמרו טיוטה ופרסמו כשסוכם."
+      },
+      "referrals": {
+        "title": "הבא חבר",
+        "body": "תוכנית שמתגמלת מנויים שמביאים מישהו שמצטרף."
+      },
+      "referralsFlow": {
+        "title": "מאשרים ומתגמלים",
+        "body": "ההפניות מגיעות לכאן. אשרו אחת והתגמול יוצא.",
+        "tip": "התגמול יכול ללכת לשניהם: למנוי ולחבר."
+      },
+      "done": {
+        "title": "הכול מוכן",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    },
+    "member_club_event": {
+      "title": "המועדון והאירוע שלכם",
+      "summary": "פתחו קבוצה במועדון של הבוקס ותכננו אירוע, לבד או עם בוקס.",
+      "chapters": {
+        "club": "המועדון שלכם",
+        "event": "האירוע שלכם"
+      },
+      "welcome": {
+        "title": "שיהיה שלכם",
+        "body": "פתחו קבוצה עם האנשים שלכם ותכננו אירועים משלכם."
+      },
+      "channels": {
+        "title": "המועדון של הבוקס",
+        "body": "לחצו על «{label}»."
+      },
+      "groups": {
+        "title": "קבוצות",
+        "body": "מועדונים קטנים בתוך הבוקס: עם צ׳אט ואירועים משלהם."
+      },
+      "propose": {
+        "title": "פתיחת קבוצה",
+        "body": "לחצו על «{label}»."
+      },
+      "groupSheet": {
+        "title": "תנו שם, בחרו מי מצטרף",
+        "body": "פתוחה לכולם, או לפי בקשה.",
+        "tip": "חלק מהבוקסים מאשרים קבוצות חדשות קודם; תקבלו הודעה כשהיא פעילה."
+      },
+      "noBox": {
+        "title": "קבוצות נמצאות בתוך בוקס",
+        "body": "הצטרפו קודם לבוקס, ואז פתחו קבוצה במועדון שלו. אירועים אפשר לתכנן כבר עכשיו."
+      },
+      "eventNew": {
+        "title": "תכנון אירוע",
+        "body": "לחצו על «{label}»."
+      },
+      "hostAs": {
+        "title": "מי מארח",
+        "body": "אתם, או קבוצה או עסק שאתם מנהלים.",
+        "tip": "«{label}» לא צריך בוקס בכלל."
+      },
+      "alone": {
+        "title": "לבד",
+        "body": "פתוח לכל מי שבסביבה, או בהזמנה בלבד עם הקישור שלכם."
+      },
+      "withBox": {
+        "title": "עם בוקס",
+        "body": "ב־«{label}», בקשו מהבוקס לארח יחד לפי כתובת הדף שלו.",
+        "tip": "אחרי שהוא מאשר, האירוע מופיע גם בדף של הבוקס."
+      },
+      "hosting": {
+        "title": "מנהלים את זה",
+        "body": "אחרי הפרסום, ב־«{label}» יש משתתפים, צ׳ק-אין והמספרים."
+      },
+      "done": {
+        "title": "עכשיו תורכם",
+        "body": "אפשר לחזור על זה מתי שרוצים מתוך מדריכים."
+      }
+    }
+  },
+  "CoachClients": {
+    "title": "הלקוחות שלי",
+    "replies": "ממתינים לתשובה",
+    "reviews": "בדיקת טכניקה",
+    "desk": "צ׳ק-אין היום",
+    "clients": "לקוחות",
+    "sentAt": "נשלח {time}",
+    "overdue": "באיחור",
+    "dueSoon": "מועד קרוב",
+    "unknownClient": "חבר/ה",
+    "openVideo": "צפה בסרטון",
+    "checkedIn": "הגיעו {count} מתוך {total}",
+    "attended": "הגיע/ה",
+    "noShow": "לא הגיע/ה",
+    "attendanceOf": "נוכחות של {name}",
+    "markError": "לא נשמר. נסה שוב.",
+    "showAll": "הצג הכול ({count})",
+    "showFewer": "הצג פחות",
+    "moreInConsole": "הכול בממשק הניהול"
   }
 }

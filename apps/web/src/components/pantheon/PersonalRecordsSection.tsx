@@ -3,8 +3,18 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { deletePR, listPRs, type PRRecord } from "@/api/gamification";
+import type { ProgressQuery } from "@/api/account-training";
+import {
+  ALL_PR_HISTORY_KEY,
+  deletePR,
+  listAllPRHistory,
+  listPRs,
+  type PRHistoryEntry,
+  type PRRecord,
+} from "@/api/gamification";
 import { ClientCard, EmptyLine, LoadingLine } from "@/components/client/ClientPage";
+import { localToday } from "@/components/client/consistency";
+import { rangeSince } from "@/components/client/progress";
 import { useSession } from "@/components/session-provider";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
@@ -15,6 +25,7 @@ import { buildPRListDocument } from "@/lib/document-export";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
 import { PantheonCard } from "./PantheonCard";
+import { prMatchesFilter, prTrend } from "./pr-trend";
 import { NewPRFormModal, PRFormModal } from "./PRFormModal";
 import { PRShareFlow } from "./PRShareFlow";
 import { PRShareModal } from "./PRShareModal";
@@ -29,8 +40,11 @@ const SEARCH_FROM = 9;
  * section of Πρόοδος and not a page of its own. Every PR is here: the first
  * six, then the rest in place; add, edit, share, delete and export without
  * leaving; PRs others share with me follow, only when there are some.
+ * Πρόοδος's chips apply (ADR-194): the sources and exercise narrow the list,
+ * and the range sets each card's trend (a lift's estimated 1RM, a
+ * benchmark's score and its «retest» hint), drawn from one history read.
  */
-export function PersonalRecordsSection() {
+export function PersonalRecordsSection({ filter }: { filter: ProgressQuery }) {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   const shareExport = useShareExport();
@@ -58,8 +72,21 @@ export function PersonalRecordsSection() {
   });
 
   const prs = useMemo(() => prsQuery.data ?? [], [prsQuery.data]);
+  const historyQuery = useQuery({
+    queryKey: ALL_PR_HISTORY_KEY,
+    enabled: Boolean(tokens?.access_token) && prs.length > 0,
+    queryFn: () => listAllPRHistory(tokens!.access_token),
+  });
+  const today = localToday();
+  const since = rangeSince(filter.range, today);
+  const historyByPr = useMemo(() => {
+    const byPr = new Map<string, PRHistoryEntry[]>();
+    for (const entry of historyQuery.data ?? []) byPr.set(entry.pr_record_id, [...(byPr.get(entry.pr_record_id) ?? []), entry]);
+    return byPr;
+  }, [historyQuery.data]);
+  const inFilter = prs.filter((pr) => prMatchesFilter(pr, filter));
   const needle = search.trim().toLocaleLowerCase(uiLocale);
-  const matching = needle ? prs.filter((pr) => pr.name.toLocaleLowerCase(uiLocale).includes(needle)) : prs;
+  const matching = needle ? inFilter.filter((pr) => pr.name.toLocaleLowerCase(uiLocale).includes(needle)) : inFilter;
   const shown = expanded || needle ? matching : matching.slice(0, SHOWN);
   const hidden = matching.length - shown.length;
 
@@ -72,7 +99,7 @@ export function PersonalRecordsSection() {
           <button
             type="button"
             onClick={() => setFormPR("new")}
-            className="min-h-9 rounded-full px-3 text-sm font-semibold"
+            className="min-h-11 rounded-full px-3 text-sm font-semibold"
             style={SPARK_CREATE_STYLE}
           >
             {i18n("addPr0a5ecff")}
@@ -98,9 +125,20 @@ export function PersonalRecordsSection() {
             ) : null}
             {shown.length === 0 ? <EmptyLine>{i18n("noPrsMatchYourSearchf6466a7")}</EmptyLine> : null}
             <div className="grid gap-3 sm:grid-cols-2">
-              {shown.map((pr) => (
-                <PantheonCard key={pr.id} pr={pr} compact onEdit={setFormPR} onShare={setSharePR} onDelete={setDeletePr} />
-              ))}
+              {shown.map((pr) => {
+                const history = historyByPr.get(pr.id) ?? [];
+                return (
+                  <PantheonCard
+                    key={pr.id}
+                    pr={pr}
+                    history={history}
+                    trend={prTrend(pr, history, { since, today })}
+                    onEdit={setFormPR}
+                    onShare={setSharePR}
+                    onDelete={setDeletePr}
+                  />
+                );
+              })}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2">
               {hidden > 0 ? (

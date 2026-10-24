@@ -445,7 +445,9 @@ test.describe("Garmin in Πρόοδος and the sync choices", () => {
     await expect(card).toContainText("Average 52 bpm over 4 days");
     await expect(card).toContainText("from Garmin");
     await expect(card).toContainText("not a medical reading");
-    await card.getByRole("button", { name: "1 month" }).click();
+    // ADR-194: the page's one range chip sets the card's period.
+    await page.getByRole("toolbar").getByRole("button", { name: /3 months/ }).click();
+    await page.getByRole("menuitemradio", { name: "4 weeks" }).click();
     await expect(card).toContainText("Average 50 bpm over 3 days");
     expect(ranges).toEqual(["resting_hr:3m", "resting_hr:1m"]);
   });

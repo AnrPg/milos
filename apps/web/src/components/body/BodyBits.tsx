@@ -35,7 +35,7 @@ export function Chip({ selected, onClick, children }: { selected: boolean; onCli
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className="min-h-9 rounded-full px-3 py-1 text-sm font-semibold"
+      className="min-h-11 rounded-full px-3 py-1 text-sm font-semibold"
       style={{
         background: selected ? "var(--primary)" : "var(--panel-raised)",
         color: selected ? "var(--primary-contrast)" : "var(--text)",
@@ -107,7 +107,7 @@ export function IconButton({ label, onClick, children }: { label: string; onClic
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full"
+      className="hit-area inline-flex h-9 w-9 items-center justify-center rounded-full"
       style={{ color: "var(--dim)", border: "1px solid var(--border)", background: "transparent" }}
     >
       {children}

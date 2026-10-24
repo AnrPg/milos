@@ -157,7 +157,7 @@ function PersonHeader({ link, chat }: { link: BuddyLink; chat: boolean }) {
       {chat ? (
         <Link
           href={`/me/buddy/${encodeURIComponent(link.id)}/chat`}
-          className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-bold"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full px-3 text-xs font-bold"
           style={{ border: "1px solid var(--border)", color: "var(--text)" }}
         >
           {t("chat")}

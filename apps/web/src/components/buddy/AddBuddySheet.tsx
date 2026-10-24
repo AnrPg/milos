@@ -185,7 +185,7 @@ function CandidateRow({
           onClick={onInvite}
           disabled={busy}
           aria-label={t("inviteName", { name })}
-          className="min-h-9 shrink-0 rounded-full px-3 text-xs font-bold disabled:opacity-50"
+          className="min-h-11 shrink-0 rounded-full px-3 text-xs font-bold disabled:opacity-50"
           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("invite")}
