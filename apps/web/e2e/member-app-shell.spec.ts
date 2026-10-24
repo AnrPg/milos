@@ -383,7 +383,7 @@ test.describe("member app shell", () => {
 
     // The gym's landing payload doesn't exist without a gym: Progress skips it, no «not found».
     await page.goto("/journal/progress");
-    await expect(page.getByRole("heading", { name: "My progress" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Personal Records" })).toBeVisible();
     await expect(page.getByText("The requested item was not found.")).toHaveCount(0);
   });
 

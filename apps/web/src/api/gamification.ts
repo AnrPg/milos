@@ -159,6 +159,14 @@ export async function getPRHistory(token: string, id: string): Promise<PRHistory
   return data.history;
 }
 
+/** Every superseded score of all my PRs, oldest first (ADR-194): one read for Πρόοδος's trends. */
+export const ALL_PR_HISTORY_KEY = ["prs", "history"] as const;
+
+export async function listAllPRHistory(token: string): Promise<PRHistoryEntry[]> {
+  const data = await apiRequest<{ history: PRHistoryEntry[] }>("/prs/history", { token });
+  return data.history ?? [];
+}
+
 export async function sharePR(token: string, id: string): Promise<{ message: string }> {
   return apiRequest<{ message: string }>(`/prs/${id}/share`, {
     method: "POST",

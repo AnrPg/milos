@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 
 import { HelpIcon, InfoModal } from "@/components/InfoModal";
 import { LoadingLine, QueryProblem } from "@/components/client/ClientPage";
-import { StreakBadges } from "@/components/member-app/progress/StreakBadges";
+import { MilestoneBadges } from "@/components/member-app/progress/MilestoneBadges";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useUiTranslations } from "@/i18n/ui";
 
+const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3"] as const;
+
 /**
- * Πρόοδος's first slots (ADR-137): rest-day banner, streak and badges, then
- * Motivation · Perseverance · Training volume. These were the member landing's
- * hero and stats strip before the four-tab app.
+ * Πρόοδος's gym slots (ADR-137): rest-day banner, badges, then Motivation ·
+ * Perseverance · Training volume. Their windows are the gym's own (10 weeks,
+ * 7 training days), so the page's range does not narrow them. The streak is
+ * in Συνέπεια (ADR-194), and a score still being worked out (no workouts,
+ * no target, «calculating») is no card at all (ANR 2026-10-24).
  */
 export function ProgressOverview() {
   const i18n = useUiTranslations();
   const landing = useLanding();
-  const [activeInfoModal, setActiveInfoModal] = useState<"streak" | "volume" | null>(null);
+  const [explainVolume, setExplainVolume] = useState(false);
 
   if (landing.noGym) return null;
   if (landing.isPending) return <LoadingLine />;
@@ -28,6 +32,45 @@ export function ProgressOverview() {
   const { gamification } = landing.data;
   const stats = gamification.stats;
   const weeklyWorkoutTarget = gamification.settings.weekly_workout_target;
+  const motivation = stats ? Math.round(stats.motivation_score ?? NaN) : NaN;
+  const perseverance = stats ? Math.round(stats.perseverance_score ?? NaN) : NaN;
+
+  const cards: ReactNode[] = [];
+  if (stats && !Number.isNaN(motivation)) {
+    cards.push(
+      <ScoreCard
+        key="motivation"
+        label={i18n("motivationd6a0619")}
+        help={<HelpIcon tooltip={i18n("workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce")} onClick={() => setExplainVolume(true)} />}
+        value={`${motivation}%`}
+        color="var(--success)"
+        caption={i18n("last10WeeksVsTarget153cf63")}
+      />,
+    );
+  }
+  if (stats && !Number.isNaN(perseverance)) {
+    cards.push(
+      <ScoreCard
+        key="perseverance"
+        label={i18n("perseverance3b53f48")}
+        help={<HelpIcon tooltip={i18n("howCloselyYouFollowedPrescribedExercises760e833")} onClick={() => setExplainVolume(true)} />}
+        value={`${perseverance}%`}
+        color="var(--primary)"
+        caption={i18n("last7TrainingDays5c44037")}
+      />,
+    );
+  }
+  if (stats && stats.total_workouts > 0) {
+    cards.push(
+      <ScoreCard
+        key="volume"
+        label={i18n("trainingVolume11e038b")}
+        value={String(stats.total_workouts)}
+        color="var(--text)"
+        caption={`${stats.total_prs > 0 ? `${stats.total_prs} ${i18n("prs80e1569")} ` : ""}${i18n("bestStreak04df811")} ${stats.longest_streak} ${i18n("days5548ae4")}`}
+      />,
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -35,81 +78,11 @@ export function ProgressOverview() {
         offDays={gamification.preferences?.off_days ?? []}
         preferencesSet={gamification.preferences !== null && gamification.preferences !== undefined}
       />
-      <StreakBadges
-        streak={stats?.current_streak ?? 0}
-        advancementCount={stats?.advancement_count ?? 0}
-        badges={gamification.badges}
-        onExplainStreak={() => setActiveInfoModal("streak")}
-      />
-      {stats ? (
-        <section className="grid gap-4 sm:grid-cols-3">
-          <article className="rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("motivationd6a0619")}</p>
-              <HelpIcon tooltip={i18n("workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce")} onClick={() => setActiveInfoModal("volume")} />
-            </div>
-            {isNaN(Math.round(stats.motivation_score ?? NaN)) ? (
-              <p className="mt-3 text-base font-semibold" style={{ color: "var(--dim)" }}>
-                {stats.total_workouts === 0
-                  ? i18n("noWorkoutsYet85a9204")
-                  : weeklyWorkoutTarget === 0
-                    ? i18n("setAWeeklyTargetdd70e51")
-                    : i18n("calculatingc573779")}
-              </p>
-            ) : (
-              <p className="mt-3 text-3xl font-semibold tracking-tight" style={{ color: "var(--success)" }}>
-                {Math.round(stats.motivation_score)}%
-              </p>
-            )}
-            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("last10WeeksVsTarget153cf63")}</p>
-          </article>
+      <MilestoneBadges advancementCount={stats?.advancement_count ?? 0} badges={gamification.badges} />
+      {cards.length > 0 ? <section className={`grid gap-4 ${GRID_COLUMNS[cards.length]}`}>{cards}</section> : null}
 
-          <article className="rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("perseverance3b53f48")}</p>
-              <HelpIcon tooltip={i18n("howCloselyYouFollowedPrescribedExercises760e833")} onClick={() => setActiveInfoModal("volume")} />
-            </div>
-            {isNaN(Math.round(stats.perseverance_score ?? NaN)) ? (
-              <p className="mt-3 text-base font-semibold" style={{ color: "var(--dim)" }}>
-                {stats.total_workouts === 0 ? i18n("noWorkoutsYet85a9204") : i18n("calculatingc573779")}
-              </p>
-            ) : (
-              <p className="mt-3 text-3xl font-semibold tracking-tight" style={{ color: "var(--primary)" }}>
-                {Math.round(stats.perseverance_score)}%
-              </p>
-            )}
-            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("last7TrainingDays5c44037")}</p>
-          </article>
-
-          <article className="rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("trainingVolume11e038b")}</p>
-            <p className="mt-3 text-3xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
-              {stats.total_workouts}
-            </p>
-            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-              {stats.total_prs > 0 ? `${stats.total_prs} ${i18n("prs80e1569")} ` : ""}
-              {i18n("bestStreak04df811")} {stats.longest_streak} {i18n("days5548ae4")}
-            </p>
-          </article>
-        </section>
-      ) : null}
-
-      {activeInfoModal === "streak" ? (
-        <InfoModal title={i18n("currentStreak031c4ed")} onClose={() => setActiveInfoModal(null)}>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("theNumberOfConsecutiveUserRelativeTrainingWeeks23b79ed")} {i18n("workoutCount", { count: weeklyWorkoutTarget })}.
-          </p>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("completeAtLeastfd38f65")} {i18n("workoutCount", { count: weeklyWorkoutTarget })} {i18n("eachTrainingWeekAStreakShieldCanProtecte2b0f06")}
-          </p>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong> {i18n("streaksBuildTheHabitOfRegularWeeklyTraining48e3b44")}
-          </p>
-        </InfoModal>
-      ) : null}
-
-      {activeInfoModal === "volume" ? (
-        <InfoModal title={i18n("consistencyScore4c4624c")} onClose={() => setActiveInfoModal(null)}>
+      {explainVolume ? (
+        <InfoModal title={i18n("consistencyScore4c4624c")} onClose={() => setExplainVolume(false)}>
           <p>
             <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("thePercentageOfWeeksInTheLast12b38b745")} {i18n("workoutCount", { count: weeklyWorkoutTarget })}.
           </p>
@@ -122,6 +95,33 @@ export function ProgressOverview() {
         </InfoModal>
       ) : null}
     </div>
+  );
+}
+
+function ScoreCard({
+  label,
+  help,
+  value,
+  color,
+  caption,
+}: {
+  label: string;
+  help?: ReactNode;
+  value: string;
+  color: string;
+  caption: string;
+}) {
+  return (
+    <article className="rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div className="flex items-center gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{label}</p>
+        {help}
+      </div>
+      <p className="mt-3 text-3xl font-semibold tracking-tight" style={{ color }}>
+        {value}
+      </p>
+      <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>{caption}</p>
+    </article>
   );
 }
 
@@ -156,7 +156,7 @@ function OffDaysBanner({ offDays, preferencesSet }: { offDays: number[]; prefere
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="shrink-0 text-sm font-semibold"
+          className="min-h-11 shrink-0 text-sm font-semibold"
           style={{ color: "var(--dim)" }}
         >
           {i18n("dismiss70afe9e")}
@@ -178,7 +178,7 @@ function OffDaysBanner({ offDays, preferencesSet }: { offDays: number[]; prefere
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        className="shrink-0 text-sm font-semibold"
+        className="min-h-11 shrink-0 text-sm font-semibold"
         style={{ color: "var(--dim)" }}
       >
         {i18n("dismiss70afe9e")}
@@ -186,5 +186,3 @@ function OffDaysBanner({ offDays, preferencesSet }: { offDays: number[]; prefere
     </div>
   );
 }
-
-// ── Member/Athlete hero ───────────────────────────────────────────────────────

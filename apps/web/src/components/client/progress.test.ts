@@ -1,6 +1,30 @@
 import { describe, expect, it } from "vitest";
 
-import { numericScore, scaleWeekly, sourceShares, sparklinePoints } from "@/components/client/progress";
+import {
+  dailyStatsRange,
+  numericScore,
+  rangeSince,
+  scaleWeekly,
+  sourceShares,
+  sparklinePoints,
+} from "@/components/client/progress";
+
+describe("the one Πρόοδος range", () => {
+  it("starts each range where the API does, months clamped to their last day", () => {
+    expect(rangeSince("all", "2026-10-22")).toBeNull();
+    expect(rangeSince("4w", "2026-10-22")).toBe("2026-09-24");
+    expect(rangeSince("12w", "2026-10-22")).toBe("2026-07-30");
+    expect(rangeSince("6m", "2026-08-31")).toBe("2026-02-28");
+    expect(rangeSince("1y", "2028-02-29")).toBe("2027-02-28");
+    expect(rangeSince("6m", "2026-03-15")).toBe("2025-09-15");
+  });
+
+  it("maps the range to the device series that covers it", () => {
+    expect(dailyStatsRange("4w")).toBe("1m");
+    expect(dailyStatsRange("6m")).toBe("6m");
+    expect(dailyStatsRange("all")).toBe("1y");
+  });
+});
 
 describe("progress chart helpers", () => {
   const weekly = [

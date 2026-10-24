@@ -1,23 +1,20 @@
 "use client";
 
 import type { LandingPayload } from "@/api/landing";
-import { HelpIcon } from "@/components/InfoModal";
 import { badgeTier, TIER_ICON } from "@/components/member-app/progress/badges";
-import { useCountUp } from "@/components/member-app/progress/use-count-up";
 import { semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
-/** Streak, advancements and the newest milestone badges (Πρόοδος). */
-export function StreakBadges({
-  streak,
+/**
+ * Advancements and the newest milestone badges (Πρόοδος). The streak lives
+ * once, in Συνέπεια (ADR-194); with nothing earned yet the card is hidden.
+ */
+export function MilestoneBadges({
   advancementCount,
   badges,
-  onExplainStreak,
 }: {
-  streak: number;
   advancementCount: number;
   badges: LandingPayload["gamification"]["badges"];
-  onExplainStreak: () => void;
 }) {
   const i18n = useUiTranslations();
 
@@ -41,37 +38,28 @@ export function StreakBadges({
     return i18n("trainingMilestoneAchieved56dc32b");
   }
 
-  const animatedStreak = useCountUp(streak);
   const tieredBadges = badges.map((b, i) => ({
     ...b,
     tier: badgeTier(b.badge_key),
     description: getBadgeDescription(b.badge_key),
     isNewest: i === 0,
   }));
+  if (advancementCount <= 0 && tieredBadges.length === 0) return null;
 
   return (
-    <section className="rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+    <section
+      aria-label={i18n("clProgressBadges")}
+      className="rounded-3xl p-5"
+      style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+    >
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
-      <div className="flex items-center gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("currentStreak031c4ed")}</p>
-        <HelpIcon tooltip={i18n("currentStreak031c4ed")} onClick={onExplainStreak} />
-      </div>
-      {/* Streak + advancement + badge chips row */}
+      <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("clProgressBadges")}</p>
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        {/* Day streak chip */}
-        <div
-          className="flex items-baseline gap-1.5 rounded-2xl px-4 py-2.5"
-          style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
-        >
-          <span className="text-3xl font-bold tabular-nums">{animatedStreak}</span>
-          <span className="text-sm font-semibold">{i18n("dayStreakca360c4")}</span>
-        </div>
-
         {/* Advancement chip */}
         {advancementCount > 0 && (
           <div
@@ -110,12 +98,6 @@ export function StreakBadges({
             </span>
           </div>
         ))}
-
-        {tieredBadges.length === 0 && (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>
-            {i18n("completeYourFirstWorkoutToEarnYourFirst4d6cd86")}
-          </p>
-        )}
       </div>
     </section>
   );

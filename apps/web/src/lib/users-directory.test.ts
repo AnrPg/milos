@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { AdminUserDirectoryEntry } from "@/api/admin-users";
-import { avatarHue, filterDirectory, initialsOf, roleCounts } from "./users-directory";
+import { avatarTone, filterDirectory, initialsOf, roleCounts } from "./users-directory";
 
 const user = (overrides: Partial<AdminUserDirectoryEntry>): AdminUserDirectoryEntry => ({
   id: "id",
@@ -35,9 +35,10 @@ describe("users directory", () => {
     expect(filterDirectory(users, { ...base, role: "athlete" }).map((entry) => entry.id)).toEqual(["1"]);
   });
 
-  it("builds initials and stable avatar hues", () => {
+  it("builds initials and stable avatar tones", () => {
     expect(initialsOf("maria_papadopoulou")).toBe("MP");
     expect(initialsOf("bob")).toBe("BO");
-    expect(avatarHue("abc")).toBe(avatarHue("abc"));
+    expect(avatarTone("abc")).toBe(avatarTone("abc"));
+    expect(avatarTone("abc")).toMatch(/^var\(--series-[1-8]\)$/);
   });
 });

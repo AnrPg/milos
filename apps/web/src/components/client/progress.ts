@@ -1,6 +1,33 @@
+import type { ProgressRange } from "@/api/account-training";
 import type { ProgressWeek, ScoreHistorySeries } from "@/api/content";
+import type { DailyStatsRange } from "@/api/devices";
 
 export type WeeklyMetric = "sessions" | "minutes";
+
+/**
+ * The first ISO day the Πρόοδος range covers (null for all time), the same
+ * rule as the API's `ProgressFilter.since` (ADR-194: one range for every card).
+ */
+export function rangeSince(range: ProgressRange, today: string): string | null {
+  if (range === "all") return null;
+  const date = new Date(`${today}T00:00:00Z`);
+  if (range === "4w" || range === "12w") {
+    date.setUTCDate(date.getUTCDate() - (range === "4w" ? 28 : 84));
+    return date.toISOString().slice(0, 10);
+  }
+  // Calendar shift that keeps the day within the month (Elixir's Date.shift).
+  const months = range === "6m" ? 6 : 12;
+  const total = date.getUTCFullYear() * 12 + date.getUTCMonth() - months;
+  const year = Math.floor(total / 12);
+  const month = total % 12;
+  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), lastDay))).toISOString().slice(0, 10);
+}
+
+/** The device series that covers the range: daily stats stop at a year. */
+export function dailyStatsRange(range: ProgressRange): DailyStatsRange {
+  return ({ "4w": "1m", "12w": "3m", "6m": "6m", "1y": "1y", all: "1y" } as const)[range];
+}
 
 export type WeeklyBar = {
   week_start: string;

@@ -23,7 +23,8 @@ const TAILWIND_PALETTE =
 
 const RULES: { name: string; pattern: RegExp }[] = [
   { name: "hex colour", pattern: /(?<![\w&])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])/g },
-  { name: "rgb/hsl colour", pattern: /\b(?:rgba?|hsla?|hwb|lab|lch|oklch|oklab)\(\s*[\d.]/g },
+  // A template value (`hsl(${hue} …)`) is a literal colour too, just computed.
+  { name: "rgb/hsl colour", pattern: /\b(?:rgba?|hsla?|hwb|lab|lch|oklch|oklab)\(\s*(?:[\d.]|\$\{)/g },
   { name: "RGB channels", pattern: /\bset(?:Text|Fill|Draw)Color\(\s*\d|\bcolor:\s*\[\s*\d{1,3},/g },
   { name: "named colour", pattern: new RegExp(`(?:["'\`:]\\s*|\\s)(?:${NAMED_COLOURS})(?=["'\`;,)\\s])`, "g") },
   {
