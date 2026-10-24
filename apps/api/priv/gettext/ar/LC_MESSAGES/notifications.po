@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "فترة بعد الظهر وقت مناسب لتعويض شرب الماء."
 
 msgid "Buddy message"
-msgstr "رسالة من رفيقك"
+msgstr "رسالة من رفيق الدعم"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: العافية الأسبوعية"

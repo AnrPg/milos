@@ -461,13 +461,13 @@ msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Ένα νέο στιγμιότυπο σε βοηθά να δεις την τάση σου. Παίρνει ένα λεπτό."
 
 msgid "A buddy invitation"
-msgstr "Πρόσκληση για buddy"
+msgstr "Πρόσκληση για φιλαράκι στήριξης"
 
 msgid "%{nickname} asks you to be their support buddy."
-msgstr "Ο/Η %{nickname} σου ζητά να γίνεις buddy στήριξης."
+msgstr "Ο/Η %{nickname} σου ζητά να γίνεις φιλαράκι στήριξης."
 
 msgid "You have a support buddy"
-msgstr "Έχεις buddy στήριξης"
+msgstr "Έχεις φιλαράκι στήριξης"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
 msgstr "Ο/Η %{nickname} αποδέχτηκε. Θα μαθαίνει μόνο όταν το ζητάς εσύ."
@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."
 
 msgid "Buddy message"
-msgstr "Μήνυμα από buddy"
+msgstr "Μήνυμα από φιλαράκι στήριξης"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: εβδομαδιαία ευεξία"

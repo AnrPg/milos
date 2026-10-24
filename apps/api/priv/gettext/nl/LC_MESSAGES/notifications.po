@@ -461,13 +461,13 @@ msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Een nieuwe momentopname laat je je trend zien. Het kost een minuut."
 
 msgid "A buddy invitation"
-msgstr "Een buddy-uitnodiging"
+msgstr "Een uitnodiging als steunmaatje"
 
 msgid "%{nickname} asks you to be their support buddy."
-msgstr "%{nickname} vraagt je om hun steunbuddy te zijn."
+msgstr "%{nickname} vraagt je om hun steunmaatje te zijn."
 
 msgid "You have a support buddy"
-msgstr "Je hebt een steunbuddy"
+msgstr "Je hebt een steunmaatje"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
 msgstr "%{nickname} heeft geaccepteerd. Ze horen alleen van je als je erom vraagt."
@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "De middag is een goed moment om je water in te halen."
 
 msgid "Buddy message"
-msgstr "Bericht van je buddy"
+msgstr "Bericht van je steunmaatje"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: welzijn van de week"

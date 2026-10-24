@@ -461,13 +461,13 @@ msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Um novo registo ajuda-te a ver a tua tendência. Demora um minuto."
 
 msgid "A buddy invitation"
-msgstr "Um convite de buddy"
+msgstr "Um convite para amigalhaço de apoio"
 
 msgid "%{nickname} asks you to be their support buddy."
-msgstr "%{nickname} pede-te para seres o seu buddy de apoio."
+msgstr "%{nickname} pede-te para seres o seu amigalhaço de apoio."
 
 msgid "You have a support buddy"
-msgstr "Tens um buddy de apoio"
+msgstr "Tens um amigalhaço de apoio"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
 msgstr "%{nickname} aceitou. Só terá notícias tuas quando pedires."
@@ -524,7 +524,7 @@ msgid "The afternoon is a good moment to catch up on water."
 msgstr "A tarde é uma boa altura para pôr a água em dia."
 
 msgid "Buddy message"
-msgstr "Mensagem do buddy"
+msgstr "Mensagem do amigalhaço de apoio"
 
 msgid "%{nickname}: weekly wellness"
 msgstr "%{nickname}: bem-estar semanal"
