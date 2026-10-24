@@ -1,7 +1,7 @@
 defmodule PaleeWeb.Schemas.Around do
   @moduledoc "OpenAPI schemas of Γύρω μου, «Η περιοχή μου» and the gazetteer (ADR-154, ADR-188)."
 
-  alias Palee.Places
+  alias Palee.{Places, Scheduling}
   alias PaleeWeb.Schemas.{Community, CommunityEvents, CommunityGroups}
   alias OpenApiSpex.Schema
 
@@ -42,7 +42,13 @@ defmodule PaleeWeb.Schemas.Around do
         max_price_cents: integer(nullable: true, minimum: 0),
         audiences: strings(),
         languages: list(string(pattern: "^[a-z]{2}$")),
-        amenities: strings()
+        amenities: strings(),
+        levels:
+          list(string(enum: Scheduling.class_levels()))
+          |> Map.put(
+            :description,
+            "Class levels (ADR-197): hosts running a current class type at one of them"
+          )
       },
       []
     )
@@ -70,7 +76,8 @@ defmodule PaleeWeb.Schemas.Around do
       :max_price_cents,
       :audiences,
       :languages,
-      :amenities
+      :amenities,
+      :levels
     ])
   end
 

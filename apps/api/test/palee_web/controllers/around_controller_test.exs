@@ -14,6 +14,7 @@ defmodule PaleeWeb.AroundControllerTest do
   alias Palee.Application.{
     AroundAlerts,
     ClubScope,
+    CreateClassType,
     OpenClubs,
     PublishBoxPublicProfile,
     UpdateBoxPublicProfile
@@ -301,7 +302,12 @@ defmodule PaleeWeb.AroundControllerTest do
       assert names(filtered.(%{max_price_cents: 500}), "events") == ["Open WOD"]
 
       assert %{"errors" => _} =
-               search(ctx, ctx.visitor, %{filter: %{min_price_cents: 2000, max_price_cents: 1000}}, 422)
+               search(
+                 ctx,
+                 ctx.visitor,
+                 %{filter: %{min_price_cents: 2000, max_price_cents: 1000}},
+                 422
+               )
 
       trial = filtered.(%{cost: ["trial"]})
       assert names(trial, "boxes") == ["Beta"]
@@ -316,6 +322,24 @@ defmodule PaleeWeb.AroundControllerTest do
 
       assert %{"errors" => _} =
                search(ctx, ctx.visitor, %{filter: %{disciplines: ["weight_loss"]}}, 422)
+    end
+
+    test "level keeps hosts running a current class type at that level (ADR-197)", ctx do
+      {:ok, _type} =
+        CreateClassType.call(ctx.alpha.context, %{name: "Foundations", level: "beginner"})
+
+      {:ok, _type} =
+        CreateClassType.call(ctx.beta.context, %{name: "Power flow", level: "advanced"})
+
+      filtered = fn filter -> search(ctx, ctx.visitor, %{filter: filter}) end
+
+      beginners = filtered.(%{levels: ["beginner"]})
+      assert beginners["filter"]["levels"] == ["beginner"]
+      assert names(beginners, "boxes") == ["Alpha"]
+      assert names(beginners, "clubs") == ["Alpha runners"]
+      assert names(filtered.(%{levels: ["advanced", "beginner"]}), "boxes") == ["Beta", "Alpha"]
+
+      assert %{"errors" => _} = search(ctx, ctx.visitor, %{filter: %{levels: ["expert"]}}, 422)
     end
 
     test "people with a gym see other boxes collapsed and never their own", ctx do

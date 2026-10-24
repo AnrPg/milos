@@ -26,7 +26,15 @@ export type PartnerGoal = PartnerProfile["goals"][number];
 export type PartnerGender = NonNullable<PartnerProfile["gender"]>;
 export type PartnerGenderPreference = PartnerProfile["gender_preference"];
 export type SwipeDirection = PartnerSwipeResponse["direction"];
-export type PartnerFilters = { time?: PartnerTime | null; level?: PartnerLevel | null; goal?: PartnerGoal | null };
+export type PartnerFilters = {
+  time?: PartnerTime | null;
+  level?: PartnerLevel | null;
+  goal?: PartnerGoal | null;
+  /** A discipline on the partner profile (ADR-197). */
+  discipline?: string | null;
+  /** Open clubs only, between people shown in Γύρω μου (ADR-197). */
+  within_km?: number | null;
+};
 
 export const PARTNERS_KEY = ["my", "partners"] as const;
 export const PARTNER_MATCHES_KEY = [...PARTNERS_KEY, "matches"] as const;
@@ -35,7 +43,17 @@ export const BLOCKS_KEY = ["my", "blocks"] as const;
 
 export const partnersClubKey = (clubId: string) => [...PARTNERS_KEY, "club", clubId] as const;
 export const partnerDeckKey = (clubId: string, filters: PartnerFilters = {}) =>
-  [...PARTNERS_KEY, "club", clubId, "deck", filters.time ?? null, filters.level ?? null, filters.goal ?? null] as const;
+  [
+    ...PARTNERS_KEY,
+    "club",
+    clubId,
+    "deck",
+    filters.time ?? null,
+    filters.level ?? null,
+    filters.goal ?? null,
+    filters.discipline ?? null,
+    filters.within_km ?? null,
+  ] as const;
 export const partnerMessagesKey = (matchId: string) => [...PARTNER_MATCHES_KEY, matchId, "messages"] as const;
 export const partnerSessionsKey = (matchId: string) => [...PARTNER_MATCHES_KEY, matchId, "sessions"] as const;
 
@@ -60,7 +78,13 @@ export async function putPartnerProfile(token: string, clubId: string, body: Par
 
 export function fetchPartnerDeck(token: string, clubId: string, filters: PartnerFilters = {}) {
   return apiRequest<PartnerDeck>(
-    `/me/clubs/${id(clubId)}/partners/deck${query({ time: filters.time, level: filters.level, goal: filters.goal })}`,
+    `/me/clubs/${id(clubId)}/partners/deck${query({
+      time: filters.time,
+      level: filters.level,
+      goal: filters.goal,
+      discipline: filters.discipline,
+      within_km: filters.within_km ? String(filters.within_km) : null,
+    })}`,
     { token },
   );
 }

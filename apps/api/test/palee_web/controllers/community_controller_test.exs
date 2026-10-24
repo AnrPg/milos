@@ -177,6 +177,48 @@ defmodule PaleeWeb.CommunityControllerTest do
     assert %{"posts" => []} = as.(member) |> get("/api/me/feed") |> json_response(200)
   end
 
+  test "the feed narrows to post types and to the gym's coaches (ADR-197)", ctx do
+    %{as: as, base: base, coach: coach, member: member, other: other} = ctx
+    club = club(as, member)
+
+    post = fn user, channel, body ->
+      %{"post" => %{"id" => id}} =
+        as.(user)
+        |> send_json(:post, "#{base}/posts", %{channel_id: channel["id"], body: body})
+        |> json_response(201)
+
+      id
+    end
+
+    notice = post.(coach, channel(club, "announcements"), "Closed on Tuesday")
+    coach_wod = post.(coach, channel(club, "wod"), "Scale the pull-ups")
+    member_wod = post.(member, channel(club, "wod"), "Fran 4:12!")
+
+    ids = fn query ->
+      page = as.(other) |> get("/api/me/feed?" <> query) |> json_response(200)
+      Enum.map(page["pinned"] ++ page["posts"], & &1["id"])
+    end
+
+    assert ids.("") == [member_wod, coach_wod, notice]
+    assert ids.("types[]=announcement") == [notice]
+    assert ids.("coaches_only=true") == [coach_wod, notice]
+    assert ids.("types[]=announcement&coaches_only=true&club_id=#{club["id"]}") == [notice]
+    assert ids.("types[]=pr&types[]=event") == []
+
+    # A pinned announcement is narrowed like the rest.
+    as.(coach)
+    |> send_json(:put, "#{base}/posts/#{notice}/pinned", %{pinned: true})
+    |> json_response(200)
+
+    assert %{"pinned" => [], "posts" => []} =
+             as.(other) |> get("/api/me/feed?types[]=pr&types[]=event") |> json_response(200)
+
+    assert %{"pinned" => [%{"id" => ^notice}], "posts" => [%{"id" => ^coach_wod}]} =
+             as.(other) |> get("/api/me/feed?coaches_only=true") |> json_response(200)
+
+    assert as.(other) |> get("/api/me/feed?types[]=story") |> json_response(422)
+  end
+
   test "attaching a journal entry snapshots it and moves it to posted", ctx do
     %{as: as, base: base, member: member} = ctx
     wod = channel(club(as, member), "wod")

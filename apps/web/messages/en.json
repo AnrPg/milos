@@ -4440,6 +4440,22 @@
     "apiErrorUnknownDemoSection": "There is no demo data for this screen.",
     "ntfBusinessDemoIdleTitle": "Your demo business is waiting for you",
     "ntfBusinessDemoIdleBody": "Nobody has used {business} for a while. If nobody opens it in the next {days} days, its demo data is removed and it is archived. You can reopen it any time.",
+    "clApptFiltersTitle": "Appointment filters",
+    "clApptFilterKind": "Type",
+    "clApptFilterFormat": "Format",
+    "clApptFilterCoach": "Coach",
+    "clApptNoMatch": "Nothing matches these filters.",
+    "reviewsFiltersTitle": "Review filters",
+    "reviewsFilterTarget": "About",
+    "reviewsFilterSentiment": "Feeling",
+    "reviewsNoMatch": "No reviews match these filters.",
+    "workoutsFiltersTitle": "Workout filters",
+    "workoutsFilterStatus": "Status",
+    "workoutsStatusDone": "Done",
+    "workoutsStatusPending": "To do",
+    "workoutsFilterKind": "Type",
+    "workoutsKindPersonal": "Personal",
+    "workoutsFilterSeason": "Season",
     "clProgressOnTargetWeeks": "{onTarget} of {weeks} weeks on target",
     "clProgressStreakDays": "{count, plural, one {# day} other {# days}}",
     "clProgressTarget": "Target {count}/week",
@@ -5565,7 +5581,6 @@
     "wodOptInLink": "Turn on",
     "announcementsEmpty": "No announcements yet.",
     "announcementsOpen": "All announcements",
-    "channelShowAll": "All channels",
     "channelSuggested": "Suggested",
     "channelSuggestedHint": "you often book this class",
     "channelsOfBox": "From the box",
@@ -5592,7 +5607,19 @@
     "more": "More",
     "report": "Report",
     "commentHidden": "Hidden",
-    "channelsOfClub": "Club channels"
+    "channelsOfClub": "Club channels",
+    "postFiltersTitle": "Post filters",
+    "filterClub": "Club",
+    "filterChannel": "Channel",
+    "filterType": "Type",
+    "postType": {
+      "announcement": "Announcements",
+      "pr": "Personal records",
+      "event": "Events"
+    },
+    "filterCoachesOnly": "Coaches only",
+    "filterAuthor": "Author",
+    "postsNoMatch": "No posts match these filters."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filters} other {Filters (#)}}",
@@ -5600,7 +5627,8 @@
     "clear": "Clear",
     "back": "Back",
     "showResults": "{count, plural, =0 {No results} other {Show #}}",
-    "show": "Show"
+    "show": "Show",
+    "all": "All"
   },
   "BoxSchedule": {
     "title": "Schedule",
@@ -6416,7 +6444,10 @@
     "notif_event_cohost_answered_title": "Co-host answer",
     "notif_event_cohost_answered_accepted_body": "{box} is co-hosting «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} declined to co-host «{event}».",
-    "notif_event_cohost_answered_removed_body": "{box} no longer co-hosts «{event}»."
+    "notif_event_cohost_answered_removed_body": "{box} no longer co-hosts «{event}».",
+    "filterKind": "Type",
+    "filterBox": "Box",
+    "findFiltersTitle": "Find filters"
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6691,7 +6722,14 @@
     "err_already_refunded": "This payment has already been refunded.",
     "err_invalid_refund": "Refund an amount above zero and no more than they paid.",
     "err_invalid_cohosts": "Those co-host addresses can't be read. Check each page address.",
-    "err_duplicate_cohost": "The same business is asked twice."
+    "err_duplicate_cohost": "The same business is asked twice.",
+    "filtersTitle": "Event filters",
+    "filterClub": "Club",
+    "filterFree": "Free",
+    "filterPrice": "Price",
+    "filterGoing": "I'm going",
+    "filterMine": "Me",
+    "filtersNoMatch": "No events match these filters."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",
@@ -6996,7 +7034,9 @@
     "dateTo": "To",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Lowest price",
-    "priceTo": "Highest price"
+    "priceTo": "Highest price",
+    "sectionLevel": "Level",
+    "levelHint": "Boxes with classes at this level"
   },
   "CheckIn": {
     "loading": "Loading…",
@@ -8884,7 +8924,6 @@
     "editProfile": "Edit my profile",
     "safetyLine": "Only members of this club. A match needs you both. You can report or block anyone at any time.",
     "filters": "Filters",
-    "filtersCount": "Filters ({count})",
     "swipesLeft": "{count, plural, one {# swipe left today} other {# swipes left today}}",
     "loading": "Loading…",
     "limitReached": "That's enough for today. New people tomorrow.",
@@ -8965,7 +9004,14 @@
     "error_partner_match_read_only": "This conversation has ended.",
     "error_partner_plans_unavailable": "Class plans are only for a gym's own clubs.",
     "error_message_body_required": "Write something first.",
-    "error_cannot_block_self": "You can't block yourself."
+    "error_cannot_block_self": "You can't block yourself.",
+    "disciplineLabel": "Discipline",
+    "disciplinesLabel": "What you'd train together (up to {max})",
+    "allDisciplines": "All disciplines",
+    "fewerDisciplines": "Fewer",
+    "distanceLabel": "Distance",
+    "withinKm": "Within {km} km",
+    "distanceNeedsArea": "To filter by distance, show up in Around me with your area."
   },
   "Squads": {
     "title": "Squads",

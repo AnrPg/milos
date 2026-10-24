@@ -53,6 +53,13 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { PageHeader } from "@/components/PageHeader";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
+import { ListFilters } from "@/components/filters/ListFilters";
+import { distinctOptions, picked } from "@/components/filters/list-filter";
+import { useListFilter } from "@/components/filters/use-remembered-filter";
+
+/** The athlete's own view (vision §7.2 «Workouts»): status, kind and season, remembered on `box_workouts`. */
+const WORKOUTS_SHAPE = { status: "one", kind: "one", season: "many" } as const;
+const workoutStatus = (assignment: AssignedWorkoutRecord) => (assignment.execution_status === "completed" ? "done" : "pending");
 import { Popover } from "@/components/ui/Popover";
 import { DateInput } from "@/components/ui/DateInput";
 
@@ -609,12 +616,22 @@ export function AssignedWorkoutsConsole({
     return generateMonthGrid(refDate);
   }, [refDate, viewMode]);
 
+  const { filter: ownFilter, setFilter: setOwnFilter } = useListFilter("box_workouts", WORKOUTS_SHAPE);
   const filteredAssignments = useMemo(() => {
-    if (!isAdmin || filterAthleteIds.length === 0) return allAssignments;
+    if (!isAdmin) {
+      if (!ownFilter) return allAssignments;
+      return allAssignments.filter(
+        (a) =>
+          picked(ownFilter.status, workoutStatus(a)) &&
+          picked(ownFilter.kind, a.assignment_kind ?? "personal") &&
+          picked(ownFilter.season, a.season?.id),
+      );
+    }
+    if (filterAthleteIds.length === 0) return allAssignments;
     return allAssignments.filter((a) =>
       (a.athlete_ids ?? []).some((id) => filterAthleteIds.includes(id)),
     );
-  }, [allAssignments, filterAthleteIds, isAdmin]);
+  }, [allAssignments, filterAthleteIds, isAdmin, ownFilter]);
 
   const assignmentMap = useMemo(() => {
     const map: Record<string, AssignedWorkoutRecord[]> = {};
@@ -1527,6 +1544,31 @@ export function AssignedWorkoutsConsole({
               {i18n("assignWorkout3e28a99")}
             </button>
           </section>
+        ) : ownFilter ? (
+          <ListFilters
+            shape={WORKOUTS_SHAPE}
+            fields={[
+              {
+                key: "status",
+                label: i18n("workoutsFilterStatus"),
+                options: distinctOptions(allAssignments, workoutStatus, (a) => (workoutStatus(a) === "done" ? i18n("workoutsStatusDone") : i18n("workoutsStatusPending"))),
+              },
+              {
+                key: "kind",
+                label: i18n("workoutsFilterKind"),
+                options: distinctOptions(
+                  allAssignments,
+                  (a) => a.assignment_kind ?? "personal",
+                  (a) => (a.assignment_kind === "class_variant" ? i18n("memberProgrammingYourClassVersion") : i18n("workoutsKindPersonal")),
+                ),
+              },
+              { key: "season", label: i18n("workoutsFilterSeason"), options: distinctOptions(allAssignments, (a) => a.season?.id, (a) => a.season?.title ?? "") },
+            ]}
+            filter={ownFilter}
+            onChange={setOwnFilter}
+            title={i18n("workoutsFiltersTitle")}
+            resultCount={filteredAssignments.length}
+          />
         ) : null}
 
         {error ? (

@@ -4440,6 +4440,22 @@
     "apiErrorUnknownDemoSection": "Для этого экрана нет демо-данных.",
     "ntfBusinessDemoIdleTitle": "Ваш демо-бизнес ждёт вас",
     "ntfBusinessDemoIdleBody": "{business} давно никто не открывал. Если его не откроют в ближайшие {days} дн., демо-данные будут удалены, а бизнес отправится в архив. Его можно снова открыть в любое время.",
+    "clApptFiltersTitle": "Фильтры записей",
+    "clApptFilterKind": "Тип",
+    "clApptFilterFormat": "Формат",
+    "clApptFilterCoach": "Тренер",
+    "clApptNoMatch": "Ничего не найдено по этим фильтрам.",
+    "reviewsFiltersTitle": "Фильтры отзывов",
+    "reviewsFilterTarget": "О чём",
+    "reviewsFilterSentiment": "Впечатление",
+    "reviewsNoMatch": "Нет отзывов по этим фильтрам.",
+    "workoutsFiltersTitle": "Фильтры тренировок",
+    "workoutsFilterStatus": "Статус",
+    "workoutsStatusDone": "Выполнены",
+    "workoutsStatusPending": "Предстоят",
+    "workoutsFilterKind": "Тип",
+    "workoutsKindPersonal": "Личные",
+    "workoutsFilterSeason": "Сезон",
     "clProgressOnTargetWeeks": "{onTarget} из {weeks} недель в цели",
     "clProgressStreakDays": "{count, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
     "clProgressTarget": "Цель {count}/нед.",
@@ -5565,7 +5581,6 @@
     "wodOptInLink": "Включить",
     "announcementsEmpty": "Объявлений пока нет.",
     "announcementsOpen": "Все объявления",
-    "channelShowAll": "Все каналы",
     "channelSuggested": "Рекомендуем",
     "channelSuggestedHint": "вы часто бронируете это занятие",
     "channelsOfBox": "От зала",
@@ -5592,7 +5607,19 @@
     "more": "Ещё",
     "report": "Пожаловаться",
     "commentHidden": "Скрыто",
-    "channelsOfClub": "Каналы клуба"
+    "channelsOfClub": "Каналы клуба",
+    "postFiltersTitle": "Фильтры публикаций",
+    "filterClub": "Клуб",
+    "filterChannel": "Канал",
+    "filterType": "Тип",
+    "postType": {
+      "announcement": "Объявления",
+      "pr": "Личные рекорды",
+      "event": "События"
+    },
+    "filterCoachesOnly": "Только тренеры",
+    "filterAuthor": "Автор",
+    "postsNoMatch": "Нет публикаций по этим фильтрам."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Фильтры} other {Фильтры (#)}}",
@@ -5600,7 +5627,8 @@
     "clear": "Сбросить",
     "back": "Назад",
     "showResults": "{count, plural, =0 {Нет результатов} other {Показать #}}",
-    "show": "Показать"
+    "show": "Показать",
+    "all": "Все"
   },
   "BoxSchedule": {
     "title": "Расписание",
@@ -6416,7 +6444,10 @@
     "notif_event_cohost_answered_title": "Ответ соорганизатора",
     "notif_event_cohost_answered_accepted_body": "{box} теперь соорганизатор «{event}» ({when}).",
     "notif_event_cohost_answered_declined_body": "{box} отказался быть соорганизатором «{event}».",
-    "notif_event_cohost_answered_removed_body": "{box} больше не соорганизатор «{event}»."
+    "notif_event_cohost_answered_removed_body": "{box} больше не соорганизатор «{event}».",
+    "filterKind": "Тип",
+    "filterBox": "Зал",
+    "findFiltersTitle": "Фильтры поиска"
   },
   "CommunityAdmin": {
     "title": "Сообщество",
@@ -6691,7 +6722,14 @@
     "err_already_refunded": "Этот платёж уже возвращён.",
     "err_invalid_refund": "Сумма возврата должна быть больше нуля и не больше оплаченной.",
     "err_invalid_cohosts": "Эти адреса соорганизаторов не читаются. Проверь каждый адрес страницы.",
-    "err_duplicate_cohost": "Один и тот же бизнес приглашён дважды."
+    "err_duplicate_cohost": "Один и тот же бизнес приглашён дважды.",
+    "filtersTitle": "Фильтры событий",
+    "filterClub": "Клуб",
+    "filterFree": "Бесплатно",
+    "filterPrice": "Цена",
+    "filterGoing": "Я иду",
+    "filterMine": "Я",
+    "filtersNoMatch": "Нет событий по этим фильтрам."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Нет предстоящих событий. Создайте через «+ Новое событие».",
@@ -6996,7 +7034,9 @@
     "dateTo": "По",
     "priceOpenEnd": "{price}+",
     "priceFrom": "Минимальная цена",
-    "priceTo": "Максимальная цена"
+    "priceTo": "Максимальная цена",
+    "sectionLevel": "Уровень",
+    "levelHint": "Залы с занятиями этого уровня"
   },
   "CheckIn": {
     "loading": "Загрузка…",
@@ -8884,7 +8924,6 @@
     "editProfile": "Изменить профиль",
     "safetyLine": "Только члены этого клуба. Пара складывается только по взаимному согласию. Пожаловаться или заблокировать можно в любой момент.",
     "filters": "Фильтры",
-    "filtersCount": "Фильтры ({count})",
     "swipesLeft": "{count, plural, one {Сегодня остался # выбор} few {Сегодня осталось # выбора} many {Сегодня осталось # выборов} other {Сегодня осталось # выбора}}",
     "loading": "Загрузка…",
     "limitReached": "На сегодня хватит. Завтра будут новые люди.",
@@ -8965,7 +9004,14 @@
     "error_partner_match_read_only": "Эта переписка завершена.",
     "error_partner_plans_unavailable": "Предлагать занятия можно только в собственных клубах зала.",
     "error_message_body_required": "Сначала напиши что-нибудь.",
-    "error_cannot_block_self": "Нельзя заблокировать себя."
+    "error_cannot_block_self": "Нельзя заблокировать себя.",
+    "disciplineLabel": "Дисциплина",
+    "disciplinesLabel": "Что тренировать вместе (до {max})",
+    "allDisciplines": "Все дисциплины",
+    "fewerDisciplines": "Меньше",
+    "distanceLabel": "Расстояние",
+    "withinKm": "До {km} км",
+    "distanceNeedsArea": "Чтобы фильтровать по расстоянию, покажись в «Рядом» со своим районом."
   },
   "Squads": {
     "title": "Сквады",

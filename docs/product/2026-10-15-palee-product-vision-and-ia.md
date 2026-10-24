@@ -238,6 +238,8 @@ One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` fi
 
 In the Γύρω μου sheet, «Πότε» and «Κόστος» each open with a picker and keep their chips underneath as shortcuts (ANR, 2026-10-24). The pickers and the chips edit one value: a chip replaces what the picker chose and the other way round (picking dates clears today/weekend; «Δωρεάν» or «Έως €15» replaces a hand-picked price range; «Δοκιμαστικό» is independent). A date range is at most 62 days; the price slider's ends mean «no limit». The chip row itself stays «Φίλτρα (n) · Τα αθλήματά μου · Πότε · Δωρεάν».
 
+Every other list uses the same `ListFilters` row + sheet, remembered per surface (ADR-197, 2026-10-24): Find (kind, box), events (club, free, going), videos (tags), appointments (kind, format, coach), my workouts (status, kind, season), reviews (subject, feeling), my posts (club, type). A filter shows only the choices the list actually has, so none is ever empty. «Επίπεδο» in Γύρω μου means the box runs classes at that level, and posts drop out. Partner distance exists only in open clubs, between people shown in Γύρω μου, measured from neighbourhood to neighbourhood.
+
 ### 7.3 Partners (gym buddies) [NEW]
 Why swipe works for people and not for clubs: swipe makes sense when **both sides must agree**, options are many, and the decision is quick. Clubs fail all three. An open club needs no approval, a neighbourhood has 10–20 of them, and joining a gym is not a snap decision. Therefore:
 - Swipe **only among members of the same club** (verified by the gym), with **mutual** match → message → "Κλείστε μαζί 07:00".

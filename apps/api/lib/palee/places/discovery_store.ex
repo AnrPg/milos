@@ -19,4 +19,10 @@ defmodule Palee.Places.DiscoveryStore do
 
   @impl true
   def pins(context, area, plan, limit), do: run(context, :pins, [area, plan, limit])
+
+  @impl true
+  def people_within(_context, [], _radius_m), do: []
+
+  def people_within(context, user_ids, radius_m),
+    do: run(context, :people_within, [user_ids, radius_m])
 end

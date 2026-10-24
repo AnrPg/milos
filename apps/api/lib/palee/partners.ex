@@ -40,14 +40,20 @@ defmodule Palee.Partners do
   def genders, do: ProfilePolicy.genders()
   def gender_preferences, do: ProfilePolicy.gender_preferences()
   def max_goals, do: ProfilePolicy.max_goals()
+  def max_disciplines, do: ProfilePolicy.max_disciplines()
   def about_max, do: ProfilePolicy.about_max()
-  defdelegate normalize_profile(params, current \\ nil), to: ProfilePolicy, as: :normalize
+
+  defdelegate normalize_profile(params, current \\ nil, disciplines \\ []),
+    to: ProfilePolicy,
+    as: :normalize
+
   defdelegate check_activation(profile, active), to: ProfilePolicy
   defdelegate profile_live?(profile), to: ProfilePolicy, as: :live?
 
   # The deck.
   def deck_page_size, do: DeckPolicy.page_size()
   def pass_cooldown_days, do: DeckPolicy.pass_cooldown_days()
+  def distances_km, do: DeckPolicy.distances_km()
   defdelegate deck_filters(params), to: DeckPolicy, as: :filters
   defdelegate swiped_ids(swipes, now), to: DeckPolicy
   defdelegate deck(viewer, candidates, excluded, filters), to: DeckPolicy

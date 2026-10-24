@@ -26,7 +26,7 @@ defmodule Palee.Application.AroundMe do
     PublicBox
   }
 
-  alias Palee.{Community, Facility, Identity, Organizations, Places}
+  alias Palee.{Community, Facility, Identity, Organizations, Places, Scheduling}
 
   @surface "around_me"
 
@@ -35,7 +35,8 @@ defmodule Palee.Application.AroundMe do
     do: %{
       disciplines: Organizations.box_disciplines(),
       audiences: Organizations.box_audiences(),
-      amenities: Organizations.box_amenities()
+      amenities: Organizations.box_amenities(),
+      levels: Scheduling.class_levels()
     }
 
   def search(%{user_id: user_id} = context, body, now \\ DateTime.utc_now()) do

@@ -4440,6 +4440,22 @@
     "apiErrorUnknownDemoSection": "لا توجد بيانات تجريبية لهذه الشاشة.",
     "ntfBusinessDemoIdleTitle": "نشاطك التجريبي بانتظارك",
     "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت.",
+    "clApptFiltersTitle": "تصفية المواعيد",
+    "clApptFilterKind": "النوع",
+    "clApptFilterFormat": "الصيغة",
+    "clApptFilterCoach": "المدرب",
+    "clApptNoMatch": "لا شيء يطابق هذه الفلاتر.",
+    "reviewsFiltersTitle": "تصفية المراجعات",
+    "reviewsFilterTarget": "عن ماذا",
+    "reviewsFilterSentiment": "الانطباع",
+    "reviewsNoMatch": "لا توجد مراجعات تطابق هذه الفلاتر.",
+    "workoutsFiltersTitle": "تصفية التمارين",
+    "workoutsFilterStatus": "الحالة",
+    "workoutsStatusDone": "منجز",
+    "workoutsStatusPending": "قيد الانتظار",
+    "workoutsFilterKind": "النوع",
+    "workoutsKindPersonal": "شخصي",
+    "workoutsFilterSeason": "الموسم",
     "clProgressOnTargetWeeks": "{onTarget} من {weeks} أسابيع ضمن الهدف",
     "clProgressStreakDays": "{count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
     "clProgressTarget": "الهدف {count}/أسبوع",
@@ -5565,7 +5581,6 @@
     "wodOptInLink": "تفعيل",
     "announcementsEmpty": "لا توجد إعلانات بعد.",
     "announcementsOpen": "كل الإعلانات",
-    "channelShowAll": "كل القنوات",
     "channelSuggested": "مقترح",
     "channelSuggestedHint": "تحجز هذه الحصة كثيرًا",
     "channelsOfBox": "من النادي",
@@ -5592,7 +5607,19 @@
     "more": "المزيد",
     "report": "إبلاغ",
     "commentHidden": "مخفي",
-    "channelsOfClub": "قنوات النادي"
+    "channelsOfClub": "قنوات النادي",
+    "postFiltersTitle": "تصفية المنشورات",
+    "filterClub": "النادي",
+    "filterChannel": "القناة",
+    "filterType": "النوع",
+    "postType": {
+      "announcement": "إعلانات",
+      "pr": "أرقام شخصية",
+      "event": "فعاليات"
+    },
+    "filterCoachesOnly": "المدربون فقط",
+    "filterAuthor": "الكاتب",
+    "postsNoMatch": "لا توجد منشورات تطابق هذه الفلاتر."
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {عوامل التصفية} other {عوامل التصفية (#)}}",
@@ -5600,7 +5627,8 @@
     "clear": "مسح",
     "back": "رجوع",
     "showResults": "{count, plural, =0 {لا توجد نتائج} other {عرض #}}",
-    "show": "عرض"
+    "show": "عرض",
+    "all": "الكل"
   },
   "BoxSchedule": {
     "title": "الجدول",
@@ -6416,7 +6444,10 @@
     "notif_event_cohost_answered_title": "رد على الاستضافة المشتركة",
     "notif_event_cohost_answered_accepted_body": "يستضيف {box} «{event}» معك ({when}).",
     "notif_event_cohost_answered_declined_body": "رفض {box} الاستضافة المشتركة لـ «{event}».",
-    "notif_event_cohost_answered_removed_body": "لم يعد {box} يستضيف «{event}» معك."
+    "notif_event_cohost_answered_removed_body": "لم يعد {box} يستضيف «{event}» معك.",
+    "filterKind": "النوع",
+    "filterBox": "النادي الرياضي",
+    "findFiltersTitle": "تصفية النتائج"
   },
   "CommunityAdmin": {
     "title": "المجتمع",
@@ -6691,7 +6722,14 @@
     "err_already_refunded": "تم استرداد هذه الدفعة بالفعل.",
     "err_invalid_refund": "يجب أن يكون المبلغ المسترد أكبر من صفر ولا يتجاوز ما دفعه.",
     "err_invalid_cohosts": "تعذّرت قراءة عناوين المنظمين المشاركين هذه. تحقّق من كل عنوان صفحة.",
-    "err_duplicate_cohost": "طُلب النشاط التجاري نفسه مرتين."
+    "err_duplicate_cohost": "طُلب النشاط التجاري نفسه مرتين.",
+    "filtersTitle": "تصفية الفعاليات",
+    "filterClub": "النادي",
+    "filterFree": "مجاني",
+    "filterPrice": "السعر",
+    "filterGoing": "سأحضر",
+    "filterMine": "أنا",
+    "filtersNoMatch": "لا توجد فعاليات تطابق هذه الفلاتر."
   },
   "EventsAdmin": {
     "emptyUpcoming": "لا فعاليات قادمة. أنشئ واحدة عبر «+ فعالية جديدة».",
@@ -6996,7 +7034,9 @@
     "dateTo": "إلى",
     "priceOpenEnd": "{price}+",
     "priceFrom": "أدنى سعر",
-    "priceTo": "أعلى سعر"
+    "priceTo": "أعلى سعر",
+    "sectionLevel": "المستوى",
+    "levelHint": "نوادٍ لديها حصص بهذا المستوى"
   },
   "CheckIn": {
     "loading": "جارٍ التحميل…",
@@ -8884,7 +8924,6 @@
     "editProfile": "تعديل ملفي",
     "safetyLine": "أعضاء هذا النادي فقط. التوافق يحتاج موافقتكما معًا. يمكنك الإبلاغ أو الحظر في أي وقت.",
     "filters": "عوامل التصفية",
-    "filtersCount": "عوامل التصفية ({count})",
     "swipesLeft": "{count, plural, one {بقي اختيار واحد اليوم} other {بقي # اختيارًا اليوم}}",
     "loading": "جارٍ التحميل…",
     "limitReached": "يكفي لليوم. أشخاص جدد غدًا.",
@@ -8965,7 +9004,14 @@
     "error_partner_match_read_only": "انتهت هذه المحادثة.",
     "error_partner_plans_unavailable": "اقتراح الحصص متاح فقط في أندية النادي الرياضي نفسه.",
     "error_message_body_required": "اكتب شيئًا أولًا.",
-    "error_cannot_block_self": "لا يمكنك حظر نفسك."
+    "error_cannot_block_self": "لا يمكنك حظر نفسك.",
+    "disciplineLabel": "الرياضة",
+    "disciplinesLabel": "ما تريد التدرب عليه معًا (حتى {max})",
+    "allDisciplines": "كل الرياضات",
+    "fewerDisciplines": "عدد أقل",
+    "distanceLabel": "المسافة",
+    "withinKm": "حتى {km} كم",
+    "distanceNeedsArea": "لتصفية حسب المسافة، اظهر في «حولي» مع منطقتك."
   },
   "Squads": {
     "title": "الفرق",

@@ -117,6 +117,7 @@ defmodule PaleeWeb.PartnersControllerTest do
       assert card["shared"] == %{
                "times" => ["early"],
                "goals" => ["strength"],
+               "disciplines" => [],
                "same_level" => true
              }
 
@@ -235,6 +236,104 @@ defmodule PaleeWeb.PartnersControllerTest do
       assert swipe(as, member, club_id, other, "like") |> json_response(404)
     end
   end
+
+  describe "disciplines and distance (ADR-197)" do
+    test "a profile names disciplines and the deck narrows by one", ctx do
+      %{as: as, member: member, other: other, third: third} = ctx
+      club_id = gym_club_id(as, member)
+      opt_in!(as, member, club_id, %{disciplines: ["running", "crossfit"]})
+
+      assert %{"disciplines" => ["running"]} =
+               opt_in!(as, other, club_id, %{disciplines: ["running"]})
+
+      opt_in!(as, third, club_id)
+
+      assert %{
+               "cards" => [
+                 %{"disciplines" => ["running"], "shared" => %{"disciplines" => ["running"]}}
+               ]
+             } =
+               as.(member)
+               |> get("/api/me/clubs/#{club_id}/partners/deck?discipline=running")
+               |> json_response(200)
+
+      assert as.(member)
+             |> send_json(:put, "/api/me/clubs/#{club_id}/partners/profile", %{
+               disciplines: ["knitting"]
+             })
+             |> json_response(422)
+
+      # A gym's club is one place: no distance there.
+      assert %{"distance" => nil, "options" => %{"distances_km" => [2, 5, 10, 25]}} =
+               as.(member) |> get("/api/me/clubs/#{club_id}/partners") |> json_response(200)
+    end
+
+    test "an open club narrows by distance between people who show in Γύρω μου", ctx do
+      %{as: as, admin: admin, member: member, other: other, third: third, staff: staff} = ctx
+
+      %{"club" => %{"id" => open_id}} =
+        as.(admin)
+        |> send_json(:post, "#{staff}/clubs", %{name: "Hill runs", join_policy: "approval"})
+        |> json_response(201)
+
+      for person <- [member, other, third] do
+        as.(person) |> post("/api/me/open-clubs/#{open_id}/membership") |> json_response(200)
+
+        as.(admin)
+        |> send_json(:put, "#{staff}/clubs/#{open_id}/requests/#{person.id}", %{approve: true})
+        |> json_response(200)
+
+        opt_in!(as, person, open_id)
+      end
+
+      assert %{"distance" => "needs_area"} =
+               as.(member) |> get("/api/me/clubs/#{open_id}/partners") |> json_response(200)
+
+      # Without the viewer showing in Γύρω μου the filter does nothing.
+      assert Enum.sort(deck_ids(as, member, open_id, "?within_km=5")) ==
+               Enum.sort([other.id, third.id])
+
+      for {person, slug, visible} <- [
+            {member, "athens-kypseli", true},
+            {other, "athens-patisia", true},
+            {third, "athens-patisia", false}
+          ] do
+        as.(person)
+        |> send_json(:put, "/api/me/around/area", %{neighbourhood_ids: [neighbourhood_id(slug)]})
+        |> json_response(200)
+
+        as.(person)
+        |> send_json(:put, "/api/me/social/around-visibility", %{visible: visible})
+        |> json_response(200)
+      end
+
+      assert %{"distance" => "available"} =
+               as.(member) |> get("/api/me/clubs/#{open_id}/partners") |> json_response(200)
+
+      # Patisia is about 2 km from Kypseli; someone not shown in Γύρω μου never counts as near.
+      assert deck_ids(as, member, open_id, "?within_km=5") == [other.id]
+      assert deck_ids(as, member, open_id, "?within_km=2") == [other.id]
+
+      as.(other)
+      |> send_json(:put, "/api/me/around/area", %{
+        neighbourhood_ids: [neighbourhood_id("athens-glyfada")]
+      })
+      |> json_response(200)
+
+      assert deck_ids(as, member, open_id, "?within_km=10") == []
+      assert deck_ids(as, member, open_id, "?within_km=25") == [other.id]
+
+      assert as.(member)
+             |> get("/api/me/clubs/#{open_id}/partners/deck?within_km=3")
+             |> json_response(422)
+    end
+  end
+
+  defp neighbourhood_id(slug),
+    do:
+      Repo.one!(
+        from(n in "places_neighbourhoods", where: n.slug == ^slug, select: type(n.id, :binary_id))
+      )
 
   describe "who takes part" do
     test "only members of a verified club, and only while the gym has Partners on", ctx do
