@@ -1404,6 +1404,9 @@ defmodule PaleeWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
+    # ADR-199: per-category notification choices (Εγώ › Ρυθμίσεις).
+    get("/notifications/preferences", NotificationPreferenceController, :index)
+    put("/notifications/preferences/:category", NotificationPreferenceController, :update)
     # ADR-171: push to the store apps.
     post("/notifications/native-push-tokens", NotificationController, :create_native_push_token)
 

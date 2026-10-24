@@ -48358,6 +48358,140 @@
         "title": "NeighbourhoodsResponse",
         "type": "object"
       },
+      "NotificationPreference": {
+        "properties": {
+          "audience": {
+            "description": "`staff`: only box staff get these, so only they need the switch.",
+            "enum": [
+              "everyone",
+              "staff"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "description": "A notification category, in the order the switches are shown.",
+            "enum": [
+              "bookings",
+              "messages",
+              "community",
+              "coach",
+              "partners",
+              "journal",
+              "staff",
+              "account"
+            ],
+            "type": "string"
+          },
+          "channels": {
+            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+            "properties": {
+              "email": {
+                "type": "boolean"
+              },
+              "in_app": {
+                "type": "boolean"
+              },
+              "push": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "locked": {
+            "description": "Always delivered (account, security, payments); cannot be changed.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "audience",
+          "category",
+          "channels",
+          "locked"
+        ],
+        "title": "NotificationPreference",
+        "type": "object"
+      },
+      "NotificationPreferenceList": {
+        "properties": {
+          "preferences": {
+            "items": {
+              "properties": {
+                "audience": {
+                  "description": "`staff`: only box staff get these, so only they need the switch.",
+                  "enum": [
+                    "everyone",
+                    "staff"
+                  ],
+                  "type": "string"
+                },
+                "category": {
+                  "description": "A notification category, in the order the switches are shown.",
+                  "enum": [
+                    "bookings",
+                    "messages",
+                    "community",
+                    "coach",
+                    "partners",
+                    "journal",
+                    "staff",
+                    "account"
+                  ],
+                  "type": "string"
+                },
+                "channels": {
+                  "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                  "properties": {
+                    "email": {
+                      "type": "boolean"
+                    },
+                    "in_app": {
+                      "type": "boolean"
+                    },
+                    "push": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "locked": {
+                  "description": "Always delivered (account, security, payments); cannot be changed.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "audience",
+                "category",
+                "channels",
+                "locked"
+              ],
+              "title": "NotificationPreference",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "preferences"
+        ],
+        "title": "NotificationPreferenceList",
+        "type": "object"
+      },
+      "NotificationPreferenceUpdate": {
+        "description": "One or more channels of the category to switch on or off.",
+        "properties": {
+          "email": {
+            "type": "boolean"
+          },
+          "in_app": {
+            "type": "boolean"
+          },
+          "push": {
+            "type": "boolean"
+          }
+        },
+        "title": "NotificationPreferenceUpdate",
+        "type": "object"
+      },
       "NutritionPlan": {
         "nullable": true,
         "properties": {
@@ -134244,6 +134378,229 @@
           }
         ],
         "summary": "Stop push to a store app install of the current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.NotificationPreferenceController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "description": "`staff`: only box staff get these, so only they need the switch.",
+                            "enum": [
+                              "everyone",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "category": {
+                            "description": "A notification category, in the order the switches are shown.",
+                            "enum": [
+                              "bookings",
+                              "messages",
+                              "community",
+                              "coach",
+                              "partners",
+                              "journal",
+                              "staff",
+                              "account"
+                            ],
+                            "type": "string"
+                          },
+                          "channels": {
+                            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                            "properties": {
+                              "email": {
+                                "type": "boolean"
+                              },
+                              "in_app": {
+                                "type": "boolean"
+                              },
+                              "push": {
+                                "type": "boolean"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "locked": {
+                            "description": "Always delivered (account, security, payments); cannot be changed.",
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "category",
+                          "channels",
+                          "locked"
+                        ],
+                        "title": "NotificationPreference",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "NotificationPreferenceList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Notification preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your notification choices, per category and channel",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/preferences/{category}": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.NotificationPreferenceController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "description": "A notification category, in the order the switches are shown.",
+              "enum": [
+                "bookings",
+                "messages",
+                "community",
+                "coach",
+                "partners",
+                "journal",
+                "staff",
+                "account"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "One or more channels of the category to switch on or off.",
+                "properties": {
+                  "email": {
+                    "type": "boolean"
+                  },
+                  "in_app": {
+                    "type": "boolean"
+                  },
+                  "push": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "NotificationPreferenceUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "description": "`staff`: only box staff get these, so only they need the switch.",
+                            "enum": [
+                              "everyone",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "category": {
+                            "description": "A notification category, in the order the switches are shown.",
+                            "enum": [
+                              "bookings",
+                              "messages",
+                              "community",
+                              "coach",
+                              "partners",
+                              "journal",
+                              "staff",
+                              "account"
+                            ],
+                            "type": "string"
+                          },
+                          "channels": {
+                            "description": "Whether the category reaches the person on each channel it has: `in_app` (the bell), `push` (browser and app push; off while `in_app` is off), `email` (no category yet).",
+                            "properties": {
+                              "email": {
+                                "type": "boolean"
+                              },
+                              "in_app": {
+                                "type": "boolean"
+                              },
+                              "push": {
+                                "type": "boolean"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "locked": {
+                            "description": "Always delivered (account, security, payments); cannot be changed.",
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "category",
+                          "channels",
+                          "locked"
+                        ],
+                        "title": "NotificationPreference",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "NotificationPreferenceList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Notification preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Switch channels of one notification category on or off",
         "tags": [
           "Notifications"
         ]

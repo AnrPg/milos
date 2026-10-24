@@ -120,6 +120,9 @@ defmodule Palee.Notifications.Notification do
     timestamps(updated_at: false)
   end
 
+  @doc "Every notification type, as atoms (ADR-199 maps each to a category)."
+  def types, do: @types
+
   def changeset(notification \\ %__MODULE__{}, params) do
     notification
     |> cast(params, [:organization_id, :user_id, :type, :payload, :dedupe_key, :read_at])
