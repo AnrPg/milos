@@ -175,6 +175,26 @@ export function toggleValue<T extends string>(values: readonly T[], value: T): T
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
 
+/** «Δες όλα» (and old `/around/<kind>` links): the «what» filter narrowed to one kind. */
+export function onlyKind(filter: AroundFilter, kind: AroundKind): AroundFilter {
+  return { ...filter, kinds: [kind] };
+}
+
+/** The one kind the filter shows, when it shows exactly one: Γύρω μου then lists it in full. */
+export function singleKind(filter: AroundFilter): AroundKind | null {
+  return filter.kinds.length === 1 ? filter.kinds[0] : null;
+}
+
+/** A kind's string from a link (`?kind=`), when it names one. */
+export function parseKind(value: string | null | undefined): AroundKind | null {
+  return KIND_ORDER.find((kind) => kind === value) ?? null;
+}
+
+/** The link to Γύρω μου with one kind preselected. */
+export function aroundKindHref(kind: AroundKind) {
+  return `/around?kind=${encodeURIComponent(kind)}`;
+}
+
 /** Turning off the last kind is not allowed: the default kinds come back. */
 export function toggleKind(filter: AroundFilter, kind: AroundKind): AroundFilter {
   const next = toggleValue(filter.kinds, kind);

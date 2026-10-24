@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_FILTER,
+  aroundKindHref,
+  onlyKind,
+  parseKind,
+  singleKind,
   activeFilterCount,
   applyChip,
   bboxAround,
@@ -310,5 +314,23 @@ describe("price range above «Κόστος»", () => {
     expect(parseFilter({ min_price_cents: 500 }).min_price_cents).toBe(500);
     expect(parseFilter({ min_price_cents: 0 }).min_price_cents).toBeNull();
     expect(parseFilter({ min_price_cents: 900, max_price_cents: 500 }).min_price_cents).toBeNull();
+  });
+});
+
+describe("one kind («Δες όλα», `?kind=`)", () => {
+  it("narrows «what» to one kind, which Γύρω μου then lists in full", () => {
+    const filter = onlyKind({ ...DEFAULT_FILTER, radius_km: 5 }, "boxes");
+    expect(filter).toMatchObject({ kinds: ["boxes"], radius_km: 5 });
+    expect(singleKind(filter)).toBe("boxes");
+    expect(singleKind(DEFAULT_FILTER)).toBeNull();
+    expect(activeFilterCount(onlyKind(DEFAULT_FILTER, "boxes"))).toBe(1);
+    expect(clearNarrowing(filter).kinds).toEqual(DEFAULT_FILTER.kinds);
+  });
+
+  it("reads only known kinds from a link and builds the link", () => {
+    expect(parseKind("events")).toBe("events");
+    expect(parseKind("people")).toBeNull();
+    expect(parseKind(null)).toBeNull();
+    expect(aroundKindHref("clubs")).toBe("/around?kind=clubs");
   });
 });

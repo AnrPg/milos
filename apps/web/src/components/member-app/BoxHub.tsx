@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import type { OrganizationMembership } from "@/api/organizations";
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { aroundKindHref } from "@/components/around/around";
 import { AnnouncementsCard } from "@/components/community/AnnouncementsCard";
 import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
@@ -104,7 +105,7 @@ function FindABox() {
       <HubCard>
         <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>{t("boxFindTitle")}</h2>
         <p className="mb-4 mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("boxFindBody")}</p>
-        <HubButton href="/around/boxes" primary>{t("boxFindAction")}</HubButton>
+        <HubButton href={aroundKindHref("boxes")} primary>{t("boxFindAction")}</HubButton>
       </HubCard>
     </HubPage>
   );
