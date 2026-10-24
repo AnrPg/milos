@@ -23,9 +23,10 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { Select } from "@/components/ui/Select";
 
-const QUEUE_KEY = ["staff", "form-reviews"] as const;
+export const FORM_REVIEWS_KEY = ["staff", "form-reviews"] as const;
 
-function ReviewForm({ review, onDone }: { review: FormReview; onDone: () => void }) {
+/** The feedback form of one review; Box › «Πελάτες μου» opens it in a dialog (ADR-198). */
+export function ReviewForm({ review, onDone }: { review: FormReview; onDone: () => void }) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
@@ -36,7 +37,7 @@ function ReviewForm({ review, onDone }: { review: FormReview; onDone: () => void
     mutationFn: () => completeFormReview(tokens!.access_token, review.id, feedback.trim()),
     onSuccess: async () => {
       setFeedback("");
-      await queryClient.invalidateQueries({ queryKey: QUEUE_KEY });
+      await queryClient.invalidateQueries({ queryKey: FORM_REVIEWS_KEY });
       onDone();
     },
   });
@@ -88,7 +89,7 @@ export function FormReviewQueue() {
   const filterId = useId();
 
   const query = useQuery({
-    queryKey: [...QUEUE_KEY, status],
+    queryKey: [...FORM_REVIEWS_KEY, status],
     enabled: Boolean(tokens?.access_token),
     queryFn: () => fetchFormReviewQueue(tokens!.access_token, status),
   });

@@ -11154,6 +11154,26 @@
       }
     }
   },
+  "CoachClients": {
+    "title": "Mijn klanten",
+    "replies": "Wachten op antwoord",
+    "reviews": "Techniekbeoordeling",
+    "desk": "Check-in vandaag",
+    "clients": "Klanten",
+    "sentAt": "Verstuurd {time}",
+    "overdue": "Te laat",
+    "dueSoon": "Bijna verlopen",
+    "unknownClient": "Lid",
+    "openVideo": "Bekijk de video",
+    "checkedIn": "{count} van {total} ingecheckt",
+    "attended": "Aanwezig",
+    "noShow": "Niet gekomen",
+    "attendanceOf": "Aanwezigheid van {name}",
+    "markError": "Niet opgeslagen. Probeer het opnieuw.",
+    "showAll": "Alles tonen ({count})",
+    "showFewer": "Minder tonen",
+    "moreInConsole": "Alles in de beheeromgeving"
+  },
   "Inbox": {
     "title": "Berichten",
     "segmentsLabel": "Welke berichten je ziet",

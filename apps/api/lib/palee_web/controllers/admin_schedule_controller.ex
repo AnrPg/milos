@@ -421,9 +421,10 @@ defmodule PaleeWeb.AdminScheduleController do
   )
 
   def record_attendance(conn, params) do
-    slot_id = params["slot_id"]
-    user_id = params["user_id"]
-    admin_id = conn.assigns[:current_user].id
+    slot_id = params["slot_id"] || params[:slot_id]
+    user_id = params["user_id"] || params[:user_id]
+    # ADR-198: the signed-in staff member; no plug assigns `:current_user`.
+    admin_id = Guardian.Plug.current_resource(conn).id
     body = normalize_body_params(conn, params)
 
     with {:ok, attendance} <-

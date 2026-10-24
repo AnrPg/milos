@@ -11154,6 +11154,26 @@
       }
     }
   },
+  "CoachClients": {
+    "title": "I miei clienti",
+    "replies": "In attesa di risposta",
+    "reviews": "Revisione tecnica",
+    "desk": "Check-in di oggi",
+    "clients": "Clienti",
+    "sentAt": "Inviato {time}",
+    "overdue": "In ritardo",
+    "dueSoon": "In scadenza",
+    "unknownClient": "Membro",
+    "openVideo": "Guarda il video",
+    "checkedIn": "{count} su {total} arrivati",
+    "attended": "Presente",
+    "noShow": "Assente",
+    "attendanceOf": "Presenza di {name}",
+    "markError": "Non salvato. Riprova.",
+    "showAll": "Mostra tutti ({count})",
+    "showFewer": "Mostra meno",
+    "moreInConsole": "Vedi tutto nella console"
+  },
   "Inbox": {
     "title": "Messaggi",
     "segmentsLabel": "Quali messaggi mostrare",

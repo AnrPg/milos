@@ -198,9 +198,9 @@ export function remainingBeneficiaryPlaces(limit: unknown, activeBeneficiaries: 
   return Math.max(0, total - 1 - activeBeneficiaries);
 }
 
-/** The chat thread where staff answer a member (same route chat notifications open). */
+/** The thread a coach answers from the reply queue, in the inbox's Coach segment (ADR-196). */
 export function chatThreadHref(threadId: string): string {
-  return `/messages?thread=${encodeURIComponent(threadId)}`;
+  return `/messages?filter=coach&thread=${encodeURIComponent(threadId)}`;
 }
 
 /** Active packages of the corporate type, the only ones a corporate client can use. */
