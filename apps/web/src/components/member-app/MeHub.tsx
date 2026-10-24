@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -16,6 +15,7 @@ import { useBuddies } from "@/components/buddy/use-buddies";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
 import { MeProfile } from "@/components/member-app/me/MeProfile";
 import { useSession } from "@/components/session-provider";
+import { CountsLine } from "@/components/social/SocialBits";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useHasBillingProviders } from "@/lib/billing-providers";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -39,7 +39,6 @@ export function MeHub() {
   const tBody = useTranslations("Body");
   const tFirstRun = useTranslations("FirstRun");
   const tNav = useTranslations("Navigation");
-  const tSocial = useTranslations("Social");
   const tCheckIn = useTranslations("CheckIn");
   const tBuddy = useTranslations("Buddy");
   const tCoach = useTranslations("SoloCoach");
@@ -95,12 +94,9 @@ export function MeHub() {
           <div className="min-w-0">
             <p className="truncate text-xl font-extrabold" style={{ color: "var(--text)" }}>{nickname}</p>
             <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{clubs.join(" · ")}</p>
-            <Link href="/me/connections" className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--text)" }}>
-              {tSocial("countsLine", {
-                followers: summary.data?.followers_count ?? 0,
-                following: summary.data?.following_count ?? 0,
-              })}
-            </Link>
+            <div className="mt-1">
+              <CountsLine groups={summary.data?.follow_groups} mine />
+            </div>
           </div>
         </div>
       </HubCard>

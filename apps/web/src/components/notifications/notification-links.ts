@@ -1,6 +1,7 @@
 import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
 import { seasonNotificationUrl } from "@/components/seasons/season-links";
 import { shopNotificationUrl } from "@/components/shop/shop-links";
+import { socialNotificationUrl } from "@/components/social/social-model";
 import { currentMemberPath } from "@/lib/member-routes";
 
 type LinkableNotification = {
@@ -139,6 +140,9 @@ export function notificationTargetUrl(
   // ADR-190: a shop order notice opens the order in Box › Κατάστημα.
   const shop = shopNotificationUrl(notification.type, notification.payload);
   if (shop) return shop;
+  // ADR-193 §2: a new follower of a public account opens their profile.
+  const social = socialNotificationUrl(notification.type, notification.payload);
+  if (social) return social;
 
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = isStaffRole(role);

@@ -11,6 +11,7 @@ import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { useSession } from "@/components/session-provider";
+import { AccountPrivacySetting } from "@/components/social/AccountPrivacy";
 import { BookingSharingSetting } from "@/components/social/BookingSharing";
 import { MemberVisibilitySetting } from "@/components/social/MemberVisibility";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
@@ -21,7 +22,8 @@ import { useUiTranslations } from "@/i18n/ui";
  * decides who sees what of me, in one place. ADR-139's default visibility for
  * new entries joins this page with the visibility ladder. ADR-160 adds the
  * coach's weekly wellness summary and who opened it; ADR-169 the Partners
- * switch and the people you blocked.
+ * switch and the people you blocked; ADR-193 the private account and the
+ * people-search switches.
  */
 export function SharingPage() {
   const t = useTranslations("MemberApp");
@@ -45,6 +47,9 @@ export function SharingPage() {
         </CollapsibleSection>
         <CollapsibleSection id="bookings" title={tSocial("bookingSharingSectionTitle")} description={tSocial("bookingSharingSectionHint")} defaultOpen>
           <BookingSharingSetting />
+        </CollapsibleSection>
+        <CollapsibleSection id="account-privacy" title={tSocial("privacyTitle")} description={tSocial("privacyHint")} defaultOpen>
+          <AccountPrivacySetting />
         </CollapsibleSection>
         <CollapsibleSection id="members-list" title={tClubs("visibilityTitle")} description={tClubs("visibilityHint")} defaultOpen>
           <MemberVisibilitySetting />

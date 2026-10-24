@@ -37,7 +37,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * leaderboard (trials at other boxes and their follow-up after the greeting,
  * board 6), then the feed of the member's clubs (ADR-138) under the club
  * bar, with ⊕ to post and ♡ for notifications and follow requests. The WOD slot is the selected gym club's #wod-σήμερα
- * card with its leaderboard (ADR-138 D6). «Τα clubs μου | Γύρω μου» switches
+ * card with its leaderboard (ADR-138 D6). «Οι δικοί μου | Γύρω μου» switches
  * to /around (ADR-154) and is remembered.
  *
  * A card with nothing in it is not shown at all (ANR 2026-10-24, vision §4

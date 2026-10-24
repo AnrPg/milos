@@ -44,7 +44,7 @@ import {
 
 /**
  * Αρχική › Γύρω μου (vision §6.2, §7.2; board 9): what is near you by kind,
- * under the same header, club bar and scope toggle as «Τα clubs μου». A
+ * under the same header, club bar and scope toggle as «Οι δικοί μου». A
  * compact map sits above the sections; the chip row and its sheet filter both.
  */
 export function AroundPage() {

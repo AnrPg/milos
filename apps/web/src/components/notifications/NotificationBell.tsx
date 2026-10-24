@@ -30,6 +30,7 @@ import { buddyNotificationText } from "@/components/buddy/buddy-links";
 import { seasonNotificationText } from "@/components/seasons/season-links";
 import { shopNotificationText } from "@/components/shop/shop-links";
 import { passwordResetNotificationText } from "@/components/password-resets/reset-notifications";
+import { socialNotificationText } from "@/components/social/social-model";
 import {
   notificationOrigin,
   type NotificationOrigin,
@@ -86,6 +87,11 @@ function NotificationCard({
   // ADR-187: a password reset request (handlers) and the reset itself (the person).
   function passwordResetText(notification: NotificationRecord, part: "title" | "body") {
     return passwordResetNotificationText(notification.type, notification.payload, part, (key, values) => tResets(key, values));
+  }
+  const tSocial = useTranslations("Social");
+  // ADR-142, ADR-193 §2: a follow request, its acceptance, and a new follower of a public account.
+  function followText(notification: NotificationRecord, part: "title" | "body") {
+    return socialNotificationText(notification.type, notification.payload, part, (key, values) => tSocial(key, values));
   }
   const tBuddy = useTranslations("Buddy");
   const tSeasons = useTranslations("Seasons");
@@ -204,6 +210,8 @@ function NotificationCard({
   function notificationBody(notification: NotificationRecord) {
     const passwordReset = passwordResetText(notification, "body");
     if (passwordReset !== null) return passwordReset;
+    const follow = followText(notification, "body");
+    if (follow !== null) return follow;
     const buddy = buddyText(notification, "body");
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "body");
@@ -479,6 +487,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const passwordReset = passwordResetText(notification, "title");
     if (passwordReset !== null) return passwordReset;
+    const follow = followText(notification, "title");
+    if (follow !== null) return follow;
     const buddy = buddyText(notification, "title");
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "title");
