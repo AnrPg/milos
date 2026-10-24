@@ -67,8 +67,8 @@ function SaveError({ error }: { error: unknown }) {
 export function UnitsSetting() {
   const t = useTranslations("Body");
   const { settings, update, save } = useBodyPrefs();
-  if (!settings.data) return <Pending settings={settings} />;
-  const prefs = settings.data.settings;
+  const prefs = settings.data?.settings;
+  if (!prefs) return <Pending settings={settings} />;
   return (
     <div className="flex flex-col gap-3">
       <div role="radiogroup" aria-label={t("unitsLabel")} className="flex gap-2">
@@ -92,8 +92,8 @@ export function JournalSectionsSetting() {
   const t = useTranslations("Body");
   const goalsT = useTranslations("WodGoals");
   const { settings, update, save } = useBodyPrefs();
-  if (!settings.data) return <Pending settings={settings} />;
-  const prefs = settings.data.settings;
+  const prefs = settings.data?.settings;
+  if (!prefs) return <Pending settings={settings} />;
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("sectionsHint")}</p>
@@ -133,8 +133,8 @@ export function JournalSectionsSetting() {
 export function BodyDefaultVisibilitySetting() {
   const t = useTranslations("Body");
   const { settings, update, save } = useBodyPrefs();
-  if (!settings.data) return <Pending settings={settings} />;
-  const prefs = settings.data.settings;
+  const prefs = settings.data?.settings;
+  if (!prefs) return <Pending settings={settings} />;
   return (
     <div className="flex flex-col gap-2">
       <div role="radiogroup" aria-label={t("defaultVisibilityLabel")} className="flex flex-col gap-2">

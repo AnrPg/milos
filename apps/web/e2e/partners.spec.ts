@@ -247,7 +247,7 @@ test.describe("partners", () => {
     const confirm = page.getByRole("dialog", { name: "Block Dimitra?" });
     await expect(confirm).toContainText("won't be told");
     await confirm.getByRole("button", { name: "Block" }).click();
-    await expect(page).toHaveURL(/\/me\/activity\/chats/);
+    await expect(page).toHaveURL(/\/messages\?filter=partners/);
     expect(blocked).toEqual([{ user_id: "member-3" }]);
   });
 

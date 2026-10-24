@@ -113,8 +113,13 @@ export function SharingPage() {
 function useLegacySectionRedirects() {
   const router = useRouter();
   useEffect(() => {
-    const target = LEGACY_SECTION_TARGETS[window.location.hash];
-    if (target) router.replace(target);
+    const follow = () => {
+      const target = LEGACY_SECTION_TARGETS[window.location.hash];
+      if (target) router.replace(target);
+    };
+    follow();
+    window.addEventListener("hashchange", follow);
+    return () => window.removeEventListener("hashchange", follow);
   }, [router]);
 }
 

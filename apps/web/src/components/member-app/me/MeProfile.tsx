@@ -86,7 +86,7 @@ function PostsGrid() {
   const feed = useFeed(MY_POSTS);
   const pages = feed.data?.pages ?? [];
   const pinned = pages[0]?.pinned ?? [];
-  const posts = [...pinned, ...withoutPinned(pages.flatMap((page) => page.posts), pinned)];
+  const posts = [...pinned, ...withoutPinned(pages.flatMap((page) => page.posts ?? []), pinned)];
 
   if (feed.isPending) return null;
   if (posts.length === 0) return <Note text={t("personPostsEmpty")} />;
