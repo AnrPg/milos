@@ -130,11 +130,11 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 
 | Tab | Answers | Landing content |
 |---|---|---|
-| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · ✈ messages (notifications: the bar's bell). Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Τα clubs μου \| Γύρω μου**. Feed. |
+| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · ✈ messages (notifications: the bar's bell). Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Οι δικοί μου \| Γύρω μου**. Feed. |
 | **Box** | "Where and with whom do I train?" | Today's workout card (**Καταγραφή / Έναρξη ▶**), next booking (+ QR check-in), actions (Πρόγραμμα · Ραντεβού · Βίντεο · Coach), membership, announcements. |
 | **Journal** | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
 | 🔔 **Ειδοποιήσεις** | "What needs me?" | Not a tab: opens the inbox over the current screen; unread badge. |
-| **Εγώ** (Me, the avatar) | "How others see me + my settings" | Public profile (Αναρτήσεις · PRs · Clubs) + a list: Φέρε φίλο, Buddy, Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
+| **Εγώ** (Me, the avatar) | "How others see me + my settings" | Public profile (Αναρτήσεις · PRs · Clubs) + a list: Φέρε φίλο, Φιλαράκι στήριξης (Check-in buddy), Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
 
 Messages live top-right in the Feed. `Box › Coach` opens the same inbox filtered to the coach. Alternatives considered: 3 tabs with an avatar; 5 tabs with Clubs; 5 tabs with Messages. Revisit **5 tabs with Clubs** only if the average member is in ≥3 clubs and events become a core use.
 
@@ -166,7 +166,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 
 Εγώ
 ├─ Profile tabs: Αναρτήσεις · PRs (shared) · Clubs
-├─ Φέρε φίλο · Buddy για στήριξη · Τα box και τα clubs μου
+├─ Φέρε φίλο · Φιλαράκι στήριξης · Τα box και τα clubs μου
 ├─ Κοινοποίηση & ορατότητα · Συνδεδεμένες συσκευές (+ Wallet, ICS)
 └─ Πληρωμές & αποδείξεις · Ρυθμίσεις · Βοήθεια & ξενάγηση · (staff) Διαχείριση → web console
 ```
@@ -197,7 +197,7 @@ Legend: **[EXISTS]** reuse as-is, only needs a new home · **[PARTIAL]** data/ba
 ### 7.1 Feed & clubs [NEW]
 - **Club bar** at the top of the feed (stories position). Tapping opens the club page.
 - **Every post shows its origin**: `Box Κυψέλη › #wod-σήμερα`.
-- **Scope toggle** (Twitter-like): `Τα clubs μου` (default; clubs + follows) | `Γύρω μου` (**local**, not global). Remember the last choice.
+- **Scope toggle** (Twitter-like): `Οι δικοί μου` / "My people" (default; clubs + people you follow, Φιλαράκια included, + boxes you follow; renamed from «Τα clubs μου», ANR 2026-10-24) | `Γύρω μου` (**local**, not global). Newest first, never ranked. Remember the last choice.
 - **Post format** (Instagram-like): optional media, text, **optional workout attachment from the journal**. Text-only posts allowed (announcements, questions).
 - **Audience picker** on compose: club › channel | followers | public.
 - **Club page (member):** `Ροή` (pinned announcement → WOD card with leaderboard → challenges → PR celebrations (opt-in) → events → member posts), `Κανάλια`, `Events`, `Μέλη` (coaches, members, Partners).
@@ -216,6 +216,13 @@ Legend: **[EXISTS]** reuse as-is, only needs a new home · **[PARTIAL]** data/ba
 | Open club (Saturday Run) | Staff only (represents the business) | All in club | Anyone, including non-members |
 
 Owner setting for member groups: **Όχι · Με έγκριση (default) · Ελεύθερα**. Moderation by creator + staff (report, archive). Auto-archive member groups after 60 days of inactivity.
+
+### 7.1a Buddies, private accounts, messages and people search [NEW] (ANR 2026-10-24, ADR-193)
+- **One concept: following.** People you follow who follow you back are **Buddies** (el «Φιλαράκια», de Kumpels, es Colegas, fr Potes, it Amiconi, nl Maatjes, pt Amigalhaços, ru Приятели, bg Приятелчета, ar رفاق, he החבר'ה). Derived, never managed separately; unfollowing ends it.
+- **Counts line** under the name (Εγώ and every profile), Buddies first, three groups that never overlap: «35 Φιλαράκια · 85 σε ακολουθούν · 45 ακολουθείς» ("follow you" = not followed back; "you follow" = not following you back, requests included). Each part opens the matching Connections tab: Φιλαράκια · Σε ακολουθούν · Ακολουθείς · Boxes · Clubs · PRs. A «Buddy» badge on profiles and rows.
+- **Private by default.** `Κοινοποίηση & ορατότητα › Ιδιωτικός λογαριασμός` (on): a follow is a request. Off: people follow at once, and turning it off accepts waiting requests. `Εμφάνιση στην αναζήτηση` (on).
+- **Messages between people** need no shared gym. Buddies, people in a shared gym/open club, and people who follow you reach your inbox; anyone else lands in **Αιτήματα μηνυμάτων** (accept, reply or decline; a decline is silent). Blocks apply everywhere. A «Μήνυμα» button on every profile. The gym's own threads (box, coach, class) stay separate (Club ≠ Box). They show together in the one inbox (✈).
+- **People search** across Palee by @handle or name: shared clubs first, then Buddies, follows, public people nearby, then anyone public. Private people, or people who turned search off, show only to people they already know.
 
 ### 7.2 Γύρω μου & filters [NEW / PARTIAL]
 One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` first**, which opens a sheet. Filters are remembered. Combinations can be saved ("ΣΚ κοντά").
@@ -296,8 +303,8 @@ Coach notes about an athlete (`/staff/clients/{id}/coach-notes`, read-audited) s
 
 Show correlations only after enough data (e.g. ≥4 weeks), and always as **indicators, not medical advice.**
 
-### 7.8 Buddy για στήριξη [NEW]
-One or two trusted people (a partner, friend, or the coach), set in `Εγώ › Buddy`, with mutual acceptance. They receive **only what the user explicitly sends** via "Χρειάζομαι στήριξη" (nothing automatic). Notification with quick replies ("Είμαι εδώ", "Πάμε βόλτα;", "Πάρε με τηλέφωνο"). Optionally a weekly summary with counts only. Either side can leave at any time. The coach can get a **weekly summary** only with permission.
+### 7.8 Check-in buddy · «Φιλαράκι στήριξης» [NEW]
+Renamed from «Buddy για στήριξη» (ANR 2026-10-24), because Buddies («Φιλαράκια») now means mutual follows (§7.1a). One or two trusted people (a partner, friend, or the coach), set in `Εγώ › Φιλαράκι στήριξης`, with mutual acceptance. They receive **only what the user explicitly sends** via "Χρειάζομαι στήριξη" (nothing automatic). Notification with quick replies ("Είμαι εδώ", "Πάμε βόλτα;", "Πάρε με τηλέφωνο"). Optionally a weekly summary with counts only. Either side can leave at any time. The coach can get a **weekly summary** only with permission.
 
 ### 7.9 Referral for members [PARTIAL]
 Today the backend has admin-only referral programs, referral events and rewards with statuses (`/admin/finance/referral-programs|referrals|referral-rewards`). Build the member side:
@@ -318,7 +325,7 @@ Today the backend has admin-only referral programs, referral events and rewards 
 ### 7.11 Εγώ [EXISTS + NEW]
 Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list:
 - **Φέρε φίλο**
-- **Buddy**
+- **Φιλαράκι στήριξης** (Check-in buddy, §7.8)
 - **Τα box και τα clubs μου:** providers, per-club notification level, join by code/link.
 - **Κοινοποίηση & ορατότητα:** what the coach sees, leaderboards/PR celebrations/challenges/partners opt-ins, PR share grants, default visibility for new entries.
 - **Συνδεδεμένες συσκευές:** Garmin; Apple Health and Health Connect marked as coming with native; Wallet pass; ICS feed.
