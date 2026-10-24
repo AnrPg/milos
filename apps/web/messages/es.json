@@ -11130,5 +11130,25 @@
         "body": "Repítelo cuando quieras desde Guías."
       }
     }
+  },
+  "CoachClients": {
+    "title": "Mis clientes",
+    "replies": "Esperan tu respuesta",
+    "reviews": "Revisión de técnica",
+    "desk": "Check-in de hoy",
+    "clients": "Clientes",
+    "sentAt": "Enviado {time}",
+    "overdue": "Vencido",
+    "dueSoon": "Vence pronto",
+    "unknownClient": "Miembro",
+    "openVideo": "Ver el vídeo",
+    "checkedIn": "{count} de {total} han llegado",
+    "attended": "Vino",
+    "noShow": "No vino",
+    "attendanceOf": "Asistencia de {name}",
+    "markError": "No se guardó. Inténtalo de nuevo.",
+    "showAll": "Ver todos ({count})",
+    "showFewer": "Ver menos",
+    "moreInConsole": "Ver todo en la consola"
   }
 }

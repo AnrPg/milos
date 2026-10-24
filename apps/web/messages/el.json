@@ -11130,5 +11130,25 @@
         "body": "Δες το ξανά όποτε θες από τους Οδηγούς."
       }
     }
+  },
+  "CoachClients": {
+    "title": "Πελάτες μου",
+    "replies": "Περιμένουν απάντηση",
+    "reviews": "Αξιολόγηση τεχνικής",
+    "desk": "Check-in σήμερα",
+    "clients": "Πελάτες",
+    "sentAt": "Στάλθηκε {time}",
+    "overdue": "Εκπρόθεσμο",
+    "dueSoon": "Λήγει σύντομα",
+    "unknownClient": "Μέλος",
+    "openVideo": "Δες το βίντεο",
+    "checkedIn": "Ήρθαν {count} από {total}",
+    "attended": "Ήρθε",
+    "noShow": "Δεν ήρθε",
+    "attendanceOf": "Παρουσία: {name}",
+    "markError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+    "showAll": "Όλοι ({count})",
+    "showFewer": "Λιγότεροι",
+    "moreInConsole": "Όλα στη Διαχείριση"
   }
 }

@@ -99,6 +99,78 @@ defmodule PaleeWeb.ScheduleControllerTest do
     end)
   end
 
+  test "ADR-198: staff read each booking's attendance on the roster, members never do", %{
+    conn: conn
+  } do
+    admin = admin_fixture(%{nickname: "roster_admin"})
+    member = user_fixture(%{nickname: "roster_member"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(member)
+    workout = workout_fixture(admin)
+    class_type = class_type_fixture(%{name: "Roster Class"})
+    slug = Organizations.legacy_organization_slug()
+    admin_conn = put_bearer_token(conn, admin)
+    member_conn = put_bearer_token(conn, member)
+
+    slot =
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/org/#{slug}/admin/schedule/slots",
+        Jason.encode!(%{
+          master_workout_id: workout.id,
+          class_type_id: class_type.id,
+          scheduled_at:
+            DateTime.add(DateTime.utc_now(), 3600, :second) |> DateTime.truncate(:second),
+          capacity: 8,
+          auto_approve: true,
+          booking_timeout_minutes: 30
+        })
+      )
+      |> json_response(201)
+      |> Map.fetch!("slot")
+
+    member_conn
+    |> recycle()
+    |> put_req_header("content-type", "application/json")
+    |> post("/api/org/#{slug}/bookings", Jason.encode!(%{slot_id: slot["id"]}))
+    |> json_response(201)
+
+    schedule_slot = fn user_conn ->
+      user_conn
+      |> recycle()
+      |> get("/api/org/#{slug}/schedule?start_date=#{gym_today()}&days=7")
+      |> json_response(200)
+      |> Map.fetch!("slots")
+      |> Enum.find(&(&1["id"] == slot["id"]))
+    end
+
+    roster_entry = fn ->
+      admin_conn
+      |> schedule_slot.()
+      |> Map.fetch!("bookings")
+      |> Enum.find(&(&1["user_id"] == member.id))
+    end
+
+    assert roster_entry.()["attendance_status"] == nil
+
+    admin_conn
+    |> recycle()
+    |> put_req_header("content-type", "application/json")
+    |> post(
+      "/api/org/#{slug}/admin/schedule/slots/#{slot["id"]}/attendance/#{member.id}",
+      Jason.encode!(%{status: "attended"})
+    )
+    |> json_response(200)
+
+    assert roster_entry.()["attendance_status"] == "attended"
+
+    member_slot = schedule_slot.(member_conn)
+    assert member_slot["bookings"] == []
+    assert member_slot["current_user_booking"]["attendance_status"] == "attended"
+  end
+
   test "admin can delete an empty slot", %{conn: conn} do
     admin = admin_fixture(%{nickname: "slot_admin"})
     {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)

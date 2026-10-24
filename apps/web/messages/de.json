@@ -11130,5 +11130,25 @@
         "body": "Wiederhole das jederzeit unter Anleitungen."
       }
     }
+  },
+  "CoachClients": {
+    "title": "Meine Kunden",
+    "replies": "Warten auf Antwort",
+    "reviews": "Technik-Feedback",
+    "desk": "Check-in heute",
+    "clients": "Kunden",
+    "sentAt": "Gesendet {time}",
+    "overdue": "Überfällig",
+    "dueSoon": "Bald fällig",
+    "unknownClient": "Mitglied",
+    "openVideo": "Video ansehen",
+    "checkedIn": "{count} von {total} eingecheckt",
+    "attended": "Da",
+    "noShow": "Nicht erschienen",
+    "attendanceOf": "Anwesenheit von {name}",
+    "markError": "Nicht gespeichert. Bitte erneut versuchen.",
+    "showAll": "Alle anzeigen ({count})",
+    "showFewer": "Weniger anzeigen",
+    "moreInConsole": "Alle in der Verwaltung"
   }
 }

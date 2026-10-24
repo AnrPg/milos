@@ -333,6 +333,8 @@ Today the backend has admin-only referral programs, referral events and rewards 
 
 **Coach role in the same app:** `Box › Πελάτες μου` (reply queue, form-review queue, programming, coach notes, nutrition editor, class-timer control, check-in desk). The full admin stays in the web console (finance, users, schedule, workout library, challenges, content, metrics/reports, inventory, cleaning, settings), entered from `Εγώ › Διαχείριση`.
 
+*Decision (ADR-198, 2026-10-24) [PARTIAL]:* `Πελάτες μου` is a Box extension shown only to someone with the coach role at the selected provider (a solo coach is owner and coach). It has four parts, each hidden when empty, and the whole section is hidden when all are empty. **Περιμένουν απάντηση**: each row opens the thread. **Αξιολόγηση τεχνικής**: a sheet with the video and the console's own feedback form. **Check-in σήμερα**: today's classes and sessions the coach leads, with «Ήρθε / Δεν ήρθε» per person. The staff roster now carries each booking's attendance. **Πελάτες**: chips that open the client's console profile, which stays the client's one home. Programming, coach notes, nutrition and the class timer stay in the console for now.
+
 ### 7.11 Εγώ [EXISTS + NEW]
 Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list:
 - **Φέρε φίλο**
