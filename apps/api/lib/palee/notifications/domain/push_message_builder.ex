@@ -198,7 +198,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Message from %{nickname}", %{nickname: nickname}),
       body: localize.("%{nickname} sent you a message.", %{nickname: nickname}),
-      url: payload["url"] || "/me/messages"
+      url: payload["url"] || "/messages"
     }
   end
 
@@ -209,7 +209,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
         localize.("%{nickname} wants to send you a message.", %{
           nickname: payload["nickname"] || ""
         }),
-      url: payload["url"] || "/me/messages?folder=requests"
+      url: payload["url"] || "/messages?folder=requests"
     }
   end
 

@@ -260,7 +260,7 @@ defmodule Palee.Notifications do
         author_id: field(payload, :author_id),
         nickname: field(payload, :author_nickname),
         dedupe_key: field(payload, :dedupe_key),
-        url: "/me/messages/#{field(payload, :conversation_id)}"
+        url: "/messages/#{field(payload, :conversation_id)}"
       })
 
   def process_event("message_request", payload),
@@ -270,7 +270,7 @@ defmodule Palee.Notifications do
         author_id: field(payload, :author_id),
         nickname: field(payload, :author_nickname),
         dedupe_key: "message_request:#{field(payload, :conversation_id)}",
-        url: "/me/messages?folder=requests"
+        url: "/messages?folder=requests"
       })
 
   def process_event("follow_accepted", payload),
