@@ -5369,9 +5369,6 @@
         "noPortions": "Het plan van je coach heeft nog geen dagporties."
       },
       "mood": {
-        "mood": "Stemming {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Hoe voel je je?",
         "open": "Beantwoord «Hoe voel ik me»"
       },
       "craving": {

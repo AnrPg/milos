@@ -146,6 +146,29 @@ test.describe("Ευεξία", () => {
     await expect(page.getByRole("button", { name: "+1 glass" })).toBeVisible();
   });
 
+  test("mood and stress are one tap each in «Σήμερα»; the injury form opens from a button", async ({ page }) => {
+    await common(page, () => overview({}));
+    const answers: unknown[] = [];
+    await page.route("**/api/wellbeing/check-ins", (route) => {
+      answers.push(bodyOf(route.request()).answers);
+      return route.fulfill(json({ check_in: { id: `c-${answers.length}`, recorded_at: new Date().toISOString(), answers: [] } }, 201));
+    });
+
+    await page.goto("/journal/wellbeing");
+    const tiles = page.getByTestId("wellness-tiles");
+    await tiles.getByRole("group", { name: "How is your mood?" }).getByRole("button", { name: "Good" }).click();
+    await expect.poll(() => answers).toEqual([[{ question_key: "mood", value: 3 }]]);
+    await tiles.getByRole("group", { name: "How much stress do you have?" }).getByRole("button", { name: "A little" }).click();
+    await expect.poll(() => answers).toHaveLength(2);
+    expect(answers[1]).toEqual([{ question_key: "stress", value: 3 }]);
+
+    // ADR-194: no second page title under the Journal's, and the injury form waits for a tap.
+    await expect(page.getByRole("heading", { name: "My wellbeing" })).toHaveCount(0);
+    await expect(page.getByPlaceholder(/Body area/)).toHaveCount(0);
+    await page.getByRole("button", { name: "Report injury" }).click();
+    await expect(page.getByRole("dialog", { name: "Report injury" }).getByPlaceholder(/Body area/)).toBeVisible();
+  });
+
   test("one tap adds a glass and the toast can undo it", async ({ page }) => {
     let waterMl = 500;
     await common(page, () => overview({ waterMl }));

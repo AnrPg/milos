@@ -16,6 +16,9 @@ import {
   type WellnessItem,
   type WellnessOverview,
 } from "@/api/wellness";
+import { submitCheckIn } from "@/api/wellbeing";
+import { CHECK_IN_FACES, CHECK_IN_VALUES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
+import { prGymSlugForSubmit, usePRGymOptions } from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -198,7 +201,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
         onToggleNumbers={() => setShowNumbers(!showNumbers)}
       />
     ) : null,
-    mood: <MoodTile mood={summary?.mood ?? null} />,
+    mood: <MoodTile mood={summary?.mood ?? null} isToday={day === today} />,
   };
 
   return (
@@ -227,7 +230,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
         <ul className="grid grid-cols-2 gap-3" data-testid="wellness-tiles">
           {items.map((item) =>
             tiles[item] ? (
-              <li key={item} className={item === "meals" || item === "plan" ? "col-span-2" : undefined}>
+              <li key={item} className={item === "meals" || item === "plan" || item === "mood" ? "col-span-2" : undefined}>
                 {tiles[item]}
               </li>
             ) : null,
@@ -626,19 +629,83 @@ function PlanTile({
   );
 }
 
-function MoodTile({ mood }: { mood: WellnessDay["mood"] | null }) {
-  const t = useTranslations("MemberApp.wellness");
-  const parts = [
-    typeof mood?.mood === "number" ? t("mood.mood", { value: mood.mood }) : null,
-    typeof mood?.stress === "number" ? t("mood.stress", { value: mood.stress }) : null,
-  ].filter(Boolean);
+const ONE_TAP_QUESTIONS = ["mood", "stress"] as const;
+
+/**
+ * Πώς νιώθω inside «Σήμερα» (ADR-194, mockup `wellness`): mood and stress
+ * are one tap each, saved as a Πώς νιώθω answer; the full form (sleep,
+ * energy, body, notes) stays below. Past days are read-only: a check-in is
+ * stamped with the moment it is given.
+ */
+function MoodTile({ mood, isToday }: { mood: WellnessDay["mood"] | null; isToday: boolean }) {
+  const tw = useTranslations("MemberApp.wellness");
+  const t = useTranslations("MemberApp.checkIn");
+  const { tokens } = useSession();
+  const queryClient = useQueryClient();
+  const { defaultGymSlug } = usePRGymOptions();
+  const answer = useMutation({
+    mutationFn: ({ key, value }: { key: (typeof ONE_TAP_QUESTIONS)[number]; value: CheckInValue }) =>
+      submitCheckIn(tokens!.access_token, {
+        answers: [{ question_key: key, value }],
+        organization_slug: prGymSlugForSubmit(defaultGymSlug),
+        recorded_tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: WELLNESS_KEY });
+      void queryClient.invalidateQueries({ queryKey: ["my", "wellbeing", "check-ins"] });
+    },
+  });
+  const current = (key: (typeof ONE_TAP_QUESTIONS)[number]) =>
+    answer.isPending && answer.variables.key === key ? answer.variables.value : mood?.[key];
+
   return (
-    <Tile
-      label={t("item.mood")}
-      color="var(--warning)"
-      value={parts.length ? parts.join(" · ") : t("mood.empty")}
-      detail={<a href="#check-in" style={{ color: "var(--primary)" }}>{t("mood.open")}</a>}
-    />
+    <div className="flex flex-col gap-3 rounded-2xl p-4" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
+      <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--warning)" }}>{tw("item.mood")}</span>
+      {ONE_TAP_QUESTIONS.map((key) => {
+        const value = current(key);
+        return (
+          <div key={key} role="group" aria-label={t(`question.${key}`)} className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm font-bold" style={{ color: "var(--text)" }}>
+              {t(`short.${key}`)}
+              {typeof value === "number" ? (
+                <span className="ms-2 text-xs font-normal" style={{ color: "var(--dim)" }}>{t(`answer.${key}.${value}`)}</span>
+              ) : null}
+            </span>
+            {isToday ? (
+              <span className="flex gap-1">
+                {CHECK_IN_VALUES.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={value === option}
+                    aria-label={t(`answer.${key}.${option}`)}
+                    disabled={answer.isPending}
+                    onClick={() => answer.mutate({ key, value: option })}
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-xl disabled:opacity-60"
+                    style={{
+                      background: value === option ? "color-mix(in srgb, var(--primary) 16%, var(--panel))" : "transparent",
+                      border: `1px solid ${value === option ? "var(--primary)" : "var(--border)"}`,
+                    }}
+                  >
+                    <span aria-hidden="true">{CHECK_IN_FACES[option]}</span>
+                  </button>
+                ))}
+              </span>
+            ) : typeof value === "number" ? (
+              <span aria-hidden="true" className="text-xl">{CHECK_IN_FACES[value as CheckInValue]}</span>
+            ) : (
+              <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
+            )}
+          </div>
+        );
+      })}
+      {answer.isError ? (
+        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{t("saveFailed")}</p>
+      ) : null}
+      <a href="#check-in" className="flex min-h-11 items-center text-xs font-semibold" style={{ color: "var(--primary)" }}>
+        {tw("mood.open")}
+      </a>
+    </div>
   );
 }
 

@@ -5369,9 +5369,6 @@
         "noPortions": "Il piano del tuo coach non ha ancora porzioni giornaliere."
       },
       "mood": {
-        "mood": "Umore {value}/4",
-        "stress": "Stress {value}/4",
-        "empty": "Come ti senti?",
         "open": "Rispondi a «Come mi sento»"
       },
       "craving": {
