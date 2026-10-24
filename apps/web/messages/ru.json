@@ -5287,7 +5287,7 @@
         "glasses": "{filled} из {goal} стаканов",
         "added": "Стакан добавлен ({ml} мл)",
         "dropsLabel": "Стаканы за сегодня",
-        "remove": "Убрать этот стакан"
+        "remove": "Убрать последний стакан"
       },
       "sleep": {
         "title": "Сон",
@@ -9547,7 +9547,8 @@
     "backToMe": "Назад в «Я»",
     "saveInterests": "Сохранить",
     "interestsSaved": "Сохранено.",
-    "interestsHubHint": "Виды спорта и уровень для рекомендаций"
+    "interestsHubHint": "Виды спорта и уровень для рекомендаций",
+    "photoAddLabel": "Добавить фото"
   },
   "Business": {
     "common": {

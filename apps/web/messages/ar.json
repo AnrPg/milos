@@ -5287,7 +5287,7 @@
         "glasses": "{filled} من {goal} أكواب",
         "added": "أُضيف كوب ({ml} مل)",
         "dropsLabel": "أكواب اليوم",
-        "remove": "إزالة هذا الكوب"
+        "remove": "إزالة آخر كوب"
       },
       "sleep": {
         "title": "النوم",
@@ -9547,7 +9547,8 @@
     "backToMe": "العودة إلى أنا",
     "saveInterests": "حفظ",
     "interestsSaved": "تم الحفظ.",
-    "interestsHubHint": "الرياضات والمستوى، للاقتراحات"
+    "interestsHubHint": "الرياضات والمستوى، للاقتراحات",
+    "photoAddLabel": "إضافة صورة"
   },
   "Business": {
     "common": {

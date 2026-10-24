@@ -5287,7 +5287,7 @@
         "glasses": "{filled} מתוך {goal} כוסות",
         "added": "נוספה כוס ({ml} מ״ל)",
         "dropsLabel": "הכוסות של היום",
-        "remove": "הסרת הכוס הזו"
+        "remove": "הסר את הכוס האחרונה"
       },
       "sleep": {
         "title": "שינה",
@@ -9547,7 +9547,8 @@
     "backToMe": "חזרה לאני",
     "saveInterests": "שמירה",
     "interestsSaved": "נשמר.",
-    "interestsHubHint": "ענפי ספורט ורמה, להצעות"
+    "interestsHubHint": "ענפי ספורט ורמה, להצעות",
+    "photoAddLabel": "הוספת תמונה"
   },
   "Business": {
     "common": {

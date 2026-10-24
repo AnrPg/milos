@@ -43,7 +43,7 @@ export function CoachWellnessPanel({ userId, nickname, frame }: { userId: string
           type="button"
           onClick={() => setWeek(shiftWeek(week, -1))}
           aria-label={t("weekPrevious")}
-          className="h-9 w-9 rounded-full"
+          className="hit-area h-9 w-9 rounded-full"
           style={{ border: "1px solid var(--border)", color: "var(--text)" }}
         >
           ‹
@@ -54,7 +54,7 @@ export function CoachWellnessPanel({ userId, nickname, frame }: { userId: string
           onClick={() => setWeek(shiftWeek(week, 1))}
           disabled={week >= current}
           aria-label={t("weekNext")}
-          className="h-9 w-9 rounded-full disabled:opacity-40"
+          className="hit-area h-9 w-9 rounded-full disabled:opacity-40"
           style={{ border: "1px solid var(--border)", color: "var(--text)" }}
         >
           ›

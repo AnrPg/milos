@@ -5287,7 +5287,7 @@
         "glasses": "{filled} от {goal} чаши",
         "added": "Добавена чаша ({ml} мл)",
         "dropsLabel": "Чаши днес",
-        "remove": "Премахни тази чаша"
+        "remove": "Премахни последната чаша"
       },
       "sleep": {
         "title": "Сън",
@@ -9547,7 +9547,8 @@
     "backToMe": "Назад към Аз",
     "saveInterests": "Запази",
     "interestsSaved": "Запазено.",
-    "interestsHubHint": "Спортове и ниво, за предложения"
+    "interestsHubHint": "Спортове и ниво, за предложения",
+    "photoAddLabel": "Добави снимка"
   },
   "Business": {
     "common": {

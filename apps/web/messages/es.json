@@ -5287,7 +5287,7 @@
         "glasses": "{filled} de {goal} vasos",
         "added": "Vaso añadido ({ml} ml)",
         "dropsLabel": "Vasos de hoy",
-        "remove": "Quitar este vaso"
+        "remove": "Quitar el último vaso"
       },
       "sleep": {
         "title": "Sueño",
@@ -9547,7 +9547,8 @@
     "backToMe": "Volver a Yo",
     "saveInterests": "Guardar",
     "interestsSaved": "Guardado.",
-    "interestsHubHint": "Deportes y nivel, para sugerencias"
+    "interestsHubHint": "Deportes y nivel, para sugerencias",
+    "photoAddLabel": "Añadir foto"
   },
   "Business": {
     "common": {

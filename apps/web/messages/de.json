@@ -5287,7 +5287,7 @@
         "glasses": "{filled} von {goal} Gläsern",
         "added": "Ein Glas hinzugefügt ({ml} ml)",
         "dropsLabel": "Gläser heute",
-        "remove": "Dieses Glas entfernen"
+        "remove": "Letztes Glas entfernen"
       },
       "sleep": {
         "title": "Schlaf",
@@ -9547,7 +9547,8 @@
     "backToMe": "Zurück zu Ich",
     "saveInterests": "Speichern",
     "interestsSaved": "Gespeichert.",
-    "interestsHubHint": "Sportarten und Level, für Vorschläge"
+    "interestsHubHint": "Sportarten und Level, für Vorschläge",
+    "photoAddLabel": "Foto hinzufügen"
   },
   "Business": {
     "common": {

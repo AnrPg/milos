@@ -219,7 +219,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
             <button
               type="button"
               onClick={() => setSheet({ kind: "customize" })}
-              className="min-h-9 rounded-full px-3 text-xs font-semibold"
+              className="min-h-11 rounded-full px-3 text-xs font-semibold"
               style={{ border: "1px solid var(--border)", color: "var(--text)" }}
             >
               {t("customize")}
@@ -362,10 +362,10 @@ function DayStepper({
   const style = { border: "1px solid var(--border)", color: "var(--text)" };
   return (
     <div className="flex items-center gap-1">
-      <button type="button" aria-label={t("previousDay")} disabled={!canBack} onClick={onBack} className="h-9 w-9 rounded-full disabled:opacity-40" style={style}>
+      <button type="button" aria-label={t("previousDay")} disabled={!canBack} onClick={onBack} className="hit-area h-9 w-9 rounded-full disabled:opacity-40" style={style}>
         ‹
       </button>
-      <button type="button" aria-label={t("nextDay")} disabled={!canForward} onClick={onForward} className="h-9 w-9 rounded-full disabled:opacity-40" style={style}>
+      <button type="button" aria-label={t("nextDay")} disabled={!canForward} onClick={onForward} className="hit-area h-9 w-9 rounded-full disabled:opacity-40" style={style}>
         ›
       </button>
     </div>
@@ -433,34 +433,40 @@ function WaterTile({
       color="var(--info)"
       value={t("water.glasses", { filled, goal })}
       detail={
-        <span className="flex flex-wrap gap-1" aria-label={t("water.dropsLabel")}>
-          {Array.from({ length: drops }, (_, index) => {
-            const entry = entries[index];
-            return entry ? (
-              <button
-                key={entry.id}
-                type="button"
-                aria-label={t("water.remove")}
-                onClick={() => onRemove(entry.id)}
-                className="h-3.5 w-3.5 rounded-full"
-                style={{ background: "var(--info)" }}
-              />
-            ) : (
-              <span key={`empty-${index}`} className="h-3.5 w-3.5 rounded-full" style={{ border: "1px solid var(--border)" }} />
-            );
-          })}
+        <span className="flex flex-wrap gap-1" role="img" aria-label={t("water.dropsLabel")}>
+          {Array.from({ length: drops }, (_, index) => (
+            <span
+              key={entries[index]?.id ?? `empty-${index}`}
+              className="h-3.5 w-3.5 rounded-full"
+              style={entries[index] ? { background: "var(--info)" } : { border: "1px solid var(--border)" }}
+            />
+          ))}
         </span>
       }
       action={
-        <button
-          type="button"
-          onClick={onAdd}
-          disabled={pending}
-          className="min-h-11 rounded-2xl text-base font-extrabold disabled:opacity-60"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-        >
-          {t("water.add")}
-        </button>
+        // ADR-194: the drops are a picture; removing a glass is its own 44px button.
+        <span className="flex gap-2">
+          <button
+            type="button"
+            onClick={onAdd}
+            disabled={pending}
+            className="min-h-11 flex-1 rounded-2xl text-base font-extrabold disabled:opacity-60"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {t("water.add")}
+          </button>
+          {entries.length > 0 ? (
+            <button
+              type="button"
+              aria-label={t("water.remove")}
+              onClick={() => onRemove(entries[entries.length - 1].id)}
+              className="min-h-11 min-w-11 rounded-2xl text-base font-extrabold"
+              style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              <span aria-hidden="true">−</span>
+            </button>
+          ) : null}
+        </span>
       }
     />
   );
@@ -526,7 +532,7 @@ function MealsTile({
           <button
             type="button"
             onClick={() => onOpen("snack", null)}
-            className="min-h-10 rounded-full px-3 text-sm font-semibold"
+            className="min-h-11 rounded-full px-3 text-sm font-semibold"
             style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
           >
             {t("meal.addSnack")}
@@ -567,7 +573,7 @@ function SlotChip({
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-10 flex-col items-start justify-center rounded-2xl px-3 py-1 text-start text-sm font-semibold"
+      className="flex min-h-11 flex-col items-start justify-center rounded-2xl px-3 py-1 text-start text-sm font-semibold"
       style={{ border: `2px solid ${border}`, color: "var(--text)", borderStyle: fit === "optional" ? "dashed" : "solid" }}
     >
       {label}
@@ -595,7 +601,7 @@ function PlanTile({
           {t("plan.title", { title })}
         </span>
         {bars.length ? (
-          <button type="button" onClick={onToggleNumbers} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+          <button type="button" onClick={onToggleNumbers} className="hit-area text-xs font-semibold" style={{ color: "var(--primary)" }}>
             {showNumbers ? t("plan.hideNumbers") : t("plan.showNumbers")}
           </button>
         ) : null}
@@ -737,7 +743,7 @@ function CravingTile({
       {open.map((craving) => (
         <div key={craving.id} className="flex flex-col gap-2">
           <HowDidItGo craving={craving} onSaved={onAnswered} />
-          <button type="button" onClick={() => onOpen(craving)} className="self-start text-xs font-semibold" style={{ color: "var(--primary)" }}>
+          <button type="button" onClick={() => onOpen(craving)} className="min-h-11 self-start text-xs font-semibold" style={{ color: "var(--primary)" }}>
             {t("craving.edit")}
           </button>
         </div>
@@ -806,10 +812,10 @@ function WeekCard({
             : t("week.title")}
         </p>
         <div className="flex gap-1">
-          <button type="button" aria-label={t("week.previous")} onClick={() => onShift(-1)} className="h-8 w-8 rounded-full" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          <button type="button" aria-label={t("week.previous")} onClick={() => onShift(-1)} className="hit-area h-8 w-8 rounded-full" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
             ‹
           </button>
-          <button type="button" aria-label={t("week.next")} disabled={!canForward} onClick={() => onShift(1)} className="h-8 w-8 rounded-full disabled:opacity-40" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          <button type="button" aria-label={t("week.next")} disabled={!canForward} onClick={() => onShift(1)} className="hit-area h-8 w-8 rounded-full disabled:opacity-40" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
             ›
           </button>
         </div>
@@ -821,7 +827,7 @@ function WeekCard({
               <th className="sr-only">{t("week.item")}</th>
               {week.dates.map((date) => (
                 <th key={date} scope="col" className="text-center text-[11px] font-semibold" style={{ color: date === selected ? "var(--primary)" : "var(--dim)" }}>
-                  <button type="button" onClick={() => onSelect(date)} disabled={!editable(date, today)} className="disabled:cursor-default">
+                  <button type="button" onClick={() => onSelect(date)} disabled={!editable(date, today)} className="hit-area disabled:cursor-default">
                     {format.dateTime(new Date(`${date}T12:00:00`), { weekday: "narrow" })}
                   </button>
                 </th>
