@@ -11,6 +11,7 @@ import { MY_TRIALS_KEY, requestTrial, type MyTrial, type TrialOffer } from "@/ap
 import { newOperationId, trialErrorKey } from "./trial-ui";
 import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Slot = PublicBoxSchedule["slots"][number];
 /** What the sheet needs of a class picked before it opens (the box schedule, or a door scan's offer). */
@@ -182,19 +183,23 @@ export function TrialSheet({
                   className="min-h-11 rounded-2xl px-3.5 text-sm"
                   style={{ background: "var(--bg)", border: `1px solid ${phoneValid ? "var(--border)" : "var(--danger)"}`, color: "var(--text)" }}
                 />
-                <span className="text-xs" style={{ color: phoneValid ? "var(--dim)" : "var(--danger)" }}>
-                  {phoneValid ? t("phoneHint") : t("phoneInvalid")}
-                </span>
+                {phoneValid ? (
+                  <span className="text-xs" style={{ color: "var(--dim)" }}>
+                    {t("phoneHint")}
+                  </span>
+                ) : (
+                  <ErrorNotice variant="field">{t("phoneInvalid")}</ErrorNotice>
+                )}
               </label>
               {ask.isError ? (
-                <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t(trialErrorKey(ask.error))}</p>
+                <ErrorNotice>{t(trialErrorKey(ask.error))}</ErrorNotice>
               ) : null}
             </div>
           ) : (
             <div className="flex flex-col gap-4">
               <p className="text-sm" style={{ color: "var(--text-soft)" }}>{manual ? t("pickHintManual") : t("pickHint")}</p>
               {classes.isPending ? <p className="py-4 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-              {classes.isError ? <p className="py-4 text-center text-sm" style={{ color: "var(--danger)" }}>{t("error_generic")}</p> : null}
+              {classes.isError ? <ErrorNotice>{t("error_generic")}</ErrorNotice> : null}
               {classes.isSuccess && days.length === 0 ? (
                 <p className="rounded-2xl p-4 text-center text-sm" style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}>{t("noClasses")}</p>
               ) : null}

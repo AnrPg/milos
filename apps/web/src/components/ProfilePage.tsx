@@ -40,6 +40,7 @@ import { JournalSectionsSetting, UnitsSetting } from "@/components/body/BodyPref
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -220,9 +221,9 @@ export function ProfilePage() {
             </p>
           ) : null}
           {languageError ? (
-            <p className="mt-3 text-sm font-semibold" style={{ color: "var(--danger)" }}>
+            <ErrorNotice className="mt-3">
               {languageError}
-            </p>
+            </ErrorNotice>
           ) : null}
         </CollapsibleSection>
 
@@ -282,7 +283,7 @@ export function ProfilePage() {
             >
               {securityPending ? i18n("revokingSessions8eee998") : i18n("signOutAllDevicesf14a071")}
             </button>
-            {securityError ? <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{securityError}</p> : null}
+            {securityError ? <ErrorNotice>{securityError}</ErrorNotice> : null}
           </div>
         </CollapsibleSection>
 
@@ -363,9 +364,9 @@ export function ProfilePage() {
             </div>
 
             {avatarError && (
-              <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
+              <ErrorNotice>
                 {avatarError}
-              </p>
+              </ErrorNotice>
             )}
           </div>
         </CollapsibleSection>

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { duplicateWorkout, reopenWorkout } from "@/api/workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type GlobalContext = {
   kind: "global";
@@ -165,7 +166,7 @@ export function WorkoutEditModal({
           </p>
 
           {error ? (
-            <p className="mt-3 text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>
+            <ErrorNotice className="mt-3">{error}</ErrorNotice>
           ) : null}
       </Dialog>
     </>

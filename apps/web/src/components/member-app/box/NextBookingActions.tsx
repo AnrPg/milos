@@ -12,6 +12,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * The next booking's check-in and live class timer (TD-105): «Check-in»
@@ -77,7 +78,7 @@ export function NextBookingActions({ slot }: { slot: ScheduleSlot }) {
           </Link>
         ) : null}
       </div>
-      {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice variant="field">{error}</ErrorNotice> : null}
     </div>
   );
 }

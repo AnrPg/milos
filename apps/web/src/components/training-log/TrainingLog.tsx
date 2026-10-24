@@ -35,6 +35,7 @@ import {
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateTimeInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export const TRAINING_LOG_ENTRIES_KEY = ["training-log", "entries"] as const;
 export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
@@ -295,7 +296,7 @@ function SourcePicker({ token, onSelect }: { token: string; onSelect: (source: S
 
     if (sourcesQuery.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("trainingLogLoading")}</p>;
     if (sourcesQuery.isError) {
-      return <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{localizeError(sourcesQuery.error, i18n)}</p>;
+      return <ErrorNotice>{localizeError(sourcesQuery.error, i18n)}</ErrorNotice>;
     }
 
     const sources = sourcesQuery.data;
@@ -626,15 +627,17 @@ function EntryForm({
       </label>
 
       {errors.length > 0 ? (
-        <ul className="grid gap-1 text-sm" role="alert" style={{ color: "var(--danger)" }}>
-          {errors.map((error) => <li key={error}>{i18n(FORM_ERROR_KEYS[error])}</li>)}
-        </ul>
+        <ErrorNotice>
+          <ul className="grid gap-1">
+            {errors.map((error) => <li key={error}>{i18n(FORM_ERROR_KEYS[error])}</li>)}
+          </ul>
+        </ErrorNotice>
       ) : null}
       {queued && !mutation.isError ? (
         <p className="text-sm" role="status" style={{ color: "var(--text-soft)" }}>{i18n("outboxQueuedNotice")}</p>
       ) : null}
       {mutation.isError ? (
-        <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{localizeError(mutation.error, i18n)}</p>
+        <ErrorNotice>{localizeError(mutation.error, i18n)}</ErrorNotice>
       ) : null}
 
       <div className="flex flex-wrap justify-end gap-2">
@@ -696,7 +699,7 @@ function VoidForm({ token, entry, onDone }: { token: string; entry: TrainingLogE
         />
       </label>
       {mutation.isError ? (
-        <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{localizeError(mutation.error, i18n)}</p>
+        <ErrorNotice>{localizeError(mutation.error, i18n)}</ErrorNotice>
       ) : null}
       <div className="flex flex-wrap justify-end gap-2">
         <button

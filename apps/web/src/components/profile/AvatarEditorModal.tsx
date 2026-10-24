@@ -18,6 +18,7 @@ import {
   zoomTo,
   type AvatarTransform,
 } from "@/lib/avatar-crop";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   /** A freshly picked file, or the URL of the current avatar to re-edit. */
@@ -188,7 +189,7 @@ export function AvatarEditorModal({ source, pending, uploadError, onCancel, onSa
           </div>
           <p className="text-xs" style={{ color: "var(--muted)" }}>{tProfile("avatarGestureHint")}</p>
           {error || uploadError ? (
-            <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error ?? uploadError}</p>
+            <ErrorNotice>{error ?? uploadError}</ErrorNotice>
           ) : null}
         </div>
       </div>

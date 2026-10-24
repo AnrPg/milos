@@ -29,6 +29,7 @@ import { coachGroups, keysOf, refOf, sameKeys, within } from "@/lib/coach-audien
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
 import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * The visibility badge every journal entry carries (vision §7.7, ADR-139).
@@ -214,9 +215,9 @@ function VisibilityPicker({
           />
         ) : null}
         {mutation.isError ? (
-          <p role="alert" className="mt-3 text-sm font-semibold" style={{ color: "var(--danger)" }}>
+          <ErrorNotice className="mt-3">
             {errorCode === "no_active_coach" ? t("noCoach") : t("visibilityFailed")}
-          </p>
+          </ErrorNotice>
         ) : null}
     </Dialog>
   );

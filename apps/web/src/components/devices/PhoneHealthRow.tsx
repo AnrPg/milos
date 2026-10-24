@@ -25,6 +25,7 @@ import {
 } from "@/components/devices/phone-health-model";
 import { grantedPrefs, healthPlugin, newCount, syncPhoneHealth } from "@/lib/platform/health";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const PILL = {
   connected: SPARK_ACTIVE_STYLE,
@@ -57,7 +58,7 @@ export function PhoneHealthRowItem({
   const provider = t(["provider", row.provider].join("_"));
   const [sheet, setSheet] = useState<"connect" | "disconnect" | null>(null);
   const [editing, setEditing] = useState<FullPhonePrefs | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null);
   const [askConsent, setAskConsent] = useState(false);
   const [consentTicked, setConsentTicked] = useState(false);
   const availability = useQuery({
@@ -82,9 +83,9 @@ export function PhoneHealthRowItem({
       if (result.row) store(result.row);
       const count = newCount(result.counts);
       if (count) refreshAfterImport(queryClient);
-      setNotice(t("phoneSynced", { count }));
+      setNotice({ text: t("phoneSynced", { count }) });
     },
-    onError: () => setNotice(t("phoneSyncFailed")),
+    onError: () => setNotice({ text: t("phoneSyncFailed"), error: true }),
   });
 
   const save = useMutation({
@@ -100,11 +101,11 @@ export function PhoneHealthRowItem({
       setEditing(null);
       setAskConsent(false);
       setConsentTicked(false);
-      setNotice(t("phonePrefsSaved"));
+      setNotice({ text: t("phonePrefsSaved") });
     },
     onError: (error) => {
       if (deviceErrorCode(error) === "health_data_consent_required") setAskConsent(true);
-      setNotice(t(deviceErrorKey(error)));
+      setNotice({ text: t(deviceErrorKey(error)), error: true });
     },
   });
 
@@ -198,7 +199,8 @@ export function PhoneHealthRowItem({
         </>
       ) : null}
 
-      {notice ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{notice}</p> : null}
+      {notice?.error ? <ErrorNotice>{notice.text}</ErrorNotice> : null}
+      {notice && !notice.error ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{notice.text}</p> : null}
 
       {sheet === "connect" ? (
         <PhoneHealthConnectSheet
@@ -215,7 +217,7 @@ export function PhoneHealthRowItem({
                 if (result.row) store(result.row);
                 if (newCount(result.counts)) refreshAfterImport(queryClient);
               })
-              .catch(() => setNotice(t("phoneSyncFailed")));
+              .catch(() => setNotice({ text: t("phoneSyncFailed"), error: true }));
           }}
         />
       ) : null}

@@ -21,6 +21,7 @@ import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Step = 1 | 2 | 3;
 
@@ -312,9 +313,9 @@ export function ReferralEventWizard({
                     </div>
 
                     {assignMembershipMutation.error instanceof Error && (
-                      <p className="text-xs" style={{ color: "var(--primary-strong)" }}>
+                      <ErrorNotice variant="field">
                         {localizeError(assignMembershipMutation.error, i18n)}
-                      </p>
+                      </ErrorNotice>
                     )}
                   </div>
                 )}
@@ -386,9 +387,9 @@ export function ReferralEventWizard({
             {createEventMutation.isPending ? i18n("recording72f9eb4") : i18n("recordReferralStep21a166e0")}
           </button>
           {createEventMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
+            <ErrorNotice>
               {localizeError(createEventMutation.error, i18n)}
-            </p>
+            </ErrorNotice>
           )}
         </div>
       )}
@@ -448,9 +449,9 @@ export function ReferralEventWizard({
             </button>
           </div>
           {(approveEventMutation.error ?? rejectEventMutation.error) instanceof Error && (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
+            <ErrorNotice>
               {localizeError(approveEventMutation.error ?? rejectEventMutation.error, i18n)}
-            </p>
+            </ErrorNotice>
           )}
         </div>
       )}
@@ -547,9 +548,9 @@ export function ReferralEventWizard({
             </button>
           </div>
           {createRewardMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
+            <ErrorNotice>
               {localizeError(createRewardMutation.error, i18n)}
-            </p>
+            </ErrorNotice>
           )}
         </div>
       )}

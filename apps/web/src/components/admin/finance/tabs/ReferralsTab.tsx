@@ -37,6 +37,7 @@ import {
 } from "@/components/admin/finance/referrals/program-rules";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import type { GuideAnchor } from "@/lib/guides/anchors";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
@@ -452,7 +453,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
               {i18n("activea733b80")}
             </label>
             {createProgramMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createProgramMutation.error, i18n)}</p>
+              <ErrorNotice>{localizeError(createProgramMutation.error, i18n)}</ErrorNotice>
             )}
           </div>
         </SidePanel>
@@ -540,7 +541,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
               ]}
             />
             {updateProgramMutation.error instanceof Error ? (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateProgramMutation.error, i18n)}</p>
+              <ErrorNotice>{localizeError(updateProgramMutation.error, i18n)}</ErrorNotice>
             ) : null}
           </div>
         </SidePanel>
@@ -607,7 +608,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
             ]}
           />
           {createRewardMutation.error instanceof Error ? (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createRewardMutation.error, i18n)}</p>
+            <ErrorNotice>{localizeError(createRewardMutation.error, i18n)}</ErrorNotice>
           ) : null}
         </SidePanel>
       ) : null}
@@ -655,7 +656,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
             </Notice>
           ) : null}
           {updateRewardMutation.error instanceof Error ? (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateRewardMutation.error, i18n)}</p>
+            <ErrorNotice>{localizeError(updateRewardMutation.error, i18n)}</ErrorNotice>
           ) : null}
         </SidePanel>
       ) : null}

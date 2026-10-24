@@ -16,6 +16,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
 import { defaultTeamName, ownsCoachPractice, shownMonthlyPrice } from "@/lib/solo-coach";
 import { setView } from "@/lib/view-mode";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * ADR-170 (vision §7.10): one screen to open a practice as an independent
@@ -123,7 +124,7 @@ export function StartCoachPractice() {
           <span className="text-xs" style={{ color: "var(--dim)" }}>{t("start.teamHint")}</span>
         </label>
         {create.error ? (
-          <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(create.error, i18n)}</p>
+          <ErrorNotice>{localizeError(create.error, i18n)}</ErrorNotice>
         ) : null}
         <button
           type="submit"

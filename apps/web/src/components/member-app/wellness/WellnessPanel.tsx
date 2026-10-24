@@ -48,6 +48,7 @@ import {
   weekRows,
   type Dot,
 } from "./wellness-model";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const [FIT_LOGGED, FIT_EMPTY, FIT_OPTIONAL] = ["logged", "empty", "optional"];
 /** The chip state of a meal slot: the plan fit when logged, else whether the slot is expected. */
@@ -153,7 +154,7 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
   if (query.isError || !data)
     return (
       <PanelShell title={t("today")}>
-        <p role="alert" style={{ color: "var(--danger)" }}>{wellnessErrorMessage(query.error, (key) => t(key), ui)}</p>
+        <ErrorNotice>{wellnessErrorMessage(query.error, (key) => t(key), ui)}</ErrorNotice>
       </PanelShell>
     );
 
@@ -261,11 +262,9 @@ export function WellnessPanel({ initialCraving }: { initialCraving?: string | nu
             </button>
           </div>
         ) : null}
-        <p className="mt-3 text-sm font-semibold" role="alert" style={{ color: "var(--danger)" }}>
-          {addGlass.error || removeEntry.error
-            ? wellnessErrorMessage(addGlass.error ?? removeEntry.error, (key) => t(key), ui)
-            : null}
-        </p>
+        {addGlass.error || removeEntry.error ? (
+          <ErrorNotice className="mt-3">{wellnessErrorMessage(addGlass.error ?? removeEntry.error, (key) => t(key), ui)}</ErrorNotice>
+        ) : null}
       </PanelShell>
 
       <WeekCard
@@ -706,7 +705,7 @@ function MoodTile({ mood, isToday }: { mood: WellnessDay["mood"] | null; isToday
         );
       })}
       {answer.isError ? (
-        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{t("saveFailed")}</p>
+        <ErrorNotice variant="field">{t("saveFailed")}</ErrorNotice>
       ) : null}
       <a href="#check-in" className="flex min-h-11 items-center text-xs font-semibold" style={{ color: "var(--primary)" }}>
         {tw("mood.open")}

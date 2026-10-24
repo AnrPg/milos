@@ -25,6 +25,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STATUSES: SubscriptionStatus[] = ["trialing", "active", "past_due", "cancelled", "comped"];
 const inputClass = "min-h-10 w-full border-[1px] border-[var(--border)] bg-[var(--panel)] px-3 text-sm text-[var(--text)]";
@@ -170,7 +171,7 @@ function PlanEditor({ token, plan }: { token: string; plan: PlatformPlan }) {
         <Check label={t("console.public")} checked={form.isPublic} onChange={(value) => set("isPublic", value)} />
         <Check label={t("console.active")} checked={form.active} onChange={(value) => set("active", value)} />
       </div>
-      {save.error ? <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(save.error, i18n)}</p> : null}
+      {save.error ? <ErrorNotice>{localizeError(save.error, i18n)}</ErrorNotice> : null}
       <div>
         <button type="submit" disabled={save.isPending} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
           {save.isSuccess && !save.isPending ? t("console.saved") : t("console.save")}
@@ -218,7 +219,7 @@ function NewPlanForm({ token }: { token: string }) {
           </Select>
         </Field>
       </div>
-      {create.error ? <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(create.error, i18n)}</p> : null}
+      {create.error ? <ErrorNotice>{localizeError(create.error, i18n)}</ErrorNotice> : null}
       <div>
         <button type="submit" disabled={create.isPending} className="border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)] disabled:opacity-50">
           {t("console.add")}
@@ -336,7 +337,7 @@ function SubscriptionRow({
               {t("console.save")}
             </button>
           </div>
-          {save.error ? <p role="alert" className="text-sm text-[var(--danger)] sm:col-span-3">{localizeError(save.error, i18n)}</p> : null}
+          {save.error ? <ErrorNotice className="sm:col-span-3">{localizeError(save.error, i18n)}</ErrorNotice> : null}
         </form>
       ) : null}
     </li>

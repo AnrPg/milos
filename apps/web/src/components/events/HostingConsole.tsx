@@ -31,6 +31,7 @@ import { Select } from "@/components/ui/Select";
 import { DateBlock, useEventError, useGoingLabel, usePriceLabel } from "./EventParts";
 import { formatPrice, formatWhen } from "./events";
 import { HostedEventSheet, useEventHosts } from "./HostedEventSheet";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { guideAnchor } from "@/lib/guides/anchors";
 import { GuideButton } from "@/components/guides/GuideButton";
 
@@ -226,7 +227,7 @@ function CohostRequests({ slug }: { slug: string | null }) {
           ))}
         </ul>
       )}
-      {problem ? <p role="alert" className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{problem}</p> : null}
+      {problem ? <ErrorNotice className="mt-2">{problem}</ErrorNotice> : null}
       {sent ? <p role="status" className="mt-2 text-sm" style={{ color: "var(--text-soft)" }}>{sent}</p> : null}
     </HubCard>
   );

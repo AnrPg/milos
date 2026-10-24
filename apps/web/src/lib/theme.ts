@@ -52,6 +52,11 @@ export type ThemeTokens = {
   warningContrast: string;
   danger: string;
   dangerContrast: string;
+  // Error messages and boxes (ui/ErrorNotice): a red-tinted surface, its
+  // border, and the red text that reads on it.
+  dangerSurface: string;
+  dangerBorder: string;
+  dangerStrong: string;
   info: string;
   infoContrast: string;
   // Interaction
@@ -194,6 +199,9 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       warningContrast: WHITE,
       danger: HEAT,
       dangerContrast: WHITE,
+      dangerSurface: "#FDECEF",
+      dangerBorder: "#F09AAA",
+      dangerStrong: "#B0102C",
       info: "#0B7FA8",
       infoContrast: WHITE,
       focusRing: DOJO,
@@ -295,6 +303,9 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       warningContrast: "#0E0F12",
       danger: HEAT_GLOW,
       dangerContrast: "#0E0F12",
+      dangerSurface: "#3A1820",
+      dangerBorder: "#8C2E42",
+      dangerStrong: "#FF8E9F",
       info: "#6FB8FF",
       infoContrast: "#0E0F12",
       focusRing: "#8FA4FF",

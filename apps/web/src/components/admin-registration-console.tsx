@@ -13,6 +13,7 @@ import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type FieldErrors = Record<string, string[]>;
 
@@ -210,9 +211,9 @@ export function AdminRegistrationConsole() {
             />
           </label>
           {nicknameErrors.length > 0 ? (
-            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+            <ErrorNotice variant="field" live="polite" className="-mt-3">
               {nicknameErrors.join(", ")}
-            </p>
+            </ErrorNotice>
           ) : null}
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
@@ -235,9 +236,9 @@ export function AdminRegistrationConsole() {
             />
           </label>
           {emailErrors.length > 0 ? (
-            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+            <ErrorNotice variant="field" live="polite" className="-mt-3">
               {emailErrors.join(", ")}
-            </p>
+            </ErrorNotice>
           ) : null}
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
@@ -284,9 +285,9 @@ export function AdminRegistrationConsole() {
             />
           </label>
           {tokenErrors.length > 0 ? (
-            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+            <ErrorNotice variant="field" live="polite" className="-mt-3">
               {tokenErrors.join(", ")}
-            </p>
+            </ErrorNotice>
           ) : null}
 
           {invitation ? (
@@ -302,17 +303,7 @@ export function AdminRegistrationConsole() {
           ) : null}
 
           {error ? (
-            <p
-              className="rounded-xl px-3 py-2 text-sm"
-              role="alert"
-              style={{
-                background: "color-mix(in srgb, var(--danger) 10%, transparent)",
-                border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)",
-                color: "var(--danger)",
-              }}
-            >
-              {error}
-            </p>
+            <ErrorNotice>{error}</ErrorNotice>
           ) : null}
 
           <button

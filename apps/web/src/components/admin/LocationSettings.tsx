@@ -18,6 +18,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 
@@ -174,7 +175,7 @@ export function LocationSettings({ token }: { token: string }) {
         </details>
       ) : null}
 
-      {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </div>
   );
 }

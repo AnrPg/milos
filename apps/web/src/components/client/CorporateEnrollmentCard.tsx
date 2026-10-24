@@ -9,6 +9,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { companyCodeFromSearch } from "@/components/client/corporate-enrollment";
 import { CLIENT_ENTITLEMENT_QUERY_KEY } from "@/components/client/use-client-entitlement";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Company plan enrollment (ADR-098). Company-paid plans are rare, so the card
@@ -83,9 +84,7 @@ export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => voi
             </button>
           </div>
           {enroll.isError ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-              {clientErrorMessage(enroll.error, i18n)}
-            </p>
+            <ErrorNotice>{clientErrorMessage(enroll.error, i18n)}</ErrorNotice>
           ) : null}
         </>
       )}

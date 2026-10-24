@@ -22,6 +22,7 @@ import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "
 import { downloadFile, trialErrorKey } from "./trial-ui";
 import { formatInZone, zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const OPEN = new Set(["requested", "booked"]);
 
@@ -187,7 +188,7 @@ function CancelTrial({ trial, token }: { trial: MyTrial; token: string }) {
   return (
     <div className="flex flex-col gap-2 rounded-2xl p-4" style={{ border: "1px solid var(--danger)" }}>
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("cancelConfirm")}</p>
-      {cancel.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(cancel.error))}</p> : null}
+      {cancel.isError ? <ErrorNotice>{t(trialErrorKey(cancel.error))}</ErrorNotice> : null}
       <div className="flex gap-2">
         <button
           type="button"
@@ -231,7 +232,7 @@ export function FollowUp({ trial, token, compact }: { trial: MyTrial; token: str
         <p className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("followUpTitle")}</p>
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("followUpBody", { box: trial.box?.name ?? "" })}</p>
       </div>
-      {answer.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(answer.error))}</p> : null}
+      {answer.isError ? <ErrorNotice>{t(trialErrorKey(answer.error))}</ErrorNotice> : null}
       <div className="flex gap-2">
         <button
           type="button"

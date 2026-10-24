@@ -8,6 +8,7 @@ import { fetchNfcTag, nfcTagKey, rotateNfcTag, setNfcTagEnabled } from "@/api/ch
 import { nfcWriter, writeNfcTag } from "@/lib/platform/nfc";
 
 import { ConfirmButton } from "./ConfirmButton";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const noSubscription = () => () => {};
 
@@ -105,8 +106,9 @@ export function NfcTagRow({ token, locationId }: { token: string; locationId: st
         </div>
       ) : null}
       {enabled && !writer ? <p className="text-xs" style={{ color: "var(--dim)" }}>{t("nfcWriteElsewhere")}</p> : null}
-      {notice ? (
-        <p role={notice.tone === "error" ? "alert" : "status"} className="text-sm" style={{ color: notice.tone === "error" ? "var(--danger)" : "var(--success)" }}>
+      {notice?.tone === "error" ? <ErrorNotice>{notice.text}</ErrorNotice> : null}
+      {notice?.tone === "ok" ? (
+        <p role="status" className="text-sm" style={{ color: "var(--success)" }}>
           {notice.text}
         </p>
       ) : null}

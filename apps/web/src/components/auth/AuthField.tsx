@@ -2,6 +2,8 @@
 
 import { useId, type ReactNode } from "react";
 
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
+
 type AuthFieldProps = {
   label: ReactNode;
   value: string;
@@ -20,12 +22,6 @@ type AuthFieldProps = {
   inputMode?: "text" | "email";
   autoFocus?: boolean;
 };
-
-const errorStyle = {
-  background: "color-mix(in srgb, var(--danger) 10%, transparent)",
-  color: "var(--danger)",
-  border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)",
-} as const;
 
 // A handle is always Latin: keep it left-to-right and free of autocorrect.
 const LATIN_IDENTIFIER_INPUT = { dir: "ltr", autoCapitalize: "none", spellCheck: false } as const;
@@ -84,9 +80,9 @@ export function AuthField({
         />
       </span>
       {invalid ? (
-        <span id={noteId} className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={errorStyle}>
+        <ErrorNotice id={noteId} variant="field" className="mt-1.5">
           {errors.join(" ")}
-        </span>
+        </ErrorNotice>
       ) : hint ? (
         <span id={noteId} className="mt-1.5 block text-xs font-normal leading-5" style={{ color: "var(--dim)" }}>
           {hint}

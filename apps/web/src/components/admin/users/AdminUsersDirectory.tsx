@@ -27,6 +27,7 @@ import {
 } from "@/lib/users-directory";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const ROLES: DirectoryRole[] = ["all", "member", "athlete", "admin"];
 const SORTS: DirectorySort[] = ["name", "newest", "oldest"];
@@ -196,12 +197,15 @@ export function AdminUsersDirectory() {
         {usersQuery.isLoading ? <SkeletonRows /> : null}
 
         {usersQuery.isError ? (
-          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl p-5 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--danger)" }}>
-            <span>{localizeError(usersQuery.error, i18n)}</span>
-            <button type="button" onClick={() => void usersQuery.refetch()} className="rounded-lg px-3 py-1.5 font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
-              {t("retry")}
-            </button>
-          </div>
+          <ErrorNotice
+            action={
+              <button type="button" onClick={() => void usersQuery.refetch()} className="rounded-lg px-3 py-1.5 font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+                {t("retry")}
+              </button>
+            }
+          >
+            {localizeError(usersQuery.error, i18n)}
+          </ErrorNotice>
         ) : null}
 
         {usersQuery.isSuccess && allUsers.length <= 1 && !filtersActive ? (

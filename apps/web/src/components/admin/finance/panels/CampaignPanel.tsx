@@ -19,6 +19,7 @@ import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { SemanticLabel } from "@/components/semantic-label";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -180,7 +181,7 @@ export function CampaignPanel({
               {createCodeMutation.isPending ? i18n("creating94d7d8e") : i18n("createCodecdeaf88")}
             </button>
             {createCodeMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createCodeMutation.error, i18n)}</p>
+              <ErrorNotice>{localizeError(createCodeMutation.error, i18n)}</ErrorNotice>
             )}
           </div>
         )}

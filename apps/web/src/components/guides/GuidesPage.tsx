@@ -10,6 +10,7 @@ import { GUIDES } from "@/lib/guides/registry";
 import type { Guide } from "@/lib/guides/types";
 
 import { useGuides } from "./GuideProvider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STATE_TONE: Record<GuideState, string> = {
   new: "var(--primary-strong, var(--primary))",
@@ -33,7 +34,7 @@ export function GuidesPage() {
     <HubPage back={<BackToMe />} title={t("ui.listTitle")}>
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("ui.listIntro")}</p>
       {guides.progressError ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("ui.loadFailed")}</p>
+        <ErrorNotice>{t("ui.loadFailed")}</ErrorNotice>
       ) : null}
       {groups.map((group) => (
         <HubCard key={group.key} eyebrow={t(`ui.${group.key}` as never)}>

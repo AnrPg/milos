@@ -21,6 +21,7 @@ import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Ρυθμίσεις › Profiles (ADR-187): one login (email + password) holds up to
@@ -51,7 +52,7 @@ export function ProfilesSection() {
           </p>
         ) : null}
         {profilesQuery.isError ? (
-          <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("profilesLoadError")}</p>
+          <ErrorNotice>{t("profilesLoadError")}</ErrorNotice>
         ) : null}
 
         <ul className="space-y-2">
@@ -66,7 +67,7 @@ export function ProfilesSection() {
           ))}
         </ul>
         {failed ? (
-          <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("switchError")}</p>
+          <ErrorNotice>{t("switchError")}</ErrorNotice>
         ) : null}
 
         {data ? (
@@ -288,7 +289,7 @@ function AddProfileDialog({ onClose }: { onClose: () => void }) {
         </fieldset>
 
         {error ? (
-          <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p>
+          <ErrorNotice>{error}</ErrorNotice>
         ) : null}
       </div>
     </Dialog>

@@ -35,6 +35,7 @@ import { WhenStep } from "./WhenStep";
 import { WhereStep } from "./WhereStep";
 import { WhoStep } from "./WhoStep";
 import { WizardStepBar } from "./WizardStepBar";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { guideAnchor } from "@/lib/guides/anchors";
 
 /** The create or edit body; a new event may carry the co-hosts to ask with it (ADR-185). */
@@ -236,8 +237,13 @@ export function EventWizard({
       onSubmit={submit}
       footer={
         <div className="flex w-full flex-col gap-2">
-          {!failures && reason ? (
-            <p id={reasonId} role={nudged ? "alert" : undefined} className="text-xs" style={{ color: nudged ? "var(--danger)" : "var(--dim)" }}>
+          {!failures && reason && nudged ? (
+            <ErrorNotice id={reasonId} variant="field">
+              {reason}
+            </ErrorNotice>
+          ) : null}
+          {!failures && reason && !nudged ? (
+            <p id={reasonId} className="text-xs" style={{ color: "var(--dim)" }}>
               {reason}
             </p>
           ) : null}
@@ -276,9 +282,9 @@ export function EventWizard({
               {failures.map((failure) => (
                 <li key={failure.slug} className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
                   <span className="font-semibold">{failure.slug}</span>
-                  <span className="block" style={{ color: "var(--danger)" }}>
+                  <ErrorNotice variant="text">
                     {(EVENT_ERROR_CODES as readonly string[]).includes(failure.code) ? t(["err", failure.code].join("_")) : tw("cohostNotSent")}
-                  </span>
+                  </ErrorNotice>
                 </li>
               ))}
             </ul>

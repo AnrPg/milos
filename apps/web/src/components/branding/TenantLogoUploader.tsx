@@ -13,6 +13,7 @@ import {
   validateTenantLogoFile,
   type TenantLogoFileProblem,
 } from "@/lib/tenant-logo-upload";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type TenantLogoUploaderProps = {
   /** Current logo URL (uploaded or legacy external), or null. */
@@ -181,7 +182,7 @@ export function TenantLogoUploader({ currentUrl, uploaded, api, onChange }: Tena
       {currentUrl && !uploaded && !file ? (
         <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("brandLogoExternalUrl")}</p>
       ) : null}
-      {error ? <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
       {status && !error ? (
         <p className="text-sm" style={{ color: "var(--success)" }}>
           {status === "saved" ? i18n("brandLogoSaved") : i18n("brandLogoRemoved")}

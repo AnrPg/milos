@@ -36,6 +36,7 @@ import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/o
 import { can } from "@/lib/role-navigation";
 import { SPARK_GO_STYLE } from "@/lib/spark";
 import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone } from "@/lib/zoned-time";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Rows a queue shows before it points to the console for the rest. */
 const QUEUE_ROWS = 5;
@@ -324,7 +325,7 @@ function RosterRow({ session, person, index }: { session: DeskSession; person: D
         </AttendanceButton>
       </span>
       {mark.isError ? (
-        <p role="alert" className="w-full text-xs" style={{ color: "var(--danger)" }}>{t("markError")}</p>
+        <ErrorNotice variant="field" className="w-full">{t("markError")}</ErrorNotice>
       ) : null}
     </li>
   );

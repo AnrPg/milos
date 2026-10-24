@@ -11,6 +11,7 @@ import { localizeError } from "@/i18n/presentation";
 import { BuddyBadge } from "./ConversationRow";
 import { personLabel } from "./conversation-model";
 import { useConversationsToken, useOpenConversation } from "./use-conversations";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export const PEOPLE_SEARCH_MIN_QUERY = 2;
 
@@ -46,18 +47,18 @@ export function PeopleSearchResults({
   return (
     <div className="flex flex-col gap-2" data-testid="people-search-results">
       {open.error ? (
-        <p className="px-1 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+        <ErrorNotice className="px-1">
           {localizeError(open.error, tUi)}
-        </p>
+        </ErrorNotice>
       ) : null}
       {results.isPending ? (
         <p className="px-1 text-sm" role="status" style={{ color: "var(--dim)" }}>
           {t("loading")}
         </p>
       ) : results.isError ? (
-        <p className="px-1 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+        <ErrorNotice className="px-1">
           {localizeError(results.error, tUi)}
-        </p>
+        </ErrorNotice>
       ) : people.length === 0 ? (
         <p className="px-1 py-2 text-sm" style={{ color: "var(--dim)" }}>
           {t("searchEmpty")}

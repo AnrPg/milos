@@ -44,6 +44,7 @@ import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -466,7 +467,7 @@ export function MemberPanel({
                       {assignPackageMutation.isPending ? i18n("assigning4d16a1a") : i18n("assign2444928")}
                     </button>
                     {assignPackageMutation.error instanceof Error && (
-                      <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(assignPackageMutation.error, i18n)}</p>
+                      <ErrorNotice variant="field">{localizeError(assignPackageMutation.error, i18n)}</ErrorNotice>
                     )}
                   </div>
                 )}
@@ -600,7 +601,7 @@ export function MemberPanel({
                     {createReceiptMutation.isPending ? i18n("recording72f9eb4") : i18n("featureRecordAndDownloadReceipt")}
                   </button>
                   {createReceiptMutation.error instanceof Error && (
-                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(createReceiptMutation.error, i18n)}</p>
+                    <ErrorNotice variant="field">{localizeError(createReceiptMutation.error, i18n)}</ErrorNotice>
                   )}
                 </div>
               )}
@@ -738,7 +739,7 @@ export function MemberPanel({
                     {createInvoiceMutation.isPending ? i18n("creating94d7d8e") : i18n("createInvoicea0567cf")}
                   </button>
                   {createInvoiceMutation.error instanceof Error && (
-                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(createInvoiceMutation.error, i18n)}</p>
+                    <ErrorNotice variant="field">{localizeError(createInvoiceMutation.error, i18n)}</ErrorNotice>
                   )}
                 </div>
               )}
@@ -844,7 +845,7 @@ export function MemberPanel({
                     {recordPaymentMutation.isPending ? i18n("recording72f9eb4") : i18n("recordPayment86e5632")}
                   </button>
                   {recordPaymentMutation.error instanceof Error && (
-                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(recordPaymentMutation.error, i18n)}</p>
+                    <ErrorNotice variant="field">{localizeError(recordPaymentMutation.error, i18n)}</ErrorNotice>
                   )}
                 </div>
               )}
@@ -1144,7 +1145,7 @@ function InvoiceCard({
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" }}
             />
           </div>
-          {saveError && <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{saveError}</p>}
+          {saveError && <ErrorNotice variant="field">{saveError}</ErrorNotice>}
           <button
             type="button"
             onClick={handleSaveEdit}
@@ -1196,9 +1197,9 @@ function InvoiceCard({
       </div>
 
       {uploadError && (
-        <p className="text-xs" style={{ color: "var(--primary-strong)" }}>
+        <ErrorNotice variant="field">
           {uploadError}
-        </p>
+        </ErrorNotice>
       )}
     </div>
   );

@@ -27,6 +27,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * ⊕ button that opens compose (vision §7.1). Everyone can post: to a club
@@ -311,7 +312,7 @@ export function ComposeSheet({
             {media.busy ? tMedia("waitUploads") : tMedia("fixUploads")}
           </p>
         ) : null}
-        {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice>{error}</ErrorNotice> : null}
       </Dialog>
       {picking ? (
         <AudienceSheet

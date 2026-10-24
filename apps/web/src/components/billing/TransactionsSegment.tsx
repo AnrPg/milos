@@ -25,6 +25,7 @@ import { formatMinorUnits } from "@/lib/finance-accounting";
 
 import { totalsByCurrency, TRANSACTION_FILTER_THRESHOLD } from "./billing-model";
 import { Detail, Empty } from "./parts";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type T = ReturnType<typeof useTranslations<"Billing">>;
 
@@ -75,7 +76,7 @@ export function TransactionsSegment({ organizationId }: { organizationId: string
   });
 
   if (feed.isPending) return <Empty>{t("loading")}</Empty>;
-  if (feed.isError) return <Empty>{t("loadFailed")}</Empty>;
+  if (feed.isError) return <ErrorNotice>{t("loadFailed")}</ErrorNotice>;
 
   const pages = feed.data.pages;
   const entries = pages.flatMap((page) => page.transactions);
@@ -251,7 +252,7 @@ function TransactionDialog({ entry, onClose }: { entry: BillingTransaction; onCl
           </ul>
         </div>
       ) : null}
-      {failed ? <p className="mt-3 text-xs" role="alert" style={{ color: "var(--danger)" }}>{t("downloadFailed")}</p> : null}
+      {failed ? <ErrorNotice variant="field" className="mt-3">{t("downloadFailed")}</ErrorNotice> : null}
     </Dialog>
   );
 }

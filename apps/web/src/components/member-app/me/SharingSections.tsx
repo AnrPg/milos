@@ -22,6 +22,8 @@ import {
 import { Switch } from "@/components/body/BodyPreferenceSettings";
 import { LoadingLine } from "@/components/client/ClientPage";
 import { useSession } from "@/components/session-provider";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { Select } from "@/components/ui/Select";
 
 const PREFERENCES_KEY = ["gamification", "preferences"] as const;
 const RUNGS: readonly DefaultRung[] = ["private", "coach_can_view"];
@@ -29,7 +31,7 @@ const RUNGS: readonly DefaultRung[] = ["private", "coach_can_view"];
 function SaveError({ failed }: { failed: boolean }) {
   const t = useTranslations("MemberApp");
   if (!failed) return null;
-  return <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("sharing.saveError")}</p>;
+  return <ErrorNotice>{t("sharing.saveError")}</ErrorNotice>;
 }
 
 /**
@@ -142,12 +144,13 @@ export function EntryDefaultsSetting() {
   return (
     <div className="flex flex-col gap-1">
       {ENTRY_DEFAULT_KINDS.map((kind) => (
-        <label key={kind} className="flex min-h-11 items-center justify-between gap-3">
+        <div key={kind} className="flex min-h-11 items-center justify-between gap-3">
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t(`sharing.defaultKind.${kind}`)}</span>
-          <select
+          <Select
+            aria-label={t(`sharing.defaultKind.${kind}`)}
             value={current[kind]}
             disabled={save.isPending}
-            onChange={(event) => save.mutate({ kind, rung: event.target.value as DefaultRung })}
+            onValueChange={(value) => save.mutate({ kind, rung: value as DefaultRung })}
             className="min-h-11 rounded-xl px-3 text-sm font-semibold"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           >
@@ -156,8 +159,8 @@ export function EntryDefaultsSetting() {
                 {t(`journal.visibility.${rung}`)}
               </option>
             ))}
-          </select>
-        </label>
+          </Select>
+        </div>
       ))}
       <SaveError failed={save.isError} />
     </div>

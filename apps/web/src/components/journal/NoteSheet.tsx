@@ -20,6 +20,7 @@ import { VisibilityChoices } from "@/components/journal/VisibilityBadge";
 import { PRGymField, prGymSlugForSubmit, usePRGymOptions } from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const BODY_MAX = 4000;
 const GYM_RUNGS: ChoosableVisibility[] = ["private", "coach_can_view", "coach_reply_requested"];
@@ -192,13 +193,9 @@ export function NoteSheet({
         )}
 
         {moveError ? (
-          <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-            {t("note.savedPrivate", { reason: moveError })}
-          </p>
+          <ErrorNotice>{t("note.savedPrivate", { reason: moveError })}</ErrorNotice>
         ) : save.isError || remove.isError ? (
-          <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-            {t("note.saveFailed")}
-          </p>
+          <ErrorNotice>{t("note.saveFailed")}</ErrorNotice>
         ) : null}
     </Dialog>
   );

@@ -20,6 +20,7 @@ import {
   type CheckInDraft,
   type CheckInValue,
 } from "./check-in";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const TIMELINE_DAYS = 14;
 const QUESTION_KEYS = ["sleep", "energy", "mood", "stress", "body"] as const;
@@ -120,7 +121,7 @@ export function CheckInPanel({ skipQuestions = [] }: { skipQuestions?: string[] 
           </p>
           {savedAt ? <SavedLine at={savedAt} /> : null}
           {submitMutation.isError ? (
-            <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("saveFailed")}</p>
+            <ErrorNotice>{t("saveFailed")}</ErrorNotice>
           ) : null}
         </form>
       </HubCard>

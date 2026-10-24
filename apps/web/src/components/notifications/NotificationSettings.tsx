@@ -19,6 +19,7 @@ import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useOrganizationMemberships } from "@/lib/membership-role";
 import { hasStaffRole } from "@/lib/role-navigation";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const CHANNELS: NotificationChannel[] = ["in_app", "push"];
 
@@ -99,7 +100,7 @@ export function NotificationSettings() {
         )}
 
         {save.isError ? (
-          <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("saveError")}</p>
+          <ErrorNotice>{t("saveError")}</ErrorNotice>
         ) : null}
       </div>
     </CollapsibleSection>

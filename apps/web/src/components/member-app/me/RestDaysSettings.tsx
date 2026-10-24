@@ -9,6 +9,7 @@ import { MAX_OFF_DAYS, toggleOffDay } from "@/components/member-app/me/off-days"
 import { LANDING_QUERY_KEY } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Weekly rest days, which streak and consistency scores skip (moved from Ρυθμίσεις, ADR-137). */
 export function RestDaysSettings() {
@@ -72,9 +73,7 @@ export function RestDaysSettings() {
         })}
       </div>
       {save.isError ? (
-        <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-          {i18n("failedToSavePleaseTryAgainb68b7e7")}
-        </p>
+        <ErrorNotice>{i18n("failedToSavePleaseTryAgainb68b7e7")}</ErrorNotice>
       ) : null}
     </div>
   );

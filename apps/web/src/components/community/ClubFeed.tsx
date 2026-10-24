@@ -14,6 +14,7 @@ import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { HubCard } from "@/components/member-app/HubParts";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const EVENTS_SHOWN = 3;
 
@@ -78,7 +79,7 @@ export function ClubFeed({ club, onShowEvents }: { club: CommunityClub; onShowEv
         </HubCard>
       ) : null}
       <Posts posts={memberPosts} />
-      {feed.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("loadFailed")}</p> : null}
+      {feed.isError ? <ErrorNotice>{t("loadFailed")}</ErrorNotice> : null}
       {feed.hasNextPage ? (
         <button
           type="button"

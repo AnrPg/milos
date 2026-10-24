@@ -11,6 +11,7 @@ import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
 import { CameraError, scannerSource, type StopScanner } from "./scanner";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const AUTO_KEY = "palee:desk-auto-check-in";
 const SAME_CODE_MS = 4_000;
@@ -214,10 +215,11 @@ export function DeskScanner({ token, locationId }: { token: string; locationId: 
         </form>
       </div>
 
-      {cameraError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{cameraError}</p> : null}
+      {cameraError ? <ErrorNotice>{cameraError}</ErrorNotice> : null}
       {scan.isPending ? <p role="status" className="text-sm" style={{ color: "var(--muted)" }}>{t("deskChecking")}</p> : null}
-      {message ? (
-        <p role={message.tone === "error" ? "alert" : "status"} className="text-sm font-semibold" style={{ color: message.tone === "error" ? "var(--danger)" : message.tone === "ok" ? "var(--success)" : "var(--muted)" }}>
+      {message?.tone === "error" ? <ErrorNotice>{message.text}</ErrorNotice> : null}
+      {message && message.tone !== "error" ? (
+        <p role="status" className="text-sm font-semibold" style={{ color: message.tone === "ok" ? "var(--success)" : "var(--muted)" }}>
           {message.text}
         </p>
       ) : null}

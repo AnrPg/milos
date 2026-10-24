@@ -23,6 +23,7 @@ import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { BoxPhotoUploadError, uploadBoxPhoto } from "@/lib/box-photo-upload";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Draft = {
   about: string;
@@ -76,9 +77,13 @@ export function PublicPageEditor() {
 
   if (!token || !profile.data || !vocabulary.data) {
     return (
-      <p className="p-6 text-sm" style={{ color: profile.isError || vocabulary.isError ? "var(--danger)" : "var(--dim)" }}>
-        {profile.isError || vocabulary.isError ? localizeError(profile.error ?? vocabulary.error, i18n) : i18n("loading33ce417")}
-      </p>
+      profile.isError || vocabulary.isError ? (
+        <div className="p-6">
+          <ErrorNotice>{localizeError(profile.error ?? vocabulary.error, i18n)}</ErrorNotice>
+        </div>
+      ) : (
+        <p className="p-6 text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+      )
     );
   }
   return <Editor token={token} profile={profile.data} vocabulary={vocabulary.data} />;
@@ -413,9 +418,13 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
         style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)", borderTop: "1px solid var(--border)" }}
       >
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-end gap-x-3 gap-y-2">
-          <p role="status" className="mr-auto w-full text-sm sm:w-auto" style={{ color: error ? "var(--danger)" : "var(--muted)" }}>
-            {error ?? (dirty ? t("unsavedDraft") : notice)}
-          </p>
+          {error ? (
+            <ErrorNotice variant="text" className="mr-auto w-full sm:w-auto">{error}</ErrorNotice>
+          ) : (
+            <p role="status" className="mr-auto w-full text-sm sm:w-auto" style={{ color: "var(--muted)" }}>
+              {dirty ? t("unsavedDraft") : notice}
+            </p>
+          )}
           <button
             type="button"
             disabled={!dirty || busy}
@@ -576,9 +585,9 @@ function SuggestTag({ token, list, initial }: { token: string; list: TagList; in
         </button>
       </div>
       {send.isError ? (
-        <p className="text-sm" style={{ color: "var(--danger)" }}>
+        <ErrorNotice>
           {t("suggestionFailed")}
-        </p>
+        </ErrorNotice>
       ) : null}
     </form>
   );

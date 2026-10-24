@@ -26,6 +26,7 @@ import { useDebounced } from "@/hooks/useDebounced";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const LocationPinMap = dynamic(() => import("@/components/admin/location/LocationPinMap"), { ssr: false });
 
@@ -257,9 +258,13 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
             style={fieldStyle}
           />
           {linkState !== "idle" ? (
-            <p role="status" className="text-xs" style={{ color: linkState === "failed" ? "var(--danger)" : "var(--dim)" }}>
-              {linkState === "failed" ? t("linkFailed") : t("linkResolving")}
-            </p>
+            linkState === "failed" ? (
+              <ErrorNotice variant="field">{t("linkFailed")}</ErrorNotice>
+            ) : (
+              <p role="status" className="text-xs" style={{ color: "var(--dim)" }}>
+                {t("linkResolving")}
+              </p>
+            )
           ) : (
             <span className="text-xs" style={{ color: "var(--dim)" }}>{t("addressHint")}</span>
           )}
@@ -271,7 +276,7 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
               style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", boxShadow: "var(--shadow-md)" }}
             >
               {searchFailed ? (
-                <li className="px-4 py-3 text-sm" style={{ color: "var(--muted)" }}>{t("searchUnavailable")}</li>
+                <li className="px-4 py-3"><ErrorNotice variant="text">{t("searchUnavailable")}</ErrorNotice></li>
               ) : places.length === 0 ? (
                 <li className="px-4 py-3 text-sm" style={{ color: "var(--muted)" }}>{t("noMatches")}</li>
               ) : (
@@ -351,9 +356,13 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)", borderTop: "1px solid var(--border)" }}
         >
           <div className="mx-auto flex max-w-3xl items-center justify-end gap-3">
-            <p role="status" className="mr-auto text-sm" style={{ color: error ? "var(--danger)" : "var(--muted)" }}>
-              {error ?? (dirty ? t("unsaved") : notice)}
-            </p>
+            {error ? (
+              <ErrorNotice variant="text" className="mr-auto">{error}</ErrorNotice>
+            ) : (
+              <p role="status" className="mr-auto text-sm" style={{ color: "var(--muted)" }}>
+                {dirty ? t("unsaved") : notice}
+              </p>
+            )}
             <button
               type="button"
               disabled={!dirty || save.isPending}

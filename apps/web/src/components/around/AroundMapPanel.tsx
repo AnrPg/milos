@@ -11,6 +11,7 @@ import { MAX_VIEWPORT_KM, initialViewport, viewportDiagonalKm } from "./around";
 import type { MapPin } from "./AroundMap";
 import { useAroundError } from "./AreaPicker";
 import { useAround, useAroundPins } from "./use-around";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const AroundMap = dynamic(() => import("./AroundMap"), {
   ssr: false,
@@ -182,7 +183,7 @@ export function AroundMapPanel({ origin, radiusKm }: { origin: AroundOrigin; rad
         </span>
         {pinsQuery.data ? <span>{t("pinCount", { count: pins.length })}</span> : null}
         {pinsQuery.data?.truncated ? <span>{t("pinsTruncated")}</span> : null}
-        {pinsQuery.isError ? <span role="alert">{aroundError(pinsQuery.error)}</span> : null}
+        {pinsQuery.isError ? <ErrorNotice variant="text">{aroundError(pinsQuery.error)}</ErrorNotice> : null}
       </div>
 
       {cardPin ? (

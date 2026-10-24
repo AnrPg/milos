@@ -31,6 +31,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** The WOD as the sheet shows it (board 2, Q7): each part with its movement names. */
 export function wodOutline(workout: WorkoutPreview) {
@@ -261,9 +262,7 @@ export function ClassSheet({
       footer={
         <div className="flex w-full flex-col gap-2">
           {shownError ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-              {shownError}
-            </p>
+            <ErrorNotice>{shownError}</ErrorNotice>
           ) : null}
           {footer}
         </div>
@@ -382,9 +381,7 @@ export function ClassSheet({
                   style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
                 />
                 {messageError ? (
-                  <p className="text-xs" style={{ color: "var(--danger)" }}>
-                    {messageError}
-                  </p>
+                  <ErrorNotice variant="field">{messageError}</ErrorNotice>
                 ) : null}
                 <button
                   type="button"

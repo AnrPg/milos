@@ -6,6 +6,7 @@ import { fetchRoleAccess, updateRoleAccess } from "@/api/roles";
 import { localizeError } from "@/i18n/presentation";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const CAPABILITY_LABELS: Record<string, string> = {
   manage_billing: "roleAccessBilling",
@@ -29,7 +30,7 @@ export function RoleAccessSettings({ token }: { token: string }) {
   });
 
   if (access.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>;
-  if (access.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(access.error, i18n)}</p>;
+  if (access.isError) return <ErrorNotice>{localizeError(access.error, i18n)}</ErrorNotice>;
 
   return (
     <div className="space-y-6">
@@ -63,7 +64,7 @@ export function RoleAccessSettings({ token }: { token: string }) {
           </fieldset>
         );
       })}
-      {mutation.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(mutation.error, i18n)}</p> : null}
+      {mutation.isError ? <ErrorNotice>{localizeError(mutation.error, i18n)}</ErrorNotice> : null}
     </div>
   );
 }

@@ -46,6 +46,7 @@ import {
 import { zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 // ADR-179: on the gym's clock (`zone`), its city added when the viewer's differs.
 function formatDateTime(locale: string, isoString: string, zone: string | null) {
@@ -488,7 +489,7 @@ export function SlotPopup({
                 {i18n("mbWaitlistExplainer")}
               </p>
               {waitlistError ? (
-                <p className="mt-2 text-xs" style={{ color: "var(--danger)" }}>{waitlistError}</p>
+                <ErrorNotice variant="field" className="mt-2">{waitlistError}</ErrorNotice>
               ) : null}
               <button
                 className="mt-3 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
@@ -517,7 +518,7 @@ export function SlotPopup({
             !isAdmin ? (
             <div className="mt-3">
               {cancelError ? (
-                <p className="mb-2 text-xs" style={{ color: "var(--danger)" }}>{cancelError}</p>
+                <ErrorNotice variant="field" className="mb-2">{cancelError}</ErrorNotice>
               ) : null}
               <button
                 className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
@@ -692,7 +693,7 @@ export function SlotPopup({
                   {i18n("mbClassFullWaitlistHint")}
                 </p>
                 {waitlistError ? (
-                  <p className="mb-2 text-xs" style={{ color: "var(--danger)" }}>{waitlistError}</p>
+                  <ErrorNotice variant="field" className="mb-2">{waitlistError}</ErrorNotice>
                 ) : null}
                 <button
                   className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
@@ -769,7 +770,7 @@ export function SlotPopup({
                     </button>
                   </div>
                   {messageError ? (
-                    <p className="text-xs" style={{ color: "var(--danger)" }}>{messageError}</p>
+                    <ErrorNotice variant="field">{messageError}</ErrorNotice>
                   ) : null}
                 </div>
               )}
@@ -796,9 +797,9 @@ export function SlotPopup({
                     nameFor={(userId) => bookingNames.get(userId) ?? i18n("injuryWarningUnknownPerson")}
                   />
                 ) : slotInjuryWarnings.isError ? (
-                  <p className="text-xs" style={{ color: "var(--dim)" }}>
+                  <ErrorNotice variant="field">
                     {i18n("injuryWarningLoadFailed")}
-                  </p>
+                  </ErrorNotice>
                 ) : null
               }
               badgeFor={(booking) => <InjuryWarningBadge level={warningLevelFor(injuryLevels, booking.user_id)} />}

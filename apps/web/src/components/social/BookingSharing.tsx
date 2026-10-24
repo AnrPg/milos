@@ -9,6 +9,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function useSetBookingSharing() {
   const { tokens } = useSession();
@@ -71,7 +72,7 @@ export function BookingSharingOffer() {
           {t("bookingSharingNo")}
         </button>
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </section>
   );
 }
@@ -97,7 +98,7 @@ export function BookingSharingSetting() {
       >
         {enabled ? t("bookingSharingTurnOff") : t("bookingSharingTurnOn")}
       </button>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </div>
   );
 }

@@ -23,6 +23,7 @@ import { MuscleChip, RoleLegend, ToggleChip } from "./GoalChips";
 import { MusclePickerSheet, type PickerEntry } from "./MusclePickerSheet";
 import { StimulusField } from "./StimulusField";
 import { useAdminWorkoutGoals, useSaveAdminWorkoutGoals } from "./use-wod-goals";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error" | "invalid";
 
@@ -97,10 +98,9 @@ function GoalsPanel({ workoutId, refreshKey, timeDomainSeconds = null }: { worko
 
   if (query.isError && !state.loaded) {
     return (
-      <div className="flex flex-wrap items-center gap-2 p-4 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+      <ErrorNotice className="m-4" action={<button type="button" className="font-semibold underline" onClick={() => void refetch()}>{t("retry")}</button>}>
         {t("loadError")}
-        <button type="button" className="font-semibold underline" onClick={() => void refetch()}>{t("retry")}</button>
-      </div>
+      </ErrorNotice>
     );
   }
   if (!state.loaded) return <p className="p-4 text-xs" style={{ color: "var(--muted)" }}>…</p>;
@@ -223,10 +223,10 @@ function SaveLine({ status, saved, onKeep, onRetry }: { status: SaveStatus; save
   const t = useTranslations("WodGoals");
   if (status === "error" || status === "invalid") {
     return (
-      <p role="alert" className="flex flex-wrap items-center gap-2 text-xs font-semibold" style={{ color: "var(--danger)" }}>
-        {status === "invalid" ? t("invalid") : t("status.error")}
+      <ErrorNotice variant="field">
+        {status === "invalid" ? t("invalid") : t("status.error")}{" "}
         <button type="button" className="underline" onClick={onRetry}>{t("retry")}</button>
-      </p>
+      </ErrorNotice>
     );
   }
   if (status === "saving") return <p role="status" className="text-xs" style={{ color: "var(--muted)" }}>{t("status.saving")}</p>;

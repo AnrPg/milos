@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { exportDeviceData } from "@/api/phone-health";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * «Λήψη δεδομένων συσκευών» (plan D11, ADR-172): everything connected devices
@@ -37,7 +38,7 @@ export function DeviceDataExport({ token }: { token: string }) {
       >
         {t("exportData")}
       </button>
-      {download.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("exportFailed")}</p> : null}
+      {download.isError ? <ErrorNotice>{t("exportFailed")}</ErrorNotice> : null}
     </div>
   );
 }

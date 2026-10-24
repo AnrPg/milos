@@ -6,6 +6,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 
 import { useOpenConversation } from "./use-conversations";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * «Message» on a person's profile (ADR-193 §3): opens (or finds) your
@@ -34,9 +35,9 @@ export function MessageButton({ personId, name, wide = false }: { personId: stri
         {t("message")}
       </button>
       {open.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+        <ErrorNotice>
           {localizeError(open.error, tUi)}
-        </p>
+        </ErrorNotice>
       ) : null}
     </div>
   );

@@ -32,6 +32,55 @@ defmodule PaleeWeb.AuthControllerTest do
       assert conn.resp_cookies["milos_refresh"].same_site == "Strict"
     end
 
+    test "keeps the language the sign-up page was shown in (ADR-195)", %{conn: conn} do
+      params = %{
+        handle: "hera",
+        password: "a b c d",
+        role: "member",
+        email: "hera@placeholder.invalid",
+        preferred_locale: "el"
+      }
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/auth/register", Jason.encode!(params))
+
+      assert %{"access_token" => _} = json_response(conn, 201)
+      assert %{preferred_locale: "el"} = Identity.find_by_handle("hera")
+    end
+
+    test "defaults the language to English and refuses an unsupported one", %{conn: conn} do
+      base = %{password: "a b c d", role: "member"}
+
+      created =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register",
+          Jason.encode!(Map.merge(base, %{handle: "ares", email: "ares@placeholder.invalid"}))
+        )
+
+      assert json_response(created, 201)
+      assert %{preferred_locale: "en"} = Identity.find_by_handle("ares")
+
+      refused =
+        build_conn()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register",
+          Jason.encode!(
+            Map.merge(base, %{
+              handle: "eris",
+              email: "eris@placeholder.invalid",
+              preferred_locale: "xx"
+            })
+          )
+        )
+
+      assert json_response(refused, 422)
+    end
+
     test "returns 422 on a duplicate handle", %{conn: conn} do
       params = %{
         nickname: "zeus",

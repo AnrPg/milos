@@ -24,6 +24,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Staff's trial queue (board 6 Q4): Αιτήματα · Επερχόμενα · Ήρθαν · Έγιναν
@@ -82,7 +83,7 @@ export function TrialQueue() {
         />
 
         {queue.isPending ? <p className="py-8 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-        {queue.isError ? <p className="py-8 text-center text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(queue.error))}</p> : null}
+        {queue.isError ? <ErrorNotice className="my-8">{t(trialErrorKey(queue.error))}</ErrorNotice> : null}
         {queue.isSuccess && queue.data.trials.length === 0 ? (
           <p className="rounded-2xl p-6 text-center text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
             {t(`stageEmpty_${stage}`)}
@@ -150,7 +151,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
       {trial.join_interest_at && trial.status !== "converted" ? (
         <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>{t("wantsToJoin")}</p>
       ) : null}
-      {action.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(action.error))}</p> : null}
+      {action.isError ? <ErrorNotice>{t(trialErrorKey(action.error))}</ErrorNotice> : null}
 
       {declining ? (
         <div className="flex flex-col gap-2">

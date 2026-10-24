@@ -44,6 +44,7 @@ import {
 } from "./wellness-model";
 import { ErrorLine, Pills, PrimaryButton, QuietButton, SheetSection, WellnessSheet } from "./WellnessSheet";
 import { TimeInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const SLEEP_KINDS: ("night" | "nap")[] = ["night", "nap"];
 
@@ -314,9 +315,13 @@ export function MealSheet({
             </button>
           ) : null}
         </div>
-        <p className="text-xs" style={{ color: picked.failed ? "var(--danger)" : "var(--dim)" }}>
-          {picked.uploading ? t("meal.photoUploading") : picked.failed ? t("meal.photoFailed") : t("meal.photoPrivate")}
-        </p>
+        {!picked.uploading && picked.failed ? (
+          <ErrorNotice variant="field">{t("meal.photoFailed")}</ErrorNotice>
+        ) : (
+          <p className="text-xs" style={{ color: "var(--dim)" }}>
+            {picked.uploading ? t("meal.photoUploading") : t("meal.photoPrivate")}
+          </p>
+        )}
       </SheetSection>
       <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
         {t("meal.note")}

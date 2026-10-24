@@ -27,6 +27,7 @@ import { HelpTooltip } from "@/components/HelpTooltip";
 import { PageHeader } from "@/components/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
 
@@ -709,9 +710,9 @@ export function AdminChallenges() {
               </div>
 
               {saveMutation.isError ? (
-                <p className="text-sm" style={{ color: "var(--primary)" }}>
+                <ErrorNotice>
                   {saveMutation.error instanceof Error ? localizeError(saveMutation.error, i18n) : i18n("challengeCouldNotBeSavedec78ef0")}
-                </p>
+                </ErrorNotice>
               ) : null}
             </div>
           </article>

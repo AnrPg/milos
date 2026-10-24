@@ -15,6 +15,7 @@ import { formatElapsed } from "@/components/client/vault";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** That day's result of one execution: time, section scores, changes and notes. */
 export function ExecutionPerformanceModal({
@@ -57,9 +58,9 @@ export function ExecutionPerformanceModal({
             {i18n("loadingExecutionDetailscda7566")}
           </p>
         ) : query.isError || !execution ? (
-          <p className="mt-6 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+          <ErrorNotice className="mt-6">
             {query.error ? clientErrorMessage(query.error, i18n) : i18n("executionDetailsCouldNotBeLoaded30a9f0a")}
-          </p>
+          </ErrorNotice>
         ) : (
           <div className="mt-5 space-y-5">
             <div className="grid gap-3 sm:grid-cols-3">

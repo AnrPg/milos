@@ -14,6 +14,7 @@ import {
   type SectionMetric,
 } from "@/lib/text-sections";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function useScoreKindLabels(): Record<ScoreKind, string> {
   const i18n = useUiTranslations();
@@ -134,9 +135,9 @@ export function SectionScoringField({
       ) : null}
 
       {invalid ? (
-        <p className="mt-1 text-xs font-semibold" style={{ color: "var(--danger)" }}>
+        <ErrorNotice variant="field" className="mt-1">
           {i18n("textSectionScoringInvalid")}
-        </p>
+        </ErrorNotice>
       ) : null}
     </div>
   );

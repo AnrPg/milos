@@ -23,6 +23,7 @@ import {
 import { SemanticLabel } from "@/components/semantic-label";
 import { useUiTranslations } from "@/i18n/ui";
 import { affectedExercises, selectionKey, warnedAthletes } from "@/lib/injury-warnings";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export type StaffInjuryWarningApi = {
   evaluate: typeof evaluateAthleteInjuryWarnings;
@@ -253,9 +254,9 @@ export function AthleteInjuryWarningsPanel({
   if (!key) return null;
   if (query.isError) {
     return (
-      <p className="text-xs" style={{ color: "var(--dim)" }}>
+      <ErrorNotice variant="field">
         {i18n("injuryWarningLoadFailed")}
-      </p>
+      </ErrorNotice>
     );
   }
   if (!query.data || query.data.level === "none") return null;
@@ -362,9 +363,9 @@ export function MyInjuryWarningsPanel({
 
   if (query.isError) {
     return (
-      <p className="text-xs" style={{ color: "var(--dim)" }}>
+      <ErrorNotice variant="field">
         {i18n("injuryWarningLoadFailed")}
-      </p>
+      </ErrorNotice>
     );
   }
   if (!query.data || query.data.level === "none") return null;

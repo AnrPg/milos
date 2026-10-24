@@ -13,6 +13,7 @@ import { reportInjury, type ReportInjuryRequest } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
   const i18n = useUiTranslations();
@@ -128,9 +129,9 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
             </div>
 
             {reportMutation.error instanceof Error && (
-              <p className="text-xs font-semibold" style={{ color: "var(--danger)" }}>
+              <ErrorNotice>
                 {localizeError(reportMutation.error, i18n)}
-              </p>
+              </ErrorNotice>
             )}
 
             <button

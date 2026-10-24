@@ -7,6 +7,7 @@ import { createClassType, type ClassTypeRecord } from "@/api/schedule";
 import { Dialog } from "@/components/ui/Dialog";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * A gym without any active class type can't hold a class yet (the type is
@@ -92,9 +93,9 @@ export function FirstClassTypeDialog({
           />
         </label>
         {error ? (
-          <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>
+          <ErrorNotice>
             {error}
-          </p>
+          </ErrorNotice>
         ) : null}
       </form>
     </Dialog>

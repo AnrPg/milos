@@ -40,6 +40,7 @@ import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { AppliesToBranches, offeredBranches } from "@/components/admin/AppliesToBranches";
 import { membershipLocationScope } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export type FieldContext = {
   classTypes: ClassTypeRecord[];
@@ -98,7 +99,7 @@ export function FieldShell({
       </div>
       {children}
       {hint ? <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{hint}</p> : null}
-      {error ? <p className="text-xs font-semibold" role="alert" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice variant="field">{error}</ErrorNotice> : null}
     </div>
   );
 }
@@ -799,7 +800,7 @@ function TimeWindowsControl({ value, onChange }: { value: TimeWindow[]; onChange
               {t("pkgRemove")}
             </button>
           </div>
-          {window.days.length === 0 || window.from >= window.to ? <p className="text-xs" style={{ color: "var(--danger)" }}>{t("pkgTimeWindowInvalid")}</p> : null}
+          {window.days.length === 0 || window.from >= window.to ? <ErrorNotice variant="field">{t("pkgTimeWindowInvalid")}</ErrorNotice> : null}
         </div>
       ))}
       <button

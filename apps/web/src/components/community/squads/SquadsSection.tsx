@@ -15,6 +15,7 @@ import type { useSelectedMembershipRole } from "@/lib/membership-role";
 
 import { CreateSquadSheet, InvitationRow, SquadRow, useSquads } from "./SquadParts";
 import { hasSquadContent } from "./squads";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Membership = ReturnType<typeof useSelectedMembershipRole>["membership"];
 
@@ -63,7 +64,7 @@ export function SquadsBoxSection({ membership, showCoach = false }: { membership
   if (squads.isError) {
     return showCoach ? (
       <HubCard eyebrow={t("title")}>
-        <p className="text-sm" style={{ color: "var(--danger)" }}>{clientErrorMessage(squads.error, tUi)}</p>
+        <ErrorNotice>{clientErrorMessage(squads.error, tUi)}</ErrorNotice>
       </HubCard>
     ) : null;
   }

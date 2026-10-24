@@ -18,6 +18,7 @@ import {
 } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice } from "@/components/auth/AuthShell";
+import { LanguagePicker } from "@/components/auth/LanguagePicker";
 import { BusinessSignUpLink } from "@/components/business/BusinessSignUp";
 import { RecoveryCodesOffer } from "@/components/auth/RecoveryCodesOffer";
 import { SignupHandleField, useHandleSuggestion } from "@/components/auth/SignupHandleField";
@@ -219,6 +220,9 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
           {offerRecoveryCodes ? <RecoveryCodesOffer onSkip={continueAfterAuth} /> : <>
+          <div className="mb-4 flex justify-end">
+            <LanguagePicker />
+          </div>
           {/* Mode toggle */}
           <div className="mb-7 flex justify-center">
             <div
@@ -464,16 +468,9 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           </div>
 
           {error ? (
-            <p
-              className="mt-4 rounded-2xl px-4 py-3 text-sm"
-              style={{
-                border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)",
-                background: "color-mix(in srgb, var(--primary) 8%, transparent)",
-                color: "var(--primary-strong)",
-              }}
-            >
+            <AuthNotice>
               {error}
-            </p>
+            </AuthNotice>
           ) : null}
           </>}
         </div>

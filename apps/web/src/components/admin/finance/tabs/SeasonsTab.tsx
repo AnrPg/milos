@@ -28,6 +28,7 @@ import { seasonDate, seasonErrorKey, seasonMoney, seasonRange, statusTone } from
 import { useSession } from "@/components/session-provider";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Seasons (ADR-167): the gym's fixed-length programmes, sold next to its
@@ -186,7 +187,7 @@ function SeasonPanel({
       {id && detail.isLoading ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : id && !detail.data ? (
-        <p className="text-sm" style={{ color: "var(--dim)" }}>{t("error_generic")}</p>
+        <ErrorNotice>{t("error_generic")}</ErrorNotice>
       ) : (
         <SeasonEditor
           key={detail.data?.id ?? "new"}
@@ -405,7 +406,7 @@ function SeasonEditor({
         </Field>
       </fieldset>
 
-      {save.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(seasonErrorKey(save.error))}</p> : null}
+      {save.error ? <ErrorNotice>{t(seasonErrorKey(save.error))}</ErrorNotice> : null}
 
       {!closed ? (
         <div className="flex flex-wrap gap-2">
@@ -539,7 +540,7 @@ function Enrollments({
           ))}
         </ul>
       )}
-      {act.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(seasonErrorKey(act.error))}</p> : null}
+      {act.error ? <ErrorNotice>{t(seasonErrorKey(act.error))}</ErrorNotice> : null}
     </section>
   );
 }

@@ -9,6 +9,7 @@ import { fetchFollowStatus, follow, followKey, SOCIAL_KEY, unfollow, type Follow
 import { clientErrorMessage } from "@/components/client/errors";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Follow a person or a box (plan §5a Q9): «Ακολούθησε» → «Εκκρεμεί» →
@@ -136,7 +137,7 @@ export function FollowButton({
           )}
         </button>
       )}
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </div>
   );
 }

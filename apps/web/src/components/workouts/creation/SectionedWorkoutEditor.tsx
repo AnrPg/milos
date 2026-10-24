@@ -47,6 +47,7 @@ import { EditorTabs } from "./EditorTabs";
 import { SectionScoringField } from "./SectionScoringField";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   draftId: string | null;
@@ -350,14 +351,17 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
       </button>
 
       <footer className="sticky bottom-(--bottom-nav-space) flex flex-wrap items-center justify-between gap-3 border-t py-3" style={{ borderColor: "var(--dim)", background: "var(--bg)" }}>
-        <span className="text-xs" role={notice ? "alert" : undefined} style={{ color: notice ? "var(--danger)" : "var(--muted)" }}>
-          {notice ??
-            (showProblems && (titleMissing || !type)
+        {notice ? (
+          <ErrorNotice variant="text">{notice}</ErrorNotice>
+        ) : (
+          <span className="text-xs" style={{ color: "var(--muted)" }}>
+            {showProblems && (titleMissing || !type)
               ? i18n("sectionedEditorNeedsTitleAndType")
               : visibleProblems.length > 0
                 ? i18n("sectionedEditorFixSections")
-                : i18n("textSectionCount", { count: sections.length }))}
-        </span>
+                : i18n("textSectionCount", { count: sections.length })}
+          </span>
+        )}
         <button
           type="button"
           disabled={!accessToken || !draftId || !loaded || publishing}
@@ -467,9 +471,9 @@ function SectionCard({
         ) : null}
       </div>
       {textMissing ? (
-        <p className="mt-1 text-xs font-semibold" style={{ color: "var(--danger)" }}>
+        <ErrorNotice variant="field" className="mt-1">
           {problems.includes("text_too_long") ? i18n("textSectionTooLong") : i18n("textSectionTextRequired")}
-        </p>
+        </ErrorNotice>
       ) : null}
 
       <div className="mt-3">
@@ -508,9 +512,9 @@ function SectionCard({
           </button>
         </div>
         {timerMissing ? (
-          <p className="mt-1 text-xs font-semibold" style={{ color: "var(--danger)" }}>
+          <ErrorNotice variant="field" className="mt-1">
             {i18n("textSectionTimerRequired")}
-          </p>
+          </ErrorNotice>
         ) : null}
         {timerOpen ? (
           <div className="mt-3 rounded-xl border p-3" style={{ borderColor: "var(--border)", background: "var(--panel)" }}>

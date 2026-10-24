@@ -36,6 +36,7 @@ import {
 import { ScheduleFiltersPage } from "./ScheduleFiltersPage";
 import { useSchedulePreferences } from "./use-schedule-preferences";
 import { WeekStrip } from "./WeekStrip";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Both views read the six-week month grid around the selected date, so
@@ -297,26 +298,25 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         </p>
       ) : null}
       {actionError ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-          {actionError}
-        </p>
+        <ErrorNotice>{actionError}</ErrorNotice>
       ) : null}
 
       <section aria-live="polite" hidden={view === "month"} className="flex flex-col gap-2">
         {windowQuery.isError ? (
-          <div className="flex flex-col items-center gap-3 py-10 text-center">
-            <p className="text-base font-bold" style={{ color: "var(--text)" }}>
-              {t("loadFailed")}
-            </p>
-            <button
-              type="button"
-              onClick={reload}
-              className="min-h-10 rounded-full px-5 text-sm font-bold"
-              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            >
-              {t("retry")}
-            </button>
-          </div>
+          <ErrorNotice
+            action={
+              <button
+                type="button"
+                onClick={reload}
+                className="min-h-10 rounded-full px-5 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                {t("retry")}
+              </button>
+            }
+          >
+            {t("loadFailed")}
+          </ErrorNotice>
         ) : windowQuery.isPending || !prefs.ready ? (
           Array.from({ length: 4 }, (_, index) => (
             <div key={index} className="h-16 animate-pulse rounded-2xl" style={{ background: "var(--panel)" }} />

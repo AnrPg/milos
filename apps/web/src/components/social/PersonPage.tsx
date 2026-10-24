@@ -14,6 +14,7 @@ import { MessageButton } from "@/components/conversations/MessageButton";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BuddyBadge, CountsLine } from "@/components/social/SocialBits";
 import { postsLockKey } from "@/components/social/social-model";
 
@@ -41,7 +42,7 @@ export function PersonPage({ id }: { id: string }) {
   if (!person.data)
     return (
       <main className="mx-auto w-full max-w-xl p-4">
-        <p role="alert" style={{ color: "var(--text-soft)" }}>{t("personMissing")}</p>
+        <ErrorNotice>{t("personMissing")}</ErrorNotice>
       </main>
     );
   const profile = person.data;

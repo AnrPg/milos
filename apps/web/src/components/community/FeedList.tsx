@@ -6,6 +6,7 @@ import type { FeedFilter } from "@/api/community";
 import { withoutPinned } from "@/components/community/community";
 import { PostCard } from "@/components/community/PostCard";
 import { useFeed } from "@/components/community/use-community";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * A feed of posts: pinned announcements first, then newest first (ADR-138).
@@ -23,7 +24,7 @@ export function FeedList({ filter, empty }: { filter: FeedFilter; empty?: string
   );
 
   if (feed.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (feed.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("loadFailed")}</p>;
+  if (feed.isError) return <ErrorNotice>{t("loadFailed")}</ErrorNotice>;
   if (pinned.length === 0 && posts.length === 0)
     return empty ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{empty}</p> : null;
 

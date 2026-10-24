@@ -401,6 +401,8 @@ Use a single enum across entry types: `private | coach_can_view | coach_reply_re
 - Every list uses the chip-row + `Φίλτρα (n)` pattern.
 - Every journal entry renders its visibility badge.
 - Copy is in neutral, non-judgmental Greek. Strings go through i18n.
+- Every error the person sees (failed sign-in, failed save, invalid field) is the same red, prominent notice (`ui/ErrorNotice`, ADR-195); blue is only for actions. Destructive buttons and badges are not errors.
+- Signed-out pages (sign in, sign up, password reset, business sign-up) carry a language picker; a new account keeps the language it signed up in (ADR-195).
 
 ### 8.6 Health & ethics requirements (MUST)
 Food and body tracking can harm people with disordered eating:

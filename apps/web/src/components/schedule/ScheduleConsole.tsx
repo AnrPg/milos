@@ -49,6 +49,7 @@ import { IntegerInput } from "@/components/integer-input";
 import { fetchGymStaff } from "@/api/staff";
 import { coachOptions } from "@/components/admin/staff-home";
 import { can } from "@/lib/role-navigation";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** A class may name its coach (ADR-100). */
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
@@ -674,9 +675,9 @@ export function ScheduleConsole({
         ) : null}
 
         {error ? (
-          <div className="rounded-[1.6rem] px-5 py-4 text-sm" role="alert" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 19%, transparent)", color: "var(--primary-strong)" }}>
+          <ErrorNotice>
             {error}
-          </div>
+          </ErrorNotice>
         ) : null}
 
         {created ? (

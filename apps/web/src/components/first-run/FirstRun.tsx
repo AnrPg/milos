@@ -16,6 +16,7 @@ import { InterestsEditor } from "@/components/interests/InterestsEditor";
 import { useSession } from "@/components/session-provider";
 import { FIRST_RUN, markFirstRunDone, safeNext } from "@/lib/first-run";
 import { useOrganizationMemberships } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STEPS = ["photo", "interests", "where"] as const;
 type Step = (typeof STEPS)[number];
@@ -121,11 +122,7 @@ function StepActions({
 }
 
 function ErrorText({ message }: { message: string }) {
-  return (
-    <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-      {message}
-    </p>
-  );
+  return <ErrorNotice>{message}</ErrorNotice>;
 }
 
 function PhotoStep({ onNext }: { onNext: () => void }) {

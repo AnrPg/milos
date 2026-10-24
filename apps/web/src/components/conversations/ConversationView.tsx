@@ -28,6 +28,7 @@ import { BuddyBadge, RequestButtons, useShortTime } from "./ConversationRow";
 import { personLabel, settledPending, shownMessages, type PendingMessage } from "./conversation-model";
 import { CONVERSATIONS_FALLBACK_REFETCH_MS } from "./conversations-realtime";
 import { REQUESTS_HREF, useConversationsToken, useRequestActions } from "./use-conversations";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** The API's limit on one message (ADR-193 §3). */
 export const MESSAGE_MAX_LENGTH = 2000;
@@ -171,9 +172,9 @@ export function ConversationView({ conversationId, onDeclined }: { conversationI
   if (conversation.isError || !conversation.data) {
     const missing = conversation.error instanceof ApiError && conversation.error.status === 404;
     return (
-      <p className="text-sm" role="alert" style={{ color: "var(--text-soft)" }} data-testid="conversation-unavailable">
+      <div data-testid="conversation-unavailable"><ErrorNotice>
         {missing ? t("unavailable") : localizeError(conversation.error, tUi)}
-      </p>
+      </ErrorNotice></div>
     );
   }
 
@@ -229,9 +230,9 @@ export function ConversationView({ conversationId, onDeclined }: { conversationI
             }
           />
           {actionError ? (
-            <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>
+            <ErrorNotice>
               {localizeError(actionError, tUi)}
-            </p>
+            </ErrorNotice>
           ) : null}
         </section>
       ) : null}
@@ -258,9 +259,9 @@ export function ConversationView({ conversationId, onDeclined }: { conversationI
           </p>
         ) : null}
         {pages.isError ? (
-          <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>
+          <ErrorNotice>
             {localizeError(pages.error, tUi)}
-          </p>
+          </ErrorNotice>
         ) : null}
         {!pages.isPending && shown.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--muted)" }}>

@@ -23,6 +23,7 @@ import { Popover } from "@/components/ui/Popover";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * ADR-184: a gym or coach in demo mode. On every admin screen one floating
@@ -197,7 +198,7 @@ function DemoButton({
             )}
           </div>
           {error ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(error, i18n)}</p>
+            <ErrorNotice>{localizeError(error, i18n)}</ErrorNotice>
           ) : null}
         </div>
       </Popover>
@@ -250,7 +251,7 @@ function NotActivatedNotice({
           {pending ? t("activation.pending") : token ? t("notice.howOwner") : t("notice.howStaff")}
         </p>
         {request.error ? (
-          <p role="alert" style={{ color: "var(--danger)" }}>{localizeError(request.error, i18n)}</p>
+          <ErrorNotice>{localizeError(request.error, i18n)}</ErrorNotice>
         ) : null}
       </div>
     </Dialog>

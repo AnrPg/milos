@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { completePasswordReset } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
 import {
   passwordLongEnough,
@@ -98,9 +99,9 @@ export function ResetPassword() {
     return (
       <AuthShell title={t("resetLinkProblemTitle")}>
         <div className="space-y-5 text-center">
-          <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }} role="alert">
+          <ErrorNotice className="text-start">
             {failure === "expired" ? t("resetLinkExpired") : t("resetLinkInvalid")}
-          </p>
+          </ErrorNotice>
           <Link className={`block ${primaryButtonClass}`} style={primaryButtonStyle} href="/forgot-password">
             {t("askForNewLink")}
           </Link>

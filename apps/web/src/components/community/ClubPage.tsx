@@ -33,6 +33,7 @@ import { useClubRealtime, useMyClubs } from "@/components/community/use-communit
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { guideAnchor } from "@/lib/guides/anchors";
 
 type ClubTab = "feed" | "channels" | "events" | "members";
@@ -273,7 +274,7 @@ function ChannelRow({
         <p className="text-xs" style={{ color: "var(--dim)" }}>
           {t(WRITE_KEYS[channel.write_policy])} · {channel.membership === "everyone" ? t("channelEveryone") : t("channelOptIn")}
         </p>
-        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice variant="text">{error}</ErrorNotice> : null}
       </div>
       {channel.can_leave ? (
         <button

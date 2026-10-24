@@ -20,6 +20,7 @@ import { semanticLabel } from "@/i18n/presentation";
 import { PageHeader } from "@/components/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function AdminWellbeing() {
   const i18n = useUiTranslations();
@@ -172,7 +173,7 @@ export function AdminWellbeing() {
                 {reportMutation.isPending ? i18n("savingae7e887") : i18n("saveInjuryReport0a1caa0")}
               </button>
               {reportMutation.error ? (
-                <p className="mt-3 text-sm font-semibold text-[var(--danger)]">{i18n("couldNotSaveInjuryReport5ec35fc")}</p>
+                <ErrorNotice className="mt-3">{i18n("couldNotSaveInjuryReport5ec35fc")}</ErrorNotice>
               ) : null}
             </div>
           </form>

@@ -17,6 +17,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { AltTextSheet } from "@/components/media/AltTextSheet";
 import type { ComposeMedia, ComposeMediaItem } from "@/components/media/useComposeMedia";
 import { CROP_ASPECTS, type CropAspect, type UploadState } from "@/lib/post-media";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export type ComposeMediaPickerHandle = { focus: () => void };
 
@@ -158,9 +159,9 @@ export const ComposeMediaPicker = forwardRef<ComposeMediaPickerHandle, { media: 
                 ) : null}
               </div>
               {selected.upload.error ? (
-                <p className="text-sm" style={{ color: "var(--danger)" }}>
+                <ErrorNotice variant="field">
                   {t(["error", selected.upload.error].join("_"), { minutes })}
-                </p>
+                </ErrorNotice>
               ) : null}
               {selected.kind === "photo" && selected.upload.phase !== "rejected" ? (
                 <>
@@ -214,9 +215,7 @@ export const ComposeMediaPicker = forwardRef<ComposeMediaPickerHandle, { media: 
       )}
 
       {media.refusal ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-          {t(["refusal", media.refusal].join("_"), { photos: limits.max_photos })}
-        </p>
+        <ErrorNotice>{t(["refusal", media.refusal].join("_"), { photos: limits.max_photos })}</ErrorNotice>
       ) : null}
 
       <input

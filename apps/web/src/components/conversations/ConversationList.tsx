@@ -10,6 +10,7 @@ import { localizeError } from "@/i18n/presentation";
 import { ConversationRow, RequestRow } from "./ConversationRow";
 import { listedConversations } from "./conversation-model";
 import { REQUESTS_HREF, useConversationList, useRequestActions } from "./use-conversations";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * The body of a folder (ADR-193 §3): inbox rows, or requests with Accept
@@ -42,9 +43,9 @@ export function ConversationList({
   }
   if (pages.isError) {
     return hideWhenEmpty ? null : (
-      <p className="px-1 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+      <ErrorNotice className="px-1">
         {localizeError(pages.error, tUi)}
-      </p>
+      </ErrorNotice>
     );
   }
   if (rows.length === 0) {
@@ -58,9 +59,9 @@ export function ConversationList({
   return (
     <div className="flex flex-col gap-2" data-testid={`conversations-${folder}`}>
       {actionError ? (
-        <p className="px-1 text-sm" role="alert" style={{ color: "var(--danger)" }}>
+        <ErrorNotice className="px-1">
           {localizeError(actionError, tUi)}
-        </p>
+        </ErrorNotice>
       ) : null}
       <ul className="flex flex-col gap-2">
         {rows.map((conversation) => (

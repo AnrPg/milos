@@ -6,6 +6,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { PageHeader } from "@/components/PageHeader";
 import { isNotEntitledError } from "@/components/client/entitlement";
 import { clientErrorMessage } from "@/components/client/errors";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** Shared frame for client (member/athlete) pages. */
 export function ClientPage({
@@ -103,19 +104,22 @@ export function QueryProblem({ error, onRetry }: { error: unknown; onRetry?: () 
   const i18n = useUiTranslations();
   if (isNotEntitledError(error)) return <NotIncluded />;
   return (
-    <div role="alert" className="flex flex-wrap items-center gap-3 text-sm" style={{ color: "var(--danger)" }}>
-      <span>{clientErrorMessage(error, i18n)}</span>
-      {onRetry ? (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="rounded-full px-3 py-1 text-xs font-semibold"
-          style={{ background: "var(--border)", color: "var(--text)" }}
-        >
-          {i18n("retry9f5cd8a")}
-        </button>
-      ) : null}
-    </div>
+    <ErrorNotice
+      action={
+        onRetry ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--danger-border)" }}
+          >
+            {i18n("retry9f5cd8a")}
+          </button>
+        ) : null
+      }
+    >
+      {clientErrorMessage(error, i18n)}
+    </ErrorNotice>
   );
 }
 

@@ -50,6 +50,7 @@ import { buildExecutionDocument, renderText } from "@/lib/document-export";
 import { latestCommentBody, sortComments } from "@/lib/journal-comments";
 import { effectiveJournalFilter, journalFilterCount, journalFilterKey, parseJournalFilter } from "@/lib/journal-filter";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const PAGE_SIZE = 30;
 
@@ -141,9 +142,7 @@ export function JournalFlow() {
       {filter ? <JournalFilters filter={filter} onChange={setFilter} /> : null}
 
       {error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-          {clientErrorMessage(error, i18n)}
-        </p>
+        <ErrorNotice>{clientErrorMessage(error, i18n)}</ErrorNotice>
       ) : null}
 
       {filter === null || feed.isPending ? (

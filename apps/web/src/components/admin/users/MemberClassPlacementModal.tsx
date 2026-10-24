@@ -8,6 +8,7 @@ import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   token: string;
@@ -148,7 +149,7 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
         {!loading && targetSlots.length === 0 ? (
           <p className="mt-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("featureNoUpcomingClasses")}</p>
         ) : null}
-        {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+        {error ? <ErrorNotice className="mt-3">{error}</ErrorNotice> : null}
 
     </Dialog>
   );

@@ -15,6 +15,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { parseJoinInput } from "@/lib/join-input";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STAFF_ROLES = new Set(["owner", "admin", "coach"]);
 
@@ -134,8 +135,9 @@ function JoinForm() {
           {pending ? t("joinPending") : t("joinSubmit")}
         </button>
       </div>
-      {message ? (
-        <p role={message.error ? "alert" : "status"} className="text-xs" style={{ color: message.error ? "var(--danger)" : "var(--success)" }}>
+      {message?.error ? <ErrorNotice variant="field">{message.text}</ErrorNotice> : null}
+      {message && !message.error ? (
+        <p role="status" className="text-xs" style={{ color: "var(--success)" }}>
           {message.text}
         </p>
       ) : null}

@@ -40,7 +40,7 @@ import {
 import { endLoginSession, startLoginSession } from "@/lib/login-session";
 import { resetRealtimeSocket } from "@/lib/realtime";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
-import { isAppLocale, persistLocaleCookie } from "@/i18n/locales";
+import { isAppLocale, persistLocaleCookie, type AppLocale } from "@/i18n/locales";
 import { Dialog } from "@/components/ui/Dialog";
 
 type SessionStatus = "loading" | "guest" | "authenticated";
@@ -71,6 +71,15 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 // app needs no separate /auth/me round trip; registration still fetches it.
 function sessionUser(tokens: AuthTokens): Promise<CurrentUser> {
   return tokens.user ? Promise.resolve(tokens.user) : fetchCurrentUser(tokens.access_token);
+}
+
+// ADR-195: a new account keeps the language its sign-up page was shown in
+// (the signed-out language picker or the browser's), instead of opening in
+// English and switching back on its first signed-in screen.
+function withPageLocale<T extends { preferred_locale?: AppLocale }>(payload: T): T {
+  if (payload.preferred_locale || typeof document === "undefined") return payload;
+  const pageLocale = document.documentElement.lang;
+  return isAppLocale(pageLocale) ? { ...payload, preferred_locale: pageLocale } : payload;
 }
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -148,17 +157,17 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUp(payload: RegisterRequest) {
-    const issuedTokens = await registerUser(payload);
+    const issuedTokens = await registerUser(withPageLocale(payload));
     return establishSession(issuedTokens);
   }
 
   async function signUpAdmin(payload: AdminRegisterRequest) {
-    const issuedTokens = await registerAdminUser(payload);
+    const issuedTokens = await registerAdminUser(withPageLocale(payload));
     return establishSession(issuedTokens);
   }
 
   async function signUpInvited(payload: InvitedRegisterRequest) {
-    const issuedTokens = await registerInvitedUser(payload);
+    const issuedTokens = await registerInvitedUser(withPageLocale(payload));
     return establishSession(issuedTokens);
   }
 

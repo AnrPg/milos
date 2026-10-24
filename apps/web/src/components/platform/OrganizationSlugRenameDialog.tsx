@@ -12,6 +12,7 @@ import {
 } from "@/api/platform-organizations";
 import { formatSlugCopy, platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -120,7 +121,7 @@ export function OrganizationSlugRenameDialog({
 
         {impactQuery.isLoading ? <p className="mt-5 text-sm text-[var(--text-soft)]">{copy.loading}</p> : null}
         {impactQuery.isError ? (
-          <p className="mt-5 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.loadError}</p>
+          <ErrorNotice className="mt-5">{copy.loadError}</ErrorNotice>
         ) : null}
 
         {impact && !result ? (
@@ -170,7 +171,7 @@ export function OrganizationSlugRenameDialog({
             </section>
 
             {impact.purge_open ? (
-              <p className="border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.purgeBlocked}</p>
+              <ErrorNotice>{copy.purgeBlocked}</ErrorNotice>
             ) : null}
 
             <section className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] p-4 text-[var(--text)]">
@@ -184,7 +185,7 @@ export function OrganizationSlugRenameDialog({
                   spellCheck={false}
                 />
               </label>
-              {actionError ? <p className="mt-3 text-sm font-semibold text-[var(--danger)]" role="alert">{actionError}</p> : null}
+              {actionError ? <ErrorNotice className="mt-3">{actionError}</ErrorNotice> : null}
               <div className="mt-3 flex flex-wrap gap-3">
                 <button type="submit" disabled={!canSubmit} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
                   {submitting ? copy.confirming : copy.confirm}

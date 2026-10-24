@@ -20,6 +20,7 @@ import { useSession } from "@/components/session-provider";
 import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** «Αιτήματα ακολούθησης» (plan §5a Q11): accept or decline, newest first. */
 export function FollowRequestsPage() {
@@ -113,7 +114,7 @@ function RequestRow({ entry }: { entry: FollowEntry }) {
           {t("accept")}
         </button>
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </li>
   );
 }

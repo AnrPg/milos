@@ -12,6 +12,7 @@ import { useSession } from "@/components/session-provider";
 import { trialErrorKey } from "@/components/trials/trial-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Draft = {
   enabled: boolean;
@@ -53,7 +54,7 @@ export function TrialSettings() {
   const token = tokens?.access_token ?? "";
   const policy = useQuery({ queryKey: TRIAL_POLICY_KEY, enabled: Boolean(token), queryFn: () => fetchTrialPolicy(token) });
   if (policy.isPending) return <p className="p-6 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (policy.isError) return <p className="p-6 text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(policy.error))}</p>;
+  if (policy.isError) return <div className="p-6"><ErrorNotice>{t(trialErrorKey(policy.error))}</ErrorNotice></div>;
   return <Form token={token} initial={{ ...DEFAULTS, ...stripNulls(policy.data.policy) }} thisWeek={policy.data.this_week} />;
 }
 
@@ -183,7 +184,7 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
         </fieldset>
 
         <div className="sticky bottom-4 flex flex-col gap-2 rounded-2xl p-3" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          {save.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(save.error))}</p> : null}
+          {save.isError ? <ErrorNotice>{t(trialErrorKey(save.error))}</ErrorNotice> : null}
           {saved ? <p role="status" className="text-sm" style={{ color: "var(--success)" }}>{t("saved")}</p> : null}
           <button type="submit" disabled={save.isPending} className="min-h-12 rounded-2xl text-sm font-bold disabled:opacity-60" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {save.isPending ? t("saving") : t("save")}

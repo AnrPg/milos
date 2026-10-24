@@ -12,6 +12,7 @@ import {
   visibleBillingChannels,
   visibleBillingFreezes,
 } from "@/components/finance/billing-entitlement-visibility";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 // The member's package as one block, shared by Box › Συνδρομή and
 // Εγώ › Πληρωμές (ADR-137): what they may still use, and whether access holds.
@@ -77,9 +78,9 @@ export function AccessNotice({ entitlement }: { entitlement: EffectiveEntitlemen
 
   if (entitlement.status === "blocked" || (entitlement.status === "inactive" && entitlement.source !== "membership_status")) {
     return (
-      <p role="alert" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--text)", border: "1px solid var(--danger)" }}>
+      <ErrorNotice className="font-semibold">
         {entitlement.status === "blocked" ? i18n("accessBlockedOverdue") : i18n("accessEnded")}
-      </p>
+      </ErrorNotice>
     );
   }
 

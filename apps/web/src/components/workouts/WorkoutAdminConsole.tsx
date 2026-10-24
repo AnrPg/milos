@@ -51,6 +51,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Dialog } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type LibraryViewMode = "folders" | "tiles" | "list";
 
@@ -743,9 +744,9 @@ export function WorkoutAdminConsole() {
             ) : null}
 
             {error ? (
-              <section className="rounded-[1.8rem] px-5 py-4 text-sm" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary-strong)" }}>
+              <ErrorNotice>
                 {error}
-              </section>
+              </ErrorNotice>
             ) : null}
 
             <section className="rounded-[2rem] p-4 sm:p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

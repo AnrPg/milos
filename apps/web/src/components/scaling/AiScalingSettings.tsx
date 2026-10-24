@@ -13,6 +13,7 @@ import {
 } from "@/api/scaling";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const fieldClass = "min-h-11 w-full rounded-xl px-3 text-sm";
 const fieldStyle = { background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" };
@@ -86,7 +87,7 @@ export function AiScalingSettings({ token }: { token: string }) {
   if (settings.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (!settings.data) {
     return settings.error ? (
-      <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(settings.error, i18n)}</p>
+      <ErrorNotice>{localizeError(settings.error, i18n)}</ErrorNotice>
     ) : null;
   }
 
@@ -201,7 +202,7 @@ export function AiScalingSettings({ token }: { token: string }) {
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("settings.privacy")}</p>
 
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(save.error, i18n)}</p>
+        <ErrorNotice>{localizeError(save.error, i18n)}</ErrorNotice>
       ) : null}
     </div>
   );

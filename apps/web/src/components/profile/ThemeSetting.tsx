@@ -8,6 +8,7 @@ import { updateProfile } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Ρυθμίσεις › Θέμα: light (Frost, the default) or dark (Graphite), saved on
@@ -75,7 +76,7 @@ export function ThemeSetting() {
       <div role="radiogroup" aria-label={t("themeTitle")} className="grid grid-cols-2 gap-2">
         {THEME_SLUGS.map((slug) => option(slug))}
       </div>
-      {error ? <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </div>
   );
 }

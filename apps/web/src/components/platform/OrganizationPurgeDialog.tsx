@@ -15,6 +15,7 @@ import {
 } from "@/api/platform-organizations";
 import { formatPurgeCopy, platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const cancellableStatuses = new Set<OrganizationPurge["status"]>(["requested", "exported"]);
 const workingStatuses = new Set<OrganizationPurge["status"]>(["requested", "exporting", "approved", "purging"]);
@@ -147,8 +148,8 @@ export function OrganizationPurgeDialog({
           })}
         </ol>
 
-        {actionError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{actionError}</p> : null}
-        {purgeQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.loadError}</p> : null}
+        {actionError ? <ErrorNotice className="mt-4">{actionError}</ErrorNotice> : null}
+        {purgeQuery.isError ? <ErrorNotice className="mt-4">{copy.loadError}</ErrorNotice> : null}
 
         {purgeQuery.isSuccess && !purge ? (
           <div className="mt-5 border-y border-[var(--border)] py-5">
@@ -203,7 +204,7 @@ export function OrganizationPurgeDialog({
             ) : null}
             {purge.status === "cancelled" ? <p className="text-sm text-[var(--text)]">{copy.cancelledBody}</p> : null}
             {purge.status === "failed" ? (
-              <div className="border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
+              <ErrorNotice>
                 <p>
                   {formatPurgeCopy(copy.failedBody, {
                     stage: purge.failed_stage === "export" ? copy.stageExport : copy.stagePurge,
@@ -219,7 +220,7 @@ export function OrganizationPurgeDialog({
                 >
                   {pending === "resume" ? copy.resuming : copy.resume}
                 </button>
-              </div>
+              </ErrorNotice>
             ) : null}
 
             {status?.export_download_url ? (

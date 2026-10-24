@@ -18,6 +18,7 @@ import { type CueMode, primeCueAudio, readCueMode, storeCueMode } from "@/lib/ti
 import { getFormatLabels } from "@/types/workout";
 
 import { ClassTimerFace } from "./ClassTimerFace";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const COUNTDOWN_CHOICES = [0, 5, 10, 15];
 
@@ -123,7 +124,8 @@ export function ClassTimerControl({ slotId }: { slotId: string }) {
           <ClassTimerFace payload={payload} position={position} size="panel" />
         </section>
 
-        {problemText ? (
+        {problemText && timer.problem !== "conflict" ? <ErrorNotice>{problemText}</ErrorNotice> : null}
+        {problemText && timer.problem === "conflict" ? (
           <p role="alert" className="rounded-2xl px-4 py-3 text-sm" style={{ background: "color-mix(in srgb, var(--warning) 14%, transparent)", color: "var(--text)" }}>
             {problemText}
           </p>

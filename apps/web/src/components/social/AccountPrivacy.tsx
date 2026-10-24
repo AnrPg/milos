@@ -10,6 +10,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { useSocialSummary } from "./use-social";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Κοινοποίηση & ορατότητα › «Ιδιωτικός λογαριασμός» and «Εμφάνιση στην
@@ -102,7 +103,7 @@ export function AccountPrivacySetting() {
         </p>
       </div>
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{clientErrorMessage(save.error, tUi)}</p>
+        <ErrorNotice>{clientErrorMessage(save.error, tUi)}</ErrorNotice>
       ) : null}
     </div>
   );

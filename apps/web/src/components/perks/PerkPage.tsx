@@ -14,6 +14,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 
 import { PerkLogo, useBenefitConditions, useBenefitText } from "./PerkRows";
 import { useClaimPerk, useMemberPerks, useRefreshPerkLink } from "./use-perks";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const REASONS = new Set([
   "perk_sold_out",
@@ -52,9 +53,9 @@ export function PerkPage({ perkId }: { perkId: string }) {
       ) : perks.isLoading ? (
         <p className="py-8 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : (
-        <p role="alert" className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+        <ErrorNotice>
           {t("missing")}
-        </p>
+        </ErrorNotice>
       )}
     </main>
   );
@@ -101,9 +102,9 @@ function PerkBody({ perk }: { perk: MemberPerk }) {
             <p className="text-sm font-semibold" style={{ color: "var(--warning)" }}>{t(reasonKey(perk.unavailable_reason))}</p>
           )}
           {claim.isError ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+            <ErrorNotice>
               {t(reasonKey(claim.error instanceof ApiError ? claim.error.payload.code : null))}
-            </p>
+            </ErrorNotice>
           ) : null}
         </section>
       )}

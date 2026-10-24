@@ -36,6 +36,7 @@ import {
   type RuleSection,
 } from "@/lib/perks/validity";
 import { uploadBoxPhoto } from "@/lib/box-photo-upload";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // Partner-issued first (the default), then the Palee QR, as the API lists them.
@@ -112,9 +113,9 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
         <div className="flex w-full flex-col gap-2">
           {demo ? <p className="text-xs" style={{ color: "var(--warning)" }}>{t("demoNote")}</p> : null}
           {error ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+            <ErrorNotice>
               {t(errorCode && ERROR_KEYS[errorCode] ? ERROR_KEYS[errorCode] : "saveFailed")}
-            </p>
+            </ErrorNotice>
           ) : null}
           <div className="flex flex-wrap items-center gap-2">
             <span className="me-auto text-xs font-semibold" style={{ color: "var(--dim)" }}>{t(`status_${perk?.status ?? "draft"}`)}</span>
@@ -287,7 +288,7 @@ function Field({ label, hint, error, children }: { label: string; hint?: string;
       <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{label}</span>
       {children}
       {hint ? <span className="text-xs" style={{ color: "var(--text-soft)" }}>{hint}</span> : null}
-      {error ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{error}</span> : null}
+      {error ? <ErrorNotice variant="field">{error}</ErrorNotice> : null}
     </label>
   );
 }
@@ -351,7 +352,7 @@ function LogoField({ draft, logoUrl, onChange }: { draft: PerkDraft; logoUrl: st
           {t("logoRemove")}
         </button>
       ) : null}
-      {state === "failed" ? <span role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{t("logoFailed")}</span> : null}
+      {state === "failed" ? <ErrorNotice variant="field">{t("logoFailed")}</ErrorNotice> : null}
     </div>
   );
 }
@@ -553,7 +554,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
               onRemove={() => setWindows(windows.filter((_, at) => at !== index))}
             />
           ))}
-          {problem("windows") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("windows")}</span> : null}
+          {problem("windows") ? <ErrorNotice variant="field">{problem("windows")}</ErrorNotice> : null}
           {windows.length < MAX_WINDOWS ? (
             <button type="button" onClick={() => setWindows([...windows, { weekdays: [], from: "", until: "" }])} className="min-h-11 self-start rounded-2xl px-4 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
               {t("addWindow")}
@@ -590,7 +591,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
                 })}
               </div>
               <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t("packagesHint")}</span>
-              {problem("packages") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("packages")}</span> : null}
+              {problem("packages") ? <ErrorNotice variant="field">{problem("packages")}</ErrorNotice> : null}
             </div>
           ) : null}
           <SegmentPicker
@@ -619,7 +620,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
                 </div>
               )}
               <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t("groupsHint")}</span>
-              {problem("groups") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("groups")}</span> : null}
+              {problem("groups") ? <ErrorNotice variant="field">{problem("groups")}</ErrorNotice> : null}
             </div>
           ) : null}
           <AppliesToBranches
@@ -631,7 +632,7 @@ function MoreRules({ draft, set, problem }: { draft: PerkDraft; set: SetDraft; p
               set("location_ids", scope === "all" ? [] : scope);
             }}
           />
-          {problem("branches") ? <span role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{problem("branches")}</span> : null}
+          {problem("branches") ? <ErrorNotice variant="field">{problem("branches")}</ErrorNotice> : null}
           <Field label={t("minTenure")} hint={t("minTenureHint")} error={problem("tenure")}>
             <IntegerInput className={inputClass} style={inputStyle} value={draft.min_tenure_days} onValueChange={(value) => set("min_tenure_days", value)} min={1} placeholder={t("noLimit")} />
           </Field>

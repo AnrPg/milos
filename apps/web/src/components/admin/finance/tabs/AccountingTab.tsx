@@ -33,6 +33,7 @@ import {
 } from "@/lib/finance-accounting";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 // ADR-126: refund receipts, manual provider reconciliation and accounting exports.
 
@@ -64,8 +65,9 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function Notice({ tone, children }: { tone: "error" | "info"; children: ReactNode }) {
+  if (tone === "error") return <ErrorNotice>{children}</ErrorNotice>;
   return (
-    <p className="text-sm" role={tone === "error" ? "alert" : "status"} style={{ color: tone === "error" ? "var(--danger)" : "var(--success)" }}>
+    <p className="text-sm" role="status" style={{ color: "var(--success)" }}>
       {children}
     </p>
   );
@@ -143,7 +145,7 @@ function RefundReceiptsSection({ locationIds }: { locationIds?: string }) {
                   <td className="py-2 font-semibold">
                     {receipt.receipt_number}
                     {receipt.integrity_verified ? null : (
-                      <span className="ms-2 text-xs" style={{ color: "var(--danger)" }}>{t("integrityFailed")}</span>
+                      <ErrorNotice variant="text" live="polite" className="ms-2 align-middle" style={{ display: "inline-flex" }}>{t("integrityFailed")}</ErrorNotice>
                     )}
                   </td>
                   <td className="py-2">{receipt.issued_at.slice(0, 10)}</td>

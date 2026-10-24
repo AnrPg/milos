@@ -22,6 +22,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { SPARK_GO_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" };
 
@@ -79,7 +80,7 @@ export function CheckInDesk() {
   const time = (value: string) =>
     new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 
-  const toneColor = { success: "var(--success)", info: "var(--muted)", danger: "var(--danger)" } as const;
+  const toneColor = { success: "var(--success)", info: "var(--muted)" } as const;
 
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
@@ -146,7 +147,13 @@ export function CheckInDesk() {
               >
                 {checkIn.isPending ? i18n("admCheckInPending") : i18n("admCheckInAction")}
               </button>
-              {result ? <p className="text-sm font-semibold" role="status" style={{ color: toneColor[result.tone] }}>{result.text}</p> : null}
+              {result ? (
+                result.tone === "danger" ? (
+                  <ErrorNotice>{result.text}</ErrorNotice>
+                ) : (
+                  <p className="text-sm font-semibold" role="status" style={{ color: toneColor[result.tone] }}>{result.text}</p>
+                )
+              ) : null}
             </section>
 
             <section className="space-y-4 rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -165,7 +172,7 @@ export function CheckInDesk() {
                 />
               </div>
               {checkInsQuery.isLoading ? <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p> : null}
-              {checkInsQuery.isError ? <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{localizeError(checkInsQuery.error, i18n)}</p> : null}
+              {checkInsQuery.isError ? <ErrorNotice>{localizeError(checkInsQuery.error, i18n)}</ErrorNotice> : null}
               {checkInsQuery.isSuccess && checkIns.length === 0 ? <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("admCheckInEmpty")}</p> : null}
               <ul className="space-y-2">
                 {checkIns.map((record) => (

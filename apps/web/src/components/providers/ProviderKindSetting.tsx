@@ -8,6 +8,7 @@ import { fetchAdminSettings, updateAdminSettings, type ProviderKind } from "@/ap
 import { MY_PROVIDERS_KEY } from "@/api/providers";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const KINDS: ProviderKind[] = ["gym", "coach"];
 
@@ -69,7 +70,7 @@ export function ProviderKindSetting({ token }: { token: string }) {
         <p className="text-xs" style={{ color: "var(--dim)" }}>{t("kindSetting.ownerOnly")}</p>
       )}
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(save.error, i18n)}</p>
+        <ErrorNotice>{localizeError(save.error, i18n)}</ErrorNotice>
       ) : null}
       {editable && dirty ? (
         <div className="flex gap-2">

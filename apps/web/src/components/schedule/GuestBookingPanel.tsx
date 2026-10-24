@@ -7,6 +7,7 @@ import { cancelBooking, createGuestBooking, type ScheduleSlot } from "@/api/sche
 import { SemanticLabel } from "@/components/semantic-label";
 import { canBringGuest, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { useUiTranslations } from "@/i18n/ui";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const GUEST_NAME_MAX_LENGTH = 80;
 
@@ -157,7 +158,7 @@ export function GuestBookingPanel({
         </button>
       ) : null}
       {notice ? <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{notice}</p> : null}
-      {error ? <p className="mt-2 text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice variant="field" className="mt-2">{error}</ErrorNotice> : null}
     </div>
   );
 }

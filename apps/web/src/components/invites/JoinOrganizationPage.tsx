@@ -10,6 +10,7 @@ import { inspectJoinLink, joinOrganization } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function JoinOrganizationPage({ slug }: { slug: string }) {
   const t = useTranslations("Invites");
@@ -68,11 +69,11 @@ export function JoinOrganizationPage({ slug }: { slug: string }) {
                   {join.isPending ? t("joining") : t("joinCta", { organization: name ?? slug })}
                 </button>
                 {join.error ? (
-                  <p role="alert" className="mt-3 text-sm" style={{ color: "var(--danger)" }}>
+                  <ErrorNotice className="mt-3">
                     {join.error instanceof ApiError && join.error.payload.code === "membership_unavailable"
                       ? t("membershipUnavailable")
                       : localizeError(join.error, uiT)}
-                  </p>
+                  </ErrorNotice>
                 ) : null}
               </>
             ) : status === "guest" ? (

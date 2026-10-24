@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { Dialog } from "@/components/ui/Dialog";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import type { GuideAnchor } from "@/lib/guides/anchors";
 
 /**
@@ -112,7 +113,5 @@ export function ChoicePill({
 }
 
 export function ErrorLine({ message }: { message: string | null }) {
-  return message ? (
-    <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{message}</p>
-  ) : null;
+  return message ? <ErrorNotice>{message}</ErrorNotice> : null;
 }

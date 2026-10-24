@@ -8,6 +8,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 
 import { timelinePositions, type InjuryEvent } from "./injury-timeline";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * One injury's progress (ADR-140 §3): a line with a point at every event
@@ -151,7 +152,7 @@ export function InjuryUpdateForm({
           {t("cancel")}
         </button>
       </div>
-      {error ? <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
     </form>
   );
 }

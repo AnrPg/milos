@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
+import { ErrorNotice as SharedErrorNotice } from "@/components/ui/ErrorNotice";
 import type { ShopPhoto } from "@/api/shop";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 import type { CardFlag } from "@/lib/shop/variants";
@@ -150,9 +151,5 @@ export function LoadingLine() {
 }
 
 export function ErrorNotice({ message }: { message: string }) {
-  return (
-    <p role="alert" className="rounded-2xl px-4 py-3 text-sm" style={{ background: "color-mix(in srgb, var(--danger) 10%, var(--panel))", color: "var(--danger)" }}>
-      {message}
-    </p>
-  );
+  return <SharedErrorNotice>{message}</SharedErrorNotice>;
 }

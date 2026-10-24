@@ -46,6 +46,7 @@ import {
   unitOf,
 } from "@/lib/body";
 import { DateTimeInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const VISIBILITIES: BodyVisibility[] = ["private", "coach_numbers", "coach_full"];
 const ASKED_KEY = "palee:body:weight-display-asked";
@@ -238,9 +239,9 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
           {t(key("metric", metric))}
           {metric === "body_fat" ? <span className="ms-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{t("optional")}</span> : null}
           {fieldError ? (
-            <span role="alert" className="block text-xs font-normal" style={{ color: "var(--danger)" }}>
+            <ErrorNotice variant="text">
               {t(key("fieldError", fieldError))}
-            </span>
+            </ErrorNotice>
           ) : null}
         </label>
         <input

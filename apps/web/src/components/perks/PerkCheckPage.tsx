@@ -8,6 +8,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 
 import { PerkLogo } from "./PerkRows";
 import { usePerkCheck, useRedeemPerkCheck } from "./use-perks";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function errorKey(error: unknown) {
   const code = error instanceof ApiError ? error.payload.code : null;
@@ -60,12 +61,12 @@ export function PerkCheckPage({ token }: { token: string }) {
               {redeem.isPending ? t("check.marking") : t("check.markUsed")}
             </button>
           ) : null}
-          {redeem.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(errorKey(redeem.error))}</p> : null}
+          {redeem.isError ? <ErrorNotice>{t(errorKey(redeem.error))}</ErrorNotice> : null}
         </section>
       ) : check.isError ? (
-        <p role="alert" className="rounded-3xl p-6 text-center text-base font-bold" style={{ background: "var(--panel)", border: "2px solid var(--danger)", color: "var(--danger)" }}>
+        <ErrorNotice>
           {t(errorKey(check.error))}
-        </p>
+        </ErrorNotice>
       ) : (
         <p className="text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       )}

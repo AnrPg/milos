@@ -38,6 +38,7 @@ defmodule Palee.Application.RegisterInvitedUser do
       # account being created in this same request (F-10).
       email: value(params, :email)
     }
+    |> maybe_put(:preferred_locale, value(params, :preferred_locale))
   end
 
   defp start_invited_coaching(%{invitation: invitation, organization: organization}, user),
@@ -70,6 +71,9 @@ defmodule Palee.Application.RegisterInvitedUser do
         end
     end
   end
+
+  defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 
   defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
 end

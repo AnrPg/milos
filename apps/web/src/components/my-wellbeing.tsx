@@ -30,6 +30,7 @@ import { localDate } from "@/components/member-app/wellness/wellness-model";
 import { WellnessSupportCard } from "@/components/buddy/WellnessSupportCard";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 export function MyWellbeing() {
@@ -236,5 +237,5 @@ export function MyWellbeing() {
 function ErrorText({ error }: { error: unknown }) {
   const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
+  return <ErrorNotice>{localizeError(error, i18n)}</ErrorNotice>;
 }

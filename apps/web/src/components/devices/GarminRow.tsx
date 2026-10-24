@@ -22,6 +22,7 @@ import {
   type FullSyncPrefs,
 } from "@/components/devices/garmin-model";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const PILL = {
   soon: { color: "var(--dim)", background: "var(--panel)" },
@@ -51,7 +52,7 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
   const queryClient = useQueryClient();
   const [sheet, setSheet] = useState<"connect" | "reconnect" | "disconnect" | null>(null);
   const [editing, setEditing] = useState<FullSyncPrefs | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null);
   // The server asks for the health-data consent when a change turns on sleep, weight or resting HR.
   const [askConsent, setAskConsent] = useState(false);
   const [consentTicked, setConsentTicked] = useState(false);
@@ -66,9 +67,9 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
     mutationFn: () => syncGarmin(token),
     onSuccess: (next) => {
       store(next);
-      setNotice(t("synced"));
+      setNotice({ text: t("synced") });
     },
-    onError: (error) => setNotice(t(deviceErrorKey(error))),
+    onError: (error) => setNotice({ text: t(deviceErrorKey(error)), error: true }),
   });
   const save = useMutation({
     mutationFn: (prefs: FullSyncPrefs) => updateGarmin(token, prefs, askConsent && consentTicked),
@@ -77,11 +78,11 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
       setEditing(null);
       setAskConsent(false);
       setConsentTicked(false);
-      setNotice(t("prefsSaved"));
+      setNotice({ text: t("prefsSaved") });
     },
     onError: (error) => {
       if (deviceErrorCode(error) === "health_data_consent_required") setAskConsent(true);
-      setNotice(t(deviceErrorKey(error)));
+      setNotice({ text: t(deviceErrorKey(error)), error: true });
     },
   });
 
@@ -122,17 +123,17 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
           {percent !== null ? <ProgressBar percent={percent} label={t("importing", { percent: formatPercent(percent, locale) })} /> : null}
 
           {state === "reconnect" ? (
-            <div role="alert" className="flex flex-col gap-2 rounded-2xl p-3" style={{ background: "color-mix(in srgb, var(--danger) 10%, var(--panel))", border: "1px solid var(--danger)" }}>
-              <p className="text-sm" style={{ color: "var(--text)" }}>{t("reconnectWarning")}</p>
+            <ErrorNotice>
+              <p>{t("reconnectWarning")}</p>
               <button
                 type="button"
                 onClick={() => setSheet("reconnect")}
-                className="min-h-11 self-start rounded-2xl px-4 text-sm font-bold"
+                className="mt-2 min-h-11 rounded-2xl px-4 text-sm font-bold"
                 style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               >
                 {t("reconnect")}
               </button>
-            </div>
+            </ErrorNotice>
           ) : null}
 
           {editing ? (
@@ -193,7 +194,8 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
         </>
       ) : null}
 
-      {notice ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{notice}</p> : null}
+      {notice?.error ? <ErrorNotice>{notice.text}</ErrorNotice> : null}
+      {notice && !notice.error ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{notice.text}</p> : null}
 
       {sheet === "connect" || sheet === "reconnect" ? (
         <GarminConnectSheet token={token} row={row} reconnect={sheet === "reconnect"} onClose={() => setSheet(null)} />

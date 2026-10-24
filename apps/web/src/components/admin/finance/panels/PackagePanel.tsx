@@ -38,6 +38,7 @@ import {
 } from "@/components/admin/finance/packages/package-catalog";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -279,10 +280,10 @@ export function PackagePanel({
             {i18n("activea733b80")}
           </label>
           {updateMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateMutation.error, i18n)}</p>
+            <ErrorNotice>{localizeError(updateMutation.error, i18n)}</ErrorNotice>
           )}
           {impactQuery.isError ? (
-            <p className="text-sm" style={{ color: "var(--danger)" }}>{i18n("couldNotCheckCurrentSubscribersThePackageWilldd8ac35")}</p>
+            <ErrorNotice>{i18n("couldNotCheckCurrentSubscribersThePackageWilldd8ac35")}</ErrorNotice>
           ) : null}
         </div>
       ) : (
@@ -362,8 +363,8 @@ export function PackagePanel({
                 </label>
               ))}
             </div>
-            {replacementOptions.length === 0 ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{i18n("createAnotherActivePackageBeforeRetiringThisOne619ea88")}</p> : null}
-            {retireMutation.error instanceof Error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{localizeError(retireMutation.error, i18n)}</p> : null}
+            {replacementOptions.length === 0 ? <ErrorNotice className="mt-3">{i18n("createAnotherActivePackageBeforeRetiringThisOne619ea88")}</ErrorNotice> : null}
+            {retireMutation.error instanceof Error ? <ErrorNotice className="mt-3">{localizeError(retireMutation.error, i18n)}</ErrorNotice> : null}
         </Dialog>
       ) : null}
     </SidePanel>

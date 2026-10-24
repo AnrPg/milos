@@ -11,6 +11,7 @@ import { PersonAvatar } from "@/components/social/PersonAvatar";
 
 import { BuddyBadge } from "./SocialBits";
 import { isPeopleSearch, relationKey } from "./social-model";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * People search across Palee (ADR-193 §4): from two characters on, ranked by
@@ -108,7 +109,7 @@ export function PeopleResults({ term }: { term: string }) {
   if (!isPeopleSearch(term)) return null;
   const people = found.data?.people ?? [];
   if (found.isPending) return <p style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (found.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("peopleSearchFailed")}</p>;
+  if (found.isError) return <ErrorNotice>{t("peopleSearchFailed")}</ErrorNotice>;
   if (people.length === 0)
     return (
       <p className="rounded-3xl p-5 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>

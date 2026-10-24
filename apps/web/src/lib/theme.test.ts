@@ -35,6 +35,8 @@ const TEXT_PAIRS: [keyof ThemeTokens, keyof ThemeTokens][] = [
   ["successContrast", "success"],
   ["warningContrast", "warning"],
   ["dangerContrast", "danger"],
+  ["dangerStrong", "dangerSurface"],
+  ["dangerStrong", "panel"],
   ["infoContrast", "info"],
   ["selectionText", "selection"],
   ["highlightText", "highlight"],

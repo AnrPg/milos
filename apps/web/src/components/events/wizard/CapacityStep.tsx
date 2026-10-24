@@ -9,6 +9,7 @@ import { asksCohosts, cohostInputProblem, MAX_COHOSTS } from "@/lib/event-wizard
 import { formAudience } from "../events";
 import { FieldGroup, Hint, fieldClass } from "./fields";
 import type { StepProps } from "./types";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Step 6: how many places (empty: no limit), and ADR-185 co-hosts. When
@@ -134,9 +135,9 @@ export function CapacityStep({
             </div>
           ) : null}
           {tried && inputProblem ? (
-            <p id={errorId} role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+            <ErrorNotice id={errorId} variant="field">
               {tw(inputProblem, { count: MAX_COHOSTS })}
-            </p>
+            </ErrorNotice>
           ) : cohosts.length >= MAX_COHOSTS ? (
             <Hint>{tw("cohost_limit", { count: MAX_COHOSTS })}</Hint>
           ) : null}

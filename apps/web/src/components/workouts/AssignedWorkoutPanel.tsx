@@ -28,6 +28,7 @@ import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
 import { Dialog } from "@/components/ui/Dialog";
 import { DateInput } from "@/components/ui/DateInput";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -339,7 +340,7 @@ export function AssignedWorkoutPanel({
                 </button>
               </div>
               {deleteError ? (
-                <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{deleteError}</p>
+                <ErrorNotice variant="field">{deleteError}</ErrorNotice>
               ) : null}
                   </section>
                 ) : null}
@@ -348,7 +349,7 @@ export function AssignedWorkoutPanel({
                 {!isAdmin ? (
                   <section className="pb-4">
                     {rejectError ? (
-                      <p className="mb-2 text-xs" style={{ color: "var(--primary-strong)" }}>{rejectError}</p>
+                      <ErrorNotice variant="field" className="mb-2">{rejectError}</ErrorNotice>
                     ) : null}
                     {!rescheduling ? (
                       <div className="flex gap-2">
@@ -385,7 +386,7 @@ export function AssignedWorkoutPanel({
                           onValueChange={(value) => setRescheduleDate(value)}
                         />
                         {rescheduleError ? (
-                          <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{rescheduleError}</p>
+                          <ErrorNotice variant="field">{rescheduleError}</ErrorNotice>
                         ) : null}
                         <div className="flex gap-2">
                           <button

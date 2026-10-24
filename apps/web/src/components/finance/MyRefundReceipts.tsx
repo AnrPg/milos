@@ -9,6 +9,7 @@ import { RefundReceiptDocumentDialog } from "@/components/finance/RefundReceiptD
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { accountingErrorKey, formatMinorUnits } from "@/lib/finance-accounting";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /** ADR-126: the signed-in member's own refund receipts on the billing page. */
 export function MyRefundReceipts() {
@@ -42,7 +43,7 @@ export function MyRefundReceipts() {
     <section className="flex flex-col gap-2">
       <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>{t("myReceiptsTitle")}</h2>
       {error ? (
-        <p className="text-sm" role="alert" style={{ color: "var(--danger)" }}>{error}</p>
+        <ErrorNotice>{error}</ErrorNotice>
       ) : null}
       {receipts.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("myReceiptsEmpty")}</p>
