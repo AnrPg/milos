@@ -13,7 +13,7 @@ import { useBuddies } from "./use-buddies";
  * Μηνύματα: the buddy conversations beside the gym threads (ADR-160 §6),
  * each with its unread count. Nothing shows without a buddy conversation.
  */
-export function BuddyThreads() {
+export function BuddyThreads({ onNavigate }: { onNavigate?: () => void } = {}) {
   const t = useTranslations("Buddy");
   const overview = useBuddies();
   const { buddies, supporting } = overviewLists(overview.data);
@@ -30,6 +30,7 @@ export function BuddyThreads() {
             <li key={link.id}>
               <Link
                 href={`/me/buddy/${encodeURIComponent(link.id)}/chat`}
+                onClick={onNavigate}
                 className="flex min-h-12 items-center justify-between gap-3 rounded-2xl px-4 py-2"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
               >
