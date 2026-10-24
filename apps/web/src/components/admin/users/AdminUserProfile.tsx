@@ -458,7 +458,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
                 title={<SemanticLabel value={valueText(note.type)} />}
                 meta={date(note.inserted_at)}
                 detail={<p className="line-clamp-3">{valueText(note.body)}</p>}
-                href="/me/activity/chats"
+                href="/messages"
               />
             ))}
             {notes.length === 0 ? <Empty>{i18n("noConversationsRecordedd525265")}</Empty> : null}
@@ -825,7 +825,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {token && inTab("coach_notes") ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} subjects={[...trainingSubjects, ...wellbeingSubjects]} /></Panel> : null}
 
 
-          {inTab("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/me/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/me/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
+          {inTab("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/messages"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/messages" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
           {inTab("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>

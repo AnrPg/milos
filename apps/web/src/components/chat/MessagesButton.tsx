@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { fetchUnreadCount } from "@/api/messaging";
 import { INBOX_PATH } from "@/components/chat/inbox/inbox-model";
+import { useConversationUnread } from "@/components/conversations/use-conversations";
 import { NavIcon } from "@/components/nav/NavIcons";
 import { useSession } from "@/components/session-provider";
 import { HeartButton } from "@/components/social/HeartButton";
@@ -28,7 +29,9 @@ export function MessagesButton() {
     queryFn: () => fetchUnreadCount(tokens!.access_token, slug),
     staleTime: 15 * 1000,
   });
-  const unread = unreadQuery.data?.unread_count ?? 0;
+  // ADR-196: one inbox, one count: gym threads plus person conversations and requests (ADR-193).
+  const conversations = useConversationUnread();
+  const unread = (unreadQuery.data?.unread_count ?? 0) + conversations.inbox + conversations.requests;
 
   if (!authenticated) return null;
 

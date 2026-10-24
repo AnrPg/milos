@@ -121,7 +121,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
   });
   const message = useMutation({
     mutationFn: () => getOrCreateContextThread(token, "box", (trial.user_id ?? trial.person?.id)!),
-    onSuccess: ({ thread }) => router.push(`/me/activity/chats?thread=${encodeURIComponent(thread.id)}`),
+    onSuccess: ({ thread }) => router.push(`/messages?thread=${encodeURIComponent(thread.id)}`),
   });
 
   const start = new Date(trial.class.scheduled_at);

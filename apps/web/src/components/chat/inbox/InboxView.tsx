@@ -14,6 +14,7 @@ import {
 } from "@/api/messaging";
 import { fetchCoachingRelationships } from "@/api/roles";
 import { PersonName } from "@/components/account/PersonName";
+import { PEOPLE_SEARCH_MIN_QUERY, PeopleSearchResults } from "@/components/conversations/PeopleSearchResults";
 import { useCoachAudience } from "@/components/journal/EntryAudience";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
@@ -79,6 +80,8 @@ export function InboxView({
 
   const [threads, setThreads] = useState<ChatThread[] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  // The settled query both searches use: people at my gym and across Palee.
+  const [term, setTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [input, setInput] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
@@ -118,12 +121,17 @@ export function InboxView({
   }, [accessToken]);
 
   useEffect(() => {
-    if (!accessToken || searchQuery.length < 2) {
-      queueMicrotask(() => setSearchResults([]));
+    const next = searchQuery.trim();
+    if (!accessToken || next.length < PEOPLE_SEARCH_MIN_QUERY) {
+      queueMicrotask(() => {
+        setSearchResults([]);
+        setTerm("");
+      });
       return;
     }
 
     const timeout = setTimeout(() => {
+      setTerm(next);
       void searchUsers(accessToken, searchQuery)
         .then((data) => {
           const filtered = data.users.filter((u) => u.id !== currentUserId);
@@ -214,6 +222,9 @@ export function InboxView({
     segmentContext,
   );
   const sources = INBOX_SOURCES.filter((source) => showsIn(source.segments, segment));
+  const topSources = sources.filter((source) => source.placement === "top");
+  const bottomSources = sources.filter((source) => source.placement === "bottom");
+  const searching = term.length >= PEOPLE_SEARCH_MIN_QUERY;
   const segmentOptions = INBOX_SEGMENTS.map((value) => ({ value, label: t(`segment.${value}`) }));
 
   if (view === "thread" && activeThread) {
@@ -312,7 +323,7 @@ export function InboxView({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {searchResults.length === 0 ? (
+        {!searching ? (
           <SegmentPicker
             ariaLabel={t("segmentsLabel")}
             options={segmentOptions}
@@ -328,30 +339,46 @@ export function InboxView({
 
       <div
         id="inbox-list"
-        role={searchResults.length === 0 ? "tabpanel" : undefined}
-        aria-labelledby={searchResults.length === 0 ? `inbox-tab-${segment}` : undefined}
+        role={!searching ? "tabpanel" : undefined}
+        aria-labelledby={!searching ? `inbox-tab-${segment}` : undefined}
         className="group/inbox scroll-area flex-1 overflow-y-auto"
       >
-        {searchResults.length > 0 ? (
-          searchResults.map((u) => (
-            <button
-              key={u.id}
-              type="button"
-              onClick={() => void startNewThread(u)}
-              className="flex w-full items-center gap-3 px-4 py-3 text-start transition-colors"
-              style={{ background: "transparent" }}
-            >
-              <Initial letter={u.nickname[0]} />
-              <div className="min-w-0">
-                <PersonName name={u.nickname} handle={u.handle} />
-                <p className="text-xs" style={{ color: "var(--dim)" }}>
-                  <SemanticLabel value={u.role} />
-                </p>
-              </div>
-            </button>
-          ))
+        {searching ? (
+          <div className="flex flex-col gap-3 py-2">
+            {/* People at my gym start a gym chat (coaching messages need one); anyone else a conversation (ADR-193). */}
+            {searchResults.length > 0 ? (
+              <section aria-label={t("searchAtGym")}>
+                <p className="px-4 pt-1 text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t("searchAtGym")}</p>
+                {searchResults.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => void startNewThread(u)}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-start transition-colors"
+                    style={{ background: "transparent" }}
+                  >
+                    <Initial letter={u.nickname[0]} />
+                    <div className="min-w-0">
+                      <PersonName name={u.nickname} handle={u.handle} />
+                      <p className="text-xs" style={{ color: "var(--dim)" }}>
+                        <SemanticLabel value={u.role} />
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </section>
+            ) : null}
+            <div className="px-3">
+              <PeopleSearchResults term={term} excludeIds={new Set(searchResults.map((u) => u.id))} onOpened={onNavigate} />
+            </div>
+          </div>
         ) : (
           <>
+            {topSources.map(({ id, Section }) => (
+              <div key={id} data-inbox-source="" className="px-3 pt-3 empty:hidden">
+                <Section onNavigate={onNavigate} />
+              </div>
+            ))}
             {threads === null ? (
               <p className="p-4 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
             ) : (
@@ -387,16 +414,14 @@ export function InboxView({
                 );
               })
             )}
-            {sources.length > 0 ? (
-              <div className="flex flex-col gap-3 px-3 py-3">
-                {sources.map(({ id, Section }) => (
-                  <Section key={id} onNavigate={onNavigate} />
-                ))}
+            {bottomSources.map(({ id, Section }) => (
+              <div key={id} data-inbox-source="" className="px-3 pt-3 empty:hidden">
+                <Section onNavigate={onNavigate} />
               </div>
-            ) : null}
-            {/* Sources render a <section> only when they have rows, so the note hides beside them. */}
+            ))}
+            {/* A source renders nothing without rows, so the note hides beside any that has some. */}
             {threads !== null && visibleThreads.length === 0 ? (
-              <p className="p-4 text-center text-sm group-has-[section]/inbox:hidden" style={{ color: "var(--dim)" }}>
+              <p className="p-4 text-center text-sm group-has-[[data-inbox-source]>*]/inbox:hidden" style={{ color: "var(--dim)" }}>
                 {segment === "all" ? i18n("noConversationsYetSearchToStartOne1a91cf7") : t("emptySegment")}
               </p>
             ) : null}

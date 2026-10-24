@@ -7,12 +7,12 @@ describe("notificationTargetUrl", () => {
     for (const role of ["member", "admin", null]) {
       expect(
         notificationTargetUrl({ type: "person_message", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
-      ).toBe("/me/messages/c-1");
+      ).toBe("/messages/c-1");
       expect(
         notificationTargetUrl({ type: "message_request", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
-      ).toBe("/me/messages?folder=requests");
+      ).toBe("/messages?folder=requests");
     }
-    expect(notificationTargetUrl({ type: "person_message", payload: {} }, "member")).toBe("/me/messages");
+    expect(notificationTargetUrl({ type: "person_message", payload: {} }, "member")).toBe("/messages");
   });
 
   it("opens the desk's visitors on the visitor who scanned the door", () => {

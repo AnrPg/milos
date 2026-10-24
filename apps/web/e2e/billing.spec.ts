@@ -301,6 +301,6 @@ test.describe("billing", () => {
     await expect(page).toHaveURL(/box=nikos/);
     await expect(page.getByText("Personal coach")).toBeVisible();
     await expect(page.getByText("No active package right now.")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Message your coach" })).toHaveAttribute("href", "/me/activity/chats");
+    await expect(page.getByRole("link", { name: "Message your coach" })).toHaveAttribute("href", "/messages?filter=coach");
   });
 });

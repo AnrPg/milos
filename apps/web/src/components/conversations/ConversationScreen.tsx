@@ -5,14 +5,14 @@ import { useTranslations } from "next-intl";
 
 import { ConversationView } from "./ConversationView";
 
-/** /me/messages/:id: the page around one conversation, with the way back to the list. */
+/** /messages/:id: the page around one conversation, with the way back to the list. */
 export function ConversationScreen({ conversationId }: { conversationId: string }) {
   const t = useTranslations("Conversations");
   return (
     <main className="min-h-screen px-4 py-6 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
         <Link
-          href="/me/messages"
+          href="/messages"
           className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-semibold"
           style={{ color: "var(--primary)" }}
         >

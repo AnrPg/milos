@@ -15,6 +15,7 @@ import { nextAppointment } from "@/lib/solo-coach";
 import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { YourTime } from "@/components/zoned-time";
+import { inboxHref } from "@/components/chat/inbox/inbox-model";
 
 /** Shared with `Box › Ραντεβού`, so booking there refreshes this card. */
 const MY_APPOINTMENTS_KEY = ["me", "appointments", "mine"] as const;
@@ -38,7 +39,7 @@ export function CoachActions({ entitlement }: { entitlement: EffectiveEntitlemen
     { href: "/box/appointments", label: t("box.sessions"), icon: HubIcons.clock, shown: hasFeature(entitlement, "appointments") },
     { href: "/box/videos", label: tApp("actionVideos"), icon: HubIcons.video, shown: hasFeature(entitlement, "videos") },
     { href: "/box/coach", label: t("box.nutrition"), icon: leafIcon, shown: hasCapability(entitlement, "receive_nutrition_plan") },
-    { href: "/me/activity/chats", label: t("box.messages"), icon: HubIcons.chat, shown: true },
+    { href: inboxHref({ filter: "coach" }), label: t("box.messages"), icon: HubIcons.chat, shown: true },
   ].filter((action) => action.shown);
 
   return (

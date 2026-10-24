@@ -24,8 +24,8 @@ export function useConversationsToken() {
   return status === "authenticated" ? (tokens?.access_token ?? null) : null;
 }
 
-export const conversationHref = (conversationId: string) => `/me/messages/${encodeURIComponent(conversationId)}`;
-export const REQUESTS_HREF = "/me/messages?folder=requests";
+export const conversationHref = (conversationId: string) => `/messages/${encodeURIComponent(conversationId)}`;
+export const REQUESTS_HREF = "/messages?folder=requests";
 
 /** The unread-count query itself (for its loading or error state). */
 export function useConversationUnreadQuery() {
