@@ -9,6 +9,7 @@ import { fetchPRsSharedWithMe } from "@/api/pr-sharing";
 import { fetchPerson, fetchPersonPosts, personKey, type PersonProfile } from "@/api/social";
 import { PostCard } from "@/components/community/PostCard";
 import { SharedPRCard } from "@/components/pantheon/SharedPRsSection";
+import { MessageButton } from "@/components/conversations/MessageButton";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -56,6 +57,7 @@ export function PersonPage({ id }: { id: string }) {
         {profile.is_me ? null : (
           <FollowButton targetType="user" targetId={profile.id} initialStatus={profile.my_status} followsMe={profile.follows_me} wide />
         )}
+        {profile.is_me ? null : <MessageButton personId={profile.id} name={profile.nickname} wide />}
       </header>
 
       <div role="tablist" aria-label={profile.nickname ?? ""} className="flex gap-6 border-b" style={{ borderColor: "var(--border)" }}>

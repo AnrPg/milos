@@ -3,6 +3,18 @@ import { describe, expect, it } from "vitest";
 import { notificationTargetUrl } from "./notification-links";
 
 describe("notificationTargetUrl", () => {
+  it("opens a person's message in its conversation and a message request in Requests (ADR-193)", () => {
+    for (const role of ["member", "admin", null]) {
+      expect(
+        notificationTargetUrl({ type: "person_message", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
+      ).toBe("/me/messages/c-1");
+      expect(
+        notificationTargetUrl({ type: "message_request", payload: { conversation_id: "c-1", url: "/me/messages/c-1" } }, role),
+      ).toBe("/me/messages?folder=requests");
+    }
+    expect(notificationTargetUrl({ type: "person_message", payload: {} }, "member")).toBe("/me/messages");
+  });
+
   it("opens the desk's visitors on the visitor who scanned the door", () => {
     expect(
       notificationTargetUrl({ type: "check_in_visitor", payload: { scan_id: "scan-1", url: "/admin/check-in?visitor=scan-1" } }, "admin"),
