@@ -22,6 +22,7 @@ defmodule Palee.Application.PeopleSearch do
       ids = Enum.map(found, &elem(&1, 0))
       people = ids |> Identity.list_by_ids() |> Map.new(&{&1.id, &1})
       mine = Community.follow_statuses(context, user_id, "user", ids)
+      buddies = context |> Community.buddy_ids(user_id) |> MapSet.new()
 
       {:ok,
        %{
@@ -40,7 +41,7 @@ defmodule Palee.Application.PeopleSearch do
                      avatar_url: Map.get(person, :avatar_url),
                      relation: relation,
                      my_status: Map.get(mine, id, "none"),
-                     buddy: relation == "buddy"
+                     buddy: MapSet.member?(buddies, id)
                    }
                  ]
              end

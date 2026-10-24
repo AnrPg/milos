@@ -306,7 +306,7 @@ const subscribeStorage = (onChange: () => void) => {
 };
 
 /**
- * «Τα clubs μου | Γύρω μου», remembered on the account (the `feed` surface's
+ * «Οι δικοί μου | Γύρω μου», remembered on the account (the `feed` surface's
  * last-used params, ADR-151) and mirrored on the device for the first paint.
  */
 export function useHomeScope() {
