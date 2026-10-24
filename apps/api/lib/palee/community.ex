@@ -36,6 +36,7 @@ defmodule Palee.Community do
     EventSeries,
     HostPolicy,
     FeedCursor,
+    FeedFilter,
     FollowPolicy,
     GroupPolicy,
     SquadPolicy,
@@ -339,6 +340,11 @@ defmodule Palee.Community do
   defdelegate list_comments(context, post_id), to: CommunityStore
   defdelegate feed_page(context, params), to: Feed, as: :page
   defdelegate pinned_posts(context, channel_ids, viewer_id), to: Feed, as: :pinned
+  defdelegate feed_post_types(), to: FeedFilter, as: :types
+  defdelegate parse_feed_filter(params), to: FeedFilter, as: :parse
+  defdelegate feed_filter_active?(filter), to: FeedFilter, as: :active?
+  defdelegate feed_narrowing(filter, clubs, staff), to: FeedFilter, as: :narrowing
+  defdelegate keep_in_feed?(post, narrowing), to: FeedFilter, as: :keep?
   def attachment_types, do: Palee.Community.Post.attachment_types()
   def shareable_attachment_types, do: Palee.Community.Post.shareable_attachment_types()
 

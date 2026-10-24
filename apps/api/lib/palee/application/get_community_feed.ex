@@ -6,7 +6,9 @@ defmodule Palee.Application.GetCommunityFeed do
   profile posts of people they follow (and their own), and the public posts
   of boxes they follow but do not belong to. `club_id` narrows to one club
   (all its channels, pinned announcements first), `channel_id` to one
-  channel, `mine` to their own posts (Εγώ › Αναρτήσεις).
+  channel, `mine` to their own posts (Εγώ › Αναρτήσεις). `types` and
+  `coaches_only` (ADR-197) narrow to club posts of those kinds or by the
+  gym's staff, pinned announcements included.
   """
 
   alias Palee.Application.{ClubScope, EventCards, PostPresenter}
@@ -22,23 +24,33 @@ defmodule Palee.Application.GetCommunityFeed do
     with {:ok, clubs} <- ClubScope.call(context),
          {:ok, channel_ids} <- channel_ids(clubs, params),
          {:ok, before} <- Community.decode_feed_cursor(params[:cursor]),
+         narrowing = narrowing(params, clubs, channel_ids),
          {:ok, page} <-
            Community.feed_page(context, %{
              channel_ids: channel_ids,
              viewer_id: user_id,
              moderated_organization_ids: moderated(clubs),
              author_id: if(truthy?(params[:mine]), do: user_id),
+             kinds: narrowing && narrowing.kinds,
+             authors: narrowing && narrowing.authors,
              cursor: params[:cursor],
              limit: limit
            }) do
       pinned =
         if params[:cursor] in [nil, ""] and not truthy?(params[:mine]),
-          do: Community.pinned_posts(context, channel_ids, user_id),
+          do:
+            context
+            |> Community.pinned_posts(channel_ids, user_id)
+            |> Enum.filter(&(is_nil(narrowing) or Community.keep_in_feed?(&1, narrowing))),
           else: []
 
       pinned_ids = MapSet.new(pinned, & &1.id)
       club_posts = Enum.reject(page.posts, &MapSet.member?(pinned_ids, &1.id))
-      {profile_posts, box_posts, boxes} = beyond_clubs(context, clubs, params, before, limit)
+
+      {profile_posts, box_posts, boxes} =
+        if narrowing,
+          do: {[], [], []},
+          else: beyond_clubs(context, clubs, params, before, limit)
 
       merged =
         (tag(club_posts, :club) ++ tag(profile_posts, :profile) ++ tag(box_posts, :box))
@@ -164,6 +176,29 @@ defmodule Palee.Application.GetCommunityFeed do
 
     ids = for club <- clubs, channel <- club.channels, mine? or channel.joined, do: channel.id
     {:ok, ids}
+  end
+
+  # Types and coaches-only (ADR-197); nil when the feed is not narrowed.
+  defp narrowing(params, clubs, channel_ids) do
+    filter = Community.parse_feed_filter(params)
+
+    if Community.feed_filter_active?(filter) do
+      staff = if filter.coaches_only, do: staff_by_organization(clubs, channel_ids), else: %{}
+      Community.feed_narrowing(filter, clubs, staff)
+    end
+  end
+
+  # Staff of each gym whose club channels are read.
+  defp staff_by_organization(clubs, channel_ids) do
+    read = MapSet.new(channel_ids)
+
+    clubs
+    |> Enum.filter(fn club -> Enum.any?(club.channels, &MapSet.member?(read, &1.id)) end)
+    |> Enum.map(& &1.organization_id)
+    |> Enum.uniq()
+    |> Map.new(fn organization_id ->
+      {organization_id, organization_id |> Organizations.list_staff() |> Enum.map(& &1.user_id)}
+    end)
   end
 
   defp moderated(clubs),

@@ -5,7 +5,8 @@ defmodule Palee.Identity.Domain.FilterPolicy do
   opaque JSON object here; the surface's own query validates what it uses.
   """
 
-  @surfaces ~w(around_me box_schedule feed club journal vault progress partners)
+  @surfaces ~w(around_me box_schedule feed club journal vault progress partners
+                box_workouts box_videos box_appointments events find_clubs my_posts reviews)
   @max_named 20
   @max_param_bytes 4_096
 
