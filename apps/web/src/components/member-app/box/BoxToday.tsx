@@ -10,7 +10,8 @@ import { listMyExecutions } from "@/api/executions";
 import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { fetchTrainingLogSources } from "@/api/training-log";
 import { useWorkoutLauncher } from "@/components/client/use-workout-launcher";
-import { HubButton, HubCard } from "@/components/member-app/HubParts";
+import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { HubCard } from "@/components/member-app/HubParts";
 import { NextBookingActions } from "@/components/member-app/box/NextBookingActions";
 import {
   buildTodayTraining,
@@ -25,6 +26,7 @@ import {
   TrainingLogDialog,
   type TrainingLogDialogState,
 } from "@/components/training-log/TrainingLog";
+import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
@@ -66,16 +68,17 @@ export function nextBooking(slots: ScheduleSlot[], now: Date) {
 
 /**
  * Box's first two slots (brief §7.4, mockup 08): today's workout with
- * Καταγραφή / Έναρξη ▶, then the next booking. Both keep their place with an
- * empty state, so the screen never reflows (brief §4.2).
+ * Καταγραφή / Έναρξη ▶, then the next booking with its QR check-in. A slot
+ * with nothing in it is hidden, never an empty state (vision §4.2, §8.5):
+ * booking stays one tap away in the action row's «Πρόγραμμα». Without a
+ * booking, a package that covers open gym gets the open-gym check-in in the
+ * booking's place (vision §6.2 «Next booking → Check-in (QR) · Open gym»).
  */
 export function BoxToday({
   nextSession,
-  emptyAction,
 }: {
   /** ADR-170: an independent coach's Box shows the next session, not a class. */
   nextSession?: ReactNode;
-  emptyAction?: { href: string; label: string };
 } = {}) {
   const t = useTranslations("MemberApp");
   const tCheckIn = useTranslations("CheckIn");
@@ -88,6 +91,7 @@ export function BoxToday({
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const launcher = useWorkoutLauncher();
+  const { entitlement } = useClientEntitlement(!nextSession);
 
   const schedule = useBoxSchedule(token, now);
   const assignments = useQuery({
@@ -153,106 +157,100 @@ export function BoxToday({
     });
   }
 
+  // Nothing today and nothing to resume: no card (vision §4.2).
+  const showToday = loading || Boolean(selected) || Boolean(today.resumeExecutionId);
+
   return (
     <>
-      <HubCard eyebrow={t("todayWorkout")} highlighted>
-        {loading ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-        ) : !selected ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
-            <div className="flex gap-2">
-              <HubButton href={emptyAction?.href ?? "/box/schedule"}>{emptyAction?.label ?? t("bookClass")}</HubButton>
-              {today.resumeExecutionId ? (
+      {showToday ? (
+        <HubCard eyebrow={t("todayWorkout")} highlighted>
+          {loading ? (
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
+          ) : !selected ? (
+            <button
+              type="button"
+              className="flex min-h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-bold"
+              style={SPARK_GO_STYLE}
+              onClick={() => launcher.resume(today.resumeExecutionId!)}
+            >
+              {t("resumeWorkout")} ▶
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {today.items.length > 1 ? (
+                <SegmentPicker
+                  ariaLabel={t("todaySources")}
+                  value={selected.key}
+                  onChange={setSelectedKey}
+                  options={today.items.map((item) => ({ value: item.key, label: `${chipLabel(item)}${item.completed ? " ✓" : ""}` }))}
+                />
+              ) : (
+                <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
+              )}
+
+              <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+              {selected.kind === "programme" && !selected.completed ? (
+                <Link
+                  href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
+                  className="self-start text-sm font-semibold"
+                  style={{ color: "var(--primary-strong)" }}
+                >
+                  {t("programmeManage")} ›
+                </Link>
+              ) : null}
+              <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
+              <WorkoutPreviewDetail
+                sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
+                initiallyExpanded={false}
+                authoringMode={selected.workout.authoring_mode}
+                freeTextBody={selected.workout.free_text_body}
+                freeTextDocument={selected.workout.free_text_document}
+              />
+              <WodGoalsStrip workoutId={selected.workout.id} />
+
+              {token ? (
+                <MyInjuryWarningsPanel
+                  accessToken={token}
+                  workoutId={selected.workout.id}
+                  surface={selected.injuryContext.surface}
+                  sourceContextId={selected.injuryContext.id}
+                />
+              ) : null}
+              {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
+
+              {launcher.error ? (
+                <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+                  {localizeError(launcher.error, i18n)}
+                </p>
+              ) : null}
+
+              <div className="flex gap-2">
                 <button
                   type="button"
                   className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                  onClick={() => launcher.resume(today.resumeExecutionId!)}
+                  style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+                  onClick={() => openLog(selected)}
+                  disabled={selected.completed}
                 >
-                  {t("resumeWorkout")} ▶
+                  {selected.completed ? t("logged") : t("logWorkout")}
                 </button>
-              ) : null}
+                <button
+                  type="button"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
+                  style={SPARK_GO_STYLE}
+                  onClick={() => void start(selected)}
+                  disabled={launcher.pendingKey !== null}
+                >
+                  {today.resumeExecutionId ? t("resumeWorkout") : t("startWorkout")} ▶
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {today.items.length > 1 ? (
-              <SegmentPicker
-                ariaLabel={t("todaySources")}
-                value={selected.key}
-                onChange={setSelectedKey}
-                options={today.items.map((item) => ({ value: item.key, label: `${chipLabel(item)}${item.completed ? " ✓" : ""}` }))}
-              />
-            ) : (
-              <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
-            )}
+          )}
+        </HubCard>
+      ) : null}
 
-            <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
-            {selected.kind === "programme" && !selected.completed ? (
-              <Link
-                href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
-                className="self-start text-sm font-semibold"
-                style={{ color: "var(--primary-strong)" }}
-              >
-                {t("programmeManage")} ›
-              </Link>
-            ) : null}
-            <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
-            <WorkoutPreviewDetail
-              sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
-              initiallyExpanded={false}
-              authoringMode={selected.workout.authoring_mode}
-              freeTextBody={selected.workout.free_text_body}
-              freeTextDocument={selected.workout.free_text_document}
-            />
-            <WodGoalsStrip workoutId={selected.workout.id} />
-
-            {token ? (
-              <MyInjuryWarningsPanel
-                accessToken={token}
-                workoutId={selected.workout.id}
-                surface={selected.injuryContext.surface}
-                sourceContextId={selected.injuryContext.id}
-              />
-            ) : null}
-            {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
-
-            {launcher.error ? (
-              <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-                {localizeError(launcher.error, i18n)}
-              </p>
-            ) : null}
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-                onClick={() => openLog(selected)}
-                disabled={selected.completed}
-              >
-                {selected.completed ? t("logged") : t("logWorkout")}
-              </button>
-              <button
-                type="button"
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-                style={SPARK_GO_STYLE}
-                onClick={() => void start(selected)}
-                disabled={launcher.pendingKey !== null}
-              >
-                {today.resumeExecutionId ? t("resumeWorkout") : t("startWorkout")} ▶
-              </button>
-            </div>
-          </div>
-        )}
-      </HubCard>
-
-      {nextSession ?? (
-      <HubCard eyebrow={t("nextSession")}>
-        {schedule.isPending ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
-        ) : booking ? (
+      {nextSession ?? (booking ? (
+        <HubCard eyebrow={t("nextSession")}>
           <div className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -277,24 +275,13 @@ export function BoxToday({
               >
                 {t("manageBooking")}
               </Link>
-              <Link
-                href="/box/check-in"
-                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-              >
-                <QrGlyph />
-                {tCheckIn("qrCheckIn")}
-              </Link>
+              <QrCheckInLink label={tCheckIn("qrCheckIn")} />
             </div>
           </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("noBooking")}</p>
-            <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
-          </div>
-        )}
-      </HubCard>
-      )}
+        </HubCard>
+      ) : token && !schedule.isPending ? (
+        <OpenGymCheckIn accessToken={token} entitlement={entitlement} extra={<QrCheckInLink label={tCheckIn("qrCheckIn")} />} />
+      ) : null)}
 
       {logDialog.mode !== "closed" && token ? (
         <TrainingLogDialog
@@ -305,6 +292,20 @@ export function BoxToday({
         />
       ) : null}
     </>
+  );
+}
+
+/** «QR check-in» (ADR-155, vision §7.5): the member's own code for the desk. */
+function QrCheckInLink({ label }: { label: string }) {
+  return (
+    <Link
+      href="/box/check-in"
+      className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
+      style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+    >
+      <QrGlyph />
+      {label}
+    </Link>
   );
 }
 
