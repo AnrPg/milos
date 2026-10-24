@@ -67,9 +67,9 @@ function ItemBody({ icon, label, current }: { icon: ReactNode; label: string; cu
   return (
     <>
       <span
-        className="relative flex h-8 w-12 items-center justify-center rounded-full transition-colors motion-reduce:transition-none"
-        // The current tab is Spark (ANR 2026-10-24), the icon dark on it.
-        style={current ? { background: "var(--spark)", color: "var(--spark-contrast)" } : { background: "transparent" }}
+        // No fill behind the current tab (ANR 2026-10-24, replaced the Spark
+        // pill): it shows by the darker colour, bolder icon and label, and the dot.
+        className="relative flex h-8 w-12 items-center justify-center"
       >
         {icon}
       </span>
@@ -225,7 +225,7 @@ export function BottomNav() {
                           alt=""
                           draggable={false}
                           className="h-7 w-7 rounded-full object-cover"
-                          style={{ boxShadow: current ? "0 0 0 2px var(--spark)" : "0 0 0 1px var(--border)" }}
+                          style={{ boxShadow: current ? "0 0 0 2px var(--text)" : "0 0 0 1px var(--border)" }}
                         />
                       ) : (
                         <span
@@ -234,7 +234,7 @@ export function BottomNav() {
                           style={{
                             background: "var(--primary)",
                             color: "var(--primary-contrast)",
-                            boxShadow: current ? "0 0 0 2px var(--bg), 0 0 0 4px var(--spark)" : "none",
+                            boxShadow: current ? "0 0 0 2px var(--bg), 0 0 0 4px var(--text)" : "none",
                           }}
                         >
                           {initials}
