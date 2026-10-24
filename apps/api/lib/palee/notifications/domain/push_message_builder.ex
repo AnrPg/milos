@@ -180,6 +180,39 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("new_follower", payload, localize) do
+    %{
+      title: localize.("New follower", %{}),
+      body:
+        localize.("%{nickname} started following you.", %{
+          nickname: payload["follower_nickname"] || ""
+        }),
+      url: payload["url"] || "/people/#{payload["follower_id"]}"
+    }
+  end
+
+  # ADR-193 §3: who wrote, never what (lock-screen safe).
+  def build("person_message", payload, localize) do
+    nickname = payload["nickname"] || ""
+
+    %{
+      title: localize.("Message from %{nickname}", %{nickname: nickname}),
+      body: localize.("%{nickname} sent you a message.", %{nickname: nickname}),
+      url: payload["url"] || "/me/messages"
+    }
+  end
+
+  def build("message_request", payload, localize) do
+    %{
+      title: localize.("Message request", %{}),
+      body:
+        localize.("%{nickname} wants to send you a message.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/me/messages?folder=requests"
+    }
+  end
+
   def build("follow_accepted", payload, localize) do
     %{
       title: localize.("Follow request accepted", %{}),

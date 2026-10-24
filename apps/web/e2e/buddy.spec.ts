@@ -167,7 +167,7 @@ test.describe("Buddy για στήριξη", () => {
     await expect(page.getByTestId("buddy-inviter")).toContainText("Dimitra");
     await page.getByRole("button", { name: "Accept Dimitra's invitation" }).click();
     await claim;
-    await expect(page.getByText("You are now Dimitra's support buddy.")).toBeVisible();
+    await expect(page.getByText("You are now Dimitra's check-in buddy.")).toBeVisible();
   });
 
   test("a buddy is invited from Εγώ › Buddy and an invitation is accepted", async ({ page }) => {
@@ -186,7 +186,7 @@ test.describe("Buddy για στήριξη", () => {
     });
 
     await page.goto("/me/buddy");
-    await expect(page.getByRole("heading", { name: "Support buddy", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check-in buddy", level: 1 })).toBeVisible();
 
     const acceptCall = page.waitForRequest((request) => request.url().endsWith("/me/buddies/link-5/accept") && request.method() === "POST");
     await page.getByRole("button", { name: "Accept", exact: true }).click();

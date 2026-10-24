@@ -35177,6 +35177,31 @@
         "title": "ContentVideo",
         "type": "object"
       },
+      "ConversationPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ConversationPerson",
+        "type": "object"
+      },
       "CorporateClient": {
         "properties": {
           "active_seats": {
@@ -39940,6 +39965,14 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "buddy": {
+                    "description": "ADR-193: you follow each other",
+                    "type": "boolean"
+                  },
+                  "handle": {
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "id": {
                     "format": "uuid",
                     "type": "string"
@@ -39964,7 +39997,8 @@
                 },
                 "required": [
                   "id",
-                  "my_status"
+                  "my_status",
+                  "buddy"
                 ],
                 "title": "FollowPerson",
                 "type": "object"
@@ -39991,6 +40025,27 @@
           "since"
         ],
         "title": "FollowEntry",
+        "type": "object"
+      },
+      "FollowGroups": {
+        "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+        "properties": {
+          "buddies": {
+            "type": "integer"
+          },
+          "followers_only": {
+            "type": "integer"
+          },
+          "following_only": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "buddies",
+          "followers_only",
+          "following_only"
+        ],
+        "title": "FollowGroups",
         "type": "object"
       },
       "FollowPage": {
@@ -40045,6 +40100,14 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "buddy": {
+                          "description": "ADR-193: you follow each other",
+                          "type": "boolean"
+                        },
+                        "handle": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -40069,7 +40132,8 @@
                       },
                       "required": [
                         "id",
-                        "my_status"
+                        "my_status",
+                        "buddy"
                       ],
                       "title": "FollowPerson",
                       "type": "object"
@@ -40117,6 +40181,14 @@
             "nullable": true,
             "type": "string"
           },
+          "buddy": {
+            "description": "ADR-193: you follow each other",
+            "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -40141,7 +40213,8 @@
         },
         "required": [
           "id",
-          "my_status"
+          "my_status",
+          "buddy"
         ],
         "title": "FollowPerson",
         "type": "object"
@@ -50526,6 +50599,116 @@
         "title": "PartnersClubOverview",
         "type": "object"
       },
+      "PeopleSearchPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "buddy": {
+            "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "my_status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "club",
+              "buddy",
+              "follow",
+              "nearby",
+              "public"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "buddy",
+          "id",
+          "my_status",
+          "relation"
+        ],
+        "title": "PeopleSearchPerson",
+        "type": "object"
+      },
+      "PeopleSearchResponse": {
+        "properties": {
+          "people": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "buddy": {
+                  "type": "boolean"
+                },
+                "handle": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "my_status": {
+                  "enum": [
+                    "none",
+                    "requested",
+                    "active"
+                  ],
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "relation": {
+                  "enum": [
+                    "club",
+                    "buddy",
+                    "follow",
+                    "nearby",
+                    "public"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "buddy",
+                "id",
+                "my_status",
+                "relation"
+              ],
+              "title": "PeopleSearchPerson",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "people"
+        ],
+        "title": "PeopleSearchResponse",
+        "type": "object"
+      },
       "PerkBenefit": {
         "description": "percent: `percent`; fixed_amount: `amount_cents` + `currency`; free_item: `item`; buy_x_get_y: `buy_quantity`, `get_quantity` (and `item`); free_text: `text`. Optional for all: `min_spend_cents`, `max_discount_cents`.",
         "properties": {
@@ -52200,6 +52383,571 @@
         "title": "PerkVersionList",
         "type": "object"
       },
+      "PersonConversation": {
+        "properties": {
+          "buddy": {
+            "description": "You and they follow each other",
+            "type": "boolean"
+          },
+          "folder": {
+            "enum": [
+              "inbox",
+              "requests"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_message": {
+            "allOf": [
+              {
+                "properties": {
+                  "author_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "conversation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "mine": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "author_id",
+                  "body",
+                  "conversation_id",
+                  "created_at",
+                  "id",
+                  "mine"
+                ],
+                "title": "PersonMessage",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "last_message_at": {
+            "allOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              }
+            ],
+            "nullable": true
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "handle": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "ConversationPerson",
+            "type": "object"
+          },
+          "started_by_me": {
+            "type": "boolean"
+          },
+          "unread": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "buddy",
+          "folder",
+          "id",
+          "person",
+          "started_by_me",
+          "unread"
+        ],
+        "title": "PersonConversation",
+        "type": "object"
+      },
+      "PersonConversationOpenRequest": {
+        "properties": {
+          "person_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id"
+        ],
+        "title": "PersonConversationOpenRequest",
+        "type": "object"
+      },
+      "PersonConversationPage": {
+        "properties": {
+          "conversations": {
+            "items": {
+              "properties": {
+                "buddy": {
+                  "description": "You and they follow each other",
+                  "type": "boolean"
+                },
+                "folder": {
+                  "enum": [
+                    "inbox",
+                    "requests"
+                  ],
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "last_message": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "author_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_operation_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "conversation_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "author_id",
+                        "body",
+                        "conversation_id",
+                        "created_at",
+                        "id",
+                        "mine"
+                      ],
+                      "title": "PersonMessage",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "last_message_at": {
+                  "allOf": [
+                    {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "ConversationPerson",
+                  "type": "object"
+                },
+                "started_by_me": {
+                  "type": "boolean"
+                },
+                "unread": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "buddy",
+                "folder",
+                "id",
+                "person",
+                "started_by_me",
+                "unread"
+              ],
+              "title": "PersonConversation",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "conversations"
+        ],
+        "title": "PersonConversationPage",
+        "type": "object"
+      },
+      "PersonConversationResponse": {
+        "properties": {
+          "conversation": {
+            "properties": {
+              "buddy": {
+                "description": "You and they follow each other",
+                "type": "boolean"
+              },
+              "folder": {
+                "enum": [
+                  "inbox",
+                  "requests"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "last_message": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "author_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "body": {
+                        "type": "string"
+                      },
+                      "client_operation_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "conversation_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "mine": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "author_id",
+                      "body",
+                      "conversation_id",
+                      "created_at",
+                      "id",
+                      "mine"
+                    ],
+                    "title": "PersonMessage",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              },
+              "last_message_at": {
+                "allOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                ],
+                "nullable": true
+              },
+              "person": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "handle": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "ConversationPerson",
+                "type": "object"
+              },
+              "started_by_me": {
+                "type": "boolean"
+              },
+              "unread": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "buddy",
+              "folder",
+              "id",
+              "person",
+              "started_by_me",
+              "unread"
+            ],
+            "title": "PersonConversation",
+            "type": "object"
+          }
+        },
+        "required": [
+          "conversation"
+        ],
+        "title": "PersonConversationResponse",
+        "type": "object"
+      },
+      "PersonConversationUnreadCount": {
+        "properties": {
+          "inbox": {
+            "type": "integer"
+          },
+          "requests": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "inbox",
+          "requests"
+        ],
+        "title": "PersonConversationUnreadCount",
+        "type": "object"
+      },
+      "PersonMessage": {
+        "properties": {
+          "author_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "client_operation_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "conversation_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mine": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "author_id",
+          "body",
+          "conversation_id",
+          "created_at",
+          "id",
+          "mine"
+        ],
+        "title": "PersonMessage",
+        "type": "object"
+      },
+      "PersonMessagePage": {
+        "properties": {
+          "messages": {
+            "items": {
+              "properties": {
+                "author_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "client_operation_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "conversation_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "mine": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "author_id",
+                "body",
+                "conversation_id",
+                "created_at",
+                "id",
+                "mine"
+              ],
+              "title": "PersonMessage",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "PersonMessagePage",
+        "type": "object"
+      },
+      "PersonMessageRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "client_operation_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "PersonMessageRequest",
+        "type": "object"
+      },
+      "PersonMessageResponse": {
+        "properties": {
+          "message": {
+            "properties": {
+              "author_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              },
+              "client_operation_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "conversation_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "mine": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "author_id",
+              "body",
+              "conversation_id",
+              "created_at",
+              "id",
+              "mine"
+            ],
+            "title": "PersonMessage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "PersonMessageResponse",
+        "type": "object"
+      },
       "PersonPostsResponse": {
         "properties": {
           "next_cursor": {
@@ -53063,6 +53811,31 @@
             "nullable": true,
             "type": "string"
           },
+          "buddy": {
+            "description": "ADR-193: you follow each other",
+            "type": "boolean"
+          },
+          "follow_groups": {
+            "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+            "properties": {
+              "buddies": {
+                "type": "integer"
+              },
+              "followers_only": {
+                "type": "integer"
+              },
+              "following_only": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "buddies",
+              "followers_only",
+              "following_only"
+            ],
+            "title": "FollowGroups",
+            "type": "object"
+          },
           "followers_count": {
             "type": "integer"
           },
@@ -53071,6 +53844,10 @@
           },
           "follows_me": {
             "type": "boolean"
+          },
+          "handle": {
+            "nullable": true,
+            "type": "string"
           },
           "id": {
             "format": "uuid",
@@ -53090,15 +53867,22 @@
           "nickname": {
             "nullable": true,
             "type": "string"
+          },
+          "private": {
+            "description": "ADR-193: following them is a request",
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "is_me",
+          "private",
           "followers_count",
           "following_count",
+          "follow_groups",
           "my_status",
-          "follows_me"
+          "follows_me",
+          "buddy"
         ],
         "title": "PersonProfile",
         "type": "object"
@@ -66233,6 +67017,35 @@
         "title": "ShopVariantStock",
         "type": "object"
       },
+      "SocialPrivacy": {
+        "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+        "properties": {
+          "private_account": {
+            "type": "boolean"
+          },
+          "searchable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "private_account",
+          "searchable"
+        ],
+        "title": "SocialPrivacy",
+        "type": "object"
+      },
+      "SocialPrivacyRequest": {
+        "properties": {
+          "private_account": {
+            "type": "boolean"
+          },
+          "searchable": {
+            "type": "boolean"
+          }
+        },
+        "title": "SocialPrivacyRequest",
+        "type": "object"
+      },
       "SocialSummary": {
         "properties": {
           "around_visibility": {
@@ -66270,6 +67083,27 @@
             "title": "BookingSharing",
             "type": "object"
           },
+          "follow_groups": {
+            "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+            "properties": {
+              "buddies": {
+                "type": "integer"
+              },
+              "followers_only": {
+                "type": "integer"
+              },
+              "following_only": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "buddies",
+              "followers_only",
+              "following_only"
+            ],
+            "title": "FollowGroups",
+            "type": "object"
+          },
           "followers_count": {
             "type": "integer"
           },
@@ -66292,18 +67126,37 @@
           "posts_count": {
             "type": "integer"
           },
+          "privacy": {
+            "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+            "properties": {
+              "private_account": {
+                "type": "boolean"
+              },
+              "searchable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "private_account",
+              "searchable"
+            ],
+            "title": "SocialPrivacy",
+            "type": "object"
+          },
           "requests_count": {
             "type": "integer"
           }
         },
         "required": [
-          "posts_count",
+          "around_visibility",
+          "booking_sharing",
+          "follow_groups",
           "followers_count",
           "following_count",
-          "requests_count",
-          "booking_sharing",
           "member_visibility",
-          "around_visibility"
+          "posts_count",
+          "privacy",
+          "requests_count"
         ],
         "title": "SocialSummary",
         "type": "object"
@@ -97387,6 +98240,177 @@
         ]
       }
     },
+    "/api/me/buddies-list": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.FollowController.buddies",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "box": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "primary_color": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "description": "Canonical slug; redirect when it differs",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "organization_id",
+                                  "slug",
+                                  "name"
+                                ],
+                                "title": "PublicBox",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "follow_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "my_status": {
+                                    "allOf": [
+                                      {
+                                        "enum": [
+                                          "none",
+                                          "requested",
+                                          "active"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    ],
+                                    "description": "Whether you follow them"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "my_status",
+                                  "buddy"
+                                ],
+                                "title": "FollowPerson",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "since": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "follow_id",
+                          "status",
+                          "since"
+                        ],
+                        "title": "FollowEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "FollowPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddies"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: your Buddies, the people you and they follow each other",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
     "/api/me/buddies/candidates": {
       "get": {
         "callbacks": {},
@@ -107150,6 +108174,1134 @@
         ]
       }
     },
+    "/api/me/conversations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "folder",
+            "required": false,
+            "schema": {
+              "enum": [
+                "inbox",
+                "requests"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversations": {
+                      "items": {
+                        "properties": {
+                          "buddy": {
+                            "description": "You and they follow each other",
+                            "type": "boolean"
+                          },
+                          "folder": {
+                            "enum": [
+                              "inbox",
+                              "requests"
+                            ],
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_message": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "author_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "body": {
+                                    "type": "string"
+                                  },
+                                  "client_operation_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "conversation_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "mine": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "author_id",
+                                  "body",
+                                  "conversation_id",
+                                  "created_at",
+                                  "id",
+                                  "mine"
+                                ],
+                                "title": "PersonMessage",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "last_message_at": {
+                            "allOf": [
+                              {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "ConversationPerson",
+                            "type": "object"
+                          },
+                          "started_by_me": {
+                            "type": "boolean"
+                          },
+                          "unread": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "buddy",
+                          "folder",
+                          "id",
+                          "person",
+                          "started_by_me",
+                          "unread"
+                        ],
+                        "title": "PersonConversation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "conversations"
+                  ],
+                  "title": "PersonConversationPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your conversations in the inbox (default) or in message requests, latest first",
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "person_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "person_id"
+                ],
+                "title": "PersonConversationOpenRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open (or find) your conversation with a person",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/unread-count": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "inbox": {
+                      "type": "integer"
+                    },
+                    "requests": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "inbox",
+                    "requests"
+                  ],
+                  "title": "PersonConversationUnreadCount",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Counts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How many conversations hold unread messages, in the inbox and in requests",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One conversation as you see it",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/accept": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.accept",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept a message request (it moves to the inbox)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/decline": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.decline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Declined"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline a message request (you never see it again; the sender is not told)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/messages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.messages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "messages": {
+                      "items": {
+                        "properties": {
+                          "author_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "client_operation_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "conversation_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "mine": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "author_id",
+                          "body",
+                          "conversation_id",
+                          "created_at",
+                          "id",
+                          "mine"
+                        ],
+                        "title": "PersonMessage",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "messages"
+                  ],
+                  "title": "PersonMessagePage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Messages"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The conversation's messages, newest first (cursor paging)",
+        "tags": [
+          "Conversations"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.send_message",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "PersonMessageRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "properties": {
+                        "author_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_operation_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "conversation_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "author_id",
+                        "body",
+                        "conversation_id",
+                        "created_at",
+                        "id",
+                        "mine"
+                      ],
+                      "title": "PersonMessage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "PersonMessageResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Message"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write a message (a retry with the same client_operation_id is answered once)",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
+    "/api/me/conversations/{id}/read": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonConversationController.read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "conversation": {
+                      "properties": {
+                        "buddy": {
+                          "description": "You and they follow each other",
+                          "type": "boolean"
+                        },
+                        "folder": {
+                          "enum": [
+                            "inbox",
+                            "requests"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "author_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "body": {
+                                  "type": "string"
+                                },
+                                "client_operation_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "conversation_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "mine": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "author_id",
+                                "body",
+                                "conversation_id",
+                                "created_at",
+                                "id",
+                                "mine"
+                              ],
+                              "title": "PersonMessage",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "last_message_at": {
+                          "allOf": [
+                            {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "ConversationPerson",
+                          "type": "object"
+                        },
+                        "started_by_me": {
+                          "type": "boolean"
+                        },
+                        "unread": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "buddy",
+                        "folder",
+                        "id",
+                        "person",
+                        "started_by_me",
+                        "unread"
+                      ],
+                      "title": "PersonConversation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "conversation"
+                  ],
+                  "title": "PersonConversationResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conversation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark the conversation read up to now",
+        "tags": [
+          "Conversations"
+        ]
+      }
+    },
     "/api/me/daily-stats": {
       "get": {
         "callbacks": {},
@@ -116190,6 +118342,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116214,7 +118374,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116428,6 +118589,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116452,7 +118621,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116640,6 +118810,14 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "buddy": {
+                                    "description": "ADR-193: you follow each other",
+                                    "type": "boolean"
+                                  },
+                                  "handle": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -116664,7 +118842,8 @@
                                 },
                                 "required": [
                                   "id",
-                                  "my_status"
+                                  "my_status",
+                                  "buddy"
                                 ],
                                 "title": "FollowPerson",
                                 "type": "object"
@@ -116787,7 +118966,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Follow a person (a request they accept) or a published box (at once)",
+        "summary": "Follow a person (a request when they are private, ADR-193) or a published box (at once)",
         "tags": [
           "Follows"
         ]
@@ -123765,6 +125944,27 @@
                       "title": "BookingSharing",
                       "type": "object"
                     },
+                    "follow_groups": {
+                      "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+                      "properties": {
+                        "buddies": {
+                          "type": "integer"
+                        },
+                        "followers_only": {
+                          "type": "integer"
+                        },
+                        "following_only": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "buddies",
+                        "followers_only",
+                        "following_only"
+                      ],
+                      "title": "FollowGroups",
+                      "type": "object"
+                    },
                     "followers_count": {
                       "type": "integer"
                     },
@@ -123787,18 +125987,37 @@
                     "posts_count": {
                       "type": "integer"
                     },
+                    "privacy": {
+                      "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+                      "properties": {
+                        "private_account": {
+                          "type": "boolean"
+                        },
+                        "searchable": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "private_account",
+                        "searchable"
+                      ],
+                      "title": "SocialPrivacy",
+                      "type": "object"
+                    },
                     "requests_count": {
                       "type": "integer"
                     }
                   },
                   "required": [
-                    "posts_count",
+                    "around_visibility",
+                    "booking_sharing",
+                    "follow_groups",
                     "followers_count",
                     "following_count",
-                    "requests_count",
-                    "booking_sharing",
                     "member_visibility",
-                    "around_visibility"
+                    "posts_count",
+                    "privacy",
+                    "requests_count"
                   ],
                   "title": "SocialSummary",
                   "type": "object"
@@ -123813,7 +126032,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Your counts for Εγώ: posts, followers, following, waiting requests",
+        "summary": "Your counts for Εγώ: posts, followers, following, Buddies, waiting requests",
         "tags": [
           "Follows"
         ]
@@ -123995,6 +126214,67 @@
           }
         ],
         "summary": "Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1)",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/social/privacy": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.FollowController.privacy",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "private_account": {
+                    "type": "boolean"
+                  },
+                  "searchable": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "SocialPrivacyRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-193: a private account answers follow requests; searchable shows you in people search",
+                  "properties": {
+                    "private_account": {
+                      "type": "boolean"
+                    },
+                    "searchable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "private_account",
+                    "searchable"
+                  ],
+                  "title": "SocialPrivacy",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Setting"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: private account (follows become requests) and showing in people search",
         "tags": [
           "Follows"
         ]
@@ -238607,6 +240887,103 @@
         ]
       }
     },
+    "/api/people-search": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PeopleController.search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "people": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "buddy": {
+                            "type": "boolean"
+                          },
+                          "handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "my_status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "relation": {
+                            "enum": [
+                              "club",
+                              "buddy",
+                              "follow",
+                              "nearby",
+                              "public"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "buddy",
+                          "id",
+                          "my_status",
+                          "relation"
+                        ],
+                        "title": "PeopleSearchPerson",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "people"
+                  ],
+                  "title": "PeopleSearchResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "People"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-193: find people by @handle or name (shared clubs, Buddies, follows, nearby, public)",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
     "/api/people/{id}": {
       "get": {
         "callbacks": {},
@@ -238632,6 +241009,31 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "buddy": {
+                      "description": "ADR-193: you follow each other",
+                      "type": "boolean"
+                    },
+                    "follow_groups": {
+                      "description": "ADR-193: the person's follows of people in three groups that never overlap: Buddies (both ways), people who follow them only, people they follow only",
+                      "properties": {
+                        "buddies": {
+                          "type": "integer"
+                        },
+                        "followers_only": {
+                          "type": "integer"
+                        },
+                        "following_only": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "buddies",
+                        "followers_only",
+                        "following_only"
+                      ],
+                      "title": "FollowGroups",
+                      "type": "object"
+                    },
                     "followers_count": {
                       "type": "integer"
                     },
@@ -238640,6 +241042,10 @@
                     },
                     "follows_me": {
                       "type": "boolean"
+                    },
+                    "handle": {
+                      "nullable": true,
+                      "type": "string"
                     },
                     "id": {
                       "format": "uuid",
@@ -238659,15 +241065,22 @@
                     "nickname": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "private": {
+                      "description": "ADR-193: following them is a request",
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "id",
                     "is_me",
+                    "private",
                     "followers_count",
                     "following_count",
+                    "follow_groups",
                     "my_status",
-                    "follows_me"
+                    "follows_me",
+                    "buddy"
                   ],
                   "title": "PersonProfile",
                   "type": "object"

@@ -1,8 +1,10 @@
 defmodule Palee.Application.Follows do
   @moduledoc """
   ADR-142 (P2-M2, D3): following people, boxes and (from P2-M4) open clubs.
-  A follow of a person is a request they accept or decline; a published box
-  is followed at once. Runs in the member's personal session.
+  A follow of a private person is a request they accept or decline; a
+  public person (ADR-193 §2) and a published box are followed at once. Two
+  people who follow each other are Buddies (ADR-193 §1). Runs in the
+  member's personal session.
   """
 
   alias Palee.{Community, Identity, Notifications, Organizations}
@@ -13,7 +15,7 @@ defmodule Palee.Application.Follows do
     with {:ok, target_id} <- uuid(target_id),
          {:ok, follow, outcome} <-
            Community.follow(context, type, target_id, target(type, target_id, user_id)) do
-      if outcome == :created and follow.status == "requested", do: notify_request(user_id, follow)
+      if outcome == :created and type == "user", do: notify_target(user_id, follow)
       {:ok, %{status: follow.status}}
     end
   end
@@ -52,25 +54,61 @@ defmodule Palee.Application.Follows do
     with {:ok, _follow} <- Community.remove_incoming_follow(context, follow_id), do: :ok
   end
 
-  @doc "The member's followers; `q` keeps those whose name contains it."
+  @doc """
+  People who follow the member and whom they do not follow back (ADR-193
+  §1: Buddies are their own group); `q` keeps those whose name contains it.
+  """
   def followers(%{user_id: user_id} = context, params) do
+    buddies = Community.buddy_ids(context, user_id)
+
     page(params, :user_id, &people_names/1, fn page ->
-      Community.list_incoming_follows(context, "user", user_id, "active", page)
+      Community.list_incoming_follows(
+        context,
+        "user",
+        user_id,
+        "active",
+        Map.put(page, :except, buddies)
+      )
     end)
     |> present_people(:user_id, context)
   end
 
+  @doc "ADR-193 §1: the member's Buddies (people who follow them back); `q` filters names."
+  def buddies(%{user_id: user_id} = context, params) do
+    buddies = Community.buddy_ids(context, user_id)
+
+    page(params, :target_id, &people_names/1, fn page ->
+      Community.list_outgoing_follows(
+        context,
+        user_id,
+        ["user"],
+        ["active"],
+        Map.update(page, :among, buddies, &Enum.filter(&1, fn id -> id in buddies end))
+      )
+    end)
+    |> present_people(:target_id, context)
+  end
+
   @doc """
-  What the member follows: `type` `user` (people) or `organization` (boxes);
-  `q` keeps those whose name contains it.
+  What the member follows: `type` `user` (people who do not follow them
+  back, and requests they are waiting on; ADR-193 §1) or `organization`
+  (boxes); `q` keeps those whose name contains it.
   """
   def following(%{user_id: user_id} = context, params) do
     type = params[:type] || params["type"] || "user"
 
     with true <- type in ~w(user organization) || {:error, :invalid_follow_target} do
+      except = if type == "user", do: Community.buddy_ids(context, user_id), else: []
+
       result =
         page(params, :target_id, names_for(type), fn page ->
-          Community.list_outgoing_follows(context, user_id, [type], ~w(requested active), page)
+          Community.list_outgoing_follows(
+            context,
+            user_id,
+            [type],
+            ~w(requested active),
+            Map.put(page, :except, except)
+          )
         end)
 
       case type do
@@ -81,10 +119,15 @@ defmodule Palee.Application.Follows do
   end
 
   # ADR-184: a mock person cannot be followed from outside its demo business.
+  # ADR-193 §2: a public person is followed at once.
   defp target("user", id, follower_id) do
     case Identity.find_by_id(id) do
-      %{id: id} -> if Identity.visible_to?(id, follower_id), do: %{id: id}
-      _missing -> nil
+      %{id: id} ->
+        if Identity.visible_to?(id, follower_id),
+          do: %{id: id, public: Community.public_user_ids([id]) == [id]}
+
+      _missing ->
+        nil
     end
   end
 
@@ -153,6 +196,7 @@ defmodule Palee.Application.Follows do
     ids = Enum.map(follows, &Map.fetch!(&1, key))
     people = ids |> Identity.list_by_ids() |> Map.new(&{&1.id, &1})
     mine = Community.follow_statuses(context, viewer_id, "user", ids)
+    buddies = context |> Community.buddy_ids(viewer_id) |> MapSet.new()
 
     {:ok,
      %{
@@ -171,8 +215,10 @@ defmodule Palee.Application.Follows do
                    person: %{
                      id: person.id,
                      nickname: person.nickname,
+                     handle: Map.get(person, :handle),
                      avatar_url: Map.get(person, :avatar_url),
-                     my_status: Map.get(mine, person.id, "none")
+                     my_status: Map.get(mine, person.id, "none"),
+                     buddy: MapSet.member?(buddies, person.id)
                    }
                  }
                ]
@@ -215,6 +261,18 @@ defmodule Palee.Application.Follows do
   end
 
   defp present_boxes(error), do: error
+
+  defp notify_target(follower_id, %{status: "requested"} = follow),
+    do: notify_request(follower_id, follow)
+
+  defp notify_target(follower_id, follow) do
+    Notifications.dispatch_event(:new_follower, %{
+      user_id: follow.target_id,
+      follow_id: follow.id,
+      follower_id: follower_id,
+      follower_nickname: nickname(follower_id)
+    })
+  end
 
   defp notify_request(follower_id, follow) do
     Notifications.dispatch_event(:follow_requested, %{

@@ -23,8 +23,40 @@ defmodule Palee.Application.SocialProfile do
        requests_count: Community.count_incoming_follows(context, "user", user_id, "requested"),
        booking_sharing: booking_sharing(context, user_id),
        member_visibility: member_visibility(context, user_id),
-       around_visibility: around_visibility(context, user_id)
+       around_visibility: around_visibility(context, user_id),
+       privacy: privacy(context, user_id),
+       follow_groups: Community.follow_groups(user_id)
      }}
+  end
+
+  @doc """
+  ADR-193 §2: «Ιδιωτικός λογαριασμός» (on until the member turns it off: a
+  follow is then a request) and «Εμφάνιση στην αναζήτηση».
+  """
+  def privacy(context, user_id) do
+    settings = Community.social_settings(context, user_id)
+
+    %{
+      private_account: if(settings, do: settings.private_account, else: true),
+      searchable: if(settings, do: settings.searchable, else: true)
+    }
+  end
+
+  @doc "Going public accepts the requests waiting for the member (ADR-193 §2)."
+  def set_privacy(%{user_id: user_id} = context, attrs, now \\ DateTime.utc_now()) do
+    changes =
+      attrs
+      |> Map.take([:private_account, :searchable])
+      |> Enum.filter(fn {_key, value} -> is_boolean(value) end)
+      |> Map.new()
+
+    with true <- changes != %{} || {:error, :bad_request},
+         {:ok, _settings} <- Community.put_social_settings(context, user_id, changes) do
+      if changes[:private_account] == false,
+        do: Community.accept_all_follow_requests(context, now)
+
+      {:ok, privacy(context, user_id)}
+    end
   end
 
   @doc "Board 7 Q1: whether the member shows in their clubs' «Μέλη» (shown unless they hide)."
@@ -85,17 +117,23 @@ defmodule Palee.Application.SocialProfile do
   def person(%{user_id: viewer_id} = context, person_id) do
     with {:ok, person} <- find(person_id, viewer_id) do
       followers = Community.follower_counts("user", [person.id])
+      my_status = Community.follow_status(context, "user", person.id)
+      follows_me = follows_me(context, person.id, viewer_id)
 
       {:ok,
        %{
          id: person.id,
          nickname: person.nickname,
+         handle: Map.get(person, :handle),
          avatar_url: Map.get(person, :avatar_url),
          is_me: person.id == viewer_id,
+         private: Community.public_user_ids([person.id]) == [],
          followers_count: Map.get(followers, person.id, 0),
          following_count: Community.following_count(person.id),
-         my_status: Community.follow_status(context, "user", person.id),
-         follows_me: follows_me(context, person.id, viewer_id)
+         follow_groups: Community.follow_groups(person.id),
+         my_status: my_status,
+         follows_me: follows_me,
+         buddy: Community.buddies?(my_status, if(follows_me, do: "active", else: "none"))
        }}
     end
   end

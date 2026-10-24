@@ -83,6 +83,7 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
     Follow
     |> where([f], f.target_type == ^type and f.target_id == ^target_id and f.status == ^status)
     |> among(:user_id, Map.get(page, :among))
+    |> except(:user_id, Map.get(page, :except))
     |> page(page)
     |> Repo.all()
     |> Enum.map(&normalize_follow/1)
@@ -93,6 +94,7 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
     Follow
     |> where([f], f.user_id == ^follower_id and f.target_type in ^types and f.status in ^statuses)
     |> among(:target_id, Map.get(page, :among))
+    |> except(:target_id, Map.get(page, :except))
     |> page(page)
     |> Repo.all()
     |> Enum.map(&normalize_follow/1)
@@ -118,6 +120,75 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
     |> where([f], f.user_id == ^follower_id and f.target_type == ^type and f.status == "active")
     |> select([f], f.target_id)
     |> Repo.all()
+  end
+
+  @impl true
+  def accept_all_incoming(_context, user_id, now) do
+    {count, _rows} =
+      Follow
+      |> where(
+        [f],
+        f.target_type == "user" and f.target_id == ^user_id and f.status == "requested"
+      )
+      |> Repo.update_all(set: [status: "active", accepted_at: now, updated_at: now])
+
+    count
+  end
+
+  # Both rows are readable in the person's session: theirs as the follower,
+  # the other one as its target.
+  @impl true
+  def buddy_ids(_context, user_id) do
+    Follow
+    |> join(:inner, [f], back in Follow,
+      on:
+        back.user_id == f.target_id and back.target_type == "user" and
+          back.target_id == f.user_id and back.status == "active"
+    )
+    |> where([f], f.user_id == ^user_id and f.target_type == "user" and f.status == "active")
+    |> select([f], f.target_id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def person_relations(_context, []), do: %{}
+
+  def person_relations(_context, ids) do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT user_id, shares_club, i_follow, follows_me, nearby FROM palee_person_relations($1)",
+        [Enum.map(ids, &Ecto.UUID.dump!/1)]
+      )
+
+    Map.new(rows, fn [id, shares_club, i_follow, follows_me, nearby] ->
+      {Ecto.UUID.load!(id),
+       %{shares_club: shares_club, i_follow: i_follow, follows_me: follows_me, nearby: nearby}}
+    end)
+  end
+
+  @impl true
+  def search_people(_context, handle_term, name_term, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, relation FROM palee_people_search($1, $2, $3)", [
+        handle_term,
+        name_term,
+        limit
+      ])
+
+    Enum.map(rows, fn [id, relation] -> {Ecto.UUID.load!(id), relation} end)
+  end
+
+  @impl true
+  def public_user_ids([]), do: []
+
+  def public_user_ids(ids) do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT id FROM unnest($1::uuid[]) AS t(id) WHERE palee_user_is_public(id)",
+        [Enum.map(ids, &Ecto.UUID.dump!/1)]
+      )
+
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
   end
 
   @impl true
@@ -164,6 +235,14 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
       Repo.query!("SELECT palee_following_count($1)", [Ecto.UUID.dump!(user_id)])
 
     count
+  end
+
+  @impl true
+  def follow_groups(user_id) do
+    %{rows: [[buddies, followers_only, following_only]]} =
+      Repo.query!("SELECT * FROM palee_follow_groups($1)", [Ecto.UUID.dump!(user_id)])
+
+    %{buddies: buddies, followers_only: followers_only, following_only: following_only}
   end
 
   # Social settings -----------------------------------------------------------
@@ -379,6 +458,10 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
   defp page_limit(query, limit), do: limit(query, ^limit)
 
   # Only the follows whose other side is one of `ids` (a name search).
+  defp except(query, _field, nil), do: query
+  defp except(query, _field, []), do: query
+  defp except(query, field, ids), do: where(query, [f], field(f, ^field) not in ^ids)
+
   defp among(query, _field, nil), do: query
   defp among(query, field, ids), do: where(query, [f], field(f, ^field) in ^ids)
 
