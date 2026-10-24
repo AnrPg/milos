@@ -148,4 +148,4 @@ next to «Γύρω μου».
   tables and routes keep `buddy_*`, and the vision doc records the new name.
 
 ## Implementation Notes
-- Migration `20261214100000_buddies_private_accounts_and_conversations`.
+- Migration `20261214200000_buddies_private_accounts_and_conversations`.
