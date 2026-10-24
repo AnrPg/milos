@@ -520,7 +520,7 @@ test.describe("Γύρω μου", () => {
     const calendar = page.getByRole("dialog", { name: "Επιλέξτε ημερομηνία" });
     await calendar.locator("button[data-day]:not([disabled])").nth(1).click();
     await expect.poll(() => lastSearch(calls).filter).toMatchObject({ when: "range" });
-    const range = lastSearch(calls).filter as { date_from: string; date_to: string };
+    const range = lastSearch(calls).filter as unknown as { date_from: string; date_to: string };
     expect(range.date_to).toBe(range.date_from);
 
     const lowest = sheet.getByRole("slider", { name: "Χαμηλότερη τιμή" });
