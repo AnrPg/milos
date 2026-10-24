@@ -82,7 +82,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 
 1. **Every object has one home.** It is created and edited in exactly one tab. Elsewhere it appears only as a card that links home (§6.3).
 2. **Stable, predictable screens.** Content refreshes, but card order never changes. A card with nothing in it is hidden, not shown as an empty state (ANR 2026-10-24): on Feed no WOD, no events, no challenges or no posts means no card. Box without a membership at any box or coach shows only «Βρες box».
-3. **⊕ means "post for others".** It exists only at the top-left of the Feed, as in Instagram's 2025 redesign. Writing for yourself is always a labelled button: `Νέα καταχώρηση`, `Καταγραφή`, `Έναρξη`. No unlabelled `+` anywhere else.
+3. **⊕ means "post for others".** It exists only on the Feed, in the top bar next to the bell (owner, 2026-10-24). Writing for yourself is always a labelled button: `Νέα καταχώρηση`, `Καταγραφή`, `Έναρξη`. No unlabelled `+` anywhere else.
 4. **Comparison with others lives in clubs and is opt-in. Comparison with yourself lives in the Journal.**
 5. **Private by default.** Notes, body data, photos and cravings are private unless the user explicitly widens visibility (§8.2). Injuries are the one exception: coaches always see them, for safety.
 6. **Club ≠ Box.** The same gym plays two roles: a *social space* (Feed: talk, see, participate) and a *service relationship* (Box: book, train, pay, ask). Never mix them.
@@ -128,9 +128,11 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 ### 6.1 Bottom bar (4 tabs + notifications, fixed)
 > **2026-10-23 (owner):** the tabs are named **Feed** (was Αρχική) and **Journal** (was Ημερολόγιο) in every locale's own word, routes unchanged; the bar floats (side margins, rounded, see-through) and holds **Feed · Box · Journal · 🔔 Ειδοποιήσεις · avatar (Εγώ)**, so the bell moved from the Feed header into the bar, next to the avatar.
 
+> **2026-10-24 (owner, decision card):** Instagram-like. The bottom bar holds **Feed · Box · Journal · Μηνύματα · avatar (Εγώ)**: Μηνύματα (line speech bubble with the unread count of the one inbox, ADR-196) opens `/messages` from every tab. A **top bar** carries the Palee logo on the left and the bell on the right; on the Feed only, `⊕` sits next to the bell. The top bar shows wherever the bottom bar does, hides while scrolling down and returns on any scroll up or near the top (not with reduced motion); the page group's tab strip rides with it. Icons are line icons, never emoji.
+
 | Tab | Answers | Landing content |
 |---|---|---|
-| **Feed** *(landing)* | "What are my people doing?" | Top: `⊕` (new post) · Palee · Μηνύματα as a line speech-bubble icon (ANR 2026-10-24: no paper plane, icons are line icons, never emoji); notifications: the bar's bell. Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Οι δικοί μου \| Γύρω μου**. Feed. |
+| **Feed** *(landing)* | "What are my people doing?" | Top bar: Palee (left) · `⊕` new post · bell (right); Μηνύματα is in the bottom bar (owner, 2026-10-24). Club bar (stories-like): Όλα · my clubs · + Βρες. Scope toggle: **Οι δικοί μου \| Γύρω μου**. Feed. |
 | **Box** | "Where and with whom do I train?" | Today's workout card (**Καταγραφή / Έναρξη ▶**), next booking (+ QR check-in), actions (Πρόγραμμα · Ραντεβού · Βίντεο · Coach), membership, announcements. |
 | **Journal** | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
 | 🔔 **Ειδοποιήσεις** | "What needs me?" | Not a tab: opens the inbox over the current screen; unread badge. |
@@ -142,7 +144,7 @@ Messages live top-right in the Feed. `Box › Coach` opens the same inbox filter
 ```
 Αρχική
 ├─ ⊕ Νέα ανάρτηση (audience: club›channel | followers | public; attach workout from journal)
-├─ ♡ Ειδοποιήσεις · Μηνύματα (Όλα | Coach | Clubs | Partners)
+├─ top bar: Ειδοποιήσεις (bell) · bottom bar: Μηνύματα (Όλα | Coach | Clubs | Partners)
 ├─ Club bar → Club page (member):  Ροή · Κανάλια · Events · Μέλη(Partners)
 ├─ Box page (non-member):          Σχετικά · Πρόγραμμα(read-only, trial slots) · Events · Δημόσια · [Ζήτα δοκιμαστικό] [Ακολούθησε]
 └─ Γύρω μου: events · open clubs · boxes with trials · public posts · Φίλτρα(n) · saved filters
@@ -178,7 +180,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Club, channel | Αρχική › club bar | Εγώ › Τα clubs μου |
 | Event | Club › Events | Feed card, Γύρω μου |
 | Partner match | Club › Μέλη › Partners | Messages |
-| Messages | Αρχική › Μηνύματα (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
+| Messages | bottom bar › Μηνύματα (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
 | Class, booking, check-in | Box | Journal (after training) |
 | WOD of the day | Box | Feed (#wod-σήμερα + leaderboard) |
 | Membership/package | Box | Εγώ › Πληρωμές |
@@ -358,7 +360,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
     | Box switcher | Τα box και τα clubs μου |
     | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff console and extras, password resets | Βοήθεια & ξενάγηση (`/me/help`) |
 
-  - Chats have no row: the one inbox is Αρχική › Μηνύματα.
+  - Chats have no row: the one inbox is Μηνύματα in the bottom bar.
   - Κοινοποίηση follows the mockup's blocks, plus a per-PR "show on profile" list.
 
 ---
@@ -379,7 +381,7 @@ Every member-facing capability in today's code has a surface. The full ~50-row t
 | Class timer display (`/class-timer/[slotId]/display`) | Box: next-class card becomes "Timer τάξης" while running |
 | Guest pass, waitlist, open-gym check-in, locations, ICS export | Box › Πρόγραμμα |
 | Entitlements, corporate enrollment, invoices, refund receipts | Box › Συνδρομή; Εγώ › Πληρωμές |
-| Chat/threads, notifications/web push | Αρχική Μηνύματα / ♡ |
+| Chat/threads, notifications/web push | bottom-bar Μηνύματα / top-bar bell |
 | Gamification preferences, PR sharing grants & coach visibility | Εγώ › Κοινοποίηση & ορατότητα |
 | Offline outbox, onboarding/tours, profile/avatar/language/theme | Εγώ › Ρυθμίσεις / Βοήθεια |
 

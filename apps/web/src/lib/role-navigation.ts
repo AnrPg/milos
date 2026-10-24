@@ -123,14 +123,15 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
 
 /**
  * The member app's four fixed tabs (redesign Phase 1, ADR-137; brief §6.1):
- * Feed · Box · Journal · Εγώ. The floating bar (lib/bottom-nav.ts) adds the
- * bell next to Εγώ and lists the routes it never shows on. Every member page lives under the tab
+ * Feed · Box · Journal · Εγώ. The floating bar (lib/bottom-nav.ts) adds
+ * Μηνύματα next to Εγώ (its own entry, so /messages lights no tab here) and
+ * lists the routes it never shows on. Every member page lives under the tab
  * that is its home (lib/member-routes.ts lists the moves); workout pages
  * opened from Box stay at /workouts and are claimed by Box.
  */
 export function clientNavItems(): NavItem[] {
   return [
-    { id: "home", href: "/", labelKey: "feed", match: ["/", "/feed", "/clubs", "/around", "/messages"], exact: true },
+    { id: "home", href: "/", labelKey: "feed", match: ["/", "/feed", "/clubs", "/around"], exact: true },
     {
       id: "box",
       href: "/box",

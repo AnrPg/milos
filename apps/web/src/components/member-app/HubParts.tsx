@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { TopBarActions } from "@/components/nav/top-bar-slot";
 import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // Shared building blocks of the four member hubs (ADR-137). Hubs use fixed
@@ -10,31 +10,24 @@ import type { GuideAnchor } from "@/lib/guides/anchors";
 // (brief §4.2, §8.5).
 
 /**
- * The Feed's top (vision IA, mockup `feedTop`): ⊕ · Palee · ♡ and no visible
- * page title. The title stays for screen readers as the page's heading.
+ * The Feed's page (both scopes), with no visible page title: the title stays
+ * for screen readers as the page's heading. The Palee logo and the bell live in the
+ * member top bar (owner, 2026-10-24); `action` (⊕ new post, vision §4
+ * principle 3: only on the Feed) goes next to the bell.
  */
 export function FeedPage({
   title,
-  start,
-  end,
+  action,
   children,
 }: {
   title: string;
-  start: ReactNode;
-  end: ReactNode;
+  action: ReactNode;
   children: ReactNode;
 }) {
-  const tUi = useTranslations("Ui");
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-6 pt-4">
-      <header data-feed-top="" className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        <h1 className="sr-only">{title}</h1>
-        <div className="flex justify-start">{start}</div>
-        <p aria-hidden="true" className="text-xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>
-          {tUi("brandName")}
-        </p>
-        <div className="flex items-center justify-end gap-2">{end}</div>
-      </header>
+      <h1 className="sr-only">{title}</h1>
+      <TopBarActions>{action}</TopBarActions>
       {children}
     </main>
   );

@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BottomNav } from "@/components/nav/BottomNav";
@@ -9,7 +9,6 @@ let unread = 0;
 let memberships: unknown[] = [{ id: "m1" }];
 let role = "member";
 let currentUser: Record<string, unknown> | null = { id: "u1", nickname: "Maria", role: "member", avatar_url: null };
-const openNotifications = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => pathname,
@@ -37,9 +36,8 @@ vi.mock("@/lib/membership-role", () => ({
   useSelectedMembershipRole: () => ({ role, memberships, isLoading: false }),
 }));
 
-vi.mock("@/components/notifications/NotificationBell", () => ({
-  openNotifications: () => openNotifications(),
-  useUnreadNotifications: () => unread,
+vi.mock("@/components/chat/use-messages-unread", () => ({
+  useMessagesUnread: () => unread,
 }));
 
 vi.mock("@/components/account/ProfileSwitcherMenu", () => ({
@@ -57,31 +55,32 @@ beforeEach(() => {
   memberships = [{ id: "m1" }];
   role = "member";
   currentUser = { id: "u1", nickname: "Maria", role: "member", avatar_url: null };
-  openNotifications.mockReset();
 });
 
 describe("BottomNav", () => {
-  it("shows Feed · Box · Journal · bell · avatar and marks the current tab", () => {
+  it("shows Feed · Box · Journal · Μηνύματα · avatar and marks the current tab", () => {
     pathname = "/box/schedule";
     render(<BottomNav />);
     const nav = screen.getByRole("navigation", { name: "memberTabs" });
     expect(nav).toBeInTheDocument();
     const links = screen.getAllByRole("link");
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/", "/box", "/journal", "/me"]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/", "/box", "/journal", "/messages", "/me"]);
     expect(screen.getByRole("link", { name: /box/ })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: /feed/ })).not.toHaveAttribute("aria-current");
     expect(screen.getByRole("link", { name: "me" })).toHaveAttribute("href", "/me");
-    expect(screen.getByRole("button", { name: "notifications" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "notifications" })).toBeNull();
     expect(document.documentElement.dataset.bottomNav).toBe("on");
   });
 
-  it("puts the unread count on the bell, which opens the inbox", () => {
+  it("puts the unread count on Μηνύματα and lights it in the inbox", () => {
     unread = 3;
+    pathname = "/messages/c-1";
     render(<BottomNav />);
-    const bell = screen.getByRole("button", { name: 'notificationsUnread:{"count":3}' });
+    const messages = screen.getByRole("link", { name: 'messagesUnread:{"count":3}' });
+    expect(messages).toHaveAttribute("href", "/messages");
+    expect(messages).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /feed/ })).not.toHaveAttribute("aria-current");
     expect(screen.getByTestId("bottom-nav-badge")).toHaveTextContent("3");
-    act(() => bell.click());
-    expect(openNotifications).toHaveBeenCalledTimes(1);
   });
 
   it("caps the badge at 99+ and shows none at zero", () => {

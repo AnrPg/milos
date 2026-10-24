@@ -6,15 +6,17 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { ProfileSwitcherMenu } from "@/components/account/ProfileSwitcherMenu";
-import { openNotifications, useUnreadNotifications } from "@/components/notifications/NotificationBell";
+import { INBOX_PATH } from "@/components/chat/inbox/inbox-model";
+import { useMessagesUnread } from "@/components/chat/use-messages-unread";
 import { useSession } from "@/components/session-provider";
 import { Popover } from "@/components/ui/Popover";
-import { bottomNavEntries, nextScrollHidden, routeShowsBottomNav, usesMemberShell } from "@/lib/bottom-nav";
+import { bottomNavEntries, routeShowsBottomNav, usesMemberShell } from "@/lib/bottom-nav";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { activeItemId, clientNavItems } from "@/lib/role-navigation";
 
 import { useBottomNavHiddenByScreen } from "./bottom-nav-visibility";
 import { NavIcon, type NavIconName } from "./NavIcons";
+import { useScrollHidden } from "./use-scroll-hidden";
 
 /** Whether this account navigates with the bottom bar (the member shell). */
 export function useMemberShell() {
@@ -44,51 +46,7 @@ export const BOTTOM_NAV_SPACE = "var(--bottom-nav-space)";
 
 const TAB_ICONS: Record<string, NavIconName> = { home: "feed", box: "box", journal: "journal" };
 
-function prefersReducedMotion() {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-/**
- * Instagram-like: the bar slides away while scrolling down and returns on any
- * scroll up. Not with reduced motion. A new page always starts with it shown.
- */
-function useScrollHidden(enabled: boolean, pathname: string) {
-  // The page it was hidden on; another page shows it again.
-  const [hiddenOn, setHiddenOn] = useState<string | null>(null);
-  const state = useRef({ hidden: false, lastY: 0 });
-
-  useEffect(() => {
-    state.current = { hidden: false, lastY: window.scrollY };
-    if (!enabled || prefersReducedMotion()) return;
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const y = window.scrollY;
-        const next = nextScrollHidden(state.current, y);
-        if (Math.abs(y - state.current.lastY) >= 8 || next !== state.current.hidden) state.current.lastY = y;
-        if (next !== state.current.hidden) {
-          state.current.hidden = next;
-          setHiddenOn(next ? pathname : null);
-        }
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, [enabled, pathname]);
-
-  const reveal = () => {
-    state.current.hidden = false;
-    setHiddenOn(null);
-  };
-  return [enabled && hiddenOn === pathname, reveal] as const;
-}
-
-function Badge({ count }: { count: number }) {
+export function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
     <span
@@ -121,21 +79,20 @@ function ItemBody({ icon, label, current }: { icon: ReactNode; label: string; cu
 }
 
 /**
- * The member app's floating bottom bar (brief §6.1; owner, 2026-10-23):
- * Feed · Box · Journal · Ειδοποιήσεις · avatar (Εγώ). It floats over the page
+ * The member app's floating bottom bar (brief §6.1; owner, 2026-10-23 and
+ * 2026-10-24): Feed · Box · Journal · Μηνύματα · avatar (Εγώ). It floats over the page
  * with side margins, a slightly see-through blurred background and rounded
  * corners; it steps aside on the focused flows of lib/bottom-nav.ts, for any
  * screen that calls useHideBottomNav(), and while scrolling down.
  */
 export function BottomNav() {
   const t = useTranslations("Navigation");
-  const tSocial = useTranslations("Social");
   const pathname = usePathname();
   const { currentUser } = useSession();
   const visible = useBottomTabBarVisible();
   const hiddenByScreen = useBottomNavHiddenByScreen();
   const [scrollHidden, reveal] = useScrollHidden(visible, pathname);
-  const unread = useUnreadNotifications();
+  const unread = useMessagesUnread();
   const avatarRef = useRef<HTMLAnchorElement>(null);
   const longPress = useRef<{ timer: number; fired: boolean }>({ timer: 0, fired: false });
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -196,29 +153,31 @@ export function BottomNav() {
         }}
       >
         {entries.map((entry) => {
-          if (entry.kind === "notifications") {
-            const label = unread > 0 ? tSocial("notificationsUnread", { count: unread }) : t("notifications");
+          if (entry.kind === "messages") {
+            const path = pathname.replace(/^\/org\/[^/]+(?=\/|$)/, "") || "/";
+            const current = path === INBOX_PATH || path.startsWith(`${INBOX_PATH}/`);
             return (
-              <li key="notifications" className="flex min-w-0">
-                <button
-                  type="button"
-                  onClick={openNotifications}
-                  aria-label={label}
-                  title={t("notifications")}
+              <li key="messages" className="flex min-w-0">
+                <Link
+                  href={INBOX_PATH}
+                  prefetch
+                  aria-current={current ? "page" : undefined}
+                  aria-label={unread > 0 ? t("messagesUnread", { count: unread }) : t("messages")}
                   className={`${ITEM_CLASS} w-full`}
-                  style={{ color: "var(--dim)" }}
+                  style={{ color: current ? "var(--text)" : "var(--dim)" }}
                 >
                   <ItemBody
-                    current={false}
+                    current={current}
                     icon={
                       <span className="relative">
-                        <NavIcon name="bell" />
+                        <NavIcon name="messages" strokeWidth={current ? 2.2 : 1.8} />
                         <Badge count={unread} />
                       </span>
                     }
-                    label={t("notificationsShort")}
+                    label={t("messages")}
                   />
-                </button>
+                  {current ? <CurrentMark /> : null}
+                </Link>
               </li>
             );
           }

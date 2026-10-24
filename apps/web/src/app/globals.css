@@ -45,6 +45,17 @@
   --bottom-nav-offset: max(0.75rem, calc(env(safe-area-inset-bottom) + 0.25rem));
   --bottom-nav-space: 0px;
   --bottom-float-inset: max(var(--bottom-nav-space), env(safe-area-inset-bottom));
+  /*
+   * The member top bar (components/nav/MemberTopBar.tsx) sets
+   * --top-bar-space to the room it takes at the top while it shows, 0 while
+   * it is scrolled away or absent; a page's own sticky strip sits at
+   * top: var(--top-bar-space) so the bar never covers it.
+   */
+  --top-bar-space: 0px;
+}
+
+:root[data-top-bar] {
+  scroll-padding-top: var(--top-bar-space);
 }
 
 :root[data-bottom-nav="on"] {

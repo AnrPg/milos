@@ -30,7 +30,6 @@ import { FeedPage } from "@/components/member-app/HubParts";
 import { WellnessStrip } from "@/components/member-app/wellness/WellnessStrip";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
-import { FeedInboxButtons } from "@/components/chat/MessagesButton";
 import { MyTrialsCard } from "@/components/trials/MyTrialsCard";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
@@ -68,12 +67,7 @@ export function HomeHub() {
   return (
     <FeedPage
       title={t("homeTitle")}
-      start={<ComposeButton clubs={clubs.data ?? []} />}
-      end={
-        <div className="flex items-center gap-2">
-          <FeedInboxButtons />
-        </div>
-      }
+      action={<ComposeButton clubs={clubs.data ?? []} />}
     >
       {/* Always there, so «+ Βρες» is reachable before the first club (vision §6.1). */}
       <ClubBar clubs={clubs.data ?? []} />

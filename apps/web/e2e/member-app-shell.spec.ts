@@ -491,6 +491,31 @@ test.describe("member app shell", () => {
     await expect(page).toHaveURL(/\/me\/settings$/);
   });
 
+  test("Instagram-like bars: Messages in the bottom bar, logo · ⊕ · bell on top, hidden while scrolling down", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.goto("/");
+
+    const bottom = page.getByRole("navigation", { name: "Main sections" });
+    await expect(bottom.getByRole("link", { name: "Messages", exact: true })).toHaveAttribute("href", "/messages");
+    await expect(bottom.getByRole("button", { name: "Notifications" })).toHaveCount(0);
+    const top = page.getByTestId("member-top-bar");
+    await expect(top.getByRole("link", { name: "Palee" })).toBeVisible();
+    await expect(top.getByRole("button", { name: "Notifications" })).toBeVisible();
+    // ⊕ new post sits next to the bell, on the Feed only (vision §4 principle 3).
+    await expect(top.getByRole("button", { name: "New post" })).toBeVisible();
+    await page.screenshot({ path: "test-results/member-app/top-bar.png" });
+
+    await page.evaluate(() => document.body.style.setProperty("min-height", "4000px"));
+    await page.mouse.wheel(0, 600);
+    await expect(top).toHaveAttribute("data-state", "hidden");
+    await page.mouse.wheel(0, -200);
+    await expect(top).toHaveAttribute("data-state", "shown");
+
+    await page.goto("/box");
+    await expect(page.getByTestId("member-top-bar").getByRole("button", { name: "Notifications" })).toBeVisible();
+    await expect(page.getByTestId("member-top-bar").getByRole("button", { name: "New post" })).toHaveCount(0);
+  });
+
   test("Home shows the gym's day: greeting and today's WOD, and hides the empty cards", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/");
