@@ -57,11 +57,11 @@ export function NavIcon({ name, size = 24, strokeWidth = 1.8, ...rest }: { name:
         </svg>
       );
     case "messages":
-      // ✈ in the Feed header: a paper plane.
+      // Μηνύματα in the Feed header: a speech bubble, the sign people read as
+      // "messages" everywhere (ANR 2026-10-24; replaced the paper plane).
       return (
         <svg {...common}>
-          <path d="M21.5 2.5 10.5 13.5" />
-          <path d="M21.5 2.5 14.6 21a.5.5 0 0 1-.9 0l-3.2-7.5L3 10.3a.5.5 0 0 1 0-.9L21.5 2.5Z" />
+          <path d="M21 14.5a2 2 0 0 1-2 2H8l-5 4v-14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
         </svg>
       );
   }

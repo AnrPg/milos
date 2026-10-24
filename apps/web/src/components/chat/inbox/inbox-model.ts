@@ -1,7 +1,7 @@
 import type { ChatThread } from "@/api/messaging";
 
 /**
- * The one inbox (vision §6.1–6.3, ADR-196): Feed ✈ and `Box › Coach` open the
+ * The one inbox (vision §6.1–6.3, ADR-196): Feed Μηνύματα and `Box › Coach` open the
  * same list, segmented «Όλα · Coach · Clubs · Partners». `/messages` is its
  * address; `?filter=` picks the segment and `?thread=` opens a conversation.
  */

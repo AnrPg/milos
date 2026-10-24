@@ -14,7 +14,7 @@ import { BELL_IN_BOTTOM_NAV } from "@/lib/bottom-nav";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 
 /**
- * ✈ Μηνύματα, top-right of the Feed (brief §6.1), with the unread count: it
+ * Μηνύματα, top-right of the Feed (brief §6.1), with the unread count: it
  * opens the one inbox, `/messages` (ADR-196). The count shares TopNav's
  * query key, so its realtime refresh updates it too.
  */
@@ -58,7 +58,7 @@ export function MessagesButton() {
 }
 
 /**
- * The Feed header's inbox buttons: ✈ always; ♡ only in the 4-tab fallback,
+ * The Feed header's inbox buttons: Μηνύματα always; ♡ only in the 4-tab fallback,
  * when the bell is not in the bottom bar (lib/bottom-nav.ts).
  */
 export function FeedInboxButtons() {
