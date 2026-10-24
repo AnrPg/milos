@@ -1,4 +1,5 @@
 import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
+import { conversationNotificationUrl } from "@/components/conversations/conversation-links";
 import { seasonNotificationUrl } from "@/components/seasons/season-links";
 import { shopNotificationUrl } from "@/components/shop/shop-links";
 import { currentMemberPath } from "@/lib/member-routes";
@@ -133,6 +134,9 @@ export function notificationTargetUrl(
   // ADR-160: buddy notices open the buddy screens, the coach's the client page.
   const buddy = buddyNotificationUrl(notification.type, notification.payload);
   if (buddy) return buddy;
+  // ADR-193: a person's message opens the conversation, a request the requests.
+  const conversation = conversationNotificationUrl(notification.type, notification.payload);
+  if (conversation) return conversation;
   // ADR-167: a season request opens the builder on it, an answer the season in Box.
   const season = seasonNotificationUrl(notification.type, notification.payload);
   if (season) return season;
