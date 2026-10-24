@@ -2141,7 +2141,9 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "Choose at least one coach, or keep the entry private"},
     audience_not_supported: {:unprocessable_entity, "This entry cannot be shared that way"},
     export_in_progress: {:conflict, "An export is already being prepared"},
-    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"}
+    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"},
+    # ADR-196: a PR on the profile is for followers or private.
+    invalid_profile_audience: {:unprocessable_entity, "Use followers or private"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do

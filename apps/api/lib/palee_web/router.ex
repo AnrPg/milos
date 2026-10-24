@@ -1447,6 +1447,10 @@ defmodule PaleeWeb.Router do
     # ADR-162: one journal across providers, Box ▾ and the merged «Σήμερα».
     get("/me/journal/coach-audience", JournalController, :coach_audience)
     put("/me/journal/coach-audience", JournalController, :put_coach_audience)
+
+    # ADR-196: Εγώ › Κοινοποίηση › «Προεπιλογή νέων καταχωρήσεων».
+    get("/me/journal/visibility-defaults", JournalController, :visibility_defaults)
+    put("/me/journal/visibility-defaults", JournalController, :put_visibility_default)
     put("/me/journal/entries/:kind/:id/audience", JournalController, :entry_audience)
     post("/me/journal/export", JournalController, :export)
     get("/me/journal/exports", JournalController, :exports)
@@ -1839,6 +1843,9 @@ defmodule PaleeWeb.Router do
     delete("/:id", PRController, :delete)
     get("/:id/history", PRController, :history)
     post("/:id/share", PRController, :share)
+    # ADR-196: a PR on the profile for followers, and a profile's PRs.
+    put("/:id/profile-audience", PRController, :profile_audience)
+    get("/profile/:user_id", PRController, :profile)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).

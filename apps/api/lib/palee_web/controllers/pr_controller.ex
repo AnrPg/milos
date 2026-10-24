@@ -7,7 +7,9 @@ defmodule PaleeWeb.PRController do
     DeletePR,
     EditPR,
     GetPRHistory,
+    ListProfilePRs,
     ListUserPRs,
+    SetPRProfileAudience,
     SharePR,
     UpdatePR
   }
@@ -171,6 +173,72 @@ defmodule PaleeWeb.PRController do
   def share(conn, %{"id" => id}) do
     with {:ok, result} <- SharePR.call(conn.assigns.user_context, id) do
       json(conn, result)
+    end
+  end
+
+  @profile_pr %Schema{
+    type: :object,
+    required: [:id, :name, :current_score, :unit, :higher_is_better, :beaten_on],
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      organization_id: %Schema{type: :string, format: :uuid, nullable: true},
+      name: %Schema{type: :string},
+      current_score: %Schema{type: :number},
+      unit: %Schema{type: :string, enum: ["mins_secs", "reps", "sets", "kcals", "m", "kg"]},
+      higher_is_better: %Schema{type: :boolean},
+      beaten_on: %Schema{type: :string, format: :date},
+      supporting_metrics: %Schema{type: :object}
+    }
+  }
+
+  operation(:profile_audience,
+    summary: "Show a PR on my profile to followers, or keep it private (ADR-196)",
+    parameters: [@id_param],
+    request_body:
+      {"Audience", "application/json",
+       %Schema{
+         type: :object,
+         required: [:audience],
+         properties: %{audience: %Schema{type: :string, enum: ["private", "followers"]}}
+       }},
+    responses: [
+      ok: {"PR", "application/json", %Schema{type: :object}},
+      not_found: {"Error", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Error", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def profile_audience(conn, %{"id" => id} = params) do
+    with {:ok, pr} <-
+           SetPRProfileAudience.call(conn.assigns.user_context, id, params["audience"]) do
+      json(conn, %{pr: pr})
+    end
+  end
+
+  operation(:profile,
+    summary: "The PRs a person shows on their profile, as a follower sees them (ADR-196)",
+    parameters: [
+      %Parameter{
+        name: :user_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Profile PRs", "application/json",
+         %Schema{
+           type: :object,
+           required: [:prs],
+           properties: %{prs: %Schema{type: :array, items: @profile_pr}}
+         }}
+    ]
+  )
+
+  def profile(conn, %{"user_id" => user_id}) do
+    with {:ok, prs} <- ListProfilePRs.call(conn.assigns.user_context, user_id) do
+      json(conn, %{prs: prs})
     end
   end
 end

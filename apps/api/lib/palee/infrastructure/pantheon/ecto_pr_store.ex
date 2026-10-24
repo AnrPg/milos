@@ -178,6 +178,31 @@ defmodule Palee.Infrastructure.Pantheon.EctoPRStore do
     end
   end
 
+  @impl true
+  def set_profile_audience(id, user_id, audience) do
+    case Repo.get_by(PRRecord, id: id, user_id: user_id) do
+      nil ->
+        {:error, :not_found}
+
+      record ->
+        record
+        |> PRRecord.profile_audience_changeset(audience)
+        |> Repo.update()
+        |> normalize_result(&normalize_pr/1)
+    end
+  end
+
+  # ADR-196: the PRs on a profile. Under RLS the owner reads their own and a
+  # follower only those `user_pr_records_follower_read_policy` admits.
+  @impl true
+  def list_profile_prs(owner_user_id) do
+    PRRecord
+    |> where([r], r.user_id == ^owner_user_id and r.profile_audience == "followers")
+    |> order_by([r], desc: r.beaten_on, desc: r.inserted_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_pr/1)
+  end
+
   # Journal feed (ADR-139 §9): a PR is dated by the day it was beaten, which
   # the feed places at midnight UTC of that day.
   @impl true
@@ -303,6 +328,7 @@ defmodule Palee.Infrastructure.Pantheon.EctoPRStore do
       beaten_on: Date.to_iso8601(pr.beaten_on),
       supporting_metrics: pr.supporting_metrics || %{},
       journal_visibility: pr.journal_visibility,
+      profile_audience: pr.profile_audience,
       inserted_at: DateTime.to_iso8601(pr.inserted_at),
       updated_at: DateTime.to_iso8601(pr.updated_at)
     }

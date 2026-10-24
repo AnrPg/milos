@@ -18,6 +18,10 @@ defmodule Palee.Pantheon.Ports.PRStore do
   # ADR-139 ladder: one PR's rung, and bulk moves when the PR default changes.
   @callback set_record_visibility(Ecto.UUID.t(), Ecto.UUID.t(), String.t()) ::
               {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
+  # ADR-196: who sees a PR on the profile, and the PRs a profile shows.
+  @callback set_profile_audience(Ecto.UUID.t(), Ecto.UUID.t(), String.t()) ::
+              {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback list_profile_prs(owner_user_id :: Ecto.UUID.t()) :: [map()]
   @callback move_records(Ecto.UUID.t(), [String.t()], String.t()) :: non_neg_integer()
   @callback list_record_items(Ecto.UUID.t(), term(), pos_integer(), term()) :: [map()]
   @callback list_owned_grants(user_id :: Ecto.UUID.t()) :: [map()]

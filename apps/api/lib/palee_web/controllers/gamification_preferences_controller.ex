@@ -20,7 +20,7 @@ defmodule PaleeWeb.GamificationPreferencesController do
 
     with {:ok, prefs} <-
            GetGamificationPreferences.call(conn.assigns.user_context, current_user.id) do
-      json(conn, %{preferences: prefs || %{off_days: []}})
+      json(conn, %{preferences: prefs || GetGamificationPreferences.defaults()})
     end
   end
 
@@ -36,6 +36,15 @@ defmodule PaleeWeb.GamificationPreferencesController do
              items: %Schema{type: :integer, minimum: 0, maximum: 6},
              maxItems: 5,
              description: "Day-of-week indices (0=Sun..6=Sat) treated as rest days"
+           },
+           pr_celebrations: %Schema{
+             type: :boolean,
+             description:
+               "ADR-196: an automatic card in my clubs when I set a PR (off by default)"
+           },
+           challenge_rankings: %Schema{
+             type: :boolean,
+             description: "ADR-196: appear in challenge rankings (on by default)"
            }
          }
        }},

@@ -18,6 +18,8 @@ defmodule Palee.Pantheon.PRRecord do
     field(:supporting_metrics, :map, default: %{})
     # ADR-139 ladder rung; the coach read policy asks it, not a per-user switch.
     field(:journal_visibility, :string, default: "coach_can_view")
+    # ADR-196: on the owner's profile for followers, or private.
+    field(:profile_audience, :string, default: "private")
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -57,6 +59,12 @@ defmodule Palee.Pantheon.PRRecord do
     record
     |> change(journal_visibility: rung)
     |> check_constraint(:journal_visibility, name: :user_pr_records_journal_visibility_check)
+  end
+
+  def profile_audience_changeset(%__MODULE__{} = record, audience) do
+    record
+    |> change(profile_audience: audience)
+    |> check_constraint(:profile_audience, name: :user_pr_records_profile_audience_check)
   end
 
   def valid_units, do: @valid_units

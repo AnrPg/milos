@@ -54,6 +54,13 @@ defmodule Palee.Pantheon.PRStore do
     do: adapter().set_record_visibility(id, user_id, rung)
 
   @impl true
+  def set_profile_audience(id, user_id, audience),
+    do: adapter().set_profile_audience(id, user_id, audience)
+
+  @impl true
+  def list_profile_prs(owner_user_id), do: adapter().list_profile_prs(owner_user_id)
+
+  @impl true
   def move_records(user_id, from, to), do: adapter().move_records(user_id, from, to)
 
   @impl true

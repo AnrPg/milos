@@ -90206,6 +90206,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "challenge_rankings": {
+                    "description": "ADR-196: appear in challenge rankings (on by default)",
+                    "type": "boolean"
+                  },
                   "off_days": {
                     "description": "Day-of-week indices (0=Sun..6=Sat) treated as rest days",
                     "items": {
@@ -90215,6 +90219,10 @@
                     },
                     "maxItems": 5,
                     "type": "array"
+                  },
+                  "pr_celebrations": {
+                    "description": "ADR-196: an automatic card in my clubs when I set a PR (off by default)",
+                    "type": "boolean"
                   }
                 },
                 "type": "object"
@@ -119307,6 +119315,191 @@
           }
         ],
         "summary": "Edit one of your notes",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/visibility-defaults": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.JournalController.visibility_defaults",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "defaults": {
+                      "description": "The rung a new entry of each kind starts on (ADR-139 §3)",
+                      "properties": {
+                        "check_in": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "pr": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "workout": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout",
+                        "pr",
+                        "note",
+                        "check_in"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "defaults"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Defaults"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who sees my new journal entries, per kind (ADR-196)",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.JournalController.put_visibility_default",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "workout",
+                      "note",
+                      "check_in"
+                    ],
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "private",
+                      "coach_can_view"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "visibility"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "defaults": {
+                      "description": "The rung a new entry of each kind starts on (ADR-139 §3)",
+                      "properties": {
+                        "check_in": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "pr": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        },
+                        "workout": {
+                          "enum": [
+                            "private",
+                            "coach_can_view"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout",
+                        "pr",
+                        "note",
+                        "check_in"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "defaults"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Defaults"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown kind or rung"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set who sees my new entries of one kind (workout, note, check_in; ADR-196)",
         "tags": [
           "Journal"
         ]
@@ -246643,6 +246836,101 @@
         ]
       }
     },
+    "/api/prs/profile/{user_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "prs": {
+                      "items": {
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "current_score": {
+                            "type": "number"
+                          },
+                          "higher_is_better": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "supporting_metrics": {
+                            "type": "object"
+                          },
+                          "unit": {
+                            "enum": [
+                              "mins_secs",
+                              "reps",
+                              "sets",
+                              "kcals",
+                              "m",
+                              "kg"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "current_score",
+                          "unit",
+                          "higher_is_better",
+                          "beaten_on"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "prs"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile PRs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The PRs a person shows on their profile, as a follower sees them (ADR-196)",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
     "/api/prs/{id}": {
       "delete": {
         "callbacks": {},
@@ -246948,6 +247236,88 @@
           }
         ],
         "summary": "Get score history for a PR",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/prs/{id}/profile-audience": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.profile_audience",
+        "parameters": [
+          {
+            "description": "PR Record ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "audience": {
+                    "enum": [
+                      "private",
+                      "followers"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audience"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Audience",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show a PR on my profile to followers, or keep it private (ADR-196)",
         "tags": [
           "Pantheon"
         ]
