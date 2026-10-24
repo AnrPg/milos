@@ -16,6 +16,8 @@ import { StockTab } from "@/components/shop/console/StockTab";
 import { useShopAccess, useShopOrders, useShopProducts } from "@/components/shop/console/use-shop";
 import { StatusText } from "@/components/staff/staff-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { guideAnchor } from "@/lib/guides/anchors";
+import { GuideButton } from "@/components/guides/GuideButton";
 
 export type ShopTab = "products" | "orders" | "stock" | "analytics";
 const TABS: ShopTab[] = ["products", "orders", "stock", "analytics"];
@@ -89,13 +91,14 @@ export function ShopConsole() {
         actions={
           <>
             <BranchFilterControl filter={branchFilter} />
+            <GuideButton guide="shop_staff" />
             {access.sell && !empty ? (
-              <Link href={adminHref("/admin/shop/pos", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-                {t("pos")}
+              <Link {...guideAnchor("shop.pos")} href={adminHref("/admin/shop/pos", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+                {t("pos.title")}
               </Link>
             ) : null}
             {access.manage ? (
-              <Link href={adminHref("/admin/shop/products/new", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+              <Link {...guideAnchor("shop.newProduct")} href={adminHref("/admin/shop/products/new", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                 + {t("newProduct")}
               </Link>
             ) : null}
@@ -109,6 +112,7 @@ export function ShopConsole() {
         <>
           {tabs.length > 1 ? (
             <SegmentPicker
+              guide="shop.tabs"
               ariaLabel={t("title")}
               variant="track"
               stretch

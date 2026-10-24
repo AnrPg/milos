@@ -10,7 +10,7 @@ defmodule Palee.Application.DailyStats do
 
   @metrics ~w(resting_hr steps)
   @fields %{"resting_hr" => :resting_heart_rate, "steps" => :steps}
-  @ranges %{"1m" => 30, "3m" => 90, "1y" => 365}
+  @ranges %{"1m" => 30, "3m" => 90, "6m" => 182, "1y" => 365}
   @default_range "3m"
 
   def metrics, do: @metrics

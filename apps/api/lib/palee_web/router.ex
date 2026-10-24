@@ -1476,6 +1476,10 @@ defmodule PaleeWeb.Router do
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)
+    # ADR-193: in-app walkthrough progress.
+    get("/me/guides", GuideProgressController, :index)
+    put("/me/guides/:guide_id", GuideProgressController, :update)
+    delete("/me/guides/:guide_id", GuideProgressController, :delete)
     get("/me/filters/:surface", SavedFilterController, :show)
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)
@@ -1849,6 +1853,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/", PRController, :index)
+    get("/history", PRController, :all_history)
     post("/", PRController, :create)
     patch("/:id/edit", PRController, :edit)
     patch("/:id", PRController, :update)

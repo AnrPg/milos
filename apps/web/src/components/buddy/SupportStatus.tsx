@@ -49,7 +49,7 @@ export function SupportStatus({ request: initial, onResent }: { request: Support
             type="button"
             onClick={() => undo.mutate(request.id)}
             disabled={undo.isPending}
-            className="min-h-9 rounded-full px-3 text-sm font-bold disabled:opacity-50"
+            className="min-h-11 rounded-full px-3 text-sm font-bold disabled:opacity-50"
             style={{ color: "var(--primary)" }}
           >
             {t("undo")}
@@ -130,7 +130,7 @@ export function NoReplyCard({ request, onResent }: { request: SupportRequest; on
           type="button"
           aria-expanded={breathing}
           onClick={() => setBreathing(!breathing)}
-          className="min-h-9 rounded-full px-3 text-sm font-semibold"
+          className="min-h-11 rounded-full px-3 text-sm font-semibold"
           style={{ background: breathing ? "var(--primary)" : "var(--panel-raised)", color: breathing ? "var(--primary-contrast)" : "var(--text)", border: "1px solid var(--border)" }}
         >
           {t("tryBreathing")}
@@ -139,7 +139,7 @@ export function NoReplyCard({ request, onResent }: { request: SupportRequest; on
           type="button"
           aria-pressed={done.includes("water")}
           onClick={() => mark("water")}
-          className="min-h-9 rounded-full px-3 text-sm font-semibold"
+          className="min-h-11 rounded-full px-3 text-sm font-semibold"
           style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
         >
           {done.includes("water") ? t("tryWaterDone") : t("tryWater")}
@@ -148,7 +148,7 @@ export function NoReplyCard({ request, onResent }: { request: SupportRequest; on
           type="button"
           aria-pressed={done.includes("walk")}
           onClick={() => mark("walk")}
-          className="min-h-9 rounded-full px-3 text-sm font-semibold"
+          className="min-h-11 rounded-full px-3 text-sm font-semibold"
           style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
         >
           {done.includes("walk") ? t("tryWalkDone") : t("tryWalk")}

@@ -32,7 +32,7 @@ function Toggle({ on, label, onChange }: { on: boolean; label: string; onChange:
       aria-checked={on}
       aria-label={label}
       onClick={() => onChange(!on)}
-      className="relative h-7 w-12 shrink-0 rounded-full"
+      className="hit-area relative h-7 w-12 shrink-0 rounded-full"
       style={{ background: on ? "var(--primary)" : "var(--panel-raised)", border: "1px solid var(--border)" }}
     >
       <span
@@ -182,7 +182,7 @@ export function WellnessCustomizeSheet({
                     aria-label={t("settings.moveUp", { item: t(`item.${item}`) })}
                     disabled={index === 0}
                     onClick={() => setOrder(moveItem(order, item, -1))}
-                    className="h-8 w-8 rounded-full disabled:opacity-30"
+                    className="hit-area h-8 w-8 rounded-full disabled:opacity-30"
                     style={{ border: "1px solid var(--border)", color: "var(--text)" }}
                   >
                     ↑
@@ -192,7 +192,7 @@ export function WellnessCustomizeSheet({
                     aria-label={t("settings.moveDown", { item: t(`item.${item}`) })}
                     disabled={index === all.length - 1}
                     onClick={() => setOrder(moveItem(order, item, 1))}
-                    className="h-8 w-8 rounded-full disabled:opacity-30"
+                    className="hit-area h-8 w-8 rounded-full disabled:opacity-30"
                     style={{ border: "1px solid var(--border)", color: "var(--text)" }}
                   >
                     ↓
@@ -215,7 +215,7 @@ export function WellnessCustomizeSheet({
           <Select
             value={glass}
             onValueChange={(value) => setGlass(Number(value))}
-            className="min-h-10 rounded-xl px-3"
+            className="min-h-11 rounded-xl px-3"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           >
             {GLASS_SIZES.map((size) => (
@@ -231,7 +231,7 @@ export function WellnessCustomizeSheet({
             max={20}
             value={goalGlasses}
             onChange={(event) => setGoalGlasses(Math.max(1, Math.min(20, Number(event.target.value) || 1)))}
-            className="min-h-10 w-20 rounded-xl px-3 text-end"
+            className="min-h-11 w-20 rounded-xl px-3 text-end"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           />
         </label>
@@ -255,7 +255,7 @@ export function WellnessCustomizeSheet({
             step={0.5}
             value={sleepHours}
             onChange={(event) => setSleepHours(Math.max(4, Math.min(12, Number(event.target.value) || 7)))}
-            className="min-h-10 w-20 rounded-xl px-3 text-end"
+            className="min-h-11 w-20 rounded-xl px-3 text-end"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           />
         </label>

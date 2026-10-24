@@ -1,3 +1,6 @@
+// Relative, not `@/`: next.config.ts loads this file too.
+import { KIND_ORDER } from "../components/around/around";
+
 // Redesign Phase 1 (ADR-137): member pages moved under the tab that is now
 // their home. Old URLs redirect (next.config.ts) and old links stored
 // server-side, such as notification payloads, are mapped here. Most specific
@@ -35,6 +38,14 @@ export const MEMBER_ROUTE_MOVES: ReadonlyArray<readonly [from: string, to: strin
 export const MEMBER_EXACT_MOVES: ReadonlyArray<readonly [from: string, to: string]> = [
   ["/partners", "/messages?filter=partners"],
   ["/me/settings/export", "/me/settings#journal-export"],
+];
+
+// Γύρω μου's «Δες όλα» narrows «what» in place (vision §7.2), so the old
+// one-kind pages `/around/<kind>` open Γύρω μου with that kind preselected.
+const AROUND_KIND_PATTERN = `:kind(${KIND_ORDER.join("|")})`;
+export const AROUND_KIND_REDIRECTS: ReadonlyArray<{ source: string; destination: string }> = [
+  { source: `/around/${AROUND_KIND_PATTERN}`, destination: "/around?kind=:kind" },
+  { source: `/org/:organization_slug/around/${AROUND_KIND_PATTERN}`, destination: "/org/:organization_slug/around?kind=:kind" },
 ];
 
 /** The current location of a member path that may predate the move; anything else is returned as is. */

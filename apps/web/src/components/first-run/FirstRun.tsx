@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { completeProductTour } from "@/api/onboarding";
 import { redeemInvitation } from "@/api/organizations";
 import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
+import { aroundKindHref } from "@/components/around/around";
 import { AreaPicker } from "@/components/around/AreaPicker";
 import { useAroundArea } from "@/components/around/use-around";
 import { InterestsEditor } from "@/components/interests/InterestsEditor";
@@ -163,7 +164,11 @@ function PhotoStep({ onNext }: { onNext: () => void }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span aria-hidden="true" className="text-3xl" style={{ color: "var(--dim)" }}>+</span>
+            // ADR-194: the "+" carries a visible label, not only an aria-label.
+            <span aria-hidden="true" className="flex flex-col items-center gap-1 px-3 text-center" style={{ color: "var(--dim)" }}>
+              <span className="text-3xl leading-none">+</span>
+              <span className="text-xs font-semibold leading-tight">{t("photoAddLabel")}</span>
+            </span>
           )}
         </button>
         <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{currentUser?.nickname}</p>
@@ -283,7 +288,7 @@ function BoxQuestion() {
       ) : (
         <div className="flex flex-col gap-2">
           <Link
-            href="/around/boxes"
+            href={aroundKindHref("boxes")}
             className="flex min-h-11 items-center rounded-2xl px-3 text-sm font-semibold"
             style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
           >

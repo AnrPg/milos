@@ -36,6 +36,7 @@ import {
   type RuleSection,
 } from "@/lib/perks/validity";
 import { uploadBoxPhoto } from "@/lib/box-photo-upload";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 // Partner-issued first (the default), then the Palee QR, as the API lists them.
 const METHODS: PerkMethod[] = ["shared_code", "code_pool", "personal_qr", "partner_link", "show_membership"];
@@ -103,6 +104,7 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
 
   return (
     <SidePanel
+      guide="finance.perk.form"
       title={perk ? perk.partner_name : t("newTitle")}
       subtitle={t("eyebrow")}
       onClose={onClose}
@@ -142,7 +144,7 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
     >
       {perk && perk.claims_count > 0 ? <p className="rounded-2xl px-4 py-3 text-xs" style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}>{t("versionNote")}</p> : null}
 
-      <Card title={t("partner")}>
+      <Card title={t("partner")} guide="finance.perk.partner">
         <Field label={t("partnerName")} error={problem("partnerName")}>
           <input className={inputClass} style={inputStyle} value={draft.partner_name} onChange={(event) => set("partner_name", event.target.value)} maxLength={120} />
         </Field>
@@ -152,7 +154,7 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
         </Field>
       </Card>
 
-      <Card title={t("benefit")}>
+      <Card title={t("benefit")} guide="finance.perk.benefit">
         <SegmentPicker
           ariaLabel={t("benefitType")}
           semantics="radiogroup"
@@ -164,7 +166,7 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
         <BenefitFields draft={draft} set={set} problem={problem} />
       </Card>
 
-      <Card title={t("method")}>
+      <Card title={t("method")} guide="finance.perk.method">
         <div role="radiogroup" aria-label={t("method")} className="grid grid-cols-1 gap-2">
           {METHODS.map((method) => (
             <button
@@ -201,7 +203,7 @@ export function PerkForm({ perk, onClose }: { perk: StaffPerk | null; onClose: (
         ) : null}
       </Card>
 
-      <Card title={t("validity")}>
+      <Card title={t("validity")} guide="finance.perk.rules">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t("validFrom")}>
             <DateInput className={inputClass} style={inputStyle} value={draft.valid_from ?? ""} onValueChange={(value) => set("valid_from", value || null)} placeholder={t("fromNow")} />
@@ -270,9 +272,9 @@ function BenefitFields({ draft, set, problem }: { draft: PerkDraft; set: SetDraf
   );
 }
 
-function Card({ title, children }: { title: string; children: ReactNode }) {
+function Card({ title, children, guide }: { title: string; children: ReactNode; guide?: GuideAnchor }) {
   return (
-    <section className="flex flex-col gap-3 rounded-3xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+    <section data-guide={guide} className="flex flex-col gap-3 rounded-3xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <h3 className="text-sm font-bold" style={{ color: "var(--text)" }}>{title}</h3>
       {children}
     </section>

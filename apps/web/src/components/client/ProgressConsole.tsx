@@ -17,17 +17,26 @@ import { PRHistoryModal } from "@/components/pantheon/PRHistoryModal";
 import { formatPRScore, groupPRTimelineByMonth, prImprovement } from "@/components/client/pr-timeline";
 import { semanticLabel } from "@/i18n/presentation";
 import { useSession } from "@/components/session-provider";
-import { ClientCard, ClientPage, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
+import { HelpIcon, InfoModal } from "@/components/InfoModal";
+import { ClientCard, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
+import {
+  consistencyGrid,
+  heatStrips,
+  localToday,
+  weeksOnTarget,
+  type HeatLevel,
+} from "@/components/client/consistency";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { InsightsCard } from "@/components/member-app/progress/InsightsCard";
 import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
+import { useLanding } from "@/components/member-app/progress/use-landing";
 import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
 import { PersonalRecordsSection } from "@/components/pantheon/PersonalRecordsSection";
 import { formatDay } from "@/components/client/format";
-import { scaleWeekly, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
+import { dailyStatsRange, scaleWeekly, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
 import { SourceLabel } from "@/components/providers/SourceLabel";
 import { useSourceDirectory } from "@/components/providers/use-providers";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -37,29 +46,19 @@ import { sourceColor, sourceOptions, sourceToken } from "@/lib/provider-sources"
 import { useTranslations } from "next-intl";
 
 /**
- * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
- * resting heart rate from a connected device (ADR-161, only with data),
- * then personal records and the statistics across every
- * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
- * the time range narrows it. The depth slots follow in a fixed order
- * (ADR-165): Μυϊκή κάλυψη (into the atlas), Ποιότητες, Φορτίο, then the
- * single Insights slot (ADR-166). A card with nothing in it is hidden
- * (ANR 2026-10-24); PRs are the «Personal Records» section (`#prs`), not a
- * page of their own; the history export lives in Vault.
+ * Ημερολόγιο › Πρόοδος (ADR-137, ADR-194; vision §7.7: «fixed section order
+ * with a time range on top»). The range and «Όλοι ▾» source chips come first
+ * and drive every card that has a period: Συνέπεια (calendar heatmap, the
+ * one streak, weeks on target), Personal Records (each lift's estimated 1RM
+ * and each benchmark's trend over the range), the statistics across every
+ * provider (ADR-162), resting heart rate (ADR-161) and the depth slots
+ * (ADR-165): Μυϊκή κάλυψη, Ποιότητες, Φορτίο, then Insights (ADR-166). The
+ * gym's badges and scores sit after the PRs; their windows are their own.
+ * The Journal header names the page, so there is no second title. A card
+ * with nothing in it is hidden (ANR 2026-10-24); PRs are the «Personal
+ * Records» section (`#prs`); the history export lives in Vault.
  */
 export function ProgressConsole() {
-  const i18n = useUiTranslations();
-  return (
-    <ClientPage title={i18n("clProgressTitle")} intro={i18n("clProgressIntro")}>
-      <ProgressOverview />
-      <RestingHeartRateCard />
-      <PersonalRecordsSection />
-      <ProgressContent />
-    </ClientPage>
-  );
-}
-
-function ProgressContent() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const { filter, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
@@ -69,29 +68,45 @@ function ProgressContent() {
     queryFn: () => fetchAccountProgress(token!, filter!),
     placeholderData: (previous) => previous,
   });
+  const progress = query.data?.totals ? query.data : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      {filter ? <ProgressFilters filter={filter} onChange={setFilter} /> : null}
-      {filter === null || query.isPending ? (
-        <LoadingLine />
-      ) : query.isError ? (
-        <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
-      ) : !query.data?.totals ? null : (
-        <>
-          <Totals progress={query.data} />
-          <WeeklyChart progress={query.data} />
-          <div className="grid gap-4 md:grid-cols-2">
-            <Consistency progress={query.data} />
-            <BySource progress={query.data} />
-          </div>
-          <PRTimeline entries={query.data.pr_timeline ?? []} />
-          <ScoreHistory series={query.data.score_history ?? []} />
-        </>
-      )}
-      {filter ? <ProgressDepthSections filter={filter} /> : null}
-      <InsightsCard />
-    </div>
+    <main className="min-h-screen px-4 py-6 md:px-10" style={{ background: "var(--bg)" }}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-4">
+        {filter === null ? (
+          <LoadingLine />
+        ) : (
+          <>
+            <ProgressFilters filter={filter} onChange={setFilter} />
+            {query.isPending ? (
+              <LoadingLine />
+            ) : query.isError ? (
+              <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
+            ) : progress ? (
+              <Consistency progress={progress} />
+            ) : null}
+            <PersonalRecordsSection filter={filter} />
+            <ProgressOverview />
+            {progress ? (
+              <>
+                <Totals progress={progress} />
+                <WeeklyChart progress={progress} />
+                <BySource progress={progress} />
+              </>
+            ) : null}
+            <RestingHeartRateCard range={dailyStatsRange(filter.range)} />
+            {progress ? (
+              <>
+                <PRTimeline entries={progress.pr_timeline ?? []} />
+                <ScoreHistory series={progress.score_history ?? []} />
+              </>
+            ) : null}
+            <ProgressDepthSections filter={filter} />
+            <InsightsCard />
+          </>
+        )}
+      </div>
+    </main>
   );
 }
 
@@ -194,7 +209,7 @@ function WeeklyChart({ progress }: { progress: ProgressStats }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const [metric, setMetric] = useState<WeeklyMetric>("sessions");
-  const bars = useMemo(() => scaleWeekly(progress.weekly, metric), [progress.weekly, metric]);
+  const bars = useMemo(() => scaleWeekly(progress.weekly, metric, progress.weekly.length), [progress.weekly, metric]);
   const metricLabel = metric === "sessions" ? i18n("clProgressSessions") : i18n("clProgressMinutes");
   const shortDate = (day: string) => formatDay(day, locale, { weekday: undefined, year: undefined, month: "short" });
 
@@ -209,7 +224,7 @@ function WeeklyChart({ progress }: { progress: ProgressStats }) {
               type="button"
               aria-pressed={metric === value}
               onClick={() => setMetric(value)}
-              className="rounded-full px-3 py-1 text-xs font-semibold"
+              className="hit-area rounded-full px-3 py-1 text-xs font-semibold"
               style={{
                 background: metric === value ? "var(--border)" : "transparent",
                 color: metric === value ? "var(--text)" : "var(--dim)",
@@ -221,7 +236,10 @@ function WeeklyChart({ progress }: { progress: ProgressStats }) {
         </div>
       }
     >
-      <ol className="flex h-40 items-end gap-1 sm:gap-2" aria-label={`${i18n("clProgressWeekly")} · ${metricLabel}`}>
+      <ol
+        className={`flex h-40 items-end ${bars.length > 26 ? "gap-px" : "gap-1 sm:gap-2"}`}
+        aria-label={`${i18n("clProgressWeekly")} · ${metricLabel}`}
+      >
         {bars.map((bar) => (
           <li
             key={bar.week_start}
@@ -229,7 +247,7 @@ function WeeklyChart({ progress }: { progress: ProgressStats }) {
             aria-label={i18n("clProgressWeekOf", { date: shortDate(bar.week_start), value: bar.value })}
           >
             <span aria-hidden="true" className="text-[10px] tabular-nums" style={{ color: "var(--dim)" }}>
-              {bar.value > 0 ? bar.value : ""}
+              {bar.value > 0 && bars.length <= 26 ? bar.value : ""}
             </span>
             <span
               aria-hidden="true"
@@ -252,35 +270,130 @@ function WeeklyChart({ progress }: { progress: ProgressStats }) {
   );
 }
 
-function Consistency({ progress }: { progress: ProgressStats }) {
+const HEAT_BACKGROUND: Record<HeatLevel, string> = {
+  0: "var(--panel-muted)",
+  1: "color-mix(in srgb, var(--primary) 35%, transparent)",
+  2: "color-mix(in srgb, var(--primary) 65%, transparent)",
+  3: "var(--primary)",
+};
+
+/**
+ * Συνέπεια (ADR-194, mockup `heatGrid`): the range as a calendar heatmap, a
+ * column per week with a mark under each week that reached the target, the
+ * one streak (the gym's day streak when there is a gym, else weeks in a row
+ * with training) and the weekly target. Every day and week has a label.
+ */
+function Consistency({ progress }: { progress: AccountProgress }) {
   const i18n = useUiTranslations();
-  const { consistency } = progress;
-  const percent = Math.min(100, Math.max(0, consistency.percent));
+  const locale = useUiLocale();
+  const landing = useLanding();
+  const [explain, setExplain] = useState(false);
+  const gamification = landing.data?.gamification;
+  const target = gamification?.settings.weekly_workout_target || null;
+  const dayStreak = gamification?.stats?.current_streak;
+  const today = localToday();
+  const weeks = useMemo(
+    () => consistencyGrid(progress.weekly, progress.days ?? [], today, target),
+    [progress.weekly, progress.days, today, target],
+  );
+  const onTarget = weeksOnTarget(weeks);
+  const percent = weeks.length > 0 ? Math.round((onTarget * 100) / weeks.length) : 0;
+  const shortDate = (day: string) => formatDay(day, locale, { weekday: undefined, year: undefined, month: "short" });
+  const streak =
+    typeof dayStreak === "number"
+      ? i18n("clProgressStreakDays", { count: dayStreak })
+      : i18n("clProgressStreakWeeks", { count: progress.consistency.current_streak_weeks });
+
   return (
-    <ClientCard title={i18n("clProgressConsistency")}>
+    <ClientCard
+      title={i18n("clProgressConsistency")}
+      aside={
+        <span className="flex flex-wrap items-center gap-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+          {/* THEME.md: the streak is Spark, a fill with dark text. */}
+          <span className="rounded-full px-2.5 py-1" style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}>
+            {i18n("clProgressStreak")}: {streak}
+          </span>
+          {target ? <span>{i18n("clProgressTarget", { count: target })}</span> : null}
+          {target ? <HelpIcon tooltip={i18n("currentStreak031c4ed")} onClick={() => setExplain(true)} /> : null}
+        </span>
+      }
+    >
       <p className="text-3xl font-semibold tabular-nums" style={{ color: "var(--text)" }}>
         {i18n("clPercentValue", { value: percent })}
       </p>
-      <div
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={percent}
-        aria-label={i18n("clProgressConsistency")}
-        className="mt-2 h-2 w-full overflow-hidden rounded-full"
-        style={{ background: "var(--border)" }}
-      >
-        <div className="h-full rounded-full" style={{ width: `${percent}%`, background: "var(--success)" }} />
+      <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+        {target
+          ? i18n("clProgressOnTargetWeeks", { onTarget, weeks: weeks.length })
+          : i18n("clProgressActiveWeeks", { active: onTarget, weeks: weeks.length })}
+      </p>
+      <div className="mt-3 flex flex-col gap-3" role="group" aria-label={i18n("clProgressHeatmap")}>
+        {heatStrips(weeks).map((strip) => (
+          <div
+            key={strip[0].week_start}
+            className="grid w-full gap-[3px]"
+            style={{ gridTemplateColumns: `repeat(${strip.length}, minmax(0, 1fr))`, maxWidth: `${strip.length * 1.5}rem` }}
+          >
+            {strip.map((week) => (
+              <ol
+                key={week.week_start}
+                className="flex min-w-0 flex-col gap-[3px]"
+                aria-label={i18n("clProgressHeatWeek", {
+                  date: shortDate(week.week_start),
+                  count: week.sessions,
+                  onTarget: String(week.onTarget),
+                })}
+              >
+                {week.days.map((day) => (
+                  <li
+                    key={day.date}
+                    className="aspect-square w-full rounded-[3px]"
+                    style={{
+                      background: day.future ? "transparent" : HEAT_BACKGROUND[day.level],
+                      border: day.future ? "1px dashed var(--border)" : undefined,
+                      outline: day.date === today ? "2px solid var(--spark)" : undefined,
+                      outlineOffset: day.date === today ? "1px" : undefined,
+                    }}
+                  >
+                    <span className="sr-only">
+                      {i18n("clProgressHeatDay", {
+                        date: formatDay(day.date, locale, { year: undefined, month: "short" }),
+                        count: day.sessions,
+                      })}
+                    </span>
+                  </li>
+                ))}
+                <li
+                  aria-hidden="true"
+                  className="mt-0.5 h-1 w-full rounded-full"
+                  style={{ background: week.onTarget ? "var(--success)" : "var(--border)" }}
+                />
+              </ol>
+            ))}
+          </div>
+        ))}
       </div>
-      <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-        {i18n("clProgressActiveWeeks", { active: consistency.active_weeks, weeks: consistency.weeks })}
-      </p>
-      <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-        {i18n("clProgressStreak")}
-      </p>
-      <p className="mt-1 text-lg font-semibold" style={{ color: "var(--text)" }}>
-        {i18n("clProgressStreakWeeks", { count: consistency.current_streak_weeks })}
-      </p>
+      {weeks.length > 0 ? (
+        <div aria-hidden="true" className="mt-2 flex justify-between text-[10px]" style={{ color: "var(--dim)" }}>
+          <span>{shortDate(weeks[0].week_start)}</span>
+          <span>{shortDate(weeks[weeks.length - 1].week_start)}</span>
+        </div>
+      ) : null}
+      {explain && target ? (
+        <InfoModal title={i18n("currentStreak031c4ed")} onClose={() => setExplain(false)}>
+          <p>
+            <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong>{" "}
+            {i18n("theNumberOfConsecutiveUserRelativeTrainingWeeks23b79ed")} {i18n("workoutCount", { count: target })}.
+          </p>
+          <p>
+            <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("completeAtLeastfd38f65")}{" "}
+            {i18n("workoutCount", { count: target })} {i18n("eachTrainingWeekAStreakShieldCanProtecte2b0f06")}
+          </p>
+          <p>
+            <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong>{" "}
+            {i18n("streaksBuildTheHabitOfRegularWeeklyTraining48e3b44")}
+          </p>
+        </InfoModal>
+      ) : null}
     </ClientCard>
   );
 }
@@ -370,7 +483,7 @@ function ScoreSeries({ series }: { series: AccountScoreSeries }) {
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((value) => !value)}
-        className="mt-2 text-xs font-semibold"
+        className="mt-2 min-h-11 text-xs font-semibold"
         style={{ color: "var(--primary)" }}
       >
         {open ? i18n("clHideDates") : i18n("clShowDates", { count: series.points.length })}

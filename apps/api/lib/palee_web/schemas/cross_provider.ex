@@ -241,6 +241,7 @@ defmodule PaleeWeb.Schemas.CrossProvider do
       required: [
         :totals,
         :weekly,
+        :days,
         :consistency,
         :sources,
         :score_history,
@@ -252,6 +253,19 @@ defmodule PaleeWeb.Schemas.CrossProvider do
       properties: %{
         totals: %Schema{type: :object, additionalProperties: true},
         weekly: %Schema{type: :array, items: %Schema{type: :object, additionalProperties: true}},
+        days: %Schema{
+          type: :array,
+          description:
+            "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              date: %Schema{type: :string, format: :date},
+              sessions: %Schema{type: :integer}
+            },
+            required: [:date, :sessions]
+          }
+        },
         consistency: %Schema{type: :object, additionalProperties: true},
         sources: %Schema{
           type: :object,

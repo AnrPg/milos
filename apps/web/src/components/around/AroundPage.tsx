@@ -16,6 +16,7 @@ import {
   clearNarrowing,
   foundTotal,
   isOneOff,
+  singleKind,
   thinResults,
   withWhen,
   type OriginChoice,
@@ -31,7 +32,12 @@ import {
 } from "./AreaPicker";
 import { AroundChipRow, RadiusChip } from "./AroundFilters";
 import { AroundMapPanel } from "./AroundMapPanel";
-import { AroundSections, ThinResultsCard } from "./AroundSections";
+import {
+  AROUND_RESULTS_ID,
+  AroundKindList,
+  AroundSections,
+  ThinResultsCard,
+} from "./AroundSections";
 import { ScopeToggle } from "./ScopeToggle";
 import {
   needsOrigin,
@@ -60,6 +66,8 @@ export function AroundPage() {
   const askOrigin =
     !data && needsOrigin(search.error) && !isOneOff(around.origin);
   const thin = data ? thinResults(data) : null;
+  // «what» is one kind («Δες όλα», `?kind=`): list it in full, paged.
+  const listedKind = singleKind(around.queryFilter);
 
   return (
     <FeedPage
@@ -71,9 +79,8 @@ export function AroundPage() {
         </div>
       }
     >
-      {clubs.data && clubs.data.length > 0 ? (
-        <ClubBar clubs={clubs.data} />
-      ) : null}
+      {/* Always there, so «+ Βρες» is reachable before the first club (vision §6.1). */}
+      <ClubBar clubs={clubs.data ?? []} />
       <ScopeToggle current="around" />
 
       {askOrigin ? (
@@ -154,12 +161,18 @@ export function AroundPage() {
                 />
               ) : null}
               <div
+                id={AROUND_RESULTS_ID}
                 style={{
                   opacity:
                     search.isFetching && search.isPlaceholderData ? 0.6 : 1,
+                  scrollMarginTop: "5rem",
                 }}
               >
-                <AroundSections data={data} />
+                {listedKind ? (
+                  <AroundKindList kind={listedKind} />
+                ) : (
+                  <AroundSections data={data} />
+                )}
               </div>
             </>
           ) : null}

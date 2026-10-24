@@ -305,6 +305,15 @@ Coach notes about an athlete (`/staff/clients/{id}/coach-notes`, read-audited) s
 
 Show correlations only after enough data (e.g. ≥4 weeks), and always as **indicators, not medical advice.**
 
+**ADR-194 (Πρόοδος / Ευεξία polish):**
+- Πρόοδος has no page title. The range chips come first and drive every card, including resting HR, which has no chips of its own.
+- Consistency is a single card holding the heatmap, the target and weeks on target. There is one streak only (a gym day streak, otherwise weeks).
+- Cards with no data are hidden, never shown as placeholders.
+- PR trends show estimated 1RM (Epley, ≤12 reps) and a retest hint after 84 days. Both come from one pure lib.
+- The member can hide the macros of the coach's plan. This is stored server-side (`hide_macros`). With no plan, no card is shown.
+- In Ευεξία, mood and stress are one tap each. The injury form opens from a button in a dialog. There is no second title.
+- Every touch target is at least 44px; the `hit-area` utility enlarges small controls.
+
 ### 7.8 Check-in buddy · «Φιλαράκι στήριξης» [NEW]
 Renamed from «Buddy για στήριξη» (ANR 2026-10-24), because Buddies («Φιλαράκια») now means mutual follows (§7.1a). One or two trusted people (a partner, friend, or the coach), set in `Εγώ › Φιλαράκι στήριξης`, with mutual acceptance. They receive **only what the user explicitly sends** via "Χρειάζομαι στήριξη" (nothing automatic). Notification with quick replies ("Είμαι εδώ", "Πάμε βόλτα;", "Πάρε με τηλέφωνο"). Optionally a weekly summary with counts only. Either side can leave at any time. The coach can get a **weekly summary** only with permission.
 
@@ -334,7 +343,7 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
-- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin.
+- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ › Βοήθεια & ξενάγηση, ADR-196), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
 - *Decided 2026-10-24 (ADR-196):*
   - The list above is the whole list, in this order. Anything else moves into one of its pages:
 

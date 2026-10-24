@@ -15,6 +15,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { combinationKey, priceRange, productStock, stockMeterPercent } from "@/lib/shop/console";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type Filter = "all" | ShopProductStatus | "low_stock";
 const FILTERS: Filter[] = ["all", "published", "draft", "low_stock", "archived"];
@@ -29,7 +30,7 @@ export function ProductsTab({ locationIds, counts }: { locationIds?: string; cou
   const rows = (products.data?.products ?? []).filter((product) => !needle || product.title.toLocaleLowerCase().includes(needle));
 
   return (
-    <section className="flex flex-col gap-4" aria-label={t("title")}>
+    <section {...guideAnchor("shop.products")} className="flex flex-col gap-4" aria-label={t("title")}>
       <SegmentPicker
         ariaLabel={t("filter")}
         semantics="radiogroup"

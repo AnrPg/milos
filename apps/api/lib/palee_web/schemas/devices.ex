@@ -335,7 +335,7 @@ defmodule PaleeWeb.Schemas.Devices do
         "Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data",
       properties: %{
         metric: %Schema{type: :string, enum: ["resting_hr", "steps"]},
-        range: %Schema{type: :string, enum: ~w(1m 3m 1y)},
+        range: %Schema{type: :string, enum: ~w(1m 3m 6m 1y)},
         from: %Schema{type: :string, format: :date},
         to: %Schema{type: :string, format: :date},
         points: %Schema{type: :array, items: point},

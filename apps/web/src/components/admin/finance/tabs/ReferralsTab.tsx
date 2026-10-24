@@ -37,6 +37,7 @@ import {
 } from "@/components/admin/finance/referrals/program-rules";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 import { Select } from "@/components/ui/Select";
+import type { GuideAnchor } from "@/lib/guides/anchors";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -235,6 +236,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
         count={programs.length}
         onNew={() => setParam({ new: "program" })}
         newLabel={i18n("newProgram03c5865")}
+        newGuide="finance.referrals.new"
       >
         {programsQuery.isLoading ? (
           <EmptyRow>{i18n("loading33ce417")}</EmptyRow>
@@ -270,6 +272,7 @@ export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
         count={events.length}
         onNew={() => setParam({ "new-event": "true" })}
         newLabel={i18n("newEvent7d0b5a7")}
+        guide="finance.referrals"
       >
         {eventsQuery.isLoading ? (
           <EmptyRow>{i18n("loading33ce417")}</EmptyRow>
@@ -667,15 +670,20 @@ function Section({
   onNew,
   newLabel,
   children,
+  guide,
+  newGuide,
 }: {
   title: string;
   count: number;
   onNew?: () => void;
   newLabel?: string;
   children: React.ReactNode;
+  /** Walkthrough anchors of the section and its «new» button (ADR-193). */
+  guide?: GuideAnchor;
+  newGuide?: GuideAnchor;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-guide={guide}>
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
           {title} ({count})
@@ -686,6 +694,7 @@ function Section({
             style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
             onClick={onNew}
             type="button"
+            data-guide={newGuide}
           >
             {newLabel}
           </button>

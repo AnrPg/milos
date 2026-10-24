@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { fetchMyAppointments } from "@/api/appointments";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { allowanceRemaining, hasCapability, hasFeature } from "@/components/client/entitlement";
-import { HubActionTile, HubButton, HubCard, HubIcons } from "@/components/member-app/HubParts";
+import { HubActionTile, HubCard, HubIcons } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { nextAppointment } from "@/lib/solo-coach";
@@ -51,7 +51,11 @@ export function CoachActions({ entitlement }: { entitlement: EffectiveEntitlemen
   );
 }
 
-/** «Επόμενη συνεδρία»: when, in person or online (with the call link), and the way to book. */
+/**
+ * «Επόμενη συνεδρία»: when, in person or online (with the call link), and
+ * the way to manage it. Without one the card is hidden (vision §4.2);
+ * booking stays in the action row's «Συνεδρίες».
+ */
 export function NextCoachSession() {
   const t = useTranslations("SoloCoach");
   const tApp = useTranslations("MemberApp");
@@ -67,57 +71,49 @@ export function NextCoachSession() {
     staleTime: 60_000,
   });
   const next = nextAppointment(appointments.data ?? [], now);
+  if (!next) return null;
 
   return (
     <HubCard eyebrow={tApp("nextSession")}>
-      {appointments.isPending && token ? (
-        <p className="text-sm" style={{ color: "var(--dim)" }}>{tApp("loading")}</p>
-      ) : next ? (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
-                {sessionWhen(next.slot.starts_at, now, locale, tApp("todayLabel"), practiceZone)}
-                <YourTime at={next.slot.starts_at} zone={practiceZone} format="day-time" />
-              </p>
-              <p className="truncate text-sm" style={{ color: "var(--dim)" }}>
-                {[
-                  next.slot.kind === "assessment" ? t("box.assessment") : t("box.ptSession"),
-                  next.slot.mode === "online" ? t("box.online") : t("box.inPerson"),
-                  next.slot.duration_minutes ? t("box.minutes", { minutes: next.slot.duration_minutes }) : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
-            </div>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
+              {sessionWhen(next.slot.starts_at, now, locale, tApp("todayLabel"), practiceZone)}
+              <YourTime at={next.slot.starts_at} zone={practiceZone} format="day-time" />
+            </p>
+            <p className="truncate text-sm" style={{ color: "var(--dim)" }}>
+              {[
+                next.slot.kind === "assessment" ? t("box.assessment") : t("box.ptSession"),
+                next.slot.mode === "online" ? t("box.online") : t("box.inPerson"),
+                next.slot.duration_minutes ? t("box.minutes", { minutes: next.slot.duration_minutes }) : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
           </div>
-          <div className="flex gap-2">
-            {next.slot.mode === "online" && next.slot.meeting_url ? (
-              <a
-                href={next.slot.meeting_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-              >
-                {t("box.join")}
-              </a>
-            ) : null}
-            <Link
-              href="/box/appointments"
+        </div>
+        <div className="flex gap-2">
+          {next.slot.mode === "online" && next.slot.meeting_url ? (
+            <a
+              href={next.slot.meeting_url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {t("box.manage")}
-            </Link>
-          </div>
+              {t("box.join")}
+            </a>
+          ) : null}
+          <Link
+            href="/box/appointments"
+            className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+            style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+          >
+            {t("box.manage")}
+          </Link>
         </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("box.noSession")}</p>
-          <HubButton href="/box/appointments">{t("box.bookSession")}</HubButton>
-        </div>
-      )}
+      </div>
     </HubCard>
   );
 }

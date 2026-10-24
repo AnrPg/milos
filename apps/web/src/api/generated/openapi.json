@@ -306,6 +306,26 @@
             "additionalProperties": true,
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "filter": {
             "additionalProperties": true,
             "type": "object"
@@ -454,6 +474,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -523,6 +544,26 @@
               "consistency": {
                 "additionalProperties": true,
                 "type": "object"
+              },
+              "days": {
+                "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                "items": {
+                  "properties": {
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "sessions": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "sessions"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
               "filter": {
                 "additionalProperties": true,
@@ -672,6 +713,7 @@
             "required": [
               "totals",
               "weekly",
+              "days",
               "consistency",
               "sources",
               "score_history",
@@ -36050,6 +36092,7 @@
             "enum": [
               "1m",
               "3m",
+              "6m",
               "1y"
             ],
             "type": "string"
@@ -41375,6 +41418,166 @@
           "role"
         ],
         "title": "GoalMuscle",
+        "type": "object"
+      },
+      "GuideProgress": {
+        "properties": {
+          "completed_at": {
+            "description": "The first finish of the current run.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "guide_id": {
+            "description": "The web app's guide id, e.g. `shop_staff`.",
+            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+            "type": "string"
+          },
+          "runs": {
+            "description": "How many times it was started.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "description": "The step reached in the current run, from 0.",
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "completed_at",
+          "guide_id",
+          "runs",
+          "started_at",
+          "status",
+          "step",
+          "updated_at",
+          "version"
+        ],
+        "title": "GuideProgress",
+        "type": "object"
+      },
+      "GuideProgressList": {
+        "properties": {
+          "guides": {
+            "items": {
+              "properties": {
+                "completed_at": {
+                  "description": "The first finish of the current run.",
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "guide_id": {
+                  "description": "The web app's guide id, e.g. `shop_staff`.",
+                  "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                  "type": "string"
+                },
+                "runs": {
+                  "description": "How many times it was started.",
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "started",
+                    "completed",
+                    "dismissed"
+                  ],
+                  "type": "string"
+                },
+                "step": {
+                  "description": "The step reached in the current run, from 0.",
+                  "maximum": 99,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "version": {
+                  "maximum": 1000,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "completed_at",
+                "guide_id",
+                "runs",
+                "started_at",
+                "status",
+                "step",
+                "updated_at",
+                "version"
+              ],
+              "title": "GuideProgress",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "guides"
+        ],
+        "title": "GuideProgressList",
+        "type": "object"
+      },
+      "GuideProgressUpdate": {
+        "properties": {
+          "status": {
+            "enum": [
+              "started",
+              "completed",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "step": {
+            "default": 0,
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "default": 1,
+            "description": "A newer version than the stored one starts a new run.",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "GuideProgressUpdate",
         "type": "object"
       },
       "GymAiSettings": {
@@ -48694,6 +48897,53 @@
         "title": "OrganizationPlatformSubscriptions",
         "type": "object"
       },
+      "PRHistoryList": {
+        "properties": {
+          "history": {
+            "items": {
+              "properties": {
+                "beaten_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "pr_record_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "supporting_metrics": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "pr_record_id",
+                "score",
+                "beaten_on",
+                "supporting_metrics"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "history"
+        ],
+        "title": "PRHistoryList",
+        "type": "object"
+      },
       "PRTimelineEntry": {
         "properties": {
           "beaten_on": {
@@ -55239,6 +55489,26 @@
             ],
             "type": "object"
           },
+          "days": {
+            "description": "Sessions per day with training in the weekly span, oldest first",
+            "items": {
+              "properties": {
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "sessions": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "pr_timeline": {
             "items": {
               "properties": {
@@ -55403,6 +55673,7 @@
         "required": [
           "totals",
           "weekly",
+          "days",
           "consistency",
           "sources",
           "score_history",
@@ -77884,6 +78155,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -77919,7 +78194,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           },
@@ -77997,6 +78273,10 @@
             },
             "type": "array"
           },
+          "hide_macros": {
+            "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+            "type": "boolean"
+          },
           "item_order": {
             "description": "Tile order; every item appears once (unplaced ones follow in default order)",
             "items": {
@@ -78052,6 +78332,10 @@
                 },
                 "type": "array"
               },
+              "hide_macros": {
+                "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                "type": "boolean"
+              },
               "item_order": {
                 "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                 "items": {
@@ -78087,7 +78371,8 @@
               "sleep_goal_minutes",
               "hidden_items",
               "item_order",
-              "water_reminder"
+              "water_reminder",
+              "hide_macros"
             ],
             "type": "object"
           }
@@ -109329,7 +109614,8 @@
               "enum": [
                 "1m",
                 "1y",
-                "3m"
+                "3m",
+                "6m"
               ],
               "type": "string"
             }
@@ -109421,6 +109707,7 @@
                       "enum": [
                         "1m",
                         "3m",
+                        "6m",
                         "1y"
                       ],
                       "type": "string"
@@ -119100,6 +119387,339 @@
         ]
       }
     },
+    "/api/me/guides": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your progress in every walkthrough you have opened",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/guides/{guide_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "guides": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "description": "The first finish of the current run.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "guide_id": {
+                            "description": "The web app's guide id, e.g. `shop_staff`.",
+                            "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                            "type": "string"
+                          },
+                          "runs": {
+                            "description": "How many times it was started.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "started",
+                              "completed",
+                              "dismissed"
+                            ],
+                            "type": "string"
+                          },
+                          "step": {
+                            "description": "The step reached in the current run, from 0.",
+                            "maximum": 99,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "version": {
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "completed_at",
+                          "guide_id",
+                          "runs",
+                          "started_at",
+                          "status",
+                          "step",
+                          "updated_at",
+                          "version"
+                        ],
+                        "title": "GuideProgress",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "guides"
+                  ],
+                  "title": "GuideProgressList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Forget one walkthrough's progress, so it is offered again",
+        "tags": [
+          "Me"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.GuideProgressController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "guide_id",
+            "required": true,
+            "schema": {
+              "description": "The web app's guide id, e.g. `shop_staff`.",
+              "pattern": "^[a-z][a-z0-9_]{1,47}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "started",
+                      "completed",
+                      "dismissed"
+                    ],
+                    "type": "string"
+                  },
+                  "step": {
+                    "default": 0,
+                    "maximum": 99,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "version": {
+                    "default": 1,
+                    "description": "A newer version than the stored one starts a new run.",
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "title": "GuideProgressUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_at": {
+                      "description": "The first finish of the current run.",
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "guide_id": {
+                      "description": "The web app's guide id, e.g. `shop_staff`.",
+                      "pattern": "^[a-z][a-z0-9_]{1,47}$",
+                      "type": "string"
+                    },
+                    "runs": {
+                      "description": "How many times it was started.",
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "started_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "started",
+                        "completed",
+                        "dismissed"
+                      ],
+                      "type": "string"
+                    },
+                    "step": {
+                      "description": "The step reached in the current run, from 0.",
+                      "maximum": 99,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "version": {
+                      "maximum": 1000,
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "completed_at",
+                    "guide_id",
+                    "runs",
+                    "started_at",
+                    "status",
+                    "step",
+                    "updated_at",
+                    "version"
+                  ],
+                  "title": "GuideProgress",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guide progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record a step reached, a finish or a «not now» in one walkthrough",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/history": {
       "get": {
         "callbacks": {},
@@ -124881,6 +125501,26 @@
                           "additionalProperties": true,
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training over the range's weeks, oldest first (ADR-194)",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "filter": {
                           "additionalProperties": true,
                           "type": "object"
@@ -125029,6 +125669,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -130290,6 +130931,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -130325,7 +130970,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     },
@@ -131811,6 +132457,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -131846,7 +132496,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -131900,6 +132551,10 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "hide_macros": {
+                    "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                    "type": "boolean"
                   },
                   "item_order": {
                     "description": "Tile order; every item appears once (unplaced ones follow in default order)",
@@ -131964,6 +132619,10 @@
                           },
                           "type": "array"
                         },
+                        "hide_macros": {
+                          "description": "Hide the macros of the coach's nutrition plan (vision §8.6, ADR-194)",
+                          "type": "boolean"
+                        },
                         "item_order": {
                           "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                           "items": {
@@ -131999,7 +132658,8 @@
                         "sleep_goal_minutes",
                         "hidden_items",
                         "item_order",
-                        "water_reminder"
+                        "water_reminder",
+                        "hide_macros"
                       ],
                       "type": "object"
                     }
@@ -207832,6 +208492,26 @@
                           ],
                           "type": "object"
                         },
+                        "days": {
+                          "description": "Sessions per day with training in the weekly span, oldest first",
+                          "items": {
+                            "properties": {
+                              "date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "date",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "pr_timeline": {
                           "items": {
                             "properties": {
@@ -207996,6 +208676,7 @@
                       "required": [
                         "totals",
                         "weekly",
+                        "days",
                         "consistency",
                         "sources",
                         "score_history",
@@ -249244,6 +249925,78 @@
           }
         ],
         "summary": "Create a PR record",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/prs/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PRController.all_history",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "history": {
+                      "items": {
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "pr_record_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "supporting_metrics": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "pr_record_id",
+                          "score",
+                          "beaten_on",
+                          "supporting_metrics"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "history"
+                  ],
+                  "title": "PRHistoryList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR history"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Score history of all my PRs, oldest first (ADR-194)",
         "tags": [
           "Pantheon"
         ]

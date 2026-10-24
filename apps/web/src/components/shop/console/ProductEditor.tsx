@@ -31,6 +31,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { addOptionValue, draftsFromProduct, MAX_OPTIONS, reconcileVariants, type VariantDraft } from "@/lib/shop/console";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 type Channel = "both" | "app" | "desk";
 
@@ -213,7 +214,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
         </div>
       </div>
 
-      <StaffPanel labelledBy="shop-photos" title={t("photos.title")}>
+      <StaffPanel guide="shop.editor.photos" labelledBy="shop-photos" title={t("photos.title")}>
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("photos.hint")}</p>
         <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {photos.photos.map((photo, index) => (
@@ -261,7 +262,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
         </ul>
       </StaffPanel>
 
-      <StaffPanel labelledBy="shop-basics" title={t("basics.title")}>
+      <StaffPanel guide="shop.editor.basics" labelledBy="shop-basics" title={t("basics.title")}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t("basics.name")} className="sm:col-span-2">
             <input className={inputClass} style={inputStyle} value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={120} />
@@ -275,7 +276,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
         </div>
       </StaffPanel>
 
-      <StaffPanel labelledBy="shop-price" title={t("price.title")}>
+      <StaffPanel guide="shop.editor.price" labelledBy="shop-price" title={t("price.title")}>
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label={t("price.price")}>
             <input className={inputClass} style={inputStyle} inputMode="decimal" value={price} onChange={(event) => setPrice(event.target.value)} required />
@@ -290,7 +291,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
         <p className="mt-2 text-xs" style={{ color: "var(--dim)" }}>{t("price.hint")}</p>
       </StaffPanel>
 
-      <StaffPanel labelledBy="shop-variants" title={t("variants.title")}>
+      <StaffPanel guide="shop.editor.variants" labelledBy="shop-variants" title={t("variants.title")}>
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("variants.hint")}</p>
         <div className="mt-3 flex flex-col gap-3">
           {options.map((option, index) => (
@@ -363,7 +364,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
         {product ? <p className="mt-2 text-xs" style={{ color: "var(--dim)" }}>{t("variants.ledgerNote")}</p> : null}
       </StaffPanel>
 
-      <StaffPanel labelledBy="shop-selling" title={t("selling.title")}>
+      <StaffPanel guide="shop.editor.selling" labelledBy="shop-selling" title={t("selling.title")}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("selling.channel")}</span>
@@ -408,6 +409,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
       </StaffPanel>
 
       <div
+        {...guideAnchor("shop.editor.save")}
         className="sticky bottom-[calc(var(--bottom-float-inset,0px)+0.5rem)] z-10 flex flex-wrap items-center justify-end gap-3 rounded-2xl p-3"
         style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", boxShadow: "var(--shadow-md)" }}
       >

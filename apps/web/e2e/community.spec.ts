@@ -205,6 +205,86 @@ test.describe("community", () => {
     await expect(page.getByRole("link", { name: /Eleni/ })).toHaveAttribute("href", "/people/member-2");
   });
 
+  test("the club's Feed keeps a fixed order: pinned · WOD · PRs · events · posts (vision §7.1)", async ({ page }) => {
+    await member(page);
+    const pinnedPost = { ...post, id: "post-pin", body: "Doors open at 07:00 on Monday", pinned: true, channel: { id: "ch-ann", kind: "announcements", name: null } };
+    const prPost = { ...post, id: "post-pr", body: "New deadlift PR: 140 kg", attachment_type: "pr" };
+    await page.route("**/api/me/feed**", (route) => route.fulfill(json({ posts: [post, prPost], pinned: [pinnedPost], next_cursor: null })));
+    await page.route("**/api/org/*/community/wod-today**", (route) =>
+      route.fulfill(
+        json({
+          date: "2026-10-20",
+          channel_id: null,
+          classes: [],
+          leaderboard: [],
+          logged_by_me: false,
+          score: null,
+          workout: { id: "wod-1", title: "Fran", type: "for_time", authoring_mode: "free_text", free_text_body: "21-15-9", sections: [] },
+        }),
+      ),
+    );
+    const startsAt = new Date(Date.now() + 3 * 86_400_000).toISOString();
+    await page.route("**/api/me/community/clubs/club-1/events**", (route) =>
+      route.fulfill(
+        json({
+          events: [
+            {
+              id: "event-1",
+              organization_id: "org-1",
+              club_id: "club-1",
+              club: { id: "club-1", name: "Box Kypseli", kind: "gym" },
+              box: { name: "Box Kypseli", slug: "kypseli", logo_url: null },
+              title: "Saturday partner WOD",
+              starts_at: startsAt,
+              ends_at: startsAt,
+              place: { name: "Box Kypseli", address: null, latitude: null, longitude: null, location_id: null },
+              capacity: 20,
+              spots_left: 10,
+              going_count: 10,
+              waitlist_count: 0,
+              price_cents: 0,
+              currency: "EUR",
+              open_to_non_members: false,
+              guest_pass_allowed: false,
+              guests_per_member: 0,
+              goers: null,
+              cancelled: false,
+              can_rsvp: true,
+              can_manage: false,
+              my: null,
+            },
+          ],
+        }),
+      ),
+    );
+    await page.goto("/clubs/club-1");
+
+    const order = [
+      page.getByText("Doors open at 07:00 on Monday"),
+      page.getByText("Fran", { exact: true }),
+      page.getByText("New deadlift PR: 140 kg"),
+      page.getByText("Saturday partner WOD", { exact: true }),
+      page.getByText("Who's in for Saturday's partner WOD?"),
+    ];
+    const tops: number[] = [];
+    for (const item of order) {
+      await expect(item).toBeVisible();
+      tops.push((await item.boundingBox())!.y);
+    }
+    expect([...tops].sort((a, b) => a - b)).toEqual(tops);
+    await expect(page.getByText("No posts yet.")).toHaveCount(0);
+  });
+
+  test("an empty club Feed shows no empty cards, only one quiet line", async ({ page }) => {
+    await member(page);
+    await page.route("**/api/me/feed**", (route) => route.fulfill(json({ posts: [], pinned: [], next_cursor: null })));
+    await page.goto("/clubs/club-1");
+
+    await expect(page.getByText("No posts yet.")).toHaveCount(1);
+    // No workout today: no WOD card at all.
+    await expect(page.getByRole("button", { name: "Log your score" })).toHaveCount(0);
+  });
+
   test("Channels lists member groups; a member joins one and suggests a new one for approval", async ({ page }) => {
     const calls = await member(page);
     await page.goto("/clubs/club-1");

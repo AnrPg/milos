@@ -39,8 +39,10 @@ import {
   buildOrigin,
   filterKey,
   isOneOff,
+  onlyKind,
   originKey,
   parseFilter,
+  parseKind,
   parseScope,
   readStored,
   scopeFromParams,
@@ -80,41 +82,70 @@ type AroundState = {
 
 const AroundContext = createContext<AroundState | null>(null);
 
+type FilterState = { filter: AroundFilter; restored: boolean; appliedId: string | null; appliedKind: AroundKind | null };
+const INITIAL_FILTER_STATE: FilterState = { filter: DEFAULT_FILTER, restored: false, appliedId: null, appliedKind: null };
+
 /**
- * The Γύρω μου state shared by /around and its «Δες όλα» pages: the filter
- * (restored from `?filter=<saved id>`, else the last-used one) and where the
- * search starts. It lives in the route's layout, so it survives moving
- * between the sections and a kind's list.
+ * The filter once the saved filters have arrived (or failed to), or null when
+ * nothing changes: first the last-used filter; a notification's `?filter=`
+ * applies its saved filter, also when it arrives later; and a `?kind=` link
+ * («Δες όλα», old `/around/<kind>` URLs) narrows «what» to that kind once.
+ */
+function restoredFilterState(
+  state: FilterState,
+  {
+    requestedId,
+    requestedKind,
+    linked,
+    lastUsed,
+  }: {
+    requestedId: string | null;
+    requestedKind: AroundKind | null;
+    /** The params of the saved filter `?filter=` names, once it is known. */
+    linked: unknown;
+    lastUsed: unknown;
+  },
+): FilterState | null {
+  const newId = Boolean(requestedId) && requestedId !== state.appliedId;
+  const newKind = requestedKind !== null && requestedKind !== state.appliedKind;
+  if (state.restored && !newId && !newKind) return null;
+  const base = linked
+    ? parseFilter(linked)
+    : state.restored
+      ? state.filter
+      : parseFilter(lastUsed ?? null);
+  return {
+    filter: newKind && requestedKind ? onlyKind(base, requestedKind) : base,
+    restored: true,
+    appliedId: requestedId,
+    appliedKind: requestedKind,
+  };
+}
+
+/**
+ * The Γύρω μου state: the filter (restored from `?filter=<saved id>`, else
+ * the last-used one, narrowed by `?kind=`) and where the search starts. It
+ * lives in the route's layout, so it survives navigating away and back.
  */
 export function AroundProvider({ children }: { children: ReactNode }) {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const params = useSearchParams();
   const requestedId = params.get("filter");
+  const requestedKind = parseKind(params.get("kind"));
   const savedQuery = useSavedAroundFilters();
-  const [state, setState] = useState<{ filter: AroundFilter; restored: boolean; appliedId: string | null }>({
-    filter: DEFAULT_FILTER,
-    restored: false,
-    appliedId: null,
-  });
+  const [state, setState] = useState<FilterState>(INITIAL_FILTER_STATE);
   const [origin, setOrigin] = useState<OriginChoice>({ type: "auto" });
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const settled = savedQuery.isSuccess || savedQuery.isError || !token;
-  // Restore once the saved filters arrive (or fail to); a notification's
-  // `?filter=` applies its saved filter, also when it arrives later.
-  if (settled && (!state.restored || (requestedId && requestedId !== state.appliedId))) {
-    const fromLink = requestedId ? savedQuery.data?.saved.find((entry) => entry.id === requestedId) : undefined;
-    const filter = fromLink
-      ? parseFilter(fromLink.params)
-      : state.restored
-        ? state.filter
-        : parseFilter(savedQuery.data?.last_used ?? null);
-    setState({ filter, restored: true, appliedId: requestedId });
-  }
+  const linked = requestedId ? savedQuery.data?.saved.find((entry) => entry.id === requestedId)?.params : undefined;
+  const lastUsed = savedQuery.data?.last_used;
+  const next = settled ? restoredFilterState(state, { requestedId, requestedKind, linked, lastUsed }) : null;
+  if (next) setState(next);
 
   const debounced = useDebounced(state.filter, 300);
-  const setFilter = useCallback((filter: AroundFilter) => setState((current) => ({ ...current, filter })), []);
+  const setFilter = useCallback((filter: AroundFilter) => setState((current) => ({ ...current, filter })), [setState]);
 
   const value = useMemo<AroundState>(
     () => ({
@@ -128,7 +159,7 @@ export function AroundProvider({ children }: { children: ReactNode }) {
       setSelectedId,
       saved: savedQuery.data?.saved ?? [],
     }),
-    [debounced, origin, savedQuery.data?.saved, selectedId, setFilter, state.filter, state.restored],
+    [debounced, origin, savedQuery.data?.saved, selectedId, setFilter, setOrigin, setSelectedId, state.filter, state.restored],
   );
 
   return <AroundContext.Provider value={value}>{children}</AroundContext.Provider>;

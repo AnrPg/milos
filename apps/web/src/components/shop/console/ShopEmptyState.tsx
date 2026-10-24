@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { primaryButtonClass, primaryButtonStyle, secondaryButtonClass, secondaryButtonStyle } from "@/components/staff/staff-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { guideAnchor } from "@/lib/guides/anchors";
 
 /**
  * The first visit: what the shop does and three steps. The steps are fixed
@@ -22,6 +23,7 @@ export function ShopEmptyState() {
       className="flex flex-col gap-5 rounded-[2rem] p-6 md:p-8"
       style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       data-testid="shop-empty"
+      {...guideAnchor("shop.empty")}
     >
       <div className="flex flex-col gap-2">
         <h2 id="shop-empty-title" className="text-xl font-semibold" style={{ color: "var(--text)" }}>

@@ -30,6 +30,7 @@ const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "";
 export function HelpPage() {
   const t = useTranslations("MemberApp");
   const tNav = useTranslations("Navigation");
+  const tGuides = useTranslations("Guides");
   const tCoach = useTranslations("SoloCoach");
   const tResets = useTranslations("passwordResets");
   const router = useRouter();
@@ -49,6 +50,8 @@ export function HelpPage() {
     <HubPage title={t("meHelp")} back={<BackToMe />}>
       <HubList>
         <HubListRow onClick={openProductTour} label={t("meTour")} />
+        {/* ADR-193 (walkthroughs): every guide, started again from here. */}
+        <HubListRow href="/guides" label={tGuides("ui.meRow")} detail={tGuides("ui.meRowHint")} />
         <HubListRow onClick={openOnboardingChecklist} label={t("meChecklist")} />
         <HubListRow onClick={() => setVisibilityOpen((open) => !open)} label={t("helpVisibility")} />
         {memberships.length > 0 ? (

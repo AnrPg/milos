@@ -15,7 +15,8 @@ defmodule PaleeWeb.WellnessJSON do
       sleep_goal_minutes: prefs.sleep_goal_minutes,
       hidden_items: prefs.hidden_items || [],
       item_order: Wellness.ordered_items(prefs.item_order || []),
-      water_reminder: prefs.water_reminder
+      water_reminder: prefs.water_reminder,
+      hide_macros: prefs.hide_macros
     }
   end
 

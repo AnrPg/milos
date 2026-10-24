@@ -11,6 +11,12 @@ import {
   withdrawFormReview,
   type FormReview,
 } from "@/api/coaching-extras";
+import {
+  fetchWellnessPreferences,
+  updateWellnessPreferences,
+  WELLNESS_KEY,
+  WELLNESS_PREFERENCES_KEY,
+} from "@/api/wellness";
 import { useSession } from "@/components/session-provider";
 import { ClientCard, ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { allowanceRemaining, hasCapability, responseSlaHours } from "@/components/client/entitlement";
@@ -388,17 +394,38 @@ function FormReviewItem({
   );
 }
 
-function NutritionPlanCard() {
+/**
+ * The coach's nutrition plan (ADR-159). Vision §8.6 (ADR-194): macros show
+ * only while there is a plan, and the member can hide them; the choice is
+ * kept with their wellness preferences (`hide_macros`) on every device. No
+ * plan, no card.
+ */
+export function NutritionPlanCard() {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
+  const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["me", "nutrition-plan"],
     enabled: Boolean(tokens?.access_token),
     queryFn: () => fetchMyNutritionPlan(tokens!.access_token),
   });
+  const preferences = useQuery({
+    queryKey: WELLNESS_PREFERENCES_KEY,
+    enabled: Boolean(tokens?.access_token) && Boolean(query.data),
+    queryFn: () => fetchWellnessPreferences(tokens!.access_token),
+  });
+  const setHidden = useMutation({
+    mutationFn: (hide: boolean) => updateWellnessPreferences(tokens!.access_token, { hide_macros: hide }),
+    onSuccess: (saved) => {
+      queryClient.setQueryData(WELLNESS_PREFERENCES_KEY, saved);
+      void queryClient.invalidateQueries({ queryKey: WELLNESS_KEY });
+    },
+  });
   const number = new Intl.NumberFormat(locale);
   const plan = query.data;
+  // Until the preference is read, hidden is the safe guess.
+  const macrosHidden = setHidden.isPending ? setHidden.variables : (preferences.data?.hide_macros ?? !preferences.isError);
   // ADR-159 (board 14, Q5): calories are the staff's working number and
   // never reach the member; the API leaves them out.
   const macros = plan
@@ -409,14 +436,15 @@ function NutritionPlanCard() {
       ].filter((macro): macro is typeof macro & { value: number } => typeof macro.value === "number")
     : [];
 
+  // No plan from the coach: no card (vision §4.2, §8.5).
+  if (query.isSuccess && !plan) return null;
+
   return (
     <ClientCard title={i18n("clNutritionTitle")}>
       {query.isPending ? (
         <LoadingLine />
-      ) : query.isError ? (
+      ) : query.isError || !plan ? (
         <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
-      ) : !plan ? (
-        <EmptyLine>{i18n("clNutritionEmpty")}</EmptyLine>
       ) : (
         <div className="flex flex-col gap-3">
           <div>
@@ -428,14 +456,38 @@ function NutritionPlanCard() {
             ) : null}
           </div>
           {macros.length > 0 ? (
-            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {macros.map((macro) => (
-                <div key={macro.key} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)" }}>
-                  <dt className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{macro.label}</dt>
-                  <dd className="mt-0.5 text-base font-semibold tabular-nums" style={{ color: "var(--text)" }}>{macro.text(macro.value)}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
+                  {macrosHidden ? i18n("clNutritionMacrosHidden") : i18n("clNutritionMacros")}
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={macrosHidden}
+                  disabled={preferences.isPending || setHidden.isPending}
+                  onClick={() => setHidden.mutate(!macrosHidden)}
+                  className="min-h-11 rounded-full px-3 text-xs font-semibold disabled:opacity-60"
+                  style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+                >
+                  {macrosHidden ? i18n("clNutritionShowMacros") : i18n("clNutritionHideMacros")}
+                </button>
+              </div>
+              {macrosHidden ? null : (
+                <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {macros.map((macro) => (
+                    <div key={macro.key} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)" }}>
+                      <dt className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{macro.label}</dt>
+                      <dd className="mt-0.5 text-base font-semibold tabular-nums" style={{ color: "var(--text)" }}>{macro.text(macro.value)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {setHidden.isError ? (
+                <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+                  {clientErrorMessage(setHidden.error, i18n)}
+                </p>
+              ) : null}
+            </div>
           ) : null}
           <p className="whitespace-pre-line break-words text-sm leading-6" style={{ color: "var(--text-soft)" }}>{plan.body}</p>
         </div>
