@@ -9,7 +9,6 @@ import { ComposeButton } from "@/components/community/ComposeSheet";
 import { ErrorLine, Sheet } from "@/components/community/Sheet";
 import { useMyClubs } from "@/components/community/use-community";
 import { FeedPage, HubCard } from "@/components/member-app/HubParts";
-import { FeedInboxButtons } from "@/components/chat/MessagesButton";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import {
@@ -72,12 +71,7 @@ export function AroundPage() {
   return (
     <FeedPage
       title={tMember("homeTitle")}
-      start={<ComposeButton clubs={clubs.data ?? []} />}
-      end={
-        <div className="flex items-center gap-2">
-          <FeedInboxButtons />
-        </div>
-      }
+      action={<ComposeButton clubs={clubs.data ?? []} />}
     >
       {/* Always there, so «+ Βρες» is reachable before the first club (vision §6.1). */}
       <ClubBar clubs={clubs.data ?? []} />

@@ -81,8 +81,8 @@ describe("client navigation", () => {
     const items = clientNavItems();
     const owner = (path: string) => activeItemId(path, items);
     expect(owner("/")).toBe("home");
-    // ADR-196: the inbox's home is the Feed (Μηνύματα).
-    expect(owner("/messages")).toBe("home");
+    // Μηνύματα is its own bottom-bar entry (2026-10-24), so no tab claims the inbox.
+    expect(owner("/messages")).not.toBe("home");
     for (const path of ["/box", "/box/workouts", "/box/schedule", "/box/appointments", "/box/videos", "/box/coach", "/workouts", "/class-timer/s1/display"]) {
       expect(owner(path)).toBe("box");
     }

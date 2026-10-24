@@ -1,31 +1,27 @@
-// The member app's floating bottom bar (brief §6.1, owner's call of
-// 2026-10-23): Feed · Box · Ημερολόγιο · Ειδοποιήσεις · avatar (Εγώ). What it
-// holds, where it never shows, and who gets it. Pure, so it is unit-tested.
+// The member app's floating bottom bar (brief §6.1, owner's calls of
+// 2026-10-23 and 2026-10-24): Feed · Box · Journal · Μηνύματα · avatar (Εγώ).
+// The bell lives in the auto-hiding top bar (components/nav/MemberTopBar.tsx),
+// as on Instagram. What the bar holds, where it never shows, and who gets it.
+// Pure, so it is unit-tested.
 
 import { clientNavItems, type NavItem } from "@/lib/role-navigation";
 
-/**
- * The bell sits in the bar, next to the avatar. Set to false for the 4-tab
- * fallback: the bar keeps the four tabs and the bell goes back to the Feed
- * header (♡ next to Μηνύματα), with nothing else to change.
- */
-export const BELL_IN_BOTTOM_NAV = true;
-
 export type BottomNavEntry =
   | { kind: "tab"; item: NavItem }
-  | { kind: "notifications" }
+  | { kind: "messages" }
   | { kind: "me"; item: NavItem };
 
 /**
  * The bar's entries in order. Box is always there (brief §6.1: the four tabs
- * are fixed); without a box it opens its empty "find a box" state.
+ * are fixed); without a box it opens its empty "find a box" state. Μηνύματα
+ * opens the one inbox (ADR-196) from every tab.
  */
-export function bottomNavEntries(bellInBar: boolean = BELL_IN_BOTTOM_NAV): BottomNavEntry[] {
+export function bottomNavEntries(): BottomNavEntry[] {
   const items = clientNavItems();
   const me = items.find((item) => item.id === "me")!;
   return [
     ...items.filter((item) => item.id !== "me").map((item) => ({ kind: "tab" as const, item })),
-    ...(bellInBar ? [{ kind: "notifications" as const }] : []),
+    { kind: "messages" as const },
     { kind: "me" as const, item: me },
   ];
 }
@@ -69,9 +65,9 @@ export function routeShowsBottomNav(pathname: string) {
 }
 
 /**
- * Who gets the member shell (the bar instead of the top bar): a signed-in
- * member or athlete, or an account without a box yet (Box then shows its
- * find-a-box state). Staff views, the vendor without a box and an account
+ * Who gets the member shell (the bottom bar and the member top bar instead of
+ * the console's top bar): a signed-in member or athlete, or an account
+ * without a box yet (Box then shows its find-a-box state). Staff views, the vendor without a box and an account
  * admin waiting for its box keep the top bar.
  */
 export function usesMemberShell(input: {
