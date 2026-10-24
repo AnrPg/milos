@@ -147,7 +147,7 @@ function List({
   render: (entry: FollowEntry) => React.ReactNode;
 }) {
   const t = useTranslations("Social");
-  const entries = query.data?.pages.flatMap((page) => page.entries) ?? [];
+  const entries = query.data?.pages.flatMap((page) => page.entries ?? []) ?? [];
   return (
     <>
       {query.isPending ? <p style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}

@@ -61,7 +61,7 @@ export type FeedFilter = {
 
 export async function fetchMyClubs(token: string) {
   const data = await apiRequest<{ clubs: CommunityClub[] }>("/me/clubs", { token });
-  return data.clubs;
+  return data.clubs ?? [];
 }
 
 export function fetchFeed(token: string, filter: FeedFilter, cursor: string | null, limit = 20) {

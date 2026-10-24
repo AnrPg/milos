@@ -25,7 +25,10 @@ defmodule Palee.Gamification.Domain.ChallengeSchedulePolicy do
       clipped_end = min_date(challenge.ends_at, ends_at)
       [{clipped_start, 1}, {Date.add(clipped_end, 1), -1}]
     end)
-    |> Enum.sort_by(fn {date, delta} -> {date, delta} end)
+    # Dates as day numbers: comparing Date structs directly orders them by
+    # their fields (day before month), so a range crossing a month end would
+    # close before it opened. Ends sort before starts on the same day.
+    |> Enum.sort_by(fn {date, delta} -> {Date.to_gregorian_days(date), delta} end)
     |> Enum.reduce({0, 0}, fn {_date, delta}, {current, max_seen} ->
       next = current + delta
       {next, max(max_seen, next)}

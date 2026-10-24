@@ -39,7 +39,14 @@ async function stub(page: Page) {
   await page.route("**/api/me/clubs", (route) => route.fulfill(json({ clubs: [] })));
   await page.route("**/api/me/social", (route) =>
     route.fulfill(
-      json({ posts_count: 3, followers_count: state.followers, following_count: 2, requests_count: state.requests, booking_sharing: state.sharing }),
+      json({
+        posts_count: 3,
+        followers_count: state.followers,
+        following_count: 2,
+        requests_count: state.requests,
+        booking_sharing: state.sharing,
+        follow_groups: { buddies: 0, followers_only: state.followers, following_only: 1 },
+      }),
     ),
   );
   await page.route("**/api/me/social/booking-sharing", (route) => {
@@ -98,17 +105,27 @@ test.describe("social", () => {
     const state = await stub(page);
     state.followers = 1;
     state.requests = 0;
-    await page.goto("/me/connections");
-    // The tabs fall back to a dropdown when they don't fit one row (SegmentPicker).
-    const tabs = page.getByRole("combobox", { name: "Connections" });
-    await expect(tabs).toContainText("1 follower");
+    await page.route("**/api/me/buddies-list**", (route) => route.fulfill(json({ entries: [], next_cursor: null })));
+    await page.goto("/me/connections?tab=followers");
+    // Six tabs: one row, a full grid or a dropdown, whichever fits (SegmentPicker).
+    const pickTab = async (value: string, label: RegExp) => {
+      const dropdown = page.getByRole("combobox", { name: "Connections" });
+      if (await dropdown.count()) {
+        await dropdown.click();
+        await page.getByRole("option", { name: label }).click();
+      } else {
+        await page.getByRole("tablist", { name: "Connections" }).locator(`[data-segment="${value}"]`).click();
+      }
+    };
+    await expect(page.getByRole("tablist", { name: "Connections" }).or(page.getByRole("combobox", { name: "Connections" }))).toContainText(
+      "Follow you 1",
+    );
     await expect(page.getByRole("link", { name: /Nikos/ })).toHaveAttribute("href", "/people/person-2");
     await page.getByRole("searchbox", { name: "Search people" }).fill("maria");
     await expect(page.getByText("Nothing matches that search.")).toBeVisible();
     await page.getByRole("searchbox", { name: "Search people" }).fill("NIK");
     await expect(page.getByRole("link", { name: /Nikos/ })).toBeVisible();
-    await tabs.click();
-    await page.getByRole("option", { name: "Following 2" }).click();
+    await pickTab("following", /^You follow 1/);
     await expect(page).toHaveURL(/tab=following/);
     await expect(page.getByRole("link", { name: /Eleni/ })).toBeVisible();
   });

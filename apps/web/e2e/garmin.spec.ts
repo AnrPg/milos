@@ -191,7 +191,7 @@ test.describe("Garmin on Συνδεδεμένες συσκευές", () => {
     await expect(row.getByRole("status")).toHaveText("Asked Garmin to resend the last two days.");
     await expect(row.getByTestId("garmin-last-sync")).toHaveText("Last synced just now");
     await row.getByRole("button", { name: "Sync now" }).click();
-    await expect(row.getByRole("status")).toHaveText("Garmin synced a moment ago. Try again in a few minutes.");
+    await expect(row.getByRole("alert")).toHaveText("Garmin synced a moment ago. Try again in a few minutes.");
 
     const patched = page.waitForRequest((request) => request.url().endsWith("/me/devices/garmin") && request.method() === "PATCH");
     await row.getByRole("button", { name: "What syncs" }).click();
@@ -484,7 +484,7 @@ test.describe("Garmin in Πρόοδος and the sync choices", () => {
     await row.getByRole("button", { name: "What syncs" }).click();
     await row.getByRole("switch", { name: "Sleep" }).click();
     await row.getByRole("button", { name: "Save" }).click();
-    await expect(row.getByRole("status")).toHaveText("Tick the health-data line to continue.");
+    await expect(row.getByRole("alert")).toHaveText("Tick the health-data line to continue.");
     await expect(row.getByRole("button", { name: "Save" })).toBeDisabled();
     await row.getByRole("checkbox").check();
     await row.getByRole("button", { name: "Save" }).click();
