@@ -90,16 +90,16 @@ defmodule Palee.Application.DispatchMessageDelivery do
   # page, so their link opens that conversation there, not the gym's inbox.
   defp thread_url(%{context_type: :box, context_id: user_id} = thread, user_id) do
     if Organizations.membership_standing(thread.organization_id, user_id) == :member do
-      "/account/activity/chats?thread=#{thread.id}"
+      "/messages?thread=#{thread.id}"
     else
       case Organizations.public_boxes([thread.organization_id]) do
         [%{slug: slug}] -> "/b/#{slug}/chat"
-        _unpublished -> "/account/activity/chats?thread=#{thread.id}"
+        _unpublished -> "/messages?thread=#{thread.id}"
       end
     end
   end
 
-  defp thread_url(thread, _user_id), do: "/account/activity/chats?thread=#{thread.id}"
+  defp thread_url(thread, _user_id), do: "/messages?thread=#{thread.id}"
 
   # Coaching messages and messages from the box reach the inbox; chat stays
   # in the chat.

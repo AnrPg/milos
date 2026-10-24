@@ -17,7 +17,7 @@ defmodule Palee.Application.NotifyAppointment do
 
   def cancelled(recipient_id, slot) do
     # The coach manages appointments in the admin screen; clients in their own.
-    url = if recipient_id == slot.coach_id, do: "/admin/appointments", else: "/appointments"
+    url = if recipient_id == slot.coach_id, do: "/admin/appointments", else: "/box/appointments"
 
     Notifications.process_event("appointment_cancelled", %{
       user_id: recipient_id,

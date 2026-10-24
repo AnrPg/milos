@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "One private, self-hosted home for group classes, personalised programming, live workout execution, coaching conversations, and progress that belongs to the athlete.",
     "createAnAccount3f4f547": "Create an account",
     "signInada2e9e": "Sign in",
-    "conversationHistory0f18fb3": "Conversation History",
     "loading33ce417": "Loading…",
-    "noConversations06b83a9": "No conversations.",
-    "selectAConversationToViewMessagesaf2cf2c": "Select a conversation to view messages.",
     "availablePackages48a5129": "Available Packages",
     "closebf5d9ce": "✕ Close",
     "noPackagesAvailable14160fb": "No packages available.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Download .ics",
     "loadingCalendarLinks1dad320": "Loading calendar links…",
     "writeAMessage24bf2a3": "Write a message…",
-    "chat67305ee": "← Chat",
     "searchOrStartAConversationabb1d82": "Search or start a conversation…",
     "noConversationsYetSearchToStartOne1a91cf7": "No conversations yet. Search to start one.",
     "hideConversationdfb77ca": "Hide conversation",
@@ -1291,9 +1287,6 @@
     "coaches181feb6": "Coaches",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Program, communicate, and understand training progress without surveillance or ads.",
     "directMessagefc7f864": "Direct message",
-    "workoutThreada03f1e1": "Workout thread",
-    "classThreadf030236": "Class thread",
-    "thread7863f75": "Thread",
     "eurd06e073": "EUR",
     "downloada479c9c": "Download",
     "billed763fe55": "Billed",
@@ -1743,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "e.g. 4 rounds + 3 reps",
     "fail2758e32": "Fail",
     "capa8fba29": "· Cap",
-    "directbc81524": "Direct",
-    "class41ff354": "Class",
-    "directChat3892e2c": "Direct Chat",
     "createAndManagePromotionalOffers46d33bb": "Create and manage promotional offers.",
     "reviewReferralActivityAndRewardActions8ea1271": "Review referral activity and reward actions.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Manage the packages used by memberships and entitlements.",
@@ -4302,7 +4292,6 @@
     "msgTopicFacility": "Facility",
     "msgSendAsCoaching": "As a coaching message",
     "msgSendAsCoachingHint": "Counts as a coaching touchpoint for your client.",
-    "chatsTabBox": "Box",
     "chatsBoxThread": "Your gym",
     "coachLatestTitle": "Latest from your coach",
     "coachLatestEmpty": "No messages from your coach yet.",
@@ -5111,14 +5100,12 @@
     "meSharingHint": "What your coach and others can see",
     "mePayments": "Payments & receipts",
     "mePaymentsHint": "Invoices, refunds and your package",
-    "meChats": "Conversations",
     "meSettings": "Settings",
     "meSettingsHint": "Profile, language, theme, account",
     "meTour": "Take the tour",
     "meChecklist": "Getting started",
     "meConsole": "Management",
     "meConsoleHint": "Open the staff console",
-    "meMyBoxes": "My boxes",
     "bookingStatus": {
       "approved": "Booked",
       "pending": "Pending",
@@ -5474,7 +5461,45 @@
         "invalid_media": "The photo isn't ready. Pick it again."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Help & tour",
+    "meHelpHint": "Tour, first steps, getting in touch",
+    "meHelpResetsWaiting": "{count, plural, one {# password reset waiting} other {# password resets waiting}}",
+    "helpVisibility": "How visibility works",
+    "helpVisibilityPrivate": "Everything you log in the Journal is yours: only you see it unless you choose otherwise.",
+    "helpVisibilityCoach": "Your coach sees only what you allow in Sharing. Injuries are always visible to them, for your safety.",
+    "helpVisibilityPosts": "Your posts show to whoever you pick when you publish them: the club, your followers or everyone.",
+    "helpContactBox": "Contact your gym",
+    "helpContactBoxHint": "Write to your gym from Messages",
+    "helpReport": "Report a problem",
+    "helpReportSubject": "A problem in Palee",
+    "helpStaffOnly": "Staff only",
+    "settingsUnitsHint": "How weight, height and girths are shown.",
+    "settingsSectionsHint": "Which sections your Journal has and how your weight shows.",
+    "mePrsPrivate": "{count, plural, one {One more PR is private.} other {The other # PRs are private.}} Choose which show in Sharing & visibility.",
+    "mePrsNoneShown": "You don't show any PRs on your profile yet.",
+    "sharing": {
+      "coachSeesTitle": "My coach sees",
+      "coachSeesHint": "What reaches your coaches without you sending it each time.",
+      "injuriesAlways": "Injuries are always visible to your coach, for your safety.",
+      "communityTitle": "Community",
+      "communityHint": "Where you appear in clubs and to other people.",
+      "prCelebrations": "PR celebrations",
+      "prCelebrationsHint": "An automatic card in your club when you set a PR",
+      "challenges": "Challenges",
+      "challengesHint": "Your name in challenge rankings",
+      "profilePrsTitle": "PRs on your profile",
+      "profilePrsHint": "People who follow you see only the ones you turn on. The rest stay private.",
+      "profilePrsEmpty": "You have no PRs yet.",
+      "defaultsTitle": "Default for new entries",
+      "defaultsHint": "Where each new entry starts. You can change any one of them whenever you like.",
+      "defaultKind": {
+        "workout": "Workouts",
+        "note": "Notes",
+        "check_in": "Check-ins"
+      },
+      "saveError": "That didn't save. Try again."
+    }
   },
   "Community": {
     "all": "All",
@@ -7493,7 +7518,7 @@
     "helpIntro": "Use a soft tape, on bare skin, snug but not tight. Measure at the same time of day, ideally in the morning.",
     "helpPhotos": "For photos: same place, same light, same distance. The timer gives you 10 seconds to step back.",
     "settingsTitle": "Body settings",
-    "settingsHubHint": "Units, weight display, photos, reminder",
+    "settingsHubHint": "Photos, measurement reminder",
     "settingsIntro": "Your body data is private by default. Here you choose how it shows and who sees it.",
     "unitsLabel": "Units",
     "sectionsLabel": "Journal sections",
@@ -7664,7 +7689,8 @@
       "share_photo_missing": "Both measurements need a ready photo of that pose.",
       "media_not_ready": "A photo is still processing. Try again in a moment."
     },
-    "fromGarmin": "from Garmin"
+    "fromGarmin": "from Garmin",
+    "unitsAndSectionsLink": "Units & sections in Settings"
   },
   "Referrals": {
     "title": "Bring a friend",
@@ -10866,9 +10892,7 @@
   },
   "Conversations": {
     "title": "Messages",
-    "inbox": "Inbox",
     "requests": "Requests",
-    "foldersLabel": "Folders",
     "requestsEntry": "Message requests ({count})",
     "buddy": "Buddy",
     "you": "You: {text}",
@@ -10898,7 +10922,6 @@
     "message": "Message",
     "messageA11y": "Message {name}",
     "viewProfile": "View {name}'s profile",
-    "searchPlaceholder": "Search people by name or @handle",
     "searchEmpty": "No one found.",
     "notif_person_message_title": "Message from {name}",
     "notif_person_message_body": "{name} sent you a message.",
@@ -11196,5 +11219,20 @@
     "showAll": "Show all ({count})",
     "showFewer": "Show fewer",
     "moreInConsole": "See all in the console"
+  },
+  "Inbox": {
+    "title": "Messages",
+    "segmentsLabel": "Which messages to show",
+    "segment": {
+      "all": "All",
+      "coach": "Coach",
+      "clubs": "Clubs",
+      "partners": "Partners"
+    },
+    "loading": "Loading messages…",
+    "emptySegment": "No conversations here yet.",
+    "workoutThread": "Workout thread",
+    "classThread": "Class thread",
+    "searchAtGym": "At your gym"
   }
 }

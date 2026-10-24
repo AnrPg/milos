@@ -2940,6 +2940,24 @@ export interface paths {
         patch: operations["PaleeWeb.JournalController.update_note"];
         trace?: never;
     };
+    "/api/me/journal/visibility-defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who sees my new journal entries, per kind (ADR-196) */
+        get: operations["PaleeWeb.JournalController.visibility_defaults"];
+        /** Set who sees my new entries of one kind (workout, note, check_in; ADR-196) */
+        put: operations["PaleeWeb.JournalController.put_visibility_default"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/media/capabilities": {
         parameters: {
             query?: never;
@@ -12248,6 +12266,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/profile/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The PRs a person shows on their profile, as a follower sees them (ADR-196) */
+        get: operations["PaleeWeb.PRController.profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs/{id}": {
         parameters: {
             query?: never;
@@ -12293,6 +12328,23 @@ export interface paths {
         /** Get score history for a PR */
         get: operations["PaleeWeb.PRController.history"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prs/{id}/profile-audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Show a PR on my profile to followers, or keep it private (ADR-196) */
+        put: operations["PaleeWeb.PRController.profile_audience"];
         post?: never;
         delete?: never;
         options?: never;
@@ -42000,8 +42052,12 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
+                    /** @description ADR-196: appear in challenge rankings (on by default) */
+                    challenge_rankings?: boolean;
                     /** @description Day-of-week indices (0=Sun..6=Sat) treated as rest days */
                     off_days?: number[];
+                    /** @description ADR-196: an automatic card in my clubs when I set a PR (off by default) */
+                    pr_celebrations?: boolean;
                 };
             };
         };
@@ -53450,6 +53506,88 @@ export interface operations {
                     "application/json": {
                         note: components["schemas"]["JournalNote"];
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.JournalController.visibility_defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The rung a new entry of each kind starts on (ADR-139 §3) */
+                        defaults: {
+                            /** @enum {string} */
+                            check_in: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            note: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            pr: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            workout: "private" | "coach_can_view";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.JournalController.put_visibility_default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "workout" | "note" | "check_in";
+                    /** @enum {string} */
+                    visibility: "private" | "coach_can_view";
+                };
+            };
+        };
+        responses: {
+            /** @description Defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The rung a new entry of each kind starts on (ADR-139 §3) */
+                        defaults: {
+                            /** @enum {string} */
+                            check_in: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            note: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            pr: "private" | "coach_can_view";
+                            /** @enum {string} */
+                            workout: "private" | "coach_can_view";
+                        };
+                    };
+                };
+            };
+            /** @description Unknown kind or rung */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -100399,6 +100537,43 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PRController.profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile PRs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        prs: {
+                            /** Format: date */
+                            beaten_on: string;
+                            current_score: number;
+                            higher_is_better: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            supporting_metrics?: Record<string, never>;
+                            /** @enum {string} */
+                            unit: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PRController.delete": {
         parameters: {
             query?: never;
@@ -100568,6 +100743,55 @@ export interface operations {
             };
             /** @description Error */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PRController.profile_audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Audience */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "private" | "followers";
+                };
+            };
+        };
+        responses: {
+            /** @description PR */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Един частен, самостоятелно хостван дом за групови класове, персонализирано програмиране, изпълнение на тренировки на живо, треньорски разговори и напредък, който принадлежи на спортиста.",
     "createAnAccount3f4f547": "Създайте акаунт",
     "signInada2e9e": "влезте",
-    "conversationHistory0f18fb3": "История на разговорите",
     "loading33ce417": "Зарежда се...",
-    "noConversations06b83a9": "Без разговори.",
-    "selectAConversationToViewMessagesaf2cf2c": "Изберете разговор, за да видите съобщенията.",
     "availablePackages48a5129": "Налични пакети",
     "closebf5d9ce": "✕ Затворете",
     "noPackagesAvailable14160fb": "Няма налични пакети.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Изтеглете .ics",
     "loadingCalendarLinks1dad320": "Връзките към календара се зареждат...",
     "writeAMessage24bf2a3": "Напишете съобщение...",
-    "chat67305ee": "← Чат",
     "searchOrStartAConversationabb1d82": "Търсете или започнете разговор...",
     "noConversationsYetSearchToStartOne1a91cf7": "Все още няма разговори. Търсете, за да започнете.",
     "hideConversationdfb77ca": "Скриване на разговора",
@@ -1291,9 +1287,6 @@
     "coaches181feb6": "Треньори",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Програмирайте, комуникирайте и разбирайте напредъка на обучението без наблюдение или реклами.",
     "directMessagefc7f864": "Директно съобщение",
-    "workoutThreada03f1e1": "Нишка за тренировка",
-    "classThreadf030236": "Нишка на класа",
-    "thread7863f75": "Нишка",
     "eurd06e073": "евро",
     "downloada479c9c": "Изтегляне",
     "billed763fe55": "Таксуван",
@@ -1743,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "напр. 4 кръга + 3 повторения",
     "fail2758e32": "Неуспех",
     "capa8fba29": "· Капачка",
-    "directbc81524": "Директен",
-    "class41ff354": "Клас",
-    "directChat3892e2c": "Директен чат",
     "createAndManagePromotionalOffers46d33bb": "Създавайте и управлявайте промоционални оферти.",
     "reviewReferralActivityAndRewardActions8ea1271": "Прегледайте активността на препоръчаните потребители и възнаградителните действия.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Управлявайте пакетите, използвани от членства и права.",
@@ -4302,7 +4292,6 @@
     "msgTopicFacility": "Помещения",
     "msgSendAsCoaching": "Като съобщение за коучинг",
     "msgSendAsCoachingHint": "Отчита се като контакт за коучинг с клиента.",
-    "chatsTabBox": "Зала",
     "chatsBoxThread": "Вашата зала",
     "coachLatestTitle": "Последно от треньора",
     "coachLatestEmpty": "Все още няма съобщения от треньора ви.",
@@ -5111,14 +5100,12 @@
     "meSharingHint": "Какво виждат треньорът и другите",
     "mePayments": "Плащания и разписки",
     "mePaymentsHint": "Фактури, възстановявания и вашият пакет",
-    "meChats": "Разговори",
     "meSettings": "Настройки",
     "meSettingsHint": "Профил, език, тема, акаунт",
     "meTour": "Разгледай приложението",
     "meChecklist": "Първи стъпки",
     "meConsole": "Управление",
     "meConsoleHint": "Отвори конзолата на персонала",
-    "meMyBoxes": "Моите зали",
     "bookingStatus": {
       "approved": "Запазено",
       "pending": "Чака одобрение",
@@ -5474,7 +5461,45 @@
         "invalid_media": "Снимката не е готова. Избери я отново."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Помощ и обиколка",
+    "meHelpHint": "Обиколка, първи стъпки, връзка",
+    "meHelpResetsWaiting": "{count, plural, one {# чакащо нулиране на парола} other {# чакащи нулирания на парола}}",
+    "helpVisibility": "Как работи видимостта",
+    "helpVisibilityPrivate": "Всичко, което записвате в Дневника, е ваше: виждате го само вие, освен ако не изберете друго.",
+    "helpVisibilityCoach": "Треньорът ви вижда само това, което разрешите в Споделяне. Контузиите вижда винаги, заради вашата безопасност.",
+    "helpVisibilityPosts": "Публикациите ви се виждат от тези, които изберете при публикуване: клуба, последователите ви или всички.",
+    "helpContactBox": "Връзка със залата",
+    "helpContactBoxHint": "Пишете на залата от Съобщения",
+    "helpReport": "Подаване на сигнал за проблем",
+    "helpReportSubject": "Проблем в Palee",
+    "helpStaffOnly": "Само за персонала",
+    "settingsUnitsHint": "Как се показват тегло, ръст и обиколки.",
+    "settingsSectionsHint": "Какви раздели има Дневникът ви и как се показва теглото.",
+    "mePrsPrivate": "{count, plural, one {Още един PR е личен.} other {Останалите # PR са лични.}} Изберете кои се виждат от Споделяне и видимост.",
+    "mePrsNoneShown": "Все още не показвате PR в профила си.",
+    "sharing": {
+      "coachSeesTitle": "Треньорът ми вижда",
+      "coachSeesHint": "Какво стига до треньорите ви, без да го изпращате всеки път.",
+      "injuriesAlways": "Контузиите винаги се виждат от треньора, заради вашата безопасност.",
+      "communityTitle": "Общност",
+      "communityHint": "Къде се появявате в клубовете и пред другите.",
+      "prCelebrations": "Празнуване на PR",
+      "prCelebrationsHint": "Автоматична карта в клуба, когато поставите PR",
+      "challenges": "Предизвикателства",
+      "challengesHint": "Името ви в класирането на предизвикателствата",
+      "profilePrsTitle": "PR в профила ви",
+      "profilePrsHint": "Последователите ви виждат само включените. Останалите остават лични.",
+      "profilePrsEmpty": "Все още нямате PR.",
+      "defaultsTitle": "По подразбиране за нови записи",
+      "defaultsHint": "Откъде започва всеки нов запис. Можете да промените всеки поотделно по всяко време.",
+      "defaultKind": {
+        "workout": "Тренировки",
+        "note": "Бележки",
+        "check_in": "Чекиране"
+      },
+      "saveError": "Не се запази. Опитайте отново."
+    }
   },
   "Community": {
     "all": "Всички",
@@ -7493,7 +7518,7 @@
     "helpIntro": "С мек шивашки метър, върху кожата, плътно, но не стегнато. Мери по едно и също време на деня, най-добре сутрин.",
     "helpPhotos": "За снимките: същото място, същата светлина, същото разстояние. Таймерът ти дава 10 секунди да се отдръпнеш.",
     "settingsTitle": "Настройки на „Тяло“",
-    "settingsHubHint": "Мерни единици, тегло, снимки, напомняне",
+    "settingsHubHint": "Снимки, напомняне за измерване",
     "settingsIntro": "Данните за тялото ти са лични по подразбиране. Тук избираш как се показват и кой ги вижда.",
     "unitsLabel": "Мерни единици",
     "sectionsLabel": "Раздели на дневника",
@@ -7664,7 +7689,8 @@
       "share_photo_missing": "И двете измервания трябва да имат готова снимка на тази поза.",
       "media_not_ready": "Снимка все още се обработва. Опитай след малко."
     },
-    "fromGarmin": "от Garmin"
+    "fromGarmin": "от Garmin",
+    "unitsAndSectionsLink": "Единици и раздели в Настройки"
   },
   "Referrals": {
     "title": "Доведи приятел",
@@ -10866,9 +10892,7 @@
   },
   "Conversations": {
     "title": "Съобщения",
-    "inbox": "Входящи",
     "requests": "Заявки",
-    "foldersLabel": "Папки",
     "requestsEntry": "Заявки за съобщения ({count})",
     "buddy": "Приятелче",
     "you": "Ти: {text}",
@@ -10898,7 +10922,6 @@
     "message": "Съобщение",
     "messageA11y": "Пиши на {name}",
     "viewProfile": "Профилът на {name}",
-    "searchPlaceholder": "Търси хора по име или @псевдоним",
     "searchEmpty": "Няма намерени хора.",
     "notif_person_message_title": "Съобщение от {name}",
     "notif_person_message_body": "{name} ти изпрати съобщение.",
@@ -11196,5 +11219,20 @@
     "showAll": "Покажи всички ({count})",
     "showFewer": "Покажи по-малко",
     "moreInConsole": "Всичко в администрацията"
+  },
+  "Inbox": {
+    "title": "Съобщения",
+    "segmentsLabel": "Кои съобщения да се показват",
+    "segment": {
+      "all": "Всички",
+      "coach": "Треньор",
+      "clubs": "Клубове",
+      "partners": "Партньори"
+    },
+    "loading": "Зареждане на съобщенията…",
+    "emptySegment": "Все още няма разговори тук.",
+    "workoutThread": "Разговор за тренировка",
+    "classThread": "Разговор за занятие",
+    "searchAtGym": "Във вашата зала"
   }
 }

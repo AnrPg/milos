@@ -155,7 +155,7 @@ export function notificationTargetUrl(
     notification.type === "chat_message" &&
     typeof notification.payload.thread_id === "string"
   ) {
-    return `/me/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
+    return `/messages?thread=${encodeURIComponent(notification.payload.thread_id)}`;
   }
 
   if (!rawUrl) return null;

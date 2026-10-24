@@ -139,7 +139,7 @@ test.describe("Box › My clients", () => {
     await expect(section.getByRole("heading", { name: "My clients" })).toBeVisible();
 
     // The reply queue opens the thread itself.
-    await expect(section.getByRole("link", { name: /Eleni.*Overdue/ })).toHaveAttribute("href", "/me/activity/chats?thread=t-1");
+    await expect(section.getByRole("link", { name: /Eleni.*Overdue/ })).toHaveAttribute("href", "/messages?filter=coach&thread=t-1");
 
     // Today's desk: 1 of 2 in; Kostas is marked from the roster.
     const deskRow = section.getByRole("button", { name: /WOD 18:00/ });

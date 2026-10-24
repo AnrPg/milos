@@ -53,6 +53,16 @@ defmodule Palee.Pantheon do
   # the member's `pr` default in the Journal context).
   defdelegate set_record_visibility(id, user_id, rung), to: Palee.Pantheon.PRStore
   defdelegate move_records(user_id, from, to), to: Palee.Pantheon.PRStore
+  defdelegate set_profile_audience(id, user_id, audience), to: Palee.Pantheon.PRStore
+
+  defdelegate list_profile_records(owner_user_id),
+    to: Palee.Pantheon.PRStore,
+    as: :list_profile_prs
+
+  defdelegate validate_profile_audience(audience),
+    to: Palee.Pantheon.Domain.ProfileAudience,
+    as: :validate
+
   defdelegate list_record_items(user_id, bound, limit, scope), to: Palee.Pantheon.PRStore
 
   # ADR-129 explicit sharing grants.

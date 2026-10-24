@@ -188,7 +188,7 @@ defmodule Palee.Application.PublishWorkout do
         scheduled_for: Date.to_iso8601(target.scheduled_for),
         change_type: "sections_updated",
         workout_title: workout.title,
-        url: "/my-workouts?open_assignment=#{target.assigned_workout_id}"
+        url: "/box/workouts?open_assignment=#{target.assigned_workout_id}"
       }
 
       unless Notifications.enqueue_workout_changed(target.user_id, payload) == :ok do
@@ -207,7 +207,7 @@ defmodule Palee.Application.PublishWorkout do
         training_type: to_string(training_type || ""),
         change_type: "sections_updated",
         workout_title: workout.title,
-        url: "/schedule?open_slot=#{Map.get(target, :scheduled_class_id)}"
+        url: "/box/schedule?open_slot=#{Map.get(target, :scheduled_class_id)}"
       }
 
       unless Notifications.enqueue_workout_changed(target.user_id, payload) == :ok do

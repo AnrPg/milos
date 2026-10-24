@@ -13,50 +13,28 @@ import {
   grantHealthConsent,
   withdrawHealthConsent,
   type BodySettingsUpdate,
-  type BodyUnits,
-  type BodyVisibility,
-  type WeightDisplay,
 } from "@/api/body";
 import { LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { ChoicePill, ErrorLine } from "@/components/community/Sheet";
 import { Card, Eyebrow, PillButton, dateFormat, key } from "@/components/body/BodyBits";
+import { Switch } from "@/components/body/BodyPreferenceSettings";
 import { bodyErrorMessage } from "@/components/body/errors";
 import { useBodySettings, useBodyToken, useHealthConsents, useUpdateBodySettings } from "@/components/body/use-body";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-const SECTIONS = ["body", "wellness", "cravings"] as const;
 const REMINDERS: (number | null)[] = [null, 2, 4];
 
-function Switch({ checked, onChange, label, hint, disabled }: { checked: boolean; onChange: (next: boolean) => void; label: string; hint?: string; disabled?: boolean }) {
-  return (
-    <label className="flex min-h-11 items-center justify-between gap-3">
-      <span className="flex flex-col">
-        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{label}</span>
-        {hint ? <span className="text-xs" style={{ color: "var(--dim)" }}>{hint}</span> : null}
-      </span>
-      <input
-        type="checkbox"
-        role="switch"
-        checked={checked}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
-        className="h-5 w-5 shrink-0"
-        style={{ accentColor: "var(--primary)" }}
-      />
-    </label>
-  );
-}
-
 /**
- * Ρυθμίσεις › Σώμα (ADR-158 §7, board 13): units, how weight shows, which
- * journal sections exist, the reminder, blur, the default «ποιος τη
- * βλέπει», the body-photo consent with withdrawal, who of your coaches
- * looked and when, and deleting every photo after an in-page confirmation.
+ * Σώμα › Ρυθμίσεις (ADR-158 §7, board 13): the measurement reminder, blur,
+ * the body-photo consent with withdrawal, who of your coaches looked and
+ * when, and deleting every photo after an in-page confirmation. Units and
+ * journal sections live in Εγώ › Ρυθμίσεις, who sees a new measurement in
+ * Κοινοποίηση & ορατότητα (ADR-196: one home each).
  */
 export function BodySettingsPage() {
   const t = useTranslations("Body");
-  const goalsT = useTranslations("WodGoals");
+  const tMe = useTranslations("MemberApp");
   const tUi = useUiTranslations();
   const locale = useUiLocale();
   const token = useBodyToken();
@@ -97,48 +75,11 @@ export function BodySettingsPage() {
         <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
         <h1 className="mt-1 text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("settingsTitle")}</h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("settingsIntro")}</p>
+        <p className="mt-2 flex flex-wrap gap-x-4 text-sm font-semibold">
+          <Link href="/me/settings#units" style={{ color: "var(--primary)" }}>{t("unitsAndSectionsLink")} ›</Link>
+          <Link href="/me/sharing#defaults" style={{ color: "var(--primary)" }}>{tMe("meSharing")} ›</Link>
+        </p>
       </div>
-
-      <Card label={t("unitsLabel")}>
-        <Eyebrow>{t("unitsLabel")}</Eyebrow>
-        <div role="radiogroup" aria-label={t("unitsLabel")} className="flex gap-2">
-          {(["metric", "imperial"] as BodyUnits[]).map((item) => (
-            <ChoicePill key={item} selected={prefs.units === item} onSelect={() => save({ units: item })}>
-              {t(key("units", item))}
-            </ChoicePill>
-          ))}
-        </div>
-      </Card>
-
-      <Card label={t("weightDisplayQuestion")}>
-        <Eyebrow>{t("weightDisplayQuestion")}</Eyebrow>
-        <div role="radiogroup" aria-label={t("weightDisplayQuestion")} className="flex flex-col gap-2">
-          {(["number", "trend", "hidden"] as WeightDisplay[]).map((item) => (
-            <ChoicePill key={item} selected={prefs.weight_display === item} onSelect={() => save({ weight_display: item })} hint={t(key("weightDisplayHint", item))}>
-              {t(key("weightDisplay", item))}
-            </ChoicePill>
-          ))}
-        </div>
-      </Card>
-
-      <Card label={t("sectionsLabel")}>
-        <Eyebrow>{t("sectionsLabel")}</Eyebrow>
-        <p className="text-xs" style={{ color: "var(--dim)" }}>{t("sectionsHint")}</p>
-        {SECTIONS.map((section) => (
-          <Switch
-            key={section}
-            label={t(key("section", section))}
-            checked={prefs.journal_sections[section] !== false}
-            onChange={(next) => save({ journal_sections: { [section]: next } })}
-          />
-        ))}
-        <Switch
-          label={goalsT("settings.feltPrompt")}
-          hint={goalsT("settings.feltPromptHint")}
-          checked={prefs.felt_prompt_without_goals !== false}
-          onChange={(next) => save({ felt_prompt_without_goals: next })}
-        />
-      </Card>
 
       <Card label={t("reminderLabel")}>
         <Eyebrow>{t("reminderLabel")}</Eyebrow>
@@ -199,17 +140,6 @@ export function BodySettingsPage() {
             </p>
           ) : null}
           <ErrorLine message={deleteAll.error ? bodyErrorMessage(deleteAll.error, t, tUi) : null} />
-        </div>
-      </Card>
-
-      <Card label={t("defaultVisibilityLabel")}>
-        <Eyebrow>{t("defaultVisibilityLabel")}</Eyebrow>
-        <div role="radiogroup" aria-label={t("defaultVisibilityLabel")} className="flex flex-col gap-2">
-          {(["private", "coach_numbers", "coach_full"] as BodyVisibility[]).map((item) => (
-            <ChoicePill key={item} selected={prefs.default_visibility === item} onSelect={() => save({ default_visibility: item })} hint={t(key("visibilityHint", item))}>
-              {t(key("visibility", item))}
-            </ChoicePill>
-          ))}
         </div>
       </Card>
 

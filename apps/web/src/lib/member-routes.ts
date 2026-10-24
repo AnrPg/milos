@@ -20,7 +20,24 @@ export const MEMBER_ROUTE_MOVES: ReadonlyArray<readonly [from: string, to: strin
   ["/reviews", "/journal/reviews"],
   ["/profile", "/me/settings"],
   ["/account/billing", "/me/payments"],
+  // ADR-196: one inbox. The old chats page and ADR-193's person
+  // conversations both open /messages (?thread=, ?folder=, /:id kept).
+  ["/account/activity/chats", "/messages"],
+  ["/me/activity/chats", "/messages"],
+  ["/me/messages", "/messages"],
   ["/account/activity", "/me/activity"],
+  // ADR-196: paths the API's notifications used to name.
+  ["/box/shop/products", "/box/shop/product"],
+  ["/journal/wellness", "/journal/wellbeing"],
+];
+
+/**
+ * Old paths with no page of their own that open a place on another page
+ * (ADR-196). Exact matches only: `/partners/:id` is a real page.
+ */
+export const MEMBER_EXACT_MOVES: ReadonlyArray<readonly [from: string, to: string]> = [
+  ["/partners", "/messages?filter=partners"],
+  ["/me/settings/export", "/me/settings#journal-export"],
 ];
 
 // Γύρω μου's «Δες όλα» narrows «what» in place (vision §7.2), so the old
@@ -36,6 +53,9 @@ export function currentMemberPath(path: string): string {
   const match = path.match(/^(\/org\/[^/?#]+)?(\/[^?#]*)?(.*)$/);
   if (!match) return path;
   const [, orgPrefix = "", pathname = "/", rest = ""] = match;
+  for (const [from, to] of MEMBER_EXACT_MOVES) {
+    if (pathname === from) return orgPrefix + to;
+  }
   for (const [from, to] of MEMBER_ROUTE_MOVES) {
     if (pathname === from || pathname.startsWith(from + "/")) {
       return orgPrefix + to + pathname.slice(from.length) + rest;

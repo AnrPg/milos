@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Один частный дом для групповых занятий, индивидуального программирования, выполнения тренировок в реальном времени, бесед с тренерами и прогресса, который принадлежит спортсмену.",
     "createAnAccount3f4f547": "Создать учетную запись",
     "signInada2e9e": "Войти",
-    "conversationHistory0f18fb3": "История разговора",
     "loading33ce417": "Загрузка…",
-    "noConversations06b83a9": "Никаких разговоров.",
-    "selectAConversationToViewMessagesaf2cf2c": "Выберите беседу, чтобы просмотреть сообщения.",
     "availablePackages48a5129": "Доступные пакеты",
     "closebf5d9ce": "✕ Закрыть",
     "noPackagesAvailable14160fb": "Нет доступных пакетов.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "Скачать .ics",
     "loadingCalendarLinks1dad320": "Загрузка ссылок на календарь…",
     "writeAMessage24bf2a3": "Написать сообщение…",
-    "chat67305ee": "← Чат",
     "searchOrStartAConversationabb1d82": "Найдите или начните разговор…",
     "noConversationsYetSearchToStartOne1a91cf7": "Разговоров пока нет. Найдите, чтобы начать.",
     "hideConversationdfb77ca": "Скрыть разговор",
@@ -1291,9 +1287,6 @@
     "coaches181feb6": "Тренеры",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "Программируйте, общайтесь и анализируйте ход обучения без наблюдения и рекламы.",
     "directMessagefc7f864": "Прямое сообщение",
-    "workoutThreada03f1e1": "Тренировочная нить",
-    "classThreadf030236": "Ветка класса",
-    "thread7863f75": "Тема",
     "eurd06e073": "евро",
     "downloada479c9c": "Скачать",
     "billed763fe55": "выставлен счет",
@@ -1743,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "например 4 раунда + 3 повторения",
     "fail2758e32": "Неудача",
     "capa8fba29": "· Кепка",
-    "directbc81524": "Прямой",
-    "class41ff354": "Класс",
-    "directChat3892e2c": "Прямой чат",
     "createAndManagePromotionalOffers46d33bb": "Создавайте и управляйте рекламными предложениями.",
     "reviewReferralActivityAndRewardActions8ea1271": "Просматривайте реферальную активность и вознаграждайте действия.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "Управляйте пакетами, используемыми членством и правами.",
@@ -4302,7 +4292,6 @@
     "msgTopicFacility": "Помещение",
     "msgSendAsCoaching": "Как сообщение коучинга",
     "msgSendAsCoachingHint": "Засчитывается как контакт коучинга с клиентом.",
-    "chatsTabBox": "Зал",
     "chatsBoxThread": "Ваш зал",
     "coachLatestTitle": "Последнее от тренера",
     "coachLatestEmpty": "Сообщений от тренера пока нет.",
@@ -5111,14 +5100,12 @@
     "meSharingHint": "Что видят тренер и другие",
     "mePayments": "Платежи и чеки",
     "mePaymentsHint": "Счета, возвраты и ваш пакет",
-    "meChats": "Переписка",
     "meSettings": "Настройки",
     "meSettingsHint": "Профиль, язык, тема, аккаунт",
     "meTour": "Обзор приложения",
     "meChecklist": "Первые шаги",
     "meConsole": "Управление",
     "meConsoleHint": "Открыть панель персонала",
-    "meMyBoxes": "Мои залы",
     "bookingStatus": {
       "approved": "Записан",
       "pending": "Ожидает",
@@ -5474,7 +5461,45 @@
         "invalid_media": "Фото не готово. Выбери его снова."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "Помощь и обзор",
+    "meHelpHint": "Обзор, первые шаги, связь",
+    "meHelpResetsWaiting": "{count, plural, one {# сброс пароля ждёт} few {# сброса пароля ждут} many {# сбросов пароля ждут} other {# сброса пароля ждут}}",
+    "helpVisibility": "Как работает видимость",
+    "helpVisibilityPrivate": "Всё, что вы записываете в Дневник, принадлежит вам: видите только вы, если не решите иначе.",
+    "helpVisibilityCoach": "Тренер видит только то, что вы разрешили в разделе «Доступ». Травмы он видит всегда — ради вашей безопасности.",
+    "helpVisibilityPosts": "Ваши публикации видят те, кого вы выберете при публикации: клуб, подписчики или все.",
+    "helpContactBox": "Связаться с залом",
+    "helpContactBoxHint": "Напишите залу в Сообщениях",
+    "helpReport": "Сообщить о проблеме",
+    "helpReportSubject": "Проблема в Palee",
+    "helpStaffOnly": "Только для персонала",
+    "settingsUnitsHint": "Как показываются вес, рост и обхваты.",
+    "settingsSectionsHint": "Какие разделы есть в Дневнике и как показывается вес.",
+    "mePrsPrivate": "{count, plural, one {Ещё # рекорд скрыт.} few {Ещё # рекорда скрыты.} many {Ещё # рекордов скрыты.} other {Ещё # рекорда скрыты.}} Выберите, какие показывать, в разделе «Доступ и видимость».",
+    "mePrsNoneShown": "Вы пока не показываете рекорды в профиле.",
+    "sharing": {
+      "coachSeesTitle": "Мой тренер видит",
+      "coachSeesHint": "Что получают ваши тренеры, без отправки каждый раз.",
+      "injuriesAlways": "Травмы тренер видит всегда — ради вашей безопасности.",
+      "communityTitle": "Сообщество",
+      "communityHint": "Где вас видно в клубах и другим людям.",
+      "prCelebrations": "Празднование рекордов",
+      "prCelebrationsHint": "Автоматическая карточка в клубе, когда вы ставите рекорд",
+      "challenges": "Челленджи",
+      "challengesHint": "Ваше имя в рейтингах челленджей",
+      "profilePrsTitle": "Рекорды в профиле",
+      "profilePrsHint": "Подписчики видят только включённые. Остальные остаются скрытыми.",
+      "profilePrsEmpty": "У вас пока нет рекордов.",
+      "defaultsTitle": "По умолчанию для новых записей",
+      "defaultsHint": "С какого уровня начинается каждая новая запись. Любую можно изменить в любой момент.",
+      "defaultKind": {
+        "workout": "Тренировки",
+        "note": "Заметки",
+        "check_in": "Отметки"
+      },
+      "saveError": "Не сохранилось. Попробуйте ещё раз."
+    }
   },
   "Community": {
     "all": "Все",
@@ -7493,7 +7518,7 @@
     "helpIntro": "Мягкой лентой, на коже, плотно, но не туго. Измеряй в одно и то же время дня, лучше утром.",
     "helpPhotos": "Для фото: то же место, тот же свет, то же расстояние. Таймер даёт 10 секунд, чтобы отойти.",
     "settingsTitle": "Настройки раздела «Тело»",
-    "settingsHubHint": "Единицы, вес, фото, напоминание",
+    "settingsHubHint": "Фото, напоминание об измерении",
     "settingsIntro": "Твои данные о теле по умолчанию приватны. Здесь ты выбираешь, как они отображаются и кто их видит.",
     "unitsLabel": "Единицы",
     "sectionsLabel": "Разделы дневника",
@@ -7664,7 +7689,8 @@
       "share_photo_missing": "В обоих замерах нужно готовое фото этой позы.",
       "media_not_ready": "Фото ещё обрабатывается. Попробуй чуть позже."
     },
-    "fromGarmin": "из Garmin"
+    "fromGarmin": "из Garmin",
+    "unitsAndSectionsLink": "Единицы и разделы в настройках"
   },
   "Referrals": {
     "title": "Приведи друга",
@@ -10866,9 +10892,7 @@
   },
   "Conversations": {
     "title": "Сообщения",
-    "inbox": "Входящие",
     "requests": "Запросы",
-    "foldersLabel": "Папки",
     "requestsEntry": "Запросы на переписку ({count})",
     "buddy": "Приятель",
     "you": "Вы: {text}",
@@ -10898,7 +10922,6 @@
     "message": "Написать",
     "messageA11y": "Написать {name}",
     "viewProfile": "Профиль: {name}",
-    "searchPlaceholder": "Ищите людей по имени или @нику",
     "searchEmpty": "Никого не найдено.",
     "notif_person_message_title": "Сообщение от {name}",
     "notif_person_message_body": "{name} отправил(а) вам сообщение.",
@@ -11196,5 +11219,20 @@
     "showAll": "Показать всех ({count})",
     "showFewer": "Свернуть",
     "moreInConsole": "Всё в панели управления"
+  },
+  "Inbox": {
+    "title": "Сообщения",
+    "segmentsLabel": "Какие сообщения показывать",
+    "segment": {
+      "all": "Все",
+      "coach": "Тренер",
+      "clubs": "Клубы",
+      "partners": "Партнёры"
+    },
+    "loading": "Загрузка сообщений…",
+    "emptySegment": "Здесь пока нет разговоров.",
+    "workoutThread": "Обсуждение тренировки",
+    "classThread": "Обсуждение занятия",
+    "searchAtGym": "В вашем зале"
   }
 }

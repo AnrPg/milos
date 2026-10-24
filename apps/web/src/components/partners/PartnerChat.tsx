@@ -28,6 +28,7 @@ import { partnerErrorMessage } from "./errors";
 import { PARTNERS_FALLBACK_REFETCH_MS } from "./partners-realtime";
 import { usePartnerMatches, usePartnersToken } from "./use-partners";
 import { Popover } from "@/components/ui/Popover";
+import { inboxHref } from "@/components/chat/inbox/inbox-model";
 
 type Confirm = "end" | "block" | null;
 
@@ -114,7 +115,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
       void queryClient.invalidateQueries({ queryKey: PARTNERS_KEY });
       if (kind === "block") {
         void queryClient.invalidateQueries({ queryKey: BLOCKS_KEY });
-        router.push("/me/activity/chats");
+        router.push(inboxHref({ filter: "partners" }));
       }
     },
   });
@@ -123,7 +124,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href="/me/activity/chats" className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>
+          <Link href={inboxHref({ filter: "partners" })} className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>
             ← {t("messagesBack")}
           </Link>
           <div className="flex items-center gap-3">

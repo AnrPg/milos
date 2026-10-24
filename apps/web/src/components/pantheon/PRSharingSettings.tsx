@@ -23,9 +23,11 @@ export const PR_SHARING_QUERY_KEY = ["pr-sharing"] as const;
 
 /**
  * ADR-129: the owner's PR sharing settings - the coach-visibility opt-out
- * (all gyms) and explicit read-only grants to chosen accounts.
+ * (all gyms) and explicit read-only grants to chosen accounts. Κοινοποίηση
+ * shows the two parts in different blocks (ADR-196): `part="coach"` under
+ * «Ο coach μου βλέπει», `part="grants"` on its own.
  */
-export function PRSharingSettings() {
+export function PRSharingSettings({ part }: { part?: "coach" | "grants" } = {}) {
   const t = useTranslations("PrSharing");
   const uiLocale = useUiLocale();
   const { tokens, currentUser } = useSession();
@@ -115,113 +117,117 @@ export function PRSharingSettings() {
 
   return (
     <div className="space-y-6">
-      <label className="flex cursor-pointer items-start gap-3">
-        <input
-          type="checkbox"
-          className="mt-1"
-          checked={sharing.coach_visibility}
-          disabled={visibilityMutation.isPending}
-          onChange={(event) => visibilityMutation.mutate(event.target.checked)}
-        />
-        <span>
-          <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
-            {t("coachVisibilityLabel")}
+      {part === "grants" ? null : (
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={sharing.coach_visibility}
+            disabled={visibilityMutation.isPending}
+            onChange={(event) => visibilityMutation.mutate(event.target.checked)}
+          />
+          <span>
+            <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
+              {t("coachVisibilityLabel")}
+            </span>
+            <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>
+              {t("coachVisibilityHint")}
+            </span>
           </span>
-          <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>
-            {t("coachVisibilityHint")}
-          </span>
-        </span>
-      </label>
+        </label>
+      )}
 
-      <div className="space-y-3">
-        <div>
-          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("grantsTitle")}</p>
-          <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{t("grantsHint")}</p>
-        </div>
+      {part === "coach" ? null : (
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("grantsTitle")}</p>
+            <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{t("grantsHint")}</p>
+          </div>
 
-        {sharing.grants.length === 0 ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("grantsEmpty")}</p>
-        ) : (
-          <ul className="space-y-2">
-            {sharing.grants.map((grant) => (
-              <li
-                key={grant.id}
-                className="flex items-center justify-between gap-3 rounded-xl px-4 py-3"
-                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-              >
-                <span>
-                  <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
-                    {grant.grantee.display_nickname}
-                  </span>
-                  <span className="block text-xs" style={{ color: "var(--muted)" }}>
-                    {t("sharedSince", { date: new Date(grant.created_at).toLocaleDateString(uiLocale) })}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  disabled={revokeMutation.isPending}
-                  onClick={() => revokeMutation.mutate(grant.id)}
-                  className="rounded-xl px-3 py-2 text-xs font-semibold disabled:opacity-50"
-                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
+          {sharing.grants.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{t("grantsEmpty")}</p>
+          ) : (
+            <ul className="space-y-2">
+              {sharing.grants.map((grant) => (
+                <li
+                  key={grant.id}
+                  className="flex items-center justify-between gap-3 rounded-xl px-4 py-3"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
                 >
-                  {t("revoke")}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="space-y-2">
-          <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-            {t("searchLabel")}
-            <input
-              className="mt-1.5 w-full rounded-xl px-4 py-2.5 text-sm normal-case tracking-normal outline-none"
-              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              placeholder={t("searchPlaceholder")}
-              value={query}
-              onChange={(event) => handleQueryChange(event.target.value)}
-            />
-          </label>
-          {searched && visibleCandidates.length === 0 ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{t("searchEmpty")}</p>
-          ) : null}
-          {query.trim() ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs" style={{ color: "var(--muted)" }}>{t("exactLookupHint")}</span>
-              <button
-                type="button"
-                disabled={exactLookupMutation.isPending}
-                onClick={() => exactLookupMutation.mutate(query.trim())}
-                className="rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-                style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              >
-                {t("exactLookup")}
-              </button>
-            </div>
-          ) : null}
-          {exactMiss ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{t("exactLookupEmpty")}</p>
-          ) : null}
-          {visibleCandidates.length > 0 ? (
-            <ul className="space-y-1">
-              {visibleCandidates.map((candidate) => (
-                <li key={candidate.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-2" style={{ border: "1px solid var(--border)" }}>
-                  <PersonName name={candidate.nickname} handle={candidate.handle} />
+                  <span>
+                    <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
+                      {grant.grantee.display_nickname}
+                    </span>
+                    <span className="block text-xs" style={{ color: "var(--muted)" }}>
+                      {t("sharedSince", { date: new Date(grant.created_at).toLocaleDateString(uiLocale) })}
+                    </span>
+                  </span>
                   <button
                     type="button"
-                    disabled={grantMutation.isPending}
-                    onClick={() => grantMutation.mutate(candidate.id)}
-                    className="rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                    disabled={revokeMutation.isPending}
+                    onClick={() => revokeMutation.mutate(grant.id)}
+                    className="rounded-xl px-3 py-2 text-xs font-semibold disabled:opacity-50"
+                    style={{ background: "var(--border)", color: "var(--text-soft)" }}
                   >
-                    {t("share")}
+                    {t("revoke")}
                   </button>
                 </li>
               ))}
             </ul>
-          ) : null}
+          )}
+
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
+              {t("searchLabel")}
+              <input
+                className="mt-1.5 w-full rounded-xl px-4 py-2.5 text-sm normal-case tracking-normal outline-none"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                placeholder={t("searchPlaceholder")}
+                value={query}
+                onChange={(event) => handleQueryChange(event.target.value)}
+              />
+            </label>
+            {searched && visibleCandidates.length === 0 ? (
+              <p className="text-xs" style={{ color: "var(--dim)" }}>{t("searchEmpty")}</p>
+            ) : null}
+            {query.trim() ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs" style={{ color: "var(--muted)" }}>{t("exactLookupHint")}</span>
+                <button
+                  type="button"
+                  disabled={exactLookupMutation.isPending}
+                  onClick={() => exactLookupMutation.mutate(query.trim())}
+                  className="rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
+                >
+                  {t("exactLookup")}
+                </button>
+              </div>
+            ) : null}
+            {exactMiss ? (
+              <p className="text-xs" style={{ color: "var(--dim)" }}>{t("exactLookupEmpty")}</p>
+            ) : null}
+            {visibleCandidates.length > 0 ? (
+              <ul className="space-y-1">
+                {visibleCandidates.map((candidate) => (
+                  <li key={candidate.id} className="flex items-center justify-between gap-3 rounded-xl px-4 py-2" style={{ border: "1px solid var(--border)" }}>
+                    <PersonName name={candidate.nickname} handle={candidate.handle} />
+                    <button
+                      type="button"
+                      disabled={grantMutation.isPending}
+                      onClick={() => grantMutation.mutate(candidate.id)}
+                      className="rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                      style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                    >
+                      {t("share")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
 
       {saveFailed ? (
         <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{t("saveError")}</p>

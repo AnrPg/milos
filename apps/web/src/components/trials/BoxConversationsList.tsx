@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { BOX_CONVERSATIONS_KEY, fetchBoxConversations } from "@/api/trials";
 
 /** Conversations with boxes you're not a member of (board 6 Q6), above your chats. */
-export function BoxConversationsList({ token }: { token: string | null }) {
+export function BoxConversationsList({ token, onNavigate }: { token: string | null; onNavigate?: () => void }) {
   const t = useTranslations("Trials");
   const conversations = useQuery({
     queryKey: BOX_CONVERSATIONS_KEY,
@@ -20,7 +20,7 @@ export function BoxConversationsList({ token }: { token: string | null }) {
     <section aria-label={t("boxChats")} className="border-b" style={{ borderColor: "var(--border)" }}>
       <p className="px-4 pt-3 text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t("boxChats")}</p>
       {rows.map((row) => (
-        <Link key={row.thread_id} href={`/b/${row.box.slug}/chat`} className="flex items-center gap-3 px-4 py-3">
+        <Link key={row.thread_id} href={`/b/${row.box.slug}/chat`} onClick={onNavigate} className="flex items-center gap-3 px-4 py-3">
           <span
             aria-hidden="true"
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold"

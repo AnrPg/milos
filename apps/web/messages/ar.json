@@ -223,10 +223,7 @@
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "منزل واحد خاص تتم استضافته ذاتيًا للفصول الجماعية والبرمجة الشخصية وتنفيذ التمارين الحية ومحادثات التدريب والتقدم الذي يخص الرياضي.",
     "createAnAccount3f4f547": "إنشاء حساب",
     "signInada2e9e": "تسجيل الدخول",
-    "conversationHistory0f18fb3": "تاريخ المحادثة",
     "loading33ce417": "جارٍ التحميل…",
-    "noConversations06b83a9": "لا محادثات.",
-    "selectAConversationToViewMessagesaf2cf2c": "حدد محادثة لعرض الرسائل.",
     "availablePackages48a5129": "الحزم المتاحة",
     "closebf5d9ce": "✕ إغلاق",
     "noPackagesAvailable14160fb": "لا توجد حزم متاحة.",
@@ -717,7 +714,6 @@
     "downloadIcs58ede50": "تحميل .ics",
     "loadingCalendarLinks1dad320": "جارٍ تحميل روابط التقويم...",
     "writeAMessage24bf2a3": "اكتب رسالة…",
-    "chat67305ee": "← دردشة",
     "searchOrStartAConversationabb1d82": "ابحث أو ابدأ محادثة...",
     "noConversationsYetSearchToStartOne1a91cf7": "لا توجد محادثات حتى الآن. البحث لبدء واحدة.",
     "hideConversationdfb77ca": "إخفاء المحادثة",
@@ -1291,9 +1287,6 @@
     "coaches181feb6": "المدربين",
     "programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89": "قم ببرمجة التقدم التدريبي والتواصل معه وفهمه دون مراقبة أو إعلانات.",
     "directMessagefc7f864": "رسالة مباشرة",
-    "workoutThreada03f1e1": "موضوع تجريب",
-    "classThreadf030236": "موضوع الطبقة",
-    "thread7863f75": "خيط",
     "eurd06e073": "يورو",
     "downloada479c9c": "تحميل",
     "billed763fe55": "فاتورة",
@@ -1743,9 +1736,6 @@
     "eG4Rounds3Reps688d025": "على سبيل المثال 4 جولات + 3 تكرارات",
     "fail2758e32": "يفشل",
     "capa8fba29": "· كاب",
-    "directbc81524": "مباشر",
-    "class41ff354": "فصل",
-    "directChat3892e2c": "الدردشة المباشرة",
     "createAndManagePromotionalOffers46d33bb": "إنشاء وإدارة العروض الترويجية.",
     "reviewReferralActivityAndRewardActions8ea1271": "قم بمراجعة نشاط الإحالة وإجراءات المكافأة.",
     "manageThePackagesUsedByMembershipsAndEntitlementsb466c1f": "إدارة الحزم المستخدمة من قبل العضويات والاستحقاقات.",
@@ -4302,7 +4292,6 @@
     "msgTopicFacility": "المرافق",
     "msgSendAsCoaching": "كرسالة تدريب",
     "msgSendAsCoachingHint": "تُحتسب تواصلًا تدريبيًا مع عميلك.",
-    "chatsTabBox": "النادي",
     "chatsBoxThread": "ناديك",
     "coachLatestTitle": "آخر ما أرسله مدربك",
     "coachLatestEmpty": "لا توجد رسائل من مدربك بعد.",
@@ -5111,14 +5100,12 @@
     "meSharingHint": "ما يمكن لمدربك وللآخرين رؤيته",
     "mePayments": "المدفوعات والإيصالات",
     "mePaymentsHint": "الفواتير والمبالغ المستردة وباقتك",
-    "meChats": "المحادثات",
     "meSettings": "الإعدادات",
     "meSettingsHint": "الملف الشخصي واللغة والمظهر والحساب",
     "meTour": "جولة تعريفية",
     "meChecklist": "البدء",
     "meConsole": "الإدارة",
     "meConsoleHint": "فتح لوحة الموظفين",
-    "meMyBoxes": "نواديّ",
     "bookingStatus": {
       "approved": "محجوز",
       "pending": "قيد الانتظار",
@@ -5474,7 +5461,45 @@
         "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "meHelp": "المساعدة والجولة",
+    "meHelpHint": "الجولة، الخطوات الأولى، التواصل",
+    "meHelpResetsWaiting": "{count, plural, zero {لا توجد طلبات إعادة تعيين} one {طلب إعادة تعيين واحد بانتظارك} two {طلبا إعادة تعيين بانتظارك} few {# طلبات إعادة تعيين بانتظارك} many {# طلبًا لإعادة التعيين بانتظارك} other {# طلب إعادة تعيين بانتظارك}}",
+    "helpVisibility": "كيف تعمل الخصوصية",
+    "helpVisibilityPrivate": "كل ما تسجّله في اليوميات ملكك: لا يراه أحد غيرك ما لم تختر غير ذلك.",
+    "helpVisibilityCoach": "يرى مدرّبك فقط ما تسمح به في المشاركة. أما الإصابات فيراها دائمًا، حفاظًا على سلامتك.",
+    "helpVisibilityPosts": "تظهر منشوراتك لمن تختارهم عند نشرها: النادي أو متابعيك أو الجميع.",
+    "helpContactBox": "تواصل مع ناديك",
+    "helpContactBoxHint": "راسل ناديك من الرسائل",
+    "helpReport": "الإبلاغ عن مشكلة",
+    "helpReportSubject": "مشكلة في Palee",
+    "helpStaffOnly": "للموظفين فقط",
+    "settingsUnitsHint": "كيف يُعرض الوزن والطول والمحيطات.",
+    "settingsSectionsHint": "الأقسام الموجودة في يومياتك وكيف يظهر وزنك.",
+    "mePrsPrivate": "{count, plural, zero {لا أرقام قياسية خاصة.} one {رقم قياسي آخر خاص.} two {رقمان قياسيان آخران خاصان.} few {# أرقام قياسية أخرى خاصة.} many {# رقمًا قياسيًا آخر خاص.} other {# رقم قياسي آخر خاص.}} اختر ما يظهر من المشاركة والظهور.",
+    "mePrsNoneShown": "لا تعرض أي رقم قياسي في ملفك بعد.",
+    "sharing": {
+      "coachSeesTitle": "ما يراه مدرّبي",
+      "coachSeesHint": "ما يصل إلى مدرّبيك دون أن ترسله في كل مرة.",
+      "injuriesAlways": "تظهر الإصابات دائمًا لمدرّبك، حفاظًا على سلامتك.",
+      "communityTitle": "المجتمع",
+      "communityHint": "أين تظهر في الأندية وللآخرين.",
+      "prCelebrations": "الاحتفال بالأرقام القياسية",
+      "prCelebrationsHint": "بطاقة تلقائية في ناديك عند تحقيق رقم قياسي",
+      "challenges": "التحديات",
+      "challengesHint": "اسمك في ترتيب التحديات",
+      "profilePrsTitle": "الأرقام القياسية في ملفك",
+      "profilePrsHint": "لا يرى متابعوك إلا ما تفعّله. ويبقى الباقي خاصًا.",
+      "profilePrsEmpty": "ليس لديك أرقام قياسية بعد.",
+      "defaultsTitle": "الإعداد الافتراضي للإدخالات الجديدة",
+      "defaultsHint": "من أين يبدأ كل إدخال جديد. يمكنك تغيير أي منها متى شئت.",
+      "defaultKind": {
+        "workout": "التمارين",
+        "note": "الملاحظات",
+        "check_in": "تسجيلات الحضور"
+      },
+      "saveError": "لم يُحفظ ذلك. حاول مرة أخرى."
+    }
   },
   "Community": {
     "all": "الكل",
@@ -7493,7 +7518,7 @@
     "helpIntro": "بشريط قياس ليّن، على الجلد، ملاصق دون شدّ. قِس في الوقت نفسه من اليوم، والأفضل صباحًا.",
     "helpPhotos": "للصور: المكان نفسه، والإضاءة نفسها، والمسافة نفسها. يمنحك المؤقت 10 ثوانٍ للابتعاد.",
     "settingsTitle": "إعدادات الجسم",
-    "settingsHubHint": "الوحدات، الوزن، الصور، التذكير",
+    "settingsHubHint": "الصور، تذكير القياس",
     "settingsIntro": "بيانات جسمك خاصة افتراضيًا. هنا تختار كيف تظهر ومن يراها.",
     "unitsLabel": "الوحدات",
     "sectionsLabel": "أقسام اليوميات",
@@ -7664,7 +7689,8 @@
       "share_photo_missing": "يحتاج كلا القياسين إلى صورة جاهزة لهذه الوضعية.",
       "media_not_ready": "ما زالت إحدى الصور قيد المعالجة. حاول بعد قليل."
     },
-    "fromGarmin": "من Garmin"
+    "fromGarmin": "من Garmin",
+    "unitsAndSectionsLink": "الوحدات والأقسام في الإعدادات"
   },
   "Referrals": {
     "title": "أحضر صديقًا",
@@ -10866,9 +10892,7 @@
   },
   "Conversations": {
     "title": "الرسائل",
-    "inbox": "الوارد",
     "requests": "الطلبات",
-    "foldersLabel": "المجلدات",
     "requestsEntry": "طلبات المراسلة ({count})",
     "buddy": "رفيق",
     "you": "أنت: {text}",
@@ -10898,7 +10922,6 @@
     "message": "مراسلة",
     "messageA11y": "راسل {name}",
     "viewProfile": "الملف الشخصي لـ {name}",
-    "searchPlaceholder": "ابحث عن أشخاص بالاسم أو @المعرّف",
     "searchEmpty": "لم يُعثر على أحد.",
     "notif_person_message_title": "رسالة من {name}",
     "notif_person_message_body": "أرسل إليك {name} رسالة.",
@@ -11196,5 +11219,20 @@
     "showAll": "عرض الكل ({count})",
     "showFewer": "عرض أقل",
     "moreInConsole": "عرض الكل في لوحة الإدارة"
+  },
+  "Inbox": {
+    "title": "الرسائل",
+    "segmentsLabel": "الرسائل المعروضة",
+    "segment": {
+      "all": "الكل",
+      "coach": "المدرّب",
+      "clubs": "الأندية",
+      "partners": "الشركاء"
+    },
+    "loading": "جارٍ تحميل الرسائل…",
+    "emptySegment": "لا توجد محادثات هنا بعد.",
+    "workoutThread": "محادثة التمرين",
+    "classThread": "محادثة الحصة",
+    "searchAtGym": "في ناديك"
   }
 }

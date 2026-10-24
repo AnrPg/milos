@@ -28,6 +28,7 @@ import { safeVideoUrl } from "@/components/client/video";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { inboxHref } from "@/components/chat/inbox/inbox-model";
 
 const FORM_REVIEWS_KEY = ["me", "form-reviews"] as const;
 
@@ -106,7 +107,7 @@ function LatestFromCoach() {
       aside={
         latestThread ? (
           <Link
-            href={`/me/activity/chats?thread=${encodeURIComponent(latestThread)}`}
+            href={inboxHref({ filter: "coach", thread: latestThread })}
             className="text-sm font-semibold"
             style={{ color: "var(--primary-strong)" }}
           >

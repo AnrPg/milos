@@ -15,10 +15,10 @@ export function isConversationNotice(type: string) {
 }
 
 export function conversationNotificationUrl(type: string, payload: Payload): string | null {
-  if (type === "message_request") return "/me/messages?folder=requests";
+  if (type === "message_request") return "/messages?folder=requests";
   if (type !== "person_message") return null;
   const conversationId = text(payload, "conversation_id");
-  return conversationId ? `/me/messages/${encodeURIComponent(conversationId)}` : "/me/messages";
+  return conversationId ? `/messages/${encodeURIComponent(conversationId)}` : "/messages";
 }
 
 export function conversationNotificationText(type: string, payload: Payload, part: "title" | "body", t: Translate): string | null {

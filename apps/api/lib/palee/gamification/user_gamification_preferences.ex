@@ -8,17 +8,31 @@ defmodule Palee.Gamification.UserGamificationPreferences do
   schema "user_gamification_preferences" do
     field :user_id, :binary_id
     field :off_days, {:array, :integer}, default: []
+    # ADR-196 community opt-ins (Εγώ › Κοινοποίηση & ορατότητα).
+    field :pr_celebrations, :boolean, default: false
+    field :challenge_rankings, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
 
   def changeset(prefs \\ %__MODULE__{}, params) do
     prefs
-    |> cast(params, [:user_id, :off_days])
+    |> cast(params, [:user_id, :off_days, :pr_celebrations, :challenge_rankings])
     |> validate_required([:user_id])
     |> validate_off_days()
     |> unique_constraint(:user_id)
     |> foreign_key_constraint(:user_id)
+  end
+
+  @doc "What the API returns; a member without a row gets the defaults."
+  def present(nil), do: present(%__MODULE__{})
+
+  def present(%__MODULE__{} = prefs) do
+    %{
+      off_days: prefs.off_days,
+      pr_celebrations: prefs.pr_celebrations,
+      challenge_rankings: prefs.challenge_rankings
+    }
   end
 
   defp validate_off_days(changeset) do

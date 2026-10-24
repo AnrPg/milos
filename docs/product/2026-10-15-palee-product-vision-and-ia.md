@@ -178,13 +178,13 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Club, channel | Αρχική › club bar | Εγώ › Τα clubs μου |
 | Event | Club › Events | Feed card, Γύρω μου |
 | Partner match | Club › Μέλη › Partners | Messages |
-| Messages | Αρχική › ✈ | Box › Coach (filtered) |
+| Messages | Αρχική › ✈ (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
 | Class, booking, check-in | Box | Journal (after training) |
 | WOD of the day | Box | Feed (#wod-σήμερα + leaderboard) |
 | Membership/package | Box | Εγώ › Πληρωμές |
 | Season | Box (purchase) | Journal (program), crew channel |
 | Workout log | Ημερολόγιο | Post attachment, WOD leaderboard |
-| PR | Ημερολόγιο › Πρόοδος (Pantheon) | Εγώ (if shared), posts |
+| PR | Ημερολόγιο › Πρόοδος (Pantheon) | Εγώ (only PRs chosen per PR in Κοινοποίηση; the rest counted as private, ADR-196), posts |
 | Measurements, wellness, injuries, cravings | Ημερολόγιο | Never public. Coach only with permission (injuries always). |
 | Profile, settings, payments | Εγώ | n/a |
 
@@ -347,7 +347,18 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
-- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
+- **Βοήθεια & ξενάγηση:** product tours; staff entry to admin. Tours are interactive walkthroughs over the real screens (ANR 2026-10-24, ADR-193): a spotlight plus one short card per step, and the person taps the real button. They are listed at `/guides` (row «Οδηγοί» in Εγώ › Βοήθεια & ξενάγηση, ADR-196), offered once on a feature's home, and started again from a «Ξενάγηση» button in the header of a staff console. Progress is saved to the account. Shipped: Κατάστημα (staff), Διοργάνωση εκδηλώσεων, Οικονομικά › Προσφορές & Παραπομπές, and, for members, «Το δικό σου club και η δική σου εκδήλωση» (with a box as co-host or alone).
+- *Decided 2026-10-24 (ADR-196):*
+  - The list above is the whole list, in this order. Anything else moves into one of its pages:
+
+    | Moved | Now in |
+    |---|---|
+    | Interests, Σώμα settings, business request, units, journal sections, rest days | Ρυθμίσεις |
+    | Box switcher | Τα box και τα clubs μου |
+    | Tour, first steps, how visibility works, contact the box, report a problem, coach practice, staff console and extras, password resets | Βοήθεια & ξενάγηση (`/me/help`) |
+
+  - Chats have no row: the one inbox is Αρχική › ✈.
+  - Κοινοποίηση follows the mockup's blocks, plus a per-PR "show on profile" list.
 
 ---
 

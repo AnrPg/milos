@@ -1,17 +1,16 @@
 import { Suspense } from "react";
 
 import { AuthGuard } from "@/components/auth-guard";
-import { ConversationsPage } from "@/components/conversations/ConversationsPage";
+import { MessagesPage } from "@/components/chat/inbox/MessagesPage";
 
 export const dynamic = "force-dynamic";
 
-// ADR-193 §3: person conversations belong to the account, so anyone signed
-// in may open them, with or without a gym (no role filter).
+/** Αρχική › ✈ Μηνύματα: the one inbox (ADR-196); `/me/activity/chats` redirects here. */
 export default function MessagesRoute() {
   return (
     <AuthGuard>
       <Suspense>
-        <ConversationsPage />
+        <MessagesPage />
       </Suspense>
     </AuthGuard>
   );

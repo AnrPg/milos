@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 import { BUDDY_REDIRECTS } from "./src/components/buddy/buddy-links";
-import { AROUND_KIND_REDIRECTS, MEMBER_ROUTE_MOVES } from "./src/lib/member-routes";
+import { AROUND_KIND_REDIRECTS, MEMBER_EXACT_MOVES, MEMBER_ROUTE_MOVES } from "./src/lib/member-routes";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -44,7 +44,12 @@ const nextConfig: NextConfig = {
     // ADR-160: the API's paths for buddy screens open the web's.
     const buddy = BUDDY_REDIRECTS.map((entry) => ({ ...entry, permanent: false }));
     const aroundKinds = AROUND_KIND_REDIRECTS.map((entry) => ({ ...entry, permanent: false }));
-    return [...buddy, ...aroundKinds, ...MEMBER_ROUTE_MOVES.flatMap(([from, to]) => [
+    // ADR-196: exact old paths that open a place on another page.
+    const exact = MEMBER_EXACT_MOVES.flatMap(([from, to]) => [
+      { source: from, destination: to, permanent: false },
+      { source: `/org/:organization_slug${from}`, destination: `/org/:organization_slug${to}`, permanent: false },
+    ]);
+    return [...buddy, ...aroundKinds, ...exact, ...MEMBER_ROUTE_MOVES.flatMap(([from, to]) => [
       { source: `${from}/:path*`, destination: `${to}/:path*`, permanent: false },
       {
         source: `/org/:organization_slug${from}/:path*`,

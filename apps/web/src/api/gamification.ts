@@ -5,6 +5,10 @@ export type GamificationPreferences = {
   id?: string;
   user_id?: string;
   off_days: number[];
+  /** ADR-196: my PRs in the Feed's celebrations; off until I opt in. */
+  pr_celebrations?: boolean;
+  /** ADR-196: my name in challenge rankings; on unless I opt out. */
+  challenge_rankings?: boolean;
 };
 
 export type PRUnit = "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
@@ -43,9 +47,19 @@ export type PRRecord = {
   supporting_metrics: PRSupportingMetrics;
   /** Σχόλια on the PR (ADR-140 §1); absent where the reader may not see them. */
   comments?: JournalComment[];
+  /** ADR-196: whether the people who follow me see this PR on my profile. */
+  profile_audience?: PRProfileAudience;
   inserted_at: string;
   updated_at: string;
 };
+
+export type PRProfileAudience = "private" | "followers";
+
+/** A PR as it shows on someone's profile (ADR-196). */
+export type ProfilePR = Pick<
+  PRRecord,
+  "id" | "organization_id" | "name" | "current_score" | "unit" | "higher_is_better" | "beaten_on" | "supporting_metrics"
+>;
 
 export type PRHistoryEntry = {
   id: string;
@@ -172,4 +186,20 @@ export async function sharePR(token: string, id: string): Promise<{ message: str
     method: "POST",
     token,
   });
+}
+
+/** Show one PR on my profile to the people who follow me, or keep it private (ADR-196). */
+export async function setPRProfileAudience(token: string, id: string, audience: PRProfileAudience): Promise<PRRecord> {
+  const data = await apiRequest<{ pr: PRRecord }>(`/prs/${id}/profile-audience`, {
+    method: "PUT",
+    token,
+    body: { audience },
+  });
+  return data.pr;
+}
+
+/** The PRs a person shows on their profile, as I, a follower, see them (ADR-196). */
+export async function fetchProfilePRs(token: string, userId: string): Promise<ProfilePR[]> {
+  const data = await apiRequest<{ prs: ProfilePR[] }>(`/prs/profile/${userId}`, { token });
+  return data.prs;
 }

@@ -477,7 +477,15 @@ test.describe("member app shell", () => {
     await page.goto("/me");
     await expect(page.getByRole("main").getByText("Maria L")).toBeVisible();
     await expect(page.getByRole("link", { name: /Payments & receipts/ })).toHaveAttribute("href", "/me/payments");
+    // ADR-196: the fixed §7.11 list; tour and first steps live in Help & tour.
+    await expect(page.getByRole("button", { name: "Take the tour" })).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/me.png", fullPage: true });
+    await page.getByRole("link", { name: /Help & tour/ }).click();
+    await expect(page).toHaveURL(/\/me\/help$/);
+    await expect(page.getByRole("button", { name: "How visibility works" })).toBeVisible();
+
+    await page.goto("/me/activity/chats");
+    await expect(page).toHaveURL(/\/messages$/);
 
     await page.goto("/profile");
     await expect(page).toHaveURL(/\/me\/settings$/);
@@ -522,13 +530,20 @@ test.describe("member app shell", () => {
     await page.screenshot({ path: "test-results/member-app/progress.png", fullPage: true });
   });
 
-  test("Sharing & visibility gathers PR sharing, the leaderboard and rest days; old anchors follow them", async ({ page }) => {
+  test("Sharing & visibility groups what the coach sees and the community opt-ins; rest days moved to Settings", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/me");
     await page.getByRole("link", { name: /Sharing & visibility/ }).click();
     await expect(page).toHaveURL(/\/me\/sharing$/);
-    await expect(page.getByRole("button", { name: "Join leaderboard" })).toBeVisible();
+    await expect(page.locator("#coach-sees")).toContainText("Injuries are always visible to your coach");
+    await expect(page.locator("#community").getByRole("button", { name: "Join leaderboard" })).toBeVisible();
+    await expect(page.locator("#community").getByRole("switch", { name: /PR celebrations/ })).not.toBeChecked();
+    await expect(page.locator("#community").getByRole("switch", { name: /Challenges/ })).toBeChecked();
+    await expect(page.locator("#training-schedule")).toHaveCount(0);
 
+    // ADR-196: rest days live in Settings; the old anchor follows them.
+    await page.goto("/me/sharing#training-schedule");
+    await expect(page).toHaveURL(/\/me\/settings#training-schedule$/);
     const sunday = page.locator("#training-schedule").getByRole("button", { pressed: true });
     await expect(sunday).toHaveCount(1);
     const saved = page.waitForRequest((request) => request.url().includes("/gamification/preferences") && request.method() !== "GET");
