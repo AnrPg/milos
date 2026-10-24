@@ -1,4 +1,4 @@
-import type { CommunityChannel, CommunityClub, CommunityPost } from "@/api/community";
+import type { CommunityChannel, CommunityClub, CommunityFeedPage, CommunityPost } from "@/api/community";
 
 /**
  * Pure helpers for the club bar, the feed and compose (ADR-138). Built-in
@@ -94,6 +94,11 @@ export function initialComposeTarget(
 export function defaultChannelId(clubs: CommunityClub[], clubId?: string | null): string | null {
   const options = postableChannels(clubs).filter((option) => !clubId || option.club.id === clubId);
   return (options.find((option) => option.channel.kind === "wod") ?? options[0])?.channel.id ?? null;
+}
+
+/** True once a loaded feed holds at least one post, pinned or not. */
+export function feedHasPosts(feed: { pages: CommunityFeedPage[] } | undefined): boolean {
+  return (feed?.pages ?? []).some((page) => page.posts.length > 0 || (page.pinned ?? []).length > 0);
 }
 
 /** Drops pinned posts from the page list so a pinned post shows once. */

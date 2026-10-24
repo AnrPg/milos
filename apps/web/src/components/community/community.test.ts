@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CommunityClub, CommunityPost } from "@/api/community";
 
-import { channelNameKey, clubInitials, defaultChannelId, postableChannels, withoutPinned } from "./community";
+import { channelNameKey, clubInitials, defaultChannelId, feedHasPosts, postableChannels, withoutPinned } from "./community";
 
 const channel = (id: string, kind: CommunityClub["channels"][number]["kind"], canPost: boolean) => ({
   id,
@@ -115,5 +115,20 @@ describe("open clubs and member groups (ADR-143)", async () => {
     const clubs = [club("a", [channel("w", "wod", true), { ...channel("m", "member_group", true), name: "Τρέξιμο" }])];
     expect(initialComposeTarget(clubs, null, "a", "m")).toEqual({ kind: "channel", channelId: "m", public: false });
     expect(initialComposeTarget(clubs, null, "a", "nope")).toEqual({ kind: "channel", channelId: "w", public: false });
+  });
+});
+
+describe("feedHasPosts", () => {
+  const post = { id: "p1" } as CommunityPost;
+  const page = (posts: CommunityPost[], pinned: CommunityPost[] = []) => ({ posts, pinned, next_cursor: null });
+
+  it("is false while loading and for an empty feed", () => {
+    expect(feedHasPosts(undefined)).toBe(false);
+    expect(feedHasPosts({ pages: [page([])] })).toBe(false);
+  });
+
+  it("is true with a post or a pinned post", () => {
+    expect(feedHasPosts({ pages: [page([post])] })).toBe(true);
+    expect(feedHasPosts({ pages: [page([], [post])] })).toBe(true);
   });
 });

@@ -366,6 +366,22 @@ test.describe("member app shell", () => {
     await page.screenshot({ path: "test-results/member-app/journal-new-entry.png" });
   });
 
+  test("Box without a membership shows only «Find a box»", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.route("**/api/memberships", (route) => route.fulfill(json([])));
+    await page.route("**/api/me/clubs", (route) => route.fulfill(json({ clubs: [] })));
+    await page.goto("/box");
+
+    await expect(page.getByRole("heading", { name: "You're not in a box yet" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around/boxes");
+    await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Membership", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Schedule" })).toHaveCount(0);
+
+    await page.goto("/");
+    await expect(page.getByText("Today's WOD at the gym")).toHaveCount(0);
+  });
+
   test("Me holds every secondary link, and old URLs land on the new pages", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/me");
@@ -377,7 +393,7 @@ test.describe("member app shell", () => {
     await expect(page).toHaveURL(/\/me\/settings$/);
   });
 
-  test("Home shows the gym's day: greeting, today's WOD, challenges, leaderboard and club posts", async ({ page }) => {
+  test("Home shows the gym's day: greeting and today's WOD, and hides the empty cards", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/");
 
@@ -386,7 +402,10 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
     // ADR-138 D6: the gym club's #wod-today card, with the score action.
     await expect(page.getByRole("button", { name: "Log your score" })).toBeVisible();
-    await expect(page.getByText("Posts from your club will show up here.")).toBeVisible();
+    // ANR 2026-10-24: a card with nothing in it is not shown at all.
+    await expect(page.getByText("From your club")).toHaveCount(0);
+    await expect(page.getByText("My events", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Seasonal momentum")).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
   });
 
