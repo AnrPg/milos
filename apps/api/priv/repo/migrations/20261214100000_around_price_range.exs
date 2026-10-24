@@ -20,7 +20,8 @@ defmodule Palee.Repo.Migrations.AroundPriceRange do
   def down, do: replace(true, false)
 
   defp replace(from_min?, to_min?) do
-    for {name, args} <- signatures(from_min?), do: execute("DROP FUNCTION IF EXISTS #{name}(#{args})")
+    for {name, args} <- signatures(from_min?),
+        do: execute("DROP FUNCTION IF EXISTS #{name}(#{args})")
 
     execute(match_events(to_min?))
     execute(events(to_min?))
@@ -54,7 +55,9 @@ defmodule Palee.Repo.Migrations.AroundPriceRange do
   defp price_arg(true), do: "p_max_price_cents, p_min_price_cents"
   defp price_arg(false), do: "p_max_price_cents"
 
-  defp min_clause(true), do: "\n        AND (p_min_price_cents IS NULL OR e.price_cents >= p_min_price_cents)"
+  defp min_clause(true),
+    do: "\n        AND (p_min_price_cents IS NULL OR e.price_cents >= p_min_price_cents)"
+
   defp min_clause(false), do: ""
 
   defp match_events(min?) do
