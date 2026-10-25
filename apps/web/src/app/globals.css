@@ -573,6 +573,18 @@ html[data-platform]::before {
   pointer-events: none;
 }
 
+/* ANR 2026-10-25: the Spark fill of a selected tab is a rounded pill with room
+   around its label, never a square box hugging the text. This is the default
+   shape of every tab; it sits in the components layer so a tab bar's own
+   rounded-* / px-* utilities (pill switchers, segmented controls) still win. */
+@layer components {
+  [role="tab"],
+  [data-tabs] a {
+    border-radius: 0.875rem;
+    padding-inline: 0.875rem;
+  }
+}
+
 /* ANR 2026-10-24: the selected tab of every tab switcher, on every screen, is
    Spark (electric green) with dark text. One rule for all of them: a tab is a
    [role="tab"] with aria-selected, or a link marked aria-current inside a
