@@ -72154,12 +72154,30 @@
             "type": "string"
           },
           "role": {
+            "description": "Primary role in this gym",
             "enum": [
               "owner",
               "admin",
               "coach"
             ],
             "type": "string"
+          },
+          "roles": {
+            "description": "Every role held in this gym (ADR-099), e.g. owner and coach",
+            "items": {
+              "enum": [
+                "owner",
+                "admin",
+                "coach",
+                "front_desk",
+                "accountant",
+                "janitor",
+                "member",
+                "athlete"
+              ],
+              "type": "string"
+            },
+            "type": "array"
           },
           "user_id": {
             "format": "uuid",
@@ -72168,7 +72186,8 @@
         },
         "required": [
           "user_id",
-          "role"
+          "role",
+          "roles"
         ],
         "title": "StaffMember",
         "type": "object"
@@ -225413,12 +225432,30 @@
                             "type": "string"
                           },
                           "role": {
+                            "description": "Primary role in this gym",
                             "enum": [
                               "owner",
                               "admin",
                               "coach"
                             ],
                             "type": "string"
+                          },
+                          "roles": {
+                            "description": "Every role held in this gym (ADR-099), e.g. owner and coach",
+                            "items": {
+                              "enum": [
+                                "owner",
+                                "admin",
+                                "coach",
+                                "front_desk",
+                                "accountant",
+                                "janitor",
+                                "member",
+                                "athlete"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
                           },
                           "user_id": {
                             "format": "uuid",
@@ -225427,7 +225464,8 @@
                         },
                         "required": [
                           "user_id",
-                          "role"
+                          "role",
+                          "roles"
                         ],
                         "title": "StaffMember",
                         "type": "object"

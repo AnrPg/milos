@@ -62,6 +62,15 @@ describe("coachOptions", () => {
     ];
     expect(coachOptions(staff).map((member) => member.user_id)).toEqual(["3", "1"]);
   });
+
+  it("keeps owners and admins who also hold the coach role (ADR-099)", () => {
+    const staff = [
+      { user_id: "1", role: "owner", roles: ["owner", "coach"], nickname: "Olga" },
+      { user_id: "2", role: "admin", roles: ["admin"], nickname: "Al" },
+      { user_id: "3", role: "admin", roles: ["admin", "coach"], nickname: "Ann" },
+    ];
+    expect(coachOptions(staff).map((member) => member.user_id)).toEqual(["3", "1"]);
+  });
 });
 
 describe("takeableAthletes", () => {

@@ -35265,8 +35265,13 @@ export interface components {
         /** StaffMember */
         StaffMember: {
             nickname?: string | null;
-            /** @enum {string} */
+            /**
+             * @description Primary role in this gym
+             * @enum {string}
+             */
             role: "owner" | "admin" | "coach";
+            /** @description Every role held in this gym (ADR-099), e.g. owner and coach */
+            roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
             /** Format: uuid */
             user_id: string;
         };
@@ -92077,8 +92082,13 @@ export interface operations {
                     "application/json": {
                         staff: {
                             nickname?: string | null;
-                            /** @enum {string} */
+                            /**
+                             * @description Primary role in this gym
+                             * @enum {string}
+                             */
                             role: "owner" | "admin" | "coach";
+                            /** @description Every role held in this gym (ADR-099), e.g. owner and coach */
+                            roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
                             /** Format: uuid */
                             user_id: string;
                         }[];
