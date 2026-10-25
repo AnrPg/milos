@@ -24,11 +24,18 @@ type Variant = "chips" | "track";
 
 const GAP_PX = 6;
 
-function chipClass(variant: Variant, stretch: boolean) {
+/**
+ * `equal`: stretched chips share the line equally. `natural`: each keeps its
+ * natural width and they share what is left, for a row whose labels fit only
+ * at their natural widths (an equal share would cut the widest one).
+ */
+type Stretch = "none" | "equal" | "natural";
+
+function chipClass(variant: Variant, stretch: Stretch) {
   return [
     "inline-flex min-h-10 min-w-0 items-center justify-center gap-2 whitespace-nowrap px-3.5 text-sm font-semibold transition-colors disabled:opacity-40",
     variant === "track" ? "rounded-full" : "rounded-xl",
-    stretch ? "flex-1" : "",
+    stretch === "equal" ? "flex-1" : stretch === "natural" ? "flex-auto" : "",
   ].join(" ");
 }
 
@@ -88,6 +95,7 @@ export function SegmentPicker<T extends string>({
   const container = useRef<HTMLDivElement>(null);
   const measurer = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<SegmentLayout>({ kind: "row" });
+  const [equalShares, setEqualShares] = useState(true);
 
   const measure = useCallback(() => {
     const box = container.current;
@@ -101,15 +109,16 @@ export function SegmentPicker<T extends string>({
     const widest = Math.max(0, ...widths);
     const next = chooseSegmentLayout({
       count: chips.length,
-      rowFits: rowFits(widths, width, GAP_PX, stretch),
+      rowFits: rowFits(widths, width, GAP_PX),
       columns: fittingColumns(width, widest, GAP_PX),
     });
+    setEqualShares(rowFits(widths, width, GAP_PX, true));
     setLayout((current) =>
       current.kind === next.kind && (next.kind !== "grid" || (current.kind === "grid" && current.columns === next.columns))
         ? current
         : next,
     );
-  }, [variant, stretch]);
+  }, [variant]);
 
   // Labels or counts changing can change the widths, so remeasure every render
   // (cheap: a handful of offsetWidth reads) and on every resize.
@@ -157,7 +166,7 @@ export function SegmentPicker<T extends string>({
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-0 overflow-hidden" style={{ visibility: "hidden" }}>
         <div ref={measurer} className="flex w-max">
           {options.map((option) => (
-            <span key={option.value} className={chipClass(variant, false)} style={chipStyle(variant, true)}>
+            <span key={option.value} className={chipClass(variant, "none")} style={chipStyle(variant, true)}>
               {option.label}
               {hasCount(option.count) ? <Badge selected>{option.count}</Badge> : null}
             </span>
@@ -211,7 +220,7 @@ export function SegmentPicker<T extends string>({
                 disabled={option.disabled}
                 onClick={() => onChange(option.value)}
                 onKeyDown={onKeyDown}
-                className={chipClass(variant, stretch || layout.kind === "grid")}
+                className={chipClass(variant, layout.kind === "grid" ? "equal" : !stretch ? "none" : equalShares ? "equal" : "natural")}
                 style={chipStyle(variant, selected)}
               >
                 <span className="truncate">{option.label}</span>

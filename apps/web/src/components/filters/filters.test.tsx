@@ -24,10 +24,16 @@ const ROLES: SegmentOption<string>[] = [
   { value: "admin", label: "Staff", count: 1 },
 ];
 
-function Picker({ options = ROLES }: { options?: SegmentOption<string>[] }) {
+function Picker({ options = ROLES, stretch = false }: { options?: SegmentOption<string>[]; stretch?: boolean }) {
   const [value, setValue] = useState(options[0].value);
-  return <SegmentPicker ariaLabel="Role" value={value} onChange={setValue} options={options} />;
+  return <SegmentPicker ariaLabel="Role" value={value} onChange={setValue} options={options} stretch={stretch} />;
 }
+
+const SEGMENTS: SegmentOption<string>[] = [
+  { value: "plan", label: "Plan" },
+  { value: "transactions", label: "Transactions" },
+  { value: "offers", label: "Offers" },
+];
 
 /** jsdom has no layout: give every element a width so the picker can measure. */
 function fakeLayout({ container, chip }: { container: number; chip: number }) {
@@ -64,6 +70,27 @@ describe("SegmentPicker", () => {
     fireEvent.click(select);
     chooseValue(select, "athlete");
     expect(select).toHaveAttribute("data-value", "athlete");
+  });
+
+  it("stretches chips equally when the widest fits every share", () => {
+    fakeLayout({ container: 400, chip: 120 });
+    render(<Picker options={SEGMENTS} stretch />);
+    for (const tab of screen.getAllByRole("tab")) expect(tab.className).toContain("flex-1");
+  });
+
+  it("keeps natural widths on a stretched row that an equal share would cut", () => {
+    // 70 + 120 + 70 + gaps fits 300px, three shares of 120 do not.
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(300);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+      return this.textContent === "Transactions" ? 120 : 70;
+    });
+    render(<Picker options={SEGMENTS} stretch />);
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs).toHaveLength(3);
+    for (const tab of tabs) {
+      expect(tab.className).toContain("flex-auto");
+      expect(tab.className).not.toContain("flex-1");
+    }
   });
 
   it("moves the selection with the arrow keys", () => {

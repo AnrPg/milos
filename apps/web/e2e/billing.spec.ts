@@ -249,6 +249,11 @@ test.describe("billing", () => {
       await expect(page.getByRole("tab")).toHaveCount(3);
       const tops = await page.getByRole("tab").evaluateAll((tabs) => tabs.map((tab) => Math.round(tab.getBoundingClientRect().top)));
       expect(new Set(tops).size).toBe(1);
+      // No label is cut: a row that fits only at natural widths keeps them.
+      for (const tab of await page.getByRole("tab").all()) {
+        const cut = await tab.locator("span").first().evaluate((label) => label.scrollWidth > label.clientWidth);
+        expect(cut).toBe(false);
+      }
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow).toBeLessThanOrEqual(0);
     });
