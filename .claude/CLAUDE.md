@@ -61,6 +61,7 @@ Use `index_status` to discover available repo aliases.
 ## Product direction
 Member-app work must follow `docs/product/2026-10-15-palee-product-vision-and-ia.md` (source of truth; its §4 principles are non-negotiable)
 and the final clickable design `docs/product/mockups/palee-ia-mockup.html`.
+Every name shown in the UI follows the canonical terms in `docs/product/ontology.md` (English and Greek).
 `docs/product/mockups/palee-bottom-bar-exploration.html` is SUPERSEDED — reasoning only, never implement from it.
 To start implementation work, use the kickoff prompt in `docs/product/IMPLEMENTATION_PROMPT.md`.
 If the vexp MCP server is not connected in a session, fall back to the built-in search tools rather than stopping.
