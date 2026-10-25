@@ -72952,8 +72952,23 @@ export interface operations {
                     /** Format: uuid */
                     master_workout_id?: string | null;
                     name?: string;
+                    /**
+                     * Format: date
+                     * @description Gym-local date
+                     */
+                    range_from?: string;
+                    /**
+                     * Format: date
+                     * @description Gym-local date
+                     */
+                    range_to?: string;
                     /** Format: date-time */
                     scheduled_at: string;
+                    /**
+                     * @description Only this class (default), every upcoming class of its series and the series itself, or the upcoming classes from range_from to range_to
+                     * @enum {string}
+                     */
+                    series_scope?: "this" | "all" | "range";
                 };
             };
         };
@@ -72968,6 +72983,8 @@ export interface operations {
                         slot: {
                             [key: string]: unknown;
                         };
+                        /** @description Classes the edit changed, the edited one included */
+                        updated_count: number;
                     };
                 };
             };

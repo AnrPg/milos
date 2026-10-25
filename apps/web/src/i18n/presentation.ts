@@ -237,6 +237,9 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-200: how far an edit to a class of a series goes.
+  invalid_series_scope: "apiErrorInvalidSeriesScope",
+  series_range_required: "apiErrorSeriesRangeRequired",
   // ADR-184: business accounts, demo mode and activation.
   business_not_activated: "apiErrorBusinessNotActivated",
   business_account_exists: "apiErrorBusinessAccountExists",

@@ -211,7 +211,18 @@
     "apply": "Toepassen",
     "confirm": "Bevestig",
     "message": "Bericht",
-    "working": "Werken..."
+    "working": "Werken...",
+    "duplicateClass": "Dupliceren",
+    "seriesScopeLegend": "Wijzigingen toepassen op",
+    "seriesScopeThis": "Alleen deze les",
+    "seriesScopeAll": "Alle komende lessen",
+    "seriesScopeRange": "Lessen tussen data",
+    "seriesScopeHint_this": "De rest van de reeks blijft zoals hij is.",
+    "seriesScopeHint_all": "Elke komende les van de reeks, en de lessen die hij later toevoegt. Elke les houdt zijn eigen datum en WOD.",
+    "seriesScopeHint_range": "Komende lessen van de reeks tussen deze data, beide inbegrepen. Elke les houdt zijn eigen datum en WOD.",
+    "seriesScopeFrom": "Van",
+    "seriesScopeTo": "Tot",
+    "seriesClassesUpdated": "{count} lessen bijgewerkt."
   },
   "Ui": {
     "exercise1091b7f": "Oefening",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "Macro's",
     "clNutritionMacrosHidden": "Cijfers verborgen",
     "clNutritionHideMacros": "Cijfers verbergen",
-    "clNutritionShowMacros": "Cijfers tonen"
+    "clNutritionShowMacros": "Cijfers tonen",
+    "apiErrorInvalidSeriesScope": "Kies deze les, alle lessen of een periode.",
+    "apiErrorSeriesRangeRequired": "Kies een begin- en einddatum, eerst het begin."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

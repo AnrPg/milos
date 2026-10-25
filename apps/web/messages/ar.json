@@ -211,7 +211,18 @@
     "apply": "يتقدم",
     "confirm": "يتأكد",
     "message": "رسالة",
-    "working": "عمل..."
+    "working": "عمل...",
+    "duplicateClass": "نسخ",
+    "seriesScopeLegend": "تطبيق التغييرات على",
+    "seriesScopeThis": "هذا الصف فقط",
+    "seriesScopeAll": "كل الصفوف القادمة",
+    "seriesScopeRange": "الصفوف بين تاريخين",
+    "seriesScopeHint_this": "تبقى بقية السلسلة كما هي.",
+    "seriesScopeHint_all": "كل صف قادم في السلسلة، والصفوف التي تضيفها لاحقًا. يحتفظ كل صف بتاريخه وبـ WOD الخاص به.",
+    "seriesScopeHint_range": "الصفوف القادمة في السلسلة بين هذين التاريخين، شاملةً لهما. يحتفظ كل صف بتاريخه وبـ WOD الخاص به.",
+    "seriesScopeFrom": "من",
+    "seriesScopeTo": "إلى",
+    "seriesClassesUpdated": "تم تحديث {count} صفوف."
   },
   "Ui": {
     "exercise1091b7f": "تمرين",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "المغذيات الكبرى",
     "clNutritionMacrosHidden": "الأرقام مخفية",
     "clNutritionHideMacros": "إخفاء الأرقام",
-    "clNutritionShowMacros": "إظهار الأرقام"
+    "clNutritionShowMacros": "إظهار الأرقام",
+    "apiErrorInvalidSeriesScope": "اختر هذا الصف أو كل الصفوف أو فترة زمنية.",
+    "apiErrorSeriesRangeRequired": "اختر تاريخ بداية وتاريخ نهاية، البداية أولًا."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

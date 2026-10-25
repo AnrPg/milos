@@ -211,7 +211,18 @@
     "apply": "Apply",
     "confirm": "Confirm",
     "message": "Message",
-    "working": "Working..."
+    "working": "Working...",
+    "duplicateClass": "Duplicate",
+    "seriesScopeLegend": "Apply changes to",
+    "seriesScopeThis": "Only this class",
+    "seriesScopeAll": "All upcoming classes",
+    "seriesScopeRange": "Classes between dates",
+    "seriesScopeHint_this": "The rest of the series stays as it is.",
+    "seriesScopeHint_all": "Every upcoming class of the series, and the classes it adds later. Each keeps its own date and WOD.",
+    "seriesScopeHint_range": "Upcoming classes of the series between these dates, both included. Each keeps its own date and WOD.",
+    "seriesScopeFrom": "From",
+    "seriesScopeTo": "To",
+    "seriesClassesUpdated": "{count} classes updated."
   },
   "Ui": {
     "exercise1091b7f": "Exercise",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "Macros",
     "clNutritionMacrosHidden": "Numbers hidden",
     "clNutritionHideMacros": "Hide numbers",
-    "clNutritionShowMacros": "Show numbers"
+    "clNutritionShowMacros": "Show numbers",
+    "apiErrorInvalidSeriesScope": "Choose this class, all classes or a date range.",
+    "apiErrorSeriesRangeRequired": "Choose a start and an end date, the start first."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",

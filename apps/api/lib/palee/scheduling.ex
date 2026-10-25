@@ -44,6 +44,16 @@ defmodule Palee.Scheduling do
   defdelegate create_class_series(params), to: CreateClassSeries, as: :call
   defdelegate extend_class_series(context, series_id, horizon), to: ExtendClassSeries, as: :call
 
+  # ADR-200: an edit to one class of a series, applied further.
+  def get_class_series(%{organization_id: _} = context, id),
+    do: Palee.Scheduling.SchedulingStore.get_class_series(context, id)
+
+  def list_series_slots(%{organization_id: _} = context, series_id, %DateTime{} = after_at),
+    do: Palee.Scheduling.SchedulingStore.list_series_slots(context, series_id, after_at)
+
+  def update_class_series(%{organization_id: _} = context, id, params),
+    do: Palee.Scheduling.SchedulingStore.update_class_series(context, id, params)
+
   # ADR-138 D7: class-slot groups.
   def list_active_class_series(%{organization_id: _} = context),
     do: Palee.Scheduling.SchedulingStore.list_active_class_series(context)

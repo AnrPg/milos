@@ -211,7 +211,18 @@
     "apply": "Кандидатствайте",
     "confirm": "Потвърдете",
     "message": "Съобщение",
-    "working": "Работи..."
+    "working": "Работи...",
+    "duplicateClass": "Дублирай",
+    "seriesScopeLegend": "Приложи промените към",
+    "seriesScopeThis": "Само това занятие",
+    "seriesScopeAll": "Всички предстоящи занятия",
+    "seriesScopeRange": "Занятия между дати",
+    "seriesScopeHint_this": "Останалата част от серията остава същата.",
+    "seriesScopeHint_all": "Всяко предстоящо занятие от серията и тези, които тя добави по-късно. Всяко запазва своята дата и своя WOD.",
+    "seriesScopeHint_range": "Предстоящите занятия от серията между тези дати, включително. Всяко запазва своята дата и своя WOD.",
+    "seriesScopeFrom": "От",
+    "seriesScopeTo": "До",
+    "seriesClassesUpdated": "Обновени занятия: {count}."
   },
   "Ui": {
     "exercise1091b7f": "Упражнение",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "Макронутриенти",
     "clNutritionMacrosHidden": "Числата са скрити",
     "clNutritionHideMacros": "Скрий числата",
-    "clNutritionShowMacros": "Покажи числата"
+    "clNutritionShowMacros": "Покажи числата",
+    "apiErrorInvalidSeriesScope": "Избери това занятие, всички занятия или период.",
+    "apiErrorSeriesRangeRequired": "Избери начална и крайна дата, първо началната."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",

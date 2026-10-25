@@ -261,6 +261,52 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def get_class_series(%{organization_id: organization_id}, id) do
+    ClassSeries
+    |> where([series], series.id == ^id)
+    |> for_organization(organization_id)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      series -> normalize_class_series(series)
+    end
+  end
+
+  @impl true
+  def list_series_slots(%{organization_id: organization_id}, series_id, %DateTime{} = after_at) do
+    ScheduledClass
+    |> where([slot], slot.class_series_id == ^series_id and slot.scheduled_at > ^after_at)
+    |> for_organization(organization_id)
+    |> order_by([slot], asc: slot.scheduled_at)
+    |> select([slot], %{id: slot.id, scheduled_at: slot.scheduled_at})
+    |> Repo.all()
+  end
+
+  # ADR-200: an edit applied to every upcoming class also reaches the classes
+  # the series creates later. Only the class template fields change.
+  @impl true
+  def update_class_series(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ClassSeries, id: id, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      %ClassSeries{} = series ->
+        series
+        |> ClassSeries.changeset(
+          Map.take(
+            params,
+            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id coach_user_id local_start_time)
+          )
+        )
+        |> Repo.update()
+        |> case do
+          {:ok, updated} -> {:ok, normalize_class_series(updated)}
+          error -> error
+        end
+    end
+  end
+
+  @impl true
   def update_slot(%{organization_id: organization_id}, id, params) do
     case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
       nil ->

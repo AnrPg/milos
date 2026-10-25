@@ -211,7 +211,18 @@
     "apply": "Εφαρμογή",
     "confirm": "Επιβεβαίωση",
     "message": "Μήνυμα",
-    "working": "Επεξεργασία..."
+    "working": "Επεξεργασία...",
+    "duplicateClass": "Αντίγραφο",
+    "seriesScopeLegend": "Εφαρμογή αλλαγών σε",
+    "seriesScopeThis": "Μόνο αυτό το μάθημα",
+    "seriesScopeAll": "Όλα τα επόμενα μαθήματα",
+    "seriesScopeRange": "Μαθήματα σε διάστημα",
+    "seriesScopeHint_this": "Η υπόλοιπη σειρά μένει όπως είναι.",
+    "seriesScopeHint_all": "Κάθε επόμενο μάθημα της σειράς, και όσα προστεθούν αργότερα. Το καθένα κρατά τη δική του ημερομηνία και το WOD του.",
+    "seriesScopeHint_range": "Τα επόμενα μαθήματα της σειράς ανάμεσα σε αυτές τις ημερομηνίες, μαζί με τις δύο. Το καθένα κρατά τη δική του ημερομηνία και το WOD του.",
+    "seriesScopeFrom": "Από",
+    "seriesScopeTo": "Έως",
+    "seriesClassesUpdated": "Ενημερώθηκαν {count} μαθήματα."
   },
   "Ui": {
     "exercise1091b7f": "Άσκηση",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "Μακροθρεπτικά",
     "clNutritionMacrosHidden": "Κρυμμένοι αριθμοί",
     "clNutritionHideMacros": "Απόκρυψη αριθμών",
-    "clNutritionShowMacros": "Εμφάνιση αριθμών"
+    "clNutritionShowMacros": "Εμφάνιση αριθμών",
+    "apiErrorInvalidSeriesScope": "Διάλεξε αυτό το μάθημα, όλα τα μαθήματα ή ένα διάστημα.",
+    "apiErrorSeriesRangeRequired": "Διάλεξε ημερομηνία έναρξης και λήξης, πρώτα την έναρξη."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",

@@ -7,7 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
@@ -85,6 +85,8 @@ type SlotPopupProps = {
   onClose: () => void;
   onBook: () => void;
   onEdit: () => void;
+  /** A new class like this one (outside any series). */
+  onDuplicate?: () => void;
   onDelete?: () => void;
   onApproveBooking: (booking: ScheduleBooking) => void;
   onRejectBooking: (booking: ScheduleBooking) => void;
@@ -107,6 +109,7 @@ export function SlotPopup({
   onClose,
   onBook,
   onEdit,
+  onDuplicate,
   onDelete,
   onApproveBooking,
   onRejectBooking,
@@ -117,6 +120,7 @@ export function SlotPopup({
   onCreateWorkout,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
+  const t = useTranslations("Schedule");
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
@@ -594,6 +598,16 @@ export function SlotPopup({
                   >
                       {i18n("editSlot4754d1f")}
                     </button>
+                  {onDuplicate ? (
+                    <button
+                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
+                      onClick={onDuplicate}
+                      type="button"
+                    >
+                      {t("duplicateClass")}
+                    </button>
+                  ) : null}
                   {onDelete ? (
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"

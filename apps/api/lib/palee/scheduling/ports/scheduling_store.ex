@@ -20,6 +20,12 @@ defmodule Palee.Scheduling.Ports.SchedulingStore do
   @callback create_class_series(TenantContext.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback extend_class_series(TenantContext.t(), Ecto.UUID.t(), Date.t()) ::
               {:ok, map()} | {:error, term()}
+  @callback get_class_series(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
+  @callback list_series_slots(TenantContext.t(), Ecto.UUID.t(), DateTime.t()) :: [
+              %{id: Ecto.UUID.t(), scheduled_at: DateTime.t()}
+            ]
+  @callback update_class_series(TenantContext.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback update_slot(TenantContext.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback delete_slot(TenantContext.t(), Ecto.UUID.t()) ::

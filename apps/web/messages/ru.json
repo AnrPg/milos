@@ -211,7 +211,18 @@
     "apply": "Применить",
     "confirm": "Подтвердить",
     "message": "Сообщение",
-    "working": "Работаю..."
+    "working": "Работаю...",
+    "duplicateClass": "Дублировать",
+    "seriesScopeLegend": "Применить изменения к",
+    "seriesScopeThis": "Только это занятие",
+    "seriesScopeAll": "Все будущие занятия",
+    "seriesScopeRange": "Занятия в диапазоне дат",
+    "seriesScopeHint_this": "Остальная серия не меняется.",
+    "seriesScopeHint_all": "Все будущие занятия серии и те, что она добавит позже. У каждого остаются своя дата и свой WOD.",
+    "seriesScopeHint_range": "Будущие занятия серии между этими датами включительно. У каждого остаются своя дата и свой WOD.",
+    "seriesScopeFrom": "С",
+    "seriesScopeTo": "По",
+    "seriesClassesUpdated": "Обновлено занятий: {count}."
   },
   "Ui": {
     "exercise1091b7f": "Упражнение",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "БЖУ",
     "clNutritionMacrosHidden": "Цифры скрыты",
     "clNutritionHideMacros": "Скрыть цифры",
-    "clNutritionShowMacros": "Показать цифры"
+    "clNutritionShowMacros": "Показать цифры",
+    "apiErrorInvalidSeriesScope": "Выберите это занятие, все занятия или диапазон дат.",
+    "apiErrorSeriesRangeRequired": "Выберите дату начала и окончания, сначала начало."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",

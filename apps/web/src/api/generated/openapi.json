@@ -173383,8 +173383,27 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "range_from": {
+                    "description": "Gym-local date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "range_to": {
+                    "description": "Gym-local date",
+                    "format": "date",
+                    "type": "string"
+                  },
                   "scheduled_at": {
                     "format": "date-time",
+                    "type": "string"
+                  },
+                  "series_scope": {
+                    "description": "Only this class (default), every upcoming class of its series and the series itself, or the upcoming classes from range_from to range_to",
+                    "enum": [
+                      "this",
+                      "all",
+                      "range"
+                    ],
                     "type": "string"
                   }
                 },
@@ -173410,10 +173429,15 @@
                     "slot": {
                       "additionalProperties": true,
                       "type": "object"
+                    },
+                    "updated_count": {
+                      "description": "Classes the edit changed, the edited one included",
+                      "type": "integer"
                     }
                   },
                   "required": [
-                    "slot"
+                    "slot",
+                    "updated_count"
                   ],
                   "type": "object"
                 }

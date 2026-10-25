@@ -66,6 +66,23 @@ defmodule PaleeWeb.AdminScheduleController do
         )
   }
 
+  # ADR-200: how far an edit to one class of a series goes.
+  @slot_update_schema %{
+    @slot_body_schema
+    | properties:
+        Map.merge(@slot_body_schema.properties, %{
+          series_scope: %Schema{
+            type: :string,
+            enum: ["this", "all", "range"],
+            description:
+              "Only this class (default), every upcoming class of its series and the " <>
+                "series itself, or the upcoming classes from range_from to range_to"
+          },
+          range_from: %Schema{type: :string, format: :date, description: "Gym-local date"},
+          range_to: %Schema{type: :string, format: :date, description: "Gym-local date"}
+        })
+  }
+
   @message_schema %Schema{
     type: :object,
     properties: %{
@@ -181,15 +198,21 @@ defmodule PaleeWeb.AdminScheduleController do
     parameters: [@id_param],
     request_body: %RequestBody{
       required: true,
-      content: %{"application/json" => %MediaType{schema: @slot_body_schema}}
+      content: %{"application/json" => %MediaType{schema: @slot_update_schema}}
     },
     responses: [
       ok:
         {"Slot", "application/json",
          %Schema{
            type: :object,
-           properties: %{slot: %Schema{type: :object, additionalProperties: true}},
-           required: [:slot]
+           properties: %{
+             slot: %Schema{type: :object, additionalProperties: true},
+             updated_count: %Schema{
+               type: :integer,
+               description: "Classes the edit changed, the edited one included"
+             }
+           },
+           required: [:slot, :updated_count]
          }}
     ]
   )
@@ -314,8 +337,9 @@ defmodule PaleeWeb.AdminScheduleController do
     body = normalize_body_params(conn, params)
 
     with :ok <- valid_coach(conn.assigns.tenant_context, body),
-         {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
-      json(conn, %{slot: slot})
+         {:ok, %{slot: slot, updated_count: count}} <-
+           UpdateScheduledSlot.update_in_scope(conn.assigns.tenant_context, id, body) do
+      json(conn, %{slot: slot, updated_count: count})
     end
   end
 

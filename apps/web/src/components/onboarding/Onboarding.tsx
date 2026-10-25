@@ -375,32 +375,53 @@ export function AdminOnboardingPanel() {
   const isOwnerOrAdmin = membershipRole === "owner" || membershipRole === "admin";
   const { query, mutation, slug } = useAdminOnboarding(isOwnerOrAdmin);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState<boolean | null>(null);
+  // Collapsed by default: open, it fills the settings page, and a step that
+  // links here (e.g. «Open settings») looked like it did nothing.
+  const [collapsed, setCollapsed] = useState(true);
   const checklist = query.data;
 
   if (!isOwnerOrAdmin || !checklist) return null;
-  const isCollapsed = collapsed ?? checklist.finished;
+  // Unfinished setup stands out in Spark (lib/spark.ts) so it is not missed.
+  const pending = !checklist.finished;
+  const textColor = pending ? "var(--spark-contrast)" : "var(--text)";
+  const softColor = pending ? "var(--spark-contrast)" : "var(--muted)";
 
   return (
-    <section id="setup-checklist" className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+    <section
+      id="setup-checklist"
+      data-pending={pending ? "true" : undefined}
+      className="rounded-[2rem] p-5"
+      style={pending ? { background: "var(--spark)", border: "1px solid var(--spark)" } : { background: "var(--panel)", border: "1px solid var(--border)" }}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{t("panelTitle")}</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            {checklist.finished ? t("allDone") : t("panelIntro")}
+          <h2 className="text-lg font-semibold" style={{ color: textColor }}>{t("panelTitle")}</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6" style={{ color: softColor }}>
+            {checklist.finished ? t("allDone") : (
+              <>
+                <strong>{t("progress", { done: checklist.completed_count, total: checklist.total })}</strong> · {t("panelIntro")}
+              </>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={openProductTour} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          <button type="button" onClick={openProductTour} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ border: `1px solid ${pending ? "var(--spark-contrast)" : "var(--border)"}`, color: textColor }}>
             {t("takeTour")}
           </button>
-          <button type="button" onClick={() => setCollapsed(!isCollapsed)} aria-expanded={!isCollapsed} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            {isCollapsed ? t("showSteps") : t("hideSteps")}
+          <button
+            type="button"
+            onClick={() => setCollapsed(!collapsed)}
+            aria-expanded={!collapsed}
+            aria-controls="setup-checklist-steps"
+            className="rounded-xl px-3 py-2 text-sm font-semibold"
+            style={pending ? { background: "var(--spark-contrast)", color: "var(--spark)" } : { color: "var(--muted)" }}
+          >
+            {collapsed ? t("showSteps") : t("hideSteps")}
           </button>
         </div>
       </div>
-      {!isCollapsed ? (
-        <div className="mt-4">
+      {!collapsed ? (
+        <div id="setup-checklist-steps" className="mt-4 rounded-2xl p-4" style={{ background: "var(--panel)" }}>
           <ChecklistView
             checklist={checklist}
             slug={slug}

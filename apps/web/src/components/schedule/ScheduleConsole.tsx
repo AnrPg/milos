@@ -18,6 +18,7 @@ import {
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
+  type SeriesEditScope,
   type ScheduleBooking,
   type ClassTypeRecord,
   type ScheduleLocation,
@@ -65,6 +66,8 @@ import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
 
 type SlotEditorState = {
   slotId: string | null;
+  /** ADR-200: the edited class's series; its edit can reach further. */
+  seriesId?: string | null;
   values: ClassPayload;
 };
 
@@ -142,6 +145,8 @@ export function ScheduleConsole({
   const [notice, setNotice] = useState<string | null>(null);
   // ADR-186 §8: «Ισχύει για» on a new class or series, and what it created.
   const [createBranches, setCreateBranches] = useState<string[]>([]);
+  // ADR-200: how far an edit to a class of a series goes.
+  const [seriesScope, setSeriesScope] = useState<SeriesEditScope>({ scope: "this" });
   const [created, setCreated] = useState<{ kind: "classes" | "series"; items: { id: string; label: string; slotId?: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -463,12 +468,18 @@ export function ScheduleConsole({
         return;
       }
 
-      const saved = editor.slotId
-        ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values)
-        : await createScheduleSlot(tokens.access_token, editor.values);
+      const { slot: saved, updatedCount } = editor.slotId
+        ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values, editor.seriesId ? seriesScope : { scope: "this" })
+        : { slot: await createScheduleSlot(tokens.access_token, editor.values), updatedCount: 1 };
 
       // ADR-176: say plainly that a class without a WOD stays hidden.
-      setNotice(!saved.master_workout_id && !saved.class_series_id ? i18n("classDraftSavedNotice") : null);
+      setNotice(
+        updatedCount > 1
+          ? t("seriesClassesUpdated", { count: updatedCount })
+          : !saved.master_workout_id && !saved.class_series_id
+            ? i18n("classDraftSavedNotice")
+            : null,
+      );
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
@@ -599,22 +610,35 @@ export function ScheduleConsole({
     }
   }
 
+  function slotValues(slot: ScheduleSlot): ClassPayload {
+    return {
+      master_workout_id: slot.master_workout_id,
+      class_type_id: slot.class_type_id,
+      name: slot.name,
+      duration_minutes: slot.duration_minutes,
+      scheduled_at: slot.scheduled_at,
+      capacity: slot.capacity,
+      auto_approve: slot.auto_approve,
+      booking_timeout_minutes: slot.booking_timeout_minutes,
+      location_id: slot.location_id ?? null,
+      ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
+    };
+  }
+
   function openUpdateEditor(slot: ScheduleSlot) {
-    setEditor({
-      slotId: slot.id,
-      values: {
-        master_workout_id: slot.master_workout_id,
-        class_type_id: slot.class_type_id,
-        name: slot.name,
-        duration_minutes: slot.duration_minutes,
-        scheduled_at: slot.scheduled_at,
-        capacity: slot.capacity,
-        auto_approve: slot.auto_approve,
-        booking_timeout_minutes: slot.booking_timeout_minutes,
-        location_id: slot.location_id ?? null,
-        ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
-      },
-    });
+    setSeriesScope({ scope: "this" });
+    setEditor({ slotId: slot.id, seriesId: slot.class_series_id ?? null, values: slotValues(slot) });
+  }
+
+  // A new class like this one, outside any series, at its branch; staff
+  // usually change only its date.
+  function openDuplicateEditor(slot: ScheduleSlot) {
+    setSelectedSlot(null);
+    setCreateBranches(slot.location_id ? [slot.location_id] : defaultAppliesTo(adminLocations));
+    // A class already past is copied to the same time on the next week ahead.
+    let at = new Date(slot.scheduled_at);
+    while (at.getTime() <= Date.now()) at = new Date(at.getTime() + 7 * 86_400_000);
+    setEditor({ slotId: null, seriesId: null, values: { ...slotValues(slot), scheduled_at: at.toISOString() } });
   }
 
   return (
@@ -775,6 +799,7 @@ export function ScheduleConsole({
           onClose={() => setSelectedSlot(null)}
           onDelete={() => void deleteSelectedSlot()}
           onEdit={() => openUpdateEditor(selectedSlot)}
+          onDuplicate={() => openDuplicateEditor(selectedSlot)}
           onRejectBooking={(booking) => {
             setResolveMessage("");
             setResolveTarget({ booking, action: "reject" });
@@ -855,7 +880,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0)}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0) || (Boolean(editor.seriesId) && !seriesScopeReady(seriesScope))}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -1035,6 +1060,15 @@ export function ScheduleConsole({
               />
             ) : null}
 
+            {editor.slotId && editor.seriesId ? (
+              <SeriesScopePicker
+                className="mt-4"
+                value={seriesScope}
+                onChange={setSeriesScope}
+                classDate={dateTimeLocalInZone(editor.values.scheduled_at, gymZone).slice(0, 10)}
+              />
+            ) : null}
+
         </Dialog>
       ) : null}
 
@@ -1104,6 +1138,72 @@ export function ScheduleConsole({
         </Dialog>
       ) : null}
     </main>
+  );
+}
+
+function seriesScopeReady(scope: SeriesEditScope) {
+  return scope.scope !== "range" || (Boolean(scope.from) && Boolean(scope.to) && scope.from <= scope.to);
+}
+
+/**
+ * ADR-200: an edit to a class of a series reaches this class, every upcoming
+ * class of the series (and the classes it creates later), or the classes
+ * between two dates on the gym's clock.
+ */
+function SeriesScopePicker({
+  className,
+  value,
+  onChange,
+  classDate,
+}: {
+  className: string;
+  value: SeriesEditScope;
+  onChange: (scope: SeriesEditScope) => void;
+  classDate: string;
+}) {
+  const t = useTranslations("Schedule");
+  const options: Array<{ scope: SeriesEditScope["scope"]; label: string }> = [
+    { scope: "this", label: t("seriesScopeThis") },
+    { scope: "all", label: t("seriesScopeAll") },
+    { scope: "range", label: t("seriesScopeRange") },
+  ];
+  const range = value.scope === "range" ? value : { scope: "range" as const, from: classDate, to: classDate };
+
+  return (
+    <fieldset className={className} data-testid="series-scope">
+      <legend className="text-sm font-semibold" style={{ color: "var(--muted)" }}>{t("seriesScopeLegend")}</legend>
+      <div role="radiogroup" aria-label={t("seriesScopeLegend")} className="mt-2 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const checked = value.scope === option.scope;
+          return (
+            <button
+              key={option.scope}
+              type="button"
+              role="radio"
+              aria-checked={checked}
+              className="rounded-full px-4 py-2 text-sm font-semibold"
+              style={checked ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--panel-muted)", color: "var(--text-soft)", border: "1px solid var(--border)" }}
+              onClick={() => onChange(option.scope === "range" ? range : { scope: option.scope } as SeriesEditScope)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{t(`seriesScopeHint_${value.scope}`)}</p>
+      {value.scope === "range" ? (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
+            {t("seriesScopeFrom")}
+            <DateInput className="mt-2 w-full rounded-xl px-3 py-2" value={value.from} onValueChange={(from) => onChange({ ...value, from })} />
+          </label>
+          <label className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
+            {t("seriesScopeTo")}
+            <DateInput className="mt-2 w-full rounded-xl px-3 py-2" min={value.from} value={value.to} onValueChange={(to) => onChange({ ...value, to })} />
+          </label>
+        </div>
+      ) : null}
+    </fieldset>
   );
 }
 

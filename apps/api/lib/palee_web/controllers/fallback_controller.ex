@@ -2589,6 +2589,8 @@ defmodule PaleeWeb.FallbackController do
     cleaning_already_finished: {:conflict, "This cleaning is already finished"},
     cleaning_finished_before_start: {:unprocessable_entity, "Finish cannot be before start"},
     not_a_coach: {:unprocessable_entity, "That person is not a coach here"},
+    invalid_series_scope: {:unprocessable_entity, "Choose this class, all classes or dates"},
+    series_range_required: {:unprocessable_entity, "Choose a start and an end date"},
     not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
     only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
     not_your_client: {:forbidden, "Not one of your clients"},

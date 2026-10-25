@@ -80,6 +80,15 @@ defmodule Palee.Scheduling.Domain.RecurrenceRule do
     end
   end
 
+  @doc """
+  `date` at `time` on the `timezone` clock, in UTC: the same DST rules as the
+  expansion (a gap is `:skip`, an ambiguous time takes the first).
+  """
+  def at_local_time(date, time, timezone) do
+    with {:ok, datetime} <- local_datetime(date, time, timezone),
+         do: {:ok, DateTime.shift_zone!(datetime, "Etc/UTC")}
+  end
+
   defp local_datetime(date, %Time{} = time, timezone) when is_binary(timezone) do
     case DateTime.new(date, time, timezone) do
       {:ok, datetime} -> {:ok, datetime}

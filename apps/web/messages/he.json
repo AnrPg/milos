@@ -211,7 +211,18 @@
     "apply": "הגש בקשה",
     "confirm": "אשר",
     "message": "הודעה",
-    "working": "עובד..."
+    "working": "עובד...",
+    "duplicateClass": "שכפול",
+    "seriesScopeLegend": "להחיל את השינויים על",
+    "seriesScopeThis": "רק השיעור הזה",
+    "seriesScopeAll": "כל השיעורים הבאים",
+    "seriesScopeRange": "שיעורים בין תאריכים",
+    "seriesScopeHint_this": "שאר הסדרה נשארת כמו שהיא.",
+    "seriesScopeHint_all": "כל שיעור בא בסדרה, וגם השיעורים שהיא תוסיף בהמשך. כל שיעור שומר על התאריך וה-WOD שלו.",
+    "seriesScopeHint_range": "השיעורים הבאים בסדרה בין התאריכים האלה, כולל שניהם. כל שיעור שומר על התאריך וה-WOD שלו.",
+    "seriesScopeFrom": "מ-",
+    "seriesScopeTo": "עד",
+    "seriesClassesUpdated": "עודכנו {count} שיעורים."
   },
   "Ui": {
     "exercise1091b7f": "תרגיל",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "מאקרו",
     "clNutritionMacrosHidden": "המספרים מוסתרים",
     "clNutritionHideMacros": "הסתר מספרים",
-    "clNutritionShowMacros": "הצג מספרים"
+    "clNutritionShowMacros": "הצג מספרים",
+    "apiErrorInvalidSeriesScope": "בחרו את השיעור הזה, את כל השיעורים או טווח תאריכים.",
+    "apiErrorSeriesRangeRequired": "בחרו תאריך התחלה ותאריך סיום, קודם ההתחלה."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

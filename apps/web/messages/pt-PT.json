@@ -211,7 +211,18 @@
     "apply": "Aplicar",
     "confirm": "Confirmar",
     "message": "Mensagem",
-    "working": "Trabalhando..."
+    "working": "Trabalhando...",
+    "duplicateClass": "Duplicar",
+    "seriesScopeLegend": "Aplicar alterações a",
+    "seriesScopeThis": "Só esta aula",
+    "seriesScopeAll": "Todas as próximas aulas",
+    "seriesScopeRange": "Aulas entre datas",
+    "seriesScopeHint_this": "O resto da série fica como está.",
+    "seriesScopeHint_all": "Cada próxima aula da série e as que ela adicionar depois. Cada uma mantém a sua data e o seu WOD.",
+    "seriesScopeHint_range": "As próximas aulas da série entre estas datas, ambas incluídas. Cada uma mantém a sua data e o seu WOD.",
+    "seriesScopeFrom": "De",
+    "seriesScopeTo": "Até",
+    "seriesClassesUpdated": "{count} aulas atualizadas."
   },
   "Ui": {
     "exercise1091b7f": "Exercício",
@@ -4468,7 +4479,9 @@
     "clNutritionMacros": "Macros",
     "clNutritionMacrosHidden": "Números ocultos",
     "clNutritionHideMacros": "Ocultar números",
-    "clNutritionShowMacros": "Mostrar números"
+    "clNutritionShowMacros": "Mostrar números",
+    "apiErrorInvalidSeriesScope": "Escolhe esta aula, todas as aulas ou um intervalo de datas.",
+    "apiErrorSeriesRangeRequired": "Escolhe uma data de início e de fim, primeiro o início."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",

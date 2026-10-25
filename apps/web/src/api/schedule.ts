@@ -399,14 +399,32 @@ export async function createScheduleSeries(
   );
 }
 
-export async function updateScheduleSlot(token: string, slotId: string, payload: ScheduleSlotPayload) {
-  const response = await apiRequest<{ slot: ScheduleSlot }>(`/admin/schedule/slots/${slotId}`, {
+/**
+ * ADR-200: how far an edit to one class of a series goes. Dates are on the
+ * gym's clock, both inclusive.
+ */
+export type SeriesEditScope =
+  | { scope: "this" }
+  | { scope: "all" }
+  | { scope: "range"; from: string; to: string };
+
+export async function updateScheduleSlot(
+  token: string,
+  slotId: string,
+  payload: ScheduleSlotPayload,
+  seriesScope: SeriesEditScope = { scope: "this" },
+) {
+  const response = await apiRequest<{ slot: ScheduleSlot; updated_count: number }>(`/admin/schedule/slots/${slotId}`, {
     method: "PATCH",
     token,
-    body: payload,
+    body: {
+      ...payload,
+      series_scope: seriesScope.scope,
+      ...(seriesScope.scope === "range" ? { range_from: seriesScope.from, range_to: seriesScope.to } : {}),
+    },
   });
 
-  return response.slot;
+  return { slot: response.slot, updatedCount: response.updated_count ?? 1 };
 }
 
 /** ADR-176: links a WOD to a class; publishes a draft. */
