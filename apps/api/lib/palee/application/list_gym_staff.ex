@@ -1,7 +1,9 @@
 defmodule Palee.Application.ListGymStaff do
   @moduledoc """
   The gym's staff by their role in this gym (ADR-098), for coach pickers in
-  packages and appointments.
+  packages, appointments and classes. `role` is the primary role; `roles` is
+  the whole set (ADR-099), so an owner or admin who also coaches can be picked
+  as a coach.
   """
 
   alias Palee.{Identity, Organizations}
@@ -12,8 +14,8 @@ defmodule Palee.Application.ListGymStaff do
 
     staff
     |> Enum.filter(&Map.has_key?(users, &1.user_id))
-    |> Enum.map(fn %{user_id: user_id, role: role} ->
-      %{user_id: user_id, role: role, nickname: Map.fetch!(users, user_id).nickname}
+    |> Enum.map(fn %{user_id: user_id, role: role, roles: roles} ->
+      %{user_id: user_id, role: role, roles: roles, nickname: Map.fetch!(users, user_id).nickname}
     end)
     |> Enum.sort_by(&String.downcase(&1.nickname || ""))
   end

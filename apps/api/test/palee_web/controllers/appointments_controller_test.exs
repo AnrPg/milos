@@ -265,9 +265,32 @@ defmodule PaleeWeb.AppointmentsControllerTest do
     assert Enum.any?(
              staff["staff"],
              &(&1["user_id"] == coach.id and &1["role"] == "coach" and
-                 &1["nickname"] == coach.nickname)
+                 &1["roles"] == ["coach"] and &1["nickname"] == coach.nickname)
            )
 
     assert member_conn |> recycle() |> get("#{base}/staff/members") |> json_response(403)
+  end
+
+  test "an owner who also coaches is listed with the coach role", %{
+    coach_conn: coach_conn,
+    base: base
+  } do
+    owner_coach = user_fixture()
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    {:ok, _} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner_coach.id,
+        roles: [:owner, :coach],
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    staff = coach_conn |> recycle() |> get("#{base}/staff/members") |> json_response(200)
+    listed = Enum.find(staff["staff"], &(&1["user_id"] == owner_coach.id))
+
+    assert listed["role"] == "owner"
+    assert Enum.sort(listed["roles"]) == ["coach", "owner"]
   end
 end

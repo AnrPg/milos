@@ -16,9 +16,30 @@ defmodule PaleeWeb.StaffController do
     properties: %{
       user_id: %Schema{type: :string, format: :uuid},
       nickname: %Schema{type: :string, nullable: true},
-      role: %Schema{type: :string, enum: ["owner", "admin", "coach"]}
+      role: %Schema{
+        type: :string,
+        enum: ["owner", "admin", "coach"],
+        description: "Primary role in this gym"
+      },
+      roles: %Schema{
+        type: :array,
+        description: "Every role held in this gym (ADR-099), e.g. owner and coach",
+        items: %Schema{
+          type: :string,
+          enum: [
+            "owner",
+            "admin",
+            "coach",
+            "front_desk",
+            "accountant",
+            "janitor",
+            "member",
+            "athlete"
+          ]
+        }
+      }
     },
-    required: [:user_id, :role]
+    required: [:user_id, :role, :roles]
   }
 
   operation(:index,

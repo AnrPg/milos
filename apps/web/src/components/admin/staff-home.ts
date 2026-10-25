@@ -50,9 +50,9 @@ export function roleErrorKey(error: unknown): string | null {
 }
 
 /** Gym staff who can be chosen as a coach, by nickname. */
-export function coachOptions<T extends { role: string; nickname?: string | null }>(staff: T[]): T[] {
+export function coachOptions<T extends { role: string; roles?: readonly string[] | null; nickname?: string | null }>(staff: T[]): T[] {
   return staff
-    .filter((member) => member.role === "coach")
+    .filter((member) => (member.roles?.length ? member.roles : [member.role]).includes("coach"))
     .sort((a, b) => (a.nickname ?? "").localeCompare(b.nickname ?? ""));
 }
 
