@@ -338,6 +338,8 @@ test.describe("member app shell", () => {
     // The bell lives in the top bar beside the logo (PR #114).
     await expect(page.getByTestId("member-top-bar").getByRole("button", { name: "Notifications" })).toBeVisible();
     await expect(tabs.getByRole("link", { name: "Box" })).toHaveAttribute("aria-current", "page");
+    // The current bottom-bar item has no fill (no Spark pill); it shows by colour, weight and the dot.
+    await expect(tabs.getByRole("link", { name: "Box" })).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 
     await expect(page.getByRole("heading", { name: "Box Kypseli" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
