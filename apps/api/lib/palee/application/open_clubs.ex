@@ -360,8 +360,18 @@ defmodule Palee.Application.OpenClubs do
 
   defp matches?(_name, query) when query in [nil, ""], do: true
 
-  defp matches?(name, query),
-    do: String.contains?(String.downcase(name || ""), String.downcase(query))
+  # As typed anywhere in the name, or, from three characters on, a word of
+  # the name spelled closely enough (a typo still finds it, ANR 2026-10-25).
+  defp matches?(name, query) do
+    name = String.downcase(name || "")
+    query = query |> String.trim() |> String.downcase()
+
+    String.contains?(name, query) or
+      (String.length(query) >= 3 and
+         name |> String.split(~r/\s+/u, trim: true) |> Enum.any?(&close?(&1, query)))
+  end
+
+  defp close?(word, query), do: String.jaro_distance(word, query) >= 0.88
 
   defp notify_staff(club, payload) do
     club.organization_id

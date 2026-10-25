@@ -29,7 +29,10 @@ defmodule PaleeWeb.PersonConversationsControllerTest do
     ctx.as.(from) |> send_json(:post, "/api/me/follows", %{target_type: "user", target_id: to.id})
   end
 
+  # Two private accounts, so each follow is a request the other accepts.
   defp buddies!(ctx, one, other) do
+    private_account!(one)
+    private_account!(other)
     follow!(ctx, one, other)
     follow!(ctx, other, one)
 
@@ -188,9 +191,20 @@ defmodule PaleeWeb.PersonConversationsControllerTest do
            |> json_response(404)
   end
 
+  test "accounts are public by default; a private one turns follows into requests", ctx do
+    dora = user_fixture()
+    eli = user_fixture()
+
+    assert json_response(get(ctx.as.(eli), "/api/me/social"), 200)["privacy"] ==
+             %{"private_account" => false, "searchable" => true}
+
+    assert json_response(follow!(ctx, dora, eli), 200)["status"] == "active"
+    refute json_response(get(ctx.as.(dora), "/api/people/#{eli.id}"), 200)["private"]
+  end
+
   test "a public person is followed at once; going public accepts waiting requests", ctx do
     ana = user_fixture()
-    ben = user_fixture()
+    ben = private_account!(user_fixture())
     cleo = user_fixture()
 
     assert json_response(follow!(ctx, cleo, ben), 200)["status"] == "requested"
@@ -216,7 +230,7 @@ defmodule PaleeWeb.PersonConversationsControllerTest do
     unique = System.unique_integer([:positive])
     me = user_fixture()
     public = user_fixture(%{nickname: "zorbas_pub_#{unique}"})
-    private = user_fixture(%{nickname: "zorbas_priv_#{unique}"})
+    private = private_account!(user_fixture(%{nickname: "zorbas_priv_#{unique}"}))
     hidden = user_fixture(%{nickname: "zorbas_hid_#{unique}"})
     buddy = user_fixture(%{nickname: "zorbas_bud_#{unique}"})
 
@@ -240,5 +254,25 @@ defmodule PaleeWeb.PersonConversationsControllerTest do
 
     refute Enum.any?(found, &(&1["id"] in [private.id, hidden.id]))
     assert json_response(get(ctx.as.(me), "/api/people-search?q=z"), 200)["people"] == []
+  end
+
+  test "people search forgives a typo, literal matches first", ctx do
+    unique = System.unique_integer([:positive])
+    me = user_fixture()
+    melissa = user_fixture(%{nickname: "melissa_#{unique}", display_name: "Melissa #{unique}"})
+    melina = user_fixture(%{nickname: "melina_#{unique}", display_name: "Melina #{unique}"})
+
+    ids = fn q ->
+      ctx.as.(me)
+      |> get("/api/people-search?q=#{URI.encode_www_form(q)}")
+      |> json_response(200)
+      |> Map.fetch!("people")
+      |> Enum.map(& &1["id"])
+    end
+
+    assert melissa.id in ids.("Melisa")
+    assert melissa.id in ids.("melisa_#{unique}")
+    assert hd(ids.("melina_#{unique}")) == melina.id
+    refute melissa.id in ids.("Kostas")
   end
 end

@@ -11,7 +11,7 @@ import { InboxView } from "./InboxView";
 
 /**
  * `/messages` (vision §6.1–6.3, mockup «inbox»): Feed Μηνύματα and `Box › Coach`
- * open it; `?filter=coach|clubs|partners` picks the segment, `?thread=<id>`
+ * open it; `?filter=people|coach|clubs|partners` picks the segment, `?thread=<id>`
  * opens a gym thread and `?folder=requests` lists message requests
  * (ADR-193), so notifications and old links land where they point (ADR-196).
  */

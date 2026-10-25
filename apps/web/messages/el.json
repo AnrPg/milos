@@ -11225,6 +11225,7 @@
     "segmentsLabel": "Ποια μηνύματα βλέπεις",
     "segment": {
       "all": "Όλα",
+      "people": "Άτομα",
       "coach": "Coach",
       "clubs": "Clubs",
       "partners": "Partners"

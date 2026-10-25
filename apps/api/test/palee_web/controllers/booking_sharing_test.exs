@@ -66,6 +66,7 @@ defmodule PaleeWeb.BookingSharingTest do
 
   test "an accepted follower sees the booking only once the person shares", ctx do
     %{ana: ana, ben: ben, cat: cat, slot: slot} = ctx
+    private_account!(ana)
     follow!(ben, ana, true)
     follow!(cat, ana, false)
 

@@ -22,6 +22,20 @@ export function fittingColumns(containerWidth: number, chipWidth: number, gap: n
 }
 
 /**
+ * Whether chips of these natural `widths` fit on one line of `containerWidth`.
+ * Stretched chips share the line equally, so each gets only its share: the
+ * line fits only when the widest chip fits that share too, otherwise a label
+ * would be cut with an ellipsis (ANR 2026-10-25, Μηνύματα «Partn…»).
+ */
+export function rowFits(widths: readonly number[], containerWidth: number, gap: number, stretch = false) {
+  if (widths.length === 0) return true;
+  const gaps = gap * Math.max(0, widths.length - 1);
+  const natural = widths.reduce((sum, width) => sum + width, 0) + gaps;
+  const widest = Math.max(...widths);
+  return natural <= containerWidth && (!stretch || widest * widths.length + gaps <= containerWidth);
+}
+
+/**
  * `rowFits`: the chips at their natural widths fit on one line. `columns`:
  * how many equal columns fit (see `fittingColumns`).
  */

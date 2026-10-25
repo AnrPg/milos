@@ -180,7 +180,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Club, channel | Αρχική › club bar | Εγώ › Τα clubs μου |
 | Event | Club › Events | Feed card, Γύρω μου |
 | Partner match | Club › Μέλη › Partners | Messages |
-| Messages | bottom bar › Μηνύματα (`/messages`: Όλα · Coach · Clubs · Partners; person conversations and requests included, ADR-196) | Box › Coach (`?filter=coach`) |
+| Messages | bottom bar › Μηνύματα (`/messages`: Όλα · Άτομα · Coach · Clubs · Partners; person conversations and requests under Άτομα; Partners only once the person has a training partner or check-in buddy; ADR-196 amended 2026-10-25) | Box › Coach (`?filter=coach`) |
 | Class, booking, check-in | Box | Journal (after training) |
 | WOD of the day | Box | Feed (#wod-σήμερα + leaderboard) |
 | Membership/package | Box | Εγώ › Πληρωμές |
@@ -222,9 +222,9 @@ Owner setting for member groups: **Όχι · Με έγκριση (default) · Ε
 ### 7.1a Buddies, private accounts, messages and people search [NEW] (ANR 2026-10-24, ADR-193)
 - **One concept: following.** People you follow who follow you back are **Buddies** (el «Φιλαράκια», de Kumpels, es Colegas, fr Potes, it Amiconi, nl Maatjes, pt Amigalhaços, ru Приятели, bg Приятелчета, ar رفاق, he החבר'ה). Derived, never managed separately; unfollowing ends it.
 - **Counts line** under the name (Εγώ and every profile), Buddies first, three groups that never overlap: «35 Φιλαράκια · 85 σε ακολουθούν · 45 ακολουθείς» ("follow you" = not followed back; "you follow" = not following you back, requests included). Each part opens the matching Connections tab: Φιλαράκια · Σε ακολουθούν · Ακολουθείς · Boxes · Clubs · PRs. A «Buddy» badge on profiles and rows.
-- **Private by default.** `Κοινοποίηση & ορατότητα › Ιδιωτικός λογαριασμός` (on): a follow is a request. Off: people follow at once, and turning it off accepts waiting requests. `Εμφάνιση στην αναζήτηση` (on).
+- **Public and searchable by default** (ANR 2026-10-25, ADR-193 amended; was private by default). `Κοινοποίηση & ορατότητα › Ιδιωτικός λογαριασμός` (off): people follow at once. On: a follow is a request; turning it off again accepts waiting requests. `Εμφάνιση στην αναζήτηση` (on). Accounts that already stored a choice keep it. Content stays private by default (§4 principle 5): the account setting only decides who may follow.
 - **Messages between people** need no shared gym. Buddies, people in a shared gym/open club, and people who follow you reach your inbox; anyone else lands in **Αιτήματα μηνυμάτων** (accept, reply or decline; a decline is silent). Blocks apply everywhere. A «Μήνυμα» button on every profile. The gym's own threads (box, coach, class) stay separate (Club ≠ Box). They show together in the one inbox (Μηνύματα).
-- **People search** across Palee by @handle or name: shared clubs first, then Buddies, follows, public people nearby, then anyone public. Private people, or people who turned search off, show only to people they already know.
+- **People search** across Palee by @handle or name, as the person types and forgiving typos (trigram similarity from three characters, literal matches first; club search in «Βρες» does the same; ANR 2026-10-25): shared clubs first, then Buddies, follows, public people nearby, then anyone public. Private people, or people who turned search off, show only to people they already know.
 
 ### 7.2 Γύρω μου & filters [NEW / PARTIAL]
 One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` first**, which opens a sheet. Filters are remembered. Combinations can be saved ("ΣΚ κοντά").

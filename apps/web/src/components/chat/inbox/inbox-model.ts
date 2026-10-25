@@ -2,11 +2,22 @@ import type { ChatThread } from "@/api/messaging";
 
 /**
  * The one inbox (vision §6.1–6.3, ADR-196): Feed Μηνύματα and `Box › Coach` open the
- * same list, segmented «Όλα · Coach · Clubs · Partners». `/messages` is its
- * address; `?filter=` picks the segment and `?thread=` opens a conversation.
+ * same list, segmented «Όλα · Άτομα · Coach · Clubs · Partners». `/messages`
+ * is its address; `?filter=` picks the segment and `?thread=` opens a
+ * conversation. «Άτομα» holds chats with other people (person conversations,
+ * message requests and other direct chats, ANR 2026-10-25).
  */
-export const INBOX_SEGMENTS = ["all", "coach", "clubs", "partners"] as const;
+export const INBOX_SEGMENTS = ["all", "people", "coach", "clubs", "partners"] as const;
 export type InboxSegment = (typeof INBOX_SEGMENTS)[number];
+
+/**
+ * The segments offered: «Partners» (training partners and check-in buddies)
+ * only once the person has one, so no tab opens onto nothing (vision §4
+ * principle 2, ANR 2026-10-25).
+ */
+export function visibleSegments({ hasPartners }: { hasPartners: boolean }): InboxSegment[] {
+  return INBOX_SEGMENTS.filter((segment) => segment !== "partners" || hasPartners);
+}
 
 export const INBOX_PATH = "/messages";
 
@@ -39,7 +50,7 @@ export type ThreadSegmentContext = {
 /**
  * Where a gym thread files: a workout thread or a chat with my coach (or my
  * client) is «Coach»; the box's thread and a class's thread are «Clubs»; any
- * other direct chat shows under «Όλα» only.
+ * other direct chat is with another person: «Άτομα».
  */
 export function threadSegment(thread: ChatThread, context: ThreadSegmentContext): InboxSegment | null {
   if (context.coachingThreadIds.has(thread.id)) return "coach";
@@ -51,7 +62,7 @@ export function threadSegment(thread: ChatThread, context: ThreadSegmentContext)
       return "clubs";
     case "direct": {
       const other = thread.participants.find((participant) => participant.user_id !== context.currentUserId);
-      return other && context.coachPeerIds.has(other.user_id) ? "coach" : null;
+      return other && context.coachPeerIds.has(other.user_id) ? "coach" : "people";
     }
     default:
       return null;

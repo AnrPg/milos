@@ -43,6 +43,15 @@ the Buddy status at once, because the status is derived and never stored.
 nobody's exposure changes) and `searchable` (default `true`). A missing
 settings row reads as private and searchable.
 
+*Amended 2026-10-25 (ANR):* accounts are **public and searchable by
+default**. Migration `20261221110000_public_accounts_by_default` sets the
+column default to `false` and reads a missing row as public
+(`palee_user_is_public`, `palee_people_search`); rows already stored keep
+their value. People search also forgives typos: migration
+`20261221100000_fuzzy_people_search` adds pg_trgm word similarity (≥ 0.5,
+from three characters) on the folded name and the handle, literal matches
+first within each relation rank.
+
 - Following a **private** person stays a request. Following a **public**
   person is `active` at once, and they get a `new_follower` notification
   instead of `follow_requested`. Row security enforces this rule as well:

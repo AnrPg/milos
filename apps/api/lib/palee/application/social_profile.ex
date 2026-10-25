@@ -30,14 +30,15 @@ defmodule Palee.Application.SocialProfile do
   end
 
   @doc """
-  ADR-193 §2: «Ιδιωτικός λογαριασμός» (on until the member turns it off: a
-  follow is then a request) and «Εμφάνιση στην αναζήτηση».
+  ADR-193 §2 (amended 2026-10-25): «Ιδιωτικός λογαριασμός» (off until the
+  member turns it on: a follow is then a request) and «Εμφάνιση στην
+  αναζήτηση» (on). Public and searchable are the default.
   """
   def privacy(context, user_id) do
     settings = Community.social_settings(context, user_id)
 
     %{
-      private_account: if(settings, do: settings.private_account, else: true),
+      private_account: if(settings, do: settings.private_account, else: false),
       searchable: if(settings, do: settings.searchable, else: true)
     }
   end

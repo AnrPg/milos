@@ -11225,6 +11225,7 @@
     "segmentsLabel": "Which messages to show",
     "segment": {
       "all": "All",
+      "people": "People",
       "coach": "Coach",
       "clubs": "Clubs",
       "partners": "Partners"

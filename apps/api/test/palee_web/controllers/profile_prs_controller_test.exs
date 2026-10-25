@@ -48,7 +48,7 @@ defmodule PaleeWeb.ProfilePRsControllerTest do
   end
 
   test "new PRs are private; followers see only the PRs put on the profile" do
-    owner = user_fixture()
+    owner = private_account!(user_fixture())
     follower = user_fixture()
     stranger = user_fixture()
     follow!(follower, owner)

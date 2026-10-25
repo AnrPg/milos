@@ -12,7 +12,7 @@ The vision (§4, §6.3, §7.10, §7.11) gives messages one home (Αρχική �
 
 ## Decision
 1. **One inbox at `/messages`.**
-   - Segments: Όλα · Coach · Clubs · Partners. The filter is in the URL (`?filter=coach`, `?thread=`, `?folder=requests`), and `/messages/[id]` opens a person conversation.
+   - Segments: Όλα · Άτομα · Coach · Clubs · Partners (*amended 2026-10-25*: «Άτομα» holds person conversations, message requests and direct gym chats that are not with a coach; «Partners» shows only once the person has a training partner or a started check-in buddy link, and `?filter=partners` reads as «Όλα» until then; the segment control never truncates a label: a row only when every label fits its share, else a full grid or a dropdown). The filter is in the URL (`?filter=coach`, `?thread=`, `?folder=requests`), and `/messages/[id]` opens a person conversation.
    - Each kind of thread is an `InboxSource` (`components/chat/inbox/inbox-sections.tsx`), so new kinds plug in without changing the list. The current sources are message requests, person conversations, box threads, partners and buddies.
    - Gym threads are filed by `threadSegment`. Assignment threads, threads with a coach, and threads that hold a coaching message file under Coach; box and class threads file under Clubs.
    - The ✈ count adds person conversations and requests to the gym threads.
