@@ -65,7 +65,7 @@ describe("rowFits", () => {
     expect(rowFits([], 0, 6)).toBe(true);
   });
 
-  it("stretched chips need room for the widest one in every share", () => {
+  it("equal shares need room for the widest chip in every share", () => {
     // «All · Coach · Clubs · Partners» at 340px: natural widths fit (290),
     // but four equal shares of ~80px would cut «Partners» (100px).
     const widths = [50, 70, 70, 100];
