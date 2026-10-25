@@ -377,6 +377,15 @@ defmodule PaleeWeb.CommunityGroupsControllerTest do
                |> get("/api/me/community/discover?q=trail")
                |> json_response(200)
 
+      # A typo still finds it; an unrelated word does not.
+      assert %{"clubs" => [%{"id" => ^club_id}]} =
+               as.(ctx.member)
+               |> get("/api/me/community/discover?q=saturdy")
+               |> json_response(200)
+
+      assert %{"clubs" => []} =
+               as.(ctx.member) |> get("/api/me/community/discover?q=yoga") |> json_response(200)
+
       assert %{"clubs" => []} =
                as.(outsider) |> get("/api/me/community/discover") |> json_response(200)
 

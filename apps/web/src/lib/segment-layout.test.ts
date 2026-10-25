@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { balancedLineBreak, chooseSegmentLayout, fittingColumns } from "./segment-layout";
+import { balancedLineBreak, chooseSegmentLayout, fittingColumns, rowFits } from "./segment-layout";
 
 describe("balancedLineBreak", () => {
   it("keeps one line when every chip fits", () => {
@@ -55,5 +55,22 @@ describe("chooseSegmentLayout", () => {
   it("falls back to a dropdown when the grid would be too tall or nothing fits", () => {
     expect(chooseSegmentLayout({ count: 8, rowFits: false, columns: 2 })).toEqual({ kind: "select" });
     expect(chooseSegmentLayout({ count: 4, rowFits: false, columns: 1 })).toEqual({ kind: "select" });
+  });
+});
+
+describe("rowFits", () => {
+  it("fits natural widths that add up within the line", () => {
+    expect(rowFits([40, 60, 50], 162, 6)).toBe(true);
+    expect(rowFits([40, 60, 50], 161, 6)).toBe(false);
+    expect(rowFits([], 0, 6)).toBe(true);
+  });
+
+  it("stretched chips need room for the widest one in every share", () => {
+    // «All · Coach · Clubs · Partners» at 340px: natural widths fit (290),
+    // but four equal shares of ~80px would cut «Partners» (100px).
+    const widths = [50, 70, 70, 100];
+    expect(rowFits(widths, 340, 6)).toBe(true);
+    expect(rowFits(widths, 340, 6, true)).toBe(false);
+    expect(rowFits(widths, 418, 6, true)).toBe(true);
   });
 });

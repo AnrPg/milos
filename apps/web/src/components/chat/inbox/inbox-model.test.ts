@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ChatThread } from "@/api/messaging";
 
-import { inboxHref, parseInboxSegment, showsIn, threadSegment, threadsIn, type ThreadSegmentContext } from "./inbox-model";
+import { inboxHref, parseInboxSegment, showsIn, threadSegment, threadsIn, visibleSegments, type ThreadSegmentContext } from "./inbox-model";
 
 function thread(id: string, context_type: ChatThread["context_type"], others: string[] = [], context_id: string | null = null): ChatThread {
   return {
@@ -38,7 +38,7 @@ describe("inbox model", () => {
   it("files gym threads by who they are with", () => {
     expect(threadSegment(thread("a", "assignment"), context)).toBe("coach");
     expect(threadSegment(thread("d1", "direct", ["coach-nikos"]), context)).toBe("coach");
-    expect(threadSegment(thread("d2", "direct", ["friend"]), context)).toBeNull();
+    expect(threadSegment(thread("d2", "direct", ["friend"]), context)).toBe("people");
     expect(threadSegment(thread("t-coaching", "direct", ["someone"]), context)).toBe("coach");
     expect(threadSegment(thread("b", "box", [], "me"), context)).toBe("clubs");
     expect(threadSegment(thread("c", "class_slot"), context)).toBe("clubs");
@@ -49,9 +49,16 @@ describe("inbox model", () => {
     expect(threadsIn(all, "all", context).map((item) => item.id)).toEqual(["a", "d2", "b"]);
     expect(threadsIn(all, "coach", context).map((item) => item.id)).toEqual(["a"]);
     expect(threadsIn(all, "clubs", context).map((item) => item.id)).toEqual(["b"]);
+    expect(threadsIn(all, "people", context).map((item) => item.id)).toEqual(["d2"]);
     expect(threadsIn(all, "partners", context)).toEqual([]);
     expect(showsIn(["partners"], "all")).toBe(true);
     expect(showsIn(["partners"], "coach")).toBe(false);
     expect(showsIn([], "all")).toBe(true);
+  });
+
+  it("offers «Partners» only to someone who has one", () => {
+    expect(visibleSegments({ hasPartners: false })).toEqual(["all", "people", "coach", "clubs"]);
+    expect(visibleSegments({ hasPartners: true })).toEqual(["all", "people", "coach", "clubs", "partners"]);
+    expect(parseInboxSegment("people")).toBe("people");
   });
 });

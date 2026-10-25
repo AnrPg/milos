@@ -284,6 +284,8 @@ defmodule PaleeWeb.EventOrganisersControllerTest do
     end
 
     test "an open event goes to the host's followers' feed; a block hides it", ctx do
+      private_account!(ctx.person)
+
       assert %{"status" => "requested"} =
                ctx.as.(ctx.follower)
                |> send_json(:post, "/api/me/follows", %{

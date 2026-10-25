@@ -180,7 +180,7 @@ defmodule Palee.Identity.DemoPeoplePrivacyTest do
       assert {:error, _reason} =
                Follows.follow(%{user_id: ctx.outsider.id}, "user", ctx.mock.id)
 
-      assert {:ok, %{status: "requested"}} =
+      assert {:ok, %{status: "active"}} =
                Follows.follow(%{user_id: ctx.outsider.id}, "user", ctx.owner.id)
     end
 

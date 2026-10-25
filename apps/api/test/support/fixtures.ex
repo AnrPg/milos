@@ -17,6 +17,23 @@ defmodule Palee.TestFixtures do
     user
   end
 
+  @doc """
+  ADR-193 §2 (amended 2026-10-25): accounts are public by default; this makes
+  one private, so following it is a request. Runs outside any acting user.
+  """
+  def private_account!(%{id: user_id} = user) do
+    Palee.Repo.query!(
+      """
+      INSERT INTO community_social_settings (user_id, private_account, inserted_at, updated_at)
+      VALUES ($1, true, now(), now())
+      ON CONFLICT (user_id) DO UPDATE SET private_account = true, updated_at = now()
+      """,
+      [Ecto.UUID.dump!(user_id)]
+    )
+
+    user
+  end
+
   def admin_fixture(attrs \\ %{}) do
     user = user_fixture(Map.put(attrs, :role, :member))
     {:ok, admin} = Identity.update_role(user, :admin)

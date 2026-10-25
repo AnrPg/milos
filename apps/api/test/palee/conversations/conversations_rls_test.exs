@@ -41,6 +41,18 @@ defmodule Palee.Conversations.ConversationsRLSTest do
     {ana_s, ana} = people.ana
     {ben_s, ben} = people.ben
 
+    # Public by default (ADR-193 §2, amended): Ben first makes his account private.
+    as_session(conn, ben_s, nil, false, fn ->
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO community_social_settings (user_id, share_bookings, private_account, inserted_at, updated_at)
+        VALUES ($1, false, true, now(), now())
+        """,
+        [ben]
+      )
+    end)
+
     as_session(conn, ana_s, nil, false, fn ->
       assert_raise Postgrex.Error, ~r/row-level security/, fn ->
         insert_follow(conn, ana, ben, "active")
@@ -50,10 +62,7 @@ defmodule Palee.Conversations.ConversationsRLSTest do
     as_session(conn, ben_s, nil, false, fn ->
       Postgrex.query!(
         conn,
-        """
-        INSERT INTO community_social_settings (user_id, share_bookings, private_account, inserted_at, updated_at)
-        VALUES ($1, false, false, now(), now())
-        """,
+        "UPDATE community_social_settings SET private_account = false WHERE user_id = $1",
         [ben]
       )
     end)

@@ -3,6 +3,11 @@ defmodule Palee.Infrastructure.Community.EctoCommunityStore do
 
   @behaviour Palee.Community.Ports.CommunityStore
 
+  # Typo-tolerant name search (ANR 2026-10-25): from this many characters,
+  # at this pg_trgm word similarity or closer.
+  @fuzzy_min 3
+  @fuzzy_threshold 0.5
+
   import Ecto.Query
 
   alias Palee.Community.{
@@ -298,7 +303,9 @@ defmodule Palee.Infrastructure.Community.EctoCommunityStore do
   end
 
   # Live open clubs anyone signed in can find; `organization_ids` narrows to
-  # some gyms, `query` matches the name.
+  # some gyms, `query` matches the name: as typed anywhere in it, or, from
+  # three characters on, a close spelling (pg_trgm word similarity, so a typo
+  # still finds the club; ANR 2026-10-25). Literal matches come first.
   @impl true
   def list_open_clubs(_context, filter) do
     Club
@@ -312,7 +319,25 @@ defmodule Palee.Infrastructure.Community.EctoCommunityStore do
     |> then(fn query ->
       case Map.get(filter, :query) do
         text when is_binary(text) and text != "" ->
-          where(query, [c], ilike(c.name, ^"%#{escape_like(text)}%"))
+          text = String.trim(text)
+          pattern = "%#{escape_like(text)}%"
+
+          if String.length(text) >= @fuzzy_min do
+            folded = String.downcase(text)
+
+            query
+            |> where(
+              [c],
+              ilike(c.name, ^pattern) or
+                fragment("word_similarity(?, lower(?)) >= ?", ^folded, c.name, ^@fuzzy_threshold)
+            )
+            |> order_by([c],
+              desc: ilike(c.name, ^pattern),
+              desc: fragment("word_similarity(?, lower(?))", ^folded, c.name)
+            )
+          else
+            where(query, [c], ilike(c.name, ^pattern))
+          end
 
         _none ->
           query

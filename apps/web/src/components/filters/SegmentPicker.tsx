@@ -2,7 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 
-import { chooseSegmentLayout, fittingColumns, type SegmentLayout } from "@/lib/segment-layout";
+import { chooseSegmentLayout, fittingColumns, rowFits, type SegmentLayout } from "@/lib/segment-layout";
 import { Select } from "@/components/ui/Select";
 import type { GuideAnchor } from "@/lib/guides/anchors";
 
@@ -97,11 +97,11 @@ export function SegmentPicker<T extends string>({
     const width = box.clientWidth - (variant === "track" ? 6 : 0);
     if (width <= 0) return;
     const chips = Array.from(ruler.children) as HTMLElement[];
-    const widest = chips.reduce((max, chip) => Math.max(max, chip.offsetWidth), 0);
-    const rowWidth = chips.reduce((sum, chip) => sum + chip.offsetWidth, 0) + GAP_PX * Math.max(0, chips.length - 1);
+    const widths = chips.map((chip) => chip.offsetWidth);
+    const widest = Math.max(0, ...widths);
     const next = chooseSegmentLayout({
       count: chips.length,
-      rowFits: rowWidth <= width,
+      rowFits: rowFits(widths, width, GAP_PX, stretch),
       columns: fittingColumns(width, widest, GAP_PX),
     });
     setLayout((current) =>
@@ -109,7 +109,7 @@ export function SegmentPicker<T extends string>({
         ? current
         : next,
     );
-  }, [variant]);
+  }, [variant, stretch]);
 
   // Labels or counts changing can change the widths, so remeasure every render
   // (cheap: a handful of offsetWidth reads) and on every resize.

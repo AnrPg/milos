@@ -11225,6 +11225,7 @@
     "segmentsLabel": "Qué mensajes ver",
     "segment": {
       "all": "Todos",
+      "people": "Personas",
       "coach": "Entrenador",
       "clubs": "Clubes",
       "partners": "Compañeros"

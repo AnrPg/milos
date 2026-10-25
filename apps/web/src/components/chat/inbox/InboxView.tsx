@@ -31,8 +31,8 @@ import { MessageBubble } from "../MessageBubble";
 import { MessageComposer } from "../MessageComposer";
 import { TOPIC_KEYS } from "../message-topics";
 import { TypingIndicator } from "../TypingIndicator";
-import { INBOX_SEGMENTS, showsIn, threadSegment, threadsIn, type InboxSegment, type ThreadSegmentContext } from "./inbox-model";
-import { INBOX_SOURCES } from "./inbox-sections";
+import { showsIn, visibleSegments, threadSegment, threadsIn, type InboxSegment, type ThreadSegmentContext } from "./inbox-model";
+import { INBOX_SOURCES, useHasPartners } from "./inbox-sections";
 
 interface SearchResult {
   id: string;
@@ -51,7 +51,7 @@ const EMPTY: ReadonlySet<string> = new Set();
  * the open thread, so the page keeps them in its address.
  */
 export function InboxView({
-  segment,
+  segment: requestedSegment,
   onSegmentChange,
   threadId,
   onThreadChange,
@@ -77,6 +77,10 @@ export function InboxView({
   const currentUserId = currentUser?.id ?? null;
 
   const { hideThread, isThreadHidden } = useUiPrefs();
+
+  // A segment that is not offered (e.g. «Partners» with none yet) reads as «Όλα».
+  const segments = visibleSegments({ hasPartners: useHasPartners() });
+  const segment: InboxSegment = segments.includes(requestedSegment) ? requestedSegment : "all";
 
   const [threads, setThreads] = useState<ChatThread[] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -225,7 +229,7 @@ export function InboxView({
   const topSources = sources.filter((source) => source.placement === "top");
   const bottomSources = sources.filter((source) => source.placement === "bottom");
   const searching = term.length >= PEOPLE_SEARCH_MIN_QUERY;
-  const segmentOptions = INBOX_SEGMENTS.map((value) => ({ value, label: t(`segment.${value}`) }));
+  const segmentOptions = segments.map((value) => ({ value, label: t(`segment.${value}`) }));
 
   if (view === "thread" && activeThread) {
     return (
@@ -422,7 +426,7 @@ export function InboxView({
             {/* A source renders nothing without rows, so the note hides beside any that has some. */}
             {threads !== null && visibleThreads.length === 0 ? (
               <p className="p-4 text-center text-sm group-has-[[data-inbox-source]>*]/inbox:hidden" style={{ color: "var(--dim)" }}>
-                {segment === "all" ? i18n("noConversationsYetSearchToStartOne1a91cf7") : t("emptySegment")}
+                {segment === "all" || segment === "people" ? i18n("noConversationsYetSearchToStartOne1a91cf7") : t("emptySegment")}
               </p>
             ) : null}
           </>

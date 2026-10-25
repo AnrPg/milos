@@ -237,6 +237,7 @@ defmodule Palee.Web.SocialControllerTest do
   describe "people" do
     test "a follow is a request; accepting it opens followers posts", ctx do
       %{as: as, member: author, outsider: follower, stranger: stranger} = ctx
+      private_account!(author)
 
       for {audience, body} <- [{"followers", "Fran PR 3:58"}, {"public", "Hello world"}] do
         assert %{"post" => %{"origin" => "profile", "audience" => ^audience}} =
@@ -305,9 +306,10 @@ defmodule Palee.Web.SocialControllerTest do
 
     test "connections search by name, ignoring case and accents (board 5 Q4)", ctx do
       %{as: as, member: me} = ctx
+      private_account!(me)
       n = System.unique_integer([:positive])
       maria = user_fixture(%{nickname: "Μαρία#{n}"})
-      kostas = user_fixture(%{nickname: "Kostas#{n}"})
+      kostas = private_account!(user_fixture(%{nickname: "Kostas#{n}"}))
 
       for user <- [maria, kostas] do
         assert %{"status" => "requested"} =

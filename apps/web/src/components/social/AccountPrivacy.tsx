@@ -14,7 +14,8 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
  * Κοινοποίηση & ορατότητα › «Ιδιωτικός λογαριασμός» and «Εμφάνιση στην
- * αναζήτηση» (ADR-193 §2). Private is the default: every follow is a request.
+ * αναζήτηση» (ADR-193 §2, amended 2026-10-25). Public and searchable are the
+ * default; a private account makes every follow a request.
  * Going public accepts the requests that are waiting, so with any waiting it
  * asks first; going private again keeps current followers.
  */
@@ -25,7 +26,7 @@ export function AccountPrivacySetting() {
   const queryClient = useQueryClient();
   const summary = useSocialSummary();
   const privacy = summary.data?.privacy;
-  const privateAccount = privacy?.private_account ?? true;
+  const privateAccount = privacy?.private_account ?? false;
   const searchable = privacy?.searchable ?? true;
   const waiting = summary.data?.requests_count ?? 0;
   const [confirmingPublic, setConfirmingPublic] = useState(false);

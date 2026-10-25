@@ -18,7 +18,7 @@ defmodule Palee.Community.SocialSettings do
     field :share_bookings_offered_at, :utc_datetime_usec
     field :hide_from_members, :boolean, default: false
     field :visible_around, :boolean, default: false
-    field :private_account, :boolean, default: true
+    field :private_account, :boolean, default: false
     field :searchable, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)

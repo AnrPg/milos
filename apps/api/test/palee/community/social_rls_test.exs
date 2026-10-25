@@ -46,6 +46,18 @@ defmodule Palee.Community.SocialRLSTest do
     {follower_s, follower} = people.follower
     {stranger_s, _stranger} = people.stranger
 
+    # Accounts are public by default (ADR-193 §2, amended): the author is private.
+    as_session(conn, author_s, nil, false, fn ->
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO community_social_settings (user_id, private_account, inserted_at, updated_at)
+        VALUES ($1, true, now(), now())
+        """,
+        [author]
+      )
+    end)
+
     as_session(conn, follower_s, nil, false, fn ->
       assert_raise Postgrex.Error, ~r/row-level security/, fn ->
         insert_follow(conn, follower, author, "active")
