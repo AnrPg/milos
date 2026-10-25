@@ -140,4 +140,24 @@ test.describe("social", () => {
     await page.getByRole("tab", { name: "PRs" }).click();
     await expect(page.getByText("They don't share their PRs with you.")).toBeVisible();
   });
+
+  test("the selected profile tab is a rounded Spark pill with room around its label", async ({ page }) => {
+    await stub(page);
+    await page.goto("/people/person-2");
+    const posts = page.getByRole("tab", { name: "Posts" });
+    await expect(posts).toHaveAttribute("aria-selected", "true");
+    const shape = await posts.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        radius: parseFloat(style.borderTopLeftRadius),
+        paddingLeft: parseFloat(style.paddingLeft),
+        paddingRight: parseFloat(style.paddingRight),
+        background: style.backgroundColor,
+      };
+    });
+    expect(shape.radius).toBeGreaterThanOrEqual(8);
+    expect(shape.paddingLeft).toBeGreaterThanOrEqual(8);
+    expect(shape.paddingRight).toBeGreaterThanOrEqual(8);
+    expect(shape.background).not.toBe("rgba(0, 0, 0, 0)");
+  });
 });
