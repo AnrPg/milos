@@ -26,7 +26,16 @@ defmodule PaleeWeb.StaffController do
         description: "Every role held in this gym (ADR-099), e.g. owner and coach",
         items: %Schema{
           type: :string,
-          enum: Enum.map(Palee.Organizations.Domain.MembershipPolicy.roles(), &to_string/1)
+          enum: [
+            "owner",
+            "admin",
+            "coach",
+            "front_desk",
+            "accountant",
+            "janitor",
+            "member",
+            "athlete"
+          ]
         }
       }
     },
