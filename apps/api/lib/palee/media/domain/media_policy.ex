@@ -47,6 +47,18 @@ defmodule Palee.Media.Domain.MediaPolicy do
       types: @client_image_types,
       max_bytes: 8 * @mb
     },
+    # ADR-202: a branch's floor plan, drawn on by staff. Re-encoded in the
+    # browser and inspected like box photos, but private: only staff of the
+    # gym see it, through signed URLs.
+    "floor_plan" => %{
+      scope: :tenant,
+      bucket: :media_private,
+      folder: "media/floor-plans",
+      kind: "image",
+      processing: :inspect,
+      types: @client_image_types,
+      max_bytes: 8 * @mb
+    },
     # ADR-158: body photos go through the post pipeline (server-stripped
     # renditions) but never into a post; private bucket, signed URLs only.
     "body_photo" => %{

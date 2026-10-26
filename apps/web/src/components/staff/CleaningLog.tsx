@@ -14,6 +14,7 @@ import {
   type CleaningEntry,
 } from "@/api/roles";
 import { useSession } from "@/components/session-provider";
+import { CLEANING_TODAY_KEY, CleaningSchedules, CleaningToday } from "@/components/spaces/CleaningToday";
 import { formatDateTime } from "@/components/client/format";
 import {
   StaffPanel,
@@ -37,7 +38,7 @@ import { can } from "@/lib/role-navigation";
 const AREAS_KEY = ["staff", "cleaning", "areas"] as const;
 const ENTRIES_KEY = ["staff", "cleaning", "entries"] as const;
 
-/** `/admin/cleaning`: what was cleaned, when and by whom (ADR-102). */
+/** `/admin/cleaning`: what was cleaned, when and by whom (ADR-102); what is due today (ADR-202). */
 export function CleaningLog() {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
@@ -47,10 +48,16 @@ export function CleaningLog() {
   const { membership } = useSelectedMembershipRole();
   const canRecord = can(membership, "record_cleaning");
   const canManage = can(membership, "manage_cleaning_areas");
+  const canSchedule = can(membership, "manage_cleaning_schedule");
 
   const areas = useQuery({ queryKey: AREAS_KEY, enabled: Boolean(token), queryFn: () => fetchCleaningAreas(token!) });
   const entries = useQuery({ queryKey: ENTRIES_KEY, enabled: Boolean(token), queryFn: () => fetchCleaningEntries(token!) });
-  const refresh = () => Promise.all([queryClient.invalidateQueries({ queryKey: AREAS_KEY }), queryClient.invalidateQueries({ queryKey: ENTRIES_KEY })]);
+  const refresh = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: AREAS_KEY }),
+      queryClient.invalidateQueries({ queryKey: ENTRIES_KEY }),
+      queryClient.invalidateQueries({ queryKey: CLEANING_TODAY_KEY }),
+    ]);
 
   const start = useMutation({ mutationFn: (areaId: string) => startCleaning(token!, areaId), onSuccess: refresh });
   const archive = useMutation({ mutationFn: (areaId: string) => archiveCleaningArea(token!, areaId), onSuccess: refresh });
@@ -72,6 +79,8 @@ export function CleaningLog() {
         {open.map((entry) => (
           <OpenCleaning key={entry.id} token={token!} entry={entry} area={areaById.get(entry.area_id)} onDone={refresh} />
         ))}
+
+        {token ? <CleaningToday token={token} canRecord={canRecord} onStart={(areaId) => start.mutate(areaId)} /> : null}
 
         <StaffPanel labelledBy="cleaning-areas" title={i18n("cleanAreas")}>
           {areas.isPending ? (
@@ -115,6 +124,8 @@ export function CleaningLog() {
           {start.isError ? <StatusText tone="error">{localizeError(start.error, i18n)}</StatusText> : null}
           {canManage && token ? <NewArea token={token} onDone={refresh} /> : null}
         </StaffPanel>
+
+        {canSchedule && token ? <CleaningSchedules token={token} spaces={activeAreas} /> : null}
 
         <StaffPanel labelledBy="cleaning-history" title={i18n("cleanHistory")}>
           {entries.isPending ? (

@@ -721,11 +721,37 @@ defmodule PaleeWeb.Router do
     get("/cleaning/entries", CleaningController, :entries)
     post("/cleaning/entries", CleaningController, :start)
     post("/cleaning/entries/:id/finish", CleaningController, :finish)
+    # ADR-202: the cleaning schedule and the janitor's «Σήμερα».
+    get("/cleaning/schedules", CleaningController, :schedules)
+    put("/cleaning/schedules/:space_id", CleaningController, :put_schedule)
+    delete("/cleaning/schedules/:space_id", CleaningController, :delete_schedule)
+    get("/cleaning/today", CleaningController, :today)
+    # ADR-202: Settings › Spaces.
+    get("/spaces", SpacesController, :index)
+    post("/spaces", SpacesController, :create)
+    get("/spaces/:id", SpacesController, :show)
+    patch("/spaces/:id", SpacesController, :update)
+    post("/spaces/:id/archive", SpacesController, :archive)
+    post("/spaces/:id/restore", SpacesController, :restore)
+    post("/spaces/:id/unavailability", SpacesController, :make_unavailable)
+
+    delete(
+      "/spaces/:id/unavailability/:window_id",
+      SpacesController,
+      :delete_unavailability
+    )
+
+    post("/floor-plans/uploads", SpacesController, :floor_plan_upload)
+    post("/floor-plans/uploads/:id/complete", SpacesController, :complete_floor_plan_upload)
+    post("/floor-plans", SpacesController, :create_floor_plan)
+    patch("/floor-plans/:id", SpacesController, :update_floor_plan)
+    delete("/floor-plans/:id", SpacesController, :delete_floor_plan)
     get("/inventory/machines", InventoryController, :machines)
     post("/inventory/machines", InventoryController, :create_machine)
     patch("/inventory/machines/:id", InventoryController, :update_machine)
     post("/inventory/machines/:id/archive", InventoryController, :archive_machine)
     get("/inventory/machines/:id/events", InventoryController, :machine_events)
+    put("/inventory/machines/:id/placements", InventoryController, :place_machine)
     post("/inventory/machines/:id/events", InventoryController, :log_machine_event)
     get("/inventory/supplies", InventoryController, :supplies)
     post("/inventory/supplies", InventoryController, :create_supply)

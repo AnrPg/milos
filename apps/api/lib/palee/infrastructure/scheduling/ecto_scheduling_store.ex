@@ -208,6 +208,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
               master_workout_id: series.master_workout_id,
               class_type_id: series.class_type_id,
               location_id: series.location_id,
+              space_id: series.space_id,
               coach_user_id: series.coach_user_id,
               class_series_id: series.id,
               name: series.name,
@@ -295,7 +296,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         |> ClassSeries.changeset(
           Map.take(
             params,
-            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id coach_user_id local_start_time status)
+            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id space_id coach_user_id local_start_time status)
           )
         )
         |> Repo.update()
@@ -490,6 +491,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> where([slot], slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at)
     |> for_organization(organization_id)
     |> maybe_filter_class_types(class_type_ids)
+    |> maybe_filter_spaces(opts[:space_ids])
     |> maybe_include_drafts(opts[:include_drafts] == true)
     |> order_by([slot], asc: slot.scheduled_at)
     |> Repo.all()
@@ -1434,6 +1436,10 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   defp maybe_filter_class_types(query, []), do: query
   defp maybe_filter_class_types(query, ids), do: where(query, [slot], slot.class_type_id in ^ids)
 
+  # ADR-202: the classes held in some spaces.
+  defp maybe_filter_spaces(query, nil), do: query
+  defp maybe_filter_spaces(query, ids), do: where(query, [slot], slot.space_id in ^ids)
+
   # ADR-176: drafts (no WOD, no series; see ClassWorkoutReadiness.published?/1)
   # are left out unless a staff view asks for them, so a new member-facing
   # caller can never show one by accident.
@@ -1548,6 +1554,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       class_type_id: slot.class_type_id,
       class_type: normalize_loaded_class_type(slot.class_type),
       location_id: slot.location_id,
+      space_id: slot.space_id,
       coach_user_id: slot.coach_user_id,
       scheduled_at: slot.scheduled_at,
       capacity: slot.capacity,
@@ -1663,6 +1670,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       master_workout_id: series.master_workout_id,
       class_type_id: series.class_type_id,
       location_id: series.location_id,
+      space_id: series.space_id,
       coach_user_id: series.coach_user_id,
       name: series.name,
       duration_minutes: series.duration_minutes,
@@ -1713,6 +1721,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
             master_workout_id: series.master_workout_id,
             class_type_id: series.class_type_id,
             location_id: series.location_id,
+            space_id: series.space_id,
             coach_user_id: series.coach_user_id,
             class_series_id: series.id,
             name: series.name,

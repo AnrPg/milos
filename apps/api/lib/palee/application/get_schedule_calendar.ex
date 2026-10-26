@@ -1,6 +1,6 @@
 defmodule Palee.Application.GetScheduleCalendar do
   alias Palee.{Community, Facility, Finance, Identity, Organizations, Scheduling, Workouts}
-  alias Palee.Application.BookingTerms
+  alias Palee.Application.{BookingTerms, ClassSpace}
   alias Palee.Scheduling.Domain.BookingPolicy
   alias Palee.TimeZones.ZonedTime
 
@@ -22,6 +22,7 @@ defmodule Palee.Application.GetScheduleCalendar do
         |> scope_located(context, actor)
         |> enrich_slots(context, actor)
         |> put_workout_status(context)
+        |> put_spaces(context, actor)
         |> put_package_coverage(context, actor)
         |> put_cancel_free_until(context, actor)
         |> put_friends_going(context, actor)
@@ -79,6 +80,11 @@ defmodule Palee.Application.GetScheduleCalendar do
     end)
   end
 
+  # ADR-202: the space of each class; staff also see when two classes share
+  # a space at the same time, or a space is unavailable then.
+  defp put_spaces(slots, context, actor),
+    do: ClassSpace.annotate(context, slots, admin_role?(context, actor))
+
   defp enrich_slots(slots, context, actor) do
     nickname_cache = booking_nickname_cache(slots, admin_role?(context, actor))
 
@@ -133,6 +139,7 @@ defmodule Palee.Application.GetScheduleCalendar do
         approved_booking_count: slot.approved_booking_count,
         spots_remaining: slot.spots_remaining,
         location_id: Map.get(slot, :location_id),
+        space_id: Map.get(slot, :space_id),
         coach_user_id: Map.get(slot, :coach_user_id),
         # ADR-200: a paused class takes no bookings; a cancelled one shows why.
         paused_at: Map.get(slot, :paused_at),

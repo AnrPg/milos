@@ -10255,10 +10255,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Cleaning areas */
+        /** Cleaning areas (the gym's spaces, ADR-202) */
         get: operations["PaleeWeb.CleaningController.areas"];
         put?: never;
-        /** Add a cleaning area */
+        /** Add a cleaning area (a space with tasks) */
         post: operations["PaleeWeb.CleaningController.create_area"];
         delete?: never;
         options?: never;
@@ -10329,6 +10329,58 @@ export interface paths {
         put?: never;
         /** Finish cleaning: the tasks done and an optional note */
         post: operations["PaleeWeb.CleaningController.finish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning/schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The cleaning schedule: per space, weekdays, times and a comment */
+        get: operations["PaleeWeb.CleaningController.schedules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning/schedules/{space_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set when a space is cleaned */
+        put: operations["PaleeWeb.CleaningController.put_schedule"];
+        post?: never;
+        /** Take a space off the cleaning schedule */
+        delete: operations["PaleeWeb.CleaningController.delete_schedule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Σήμερα»: the spaces due for cleaning today, with their floor plans */
+        get: operations["PaleeWeb.CleaningController.today"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10543,6 +10595,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/floor-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a floor plan (one floor of a branch) from a ready upload */
+        post: operations["PaleeWeb.SpacesController.create_floor_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/floor-plans/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a floor plan image (floor_plan) and get a presigned upload for it */
+        post: operations["PaleeWeb.SpacesController.floor_plan_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/floor-plans/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded floor plan image and mark it ready */
+        post: operations["PaleeWeb.SpacesController.complete_floor_plan_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/floor-plans/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a floor plan; the spaces drawn on it lose their area */
+        delete: operations["PaleeWeb.SpacesController.delete_floor_plan"];
+        options?: never;
+        head?: never;
+        /** Rename, reorder or replace the image of a floor plan */
+        patch: operations["PaleeWeb.SpacesController.update_floor_plan"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/form-reviews": {
         parameters: {
             query?: never;
@@ -10641,6 +10762,26 @@ export interface paths {
         put?: never;
         /** Log a note, issue, outage, repair call, service or repair */
         post: operations["PaleeWeb.InventoryController.log_machine_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/placements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set how many of a machine stand in which space (ADR-202)
+         * @description Replaces the machine's placement. The quantities may not add up to more than the quantity owned (`placement_exceeds_quantity`); the rest is unassigned.
+         */
+        put: operations["PaleeWeb.InventoryController.place_machine"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -11314,6 +11455,113 @@ export interface paths {
         /** Receive, adjust (with a reason), recount or transfer a variant's stock */
         post: operations["PaleeWeb.ShopController.record_movement"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Spaces and floor plans of the branches the caller works at */
+        get: operations["PaleeWeb.SpacesController.index"];
+        put?: never;
+        /** Add a space */
+        post: operations["PaleeWeb.SpacesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A space with its unavailability, upcoming classes and machines */
+        get: operations["PaleeWeb.SpacesController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a space (front desk: name, description and directions only) */
+        patch: operations["PaleeWeb.SpacesController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a space (its history and cleaning log are kept) */
+        post: operations["PaleeWeb.SpacesController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bring an archived space back */
+        post: operations["PaleeWeb.SpacesController.restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/unavailability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a space unavailable from–to, with a reason
+         * @description Classes cannot be planned in the space while it is unavailable (`space_unavailable`). Classes already planned then keep their space and are returned as affected_classes.
+         */
+        post: operations["PaleeWeb.SpacesController.make_unavailable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/unavailability/{window_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove an unavailability window */
+        delete: operations["PaleeWeb.SpacesController.delete_unavailability"];
         options?: never;
         head?: never;
         patch?: never;
@@ -17762,7 +18010,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -17794,7 +18042,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -17864,7 +18112,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                    purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -17896,7 +18144,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                    purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -19352,6 +19600,15 @@ export interface components {
         CleaningArea: {
             /** Format: date-time */
             archived_at?: string | null;
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            /** Format: uuid */
+            floor_plan_id?: string | null;
             /** Format: uuid */
             id: string;
             /** Format: date-time */
@@ -19360,6 +19617,29 @@ export interface components {
             location_id?: string | null;
             name: string;
             tasks: string[];
+        };
+        /** CleaningDue */
+        CleaningDue: {
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            cleanings_done: number;
+            cleanings_due: number;
+            comment?: string | null;
+            done: boolean;
+            /** Format: uuid */
+            floor_plan_id?: string | null;
+            /** Format: uuid */
+            location_id?: string | null;
+            name: string;
+            /** Format: uuid */
+            space_id: string;
+            tasks: string[];
+            times: string[];
         };
         /** CleaningEntry */
         CleaningEntry: {
@@ -19376,6 +19656,16 @@ export interface components {
             tasks_done: string[];
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** CleaningSchedule */
+        CleaningSchedule: {
+            comment?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            space_id: string;
+            times: string[];
+            weekdays: number[];
         };
         /**
          * ClientTrainingDepth
@@ -25300,6 +25590,20 @@ export interface components {
                 user_id: string;
             };
         };
+        /** FloorPlan */
+        FloorPlan: {
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            image_url?: string | null;
+            /** Format: uuid */
+            location_id?: string | null;
+            /** Format: uuid */
+            media_id: string;
+            name: string;
+            sort_order: number;
+            width?: number | null;
+        };
         /** FollowEntry */
         FollowEntry: {
             box?: {
@@ -26004,6 +26308,11 @@ export interface components {
             /** Format: date */
             next_service_on?: string | null;
             notes?: string | null;
+            placements?: {
+                quantity: number;
+                /** Format: uuid */
+                space_id: string;
+            }[];
             purchase_price_cents?: number | null;
             /** Format: date */
             purchased_on?: string | null;
@@ -26014,6 +26323,7 @@ export interface components {
             service_interval_days?: number | null;
             /** @enum {string} */
             status: "working" | "needs_attention" | "out_of_order" | "retired";
+            unassigned?: number;
             /** Format: date */
             warranty_until?: string | null;
         };
@@ -26568,6 +26878,12 @@ export interface components {
                 thread_id?: string;
             } | null;
         };
+        /** MachinePlacement */
+        MachinePlacement: {
+            quantity: number;
+            /** Format: uuid */
+            space_id: string;
+        };
         /** Media */
         Media: {
             alt_text?: string | null;
@@ -26583,7 +26899,7 @@ export interface components {
             /** @description A tiny blurred WebP data URI to show while the image loads */
             placeholder?: string | null;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
             rejection_reason?: string | null;
             /**
              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -26627,7 +26943,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -33778,6 +34094,137 @@ export interface components {
                 searchable: boolean;
             };
             requests_count: number;
+        };
+        /** Space */
+        Space: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            description?: string | null;
+            directions?: string | null;
+            /** Format: uuid */
+            floor_plan_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            name: string;
+            tasks: string[];
+            unavailability?: {
+                /** Format: uuid */
+                created_by_id?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                reason?: string | null;
+                /** Format: uuid */
+                space_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+        };
+        /**
+         * SpaceArea
+         * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+         */
+        SpaceArea: {
+            points: number[][];
+        } | null;
+        /** SpaceClass */
+        SpaceClass: {
+            approved_booking_count?: number;
+            capacity?: number;
+            /** Format: uuid */
+            coach_user_id?: string | null;
+            duration_minutes: number;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date-time */
+            scheduled_at: string;
+        };
+        /** SpaceDetail */
+        SpaceDetail: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            classes: {
+                approved_booking_count?: number;
+                capacity?: number;
+                /** Format: uuid */
+                coach_user_id?: string | null;
+                duration_minutes: number;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** Format: date-time */
+                scheduled_at: string;
+            }[];
+            description?: string | null;
+            directions?: string | null;
+            equipment: {
+                /** Format: uuid */
+                machine_id: string;
+                name: string;
+                quantity: number;
+                status: string;
+            }[];
+            /** Format: uuid */
+            floor_plan_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            name: string;
+            tasks: string[];
+            unavailability: {
+                /** Format: uuid */
+                created_by_id?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                reason?: string | null;
+                /** Format: uuid */
+                space_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+        };
+        /** SpaceEquipment */
+        SpaceEquipment: {
+            /** Format: uuid */
+            machine_id: string;
+            name: string;
+            quantity: number;
+            status: string;
+        };
+        /** SpaceUnavailability */
+        SpaceUnavailability: {
+            /** Format: uuid */
+            created_by_id?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            reason?: string | null;
+            /** Format: uuid */
+            space_id: string;
+            /** Format: date-time */
+            starts_at: string;
         };
         /** StaffCommunityEvent */
         StaffCommunityEvent: {
@@ -53845,7 +54292,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -53924,7 +54371,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -54007,7 +54454,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71131,7 +71578,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71163,7 +71610,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71259,7 +71706,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71291,7 +71738,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71409,7 +71856,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71484,7 +71931,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71516,7 +71963,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71661,7 +72108,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -71693,7 +72140,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -72871,6 +73318,8 @@ export interface operations {
                     name?: string;
                     /** Format: date-time */
                     scheduled_at: string;
+                    /** Format: uuid */
+                    space_id?: string | null;
                 };
             };
         };
@@ -72924,6 +73373,8 @@ export interface operations {
                     /** Format: uuid */
                     master_workout_id?: string | null;
                     name: string;
+                    /** Format: uuid */
+                    space_id?: string | null;
                     /** Format: date */
                     starts_on: string;
                     timezone: string;
@@ -73011,6 +73462,8 @@ export interface operations {
                      * @enum {string}
                      */
                     series_scope?: "this" | "all" | "range";
+                    /** Format: uuid */
+                    space_id?: string | null;
                 };
             };
         };
@@ -89467,6 +89920,18 @@ export interface operations {
                                 id: string;
                                 nickname?: string | null;
                             }[];
+                            /** @description ADR-202: the room or area of the branch the class is held in. */
+                            space?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            space_id?: string | null;
+                            /** @description Staff only: another class is in the same space at an overlapping time (a warning, not a block). */
+                            space_overlap?: boolean;
+                            /** @description Staff only: the space was made unavailable for this class's time after it was planned. */
+                            space_unavailable?: boolean;
                             workout?: ({
                                 /** @description What the workout trains, read from its movements. */
                                 focus?: ("strength" | "endurance" | "gymnastics" | "olympic_lifting" | "mobility" | "legs" | "core" | "upper_body")[];
@@ -89915,6 +90380,15 @@ export interface operations {
                         areas: {
                             /** Format: date-time */
                             archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -89958,6 +90432,15 @@ export interface operations {
                         area: {
                             /** Format: date-time */
                             archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -90003,6 +90486,15 @@ export interface operations {
                         area: {
                             /** Format: date-time */
                             archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -90039,6 +90531,15 @@ export interface operations {
                         area: {
                             /** Format: date-time */
                             archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -90176,6 +90677,172 @@ export interface operations {
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.CleaningController.schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Schedules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        schedules: {
+                            comment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            space_id: string;
+                            times: string[];
+                            weekdays: number[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.CleaningController.put_schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                space_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    comment?: string | null;
+                    times?: string[];
+                    weekdays: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Schedule */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CleaningSchedule */
+                        schedule: {
+                            comment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            space_id: string;
+                            times: string[];
+                            weekdays: number[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.CleaningController.delete_schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                space_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.CleaningController.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Today */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date */
+                        date: string;
+                        due: {
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            cleanings_done: number;
+                            cleanings_due: number;
+                            comment?: string | null;
+                            done: boolean;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            space_id: string;
+                            tasks: string[];
+                            times: string[];
+                        }[];
+                        floor_plans: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            sort_order: number;
+                            width?: number | null;
+                        }[];
+                        open_entries: {
+                            /** Format: uuid */
+                            area_id: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            started_at: string;
+                            tasks_done: string[];
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
                     };
                 };
             };
@@ -91108,6 +91775,228 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.SpacesController.create_floor_plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    media_id?: string;
+                    name?: string;
+                    sort_order?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Floor plan */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FloorPlan */
+                        floor_plan: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            sort_order: number;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.floor_plan_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.complete_floor_plan_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.delete_floor_plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Floor plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FloorPlan */
+                        floor_plan: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            sort_order: number;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.update_floor_plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    media_id?: string;
+                    name?: string;
+                    sort_order?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Floor plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FloorPlan */
+                        floor_plan: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            sort_order: number;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.CoachingExtrasController.form_review_queue": {
         parameters: {
             query?: {
@@ -91247,6 +92136,11 @@ export interface operations {
                             /** Format: date */
                             next_service_on?: string | null;
                             notes?: string | null;
+                            placements?: {
+                                quantity: number;
+                                /** Format: uuid */
+                                space_id: string;
+                            }[];
                             purchase_price_cents?: number | null;
                             /** Format: date */
                             purchased_on?: string | null;
@@ -91257,6 +92151,7 @@ export interface operations {
                             service_interval_days?: number | null;
                             /** @enum {string} */
                             status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            unassigned?: number;
                             /** Format: date */
                             warranty_until?: string | null;
                         }[];
@@ -91323,6 +92218,11 @@ export interface operations {
                             /** Format: date */
                             next_service_on?: string | null;
                             notes?: string | null;
+                            placements?: {
+                                quantity: number;
+                                /** Format: uuid */
+                                space_id: string;
+                            }[];
                             purchase_price_cents?: number | null;
                             /** Format: date */
                             purchased_on?: string | null;
@@ -91333,6 +92233,7 @@ export interface operations {
                             service_interval_days?: number | null;
                             /** @enum {string} */
                             status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            unassigned?: number;
                             /** Format: date */
                             warranty_until?: string | null;
                         };
@@ -91401,6 +92302,11 @@ export interface operations {
                             /** Format: date */
                             next_service_on?: string | null;
                             notes?: string | null;
+                            placements?: {
+                                quantity: number;
+                                /** Format: uuid */
+                                space_id: string;
+                            }[];
                             purchase_price_cents?: number | null;
                             /** Format: date */
                             purchased_on?: string | null;
@@ -91411,6 +92317,7 @@ export interface operations {
                             service_interval_days?: number | null;
                             /** @enum {string} */
                             status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            unassigned?: number;
                             /** Format: date */
                             warranty_until?: string | null;
                         };
@@ -91455,6 +92362,11 @@ export interface operations {
                             /** Format: date */
                             next_service_on?: string | null;
                             notes?: string | null;
+                            placements?: {
+                                quantity: number;
+                                /** Format: uuid */
+                                space_id: string;
+                            }[];
                             purchase_price_cents?: number | null;
                             /** Format: date */
                             purchased_on?: string | null;
@@ -91465,6 +92377,7 @@ export interface operations {
                             service_interval_days?: number | null;
                             /** @enum {string} */
                             status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            unassigned?: number;
                             /** Format: date */
                             warranty_until?: string | null;
                         };
@@ -91589,6 +92502,11 @@ export interface operations {
                             /** Format: date */
                             next_service_on?: string | null;
                             notes?: string | null;
+                            placements?: {
+                                quantity: number;
+                                /** Format: uuid */
+                                space_id: string;
+                            }[];
                             purchase_price_cents?: number | null;
                             /** Format: date */
                             purchased_on?: string | null;
@@ -91599,9 +92517,51 @@ export interface operations {
                             service_interval_days?: number | null;
                             /** @enum {string} */
                             status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            unassigned?: number;
                             /** Format: date */
                             warranty_until?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.InventoryController.place_machine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    placements: {
+                        quantity: number;
+                        /** Format: uuid */
+                        space_id: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Placement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        machine_id: string;
+                        placements: {
+                            quantity: number;
+                            /** Format: uuid */
+                            space_id: string;
+                        }[];
+                        unassigned: number;
                     };
                 };
             };
@@ -93893,7 +94853,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -95501,6 +96461,521 @@ export interface operations {
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.index": {
+        parameters: {
+            query?: {
+                location_id?: string;
+                include_archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Spaces */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        floor_plans: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            sort_order: number;
+                            width?: number | null;
+                        }[];
+                        spaces: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability?: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * SpaceArea
+                     * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                     */
+                    area?: {
+                        points: number[][];
+                    } | null;
+                    description?: string | null;
+                    directions?: string | null;
+                    /** Format: uuid */
+                    floor_plan_id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string;
+                    tasks?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Space */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Space */
+                        space: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability?: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Space */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpaceDetail */
+                        space: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            classes: {
+                                approved_booking_count?: number;
+                                capacity?: number;
+                                /** Format: uuid */
+                                coach_user_id?: string | null;
+                                duration_minutes: number;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            }[];
+                            description?: string | null;
+                            directions?: string | null;
+                            equipment: {
+                                /** Format: uuid */
+                                machine_id: string;
+                                name: string;
+                                quantity: number;
+                                status: string;
+                            }[];
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * SpaceArea
+                     * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                     */
+                    area?: {
+                        points: number[][];
+                    } | null;
+                    description?: string | null;
+                    directions?: string | null;
+                    /** Format: uuid */
+                    floor_plan_id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string;
+                    tasks?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Space */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Space */
+                        space: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability?: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Space */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Space */
+                        space: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability?: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Space */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Space */
+                        space: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            floor_plan_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            tasks: string[];
+                            unavailability?: {
+                                /** Format: uuid */
+                                created_by_id?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                reason?: string | null;
+                                /** Format: uuid */
+                                space_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.make_unavailable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date-time */
+                    ends_at: string;
+                    reason?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Unavailability */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        affected_classes: {
+                            approved_booking_count?: number;
+                            capacity?: number;
+                            /** Format: uuid */
+                            coach_user_id?: string | null;
+                            duration_minutes: number;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        }[];
+                        /** SpaceUnavailability */
+                        unavailability: {
+                            /** Format: uuid */
+                            created_by_id?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            space_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.delete_unavailability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                window_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unavailability */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpaceUnavailability */
+                        unavailability: {
+                            /** Format: uuid */
+                            created_by_id?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            space_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
                         };
                     };
                 };

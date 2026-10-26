@@ -167,6 +167,13 @@ export type ScheduleSlot = {
   /** The member's own guest booking for this class, if any. */
   current_user_guest?: ScheduleBooking | null;
   location_id?: string | null;
+  /** ADR-202: the room or area of the branch the class is held in. */
+  space_id?: string | null;
+  space?: { id: string; name: string } | null;
+  /** Staff only: another class shares the space at an overlapping time (a warning). */
+  space_overlap?: boolean;
+  /** Staff only: the space was made unavailable for this class's time. */
+  space_unavailable?: boolean;
   coach_user_id?: string | null;
   /** ADR-200: a paused class takes no new bookings; existing ones stay. */
   paused_at?: string | null;
@@ -226,6 +233,8 @@ export type ScheduleSlotPayload = {
   booking_timeout_minutes: number;
   /** Optional gym location (ADR-097); null for single-site gyms. */
   location_id?: string | null;
+  /** Optional space of the branch (ADR-202). */
+  space_id?: string | null;
 };
 
 export async function fetchSchedule(
@@ -391,6 +400,8 @@ export async function createScheduleSeries(
     auto_approve: boolean;
     booking_timeout_minutes: number;
     location_id?: string | null;
+    /** ADR-202: the space every class of the series is held in. */
+    space_id?: string | null;
     /** ADR-186 §8: one series per branch, created together. */
     location_ids?: string[];
     /** Optional (ADR-176): each occurrence can get its own WOD later. */

@@ -17,6 +17,8 @@ defmodule Palee.Scheduling.ScheduledClass do
     field :booking_timeout_minutes, :integer, default: 60
     # ADR-097: optional Facility location.
     field :location_id, :binary_id
+    # ADR-202: optional space (room) of the branch.
+    field :space_id, :binary_id
     # The coach who runs it (ADR-100).
     field :coach_user_id, :binary_id
     # ADR-200 §2: paused = no new bookings; cancelled = it will not happen.
@@ -39,6 +41,7 @@ defmodule Palee.Scheduling.ScheduledClass do
       :master_workout_id,
       :class_type_id,
       :location_id,
+      :space_id,
       :coach_user_id,
       :class_series_id,
       :name,
@@ -67,6 +70,7 @@ defmodule Palee.Scheduling.ScheduledClass do
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)
     |> foreign_key_constraint(:location_id)
+    |> foreign_key_constraint(:space_id, name: :scheduled_classes_space_fkey)
     |> foreign_key_constraint(:class_series_id)
   end
 

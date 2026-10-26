@@ -1,5 +1,5 @@
 defmodule Palee.Application.CreateRecurringClassSeries do
-  alias Palee.Application.{ClassLocation, ScheduleRealtime, TrackAnalyticsEvent}
+  alias Palee.Application.{ClassLocation, ClassSpace, ScheduleRealtime, TrackAnalyticsEvent}
   alias Palee.Scheduling
   alias Palee.Workouts
 
@@ -10,6 +10,7 @@ defmodule Palee.Application.CreateRecurringClassSeries do
     with {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          :ok <- ClassLocation.check(context, params),
+         :ok <- ClassSpace.check_series(context, params),
          {:ok, series} <- create_series(context, params) do
       ScheduleRealtime.broadcast("series_created", series)
       TrackAnalyticsEvent.call("class_series_created", context, series)
@@ -39,6 +40,7 @@ defmodule Palee.Application.CreateRecurringClassSeries do
   defp create_many(context, params, items) do
     with {:ok, _workout} <- fetch_workout(context, value(params, :master_workout_id)),
          {:ok, _class_type} <- fetch_class_type(context, value(params, :class_type_id)),
+         :ok <- ClassSpace.check_all(context, items, &ClassSpace.check_series/2),
          {:ok, all} <- ClassLocation.create_all(context, items, &create_series(context, &1)) do
       Enum.each(all, fn series ->
         ScheduleRealtime.broadcast("series_created", series)

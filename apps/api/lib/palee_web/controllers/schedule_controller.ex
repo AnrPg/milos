@@ -115,6 +115,27 @@ defmodule PaleeWeb.ScheduleController do
                  type: :object,
                  additionalProperties: true,
                  properties: %{
+                   space_id: %Schema{type: :string, format: :uuid, nullable: true},
+                   space: %Schema{
+                     type: :object,
+                     nullable: true,
+                     description: "ADR-202: the room or area of the branch the class is held in.",
+                     properties: %{
+                       id: %Schema{type: :string, format: :uuid},
+                       name: %Schema{type: :string}
+                     },
+                     required: [:id, :name]
+                   },
+                   space_overlap: %Schema{
+                     type: :boolean,
+                     description:
+                       "Staff only: another class is in the same space at an overlapping time (a warning, not a block)."
+                   },
+                   space_unavailable: %Schema{
+                     type: :boolean,
+                     description:
+                       "Staff only: the space was made unavailable for this class's time after it was planned."
+                   },
                    cancel_free_until: %Schema{
                      type: :string,
                      format: :"date-time",

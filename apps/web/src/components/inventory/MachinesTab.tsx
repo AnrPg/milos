@@ -45,6 +45,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { Select } from "@/components/ui/Select";
+import { MachinePlacement } from "@/components/inventory/MachinePlacement";
 import { DateInput } from "@/components/ui/DateInput";
 
 export const MACHINES_KEY = ["staff", "inventory", "machines"] as const;
@@ -191,6 +192,7 @@ function MachineRow({
               {archive.isError ? <StatusText tone="error">{localizeError(archive.error, i18n)}</StatusText> : null}
             </>
           )}
+          {editing ? null : <MachinePlacement token={token} machine={machine} machinesKey={MACHINES_KEY} />}
           {kinds.length > 0 ? <EventForm token={token} machine={machine} kinds={kinds} /> : null}
           <EventLog token={token} machineId={machine.id} />
         </div>

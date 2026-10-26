@@ -72,6 +72,41 @@ defmodule Palee.Organizations.Domain.AccessPolicyTest do
     assert Map.keys(janitor) |> Enum.sort() == [:record_cleaning, :report_inventory]
   end
 
+  test "spaces: owners and admins manage, front desk edits details and unavailability (ADR-202)" do
+    for role <- [:owner, :admin] do
+      rights = caps([role])
+
+      for capability <- [
+            :manage_spaces,
+            :edit_space_details,
+            :set_space_unavailable,
+            :view_spaces,
+            :manage_cleaning_schedule
+          ] do
+        assert AccessPolicy.can?(rights, capability), inspect({role, capability})
+      end
+    end
+
+    desk = caps([:front_desk])
+    assert AccessPolicy.can?(desk, :edit_space_details)
+    assert AccessPolicy.can?(desk, :set_space_unavailable)
+    assert AccessPolicy.can?(desk, :view_spaces)
+    assert AccessPolicy.can?(desk, :manage_cleaning_schedule)
+    refute AccessPolicy.can?(desk, :manage_spaces)
+
+    coach = caps([:coach])
+    assert AccessPolicy.can?(coach, :view_spaces)
+    refute AccessPolicy.can?(coach, :edit_space_details)
+    refute AccessPolicy.can?(coach, :manage_cleaning_schedule)
+
+    refute AccessPolicy.can?(caps([:janitor]), :view_spaces)
+
+    # A gym may let its front desk add spaces and draw floor plans too.
+    granted = caps([:front_desk], role_grants: %{"front_desk" => ["manage_spaces"]})
+    assert AccessPolicy.can?(granted, :manage_spaces)
+    assert :manage_spaces in AccessPolicy.grantable().front_desk
+  end
+
   test "rights are the union of roles and the wider scope wins" do
     both = caps([:coach, :admin])
     assert AccessPolicy.scope(both, :manage_coaching) == :all

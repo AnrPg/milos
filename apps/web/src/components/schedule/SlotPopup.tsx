@@ -130,6 +130,7 @@ export function SlotPopup({
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
+  const spaceT = useTranslations("Spaces");
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
@@ -425,6 +426,26 @@ export function SlotPopup({
                   style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
                 >
                   {i18n("mbLocationAt", { location: locationName })}
+                </span>
+              ) : null}
+              {/* ADR-202: the space of the class; staff also see a clash with another class or a closure. */}
+              {slot.space ? (
+                <span
+                  data-testid="slot-space"
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {spaceT("classSpaceAt", { space: slot.space.name })}
+                </span>
+              ) : null}
+              {slot.space_unavailable ? (
+                <span data-testid="slot-space-unavailable" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--danger)", color: "var(--danger)" }}>
+                  {spaceT("classSpaceUnavailable")}
+                </span>
+              ) : null}
+              {slot.space_overlap ? (
+                <span data-testid="slot-space-overlap" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--warning)", color: "var(--warning)" }}>
+                  {spaceT("classSpaceOverlap")}
                 </span>
               ) : null}
               {creditCost ? (

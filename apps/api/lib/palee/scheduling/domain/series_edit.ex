@@ -18,7 +18,7 @@ defmodule Palee.Scheduling.Domain.SeriesEdit do
 
   alias Palee.Scheduling.Domain.RecurrenceRule
 
-  @shared ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id coach_user_id)
+  @shared ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id space_id coach_user_id)
 
   @type scope :: :this | :all | {:range, Date.t(), Date.t()}
 

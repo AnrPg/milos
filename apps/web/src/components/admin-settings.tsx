@@ -33,6 +33,7 @@ import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
 import { TrialsLink } from "@/components/admin/trials/TrialsLink";
 import { CommunitySettingsLink } from "@/components/admin/community/CommunitySettings";
 import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
+import { SpacesSettingsLink } from "@/components/spaces/SpacesSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -1267,6 +1268,9 @@ export function AdminSettingsHub() {
           {token ? (
             <CollapsibleSection id="locations" title={i18n("admLocationsTitle")} description={i18n("admLocationsDescription")}>
               <LocationSettings token={token} />
+              <div className="mt-3">
+                <SpacesSettingsLink />
+              </div>
             </CollapsibleSection>
           ) : (
             <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
@@ -1360,6 +1364,9 @@ export function AdminSettingsHub() {
               defaultOpen={false}
             >
               <LocationSettings token={token} />
+              <div className="mt-3">
+                <SpacesSettingsLink />
+              </div>
             </CollapsibleSection>
 
             <CollapsibleSection

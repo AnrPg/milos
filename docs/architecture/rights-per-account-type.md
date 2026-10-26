@@ -127,6 +127,14 @@ admin is logged and the coach is notified with who read which note and when
 | Coaching analytics | ✔ | ✔ | own | — | — | — | own progress |
 | Cleaning log: record cleaning | ✔ | ✔ | — | — | — | ✔ | — |
 | Cleaning log: review, set areas and tasks | ✔ | ✔ | — | 👁 | — | own entries | — |
+| Cleaning schedule: days, times and a comment per space (`manage_cleaning_schedule`, ADR-202) | ✔ | ✔ | — | ✔ | — | — | — |
+| Cleaning «Σήμερα»: what is due today, tap a space on the floor plan to start it (ADR-202) | ✔ | ✔ | — | 👁 | — | ✔ | — |
+| Spaces: add, archive, restore, branch, cleaning checklist; floor plans and drawing areas (`manage_spaces`, ADR-202) ⁷ | ✔ | ✔ | — | unlockable | — | — | — |
+| Spaces: edit name, description and directions (`edit_space_details`) | ✔ | ✔ | — | ✔ | — | — | — |
+| Spaces: make unavailable from–to with a reason, remove a closure (`set_space_unavailable`) | ✔ | ✔ | — | ✔ | — | — | — |
+| Spaces: see the list, floor plans, upcoming classes and equipment of a space (`view_spaces`) | ✔ | ✔ | ✔ | ✔ | — | — | — |
+| Class space: set the space of a class (whoever can edit the class) | ✔ | ✔ | classes they can edit | — | — | — | sees the space name |
+| Equipment placement: how many of a machine stand in which space (`manage_inventory` or `manage_spaces`) | ✔ | ✔ | 👁 | ✔ | — | — | — |
 | Inventory: add and edit items, prices, shops; restock, use, recount; service, repair, retire; inventory report (`manage_inventory`) | ✔ | ✔ | — | ✔ | — | — | — |
 | Inventory: see machines and consumables without prices or shops; log notes, issues, outages; report running low (`report_inventory`) ³ | ✔ | ✔ | ✔ | ✔ | — | ✔ | — |
 | Shop: products, variants, prices, publishing, stock movements, «Προώθηση» (`manage_shop`, ADR-190) ⁶ | ✔ | ✔ | — | unlockable | — | — | — |
@@ -151,6 +159,13 @@ the attendee list any of the three (ADR-153).
 scoped staff (ADR-186) see orders picked up at their branches and products
 valid at them. A demo business (ADR-184) builds its catalog but cannot
 publish for visitors (`anyone`) or sell to real people.
+
+⁷ A class cannot take place in a space while it is unavailable
+(`space_unavailable`); two classes in the same space at once only get a
+warning on the schedule, for staff. Branch-scoped staff (ADR-186) see and
+change only the spaces and floor plans of their branches; gym-wide spaces
+(no branch) are for staff of every branch. A gym can unlock `manage_spaces`
+for its front desk in Settings › Role access.
 
 ## 4. Rules that are easy to get wrong
 

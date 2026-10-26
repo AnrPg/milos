@@ -11,11 +11,7 @@ defmodule Palee.Housekeeping.HousekeepingStore do
   end
 
   @impl true
-  def list_areas(context, filters), do: tenant_call(context, :list_areas, [filters])
-  @impl true
-  def get_area(context, id), do: tenant_call(context, :get_area, [id])
-  @impl true
-  def save_area(context, id, attrs), do: tenant_call(context, :save_area, [id, attrs])
+  def last_cleaned(context, area_ids), do: tenant_call(context, :last_cleaned, [area_ids])
   @impl true
   def start_entry(context, attrs), do: tenant_call(context, :start_entry, [attrs])
   @impl true
@@ -24,4 +20,12 @@ defmodule Palee.Housekeeping.HousekeepingStore do
   def finish_entry(context, id, attrs), do: tenant_call(context, :finish_entry, [id, attrs])
   @impl true
   def list_entries(context, filters), do: tenant_call(context, :list_entries, [filters])
+  @impl true
+  def list_schedules(context), do: tenant_call(context, :list_schedules, [])
+  @impl true
+  def put_schedule(context, space_id, attrs),
+    do: tenant_call(context, :put_schedule, [space_id, attrs])
+
+  @impl true
+  def delete_schedule(context, space_id), do: tenant_call(context, :delete_schedule, [space_id])
 end

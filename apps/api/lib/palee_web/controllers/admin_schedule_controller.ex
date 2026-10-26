@@ -40,6 +40,8 @@ defmodule PaleeWeb.AdminScheduleController do
       master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
       class_type_id: %Schema{type: :string, format: :uuid},
       location_id: %Schema{type: :string, format: :uuid, nullable: true},
+      # ADR-202: the room or area of the branch.
+      space_id: %Schema{type: :string, format: :uuid, nullable: true},
       coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
       name: %Schema{type: :string, minLength: 1, maxLength: 120},
       duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
@@ -178,6 +180,7 @@ defmodule PaleeWeb.AdminScheduleController do
               class_type_id: %Schema{type: :string, format: :uuid},
               location_id: %Schema{type: :string, format: :uuid, nullable: true},
               location_ids: PaleeWeb.Schemas.LocationScope.targets_schema(),
+              space_id: %Schema{type: :string, format: :uuid, nullable: true},
               coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
               master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
               name: %Schema{type: :string, minLength: 1, maxLength: 120},
