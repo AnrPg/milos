@@ -25,6 +25,13 @@ defmodule Palee.Inventory.InventoryStore do
     do: tenant_call(context, :list_machine_events, [filters])
 
   @impl true
+  def list_placements(context, filters), do: tenant_call(context, :list_placements, [filters])
+
+  @impl true
+  def replace_placements(context, machine_id, placements),
+    do: tenant_call(context, :replace_placements, [machine_id, placements])
+
+  @impl true
   def list_supplies(context, filters), do: tenant_call(context, :list_supplies, [filters])
   @impl true
   def get_supply(context, id), do: tenant_call(context, :get_supply, [id])

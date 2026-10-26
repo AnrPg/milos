@@ -18,7 +18,10 @@ defmodule PaleeWeb.Schemas.Cleaning do
         location_id: %Schema{type: :string, format: :uuid, nullable: true},
         tasks: %Schema{type: :array, items: %Schema{type: :string}},
         archived_at: @time,
-        last_cleaned_at: @time
+        last_cleaned_at: @time,
+        # ADR-202: an area is a space; where it is drawn on a floor plan.
+        floor_plan_id: %Schema{type: :string, format: :uuid, nullable: true},
+        area: PaleeWeb.Schemas.Spaces.area()
       },
       required: [:id, :name, :tasks]
     }

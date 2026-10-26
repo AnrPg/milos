@@ -7,6 +7,7 @@ defmodule Palee.Application.UpdateScheduledSlot do
 
   alias Palee.Application.{
     ClassLocation,
+    ClassSpace,
     ClassWorkoutFiling,
     PromoteClassWaitlist,
     ScheduleRealtime
@@ -40,6 +41,7 @@ defmodule Palee.Application.UpdateScheduledSlot do
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          :ok <-
            ClassLocation.check_change(context, params, ClassLocation.class_location(context, id)),
+         :ok <- ClassSpace.check_edit(context, id, params, scope),
          {:ok, {slot, others}} <- update(context, id, params, scope) do
       Enum.each([slot | others], &after_update(context, &1))
       {:ok, %{slot: slot, updated_count: 1 + length(others)}}

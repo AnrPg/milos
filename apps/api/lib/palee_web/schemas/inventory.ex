@@ -37,7 +37,10 @@ defmodule PaleeWeb.Schemas.Inventory do
           enum: ["working", "needs_attention", "out_of_order", "retired"]
         },
         notes: @text,
-        archived_at: @time
+        archived_at: @time,
+        # ADR-202: how many stand in which space; the rest is unassigned.
+        placements: %Schema{type: :array, items: PaleeWeb.Schemas.Spaces.placement()},
+        unassigned: %Schema{type: :integer}
       },
       required: [:id, :name, :category, :quantity, :status]
     }

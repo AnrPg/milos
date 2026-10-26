@@ -5,8 +5,17 @@ defmodule Palee.Infrastructure.Inventory.EctoInventoryStore do
 
   import Ecto.Query
 
-  alias Palee.Inventory.Domain.{MachinePolicy, StockPolicy}
-  alias Palee.Inventory.{Machine, MachineEvent, Supply, SupplyMovement, SupplyReport}
+  alias Palee.Inventory.Domain.{MachinePolicy, PlacementPolicy, StockPolicy}
+
+  alias Palee.Inventory.{
+    Machine,
+    MachineEvent,
+    MachinePlacement,
+    Supply,
+    SupplyMovement,
+    SupplyReport
+  }
+
   alias Palee.Repo
 
   @machine_fields [:id | Machine.fields() -- [:organization_id]] ++ [:inserted_at]
@@ -281,6 +290,55 @@ defmodule Palee.Infrastructure.Inventory.EctoInventoryStore do
 
   defp since(query, nil), do: query
   defp since(query, %DateTime{} = from), do: where(query, [r], r.occurred_at >= ^from)
+
+  @impl true
+  def list_placements(%{organization_id: organization_id}, filters) do
+    MachinePlacement
+    |> where([p], p.organization_id == ^organization_id)
+    |> then(fn query ->
+      case filters[:machine_ids] do
+        nil -> query
+        ids -> where(query, [p], p.machine_id in ^ids)
+      end
+    end)
+    |> then(fn query ->
+      case filters[:space_id] do
+        nil -> query
+        id -> where(query, [p], p.space_id == ^id)
+      end
+    end)
+    |> order_by([p], asc: p.inserted_at)
+    |> Repo.all()
+    |> Enum.map(&Map.take(&1, [:machine_id, :space_id, :quantity]))
+  end
+
+  # ADR-202: the machine row is locked so two edits cannot both pass the
+  # owned-quantity check; the placement is replaced as a whole.
+  @impl true
+  def replace_placements(%{organization_id: organization_id}, machine_id, placements) do
+    Repo.transaction(fn ->
+      with %Machine{} = machine <-
+             locked(Machine, organization_id, machine_id) || {:error, :not_found},
+           :ok <- PlacementPolicy.check_quantity(machine.quantity, placements) do
+        MachinePlacement
+        |> where([p], p.organization_id == ^organization_id and p.machine_id == ^machine_id)
+        |> Repo.delete_all()
+
+        Enum.map(placements, fn placement ->
+          placement
+          |> Map.merge(%{organization_id: organization_id, machine_id: machine_id})
+          |> MachinePlacement.changeset()
+          |> Repo.insert()
+          |> case do
+            {:ok, row} -> Map.take(row, [:machine_id, :space_id, :quantity])
+            {:error, reason} -> Repo.rollback(reason)
+          end
+        end)
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
 
   defp result({:ok, value}, fields), do: {:ok, Map.take(value, fields)}
   defp result(error, _fields), do: error

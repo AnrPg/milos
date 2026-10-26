@@ -55,6 +55,12 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     record_cleaning: :all,
     review_cleaning: :all,
     manage_cleaning_areas: :all,
+    # ADR-202: spaces (rooms) of each branch, and when they are cleaned.
+    manage_spaces: :all,
+    edit_space_details: :all,
+    set_space_unavailable: :all,
+    view_spaces: :all,
+    manage_cleaning_schedule: :all,
     manage_inventory: :all,
     manage_shop: :all,
     sell_shop: :all,
@@ -95,6 +101,7 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
            manage_content: :all,
            manage_challenges: :all,
            report_inventory: :all,
+           view_spaces: :all,
            moderate_community: :all,
            manage_events: :all
          })
@@ -111,6 +118,10 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     message_clients: :all,
     message_from_box: :all,
     review_cleaning: :all,
+    manage_cleaning_schedule: :all,
+    view_spaces: :all,
+    edit_space_details: :all,
+    set_space_unavailable: :all,
     manage_inventory: :all,
     sell_shop: :all
   }
@@ -149,7 +160,9 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
       :manage_promotions,
       :manage_packages,
       :view_finance_reports,
-      :manage_shop
+      :manage_shop,
+      # ADR-202: adding and archiving spaces and drawing floor plans.
+      :manage_spaces
     ]
   }
 

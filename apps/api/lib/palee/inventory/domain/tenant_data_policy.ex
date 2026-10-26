@@ -16,6 +16,7 @@ defmodule Palee.Inventory.Domain.TenantDataPolicy do
               "Machines, supplies and their event, movement and low-stock records are operational data with no retention obligation.",
             tables: [
               %{table: "inventory_machine_events"},
+              %{table: "inventory_machine_placements"},
               %{table: "inventory_machines"},
               %{table: "inventory_supply_movements"},
               %{table: "inventory_supply_reports"},

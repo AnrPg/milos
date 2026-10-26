@@ -9,6 +9,7 @@ defmodule Palee.Inventory do
     InventoryDigest,
     InventoryReport,
     MachinePolicy,
+    PlacementPolicy,
     StockPolicy
   }
 
@@ -22,6 +23,7 @@ defmodule Palee.Inventory do
     context
     |> InventoryStore.list_machines(%{})
     |> Enum.map(&with_service(&1, today))
+    |> with_placements(context)
   end
 
   def get_machine(context, id), do: InventoryStore.get_machine(context, id)
@@ -29,9 +31,65 @@ defmodule Palee.Inventory do
   def save_machine(context, id, attrs) do
     attrs = Map.drop(attrs, [:status, :archived_at, :organization_id])
 
-    with {:ok, machine} <- InventoryStore.save_machine(context, id, attrs) do
-      {:ok, with_service(machine, gym_today(context))}
+    with :ok <- keeps_placements(context, id, Map.get(attrs, :quantity)),
+         {:ok, machine} <- InventoryStore.save_machine(context, id, attrs) do
+      [machine] = with_placements([with_service(machine, gym_today(context))], context)
+      {:ok, machine}
     end
+  end
+
+  # ── Placement (ADR-202) ─────────────────────────────────────────────────
+
+  @doc "Placements (`%{machine_id, space_id, quantity}`); filters `machine_ids`, `space_id`."
+  def list_placements(context, filters \\ %{}),
+    do: InventoryStore.list_placements(context, filters)
+
+  @doc """
+  Replaces where a machine stands: `[%{space_id, quantity}]`, at most the
+  quantity owned in all. The caller checks the spaces.
+  """
+  def place_machine(context, machine_id, placements) do
+    with %{} = machine <- get_machine(context, machine_id) || {:error, :not_found},
+         {:ok, rows} <- PlacementPolicy.normalize(placements, machine.quantity) do
+      InventoryStore.replace_placements(context, machine.id, rows)
+    end
+  end
+
+  @doc "Validates a placement against the quantity owned (`PlacementPolicy.normalize/2`)."
+  defdelegate normalize_placement(placements, owned), to: PlacementPolicy, as: :normalize
+
+  @doc "How many of `owned` a placement leaves unassigned."
+  defdelegate unassigned(owned, placements), to: PlacementPolicy
+
+  defp keeps_placements(_context, nil, _quantity), do: :ok
+  defp keeps_placements(_context, _id, nil), do: :ok
+
+  defp keeps_placements(context, id, quantity) do
+    case get_machine(context, id) do
+      %{id: id} ->
+        PlacementPolicy.check_quantity(quantity, list_placements(context, %{machine_ids: [id]}))
+
+      nil ->
+        :ok
+    end
+  end
+
+  defp with_placements([], _context), do: []
+
+  defp with_placements(machines, context) do
+    by_machine =
+      context
+      |> list_placements(%{machine_ids: Enum.map(machines, & &1.id)})
+      |> Enum.group_by(& &1.machine_id, &Map.take(&1, [:space_id, :quantity]))
+
+    Enum.map(machines, fn machine ->
+      placements = Map.get(by_machine, machine.id, [])
+
+      Map.merge(machine, %{
+        placements: placements,
+        unassigned: PlacementPolicy.unassigned(machine.quantity || 1, placements)
+      })
+    end)
   end
 
   @doc "Logs an event and moves the machine's state (MachinePolicy)."

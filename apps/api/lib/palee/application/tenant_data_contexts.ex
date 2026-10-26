@@ -38,6 +38,7 @@ defmodule Palee.Application.TenantDataContexts do
     Scheduling,
     Seasons,
     Shop,
+    Spaces,
     Trials,
     Wallet,
     Wellbeing,
@@ -81,6 +82,7 @@ defmodule Palee.Application.TenantDataContexts do
     Housekeeping,
     Inventory,
     Appointments,
+    Spaces,
     Facility
   ]
 

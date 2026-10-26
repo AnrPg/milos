@@ -4,7 +4,7 @@ defmodule PaleeWeb.InventoryController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.ManageInventory
+  alias Palee.Application.{ManageInventory, PlaceMachine}
   alias Palee.{Identity, Inventory, Organizations}
   alias PaleeWeb.Schemas.Inventory, as: S
   alias OpenApiSpex.{Parameter, Schema}
@@ -134,6 +134,47 @@ defmodule PaleeWeb.InventoryController do
       conn
       |> put_status(:created)
       |> json(%{machine: redact(machine, context), event: hd(with_nicknames([event]))})
+    end
+  end
+
+  operation(:place_machine,
+    summary: "Set how many of a machine stand in which space (ADR-202)",
+    description:
+      "Replaces the machine's placement. The quantities may not add up to more than the " <>
+        "quantity owned (`placement_exceeds_quantity`); the rest is unassigned.",
+    parameters: [@id],
+    request_body:
+      S.body(%Schema{
+        type: :object,
+        additionalProperties: false,
+        properties: %{
+          placements: %Schema{
+            type: :array,
+            maxItems: 50,
+            items: PaleeWeb.Schemas.Spaces.placement()
+          }
+        },
+        required: [:placements]
+      }),
+    responses: [
+      ok:
+        {"Placement", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             machine_id: S.uuid(),
+             placements: %Schema{type: :array, items: PaleeWeb.Schemas.Spaces.placement()},
+             unassigned: %Schema{type: :integer}
+           },
+           required: [:machine_id, :placements, :unassigned]
+         }}
+    ]
+  )
+
+  def place_machine(conn, %{id: id}) do
+    with {:ok, result} <-
+           PlaceMachine.call(conn.assigns.tenant_context, id, conn.body_params.placements) do
+      json(conn, result)
     end
   end
 
