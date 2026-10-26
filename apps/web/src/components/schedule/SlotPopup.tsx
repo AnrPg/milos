@@ -14,6 +14,7 @@ import {
   cancelBooking,
   joinWaitlist,
   sendSlotMessage,
+  type ClassAction,
   type ScheduleBooking,
   type ScheduleLocation,
   type ScheduleSlot,
@@ -22,6 +23,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
 import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
@@ -88,6 +90,8 @@ type SlotPopupProps = {
   /** A new class like this one (outside any series). */
   onDuplicate?: () => void;
   onDelete?: () => void;
+  /** ADR-200: pause, resume, cancel, restore or delete (staff, upcoming classes). */
+  onClassAction?: (action: ClassAction) => void;
   onApproveBooking: (booking: ScheduleBooking) => void;
   onRejectBooking: (booking: ScheduleBooking) => void;
   /** Called after the member withdraws their own booking (the popup closes). */
@@ -111,6 +115,7 @@ export function SlotPopup({
   onEdit,
   onDuplicate,
   onDelete,
+  onClassAction,
   onApproveBooking,
   onRejectBooking,
   onCancelBooking,
@@ -318,6 +323,30 @@ export function SlotPopup({
               {i18n("addToCalendar33cead7")}
             </button>
           </div>
+
+          <ClassStateNotice slot={slot} className="mt-4" />
+
+          {isAdmin && onClassAction && !isPast ? (
+            <div className="mt-4 flex flex-wrap gap-2" data-testid="class-actions">
+              {classActionsFor(slot)
+                .filter((action) => action !== "delete")
+                .map((action) => (
+                  <button
+                    key={action}
+                    className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                    style={
+                      action === "cancel"
+                        ? { background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }
+                        : { background: "var(--card)", color: "var(--text-soft)" }
+                    }
+                    onClick={() => onClassAction(action)}
+                    type="button"
+                  >
+                    {t(`classAction_${action}`)}
+                  </button>
+                ))}
+            </div>
+          ) : null}
 
           {isAdmin ? (
             <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} onCreateNew={onCreateWorkout} />
@@ -608,11 +637,11 @@ export function SlotPopup({
                       {t("duplicateClass")}
                     </button>
                   ) : null}
-                  {onDelete ? (
+                  {onDelete || onClassAction ? (
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                       style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }}
-                      onClick={onDelete}
+                      onClick={() => (onClassAction ? onClassAction("delete") : onDelete?.())}
                       type="button"
                     >
                       {i18n("deletef6fdbe4")}

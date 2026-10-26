@@ -173368,6 +173368,12 @@
                     "minimum": 1,
                     "type": "integer"
                   },
+                  "every": {
+                    "description": "ADR-200: 1 reaches every class in the scope, 2 every other one, and so on, counted from this class in date order",
+                    "maximum": 52,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "location_id": {
                     "format": "uuid",
                     "nullable": true,
@@ -173810,6 +173816,140 @@
         "summary": "Injury safety warnings for the members booked into a class slot",
         "tags": [
           "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/state": {
+      "post": {
+        "callbacks": {},
+        "description": "ADR-200: with series_scope and every, also the other upcoming classes of its series. A cancel releases every booking without a late penalty; a delete leaves classes with bookings alone and counts them.",
+        "operationId": "PaleeWeb.AdminScheduleController.change_state",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "pause",
+                      "resume",
+                      "cancel",
+                      "restore",
+                      "delete"
+                    ],
+                    "type": "string"
+                  },
+                  "every": {
+                    "description": "ADR-200: 1 reaches every class in the scope, 2 every other one, and so on, counted from this class in date order",
+                    "maximum": 52,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "range_from": {
+                    "description": "Gym-local date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "range_to": {
+                    "description": "Gym-local date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "description": "Why a class is cancelled; members see it",
+                    "maxLength": 280,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "series_scope": {
+                    "enum": [
+                      "this",
+                      "all",
+                      "range"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "action": {
+                      "type": "string"
+                    },
+                    "changed_count": {
+                      "type": "integer"
+                    },
+                    "deleted_ids": {
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "released_count": {
+                      "type": "integer"
+                    },
+                    "skipped_count": {
+                      "type": "integer"
+                    },
+                    "skipped_with_bookings": {
+                      "type": "integer"
+                    },
+                    "slots": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "action",
+                    "slots",
+                    "deleted_ids",
+                    "changed_count",
+                    "skipped_count",
+                    "skipped_with_bookings",
+                    "released_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class state"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pause, resume, cancel, restore or delete a class",
+        "tags": [
+          "Admin Schedule"
         ]
       }
     },

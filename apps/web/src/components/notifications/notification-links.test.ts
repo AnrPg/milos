@@ -133,6 +133,10 @@ describe("notificationTargetUrl", () => {
     ).toBe("/box/schedule");
   });
 
+  it("opens the schedule for a cancelled class (ADR-200)", () => {
+    expect(notificationTargetUrl({ type: "class_cancelled", payload: {} }, "member")).toBe("/box/schedule");
+  });
+
   it("links an expiring package to billing", () => {
     expect(
       notificationTargetUrl(

@@ -175,6 +175,8 @@ function NotificationCard({
   // ADR-144: trial notifications carry the box, the class and its time.
   function trialText(notification: NotificationRecord, part: "title" | "body") {
     const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    // ADR-200: a plain class_cancelled is a member's class, not a trial.
+    if (!notification.type.startsWith("trial_")) return null;
     const type = notification.type.replace(/^trial_/, "") as TrialNotice;
     if (!TRIAL_NOTICES.includes(type)) return null;
     const values = {
@@ -467,6 +469,15 @@ function NotificationCard({
         return i18n("stfNotifAppointmentBookedBody", { client: client(), kind: kind(), time: when("starts_at") || "—" });
       case "appointment_cancelled":
         return i18n("stfNotifAppointmentCancelledBody", { kind: kind(), time: when("starts_at") || "—" });
+      // ADR-200: staff cancelled a class the member had a place in.
+      case "class_cancelled": {
+        const values = {
+          class: text("class_name") || "—",
+          time: text("class_when") || when("class_starts_at") || "—",
+          reason: text("reason"),
+        };
+        return values.reason ? i18n("ntfClassCancelledReasonBody", values) : i18n("ntfClassCancelledBody", values);
+      }
       // ADR-100, ADR-101, ADR-104.
       case "coach_client_assigned":
         return i18n("ntfCoachClientAssignedBody", { coach: text("coach_nickname") || "—", client: client() });
@@ -595,6 +606,8 @@ function NotificationCard({
         return i18n("stfNotifAppointmentBookedTitle");
       case "appointment_cancelled":
         return i18n("stfNotifAppointmentCancelledTitle");
+      case "class_cancelled":
+        return i18n("ntfClassCancelledTitle");
       case "coach_client_assigned":
         return i18n("ntfCoachClientAssignedTitle");
       case "coach_note_viewed":
@@ -724,6 +737,8 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
     // ADR-098 appointments
     "appointment_booked",
     "appointment_cancelled",
+    // ADR-200
+    "class_cancelled",
   ],
 };
 

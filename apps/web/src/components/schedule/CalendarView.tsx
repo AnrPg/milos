@@ -12,7 +12,8 @@ import { buildScheduleWindow, monthKey, parseLocalDate, type ScheduleDays } from
 import { dateKeyInZone, formatInZone } from "@/lib/zoned-time";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 import { semanticLabel } from "@/i18n/presentation";
-import { isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
+import { classStateBadge, isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
+import { ClassStateBadge } from "@/components/schedule/ClassState";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { classWorkoutNoticeKind } from "@/components/schedule/ClassWorkoutNotice";
 
@@ -267,8 +268,11 @@ function SlotCard({
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   // A full class stays inviting for members because they can join the waitlist.
+  // ADR-200: a cancelled class stays listed, struck through.
+  const cancelled = classStateBadge(slot) === "cancelled";
   const isUnavailable =
-    !slot.current_user_booking && (isPast || (slot.spots_remaining === 0 && isAdmin));
+    cancelled || (!slot.current_user_booking && (isPast || (slot.spots_remaining === 0 && isAdmin)));
+  const strike = cancelled ? "line-through" : undefined;
   const details = [isEventSlot(slot) ? i18n("mbEventMarker") : null, locationName].filter(Boolean).join(" · ");
   const classType = slotClassType(slot);
   const typeColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
@@ -296,7 +300,7 @@ function SlotCard({
         onClick={() => onSelectSlot(slot)}
         type="button"
       >
-        <p className="text-xs font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
+        <p className="text-xs font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)", textDecoration: strike }}>
           {formatTime(locale, slot.scheduled_at, timeZone)}
         </p>
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
@@ -308,6 +312,7 @@ function SlotCard({
           </p>
         ) : null}
         {incompleteBadge ? <div className="mt-1 truncate">{incompleteBadge}</div> : null}
+        {classStateBadge(slot) ? <div className="mt-1 truncate"><ClassStateBadge slot={slot} /></div> : null}
       </button>
     );
   }
@@ -324,13 +329,14 @@ function SlotCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
+          <p className="text-sm font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)", textDecoration: strike }}>
             {formatTime(locale, slot.scheduled_at, timeZone)}
           </p>
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
           {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}
           </p>
           {incompleteBadge ? <div className="mt-2">{incompleteBadge}</div> : null}
+          {classStateBadge(slot) ? <div className="mt-2"><ClassStateBadge slot={slot} /></div> : null}
           {slot.my_version ? (
             <span
               className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold"

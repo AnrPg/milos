@@ -18,6 +18,7 @@ import {
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
+  type ClassAction,
   type SeriesEditScope,
   type ScheduleBooking,
   type ClassTypeRecord,
@@ -33,6 +34,8 @@ import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
+import { ClassActionDialog, useClassActionSummary } from "@/components/schedule/ClassState";
+import { SeriesScopePicker, seriesScopeReady } from "@/components/schedule/SeriesScopePicker";
 import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
 import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import { listAdminLocations } from "@/api/facility";
@@ -152,6 +155,9 @@ export function ScheduleConsole({
   const [error, setError] = useState<string | null>(null);
   const submitCommand = useOutboxCommand();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
+  // ADR-200 §2: the pause / cancel / delete waiting for its confirmation.
+  const [classAction, setClassAction] = useState<{ slot: ScheduleSlot; action: ClassAction } | null>(null);
+  const classActionSummary = useClassActionSummary();
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [resolveTarget, setResolveTarget] = useState<{ booking: ScheduleBooking; action: "approve" | "reject" } | null>(
     null,
@@ -513,26 +519,6 @@ export function ScheduleConsole({
     }
   }
 
-  async function deleteSelectedSlot() {
-    if (!tokens?.access_token || !selectedSlot) return;
-    if (!window.confirm(t("deleteSlot"))) return;
-
-    setBusy(true);
-    setError(null);
-
-    try {
-      await deleteScheduleSlot(tokens.access_token, selectedSlot.id);
-      setSelectedSlot(null);
-      await loadSchedule();
-    } catch (requestError) {
-      const message =
-        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
-      setError(message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
   // ADR-176: a class needs a class type, never a WOD. A gym without any type
   // names its first one inline and goes on to the class it was adding.
   function openCreateEditor(isoDate: string, types: ClassTypeRecord[] = classTypes) {
@@ -797,7 +783,7 @@ export function ScheduleConsole({
           }}
           onSlotChanged={() => void refreshSelectedSlot()}
           onClose={() => setSelectedSlot(null)}
-          onDelete={() => void deleteSelectedSlot()}
+          onClassAction={(action) => setClassAction({ slot: selectedSlot, action })}
           onEdit={() => openUpdateEditor(selectedSlot)}
           onDuplicate={() => openDuplicateEditor(selectedSlot)}
           onRejectBooking={(booking) => {
@@ -805,6 +791,26 @@ export function ScheduleConsole({
             setResolveTarget({ booking, action: "reject" });
           }}
           slot={selectedSlot}
+        />
+      ) : null}
+
+      {classAction && tokens?.access_token ? (
+        <ClassActionDialog
+          token={tokens.access_token}
+          slot={classAction.slot}
+          action={classAction.action}
+          classDate={dateTimeLocalInZone(classAction.slot.scheduled_at, gymZone).slice(0, 10)}
+          onClose={() => setClassAction(null)}
+          onDone={(result) => {
+            setClassAction(null);
+            setNotice(classActionSummary(result) || null);
+            if (selectedSlot && result.deleted_ids.includes(selectedSlot.id)) {
+              setSelectedSlot(null);
+              void loadSchedule();
+            } else {
+              void refreshSelectedSlot();
+            }
+          }}
         />
       ) : null}
 
@@ -1138,72 +1144,6 @@ export function ScheduleConsole({
         </Dialog>
       ) : null}
     </main>
-  );
-}
-
-function seriesScopeReady(scope: SeriesEditScope) {
-  return scope.scope !== "range" || (Boolean(scope.from) && Boolean(scope.to) && scope.from <= scope.to);
-}
-
-/**
- * ADR-200: an edit to a class of a series reaches this class, every upcoming
- * class of the series (and the classes it creates later), or the classes
- * between two dates on the gym's clock.
- */
-function SeriesScopePicker({
-  className,
-  value,
-  onChange,
-  classDate,
-}: {
-  className: string;
-  value: SeriesEditScope;
-  onChange: (scope: SeriesEditScope) => void;
-  classDate: string;
-}) {
-  const t = useTranslations("Schedule");
-  const options: Array<{ scope: SeriesEditScope["scope"]; label: string }> = [
-    { scope: "this", label: t("seriesScopeThis") },
-    { scope: "all", label: t("seriesScopeAll") },
-    { scope: "range", label: t("seriesScopeRange") },
-  ];
-  const range = value.scope === "range" ? value : { scope: "range" as const, from: classDate, to: classDate };
-
-  return (
-    <fieldset className={className} data-testid="series-scope">
-      <legend className="text-sm font-semibold" style={{ color: "var(--muted)" }}>{t("seriesScopeLegend")}</legend>
-      <div role="radiogroup" aria-label={t("seriesScopeLegend")} className="mt-2 flex flex-wrap gap-2">
-        {options.map((option) => {
-          const checked = value.scope === option.scope;
-          return (
-            <button
-              key={option.scope}
-              type="button"
-              role="radio"
-              aria-checked={checked}
-              className="rounded-full px-4 py-2 text-sm font-semibold"
-              style={checked ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--panel-muted)", color: "var(--text-soft)", border: "1px solid var(--border)" }}
-              onClick={() => onChange(option.scope === "range" ? range : { scope: option.scope } as SeriesEditScope)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{t(`seriesScopeHint_${value.scope}`)}</p>
-      {value.scope === "range" ? (
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <label className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            {t("seriesScopeFrom")}
-            <DateInput className="mt-2 w-full rounded-xl px-3 py-2" value={value.from} onValueChange={(from) => onChange({ ...value, from })} />
-          </label>
-          <label className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            {t("seriesScopeTo")}
-            <DateInput className="mt-2 w-full rounded-xl px-3 py-2" min={value.from} value={value.to} onValueChange={(to) => onChange({ ...value, to })} />
-          </label>
-        </div>
-      ) : null}
-    </fieldset>
   );
 }
 

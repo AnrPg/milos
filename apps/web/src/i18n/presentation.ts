@@ -240,6 +240,11 @@ const API_ERROR_KEYS: Record<string, string> = {
   // ADR-200: how far an edit to a class of a series goes.
   invalid_series_scope: "apiErrorInvalidSeriesScope",
   series_range_required: "apiErrorSeriesRangeRequired",
+  invalid_series_every: "apiErrorInvalidSeriesEvery",
+  invalid_class_action: "apiErrorInvalidClassAction",
+  class_cancelled: "apiErrorClassCancelled",
+  class_paused: "apiErrorClassPaused",
+  class_has_bookings: "apiErrorClassHasBookings",
   // ADR-184: business accounts, demo mode and activation.
   business_not_activated: "apiErrorBusinessNotActivated",
   business_account_exists: "apiErrorBusinessAccountExists",

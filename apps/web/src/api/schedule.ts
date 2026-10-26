@@ -168,6 +168,11 @@ export type ScheduleSlot = {
   current_user_guest?: ScheduleBooking | null;
   location_id?: string | null;
   coach_user_id?: string | null;
+  /** ADR-200: a paused class takes no new bookings; existing ones stay. */
+  paused_at?: string | null;
+  /** ADR-200: a cancelled class stays listed, struck through, with its reason. */
+  cancelled_at?: string | null;
+  cancel_reason?: string | null;
   /** Members only: whether their package includes this class, visits aside. */
   covered_by_package?: boolean;
   /** Members only: until when withdrawing is free; null when no cutoff applies. */
@@ -403,10 +408,22 @@ export async function createScheduleSeries(
  * ADR-200: how far an edit to one class of a series goes. Dates are on the
  * gym's clock, both inclusive.
  */
-export type SeriesEditScope =
+export type SeriesEditScope = (
   | { scope: "this" }
   | { scope: "all" }
-  | { scope: "range"; from: string; to: string };
+  | { scope: "range"; from: string; to: string }
+) & {
+  /** ADR-200 §3: every nth class of the scope, counted from this one (1 = all). */
+  every?: number;
+};
+
+function seriesScopeBody(seriesScope: SeriesEditScope) {
+  return {
+    series_scope: seriesScope.scope,
+    ...(seriesScope.scope === "range" ? { range_from: seriesScope.from, range_to: seriesScope.to } : {}),
+    ...(seriesScope.scope !== "this" && seriesScope.every && seriesScope.every > 1 ? { every: seriesScope.every } : {}),
+  };
+}
 
 export async function updateScheduleSlot(
   token: string,
@@ -417,14 +434,48 @@ export async function updateScheduleSlot(
   const response = await apiRequest<{ slot: ScheduleSlot; updated_count: number }>(`/admin/schedule/slots/${slotId}`, {
     method: "PATCH",
     token,
-    body: {
-      ...payload,
-      series_scope: seriesScope.scope,
-      ...(seriesScope.scope === "range" ? { range_from: seriesScope.from, range_to: seriesScope.to } : {}),
-    },
+    body: { ...payload, ...seriesScopeBody(seriesScope) },
   });
 
   return { slot: response.slot, updatedCount: response.updated_count ?? 1 };
+}
+
+export const CLASS_ACTIONS = ["pause", "resume", "cancel", "restore", "delete"] as const;
+export type ClassAction = (typeof CLASS_ACTIONS)[number];
+
+export type ClassStateResult = {
+  action: ClassAction;
+  slots: ScheduleSlot[];
+  deleted_ids: string[];
+  /** Classes changed or deleted. */
+  changed_count: number;
+  /** Classes left alone (already started, cancelled, or booked for a delete). */
+  skipped_count: number;
+  skipped_with_bookings: number;
+  /** Bookings and waitlist places a cancel released. */
+  released_count: number;
+};
+
+/**
+ * ADR-200 §2: pause, resume, cancel, restore or delete a class and, by the
+ * series scope, the other classes of its series.
+ */
+export async function changeClassState(
+  token: string,
+  slotId: string,
+  action: ClassAction,
+  seriesScope: SeriesEditScope = { scope: "this" },
+  reason?: string,
+) {
+  return apiRequest<ClassStateResult>(`/admin/schedule/slots/${slotId}/state`, {
+    method: "POST",
+    token,
+    body: {
+      action,
+      ...seriesScopeBody(seriesScope),
+      ...(action === "cancel" && reason?.trim() ? { reason: reason.trim() } : {}),
+    },
+  });
 }
 
 /** ADR-176: links a WOD to a class; publishes a draft. */

@@ -6967,6 +6967,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause, resume, cancel, restore or delete a class
+         * @description ADR-200: with series_scope and every, also the other upcoming classes of its series. A cancel releases every booking without a late penalty; a delete leaves classes with bookings alone and counts them.
+         */
+        post: operations["PaleeWeb.AdminScheduleController.change_state"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/workout": {
         parameters: {
             query?: never;
@@ -72947,6 +72967,8 @@ export interface operations {
                     /** Format: uuid */
                     coach_user_id?: string | null;
                     duration_minutes?: number;
+                    /** @description ADR-200: 1 reaches every class in the scope, 2 every other one, and so on, counted from this class in date order */
+                    every?: number;
                     /** Format: uuid */
                     location_id?: string | null;
                     /** Format: uuid */
@@ -73102,6 +73124,61 @@ export interface operations {
                         slot_id: string;
                         /** Format: uuid */
                         workout_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminScheduleController.change_state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "pause" | "resume" | "cancel" | "restore" | "delete";
+                    /** @description ADR-200: 1 reaches every class in the scope, 2 every other one, and so on, counted from this class in date order */
+                    every?: number;
+                    /**
+                     * Format: date
+                     * @description Gym-local date
+                     */
+                    range_from?: string;
+                    /**
+                     * Format: date
+                     * @description Gym-local date
+                     */
+                    range_to?: string;
+                    /** @description Why a class is cancelled; members see it */
+                    reason?: string | null;
+                    /** @enum {string} */
+                    series_scope?: "this" | "all" | "range";
+                };
+            };
+        };
+        responses: {
+            /** @description Class state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        action: string;
+                        changed_count: number;
+                        deleted_ids: string[];
+                        released_count: number;
+                        skipped_count: number;
+                        skipped_with_bookings: number;
+                        slots: {
+                            [key: string]: unknown;
+                        }[];
                     };
                 };
             };

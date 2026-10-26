@@ -28,6 +28,7 @@ export function ClassRow({
   onOpen: () => void;
 }) {
   const t = useTranslations("BoxSchedule");
+  const sched = useTranslations("Schedule");
   const i18n = useUiTranslations();
   const locale = useLocale();
   const state = memberSlotState(slot);
@@ -56,6 +57,13 @@ export function ClassRow({
     case "unavailable":
       status = { text: t("statusFull"), color: "var(--dim)" };
       break;
+    // ADR-200: staff cancelled the class or paused its booking.
+    case "cancelled":
+      status = { text: sched("classStateCancelled"), color: "var(--danger)" };
+      break;
+    case "paused":
+      status = { text: sched("classStatePaused"), color: "var(--warning)" };
+      break;
     default:
       status = { text: t("spotsLeft", { count: slot.spots_remaining }), color: "var(--success)" };
   }
@@ -80,7 +88,10 @@ export function ClassRow({
         </span>
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>
+        <span
+          className="truncate text-sm font-bold"
+          style={{ color: "var(--text)", textDecoration: state.kind === "cancelled" ? "line-through" : undefined }}
+        >
           {slot.name}
         </span>
         {detail ? (
