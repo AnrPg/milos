@@ -184,6 +184,34 @@ export function programAdminUserWorkout(
   );
 }
 
+export type ProgramForUsersBody = NonNullable<
+  paths["/api/org/{organization_slug}/admin/users/programming"]["post"]["requestBody"]
+>["content"]["application/json"];
+
+/** ADR-201: one person's outcome; a failure carries the one-person error code. */
+export type ProgramForUsersResult = {
+  user_id: string;
+  status: "ok" | "error";
+  mode?: string;
+  workout?: Record<string, unknown>;
+  association?: Record<string, unknown>;
+  code?: string;
+  params?: Record<string, unknown>;
+};
+
+/**
+ * ADR-201: program the same workout for several people at once. Each person is
+ * programmed exactly as `programAdminUserWorkout` would program them alone;
+ * one failing does not undo the others.
+ */
+export function programWorkoutForUsers(token: string, body: ProgramForUsersBody) {
+  return apiRequest<{ results: ProgramForUsersResult[] }>("/admin/users/programming", {
+    token,
+    method: "POST",
+    body,
+  });
+}
+
 /** ADR-132: the PR owner's public identity when they are active in this gym. */
 export type AdminUserPRMember = { id: string; nickname: string; avatar_url?: string | null };
 

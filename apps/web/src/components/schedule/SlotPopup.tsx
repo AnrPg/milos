@@ -35,6 +35,7 @@ import { warningLevelFor, warningLevelsByUser } from "@/lib/injury-warnings";
 import { AdminSlotRoster } from "@/components/schedule/AdminSlotRoster";
 import { FeltSummaryCard } from "@/components/wod-goals/FeltSummaryCard";
 import { GuestBookingPanel } from "@/components/schedule/GuestBookingPanel";
+import { ClassVariationDialog } from "@/components/schedule/ClassVariationDialog";
 import {
   isEventSlot,
   localizeMemberBookingError,
@@ -97,6 +98,8 @@ type SlotPopupProps = {
   guestsIncluded?: boolean;
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
   onCreateWorkout?: () => void;
+  /** ADR-201: staff who manage coaching can give attendees a variation. */
+  canProgramVariations?: boolean;
 };
 
 export function SlotPopup({
@@ -115,6 +118,7 @@ export function SlotPopup({
   locations,
   guestsIncluded = false,
   onCreateWorkout,
+  canProgramVariations = false,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -134,6 +138,7 @@ export function SlotPopup({
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [editWorkoutOpen, setEditWorkoutOpen] = useState(false);
+  const [variationOpen, setVariationOpen] = useState(false);
   const [activeScale, setActiveScale] = useState<string | null>(null);
   // ADR-124: informational injury warnings for booked members (staff) and
   // for the member's own booking. Never blocks booking or attendance.
@@ -537,8 +542,9 @@ export function SlotPopup({
           ) : null}
 
           {/* ADR-125: the member's own version of this class (only ever theirs).
-              Informational only: members start it from My workouts, and staff
-              program it from the user's profile - no class-view action. */}
+              Informational only: members start it from My workouts. Staff
+              program it from the user's profile or, for several attendees at
+              once, with «Variation for…» below (ADR-201). */}
           {!isAdmin && slot.my_version ? (
             <section
               className="mt-8 rounded-[1.8rem] p-5"
@@ -612,6 +618,16 @@ export function SlotPopup({
                       type="button"
                     >
                       {i18n("editWorkoutd299ce5")}
+                    </button>
+                  ) : null}
+                  {canProgramVariations ? (
+                    <button
+                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
+                      onClick={() => setVariationOpen(true)}
+                      type="button"
+                    >
+                      {i18n("groupVariationAction")}
                     </button>
                   ) : null}
                 </div>
@@ -815,6 +831,15 @@ export function SlotPopup({
           accessToken={accessToken}
           context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOn5e673bd") + (slot.scheduled_at) }}
           onClose={() => setEditWorkoutOpen(false)}
+        />
+      ) : null}
+
+      {variationOpen && isAdmin && canProgramVariations ? (
+        <ClassVariationDialog
+          slot={slot}
+          accessToken={accessToken}
+          onClose={() => setVariationOpen(false)}
+          onProgrammed={onSlotChanged}
         />
       ) : null}
     </>
