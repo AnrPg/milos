@@ -2,10 +2,18 @@ defmodule Palee.Repo.Migrations.FuzzyPeopleSearch do
   @moduledoc """
   People search forgives typos (ANR 2026-10-25): besides the handle prefix
   and the name substring of ADR-193 §4, `palee_people_search` matches a name
-  or handle that is close in trigram word similarity (pg_trgm `<%`, served
-  by the trigram indexes on `users.search_text` and `users.nickname`), from
-  three characters on. Literal matches still come before close ones within
-  each relation rank, closest first.
+  or handle whose trigram word similarity is at least 0.5, from three
+  characters on. Literal matches still come before close ones within each
+  relation rank, closest first.
+
+  The threshold is an explicit `word_similarity(...) >= 0.5` comparison, never
+  the `pg_trgm.word_similarity_threshold` setting behind `<%`: a function-level
+  `SET` of an extension parameter needs superuser rights at `CREATE FUNCTION`
+  time, which the production migration role does not have (this migration
+  failed in prod with 42501 on 2026-10-26), and a session setting would leak
+  into callers. Each match arm stays index-backed: the literal arms use the
+  GIN trigram indexes, the fuzzy arms walk new GiST trigram indexes nearest
+  first (`<<->`, the word-similarity distance) and stop after 500 rows.
   """
 
   use Ecto.Migration
@@ -15,12 +23,21 @@ defmodule Palee.Repo.Migrations.FuzzyPeopleSearch do
 
   def up do
     execute("""
+    CREATE INDEX IF NOT EXISTS users_search_text_trgm_gist_index
+      ON users USING gist (search_text gist_trgm_ops)
+    """)
+
+    execute("""
+    CREATE INDEX IF NOT EXISTS users_handle_trgm_gist_index
+      ON users USING gist (nickname gist_trgm_ops)
+    """)
+
+    execute("""
     CREATE OR REPLACE FUNCTION palee_people_search(handle_term text, name_term text, lim integer)
     RETURNS TABLE (user_id uuid, relation text)
     LANGUAGE sql
     STABLE SECURITY DEFINER
     SET search_path = public, pg_temp
-    SET pg_trgm.word_similarity_threshold = #{@threshold}
     AS $function$
       WITH me AS (SELECT #{@me} AS id),
       terms AS (
@@ -33,6 +50,29 @@ defmodule Palee.Repo.Migrations.FuzzyPeopleSearch do
           END AS name_p,
           CASE WHEN length(COALESCE(name_term, '')) < 3 THEN NULL ELSE name_term END AS fuzzy
       ),
+      matches AS (
+        SELECT u.id FROM users u WHERE u.nickname LIKE (SELECT handle_p FROM terms)
+        UNION
+        SELECT u.id FROM users u WHERE u.search_text LIKE (SELECT name_p FROM terms)
+        UNION
+        SELECT near.id FROM (
+          SELECT u.id, word_similarity(name_term, u.search_text) AS closeness
+          FROM users u
+          WHERE length(name_term) >= 3 AND u.demo_organization_id IS NULL
+          ORDER BY name_term <<-> u.search_text
+          LIMIT 500
+        ) near
+        WHERE near.closeness >= #{@threshold}
+        UNION
+        SELECT near.id FROM (
+          SELECT u.id, word_similarity(handle_term, u.nickname) AS closeness
+          FROM users u
+          WHERE length(handle_term) >= 3 AND u.demo_organization_id IS NULL
+          ORDER BY handle_term <<-> u.nickname
+          LIMIT 500
+        ) near
+        WHERE near.closeness >= #{@threshold}
+      ),
       candidates AS (
         SELECT u.id, u.nickname,
           (u.nickname LIKE (SELECT handle_p FROM terms)
@@ -42,13 +82,9 @@ defmodule Palee.Repo.Migrations.FuzzyPeopleSearch do
             COALESCE(word_similarity(handle_term, u.nickname), 0)) AS closeness
         FROM users u
         WHERE (SELECT id FROM me) IS NOT NULL
+          AND u.id IN (SELECT id FROM matches)
           AND u.id <> (SELECT id FROM me)
           AND u.demo_organization_id IS NULL
-          AND ((SELECT handle_p FROM terms) IS NOT NULL OR (SELECT name_p FROM terms) IS NOT NULL)
-          AND (u.nickname LIKE (SELECT handle_p FROM terms)
-            OR u.search_text LIKE (SELECT name_p FROM terms)
-            OR (SELECT fuzzy FROM terms) <% u.search_text
-            OR (length(handle_term) >= 3 AND handle_term <% u.nickname))
           AND u.id NOT IN (
             SELECT b.blocked_user_id FROM community_user_blocks b WHERE b.user_id = (SELECT id FROM me)
             UNION
@@ -93,6 +129,9 @@ defmodule Palee.Repo.Migrations.FuzzyPeopleSearch do
   end
 
   def down do
+    execute("DROP INDEX IF EXISTS users_handle_trgm_gist_index")
+    execute("DROP INDEX IF EXISTS users_search_text_trgm_gist_index")
+
     execute("""
     CREATE OR REPLACE FUNCTION palee_people_search(handle_term text, name_term text, lim integer)
     RETURNS TABLE (user_id uuid, relation text)

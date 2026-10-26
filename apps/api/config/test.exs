@@ -8,9 +8,19 @@ config :palee, Palee.Infrastructure.Shop.MockPaymentProvider, mode: :simulate
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+#
+# The tests connect as a login role that owns the database but is not a
+# superuser, as production's migration role does, so a migration or query
+# that only a superuser may run fails here and not at the deploy.
+# `mix palee.test.migrate` (run by `mix test`) provisions it with the admin
+# credentials below, which also serve RLSCase's role setup.
+config :palee, :test_database_admin,
+  username: System.get_env("DB_ADMIN_USER") || System.get_env("DB_USER", "postgres"),
+  password: System.get_env("DB_ADMIN_PASSWORD") || System.get_env("DB_PASSWORD", "postgres")
+
 config :palee, Palee.Repo,
-  username: System.get_env("DB_USER", "postgres"),
-  password: System.get_env("DB_PASSWORD", "postgres"),
+  username: "palee_test_owner",
+  password: "palee_test_owner_pw",
   hostname: System.get_env("DB_HOST", "localhost"),
   port: String.to_integer(System.get_env("DB_PORT", "5432")),
   database: System.get_env("DB_NAME", "palee_test#{System.get_env("MIX_TEST_PARTITION")}"),

@@ -67,7 +67,12 @@ defmodule Palee.TestSupport.ShopReportFixtures do
         [dump(variant_id)]
       )
 
-    Repo.query!("SET session_replication_role = replica")
+    # The suite's role owns the table but is no superuser, so it switches off
+    # the one append-only trigger (inside the sandbox transaction, rolled
+    # back with it) rather than every trigger via session_replication_role.
+    Repo.query!(
+      "ALTER TABLE shop_variant_price_changes DISABLE TRIGGER shop_variant_price_changes_append_only"
+    )
 
     ids
     |> Enum.zip(times)
@@ -75,7 +80,9 @@ defmodule Palee.TestSupport.ShopReportFixtures do
       Repo.query!("UPDATE shop_variant_price_changes SET changed_at = $2 WHERE id = $1", [id, at])
     end)
 
-    Repo.query!("SET session_replication_role = DEFAULT")
+    Repo.query!(
+      "ALTER TABLE shop_variant_price_changes ENABLE TRIGGER shop_variant_price_changes_append_only"
+    )
   end
 
   def stock(org, variant_id, location_id, on_hand, reserved \\ 0) do

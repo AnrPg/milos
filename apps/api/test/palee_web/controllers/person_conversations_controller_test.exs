@@ -275,4 +275,31 @@ defmodule PaleeWeb.PersonConversationsControllerTest do
     assert hd(ids.("melina_#{unique}")) == melina.id
     refute melissa.id in ids.("Kostas")
   end
+
+  test "people search keeps its own typo threshold whatever the session says", ctx do
+    unique = System.unique_integer([:positive])
+    me = user_fixture()
+    melissa = user_fixture(%{nickname: "melissa_#{unique}", display_name: "Melissa #{unique}"})
+
+    # The threshold lives in the function, not in pg_trgm's settings: a strict
+    # or a loose session value changes neither what matches nor what does not.
+    for threshold <- ["0.9", "0.1"] do
+      Palee.Repo.query!("SET pg_trgm.word_similarity_threshold = #{threshold}")
+
+      found =
+        ctx.as.(me)
+        |> get("/api/people-search?q=Melisa")
+        |> json_response(200)
+        |> Map.fetch!("people")
+        |> Enum.map(& &1["id"])
+
+      assert melissa.id in found
+
+      refute melissa.id in (ctx.as.(me)
+                            |> get("/api/people-search?q=Kostas")
+                            |> json_response(200)
+                            |> Map.fetch!("people")
+                            |> Enum.map(& &1["id"]))
+    end
+  end
 end
