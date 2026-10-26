@@ -7,13 +7,14 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
   cancelBooking,
   joinWaitlist,
   sendSlotMessage,
+  type ClassAction,
   type ScheduleBooking,
   type ScheduleLocation,
   type ScheduleSlot,
@@ -22,6 +23,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
 import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
@@ -35,6 +37,7 @@ import { warningLevelFor, warningLevelsByUser } from "@/lib/injury-warnings";
 import { AdminSlotRoster } from "@/components/schedule/AdminSlotRoster";
 import { FeltSummaryCard } from "@/components/wod-goals/FeltSummaryCard";
 import { GuestBookingPanel } from "@/components/schedule/GuestBookingPanel";
+import { ClassVariationDialog } from "@/components/schedule/ClassVariationDialog";
 import {
   isEventSlot,
   localizeMemberBookingError,
@@ -85,7 +88,11 @@ type SlotPopupProps = {
   onClose: () => void;
   onBook: () => void;
   onEdit: () => void;
+  /** A new class like this one (outside any series). */
+  onDuplicate?: () => void;
   onDelete?: () => void;
+  /** ADR-200: pause, resume, cancel, restore or delete (staff, upcoming classes). */
+  onClassAction?: (action: ClassAction) => void;
   onApproveBooking: (booking: ScheduleBooking) => void;
   onRejectBooking: (booking: ScheduleBooking) => void;
   /** Called after the member withdraws their own booking (the popup closes). */
@@ -97,6 +104,8 @@ type SlotPopupProps = {
   guestsIncluded?: boolean;
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
   onCreateWorkout?: () => void;
+  /** ADR-201: staff who manage coaching can give attendees a variation. */
+  canProgramVariations?: boolean;
 };
 
 export function SlotPopup({
@@ -107,7 +116,9 @@ export function SlotPopup({
   onClose,
   onBook,
   onEdit,
+  onDuplicate,
   onDelete,
+  onClassAction,
   onApproveBooking,
   onRejectBooking,
   onCancelBooking,
@@ -115,8 +126,11 @@ export function SlotPopup({
   locations,
   guestsIncluded = false,
   onCreateWorkout,
+  canProgramVariations = false,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
+  const t = useTranslations("Schedule");
+  const spaceT = useTranslations("Spaces");
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
@@ -134,6 +148,7 @@ export function SlotPopup({
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [editWorkoutOpen, setEditWorkoutOpen] = useState(false);
+  const [variationOpen, setVariationOpen] = useState(false);
   const [activeScale, setActiveScale] = useState<string | null>(null);
   // ADR-124: informational injury warnings for booked members (staff) and
   // for the member's own booking. Never blocks booking or attendance.
@@ -252,6 +267,32 @@ export function SlotPopup({
   });
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
+  // ADR-202: the space of the class; staff also see a clash with another class or a closure.
+  const spaceChips =
+    slot.space || slot.space_unavailable || slot.space_overlap ? (
+      <>
+              {slot.space ? (
+                <span
+                  data-testid="slot-space"
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {spaceT("classSpaceAt", { space: slot.space.name })}
+                </span>
+              ) : null}
+              {slot.space_unavailable ? (
+                <span data-testid="slot-space-unavailable" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--danger)", color: "var(--danger)" }}>
+                  {spaceT("classSpaceUnavailable")}
+                </span>
+              ) : null}
+              {slot.space_overlap ? (
+                <span data-testid="slot-space-overlap" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--warning)", color: "var(--warning)" }}>
+                  {spaceT("classSpaceOverlap")}
+                </span>
+              ) : null}
+      </>
+    ) : null;
+
   return (
     <>
       <Dialog
@@ -314,6 +355,30 @@ export function SlotPopup({
               {i18n("addToCalendar33cead7")}
             </button>
           </div>
+
+          <ClassStateNotice slot={slot} className="mt-4" />
+
+          {isAdmin && onClassAction && !isPast ? (
+            <div className="mt-4 flex flex-wrap gap-2" data-testid="class-actions">
+              {classActionsFor(slot)
+                .filter((action) => action !== "delete")
+                .map((action) => (
+                  <button
+                    key={action}
+                    className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                    style={
+                      action === "cancel"
+                        ? { background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }
+                        : { background: "var(--card)", color: "var(--text-soft)" }
+                    }
+                    onClick={() => onClassAction(action)}
+                    type="button"
+                  >
+                    {t(`classAction_${action}`)}
+                  </button>
+                ))}
+            </div>
+          ) : null}
 
           {isAdmin ? (
             <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} onCreateNew={onCreateWorkout} />
@@ -389,6 +454,7 @@ export function SlotPopup({
                   {i18n("mbLocationAt", { location: locationName })}
                 </span>
               ) : null}
+              {spaceChips}
               {creditCost ? (
                 <span
                   className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -413,6 +479,8 @@ export function SlotPopup({
               )}
             </div>
           )}
+
+          {isAdmin && spaceChips ? <div className="mt-4 flex flex-wrap gap-2">{spaceChips}</div> : null}
 
           {/* Pending-approval banner */}
           {slot.current_user_booking?.status === "pending" && !isAdmin ? (
@@ -537,8 +605,9 @@ export function SlotPopup({
           ) : null}
 
           {/* ADR-125: the member's own version of this class (only ever theirs).
-              Informational only: members start it from My workouts, and staff
-              program it from the user's profile - no class-view action. */}
+              Informational only: members start it from My workouts. Staff
+              program it from the user's profile or, for several attendees at
+              once, with «Variation for…» below (ADR-201). */}
           {!isAdmin && slot.my_version ? (
             <section
               className="mt-8 rounded-[1.8rem] p-5"
@@ -594,11 +663,21 @@ export function SlotPopup({
                   >
                       {i18n("editSlot4754d1f")}
                     </button>
-                  {onDelete ? (
+                  {onDuplicate ? (
+                    <button
+                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
+                      onClick={onDuplicate}
+                      type="button"
+                    >
+                      {t("duplicateClass")}
+                    </button>
+                  ) : null}
+                  {onDelete || onClassAction ? (
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                       style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }}
-                      onClick={onDelete}
+                      onClick={() => (onClassAction ? onClassAction("delete") : onDelete?.())}
                       type="button"
                     >
                       {i18n("deletef6fdbe4")}
@@ -612,6 +691,16 @@ export function SlotPopup({
                       type="button"
                     >
                       {i18n("editWorkoutd299ce5")}
+                    </button>
+                  ) : null}
+                  {canProgramVariations ? (
+                    <button
+                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
+                      onClick={() => setVariationOpen(true)}
+                      type="button"
+                    >
+                      {i18n("groupVariationAction")}
                     </button>
                   ) : null}
                 </div>
@@ -815,6 +904,15 @@ export function SlotPopup({
           accessToken={accessToken}
           context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOn5e673bd") + (slot.scheduled_at) }}
           onClose={() => setEditWorkoutOpen(false)}
+        />
+      ) : null}
+
+      {variationOpen && isAdmin && canProgramVariations ? (
+        <ClassVariationDialog
+          slot={slot}
+          accessToken={accessToken}
+          onClose={() => setVariationOpen(false)}
+          onProgrammed={onSlotChanged}
         />
       ) : null}
     </>

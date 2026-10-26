@@ -687,3 +687,12 @@ msgstr "Berichtverzoek"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "%{nickname} wil je een bericht sturen."
+
+msgid "Class cancelled"
+msgstr "Les geannuleerd"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "%{class} (%{time}) is geannuleerd: %{reason}. Je plek is vrijgegeven."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "%{class} (%{time}) is geannuleerd. Je plek is vrijgegeven."

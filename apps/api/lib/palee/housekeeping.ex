@@ -1,22 +1,21 @@
 defmodule Palee.Housekeeping do
   @moduledoc """
-  The cleaning log (ADR-102): owners and admins define areas and their tasks;
-  janitors record when they cleaned what; owners, admins and front desk review
-  the log.
+  The cleaning log (ADR-102): janitors record when they cleaned what; owners,
+  admins and front desk review the log. Since ADR-202 the cleaned areas are
+  the gym's spaces (`Palee.Spaces`, with their task checklists), and each
+  space may have a cleaning schedule: the weekdays and times it should be
+  cleaned, with a comment. `Application.CleaningLog` joins the two.
   """
 
-  alias Palee.Housekeeping.Domain.CleaningPolicy
+  alias Palee.Housekeeping.Domain.{CleaningPolicy, CleaningSchedule}
   alias Palee.Housekeeping.HousekeepingStore
 
-  def list_areas(context, filters \\ %{}), do: HousekeepingStore.list_areas(context, filters)
-  def save_area(context, id, attrs), do: HousekeepingStore.save_area(context, id, attrs)
+  @doc "When each of these areas (spaces) was last cleaned: `%{id => finished_at}`."
+  def last_cleaned(context, area_ids), do: HousekeepingStore.last_cleaned(context, area_ids)
 
-  def archive_area(context, id),
-    do: HousekeepingStore.save_area(context, id, %{archived_at: DateTime.utc_now()})
-
-  def start(context, user_id, area_id, now \\ DateTime.utc_now()) do
-    with %{} = area <- HousekeepingStore.get_area(context, area_id) || {:error, :not_found},
-         :ok <- CleaningPolicy.can_start?(area) do
+  @doc "Starts cleaning `area` (a space map with `id`, `archived_at`)."
+  def start(context, user_id, area, now \\ DateTime.utc_now()) do
+    with :ok <- CleaningPolicy.can_start?(area) do
       HousekeepingStore.start_entry(context, %{
         area_id: area.id,
         user_id: user_id,
@@ -25,10 +24,11 @@ defmodule Palee.Housekeeping do
     end
   end
 
-  def finish(context, user_id, entry_id, params, now \\ DateTime.utc_now()) do
-    with %{} = entry <- HousekeepingStore.get_entry(context, entry_id) || {:error, :not_found},
-         true <- entry.user_id == user_id || {:error, :forbidden},
-         %{} = area <- HousekeepingStore.get_area(context, entry.area_id),
+  def get_entry(context, id), do: HousekeepingStore.get_entry(context, id)
+
+  @doc "Finishes the caller's own cleaning of `area`, keeping only the area's tasks."
+  def finish(context, user_id, entry, area, params, now \\ DateTime.utc_now()) do
+    with true <- entry.user_id == user_id || {:error, :forbidden},
          {:ok, tasks_done} <-
            CleaningPolicy.finish(entry, area, Map.get(params, :tasks_done), now) do
       HousekeepingStore.finish_entry(context, entry.id, %{
@@ -40,6 +40,19 @@ defmodule Palee.Housekeeping do
   end
 
   def list_entries(context, filters \\ %{}), do: HousekeepingStore.list_entries(context, filters)
+
+  @doc "Every cleaning schedule of the gym (one per space at most)."
+  def list_schedules(context), do: HousekeepingStore.list_schedules(context)
+
+  @doc "Sets a space's cleaning schedule (weekdays, times, comment)."
+  def put_schedule(context, space_id, attrs) do
+    with {:ok, schedule} <- CleaningSchedule.normalize(attrs),
+         do: HousekeepingStore.put_schedule(context, space_id, schedule)
+  end
+
+  def delete_schedule(context, space_id), do: HousekeepingStore.delete_schedule(context, space_id)
+
+  defdelegate due(spaces, schedules, finished_today, date), to: CleaningSchedule
 
   # Tenant data lifecycle (ADR-117).
   def tenant_data_policy, do: Palee.Housekeeping.Domain.TenantDataPolicy.policy()

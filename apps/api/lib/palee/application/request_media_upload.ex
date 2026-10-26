@@ -81,6 +81,13 @@ defmodule Palee.Application.RequestMediaUpload do
       else: {:error, :forbidden}
   end
 
+  # ADR-202: floor plans, by staff who manage the gym's spaces.
+  defp authorize(context, "floor_plan") do
+    if Organizations.can?(context, :manage_spaces),
+      do: :ok,
+      else: {:error, :forbidden}
+  end
+
   defp authorize(%{user_id: user_id}, purpose)
        when purpose in ["post_photo", "post_video"] and is_binary(user_id),
        do: :ok

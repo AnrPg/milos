@@ -1050,6 +1050,33 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("class_cancelled", payload, localize) do
+    class = payload["class_name"] || ""
+    time = payload["class_when"] || payload["class_starts_at"] || ""
+
+    body =
+      case payload["reason"] do
+        reason when is_binary(reason) and reason != "" ->
+          localize.("%{class} (%{time}) was cancelled: %{reason}. Your place was released.", %{
+            class: class,
+            time: time,
+            reason: reason
+          })
+
+        _none ->
+          localize.("%{class} (%{time}) was cancelled. Your place was released.", %{
+            class: class,
+            time: time
+          })
+      end
+
+    %{
+      title: localize.("Class cancelled", %{}),
+      body: body,
+      url: payload["url"] || "/box/schedule"
+    }
+  end
+
   def build("appointment_cancelled", payload, localize) do
     %{
       title: localize.("Appointment cancelled", %{}),

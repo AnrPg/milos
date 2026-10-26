@@ -237,6 +237,25 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
+  space_unavailable: "apiErrorSpaceUnavailable",
+  space_archived: "apiErrorSpaceArchived",
+  space_wrong_branch: "apiErrorSpaceWrongBranch",
+  space_not_found: "apiErrorSpaceNotFound",
+  invalid_space_area: "apiErrorInvalidSpaceArea",
+  invalid_unavailability: "apiErrorInvalidUnavailability",
+  floor_plan_wrong_branch: "apiErrorFloorPlanWrongBranch",
+  invalid_cleaning_schedule: "apiErrorInvalidCleaningSchedule",
+  invalid_placement: "apiErrorInvalidPlacement",
+  placement_exceeds_quantity: "apiErrorPlacementExceedsQuantity",
+  // ADR-200: how far an edit to a class of a series goes.
+  invalid_series_scope: "apiErrorInvalidSeriesScope",
+  series_range_required: "apiErrorSeriesRangeRequired",
+  invalid_series_every: "apiErrorInvalidSeriesEvery",
+  invalid_class_action: "apiErrorInvalidClassAction",
+  class_cancelled: "apiErrorClassCancelled",
+  class_paused: "apiErrorClassPaused",
+  class_has_bookings: "apiErrorClassHasBookings",
   // ADR-184: business accounts, demo mode and activation.
   business_not_activated: "apiErrorBusinessNotActivated",
   business_account_exists: "apiErrorBusinessAccountExists",
@@ -344,6 +363,8 @@ const API_ERROR_KEYS: Record<string, string> = {
   member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",
   slot_not_booked_by_member: "apiErrorSlotNotBookedByMember",
+  // ADR-201: a coach with scope own programming someone who is not their client.
+  not_your_client: "rhErrNotYourClient",
   slot_not_found: "apiErrorSlotNotFound",
   workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",

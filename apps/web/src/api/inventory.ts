@@ -57,6 +57,14 @@ export async function updateMachine(token: string, id: string, body: MachineInpu
   return response.machine;
 }
 
+type PlacementResponse = Json<InventoryOp<"place_machine">["responses"][200]>;
+export type MachinePlacement = PlacementResponse["placements"][number];
+
+/** ADR-202: how many of a machine stand in which space (replaces the whole placement). */
+export async function placeMachine(token: string, id: string, placements: MachinePlacement[]) {
+  return apiRequest<PlacementResponse>(`/staff/inventory/machines/${id}/placements`, { method: "PUT", token, body: { placements } });
+}
+
 export async function archiveMachine(token: string, id: string) {
   const response = await apiRequest<MachineResponse>(`/staff/inventory/machines/${id}/archive`, { method: "POST", token });
   return response.machine;

@@ -24,6 +24,8 @@ defmodule Palee.Scheduling.ClassSeries do
     field :booking_timeout_minutes, :integer, default: 60
     # ADR-097: optional Facility location.
     field :location_id, :binary_id
+    # ADR-202: optional space (room) of the branch.
+    field :space_id, :binary_id
     # The coach who runs it (ADR-100).
     field :coach_user_id, :binary_id
     field :status, :string, default: "active"
@@ -41,6 +43,7 @@ defmodule Palee.Scheduling.ClassSeries do
       :master_workout_id,
       :class_type_id,
       :location_id,
+      :space_id,
       :coach_user_id,
       :name,
       :duration_minutes,
@@ -85,6 +88,7 @@ defmodule Palee.Scheduling.ClassSeries do
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)
     |> foreign_key_constraint(:location_id)
+    |> foreign_key_constraint(:space_id, name: :class_series_space_fkey)
   end
 
   defp validate_date_order(changeset) do

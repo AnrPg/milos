@@ -13,10 +13,10 @@ defmodule Palee.Housekeeping.Domain.TenantDataPolicy do
             purge_order: 85,
             disposition: :purge,
             basis:
-              "Cleaning areas and cleaning log entries are operational data with no retention obligation.",
+              "Cleaning log entries and cleaning schedules are operational data with no retention obligation; the cleaned spaces belong to Spaces (ADR-202).",
             tables: [
               %{table: "housekeeping_entries"},
-              %{table: "housekeeping_areas"}
+              %{table: "housekeeping_schedules"}
             ]
           })
 

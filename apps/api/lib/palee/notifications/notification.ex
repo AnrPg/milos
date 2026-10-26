@@ -33,6 +33,7 @@ defmodule Palee.Notifications.Notification do
     :nutrition_plan_updated,
     :appointment_booked,
     :appointment_cancelled,
+    :class_cancelled,
     :coach_client_assigned,
     :inventory_repair_needed,
     :inventory_stock_low,

@@ -103,6 +103,48 @@ test.describe("admin setup checklist", () => {
     expect(await page.evaluate(() => window.localStorage.getItem("palee.view"))).toBe("staff");
   });
 
+  test("the settings checklist starts collapsed and stands out until setup is done", async ({ page }) => {
+    await stubApi(page);
+    const dialog = await openChecklist(page, "/org/kypseli/admin");
+    await dialog.getByRole("link", { name: "Open settings" }).click();
+    await expect(page).toHaveURL(/\/org\/kypseli\/admin\/settings$/);
+
+    // Collapsed, so the settings themselves are what the owner lands on.
+    const panel = page.locator("#setup-checklist");
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveAttribute("data-pending", "true");
+    await expect(panel).toContainText("0 of 6 done");
+    await expect(panel.getByRole("link", { name: "Set up classes" })).toHaveCount(0);
+    const toggle = panel.getByRole("button", { name: "Show steps" });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    const box = await panel.boundingBox();
+    expect(box!.height).toBeLessThan(page.viewportSize()!.height / 2);
+
+    await toggle.click();
+    await expect(panel.getByRole("link", { name: "Set up classes" })).toBeVisible();
+    await expect(panel.getByRole("button", { name: "Hide steps" })).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("a finished checklist stays collapsed without the highlight", async ({ page }) => {
+    await stubApi(page);
+    await page.route("**/api/org/*/admin/onboarding", (route) =>
+      route.fulfill(
+        json({
+          ...checklist,
+          steps: STEPS.map((id) => ({ id, done: true, auto: false, skipped: false })),
+          completed_count: STEPS.length,
+          finished: true,
+          tour_completed: true,
+        }),
+      ),
+    );
+    await page.goto("/org/kypseli/admin/settings");
+    const panel = page.locator("#setup-checklist");
+    await expect(panel).toBeVisible();
+    await expect(panel).not.toHaveAttribute("data-pending", "true");
+    await expect(panel.getByRole("button", { name: "Show steps" })).toBeVisible();
+  });
+
   test("remind me later lasts until the next login", async ({ page }) => {
     await stubApi(page);
     const dialog = await openChecklist(page, "/org/kypseli/admin");

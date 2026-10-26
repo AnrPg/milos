@@ -64,6 +64,21 @@ defmodule Palee.Scheduling.SchedulingStore do
   def extend_class_series(_series_id, _horizon), do: missing_tenant()
 
   @impl true
+  def get_class_series(context, id), do: tenant_call(context, :get_class_series, [id])
+
+  @impl true
+  def list_series_slots(context, series_id, after_at),
+    do: tenant_call(context, :list_series_slots, [series_id, after_at])
+
+  @impl true
+  def update_class_series(context, id, params),
+    do: tenant_call(context, :update_class_series, [id, params])
+
+  @impl true
+  def set_slot_state(context, id, params),
+    do: tenant_call(context, :set_slot_state, [id, params])
+
+  @impl true
   def update_slot(context, id, params), do: tenant_call(context, :update_slot, [id, params])
   def update_slot(_id, _params), do: missing_tenant()
 

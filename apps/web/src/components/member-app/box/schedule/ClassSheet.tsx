@@ -32,6 +32,7 @@ import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ClassStateNotice } from "@/components/schedule/ClassState";
 
 /** The WOD as the sheet shows it (board 2, Q7): each part with its movement names. */
 export function wodOutline(workout: WorkoutPreview) {
@@ -219,6 +220,9 @@ export function ClassSheet({
         {i18n("mbLeaveWaitlist")}
       </button>
     );
+  } else if (state.kind === "cancelled" || state.kind === "paused") {
+    // ADR-200: the reason shows in the sheet; there is nothing to do here.
+    footer = null;
   } else {
     footer = (
       <p className="py-3 text-center text-sm" style={{ color: "var(--dim)" }}>
@@ -268,6 +272,7 @@ export function ClassSheet({
         </div>
       }
     >
+          <ClassStateNotice slot={slot} className="mb-4" />
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             {coachName ? <Fact label={t("coach")}>{coachName}</Fact> : null}
             {slot.friends_going && slot.friends_going.length > 0 ? (

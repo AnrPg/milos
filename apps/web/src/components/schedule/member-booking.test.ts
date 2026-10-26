@@ -6,6 +6,7 @@ import type { ScheduleBooking, ScheduleSlot } from "@/api/schedule";
 import { allowanceLabel } from "@/i18n/presentation";
 import {
   canBringGuest,
+  classStateBadge,
   includesGuestPasses,
   includesOpenGym,
   isEventSlot,
@@ -85,6 +86,30 @@ describe("memberSlotState", () => {
     expect(memberSlotState(slot({ current_user_booking: booking({ status: "rejected" }) }), NOW)).toEqual({
       kind: "unavailable",
     });
+  });
+});
+
+describe("paused and cancelled classes (ADR-200)", () => {
+  it("shows a cancelled class as cancelled, with its reason, whatever the booking", () => {
+    const cancelled = slot({ cancelled_at: PAST, cancel_reason: "Flood", current_user_booking: booking({}) });
+    expect(memberSlotState(cancelled, NOW)).toEqual({ kind: "cancelled", reason: "Flood" });
+    expect(classStateBadge(cancelled)).toBe("cancelled");
+  });
+
+  it("keeps a booking in a paused class, and closes it to others", () => {
+    const paused = slot({ paused_at: PAST });
+    expect(memberSlotState(paused, NOW)).toEqual({ kind: "paused" });
+    expect(memberSlotState({ ...paused, current_user_booking: booking({}) }, NOW)).toEqual({
+      kind: "booked",
+      status: "approved",
+    });
+    expect(classStateBadge(paused)).toBe("paused");
+    expect(classStateBadge(slot())).toBeNull();
+  });
+
+  it("offers no guest place in a paused or cancelled class", () => {
+    expect(canBringGuest(slot({ paused_at: PAST }), true, NOW)).toBe(false);
+    expect(canBringGuest(slot({ cancelled_at: PAST }), true, NOW)).toBe(false);
   });
 });
 

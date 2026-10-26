@@ -92,6 +92,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     coaching/relationship_store
     coaching/note_store
     housekeeping/housekeeping_store
+    spaces/space_store
     inventory/inventory_store
     facility/facility_store
     content/content_store

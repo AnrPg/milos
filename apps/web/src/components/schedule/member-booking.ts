@@ -13,11 +13,24 @@ export type MemberSlotState =
   | { kind: "bookable" }
   | { kind: "waitlist_open" }
   | { kind: "past" }
-  | { kind: "unavailable" };
+  | { kind: "unavailable" }
+  /** ADR-200: staff cancelled the class; every place was released. */
+  | { kind: "cancelled"; reason: string | null }
+  /** ADR-200: staff paused booking; existing bookings stay. */
+  | { kind: "paused" };
+
+/** ADR-200: whether staff cancelled or paused the class, for its badge. */
+export function classStateBadge(slot: ScheduleSlot): "cancelled" | "paused" | null {
+  if (slot.cancelled_at) return "cancelled";
+  if (slot.paused_at) return "paused";
+  return null;
+}
 
 /** What the member can do with a class, from their own booking and capacity. */
 export function memberSlotState(slot: ScheduleSlot, now: Date = new Date()): MemberSlotState {
   const booking = slot.current_user_booking;
+
+  if (slot.cancelled_at) return { kind: "cancelled", reason: slot.cancel_reason ?? null };
 
   // A waitlist place is never a booking, even after the class has started.
   if (booking?.status === "waitlisted") {
@@ -28,6 +41,7 @@ export function memberSlotState(slot: ScheduleSlot, now: Date = new Date()): Mem
   }
   if (new Date(slot.scheduled_at) <= now) return { kind: "past" };
   if (booking) return { kind: "unavailable" };
+  if (slot.paused_at) return { kind: "paused" };
   return slot.spots_remaining > 0 ? { kind: "bookable" } : { kind: "waitlist_open" };
 }
 
@@ -53,6 +67,7 @@ export function slotLocationName(slot: ScheduleSlot, locations: ScheduleLocation
 /** "Bring a guest" needs a free spot, a future class and no guest booked yet. */
 export function canBringGuest(slot: ScheduleSlot, guestsIncluded: boolean, now: Date = new Date()) {
   if (!guestsIncluded || slot.current_user_guest) return false;
+  if (classStateBadge(slot)) return false;
   if (new Date(slot.scheduled_at) <= now) return false;
   return slot.spots_remaining > 0;
 }

@@ -134,6 +134,9 @@ config :palee,
        :inventory_store,
        Palee.Infrastructure.Inventory.EctoInventoryStore
 
+# ADR-202: the spaces of each branch, their floor plans and unavailability.
+config :palee, :space_store, Palee.Infrastructure.Spaces.EctoSpaceStore
+
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
 config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier

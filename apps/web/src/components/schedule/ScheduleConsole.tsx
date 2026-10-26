@@ -18,6 +18,8 @@ import {
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
+  type ClassAction,
+  type SeriesEditScope,
   type ScheduleBooking,
   type ClassTypeRecord,
   type ScheduleLocation,
@@ -32,7 +34,10 @@ import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
+import { ClassActionDialog, useClassActionSummary } from "@/components/schedule/ClassState";
+import { SeriesScopePicker, seriesScopeReady } from "@/components/schedule/SeriesScopePicker";
 import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
+import { SlotSpaceSelect } from "@/components/schedule/SlotSpaceSelect";
 import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import { listAdminLocations } from "@/api/facility";
 import { useQuery } from "@tanstack/react-query";
@@ -65,6 +70,8 @@ import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
 
 type SlotEditorState = {
   slotId: string | null;
+  /** ADR-200: the edited class's series; its edit can reach further. */
+  seriesId?: string | null;
   values: ClassPayload;
 };
 
@@ -142,11 +149,16 @@ export function ScheduleConsole({
   const [notice, setNotice] = useState<string | null>(null);
   // ADR-186 §8: «Ισχύει για» on a new class or series, and what it created.
   const [createBranches, setCreateBranches] = useState<string[]>([]);
+  // ADR-200: how far an edit to a class of a series goes.
+  const [seriesScope, setSeriesScope] = useState<SeriesEditScope>({ scope: "this" });
   const [created, setCreated] = useState<{ kind: "classes" | "series"; items: { id: string; label: string; slotId?: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const submitCommand = useOutboxCommand();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
+  // ADR-200 §2: the pause / cancel / delete waiting for its confirmation.
+  const [classAction, setClassAction] = useState<{ slot: ScheduleSlot; action: ClassAction } | null>(null);
+  const classActionSummary = useClassActionSummary();
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [resolveTarget, setResolveTarget] = useState<{ booking: ScheduleBooking; action: "approve" | "reject" } | null>(
     null,
@@ -463,12 +475,18 @@ export function ScheduleConsole({
         return;
       }
 
-      const saved = editor.slotId
-        ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values)
-        : await createScheduleSlot(tokens.access_token, editor.values);
+      const { slot: saved, updatedCount } = editor.slotId
+        ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values, editor.seriesId ? seriesScope : { scope: "this" })
+        : { slot: await createScheduleSlot(tokens.access_token, editor.values), updatedCount: 1 };
 
       // ADR-176: say plainly that a class without a WOD stays hidden.
-      setNotice(!saved.master_workout_id && !saved.class_series_id ? i18n("classDraftSavedNotice") : null);
+      setNotice(
+        updatedCount > 1
+          ? t("seriesClassesUpdated", { count: updatedCount })
+          : !saved.master_workout_id && !saved.class_series_id
+            ? i18n("classDraftSavedNotice")
+            : null,
+      );
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
@@ -492,26 +510,6 @@ export function ScheduleConsole({
         setSelectedSlot(null);
       }
 
-      await loadSchedule();
-    } catch (requestError) {
-      const message =
-        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
-      setError(message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function deleteSelectedSlot() {
-    if (!tokens?.access_token || !selectedSlot) return;
-    if (!window.confirm(t("deleteSlot"))) return;
-
-    setBusy(true);
-    setError(null);
-
-    try {
-      await deleteScheduleSlot(tokens.access_token, selectedSlot.id);
-      setSelectedSlot(null);
       await loadSchedule();
     } catch (requestError) {
       const message =
@@ -599,22 +597,36 @@ export function ScheduleConsole({
     }
   }
 
+  function slotValues(slot: ScheduleSlot): ClassPayload {
+    return {
+      master_workout_id: slot.master_workout_id,
+      class_type_id: slot.class_type_id,
+      name: slot.name,
+      duration_minutes: slot.duration_minutes,
+      scheduled_at: slot.scheduled_at,
+      capacity: slot.capacity,
+      auto_approve: slot.auto_approve,
+      booking_timeout_minutes: slot.booking_timeout_minutes,
+      location_id: slot.location_id ?? null,
+      space_id: slot.space_id ?? null,
+      ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
+    };
+  }
+
   function openUpdateEditor(slot: ScheduleSlot) {
-    setEditor({
-      slotId: slot.id,
-      values: {
-        master_workout_id: slot.master_workout_id,
-        class_type_id: slot.class_type_id,
-        name: slot.name,
-        duration_minutes: slot.duration_minutes,
-        scheduled_at: slot.scheduled_at,
-        capacity: slot.capacity,
-        auto_approve: slot.auto_approve,
-        booking_timeout_minutes: slot.booking_timeout_minutes,
-        location_id: slot.location_id ?? null,
-        ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
-      },
-    });
+    setSeriesScope({ scope: "this" });
+    setEditor({ slotId: slot.id, seriesId: slot.class_series_id ?? null, values: slotValues(slot) });
+  }
+
+  // A new class like this one, outside any series, at its branch; staff
+  // usually change only its date.
+  function openDuplicateEditor(slot: ScheduleSlot) {
+    setSelectedSlot(null);
+    setCreateBranches(slot.location_id ? [slot.location_id] : defaultAppliesTo(adminLocations));
+    // A class already past is copied to the same time on the next week ahead.
+    let at = new Date(slot.scheduled_at);
+    while (at.getTime() <= Date.now()) at = new Date(at.getTime() + 7 * 86_400_000);
+    setEditor({ slotId: null, seriesId: null, values: { ...slotValues(slot), scheduled_at: at.toISOString() } });
   }
 
   return (
@@ -765,6 +777,7 @@ export function ScheduleConsole({
           }}
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
+          canProgramVariations={can(membership, "manage_coaching")}
           onCreateWorkout={() => createNewWod({ kind: "link", slotId: selectedSlot.id })}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {
@@ -773,13 +786,34 @@ export function ScheduleConsole({
           }}
           onSlotChanged={() => void refreshSelectedSlot()}
           onClose={() => setSelectedSlot(null)}
-          onDelete={() => void deleteSelectedSlot()}
+          onClassAction={(action) => setClassAction({ slot: selectedSlot, action })}
           onEdit={() => openUpdateEditor(selectedSlot)}
+          onDuplicate={() => openDuplicateEditor(selectedSlot)}
           onRejectBooking={(booking) => {
             setResolveMessage("");
             setResolveTarget({ booking, action: "reject" });
           }}
           slot={selectedSlot}
+        />
+      ) : null}
+
+      {classAction && tokens?.access_token ? (
+        <ClassActionDialog
+          token={tokens.access_token}
+          slot={classAction.slot}
+          action={classAction.action}
+          classDate={dateTimeLocalInZone(classAction.slot.scheduled_at, gymZone).slice(0, 10)}
+          onClose={() => setClassAction(null)}
+          onDone={(result) => {
+            setClassAction(null);
+            setNotice(classActionSummary(result) || null);
+            if (selectedSlot && result.deleted_ids.includes(selectedSlot.id)) {
+              setSelectedSlot(null);
+              void loadSchedule();
+            } else {
+              void refreshSelectedSlot();
+            }
+          }}
         />
       ) : null}
 
@@ -855,7 +889,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0)}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0) || (Boolean(editor.seriesId) && !seriesScopeReady(seriesScope))}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -1019,6 +1053,15 @@ export function ScheduleConsole({
                 value={editor.values.location_id}
               />
             )}
+            {/* ADR-202: the space of the class, among those of its branch. */}
+            <SlotSpaceSelect
+              className="mt-4 block space-y-2 text-sm font-semibold"
+              locationIds={!editor.slotId && manyBranches ? createBranches : [editor.values.location_id]}
+              onChange={(spaceId) => setEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))}
+              selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={editor.values.space_id}
+            />
 
             {canManageSchedule ? (
               <ClassCoachSelect
@@ -1032,6 +1075,15 @@ export function ScheduleConsole({
                 selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
                 selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                 value={editor.values.coach_user_id}
+              />
+            ) : null}
+
+            {editor.slotId && editor.seriesId ? (
+              <SeriesScopePicker
+                className="mt-4"
+                value={seriesScope}
+                onChange={setSeriesScope}
+                classDate={dateTimeLocalInZone(editor.values.scheduled_at, gymZone).slice(0, 10)}
               />
             ) : null}
 
@@ -1097,6 +1149,7 @@ export function ScheduleConsole({
               ) : (
                 <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
               )}
+              <SlotSpaceSelect className="text-sm font-semibold" locationIds={manyBranches ? createBranches : [seriesEditor.values.location_id]} onChange={(spaceId) => setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.space_id} />
               {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>

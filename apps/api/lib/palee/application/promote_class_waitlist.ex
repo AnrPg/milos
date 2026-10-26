@@ -20,7 +20,9 @@ defmodule Palee.Application.PromoteClassWaitlist do
         :ok
 
       slot ->
+        # A paused or cancelled class promotes nobody (ADR-200 §2).
         if DateTime.compare(slot.scheduled_at, DateTime.utc_now()) == :gt and
+             is_nil(BookingPolicy.closed_reason(slot)) and
              not BookingPolicy.slot_full?(slot) do
           context
           |> Scheduling.list_waitlist(slot.id)

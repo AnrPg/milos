@@ -39,10 +39,11 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     community_event_view_days community_event_view_marks
     partner_profiles partner_swipes partner_matches partner_messages
     media_tenant_objects organization_public_profiles profile_tag_suggestions
-    housekeeping_areas
-    housekeeping_entries
+    spaces space_floor_plans space_unavailabilities
+    housekeeping_entries housekeeping_schedules
     inventory_machines
     inventory_machine_events
+    inventory_machine_placements
     inventory_supplies
     inventory_supply_movements
     inventory_supply_reports

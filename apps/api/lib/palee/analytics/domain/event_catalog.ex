@@ -138,6 +138,8 @@ defmodule Palee.Analytics.Domain.EventCatalog do
     "class_workout_linked" =>
       {"scheduled_class", [:class_type_id, :master_workout_id, :class_series_id], nil},
     "class_slot_cancelled" => {"scheduled_class", [], nil},
+    # ADR-200: a class paused, resumed, cancelled or restored.
+    "class_state_changed" => {"scheduled_class", [:action], nil},
     # Messaging
     "messaging_thread_created" => {"messaging_thread", [:context_type], :subject},
     "messaging_message_sent" => {"messaging_message", [:thread_id, :message_type], :subject},

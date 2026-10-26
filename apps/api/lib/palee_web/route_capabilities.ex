@@ -64,6 +64,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminUserController, :training_history} => [:view_client_training],
     {W.AdminUserController, :schedule} => [:view_client_training, :run_classes],
     {W.AdminUserController, :program_workout} => [:manage_coaching],
+    {W.AdminUserController, :program_workout_for_users} => [:manage_coaching],
     {W.AdminUserController, :place_in_class} => [:book_for_clients, :manage_schedule],
     {W.AdminUserController, :prs} => [:view_client_training],
     {W.AdminUserController, :pr_members} => [:view_client_training],
@@ -174,6 +175,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
     {W.AdminScheduleController, :create_series} => [:manage_schedule],
     {W.AdminScheduleController, :update_slot} => [:manage_schedule],
+    {W.AdminScheduleController, :change_state} => [:manage_schedule],
     # ADR-176: whoever programmes WODs may link one to a class.
     {W.AdminScheduleController, :link_workout} => [:manage_schedule, :manage_workouts],
     {W.AdminScheduleController, :delete_slot} => [:manage_schedule],
@@ -319,6 +321,47 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.CleaningController, :entries} => [:record_cleaning, :review_cleaning],
     {W.CleaningController, :start} => [:record_cleaning],
     {W.CleaningController, :finish} => [:record_cleaning],
+    # ADR-202: the cleaning schedule (owners, admins, front desk) and «Σήμερα».
+    {W.CleaningController, :schedules} => [
+      :record_cleaning,
+      :review_cleaning,
+      :manage_cleaning_schedule
+    ],
+    {W.CleaningController, :put_schedule} => [:manage_cleaning_schedule],
+    {W.CleaningController, :delete_schedule} => [:manage_cleaning_schedule],
+    {W.CleaningController, :today} => [
+      :record_cleaning,
+      :review_cleaning,
+      :manage_cleaning_schedule
+    ],
+
+    # Spaces (ADR-202): whoever plans classes also reads the spaces.
+    {W.SpacesController, :index} => [
+      :view_spaces,
+      :manage_spaces,
+      :edit_space_details,
+      :set_space_unavailable,
+      :manage_schedule
+    ],
+    {W.SpacesController, :show} => [
+      :view_spaces,
+      :manage_spaces,
+      :edit_space_details,
+      :set_space_unavailable,
+      :manage_schedule
+    ],
+    {W.SpacesController, :create} => [:manage_spaces],
+    # Front desk edits the details only (checked in SpaceDirectory).
+    {W.SpacesController, :update} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :archive} => [:manage_spaces],
+    {W.SpacesController, :restore} => [:manage_spaces],
+    {W.SpacesController, :make_unavailable} => [:manage_spaces, :set_space_unavailable],
+    {W.SpacesController, :delete_unavailability} => [:manage_spaces, :set_space_unavailable],
+    {W.SpacesController, :floor_plan_upload} => [:manage_spaces],
+    {W.SpacesController, :complete_floor_plan_upload} => [:manage_spaces],
+    {W.SpacesController, :create_floor_plan} => [:manage_spaces],
+    {W.SpacesController, :update_floor_plan} => [:manage_spaces],
+    {W.SpacesController, :delete_floor_plan} => [:manage_spaces],
 
     # Invitations
     {W.OrganizationAccessController, :issue} => [:invite_clients],
@@ -333,6 +376,8 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.InventoryController, :supplies} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :report_low} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :supply_reports} => [:manage_inventory, :report_inventory],
+    # ADR-202: where machines stand; who manages inventory or spaces.
+    {W.InventoryController, :place_machine} => [:manage_inventory, :manage_spaces],
     # ADR-190: the shop. The desk sells (sell_shop); the catalog, stock and
     # refunds are manage_shop (refunds also need take_payments, checked in
     # the controller); Finance readers see the per-stream totals and lineage.

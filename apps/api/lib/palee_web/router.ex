@@ -721,11 +721,37 @@ defmodule PaleeWeb.Router do
     get("/cleaning/entries", CleaningController, :entries)
     post("/cleaning/entries", CleaningController, :start)
     post("/cleaning/entries/:id/finish", CleaningController, :finish)
+    # ADR-202: the cleaning schedule and the janitor's «Σήμερα».
+    get("/cleaning/schedules", CleaningController, :schedules)
+    put("/cleaning/schedules/:space_id", CleaningController, :put_schedule)
+    delete("/cleaning/schedules/:space_id", CleaningController, :delete_schedule)
+    get("/cleaning/today", CleaningController, :today)
+    # ADR-202: Settings › Spaces.
+    get("/spaces", SpacesController, :index)
+    post("/spaces", SpacesController, :create)
+    get("/spaces/:id", SpacesController, :show)
+    patch("/spaces/:id", SpacesController, :update)
+    post("/spaces/:id/archive", SpacesController, :archive)
+    post("/spaces/:id/restore", SpacesController, :restore)
+    post("/spaces/:id/unavailability", SpacesController, :make_unavailable)
+
+    delete(
+      "/spaces/:id/unavailability/:window_id",
+      SpacesController,
+      :delete_unavailability
+    )
+
+    post("/floor-plans/uploads", SpacesController, :floor_plan_upload)
+    post("/floor-plans/uploads/:id/complete", SpacesController, :complete_floor_plan_upload)
+    post("/floor-plans", SpacesController, :create_floor_plan)
+    patch("/floor-plans/:id", SpacesController, :update_floor_plan)
+    delete("/floor-plans/:id", SpacesController, :delete_floor_plan)
     get("/inventory/machines", InventoryController, :machines)
     post("/inventory/machines", InventoryController, :create_machine)
     patch("/inventory/machines/:id", InventoryController, :update_machine)
     post("/inventory/machines/:id/archive", InventoryController, :archive_machine)
     get("/inventory/machines/:id/events", InventoryController, :machine_events)
+    put("/inventory/machines/:id/placements", InventoryController, :place_machine)
     post("/inventory/machines/:id/events", InventoryController, :log_machine_event)
     get("/inventory/supplies", InventoryController, :supplies)
     post("/inventory/supplies", InventoryController, :create_supply)
@@ -799,6 +825,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/users", AdminUserController, :index)
+    post("/users/programming", AdminUserController, :program_workout_for_users)
     get("/users/:id", AdminUserController, :show)
     get("/users/:id/finance", AdminUserController, :finance)
     get("/users/:id/training-history", AdminUserController, :training_history)
@@ -1024,6 +1051,7 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
+    post("/schedule/slots/:id/state", AdminScheduleController, :change_state)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
 
     get(

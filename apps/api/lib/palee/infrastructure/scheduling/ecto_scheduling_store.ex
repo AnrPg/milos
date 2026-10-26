@@ -208,6 +208,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
               master_workout_id: series.master_workout_id,
               class_type_id: series.class_type_id,
               location_id: series.location_id,
+              space_id: series.space_id,
               coach_user_id: series.coach_user_id,
               class_series_id: series.id,
               name: series.name,
@@ -261,6 +262,52 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def get_class_series(%{organization_id: organization_id}, id) do
+    ClassSeries
+    |> where([series], series.id == ^id)
+    |> for_organization(organization_id)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      series -> normalize_class_series(series)
+    end
+  end
+
+  @impl true
+  def list_series_slots(%{organization_id: organization_id}, series_id, %DateTime{} = after_at) do
+    ScheduledClass
+    |> where([slot], slot.class_series_id == ^series_id and slot.scheduled_at > ^after_at)
+    |> for_organization(organization_id)
+    |> order_by([slot], asc: slot.scheduled_at)
+    |> select([slot], %{id: slot.id, scheduled_at: slot.scheduled_at})
+    |> Repo.all()
+  end
+
+  # ADR-200: an edit applied to every upcoming class also reaches the classes
+  # the series creates later. Only the class template fields change.
+  @impl true
+  def update_class_series(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ClassSeries, id: id, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      %ClassSeries{} = series ->
+        series
+        |> ClassSeries.changeset(
+          Map.take(
+            params,
+            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id space_id coach_user_id local_start_time status)
+          )
+        )
+        |> Repo.update()
+        |> case do
+          {:ok, updated} -> {:ok, normalize_class_series(updated)}
+          error -> error
+        end
+    end
+  end
+
+  @impl true
   def update_slot(%{organization_id: organization_id}, id, params) do
     case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
       nil ->
@@ -275,6 +322,23 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         |> validate_booked_class_keeps_workout(slot)
         |> Repo.update()
         |> wrap_slot_result()
+    end
+  end
+
+  @impl true
+  def set_slot_state(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      %ScheduledClass{} = slot ->
+        slot
+        |> ScheduledClass.state_changeset(params)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} -> {:ok, updated |> preload_slot() |> normalize_slot()}
+          error -> error
+        end
     end
   end
 
@@ -427,6 +491,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> where([slot], slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at)
     |> for_organization(organization_id)
     |> maybe_filter_class_types(class_type_ids)
+    |> maybe_filter_spaces(opts[:space_ids])
     |> maybe_include_drafts(opts[:include_drafts] == true)
     |> order_by([slot], asc: slot.scheduled_at)
     |> Repo.all()
@@ -1371,6 +1436,10 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   defp maybe_filter_class_types(query, []), do: query
   defp maybe_filter_class_types(query, ids), do: where(query, [slot], slot.class_type_id in ^ids)
 
+  # ADR-202: the classes held in some spaces.
+  defp maybe_filter_spaces(query, nil), do: query
+  defp maybe_filter_spaces(query, ids), do: where(query, [slot], slot.space_id in ^ids)
+
   # ADR-176: drafts (no WOD, no series; see ClassWorkoutReadiness.published?/1)
   # are left out unless a staff view asks for them, so a new member-facing
   # caller can never show one by accident.
@@ -1485,11 +1554,15 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       class_type_id: slot.class_type_id,
       class_type: normalize_loaded_class_type(slot.class_type),
       location_id: slot.location_id,
+      space_id: slot.space_id,
       coach_user_id: slot.coach_user_id,
       scheduled_at: slot.scheduled_at,
       capacity: slot.capacity,
       auto_approve: slot.auto_approve,
       booking_timeout_minutes: slot.booking_timeout_minutes,
+      paused_at: slot.paused_at,
+      cancelled_at: slot.cancelled_at,
+      cancel_reason: slot.cancel_reason,
       approved_booking_count: approved_booking_count,
       spots_remaining: max(slot.capacity - approved_booking_count, 0),
       waitlist_count: Enum.count(bookings, &(&1.status == :waitlisted)),
@@ -1597,6 +1670,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       master_workout_id: series.master_workout_id,
       class_type_id: series.class_type_id,
       location_id: series.location_id,
+      space_id: series.space_id,
       coach_user_id: series.coach_user_id,
       name: series.name,
       duration_minutes: series.duration_minutes,
@@ -1647,6 +1721,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
             master_workout_id: series.master_workout_id,
             class_type_id: series.class_type_id,
             location_id: series.location_id,
+            space_id: series.space_id,
             coach_user_id: series.coach_user_id,
             class_series_id: series.id,
             name: series.name,

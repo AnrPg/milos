@@ -34,6 +34,44 @@ defmodule PaleeWeb.FallbackController do
     invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
   }
 
+  # ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
+  @space_errors %{
+    space_not_found: {:not_found, "Space not found"},
+    space_archived: {:unprocessable_entity, "That space is archived"},
+    space_wrong_branch: {:unprocessable_entity, "That space is in another branch"},
+    invalid_space_area: {:unprocessable_entity, "Draw the area inside the floor plan"},
+    invalid_unavailability: {:unprocessable_entity, "The end must be after the start"},
+    floor_plan_not_found: {:not_found, "Floor plan not found"},
+    floor_plan_wrong_branch: {:unprocessable_entity, "That floor plan is of another branch"},
+    invalid_cleaning_schedule:
+      {:unprocessable_entity, "Choose at least one day, and times as HH:MM"},
+    invalid_placement: {:unprocessable_entity, "Choose a space and a quantity"},
+    placement_exceeds_quantity:
+      {:unprocessable_entity, "More are placed than the gym owns of this machine"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@space_errors, reason) do
+    {status, message} = Map.fetch!(@space_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-202: a class cannot take place while its space is unavailable.
+  def call(conn, {:error, {:space_unavailable, window}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "space_unavailable",
+      error: "The space is unavailable then",
+      reason: Map.get(window, :reason),
+      starts_at: Map.get(window, :starts_at),
+      ends_at: Map.get(window, :ends_at),
+      class_starts_at: Map.get(window, :class_starts_at)
+    })
+  end
+
   def call(conn, {:error, reason}) when is_map_key(@notification_preference_errors, reason) do
     {status, message} = Map.fetch!(@notification_preference_errors, reason)
 
@@ -1762,6 +1800,16 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-201: programming for several people.
+  def call(conn, {:error, reason}) when reason in [:invalid_user_ids, :too_many_users] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: to_string(reason),
+      error: "Choose between 1 and #{Palee.Application.ProgramWorkoutForUsers.max_users()} people"
+    })
+  end
+
   def call(conn, {:error, :class_variant_requires_single_member}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -2589,6 +2637,13 @@ defmodule PaleeWeb.FallbackController do
     cleaning_already_finished: {:conflict, "This cleaning is already finished"},
     cleaning_finished_before_start: {:unprocessable_entity, "Finish cannot be before start"},
     not_a_coach: {:unprocessable_entity, "That person is not a coach here"},
+    invalid_series_scope: {:unprocessable_entity, "Choose this class, all classes or dates"},
+    series_range_required: {:unprocessable_entity, "Choose a start and an end date"},
+    invalid_series_every: {:unprocessable_entity, "Choose every 1 to 52 classes"},
+    invalid_class_action: {:unprocessable_entity, "Unknown class action"},
+    class_cancelled: {:conflict, "This class is cancelled"},
+    class_paused: {:conflict, "Booking for this class is paused"},
+    class_has_bookings: {:conflict, "This class has bookings. Cancel it instead"},
     not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
     only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
     not_your_client: {:forbidden, "Not one of your clients"},

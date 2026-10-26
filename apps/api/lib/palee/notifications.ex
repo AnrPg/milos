@@ -608,6 +608,20 @@ defmodule Palee.Notifications do
         url: "/box/schedule"
       })
 
+  # ADR-200: staff cancelled a class the member had a place in.
+  def process_event("class_cancelled", payload),
+    do:
+      enqueue_simple(:class_cancelled, payload, %{
+        organization_id: field(payload, :organization_id),
+        scheduled_class_id: field(payload, :scheduled_class_id),
+        class_name: field(payload, :class_name),
+        class_starts_at: field(payload, :class_starts_at),
+        reason: field(payload, :reason),
+        dedupe_key:
+          "class_cancelled:#{field(payload, :scheduled_class_id)}:#{field(payload, :cancelled_at)}",
+        url: "/box/schedule"
+      })
+
   def process_event("package_expiring", payload),
     do:
       enqueue_simple(:package_expiring, payload, %{

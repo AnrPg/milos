@@ -197,3 +197,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-197 | One filter pattern on every list; feed types, Around level, partner disciplines and distance | Accepted |
 | ADR-198 | Box › «Πελάτες μου»: the coach's home in the member app | Accepted |
 | ADR-199 | Notification preferences per category and channel, checked at the bell and push chokepoints | Accepted |
+| ADR-200 | Series edits, pause / cancel / delete reach this class, all upcoming classes or a date range, every nth; duplicate a class | Accepted |
+| ADR-201 | WOD variation for several people at once: each programmed as if alone, results per person | Accepted |
+| ADR-202 | Spaces: floor plans, unavailability, class spaces, cleaning schedule and machine placement | Accepted |

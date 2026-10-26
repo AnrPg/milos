@@ -687,3 +687,12 @@ msgstr "طلب مراسلة"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "يريد %{nickname} أن يرسل إليك رسالة."
+
+msgid "Class cancelled"
+msgstr "أُلغي الصف"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "أُلغي الصف %{class} (%{time}): %{reason}. تم تحرير مكانك."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "أُلغي الصف %{class} (%{time}). تم تحرير مكانك."
