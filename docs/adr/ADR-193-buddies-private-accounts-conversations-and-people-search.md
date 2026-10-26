@@ -50,7 +50,14 @@ column default to `false` and reads a missing row as public
 their value. People search also forgives typos: migration
 `20261221100000_fuzzy_people_search` adds pg_trgm word similarity (≥ 0.5,
 from three characters) on the folded name and the handle, literal matches
-first within each relation rank.
+first within each relation rank. *Amended 2026-10-26:* the threshold is an
+explicit `word_similarity(...) >= 0.5` in the query, never a function-level
+`SET pg_trgm.word_similarity_threshold` (that needs superuser rights the prod
+migration role lacks, and failed the deploy with 42501); the fuzzy arms walk
+GiST trigram indexes nearest first (`<<->`, 500 rows each). `mix test` now
+creates and migrates the test database, and runs the whole suite, as a
+non-superuser owner role (`mix palee.test.migrate`, one fresh session per
+migration), and a test allows functions to pin only `search_path`.
 
 - Following a **private** person stays a request. Following a **public**
   person is `active` at once, and they get a `new_follower` notification

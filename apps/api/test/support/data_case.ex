@@ -56,7 +56,8 @@ defmodule Palee.DataCase do
   end
 
   @doc """
-  TD-046: the suite connects as a Postgres superuser (`rolbypassrls`), so
+  TD-046: the suite connects as the database owner role (`rolbypassrls`, no
+  superuser, like production's migration role), so
   Row Level Security never applies to ordinary tests and a query that skips
   `RepoContext.run/2` passes locally but returns nothing in production.
 
@@ -77,7 +78,7 @@ defmodule Palee.DataCase do
 
   @doc """
   Runs `fun` as the RLS-enforcing runtime role inside the sandbox transaction
-  and restores the superuser test role afterwards, even if `fun` raises.
+  and restores the owner test role afterwards, even if `fun` raises.
   """
   def with_runtime_role(fun) when is_function(fun, 0) do
     enforce_rls!()
@@ -135,7 +136,7 @@ defmodule Palee.DataCase do
     do: Palee.Repo.query!("SELECT set_config($1, $2, false)", [name, value])
 
   @doc """
-  Runs `fun` as the superuser test role and restores the previous role.
+  Runs `fun` as the owner test role and restores the previous role.
   Only for fixtures: assertions about tenant isolation must run enforced.
   """
   def bypass_rls(fun) when is_function(fun, 0) do

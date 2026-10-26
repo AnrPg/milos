@@ -44,13 +44,16 @@ jobs:
         working-directory: apps/api
       - run: mix deps.get
         working-directory: apps/api
+      # The admin user only creates the non-superuser owner role and the
+      # test database; migrations and tests run as that role, as prod does
+      # (mix palee.test.migrate).
       - run: mix precommit
         working-directory: apps/api
         env:
           DB_HOST: postgres
           DB_NAME: palee_test
-          DB_PASSWORD: postgres
-          DB_USER: postgres
+          DB_ADMIN_PASSWORD: postgres
+          DB_ADMIN_USER: postgres
 
   web-verify:
     name: Verify web

@@ -3,7 +3,7 @@ defmodule PaleeWeb.RLSEnforcedEndpoint do
   TD-046: a test-only stand-in for `PaleeWeb.Endpoint` that dispatches
   each request as the non-superuser runtime role, so Row Level Security applies
   to the controller/application/store code under test exactly as in production.
-  Fixtures and assertions outside the request keep the superuser test role.
+  Fixtures and assertions outside the request keep the owner test role.
 
   It is the `@endpoint` of every `PaleeWeb.ConnCase` test. A test that
   must observe behavior RLS deliberately hides can opt out with

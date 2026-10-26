@@ -2,8 +2,9 @@ defmodule Palee.RLSCase do
   @moduledoc """
   For tests that must prove an RLS policy actually blocks something.
 
-  This whole suite runs against Postgres as a superuser (rolbypassrls =
-  true - see F-07 in the multi-tenancy audit), so ordinary Ecto-based tests
+  This whole suite runs against Postgres as the database owner role, which
+  has rolbypassrls = true like production's migration role (see F-07 in the
+  multi-tenancy audit) but is no superuser, so ordinary Ecto-based tests
   never exercise Row Level Security: every query succeeds regardless of
   policy correctness, RED and GREEN alike. `use Palee.RLSCase`
   self-provisions a dedicated non-superuser role and hands each test a raw
@@ -58,8 +59,8 @@ defmodule Palee.RLSCase do
         Postgrex.start_link(
           hostname: System.get_env("DB_HOST", "localhost"),
           port: String.to_integer(System.get_env("DB_PORT", "5432")),
-          username: System.get_env("DB_USER", "postgres"),
-          password: System.get_env("DB_PASSWORD", "postgres"),
+          username: admin_config(:username),
+          password: admin_config(:password),
           database:
             System.get_env(
               "DB_NAME",
@@ -94,8 +95,8 @@ defmodule Palee.RLSCase do
       Postgrex.start_link(
         hostname: System.get_env("DB_HOST", "localhost"),
         port: String.to_integer(System.get_env("DB_PORT", "5432")),
-        username: System.get_env("DB_USER", "postgres"),
-        password: System.get_env("DB_PASSWORD", "postgres"),
+        username: admin_config(:username),
+        password: admin_config(:password),
         database: System.get_env("DB_NAME", "palee_test#{System.get_env("MIX_TEST_PARTITION")}")
       )
 
@@ -135,9 +136,18 @@ defmodule Palee.RLSCase do
       []
     )
 
+    # The suite's own role switches to the runtime role with SET LOCAL ROLE
+    # (DataCase.with_rls/1), which needs membership once it is no superuser.
+    Postgrex.query!(admin_conn, "GRANT #{@runtime_role} TO #{repo_role()}", [])
+
     GenServer.stop(admin_conn)
     :ok
   end
+
+  defp repo_role, do: Keyword.fetch!(Palee.Repo.config(), :username)
+
+  defp admin_config(key),
+    do: :palee |> Application.fetch_env!(:test_database_admin) |> Keyword.fetch!(key)
 
   @doc "Generates a UUID as both its string form (for set_config/text params) and its 16-byte binary form (for uuid columns)."
   def uuid do

@@ -88,11 +88,19 @@ defmodule Palee.Infrastructure.Maintenance.CleanSlatePurge do
       SQL.query!(
         Repo,
         """
-        SELECT tablename
-        FROM pg_tables
-        WHERE schemaname = 'public'
-          AND tablename <> ALL($1::text[])
-        ORDER BY tablename
+        SELECT t.tablename
+        FROM pg_tables t
+        WHERE t.schemaname = 'public'
+          AND t.tablename <> ALL($1::text[])
+          -- Extension tables (PostGIS's spatial_ref_sys) are reference data
+          -- owned by the administrator, not tenant data; the migration role
+          -- may not truncate them.
+          AND NOT EXISTS (
+            SELECT 1 FROM pg_depend d
+            WHERE d.classid = 'pg_class'::regclass
+              AND d.objid = format('public.%I', t.tablename)::regclass
+              AND d.deptype = 'e')
+        ORDER BY t.tablename
         """,
         [@preserved_tables]
       )

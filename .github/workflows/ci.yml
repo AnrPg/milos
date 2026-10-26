@@ -32,8 +32,8 @@ jobs:
         env:
           DB_HOST: localhost
           DB_NAME: palee_test
-          DB_PASSWORD: postgres
-          DB_USER: postgres
+          DB_ADMIN_PASSWORD: postgres
+          DB_ADMIN_USER: postgres
       - run: mix hex.audit
         working-directory: apps/api
       - run: mix dialyzer --list-unused-filters
@@ -41,16 +41,16 @@ jobs:
         env:
           DB_HOST: localhost
           DB_NAME: palee_test
-          DB_PASSWORD: postgres
-          DB_USER: postgres
+          DB_ADMIN_PASSWORD: postgres
+          DB_ADMIN_USER: postgres
       - name: Verify latest migration is reversible
         run: mix ecto.rollback --step 1 && mix ecto.migrate
         working-directory: apps/api
         env:
           DB_HOST: localhost
           DB_NAME: palee_test
-          DB_PASSWORD: postgres
-          DB_USER: postgres
+          DB_ADMIN_PASSWORD: postgres
+          DB_ADMIN_USER: postgres
 
   web-test:
     runs-on: self-hosted
