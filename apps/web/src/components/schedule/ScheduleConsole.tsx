@@ -34,6 +34,7 @@ import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
+import { SlotSpaceSelect } from "@/components/schedule/SlotSpaceSelect";
 import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import { listAdminLocations } from "@/api/facility";
 import { useQuery } from "@tanstack/react-query";
@@ -621,6 +622,7 @@ export function ScheduleConsole({
       auto_approve: slot.auto_approve,
       booking_timeout_minutes: slot.booking_timeout_minutes,
       location_id: slot.location_id ?? null,
+      space_id: slot.space_id ?? null,
       ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
     };
   }
@@ -1044,6 +1046,15 @@ export function ScheduleConsole({
                 value={editor.values.location_id}
               />
             )}
+            {/* ADR-202: the space of the class, among those of its branch. */}
+            <SlotSpaceSelect
+              className="mt-4 block space-y-2 text-sm font-semibold"
+              locationIds={!editor.slotId && manyBranches ? createBranches : [editor.values.location_id]}
+              onChange={(spaceId) => setEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))}
+              selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={editor.values.space_id}
+            />
 
             {canManageSchedule ? (
               <ClassCoachSelect
@@ -1131,6 +1142,7 @@ export function ScheduleConsole({
               ) : (
                 <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
               )}
+              <SlotSpaceSelect className="text-sm font-semibold" locationIds={manyBranches ? createBranches : [seriesEditor.values.location_id]} onChange={(spaceId) => setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.space_id} />
               {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>

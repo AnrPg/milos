@@ -87,7 +87,7 @@ export function FloorPlanCanvas({
       ) : (
         <div className="aspect-[4/3] w-full" aria-label={alt} role="img" />
       )}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden={drawing ? "true" : undefined}>
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden={drawing || undefined}>
         {areas.map((area) => {
           const tone = fills[area.tone ?? "default"];
           return (

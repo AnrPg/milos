@@ -237,6 +237,17 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
+  space_unavailable: "apiErrorSpaceUnavailable",
+  space_archived: "apiErrorSpaceArchived",
+  space_wrong_branch: "apiErrorSpaceWrongBranch",
+  space_not_found: "apiErrorSpaceNotFound",
+  invalid_space_area: "apiErrorInvalidSpaceArea",
+  invalid_unavailability: "apiErrorInvalidUnavailability",
+  floor_plan_wrong_branch: "apiErrorFloorPlanWrongBranch",
+  invalid_cleaning_schedule: "apiErrorInvalidCleaningSchedule",
+  invalid_placement: "apiErrorInvalidPlacement",
+  placement_exceeds_quantity: "apiErrorPlacementExceedsQuantity",
   // ADR-200: how far an edit to a class of a series goes.
   invalid_series_scope: "apiErrorInvalidSeriesScope",
   series_range_required: "apiErrorSeriesRangeRequired",

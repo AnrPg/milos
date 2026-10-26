@@ -184,6 +184,8 @@ export function AdminDashboard({
         { label: nav("appointments"), href: "/admin/appointments", icon: "clock", show: has("manage_appointments") },
         { label: nav("cleaningLog"), href: "/admin/cleaning", icon: "sparkle", show: has("record_cleaning", "review_cleaning", "manage_cleaning_areas") },
         { label: nav("inventory"), href: "/admin/inventory", icon: "box", show: has("report_inventory", "manage_inventory") },
+        // ADR-202: the gym's spaces, their floor plans and unavailability.
+        { label: nav("spaces"), href: "/admin/spaces", icon: "box", show: has("view_spaces", "manage_spaces", "edit_space_details", "set_space_unavailable") },
       ],
     },
     {

@@ -76,6 +76,18 @@ export function groupByBranch<T extends Located>(items: T[], order: (string | nu
     .filter((group) => group.items.length > 0 || order.includes(group.locationId));
 }
 
+type Branchy = { location_id?: string | null; archived_at?: string | null };
+
+/**
+ * The spaces a class at these branches can take: gym-wide spaces always, a
+ * branch's own only when the class is at that one branch. Archived ones never.
+ */
+export function spacesForBranches<T extends Branchy>(spaces: T[], locationIds: (string | null | undefined)[]): T[] {
+  const branches = Array.from(new Set(locationIds.map((id) => id ?? null)));
+  const only = branches.length === 1 ? branches[0] : null;
+  return spaces.filter((space) => !space.archived_at && ((space.location_id ?? null) === null || (only !== null && space.location_id === only)));
+}
+
 /** Whether a window is still current or ahead at `now`. */
 export function upcomingWindow(window: { ends_at: string }, now: Date = new Date()) {
   return new Date(window.ends_at).getTime() > now.getTime();

@@ -6,6 +6,7 @@ import {
   labelPosition,
   normalizedPoint,
   rectangleFromDrag,
+  spacesForBranches,
   spacesOnPlan,
   svgPoints,
   upcomingWindow,
@@ -69,6 +70,18 @@ describe("floor plan geometry (ADR-202)", () => {
       ["empty", []],
       [null, ["1"]],
     ]);
+  });
+
+  it("offers a class the spaces of its branch and the gym-wide ones", () => {
+    const spaces = [
+      { id: "gym", location_id: null },
+      { id: "k", location_id: "kifisia" },
+      { id: "m", location_id: "marousi" },
+      { id: "old", location_id: null, archived_at: "2026-01-01T00:00:00Z" },
+    ];
+    expect(spacesForBranches(spaces, ["kifisia"]).map((space) => space.id)).toEqual(["gym", "k"]);
+    expect(spacesForBranches(spaces, [null]).map((space) => space.id)).toEqual(["gym"]);
+    expect(spacesForBranches(spaces, ["kifisia", "marousi"]).map((space) => space.id)).toEqual(["gym"]);
   });
 
   it("reads unavailability windows", () => {
