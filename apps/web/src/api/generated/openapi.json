@@ -16039,6 +16039,7 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "floor_plan",
                   "meal_photo",
                   "post_photo",
                   "post_video",
@@ -16211,6 +16212,7 @@
                   "enum": [
                     "body_photo",
                     "box_photo",
+                    "floor_plan",
                     "meal_photo",
                     "post_photo",
                     "post_video",
@@ -16497,6 +16499,7 @@
                     "enum": [
                       "body_photo",
                       "box_photo",
+                      "floor_plan",
                       "meal_photo",
                       "post_photo",
                       "post_video",
@@ -16669,6 +16672,7 @@
                       "enum": [
                         "body_photo",
                         "box_photo",
+                        "floor_plan",
                         "meal_photo",
                         "post_photo",
                         "post_video",
@@ -21558,6 +21562,37 @@
             "nullable": true,
             "type": "string"
           },
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "floor_plan_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -21588,6 +21623,90 @@
           "tasks"
         ],
         "title": "CleaningArea",
+        "type": "object"
+      },
+      "CleaningDue": {
+        "properties": {
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "cleanings_done": {
+            "type": "integer"
+          },
+          "cleanings_due": {
+            "type": "integer"
+          },
+          "comment": {
+            "nullable": true,
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "floor_plan_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "times": {
+            "items": {
+              "format": "time",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "space_id",
+          "name",
+          "tasks",
+          "times",
+          "cleanings_due",
+          "cleanings_done",
+          "done"
+        ],
+        "title": "CleaningDue",
         "type": "object"
       },
       "CleaningEntry": {
@@ -21636,6 +21755,45 @@
           "tasks_done"
         ],
         "title": "CleaningEntry",
+        "type": "object"
+      },
+      "CleaningSchedule": {
+        "properties": {
+          "comment": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "times": {
+            "items": {
+              "format": "time",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "weekdays": {
+            "items": {
+              "maximum": 7,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "space_id",
+          "weekdays",
+          "times"
+        ],
+        "title": "CleaningSchedule",
         "type": "object"
       },
       "ClientTrainingDepth": {
@@ -40033,6 +40191,49 @@
         "title": "FinanceRefundReceiptResponse",
         "type": "object"
       },
+      "FloorPlan": {
+        "properties": {
+          "height": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "image_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "media_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "width": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "media_id",
+          "sort_order"
+        ],
+        "title": "FloorPlan",
+        "type": "object"
+      },
       "FollowEntry": {
         "properties": {
           "box": {
@@ -42214,6 +42415,27 @@
             "nullable": true,
             "type": "string"
           },
+          "placements": {
+            "items": {
+              "properties": {
+                "quantity": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "space_id",
+                "quantity"
+              ],
+              "title": "MachinePlacement",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "purchase_price_cents": {
             "minimum": 0,
             "nullable": true,
@@ -42250,6 +42472,9 @@
               "retired"
             ],
             "type": "string"
+          },
+          "unassigned": {
+            "type": "integer"
           },
           "warranty_until": {
             "format": "date",
@@ -44209,6 +44434,24 @@
         "title": "JournalVisibilityResponse",
         "type": "object"
       },
+      "MachinePlacement": {
+        "properties": {
+          "quantity": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "space_id",
+          "quantity"
+        ],
+        "title": "MachinePlacement",
+        "type": "object"
+      },
       "Media": {
         "properties": {
           "alt_text": {
@@ -44254,6 +44497,7 @@
             "enum": [
               "body_photo",
               "box_photo",
+              "floor_plan",
               "meal_photo",
               "post_photo",
               "post_video",
@@ -44389,6 +44633,7 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "floor_plan",
                   "meal_photo",
                   "post_photo",
                   "post_video",
@@ -67758,6 +68003,428 @@
           "requests_count"
         ],
         "title": "SocialSummary",
+        "type": "object"
+      },
+      "Space": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "directions": {
+            "nullable": true,
+            "type": "string"
+          },
+          "floor_plan_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "unavailability": {
+            "items": {
+              "properties": {
+                "created_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ends_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "starts_at",
+                "ends_at"
+              ],
+              "title": "SpaceUnavailability",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tasks"
+        ],
+        "title": "Space",
+        "type": "object"
+      },
+      "SpaceArea": {
+        "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+        "nullable": true,
+        "properties": {
+          "points": {
+            "items": {
+              "items": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "maxItems": 32,
+            "minItems": 3,
+            "type": "array"
+          }
+        },
+        "required": [
+          "points"
+        ],
+        "title": "SpaceArea",
+        "type": "object"
+      },
+      "SpaceClass": {
+        "properties": {
+          "approved_booking_count": {
+            "type": "integer"
+          },
+          "capacity": {
+            "type": "integer"
+          },
+          "coach_user_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "duration_minutes": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "scheduled_at",
+          "duration_minutes"
+        ],
+        "title": "SpaceClass",
+        "type": "object"
+      },
+      "SpaceDetail": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "approved_booking_count": {
+                  "type": "integer"
+                },
+                "capacity": {
+                  "type": "integer"
+                },
+                "coach_user_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "duration_minutes": {
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "scheduled_at",
+                "duration_minutes"
+              ],
+              "title": "SpaceClass",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "directions": {
+            "nullable": true,
+            "type": "string"
+          },
+          "equipment": {
+            "items": {
+              "properties": {
+                "machine_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "machine_id",
+                "name",
+                "status",
+                "quantity"
+              ],
+              "title": "SpaceEquipment",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "floor_plan_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "unavailability": {
+            "items": {
+              "properties": {
+                "created_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ends_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "starts_at",
+                "ends_at"
+              ],
+              "title": "SpaceUnavailability",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tasks",
+          "unavailability",
+          "classes",
+          "equipment"
+        ],
+        "title": "SpaceDetail",
+        "type": "object"
+      },
+      "SpaceEquipment": {
+        "properties": {
+          "machine_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "machine_id",
+          "name",
+          "status",
+          "quantity"
+        ],
+        "title": "SpaceEquipment",
+        "type": "object"
+      },
+      "SpaceUnavailability": {
+        "properties": {
+          "created_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "space_id",
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "SpaceUnavailability",
         "type": "object"
       },
       "StaffCommunityEvent": {
@@ -123220,6 +123887,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "floor_plan",
                             "meal_photo",
                             "post_photo",
                             "post_video",
@@ -123379,6 +124047,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "floor_plan",
                             "meal_photo",
                             "post_photo",
                             "post_video",
@@ -123584,6 +124253,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "floor_plan",
                             "meal_photo",
                             "post_photo",
                             "post_video",
@@ -167906,6 +168576,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "floor_plan",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
@@ -168078,6 +168749,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "floor_plan",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
@@ -168528,6 +169200,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "floor_plan",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
@@ -168700,6 +169373,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "floor_plan",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
@@ -169001,6 +169675,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "floor_plan",
                             "meal_photo",
                             "post_photo",
                             "post_video",
@@ -169251,6 +169926,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "floor_plan",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
@@ -169423,6 +170099,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "floor_plan",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
@@ -169841,6 +170518,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "floor_plan",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
@@ -170013,6 +170691,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "floor_plan",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
@@ -173096,6 +173775,11 @@
                   "scheduled_at": {
                     "format": "date-time",
                     "type": "string"
+                  },
+                  "space_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -173227,6 +173911,11 @@
                   "name": {
                     "maxLength": 120,
                     "minLength": 1,
+                    "type": "string"
+                  },
+                  "space_id": {
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "starts_on": {
@@ -173404,6 +174093,11 @@
                       "all",
                       "range"
                     ],
+                    "type": "string"
+                  },
+                  "space_id": {
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   }
                 },
@@ -217768,6 +218462,37 @@
                             },
                             "type": "array"
                           },
+                          "space": {
+                            "description": "ADR-202: the room or area of the branch the class is held in.",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "type": "object"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "space_overlap": {
+                            "description": "Staff only: another class is in the same space at an overlapping time (a warning, not a block).",
+                            "type": "boolean"
+                          },
+                          "space_unavailable": {
+                            "description": "Staff only: the space was made unavailable for this class's time after it was planned.",
+                            "type": "boolean"
+                          },
                           "workout": {
                             "additionalProperties": true,
                             "nullable": true,
@@ -218887,6 +219612,37 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "area": {
+                            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                            "nullable": true,
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 32,
+                                "minItems": 3,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "points"
+                            ],
+                            "title": "SpaceArea",
+                            "type": "object"
+                          },
+                          "floor_plan_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -218937,7 +219693,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Cleaning areas",
+        "summary": "Cleaning areas (the gym's spaces, ADR-202)",
         "tags": [
           "Cleaning log"
         ]
@@ -218990,6 +219746,37 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -219038,7 +219825,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Add a cleaning area",
+        "summary": "Add a cleaning area (a space with tasks)",
         "tags": [
           "Cleaning log"
         ]
@@ -219100,6 +219887,37 @@
                       "properties": {
                         "archived_at": {
                           "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
                           "nullable": true,
                           "type": "string"
                         },
@@ -219182,6 +220000,37 @@
                       "properties": {
                         "archived_at": {
                           "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
                           "nullable": true,
                           "type": "string"
                         },
@@ -219540,6 +220389,462 @@
           }
         ],
         "summary": "Finish cleaning: the tasks done and an optional note",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/schedules": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.CleaningController.schedules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "schedules": {
+                      "items": {
+                        "properties": {
+                          "comment": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "times": {
+                            "items": {
+                              "format": "time",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "weekdays": {
+                            "items": {
+                              "maximum": 7,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "space_id",
+                          "weekdays",
+                          "times"
+                        ],
+                        "title": "CleaningSchedule",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "schedules"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Schedules"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The cleaning schedule: per space, weekdays, times and a comment",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/schedules/{space_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.CleaningController.delete_schedule",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take a space off the cleaning schedule",
+        "tags": [
+          "Cleaning log"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.CleaningController.put_schedule",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "comment": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "times": {
+                    "items": {
+                      "pattern": "^\\d{2}:\\d{2}(:\\d{2})?$",
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "weekdays": {
+                    "items": {
+                      "maximum": 7,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "maxItems": 7,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "weekdays"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "schedule": {
+                      "properties": {
+                        "comment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "times": {
+                          "items": {
+                            "format": "time",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "weekdays": {
+                          "items": {
+                            "maximum": 7,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "weekdays",
+                        "times"
+                      ],
+                      "title": "CleaningSchedule",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "schedule"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Schedule"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set when a space is cleaned",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/today": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.CleaningController.today",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "due": {
+                      "items": {
+                        "properties": {
+                          "area": {
+                            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                            "nullable": true,
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 32,
+                                "minItems": 3,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "points"
+                            ],
+                            "title": "SpaceArea",
+                            "type": "object"
+                          },
+                          "cleanings_done": {
+                            "type": "integer"
+                          },
+                          "cleanings_due": {
+                            "type": "integer"
+                          },
+                          "comment": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          },
+                          "floor_plan_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "tasks": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "times": {
+                            "items": {
+                              "format": "time",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "space_id",
+                          "name",
+                          "tasks",
+                          "times",
+                          "cleanings_due",
+                          "cleanings_done",
+                          "done"
+                        ],
+                        "title": "CleaningDue",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "floor_plans": {
+                      "items": {
+                        "properties": {
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "image_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "media_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "sort_order": {
+                            "type": "integer"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "media_id",
+                          "sort_order"
+                        ],
+                        "title": "FloorPlan",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "open_entries": {
+                      "items": {
+                        "properties": {
+                          "area_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "finished_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "tasks_done": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "area_id",
+                          "started_at",
+                          "tasks_done"
+                        ],
+                        "title": "CleaningEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "due",
+                    "open_entries",
+                    "floor_plans"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Today"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Σήμερα»: the spaces due for cleaning today, with their floor plans",
         "tags": [
           "Cleaning log"
         ]
@@ -222138,6 +223443,544 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/floor-plans": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.create_floor_plan",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sort_order": {
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "floor_plan": {
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "image_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "media_id",
+                        "sort_order"
+                      ],
+                      "title": "FloorPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "floor_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Floor plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a floor plan (one floor of a branch) from a ready upload",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/floor-plans/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.floor_plan_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve a floor plan image (floor_plan) and get a presigned upload for it",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/floor-plans/uploads/{id}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.complete_floor_plan_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "media": {
+                      "properties": {
+                        "alt_text": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "content_type": {
+                          "type": "string"
+                        },
+                        "duration_ms": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "feed_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "full_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "image",
+                            "video"
+                          ],
+                          "type": "string"
+                        },
+                        "placeholder": {
+                          "description": "A tiny blurred WebP data URI to show while the image loads",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "enum": [
+                            "body_photo",
+                            "box_photo",
+                            "floor_plan",
+                            "meal_photo",
+                            "post_photo",
+                            "post_video",
+                            "shop_product_photo"
+                          ],
+                          "type": "string"
+                        },
+                        "rejection_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)",
+                          "enum": [
+                            "pending",
+                            "processing",
+                            "ready",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "thumb_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition.",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "purpose",
+                        "status",
+                        "content_type",
+                        "width",
+                        "height",
+                        "url"
+                      ],
+                      "title": "Media",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "media"
+                  ],
+                  "title": "MediaResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Media"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded floor plan image and mark it ready",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/floor-plans/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.delete_floor_plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "floor_plan": {
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "image_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "media_id",
+                        "sort_order"
+                      ],
+                      "title": "FloorPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "floor_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Floor plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a floor plan; the spaces drawn on it lose their area",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.update_floor_plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sort_order": {
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "floor_plan": {
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "image_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "media_id",
+                        "sort_order"
+                      ],
+                      "title": "FloorPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "floor_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Floor plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename, reorder or replace the image of a floor plan",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/staff/form-reviews": {
       "get": {
         "callbacks": {},
@@ -222456,6 +224299,27 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "placements": {
+                            "items": {
+                              "properties": {
+                                "quantity": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                },
+                                "space_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "space_id",
+                                "quantity"
+                              ],
+                              "title": "MachinePlacement",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "purchase_price_cents": {
                             "minimum": 0,
                             "nullable": true,
@@ -222492,6 +224356,9 @@
                               "retired"
                             ],
                             "type": "string"
+                          },
+                          "unassigned": {
+                            "type": "integer"
                           },
                           "warranty_until": {
                             "format": "date",
@@ -222674,6 +224541,27 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "placements": {
+                          "items": {
+                            "properties": {
+                              "quantity": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "space_id",
+                              "quantity"
+                            ],
+                            "title": "MachinePlacement",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "purchase_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -222710,6 +224598,9 @@
                             "retired"
                           ],
                           "type": "string"
+                        },
+                        "unassigned": {
+                          "type": "integer"
                         },
                         "warranty_until": {
                           "format": "date",
@@ -222902,6 +224793,27 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "placements": {
+                          "items": {
+                            "properties": {
+                              "quantity": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "space_id",
+                              "quantity"
+                            ],
+                            "title": "MachinePlacement",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "purchase_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -222938,6 +224850,9 @@
                             "retired"
                           ],
                           "type": "string"
+                        },
+                        "unassigned": {
+                          "type": "integer"
                         },
                         "warranty_until": {
                           "format": "date",
@@ -223046,6 +224961,27 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "placements": {
+                          "items": {
+                            "properties": {
+                              "quantity": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "space_id",
+                              "quantity"
+                            ],
+                            "title": "MachinePlacement",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "purchase_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -223082,6 +225018,9 @@
                             "retired"
                           ],
                           "type": "string"
+                        },
+                        "unassigned": {
+                          "type": "integer"
                         },
                         "warranty_until": {
                           "format": "date",
@@ -223469,6 +225408,27 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "placements": {
+                          "items": {
+                            "properties": {
+                              "quantity": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "space_id",
+                              "quantity"
+                            ],
+                            "title": "MachinePlacement",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "purchase_price_cents": {
                           "minimum": 0,
                           "nullable": true,
@@ -223506,6 +225466,9 @@
                           ],
                           "type": "string"
                         },
+                        "unassigned": {
+                          "type": "integer"
+                        },
                         "warranty_until": {
                           "format": "date",
                           "nullable": true,
@@ -223540,6 +225503,118 @@
           }
         ],
         "summary": "Log a note, issue, outage, repair call, service or repair",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/placements": {
+      "put": {
+        "callbacks": {},
+        "description": "Replaces the machine's placement. The quantities may not add up to more than the quantity owned (`placement_exceeds_quantity`); the rest is unassigned.",
+        "operationId": "PaleeWeb.InventoryController.place_machine",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "placements": {
+                    "items": {
+                      "properties": {
+                        "quantity": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "space_id",
+                        "quantity"
+                      ],
+                      "title": "MachinePlacement",
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "placements"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "machine_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "placements": {
+                      "items": {
+                        "properties": {
+                          "quantity": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "space_id",
+                          "quantity"
+                        ],
+                        "title": "MachinePlacement",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "unassigned": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "machine_id",
+                    "placements",
+                    "unassigned"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Placement"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set how many of a machine stand in which space (ADR-202)",
         "tags": [
           "Inventory"
         ]
@@ -230273,6 +232348,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "floor_plan",
                             "meal_photo",
                             "post_photo",
                             "post_video",
@@ -235369,6 +237445,1442 @@
         "summary": "Receive, adjust (with a reason), recount or transfer a variant's stock",
         "tags": [
           "Shop"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "location_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_archived",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "floor_plans": {
+                      "items": {
+                        "properties": {
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "image_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "media_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "sort_order": {
+                            "type": "integer"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "media_id",
+                          "sort_order"
+                        ],
+                        "title": "FloorPlan",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "spaces": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "area": {
+                            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                            "nullable": true,
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 32,
+                                "minItems": 3,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "points"
+                            ],
+                            "title": "SpaceArea",
+                            "type": "object"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "directions": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "floor_plan_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "tasks": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "unavailability": {
+                            "items": {
+                              "properties": {
+                                "created_by_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "ends_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "reason": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "space_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "space_id",
+                                "starts_at",
+                                "ends_at"
+                              ],
+                              "title": "SpaceUnavailability",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "tasks"
+                        ],
+                        "title": "Space",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "spaces",
+                    "floor_plans"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Spaces"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Spaces and floor plans of the branches the caller works at",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "area": {
+                    "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                    "nullable": true,
+                    "properties": {
+                      "points": {
+                        "items": {
+                          "items": {
+                            "maximum": 1,
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          "maxItems": 2,
+                          "minItems": 2,
+                          "type": "array"
+                        },
+                        "maxItems": 32,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "points"
+                    ],
+                    "title": "SpaceArea",
+                    "type": "object"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "directions": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "floor_plan_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tasks": {
+                    "items": {
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "space": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unavailability": {
+                          "items": {
+                            "properties": {
+                              "created_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "starts_at",
+                              "ends_at"
+                            ],
+                            "title": "SpaceUnavailability",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "Space",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Space"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a space",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "space": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "classes": {
+                          "items": {
+                            "properties": {
+                              "approved_booking_count": {
+                                "type": "integer"
+                              },
+                              "capacity": {
+                                "type": "integer"
+                              },
+                              "coach_user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "scheduled_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "scheduled_at",
+                              "duration_minutes"
+                            ],
+                            "title": "SpaceClass",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "equipment": {
+                          "items": {
+                            "properties": {
+                              "machine_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "quantity": {
+                                "type": "integer"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "machine_id",
+                              "name",
+                              "status",
+                              "quantity"
+                            ],
+                            "title": "SpaceEquipment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unavailability": {
+                          "items": {
+                            "properties": {
+                              "created_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "starts_at",
+                              "ends_at"
+                            ],
+                            "title": "SpaceUnavailability",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks",
+                        "unavailability",
+                        "classes",
+                        "equipment"
+                      ],
+                      "title": "SpaceDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Space"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A space with its unavailability, upcoming classes and machines",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "area": {
+                    "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                    "nullable": true,
+                    "properties": {
+                      "points": {
+                        "items": {
+                          "items": {
+                            "maximum": 1,
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          "maxItems": 2,
+                          "minItems": 2,
+                          "type": "array"
+                        },
+                        "maxItems": 32,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "points"
+                    ],
+                    "title": "SpaceArea",
+                    "type": "object"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "directions": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "floor_plan_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tasks": {
+                    "items": {
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "space": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unavailability": {
+                          "items": {
+                            "properties": {
+                              "created_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "starts_at",
+                              "ends_at"
+                            ],
+                            "title": "SpaceUnavailability",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "Space",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Space"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change a space (front desk: name, description and directions only)",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.archive",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "space": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unavailability": {
+                          "items": {
+                            "properties": {
+                              "created_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "starts_at",
+                              "ends_at"
+                            ],
+                            "title": "SpaceUnavailability",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "Space",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Space"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive a space (its history and cleaning log are kept)",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/restore": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.restore",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "space": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "area": {
+                          "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                          "nullable": true,
+                          "properties": {
+                            "points": {
+                              "items": {
+                                "items": {
+                                  "maximum": 1,
+                                  "minimum": 0,
+                                  "type": "number"
+                                },
+                                "maxItems": 2,
+                                "minItems": 2,
+                                "type": "array"
+                              },
+                              "maxItems": 32,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "points"
+                          ],
+                          "title": "SpaceArea",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "floor_plan_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unavailability": {
+                          "items": {
+                            "properties": {
+                              "created_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "starts_at",
+                              "ends_at"
+                            ],
+                            "title": "SpaceUnavailability",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "Space",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Space"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Bring an archived space back",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/unavailability": {
+      "post": {
+        "callbacks": {},
+        "description": "Classes cannot be planned in the space while it is unavailable (`space_unavailable`). Classes already planned then keep their space and are returned as affected_classes.",
+        "operationId": "PaleeWeb.SpacesController.make_unavailable",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "ends_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "starts_at",
+                  "ends_at"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "affected_classes": {
+                      "items": {
+                        "properties": {
+                          "approved_booking_count": {
+                            "type": "integer"
+                          },
+                          "capacity": {
+                            "type": "integer"
+                          },
+                          "coach_user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at",
+                          "duration_minutes"
+                        ],
+                        "title": "SpaceClass",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "unavailability": {
+                      "properties": {
+                        "created_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "starts_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "starts_at",
+                        "ends_at"
+                      ],
+                      "title": "SpaceUnavailability",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "unavailability",
+                    "affected_classes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unavailability"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Make a space unavailable from–to, with a reason",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/unavailability/{window_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.delete_unavailability",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "window_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "unavailability": {
+                      "properties": {
+                        "created_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "starts_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "starts_at",
+                        "ends_at"
+                      ],
+                      "title": "SpaceUnavailability",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "unavailability"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unavailability"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove an unavailability window",
+        "tags": [
+          "Spaces"
         ]
       }
     },
