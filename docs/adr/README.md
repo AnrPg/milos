@@ -198,3 +198,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-198 | Box › «Πελάτες μου»: the coach's home in the member app | Accepted |
 | ADR-199 | Notification preferences per category and channel, checked at the bell and push chokepoints | Accepted |
 | ADR-200 | Series edits reach this class, all upcoming classes or a date range; duplicate a class | Accepted |
+| ADR-202 | Spaces: floor plans, unavailability, class spaces, cleaning schedule and machine placement | Accepted |
