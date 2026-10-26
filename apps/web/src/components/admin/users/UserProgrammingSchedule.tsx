@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import {
   fetchAdminUserSchedule,
   programAdminUserWorkout,
+  programWorkoutForUsers,
   type AdminUserSchedule,
   type MemberProgrammingMode,
 } from "@/api/admin-users";
@@ -29,11 +30,16 @@ import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { AdditionalPeoplePicker, type PickedPerson } from "@/components/admin/users/AdditionalPeoplePicker";
+import { GroupOutcomeList } from "@/components/workouts/GroupOutcomeList";
+import { groupOutcomeRows, type GroupOutcomeRow } from "@/lib/group-variations";
 
 type Props = {
   token: string;
   userId: string;
   role: "member" | "athlete" | "admin";
+  /** The person's nickname, shown in the outcome when more people are programmed (ADR-201). */
+  nickname?: string;
   /** When set, opens the assignment dialog for this day (used by the profile's quick action). */
   assignRequestDate?: string | null;
   onAssignRequestHandled?: () => void;
@@ -80,7 +86,7 @@ function isClassVariantItem(item: Record<string, unknown>) {
   return item.kind === "assignment" && item.assignment_kind === "class_variant";
 }
 
-export function UserProgrammingSchedule({ token, userId, role, assignRequestDate, onAssignRequestHandled }: Props) {
+export function UserProgrammingSchedule({ token, userId, role, nickname, assignRequestDate, onAssignRequestHandled }: Props) {
   const i18n = useUiTranslations();
   const locale = useLocale();
   const isMember = role === "member";
@@ -99,8 +105,14 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // ADR-201: more people who get the same programming, each as if alone.
+  const [extraPeople, setExtraPeople] = useState<PickedPerson[]>([]);
+  const [outcomeRows, setOutcomeRows] = useState<GroupOutcomeRow[]>([]);
 
   const needsClass = isMember && modeRequiresBookedClass(memberMode);
+  // Replacing the class's workout already reaches everyone in the class.
+  const canAddPeople = !(isMember && memberMode === "class_workout");
+  const groupPeople = canAddPeople ? extraPeople : [];
   const automaticFolderLabel = !isMember
     ? i18n("featureAutoAthleteFolder")
     : memberMode === "class_workout"
@@ -171,16 +183,22 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
 
     setBusy(true);
     setError(null);
+    setOutcomeRows([]);
+    const body = {
+      ...(masterWorkoutId ? { master_workout_id: masterWorkoutId } : {}),
+      // Empty = file automatically in the athlete's, class-day or member variations folder.
+      folder_id: selectedFolderId || null,
+      scheduled_for: selectedDate,
+      slot_id: needsClass ? selectedSlotId : undefined,
+      copy_source: copySource,
+      ...(isMember ? { mode: memberMode } : {}),
+    };
     try {
-      await programAdminUserWorkout(token, userId, {
-        ...(masterWorkoutId ? { master_workout_id: masterWorkoutId } : {}),
-        // Empty = file automatically in the athlete's, class-day or member variations folder.
-        folder_id: selectedFolderId || null,
-        scheduled_for: selectedDate,
-        slot_id: needsClass ? selectedSlotId : undefined,
-        copy_source: copySource,
-        ...(isMember ? { mode: memberMode } : {}),
-      });
+      if (groupPeople.length) {
+        await programGroup(body);
+        return;
+      }
+      await programAdminUserWorkout(token, userId, body);
       setMessage(i18n(programmingSuccessKey(role, memberMode)));
       setSelectedWorkoutId("");
       setAssignmentModalOpen(false);
@@ -190,6 +208,31 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
     } finally {
       setBusy(false);
     }
+  }
+
+  // ADR-201: everyone is programmed as if alone. A WOD made just now is
+  // filed for this person (as today) and copied for each of the others.
+  async function programGroup(body: Parameters<typeof programAdminUserWorkout>[2]) {
+    const names = new Map<string, string>([
+      [userId, nickname ?? userId],
+      ...groupPeople.map((person): [string, string] => [person.id, person.nickname]),
+    ]);
+    const others = groupPeople.map((person) => person.id);
+    let rows: GroupOutcomeRow[];
+    if (body.copy_source) {
+      const response = await programWorkoutForUsers(token, { ...body, user_ids: [userId, ...others] });
+      rows = groupOutcomeRows(response.results, names);
+    } else {
+      await programAdminUserWorkout(token, userId, body);
+      const response = await programWorkoutForUsers(token, { ...body, copy_source: true, user_ids: others });
+      rows = [{ userId, nickname: names.get(userId) ?? userId, ok: true }, ...groupOutcomeRows(response.results, names)];
+    }
+    setOutcomeRows(rows);
+    setMessage(null);
+    setSelectedWorkoutId("");
+    setExtraPeople([]);
+    setAssignmentModalOpen(false);
+    await reload();
   }
 
   function openCreator() {
@@ -253,6 +296,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
 
       {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
       {error ? <ErrorNotice>{error}</ErrorNotice> : null}
+      <GroupOutcomeList rows={outcomeRows} />
 
       {assignmentModalOpen ? <Dialog onClose={() => setAssignmentModalOpen(false)} eyebrow={i18n("featureScheduleProgramming")} title={selectedDate} size="3xl" variant="center">
       {isMember ? <fieldset className="mb-4 rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
@@ -292,6 +336,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
             </Select>
           </label> : <div />}
         </div>
+        {canAddPeople ? <AdditionalPeoplePicker token={token} excludeUserId={userId} picked={extraPeople} onChange={setExtraPeople} needsBooking={needsClass} /> : null}
         <div className="mt-4 flex flex-wrap gap-2">
           {isMember && memberMode === "class_variant" ? <>
             <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} disabled={busy || !selectedSlotId} onClick={() => void editClassWorkoutForMember()}>{i18n("memberProgrammingEditClassWodForMember")}</button>

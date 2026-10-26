@@ -7443,6 +7443,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/programming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Program the same workout for several people at once (ADR-201)
+         * @description Each person in `user_ids` is programmed exactly as `POST /users/{id}/programming` would program them alone: the same checks (client scope, mode, booked class, personal-programming grant), their own copy and their own folder. The answer lists one result per person; one person failing does not undo the others.
+         */
+        post: operations["PaleeWeb.AdminUserController.program_workout_for_users"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}": {
         parameters: {
             query?: never;
@@ -75676,6 +75696,78 @@ export interface operations {
         responses: {
             /** @description User directory */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminUserController.program_workout_for_users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @default true */
+                    copy_source: boolean;
+                    folder_id?: string | null;
+                    instructions?: string | null;
+                    /** Format: uuid */
+                    master_workout_id?: string;
+                    /**
+                     * @description Member programming mode (ADR-125; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.
+                     * @enum {string}
+                     */
+                    mode?: "class_workout" | "class_variant" | "personal";
+                    /** Format: date */
+                    scheduled_for: string;
+                    slot_id?: string | null;
+                    /** @description The people to program; duplicates are ignored (at most 50). */
+                    user_ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description One result per person */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        results: {
+                            association?: {
+                                [key: string]: unknown;
+                            };
+                            /** @description Set when `status` is error: the code the one-person endpoint answers. */
+                            code?: string;
+                            /** @description Set when `status` is ok. */
+                            mode?: string;
+                            params?: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            status: "ok" | "error";
+                            /** Format: uuid */
+                            user_id: string;
+                            workout?: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+            /** @description No people or too many */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

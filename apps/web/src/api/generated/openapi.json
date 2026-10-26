@@ -180686,6 +180686,165 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/users/programming": {
+      "post": {
+        "callbacks": {},
+        "description": "Each person in `user_ids` is programmed exactly as `POST /users/{id}/programming` would program them alone: the same checks (client scope, mode, booked class, personal-programming grant), their own copy and their own folder. The answer lists one result per person; one person failing does not undo the others.",
+        "operationId": "PaleeWeb.AdminUserController.program_workout_for_users",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "copy_source": {
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "folder_id": {
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "instructions": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "mode": {
+                    "description": "Member programming mode (ADR-125; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.",
+                    "enum": [
+                      "class_workout",
+                      "class_variant",
+                      "personal"
+                    ],
+                    "type": "string"
+                  },
+                  "scheduled_for": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "user_ids": {
+                    "description": "The people to program; duplicates are ignored (at most 50).",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 50,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "user_ids",
+                  "scheduled_for",
+                  "copy_source"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "results": {
+                      "items": {
+                        "properties": {
+                          "association": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "code": {
+                            "description": "Set when `status` is error: the code the one-person endpoint answers.",
+                            "type": "string"
+                          },
+                          "mode": {
+                            "description": "Set when `status` is ok.",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "status": {
+                            "enum": [
+                              "ok",
+                              "error"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "results"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "One result per person"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No people or too many"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Program the same workout for several people at once (ADR-201)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}": {
       "delete": {
         "callbacks": {},

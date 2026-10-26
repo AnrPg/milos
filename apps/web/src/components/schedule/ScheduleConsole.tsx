@@ -775,6 +775,7 @@ export function ScheduleConsole({
           }}
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
+          canProgramVariations={can(membership, "manage_coaching")}
           onCreateWorkout={() => createNewWod({ kind: "link", slotId: selectedSlot.id })}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {

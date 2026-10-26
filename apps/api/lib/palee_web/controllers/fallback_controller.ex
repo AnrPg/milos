@@ -1762,6 +1762,16 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-201: programming for several people.
+  def call(conn, {:error, reason}) when reason in [:invalid_user_ids, :too_many_users] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: to_string(reason),
+      error: "Choose between 1 and #{Palee.Application.ProgramWorkoutForUsers.max_users()} people"
+    })
+  end
+
   def call(conn, {:error, :class_variant_requires_single_member}) do
     conn
     |> put_status(:unprocessable_entity)

@@ -352,6 +352,8 @@ const API_ERROR_KEYS: Record<string, string> = {
   member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",
   slot_not_booked_by_member: "apiErrorSlotNotBookedByMember",
+  // ADR-201: a coach with scope own programming someone who is not their client.
+  not_your_client: "rhErrNotYourClient",
   slot_not_found: "apiErrorSlotNotFound",
   workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",
