@@ -687,3 +687,12 @@ msgstr "Запрос на переписку"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "%{nickname} хочет отправить вам сообщение."
+
+msgid "Class cancelled"
+msgstr "Занятие отменено"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "Занятие %{class} (%{time}) отменено: %{reason}. Ваше место освобождено."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "Занятие %{class} (%{time}) отменено. Ваше место освобождено."

@@ -54,6 +54,9 @@ defmodule Palee.Scheduling do
   def update_class_series(%{organization_id: _} = context, id, params),
     do: Palee.Scheduling.SchedulingStore.update_class_series(context, id, params)
 
+  def set_slot_state(%{organization_id: _} = context, id, params),
+    do: Palee.Scheduling.SchedulingStore.set_slot_state(context, id, params)
+
   # ADR-138 D7: class-slot groups.
   def list_active_class_series(%{organization_id: _} = context),
     do: Palee.Scheduling.SchedulingStore.list_active_class_series(context)

@@ -64,9 +64,16 @@ defmodule Palee.Application.WithdrawBooking do
 
   defp late_cancellation?(_context, _booking), do: false
 
-  defp reconciliation(%{status: :waitlisted}, _late?), do: nil
+  @doc """
+  The durable release of a withdrawn booking's visit, written with the
+  withdrawal (nil for a waitlist place, which holds no visit). A cancelled
+  class (ADR-200) releases its bookings the same way, never as late.
+  """
+  def reconciliation(booking, late?, reason \\ nil)
 
-  defp reconciliation(booking, late?) do
+  def reconciliation(%{status: :waitlisted}, _late?, _reason), do: nil
+
+  def reconciliation(booking, late?, reason) do
     %{
       organization_id: booking.organization_id,
       booking_id: booking.id,
@@ -74,19 +81,26 @@ defmodule Palee.Application.WithdrawBooking do
       scheduled_class_id: booking.scheduled_class_id,
       allowance: Atom.to_string(BookingEntitlement.allowance(booking)),
       finalize: late?,
-      reason: reason(late?),
+      reason: reason || reason(late?),
       idempotency_key: "booking-withdrawn:#{booking.id}",
       delete_pending_notification: true
     }
   end
 
-  defp reconcile_now(_context, %{status: :waitlisted}, _late?), do: :ok
+  @doc "Returns (or consumes) the visit right away; the durable job is the fallback."
+  def reconcile_now(context, booking, late?, reason \\ nil)
+
+  def reconcile_now(_context, %{status: :waitlisted}, _late?, _reason), do: :ok
 
   # TD-092: the ledger transition runs in the tenant's scope and the staff's
   # pending-booking notifications are removed in each recipient's scope -
   # unscoped, RLS hid both and the visit was silently never returned.
-  defp reconcile_now(context, booking, late?) do
-    params = %{reason: reason(late?), idempotency_key: "booking-withdrawn:#{booking.id}"}
+  def reconcile_now(context, booking, late?, reason) do
+    params = %{
+      reason: reason || reason(late?),
+      idempotency_key: "booking-withdrawn:#{booking.id}"
+    }
+
     allowance = BookingEntitlement.allowance(booking)
 
     _result =

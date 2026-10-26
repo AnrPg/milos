@@ -174,6 +174,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
     {W.AdminScheduleController, :create_series} => [:manage_schedule],
     {W.AdminScheduleController, :update_slot} => [:manage_schedule],
+    {W.AdminScheduleController, :change_state} => [:manage_schedule],
     # ADR-176: whoever programmes WODs may link one to a class.
     {W.AdminScheduleController, :link_workout} => [:manage_schedule, :manage_workouts],
     {W.AdminScheduleController, :delete_slot} => [:manage_schedule],

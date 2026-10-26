@@ -4,6 +4,7 @@ defmodule PaleeWeb.AdminScheduleController do
 
   alias Palee.Application.{
     AdminRecordAttendance,
+    ChangeClassState,
     CreateRecurringClassSeries,
     CreateScheduledSlot,
     DeleteScheduledSlot,
@@ -25,6 +26,7 @@ defmodule PaleeWeb.AdminScheduleController do
               :create_slot,
               :create_series,
               :update_slot,
+              :change_state,
               :link_workout,
               :approve_booking,
               :reject_booking
@@ -67,6 +69,15 @@ defmodule PaleeWeb.AdminScheduleController do
   }
 
   # ADR-200: how far an edit to one class of a series goes.
+  @every_schema %Schema{
+    type: :integer,
+    minimum: 1,
+    maximum: 52,
+    description:
+      "ADR-200: 1 reaches every class in the scope, 2 every other one, and so on, " <>
+        "counted from this class in date order"
+  }
+
   @slot_update_schema %{
     @slot_body_schema
     | properties:
@@ -79,8 +90,27 @@ defmodule PaleeWeb.AdminScheduleController do
                 "series itself, or the upcoming classes from range_from to range_to"
           },
           range_from: %Schema{type: :string, format: :date, description: "Gym-local date"},
-          range_to: %Schema{type: :string, format: :date, description: "Gym-local date"}
+          range_to: %Schema{type: :string, format: :date, description: "Gym-local date"},
+          every: @every_schema
         })
+  }
+
+  @state_change_schema %Schema{
+    type: :object,
+    properties: %{
+      action: %Schema{type: :string, enum: ["pause", "resume", "cancel", "restore", "delete"]},
+      reason: %Schema{
+        type: :string,
+        maxLength: 280,
+        nullable: true,
+        description: "Why a class is cancelled; members see it"
+      },
+      series_scope: %Schema{type: :string, enum: ["this", "all", "range"]},
+      range_from: %Schema{type: :string, format: :date, description: "Gym-local date"},
+      range_to: %Schema{type: :string, format: :date, description: "Gym-local date"},
+      every: @every_schema
+    },
+    required: [:action]
   }
 
   @message_schema %Schema{
@@ -217,6 +247,47 @@ defmodule PaleeWeb.AdminScheduleController do
     ]
   )
 
+  operation(:change_state,
+    summary: "Pause, resume, cancel, restore or delete a class",
+    description:
+      "ADR-200: with series_scope and every, also the other upcoming classes of its " <>
+        "series. A cancel releases every booking without a late penalty; a delete " <>
+        "leaves classes with bookings alone and counts them.",
+    parameters: [@id_param],
+    request_body: %RequestBody{
+      required: true,
+      content: %{"application/json" => %MediaType{schema: @state_change_schema}}
+    },
+    responses: [
+      ok:
+        {"Class state", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             action: %Schema{type: :string},
+             slots: %Schema{
+               type: :array,
+               items: %Schema{type: :object, additionalProperties: true}
+             },
+             deleted_ids: %Schema{type: :array, items: %Schema{type: :string, format: :uuid}},
+             changed_count: %Schema{type: :integer},
+             skipped_count: %Schema{type: :integer},
+             skipped_with_bookings: %Schema{type: :integer},
+             released_count: %Schema{type: :integer}
+           },
+           required: [
+             :action,
+             :slots,
+             :deleted_ids,
+             :changed_count,
+             :skipped_count,
+             :skipped_with_bookings,
+             :released_count
+           ]
+         }}
+    ]
+  )
+
   operation(:link_workout,
     summary: "Link a WOD to a class",
     description:
@@ -340,6 +411,15 @@ defmodule PaleeWeb.AdminScheduleController do
          {:ok, %{slot: slot, updated_count: count}} <-
            UpdateScheduledSlot.update_in_scope(conn.assigns.tenant_context, id, body) do
       json(conn, %{slot: slot, updated_count: count})
+    end
+  end
+
+  def change_state(conn, params) do
+    id = params["id"] || params[:id]
+    body = normalize_body_params(conn, params)
+
+    with {:ok, result} <- ChangeClassState.call(conn.assigns.tenant_context, id, body) do
+      json(conn, result)
     end
   end
 

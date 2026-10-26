@@ -687,3 +687,12 @@ msgstr "Αίτημα μηνύματος"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "Το %{nickname} θέλει να σου στείλει μήνυμα."
+
+msgid "Class cancelled"
+msgstr "Το μάθημα ακυρώθηκε"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε: %{reason}. Η θέση σου αποδεσμεύτηκε."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε. Η θέση σου αποδεσμεύτηκε."

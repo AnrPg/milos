@@ -19,6 +19,10 @@ defmodule Palee.Scheduling.ScheduledClass do
     field :location_id, :binary_id
     # The coach who runs it (ADR-100).
     field :coach_user_id, :binary_id
+    # ADR-200 §2: paused = no new bookings; cancelled = it will not happen.
+    field :paused_at, :utc_datetime_usec
+    field :cancelled_at, :utc_datetime_usec
+    field :cancel_reason, :string
 
     belongs_to :class_type, ClassType
     belongs_to :class_series, ClassSeries
@@ -65,6 +69,23 @@ defmodule Palee.Scheduling.ScheduledClass do
     |> foreign_key_constraint(:location_id)
     |> foreign_key_constraint(:class_series_id)
   end
+
+  @doc "Pausing, cancelling and their undo (ADR-200 §2); nothing else changes."
+  def state_changeset(slot, params) do
+    slot
+    |> cast(params, [:paused_at, :cancelled_at, :cancel_reason])
+    |> update_change(:cancel_reason, &blank_to_nil/1)
+    |> validate_length(:cancel_reason, max: 280)
+  end
+
+  defp blank_to_nil(value) when is_binary(value) do
+    case String.trim(value) do
+      "" -> nil
+      trimmed -> trimmed
+    end
+  end
+
+  defp blank_to_nil(value), do: value
 
   defp validate_future_schedule(changeset) do
     case get_change(changeset, :scheduled_at) do

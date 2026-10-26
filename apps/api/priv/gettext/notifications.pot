@@ -682,3 +682,12 @@ msgstr ""
 
 msgid "%{nickname} wants to send you a message."
 msgstr ""
+
+msgid "Class cancelled"
+msgstr ""
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr ""
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr ""

@@ -102,4 +102,26 @@ defmodule Palee.Scheduling.Domain.SeriesEditTest do
     params = %{name: "WOD", master_workout_id: "w", scheduled_at: "x", capacity: 9}
     assert SeriesEdit.shared_changes(params) == %{"name" => "WOD", "capacity" => 9}
   end
+
+  describe "every/1 and every_nth/3" do
+    test "reads 1 to 52 as a number or text" do
+      assert SeriesEdit.every(%{}) == {:ok, 1}
+      assert SeriesEdit.every(%{"every" => "3"}) == {:ok, 3}
+      assert SeriesEdit.every(%{every: 52}) == {:ok, 52}
+      assert SeriesEdit.every(%{every: 0}) == {:error, :invalid_series_every}
+      assert SeriesEdit.every(%{"every" => "2x"}) == {:error, :invalid_series_every}
+    end
+
+    test "counts from the edited class in date order, both ways" do
+      targets =
+        for day <- [1, 2, 4, 5, 6], do: occurrence("d#{day}", "2026-11-0#{day}T07:00:00Z")
+
+      edited_at = ~U[2026-11-03 07:00:00Z]
+
+      # d1 d2 [edited] d4 d5 d6: every 2nd reaches d1 and d5.
+      assert targets |> SeriesEdit.every_nth(edited_at, 2) |> Enum.map(& &1.id) == ["d1", "d5"]
+      assert SeriesEdit.every_nth(targets, edited_at, 1) == targets
+      assert targets |> SeriesEdit.every_nth(edited_at, 3) |> Enum.map(& &1.id) == ["d6"]
+    end
+  end
 end

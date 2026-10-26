@@ -75,6 +75,10 @@ defmodule Palee.Scheduling.SchedulingStore do
     do: tenant_call(context, :update_class_series, [id, params])
 
   @impl true
+  def set_slot_state(context, id, params),
+    do: tenant_call(context, :set_slot_state, [id, params])
+
+  @impl true
   def update_slot(context, id, params), do: tenant_call(context, :update_slot, [id, params])
   def update_slot(_id, _params), do: missing_tenant()
 

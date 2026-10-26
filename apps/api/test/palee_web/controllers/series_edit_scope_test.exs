@@ -187,4 +187,17 @@ defmodule PaleeWeb.SeriesEditScopeTest do
     assert ctx |> edit(first, %{capacity: 1, series_scope: "all"}) |> json_response(422)
     assert Enum.all?(classes(context, ctx.series_id), &(&1.capacity == 10))
   end
+
+  test "every 2nd class takes the edit, counted from the edited one", %{context: context} = ctx do
+    [first | _] = classes(context, ctx.series_id)
+
+    assert %{"updated_count" => 3} =
+             ctx
+             |> edit(first, %{capacity: 7, series_scope: "all", every: 2})
+             |> json_response(200)
+
+    assert Enum.map(classes(context, ctx.series_id), & &1.capacity) == [7, 10, 7, 10, 7, 10]
+    # Part of the series only: the series keeps its own.
+    assert Scheduling.get_class_series(context, ctx.series_id).capacity == 10
+  end
 end

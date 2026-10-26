@@ -134,6 +134,10 @@ defmodule Palee.Application.GetScheduleCalendar do
         spots_remaining: slot.spots_remaining,
         location_id: Map.get(slot, :location_id),
         coach_user_id: Map.get(slot, :coach_user_id),
+        # ADR-200: a paused class takes no bookings; a cancelled one shows why.
+        paused_at: Map.get(slot, :paused_at),
+        cancelled_at: Map.get(slot, :cancelled_at),
+        cancel_reason: Map.get(slot, :cancel_reason),
         waitlist_count: length(waitlist),
         workout: preview_workout(workout),
         current_user_booking:

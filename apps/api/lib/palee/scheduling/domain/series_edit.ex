@@ -44,6 +44,50 @@ defmodule Palee.Scheduling.Domain.SeriesEdit do
     end
   end
 
+  @max_every 52
+
+  @doc """
+  Reads `every` (ADR-200 §3): 1 reaches every class in the scope, 2 every
+  other one, and so on, counted from the edited class in date order.
+  """
+  @spec every(map()) :: {:ok, pos_integer()} | {:error, :invalid_series_every}
+  def every(params) do
+    case value(params, :every) do
+      nil -> {:ok, 1}
+      n when is_integer(n) and n in 1..@max_every -> {:ok, n}
+      n when is_binary(n) -> n |> Integer.parse() |> parsed_every()
+      _other -> {:error, :invalid_series_every}
+    end
+  end
+
+  defp parsed_every({n, ""}) when n in 1..@max_every, do: {:ok, n}
+  defp parsed_every(_invalid), do: {:error, :invalid_series_every}
+
+  @doc """
+  Keeps every `n`th of `targets`, counting from the edited class (at
+  `edited_at`) in date order, both forwards and backwards.
+  """
+  @spec every_nth([map()], DateTime.t(), pos_integer()) :: [map()]
+  def every_nth(targets, _edited_at, 1), do: targets
+
+  def every_nth(targets, edited_at, n) do
+    ordered =
+      Enum.sort_by(
+        [%{id: :edited, scheduled_at: edited_at} | targets],
+        & &1.scheduled_at,
+        DateTime
+      )
+
+    origin = Enum.find_index(ordered, &(&1.id == :edited))
+
+    ordered
+    |> Enum.with_index()
+    |> Enum.filter(fn {item, index} ->
+      item.id != :edited and rem(abs(index - origin), n) == 0
+    end)
+    |> Enum.map(&elem(&1, 0))
+  end
+
   @doc "The latest date a scope reaches, or nil when it reaches every class."
   def last_date({:range, _from, to}), do: to
   def last_date(_scope), do: nil

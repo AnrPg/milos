@@ -1024,6 +1024,7 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
+    post("/schedule/slots/:id/state", AdminScheduleController, :change_state)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
 
     get(

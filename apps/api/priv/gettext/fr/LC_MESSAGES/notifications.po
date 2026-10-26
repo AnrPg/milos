@@ -687,3 +687,12 @@ msgstr "Demande de message"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "%{nickname} souhaite vous envoyer un message."
+
+msgid "Class cancelled"
+msgstr "Cours annulé"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "%{class} (%{time}) est annulé : %{reason}. Ta place a été libérée."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "%{class} (%{time}) est annulé. Ta place a été libérée."

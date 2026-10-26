@@ -295,7 +295,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         |> ClassSeries.changeset(
           Map.take(
             params,
-            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id coach_user_id local_start_time)
+            ~w(name class_type_id duration_minutes capacity auto_approve booking_timeout_minutes location_id coach_user_id local_start_time status)
           )
         )
         |> Repo.update()
@@ -321,6 +321,23 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         |> validate_booked_class_keeps_workout(slot)
         |> Repo.update()
         |> wrap_slot_result()
+    end
+  end
+
+  @impl true
+  def set_slot_state(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      %ScheduledClass{} = slot ->
+        slot
+        |> ScheduledClass.state_changeset(params)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} -> {:ok, updated |> preload_slot() |> normalize_slot()}
+          error -> error
+        end
     end
   end
 
@@ -1536,6 +1553,9 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       capacity: slot.capacity,
       auto_approve: slot.auto_approve,
       booking_timeout_minutes: slot.booking_timeout_minutes,
+      paused_at: slot.paused_at,
+      cancelled_at: slot.cancelled_at,
+      cancel_reason: slot.cancel_reason,
       approved_booking_count: approved_booking_count,
       spots_remaining: max(slot.capacity - approved_booking_count, 0),
       waitlist_count: Enum.count(bookings, &(&1.status == :waitlisted)),

@@ -29,7 +29,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       types: ~w(
         booking_approved booking_rejected booking_waitlist_promoted
         trial_accepted trial_declined trial_reminder trial_follow_up trial_class_cancelled
-        appointment_booked appointment_cancelled
+        appointment_booked appointment_cancelled class_cancelled
         season_confirmed season_declined season_cancelled
       )
     },

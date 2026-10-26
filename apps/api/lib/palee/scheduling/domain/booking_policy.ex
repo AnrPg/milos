@@ -11,6 +11,10 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
     now = Keyword.fetch!(opts, :now)
 
     cond do
+      # ADR-200 §2: a cancelled or paused class takes no bookings.
+      closed_reason(slot) ->
+        {:error, closed_reason(slot)}
+
       # ADR-176: a draft class (no WOD, not in a series) is not published.
       not ClassWorkoutReadiness.published?(slot) ->
         {:error, :class_not_published}
@@ -26,6 +30,15 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
 
       true ->
         :ok
+    end
+  end
+
+  @doc "Why a class takes no bookings now: cancelled or paused (ADR-200 §2), or nil."
+  def closed_reason(slot) do
+    cond do
+      Map.get(slot, :cancelled_at) -> :class_cancelled
+      Map.get(slot, :paused_at) -> :class_paused
+      true -> nil
     end
   end
 
@@ -75,6 +88,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
     now = Keyword.fetch!(opts, :now)
 
     cond do
+      closed_reason(slot) -> {:error, closed_reason(slot)}
       not ClassWorkoutReadiness.published?(slot) -> {:error, :class_not_published}
       DateTime.compare(slot.scheduled_at, now) != :gt -> {:error, :slot_in_past}
       not slot_full?(slot) -> {:error, :slot_not_full}
@@ -89,6 +103,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
   """
   def can_book_guest?(slot, user_id, now) do
     cond do
+      closed_reason(slot) -> {:error, closed_reason(slot)}
       not ClassWorkoutReadiness.published?(slot) -> {:error, :class_not_published}
       DateTime.compare(slot.scheduled_at, now) != :gt -> {:error, :slot_in_past}
       has_guest?(slot, user_id) -> {:error, :guest_already_booked}

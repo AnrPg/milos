@@ -9,82 +9,61 @@ defmodule Palee.Application.UpdateScheduledSlot do
     ClassLocation,
     ClassWorkoutFiling,
     PromoteClassWaitlist,
-    ScheduleRealtime
+    ScheduleRealtime,
+    SeriesScope
   }
 
   alias Palee.Scheduling
   alias Palee.Scheduling.Domain.SeriesEdit
   alias Palee.Workouts
 
-  @scope_keys [:series_scope, :range_from, :range_to]
-
   @doc "Edits only this class; see `update_in_scope/3` for a series."
   def call(context, id, params) do
-    with {:ok, %{slot: slot}} <- update_in_scope(context, id, Map.drop(params, scope_keys())),
+    with {:ok, %{slot: slot}} <-
+           update_in_scope(context, id, Map.drop(params, SeriesScope.keys())),
          do: {:ok, slot}
   end
 
   def call(_id, _params), do: {:error, :organization_context_required}
 
   @doc """
-  Edits the class and, by `series_scope`, the other classes of its series.
-  Returns the edited class and how many classes changed in all.
+  Edits the class and, by `series_scope` and `every`, the other classes of
+  its series. Returns the edited class and how many classes changed in all.
   """
   def update_in_scope(%{organization_id: _} = context, id, params) do
     master_workout_id = params[:master_workout_id] || params["master_workout_id"]
     class_type_id = params[:class_type_id] || params["class_type_id"]
 
-    with {:ok, scope} <- SeriesEdit.scope(params),
-         params = Map.drop(params, scope_keys()),
+    with {:ok, scope} <- SeriesScope.read(params),
+         params = Map.drop(params, SeriesScope.keys()),
          {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          :ok <-
            ClassLocation.check_change(context, params, ClassLocation.class_location(context, id)),
-         {:ok, {slot, others}} <- update(context, id, params, scope) do
+         {:ok, resolved} <- SeriesScope.resolve(context, id, scope),
+         {:ok, {slot, others}} <- update(context, params, resolved) do
       Enum.each([slot | others], &after_update(context, &1))
       {:ok, %{slot: slot, updated_count: 1 + length(others)}}
     end
   end
 
-  defp update(context, id, params, :this) do
-    with {:ok, slot} <- update_one(context, id, params), do: {:ok, {slot, []}}
+  defp update(context, params, %{series: nil, current: current}) do
+    with {:ok, slot} <- update_one(context, current.id, params), do: {:ok, {slot, []}}
   end
 
-  defp update(context, id, params, scope) do
-    case Scheduling.get_slot(context, id) do
-      nil ->
-        {:error, :not_found}
-
-      %{class_series_id: nil} ->
-        update(context, id, params, :this)
-
-      %{class_series_id: series_id} = current ->
-        with %{} = series <-
-               Scheduling.get_class_series(context, series_id) || {:error, :not_found},
-             :ok <- materialize_through(context, series, SeriesEdit.last_date(scope)) do
-          Scheduling.transaction(context, fn ->
-            update_series(context, current, params, scope, series)
-          end)
-        end
-    end
-  end
-
-  defp update_series(context, current, params, scope, series) do
+  defp update(context, params, %{current: current, series: series, targets: targets} = resolved) do
     timezone = series.timezone
     now = DateTime.utc_now()
     shared = SeriesEdit.shared_changes(params)
     time = SeriesEdit.new_local_time(current.scheduled_at, value(params, :scheduled_at), timezone)
 
-    targets =
-      context
-      |> Scheduling.list_series_slots(series.id, now)
-      |> SeriesEdit.targets(scope, timezone, current.id, now)
-
-    with {:ok, slot} <- update_one(context, current.id, params),
-         {:ok, others} <- update_targets(context, targets, shared, time, timezone, now),
-         :ok <- update_template(context, series, scope, shared, time) do
-      {:ok, {slot, others}}
-    end
+    Scheduling.transaction(context, fn ->
+      with {:ok, slot} <- update_one(context, current.id, params),
+           {:ok, others} <- update_targets(context, targets, shared, time, timezone, now),
+           :ok <- update_template(context, resolved, shared, time) do
+        {:ok, {slot, others}}
+      end
+    end)
   end
 
   defp update_targets(context, targets, shared, time, timezone, now) do
@@ -102,26 +81,14 @@ defmodule Palee.Application.UpdateScheduledSlot do
     end
   end
 
-  defp update_template(context, series, :all, shared, time) do
-    case Scheduling.update_class_series(
-           context,
-           series.id,
-           SeriesEdit.template_changes(shared, time)
-         ) do
-      {:ok, _series} -> :ok
-      error -> error
-    end
-  end
-
-  defp update_template(_context, _series, _scope, _shared, _time), do: :ok
-
-  # A range past the classes created so far creates them first, so the
-  # edit reaches every date in it.
-  defp materialize_through(_context, _series, nil), do: :ok
-
-  defp materialize_through(context, %{status: "active"} = series, %Date{} = last) do
-    if Date.after?(last, series.materialized_through) do
-      case Scheduling.extend_class_series(context, series.id, last) do
+  # Only an edit to every upcoming class becomes the series's own.
+  defp update_template(context, resolved, shared, time) do
+    if SeriesScope.whole_series?(resolved) do
+      case Scheduling.update_class_series(
+             context,
+             resolved.series.id,
+             SeriesEdit.template_changes(shared, time)
+           ) do
         {:ok, _series} -> :ok
         error -> error
       end
@@ -129,8 +96,6 @@ defmodule Palee.Application.UpdateScheduledSlot do
       :ok
     end
   end
-
-  defp materialize_through(_context, _series, _last), do: :ok
 
   defp update_one(context, id, params) do
     ClassWorkoutFiling.with_filed_workout(
@@ -146,8 +111,6 @@ defmodule Palee.Application.UpdateScheduledSlot do
     # A larger capacity may admit waitlisted members (ADR-097).
     PromoteClassWaitlist.call(context, slot.id)
   end
-
-  defp scope_keys, do: @scope_keys ++ Enum.map(@scope_keys, &Atom.to_string/1)
 
   defp value(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 

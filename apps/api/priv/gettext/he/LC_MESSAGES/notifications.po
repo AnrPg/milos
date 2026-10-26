@@ -687,3 +687,12 @@ msgstr "בקשת הודעה"
 
 msgid "%{nickname} wants to send you a message."
 msgstr "%{nickname} רוצה לשלוח לך הודעה."
+
+msgid "Class cancelled"
+msgstr "השיעור בוטל"
+
+msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
+msgstr "השיעור %{class} (%{time}) בוטל: %{reason}. המקום שלך שוחרר."
+
+msgid "%{class} (%{time}) was cancelled. Your place was released."
+msgstr "השיעור %{class} (%{time}) בוטל. המקום שלך שוחרר."
