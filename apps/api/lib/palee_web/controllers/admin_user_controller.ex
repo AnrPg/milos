@@ -18,6 +18,7 @@ defmodule PaleeWeb.AdminUserController do
     ListPRDossierMembers,
     PlaceMemberInClass,
     ProgramUserWorkout,
+    ProgramWorkoutForUsers,
     RevokeUserAllowance
   }
 
@@ -201,6 +202,53 @@ defmodule PaleeWeb.AdminUserController do
     }
   }
 
+  # ADR-201: the same programming for several people, each treated as the only one.
+  @program_many_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties:
+            Map.put(
+              @program_body.content["application/json"].schema.properties,
+              :user_ids,
+              %Schema{
+                type: :array,
+                items: @user_id,
+                minItems: 1,
+                maxItems: 50,
+                description: "The people to program; duplicates are ignored (at most 50)."
+              }
+            ),
+          required: [:user_ids, :scheduled_for, :copy_source]
+        }
+      }
+    }
+  }
+  @program_many_result %Schema{
+    type: :object,
+    required: [:user_id, :status],
+    properties: %{
+      user_id: @user_id,
+      status: %Schema{type: :string, enum: ["ok", "error"]},
+      mode: %Schema{type: :string, description: "Set when `status` is ok."},
+      workout: %Schema{type: :object, additionalProperties: true},
+      association: %Schema{type: :object, additionalProperties: true},
+      code: %Schema{
+        type: :string,
+        description: "Set when `status` is error: the code the one-person endpoint answers."
+      },
+      params: %Schema{type: :object, additionalProperties: true}
+    }
+  }
+  @program_many_response %Schema{
+    type: :object,
+    required: [:results],
+    properties: %{results: %Schema{type: :array, items: @program_many_result}}
+  }
+
   @class_placement_body %RequestBody{
     required: true,
     content: %{
@@ -225,6 +273,7 @@ defmodule PaleeWeb.AdminUserController do
               :grant_allowance,
               :revoke_allowance,
               :program_workout,
+              :program_workout_for_users,
               :place_in_class,
               :freezes,
               :create_freeze,
@@ -436,6 +485,20 @@ defmodule PaleeWeb.AdminUserController do
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
+  )
+
+  operation(:program_workout_for_users,
+    summary: "Program the same workout for several people at once (ADR-201)",
+    description:
+      "Each person in `user_ids` is programmed exactly as `POST /users/{id}/programming` " <>
+        "would program them alone: the same checks (client scope, mode, booked class, " <>
+        "personal-programming grant), their own copy and their own folder. The answer lists " <>
+        "one result per person; one person failing does not undo the others.",
+    request_body: @program_many_body,
+    responses: [
+      ok: {"One result per person", "application/json", @program_many_response},
+      unprocessable_entity: {"No people or too many", "application/json", @summary_object}
+    ]
   )
 
   operation(:place_in_class,
@@ -1041,6 +1104,21 @@ defmodule PaleeWeb.AdminUserController do
              conn.body_params
            ) do
       conn |> put_status(:created) |> json(payload)
+    end
+  end
+
+  def program_workout_for_users(conn, _params) do
+    admin = Guardian.Plug.current_resource(conn)
+    body = conn.body_params
+
+    with {:ok, payload} <-
+           ProgramWorkoutForUsers.call(
+             conn.assigns.tenant_context,
+             admin,
+             body[:user_ids] || body["user_ids"],
+             body
+           ) do
+      json(conn, payload)
     end
   end
 

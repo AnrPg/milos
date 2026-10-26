@@ -799,6 +799,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/users", AdminUserController, :index)
+    post("/users/programming", AdminUserController, :program_workout_for_users)
     get("/users/:id", AdminUserController, :show)
     get("/users/:id/finance", AdminUserController, :finance)
     get("/users/:id/training-history", AdminUserController, :training_history)
