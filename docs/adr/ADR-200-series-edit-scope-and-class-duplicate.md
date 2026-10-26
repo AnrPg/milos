@@ -50,3 +50,35 @@ WOD-filing rules stay in one place.
 - Editing the class's date moves only that class, whatever the scope.
 - Weekdays, start/end dates and excluded dates of a series are still edited
   only by creating a new series.
+
+## §2 Pause, cancel and delete (2026-10-26)
+Staff can pause, resume, cancel, restore and delete a class
+(`POST /admin/schedule/slots/:id/state`, `manage_schedule`). Each takes the
+same scope as an edit. The rules live in `Scheduling.Domain.ClassState` and the
+use case is `ChangeClassState`; the scope is resolved by
+`Application.SeriesScope`, which edits share.
+
+- **Pause** (`paused_at`): no new bookings, waitlist joins or guests, and the
+  waitlist is not promoted. Existing bookings stay. **Resume** clears it and
+  promotes the waitlist.
+- **Cancel** (`cancelled_at`, optional `cancel_reason` up to 280 characters,
+  which members see): the class stays listed and is shown struck through.
+  Every pending, approved or waitlisted booking is withdrawn in the same
+  transaction, with a durable reconciliation job and no late-cancel charge.
+  `:booking_cancelled` (by `:staff`) and `:class_cancelled` are published, so
+  trials end as they do when a class is deleted. Each member gets one
+  `class_cancelled` notification (bookings category). **Restore** works while
+  the class is upcoming; released bookings don't come back.
+- **Delete**: only a class without any booking. When several classes are
+  reached, booked ones are skipped and counted (`skipped_with_bookings`). When
+  only one class is reached, the action is refused with `class_has_bookings`.
+- A cancel or delete of every upcoming class (`all`, every 1) sets the series
+  to `ended`, so it creates no more classes. A pause never ends it.
+- Classes that already started are skipped. A skip is an error only when the
+  action reached a single class.
+
+## §3 Every nth class
+`every` (1–52) narrows any scope, for edits and state changes alike, to every
+nth class counted from the acted-on class in date order, both forwards and
+backwards (`SeriesEdit.every_nth/3`). Only `all` with `every` 1 updates the
+series template or ends the series.
