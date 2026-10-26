@@ -267,6 +267,32 @@ export function SlotPopup({
   });
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
+  // ADR-202: the space of the class; staff also see a clash with another class or a closure.
+  const spaceChips =
+    slot.space || slot.space_unavailable || slot.space_overlap ? (
+      <>
+              {slot.space ? (
+                <span
+                  data-testid="slot-space"
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {spaceT("classSpaceAt", { space: slot.space.name })}
+                </span>
+              ) : null}
+              {slot.space_unavailable ? (
+                <span data-testid="slot-space-unavailable" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--danger)", color: "var(--danger)" }}>
+                  {spaceT("classSpaceUnavailable")}
+                </span>
+              ) : null}
+              {slot.space_overlap ? (
+                <span data-testid="slot-space-overlap" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--warning)", color: "var(--warning)" }}>
+                  {spaceT("classSpaceOverlap")}
+                </span>
+              ) : null}
+      </>
+    ) : null;
+
   return (
     <>
       <Dialog
@@ -428,26 +454,7 @@ export function SlotPopup({
                   {i18n("mbLocationAt", { location: locationName })}
                 </span>
               ) : null}
-              {/* ADR-202: the space of the class; staff also see a clash with another class or a closure. */}
-              {slot.space ? (
-                <span
-                  data-testid="slot-space"
-                  className="rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
-                >
-                  {spaceT("classSpaceAt", { space: slot.space.name })}
-                </span>
-              ) : null}
-              {slot.space_unavailable ? (
-                <span data-testid="slot-space-unavailable" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--danger)", color: "var(--danger)" }}>
-                  {spaceT("classSpaceUnavailable")}
-                </span>
-              ) : null}
-              {slot.space_overlap ? (
-                <span data-testid="slot-space-overlap" className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid var(--warning)", color: "var(--warning)" }}>
-                  {spaceT("classSpaceOverlap")}
-                </span>
-              ) : null}
+              {spaceChips}
               {creditCost ? (
                 <span
                   className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -472,6 +479,8 @@ export function SlotPopup({
               )}
             </div>
           )}
+
+          {isAdmin && spaceChips ? <div className="mt-4 flex flex-wrap gap-2">{spaceChips}</div> : null}
 
           {/* Pending-approval banner */}
           {slot.current_user_booking?.status === "pending" && !isAdmin ? (

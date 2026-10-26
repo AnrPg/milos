@@ -207,7 +207,8 @@ function ScheduleForm({ token, space, schedule, onClose }: { token: string; spac
       size="md"
       testId="schedule-form"
       onClose={onClose}
-      onSubmit={() => {
+      onSubmit={(event) => {
+        event.preventDefault();
         if (ready) save.mutate();
       }}
       footerStart={

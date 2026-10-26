@@ -399,7 +399,8 @@ function FloorPlanUpload({ token, locationId, sortOrder, onDone }: { token: stri
           description={t("addPlanHint")}
           size="md"
           onClose={() => setOpen(false)}
-          onSubmit={() => {
+          onSubmit={(event) => {
+            event.preventDefault();
             if (file && name.trim()) upload.mutate();
           }}
           footer={
@@ -493,7 +494,8 @@ function SpaceForm({
       size="lg"
       testId="space-form"
       onClose={onClose}
-      onSubmit={() => {
+      onSubmit={(event) => {
+        event.preventDefault();
         if (name.trim()) save.mutate();
       }}
       footer={
@@ -595,7 +597,8 @@ function UnavailableForm({ token, space, onClose, onSaved }: { token: string; sp
       size="md"
       testId="space-unavailable-form"
       onClose={onClose}
-      onSubmit={() => {
+      onSubmit={(event) => {
+        event.preventDefault();
         if (ready && !save.isSuccess) save.mutate();
       }}
       footer={
