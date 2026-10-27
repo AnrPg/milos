@@ -14,11 +14,13 @@ defmodule Palee.MailerTest do
 
   setup do
     previous = Application.fetch_env!(:palee, :mail_from)
+
     Application.put_env(:palee, :mail_from,
       name: "Palee",
       address: "no-reply@palee.app",
       reply_to: "support@palee.app"
     )
+
     on_exit(fn -> Application.put_env(:palee, :mail_from, previous) end)
   end
 

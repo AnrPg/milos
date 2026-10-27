@@ -75,8 +75,11 @@ defmodule Palee.Infrastructure.Search.MeilisearchPRIndex do
            request(:post, index_path("/documents"), json: Enum.map(prs, &serialize/1)) do
       :ok
     else
-      {:ok, %Req.Response{status: status, body: body}} -> {:error, {:meilisearch_status, status, body}}
-      {:error, reason} -> {:error, reason}
+      {:ok, %Req.Response{status: status, body: body}} ->
+        {:error, {:meilisearch_status, status, body}}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 

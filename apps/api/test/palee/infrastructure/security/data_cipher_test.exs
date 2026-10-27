@@ -17,7 +17,15 @@ defmodule Palee.Infrastructure.Security.DataCipherTest do
     nonce = :crypto.strong_rand_bytes(12)
 
     {ciphertext, tag} =
-      :crypto.crypto_one_time_aead(:aes_256_gcm, key, nonce, "x", "milos:data-at-rest:v1", 16, true)
+      :crypto.crypto_one_time_aead(
+        :aes_256_gcm,
+        key,
+        nonce,
+        "x",
+        "milos:data-at-rest:v1",
+        16,
+        true
+      )
 
     assert DataCipher.decrypt("v1" <> nonce <> tag <> ciphertext) == {:error, :undecryptable}
   end

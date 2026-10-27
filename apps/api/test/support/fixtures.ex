@@ -103,7 +103,10 @@ defmodule Palee.TestFixtures do
 
   def slot_fixture(workout, attrs \\ %{}) do
     context = Map.get(attrs, :tenant_context) || workout_tenant_context(workout)
-    default_class_type = Scheduling.list_class_types(context) |> List.first()
+
+    default_class_type =
+      List.first(Scheduling.list_class_types(context)) ||
+        class_type_fixture(%{tenant_context: context})
 
     params =
       %{

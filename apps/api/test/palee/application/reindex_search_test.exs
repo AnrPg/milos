@@ -26,7 +26,9 @@ defmodule Palee.Application.ReindexSearchTest do
     Application.put_env(:palee, :pr_search_index, CapturingIndex)
     Application.put_env(:palee, :admin_member_search_index, CapturingIndex)
 
-    on_exit(fn -> Enum.each(previous, fn {key, value} -> Application.put_env(:palee, key, value) end) end)
+    on_exit(fn ->
+      Enum.each(previous, fn {key, value} -> Application.put_env(:palee, key, value) end)
+    end)
   end
 
   test "rebuilds the member index and every member's PRs from the database" do

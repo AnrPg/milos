@@ -54,7 +54,10 @@ defmodule Palee.Mailer do
     host = String.downcase(host)
 
     not String.contains?(host, ".") or host in ["example.com", "localhost"] or
-      Enum.any?(~w(.4kq.net .local .localhost .internal .svc .cluster.local), &String.ends_with?(host, &1)) or
+      Enum.any?(
+        ~w(.4kq.net .local .localhost .internal .svc .cluster.local),
+        &String.ends_with?(host, &1)
+      ) or
       host == "4kq.net"
   end
 
