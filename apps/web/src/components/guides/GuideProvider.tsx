@@ -51,13 +51,13 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   // the guides list and on a guide's home (the first-visit offer).
   const needed = signedIn && (run !== null || stripOrganization(pathname) === "/guides" || GUIDES.some((guide) => onRoute({ path: guide.home.path }, pathname, "")));
   const abilities = useAbilities(needed);
-  const clubs = useMyClubs();
+  const clubs = useMyClubs(needed);
   const { membership } = useSelectedMembershipRole();
   const gymClub = gymClubFor(clubs.data ?? [], membership?.organization?.id);
   const routeParams = useMemo<RouteParams>(() => ({ gymClub: gymClub?.id ?? null }), [gymClub?.id]);
 
   const progressQuery = useQuery({
-    queryKey: guideProgressKey(token),
+    queryKey: guideProgressKey(),
     enabled: needed,
     queryFn: () => fetchGuideProgress(token!),
     staleTime: 5 * 60_000,
@@ -66,7 +66,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   const save = useMutation({
     mutationFn: ({ id, ...body }: { id: GuideId; status: GuideStatus; step: number; version: number }) => putGuideProgress(token!, id, body),
     onSuccess: (row) =>
-      queryClient.setQueryData<GuideProgressList>(guideProgressKey(token), (current) => ({
+      queryClient.setQueryData<GuideProgressList>(guideProgressKey(), (current) => ({
         guides: [...(current?.guides ?? []).filter((entry) => entry.guide_id !== row.guide_id), row],
       })),
   });
@@ -174,7 +174,7 @@ export function useOptionalGuides() {
 
 function useAbilities(needed: boolean): GuideAbilities {
   const { membership } = useSelectedMembershipRole();
-  const clubs = useMyClubs();
+  const clubs = useMyClubs(needed);
   const hosts = useEventHosts(needed);
   const roles = membership?.roles ?? [];
   const staff = hasStaffRole(membership);

@@ -90,7 +90,7 @@ export function PlatformOrganizationsPage() {
 
   const accessToken = tokens?.access_token;
   const organizationsQuery = useQuery({
-    queryKey: ["platform-organizations", accessToken],
+    queryKey: ["platform-organizations"],
     queryFn: () => listPlatformOrganizations(accessToken!),
     enabled: Boolean(accessToken),
   });
@@ -628,7 +628,7 @@ function AccessDialog({
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
   const accessQuery = useQuery({
-    queryKey: ["platform-organization-access", accessToken, organization.organization.id],
+    queryKey: ["platform-organization-access", organization.organization.id],
     enabled: Boolean(accessToken),
     queryFn: () => fetchPlatformOrganizationAccess(accessToken!, organization.organization.id),
   });

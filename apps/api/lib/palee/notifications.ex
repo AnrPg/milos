@@ -68,6 +68,16 @@ defmodule Palee.Notifications do
     end)
   end
 
+  @doc """
+  The person's unread inbox count alone: what the bell shows on every screen,
+  without loading a page of notifications.
+  """
+  def unread_count(user_id) do
+    NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+      GetUnreadCount.call(user_id)
+    end)
+  end
+
   def mark_all_read(user_id) do
     marked_count =
       NotificationStore.with_user_context(%{user_id: user_id}, fn -> MarkAllRead.call(user_id) end)

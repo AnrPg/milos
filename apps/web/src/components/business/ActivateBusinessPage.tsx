@@ -26,7 +26,7 @@ export function ActivateBusinessPage({ token }: { token: string }) {
   const access = tokens?.access_token ?? null;
 
   const preview = useQuery({
-    queryKey: ["business-activation", token],
+    queryKey: ["business-activation"],
     enabled: Boolean(access && token),
     queryFn: () => inspectActivation(access!, token),
     retry: false,

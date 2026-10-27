@@ -14,6 +14,7 @@ import { overviewLists, personName } from "./buddy-model";
 import { BUDDY_FALLBACK_REFETCH_MS } from "./buddy-realtime";
 import { buddyErrorMessage } from "./errors";
 import { useBuddies, useBuddyToken } from "./use-buddies";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
 
 /**
  * The pair's own conversation (ADR-160 §6): replies to «Χρειάζομαι
@@ -33,14 +34,15 @@ export function BuddyChat({ linkId }: { linkId: string }) {
   const bottom = useRef<HTMLDivElement | null>(null);
   const messagesKey = useMemo(() => [...BUDDIES_KEY, linkId, "messages"], [linkId]);
 
+  const fallback = useRealtimeFallbackInterval(BUDDY_FALLBACK_REFETCH_MS);
   const pages = useInfiniteQuery({
     queryKey: messagesKey,
     enabled: Boolean(token),
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => fetchBuddyMessages(token!, linkId, pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
-    // New messages and read receipts arrive live; this is the safety net.
-    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
+    // New messages and read receipts arrive live; this is the safety net while the connection is down.
+    refetchInterval: fallback,
   });
 
   const { buddies, supporting, invitations } = overviewLists(overview.data);

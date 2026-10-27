@@ -1419,6 +1419,7 @@ defmodule PaleeWeb.Router do
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
     get("/notifications", NotificationController, :index)
+    get("/notifications/unread-count", NotificationController, :unread_count)
     post("/notifications/read-all", NotificationController, :mark_all_read)
     post("/notifications/:id/read", NotificationController, :mark_read)
     post("/notifications/:id/click", NotificationController, :mark_clicked)

@@ -4161,6 +4161,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the current user's unread notifications
+         * @description The bell's badge on every screen; the list itself loads only when the panel opens.
+         */
+        get: operations["PaleeWeb.NotificationController.unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications/{id}/click": {
         parameters: {
             query?: never;
@@ -58894,6 +58914,28 @@ export interface operations {
                 content: {
                     "application/json": {
                         marked_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.NotificationController.unread_count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unread count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        unread_count: number;
                     };
                 };
             };
