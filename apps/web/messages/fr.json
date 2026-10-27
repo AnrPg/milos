@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Ce plan d’étage appartient à un autre site.",
     "apiErrorInvalidCleaningSchedule": "Choisissez au moins un jour et écrivez les heures au format HH:MM.",
     "apiErrorInvalidPlacement": "Choisissez un espace et une quantité sur chaque ligne.",
-    "apiErrorPlacementExceedsQuantity": "Il y en a plus de placées que la salle n’en possède pour cette machine."
+    "apiErrorPlacementExceedsQuantity": "Il y en a plus de placées que la salle n’en possède pour cette machine.",
+    "apiErrorInvitationEmailUnverified": "Cette invitation est destinée à une adresse e-mail confirmée. Ouvrez le lien de l’e-mail d’invitation ou confirmez d’abord votre adresse.",
+    "apiErrorInvitationRevoked": "La box a révoqué cette invitation."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -11576,5 +11578,55 @@
     "notifKeyExpiredTitle": "La clé e-mail a expiré",
     "notifKeyExpiringBody": "La clé SMTP de Palee expire dans {days} jours ({date}). Créez une nouvelle clé dans Brevo et mettez à jour le secret du serveur d’ici là, sinon Palee n’enverra plus d’e-mails.",
     "notifKeyExpiredBody": "La clé SMTP de Palee a expiré le {date} : Palee ne peut plus envoyer d’e-mails. Créez une nouvelle clé dans Brevo et mettez à jour le secret du serveur."
+  },
+  "InviteEmail": {
+    "tabBulk": "Plusieurs personnes",
+    "demoNotice": "Votre entreprise est en mode démo : elle ne peut pas encore inviter ni écrire à de vraies personnes. L’équipe Palee l’active ; d’ici là, essayez tout avec des données de démo.",
+    "languageLabel": "Langue de l’e-mail",
+    "boxLanguage": "{language} (langue de votre box)",
+    "emailSendHint": "Nous envoyons l’invitation par e-mail. Seule cette adresse peut l’utiliser, et ouvrir l’e-mail la confirme.",
+    "emailLinkHint": "Laissez vide pour obtenir un lien à copier et partager vous-même.",
+    "send": "Envoyer l’invitation",
+    "sending": "Envoi…",
+    "sentTo": "Invitation envoyée à {email}.",
+    "sentHint": "Le lien se trouve uniquement dans l’e-mail. Il fonctionne une fois et expire le {date}. Suivez-la dans En attente.",
+    "sendAnother": "Inviter quelqu’un d’autre",
+    "bulkLabel": "Adresses e-mail",
+    "bulkHint": "Collez des adresses ou choisissez un fichier CSV, jusqu’à {max} à la fois. Chaque personne reçoit sa propre invitation.",
+    "chooseCsv": "Choisir un fichier CSV",
+    "bulkCount": "{count, plural, =0 {Aucune adresse pour l’instant} one {# adresse} other {# adresses}}",
+    "bulkSend": "{count, plural, =0 {Envoyer les invitations} one {Envoyer # invitation} other {Envoyer # invitations}}",
+    "bulkDone": "{sent, plural, =0 {Aucune invitation envoyée.} one {# invitation envoyée.} other {# invitations envoyées.}}",
+    "bulkFailed": "{count, plural, one {# adresse n’a pas reçu d’invitation :} other {# adresses n’ont pas reçu d’invitation :}}",
+    "bulkSkipped": "Pas des adresses e-mail, ignorées : {values}",
+    "resend": "Renvoyer",
+    "resent": "Renvoyée à {email}. L’ancien lien ne fonctionne plus.",
+    "status": {
+      "queued": "Envoi en cours",
+      "sent": "Envoyée",
+      "failed": "Non distribuée",
+      "bounced": "Rejetée",
+      "suppressed": "Adresse bloquée"
+    },
+    "errors": {
+      "invalid_address": "Saisissez une adresse e-mail valide.",
+      "suppressed": "Les e-mails vers cette adresse sont rejetés. Vérifiez-la ou utilisez-en une autre.",
+      "throttled": "Une invitation vient de partir vers cette adresse. Réessayez dans quelques minutes.",
+      "over_budget": "L’envoi d’e-mails est saturé aujourd’hui. Réessayez plus tard.",
+      "invitation_email_required": "Saisissez au moins une adresse e-mail.",
+      "too_many_invitation_emails": "Jusqu’à {max} adresses à la fois.",
+      "invitation_email_cap_reached": "Votre box a envoyé tous ses e-mails d’invitation pour aujourd’hui. Réessayez demain.",
+      "invitation_not_emailed": "Cette invitation n’a pas été envoyée par e-mail.",
+      "business_not_activated": "Votre entreprise est en mode démo : elle ne peut pas encore inviter de vraies personnes.",
+      "other": "L’envoi a échoué."
+    },
+    "revokedTitle": "Cette invitation a été révoquée",
+    "revokedBody": "La box a retiré cette invitation. Demandez-en une nouvelle si vous voulez toujours la rejoindre.",
+    "invalidTitle": "Cette invitation ne fonctionne plus",
+    "invalidBody": "Elle a peut-être déjà été utilisée ou a expiré. Demandez une nouvelle invitation à la box.",
+    "boundNote": "Cette invitation est destinée à une adresse e-mail. Connectez-vous ou créez votre compte avec l’adresse à laquelle elle a été envoyée.",
+    "mismatch": "Vous êtes connecté avec une autre adresse e-mail que celle qui a reçu cette invitation. Déconnectez-vous, puis connectez-vous ou créez un compte avec l’adresse invitée.",
+    "unverified": "Cette invitation est destinée à une adresse e-mail confirmée. Ouvrez le lien de l’e-mail d’invitation ou confirmez d’abord votre adresse.",
+    "signOut": "Se déconnecter"
   }
 }

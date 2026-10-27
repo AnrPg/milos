@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "Ιδιοκτήτης"
+
+msgid "Admin"
+msgstr "Διαχειριστής"
+
+msgid "Coach"
+msgstr "Coach"
+
+msgid "Front desk"
+msgstr "Υπάλληλος υποδοχής"
+
+msgid "Accountant"
+msgstr "Λογιστής"
+
+msgid "Cleaning staff"
+msgstr "Προσωπικό καθαριότητας"
+
+msgid "Box member"
+msgstr "Μέλος box"
+
+msgid "Athlete"
+msgstr "Αθλητής"
+
+msgid "Your invitation to %{business}"
+msgstr "Η πρόσκλησή σας: «%{business}»"
+
+msgid "You're invited to %{business}"
+msgstr "Πρόσκληση από «%{business}»"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "%{inviter} σας στέλνει πρόσκληση για την επιχείρηση «%{business}» στο %{product}."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "Η επιχείρηση «%{business}» σας προσκαλεί μέσω του %{product}."
+
+msgid "Accept the invitation"
+msgstr "Αποδοχή πρόσκλησης"
+
+msgid "Joins as"
+msgstr "Ρόλος"
+
+msgid "Branches"
+msgstr "Παραρτήματα"
+
+msgid "All branches"
+msgstr "Όλα τα παραρτήματα"
+
+msgid "The link works once and expires on %{date}."
+msgstr "Ο σύνδεσμος λειτουργεί μία φορά και λήγει στις %{date}."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "Για να την αποδεχτείτε, δημιουργήστε λογαριασμό ή συνδεθείτε με αυτή τη διεύθυνση email."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "Αν δεν περιμένατε αυτή την πρόσκληση, απλώς αγνοήστε αυτό το email."

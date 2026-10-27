@@ -557,6 +557,28 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-209: invitations sent by email.
+  @invitation_email_errors %{
+    invitation_email_unverified:
+      {:forbidden,
+       "This invitation is for a confirmed email address. Open the link in the invitation email, or confirm your email first"},
+    invitation_revoked: {:gone, "The box revoked this invitation"},
+    invitation_not_emailed: {:unprocessable_entity, "This invitation was not sent by email"},
+    invitation_email_required: {:unprocessable_entity, "Enter the email address to send it to"},
+    too_many_invitation_emails:
+      {:unprocessable_entity, "Send to at most 200 addresses at a time"},
+    invitation_email_cap_reached:
+      {:too_many_requests, "Your box sent its invitations for today. Try again tomorrow"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@invitation_email_errors, reason) do
+    {status, message} = Map.fetch!(@invitation_email_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, :invalid_invitation}) do
     conn
     |> put_status(:not_found)

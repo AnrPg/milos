@@ -37,6 +37,7 @@ describe("hidden routes", () => {
       "/reset-password",
       "/sign-out-everywhere",
       "/join/kypseli",
+      "/invite",
       "/set-admin",
       "/activate-business",
       "/platform/organizations",

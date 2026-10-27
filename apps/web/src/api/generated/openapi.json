@@ -85466,8 +85466,34 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "description": "ADR-209 (inspect): the invitation is for one email address, never shown",
+                      "type": "boolean"
+                    },
                     "expires_at": {
                       "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ADR-209: issue responses only",
+                      "format": "uuid",
                       "type": "string"
                     },
                     "location_scope": {
@@ -85545,6 +85571,7 @@
                       "type": "array"
                     },
                     "token": {
+                      "description": "The link token; never returned for an invitation sent by email (ADR-209)",
                       "nullable": true,
                       "type": "string"
                     }
@@ -85650,6 +85677,11 @@
                           "type": "string"
                         },
                         "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
                           "nullable": true,
                           "type": "string"
                         }
@@ -134858,6 +134890,11 @@
                           "brand_primary_color": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "default_locale": {
+                            "description": "ADR-209: the box's language (its emails default to it)",
+                            "nullable": true,
+                            "type": "string"
                           }
                         },
                         "type": "object"
@@ -135025,6 +135062,11 @@
                         "brand_primary_color": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
                         }
                       },
                       "type": "object"
@@ -135161,6 +135203,11 @@
                           "type": "string"
                         },
                         "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
                           "nullable": true,
                           "type": "string"
                         }
@@ -135338,6 +135385,11 @@
                           "type": "string"
                         },
                         "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
                           "nullable": true,
                           "type": "string"
                         }
@@ -207891,8 +207943,29 @@
                 "schema": {
                   "items": {
                     "properties": {
+                      "delivery_status": {
+                        "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                        "enum": [
+                          "queued",
+                          "sent",
+                          "failed",
+                          "bounced",
+                          "suppressed"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "email": {
+                        "description": "ADR-209: the address an invitation sent by email went to",
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "email_bound": {
                         "type": "boolean"
+                      },
+                      "email_locale": {
+                        "nullable": true,
+                        "type": "string"
                       },
                       "expires_at": {
                         "format": "date_time",
@@ -207984,6 +208057,10 @@
                     "description": "ADR-186: staff work at every branch («Όλα τα καταστήματα»)",
                     "type": "boolean"
                   },
+                  "email_locale": {
+                    "description": "ADR-209: the email's language; defaults to the box's language",
+                    "type": "string"
+                  },
                   "intended_email": {
                     "type": "string"
                   },
@@ -208032,6 +208109,10 @@
                     },
                     "minItems": 1,
                     "type": "array"
+                  },
+                  "send_email": {
+                    "description": "ADR-209: email the invitation to `intended_email`; the token is then not returned",
+                    "type": "boolean"
                   }
                 },
                 "type": "object"
@@ -208046,8 +208127,34 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "description": "ADR-209 (inspect): the invitation is for one email address, never shown",
+                      "type": "boolean"
+                    },
                     "expires_at": {
                       "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ADR-209: issue responses only",
+                      "format": "uuid",
                       "type": "string"
                     },
                     "location_scope": {
@@ -208125,6 +208232,7 @@
                       "type": "array"
                     },
                     "token": {
+                      "description": "The link token; never returned for an invitation sent by email (ADR-209)",
                       "nullable": true,
                       "type": "string"
                     }
@@ -208147,6 +208255,150 @@
           }
         ],
         "summary": "Issue a one-time organization invitation",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/bulk": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.bulk_invite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "all_locations": {
+                    "type": "boolean"
+                  },
+                  "email_locale": {
+                    "type": "string"
+                  },
+                  "emails": {
+                    "description": "Addresses, or pasted text / CSV holding them",
+                    "oneOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "maxItems": 1000,
+                        "type": "array"
+                      },
+                      {
+                        "maxLength": 100000,
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "lifetime_seconds": {
+                    "maximum": 604800,
+                    "minimum": 300,
+                    "type": "integer"
+                  },
+                  "location_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "roles": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "emails"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "failed": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "items": {
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "description": "Why this address got no invitation",
+                            "type": "string"
+                          },
+                          "invitation_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "email"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "sent": {
+                      "type": "integer"
+                    },
+                    "skipped": {
+                      "description": "Pasted values that are not email addresses",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "results",
+                    "sent",
+                    "failed",
+                    "skipped"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Per-address results"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-209: email one invitation to each of up to 200 addresses",
         "tags": [
           "Organizations"
         ]
@@ -208186,6 +208438,126 @@
           }
         ],
         "summary": "Revoke an active organization invitation",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/{id}/resend": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.resend",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "type": "boolean"
+                    },
+                    "email_locale": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "issued_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "expires_at",
+                    "issued_at",
+                    "email_bound"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The new invitation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-209: re-issue an emailed invitation and email the new link",
         "tags": [
           "Organizations"
         ]

@@ -7,6 +7,7 @@ defmodule PaleeWeb.OrganizationAccessController do
   alias Palee.Application.{
     InspectOrganizationJoinLink,
     InspectRegistrationInvitation,
+    InvitationEmails,
     IssueRegistrationInvitation,
     JoinOrganizationByLink,
     ListOrganizationInvitations,
@@ -83,8 +84,20 @@ defmodule PaleeWeb.OrganizationAccessController do
     properties: %{
       brand_name: %Schema{type: :string, nullable: true},
       brand_logo_url: %Schema{type: :string, nullable: true},
-      brand_primary_color: %Schema{type: :string, nullable: true}
+      brand_primary_color: %Schema{type: :string, nullable: true},
+      default_locale: %Schema{
+        type: :string,
+        nullable: true,
+        description: "ADR-209: the box's language (its emails default to it)"
+      }
     }
+  }
+
+  @delivery_status_schema %Schema{
+    type: :string,
+    nullable: true,
+    enum: ["queued", "sent", "failed", "bounced", "suppressed"],
+    description: "ADR-209: delivery of the invitation email (null when it was not emailed)"
   }
 
   @invitation_schema %Schema{
@@ -99,7 +112,22 @@ defmodule PaleeWeb.OrganizationAccessController do
       },
       location_scope: PaleeWeb.Schemas.LocationScope.schema(),
       expires_at: %Schema{type: :string, format: :date_time},
-      token: %Schema{type: :string, nullable: true}
+      token: %Schema{
+        type: :string,
+        nullable: true,
+        description: "The link token; never returned for an invitation sent by email (ADR-209)"
+      },
+      id: %Schema{type: :string, format: :uuid, description: "ADR-209: issue responses only"},
+      email_bound: %Schema{
+        type: :boolean,
+        description: "ADR-209 (inspect): the invitation is for one email address, never shown"
+      },
+      email: %Schema{
+        type: :string,
+        nullable: true,
+        description: "ADR-209: the address an invitation sent by email went to"
+      },
+      delivery_status: @delivery_status_schema
     },
     required: [:organization, :role, :expires_at]
   }
@@ -197,7 +225,16 @@ defmodule PaleeWeb.OrganizationAccessController do
                   "ADR-186: the branches staff work at; defaults to the issuer's own scope"
               },
               lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800},
-              intended_email: %Schema{type: :string}
+              intended_email: %Schema{type: :string},
+              send_email: %Schema{
+                type: :boolean,
+                description:
+                  "ADR-209: email the invitation to `intended_email`; the token is then not returned"
+              },
+              email_locale: %Schema{
+                type: :string,
+                description: "ADR-209: the email's language; defaults to the box's language"
+              }
             }
           }
         }
@@ -222,9 +259,43 @@ defmodule PaleeWeb.OrganizationAccessController do
       location_scope: PaleeWeb.Schemas.LocationScope.schema(),
       expires_at: %Schema{type: :string, format: :date_time},
       issued_at: %Schema{type: :string, format: :date_time},
-      email_bound: %Schema{type: :boolean}
+      email_bound: %Schema{type: :boolean},
+      email: %Schema{
+        type: :string,
+        nullable: true,
+        description: "ADR-209: the address an invitation sent by email went to"
+      },
+      email_locale: %Schema{type: :string, nullable: true},
+      delivery_status: @delivery_status_schema
     },
     required: [:id, :role, :expires_at, :issued_at, :email_bound]
+  }
+
+  @bulk_result_schema %Schema{
+    type: :object,
+    properties: %{
+      results: %Schema{
+        type: :array,
+        items: %Schema{
+          type: :object,
+          properties: %{
+            email: %Schema{type: :string},
+            status: %Schema{type: :string, enum: ["queued"]},
+            invitation_id: %Schema{type: :string, format: :uuid},
+            error: %Schema{type: :string, description: "Why this address got no invitation"}
+          },
+          required: [:email]
+        }
+      },
+      sent: %Schema{type: :integer},
+      failed: %Schema{type: :integer},
+      skipped: %Schema{
+        type: :array,
+        items: %Schema{type: :string},
+        description: "Pasted values that are not email addresses"
+      }
+    },
+    required: [:results, :sent, :failed, :skipped]
   }
 
   @join_link_schema %Schema{
@@ -262,6 +333,46 @@ defmodule PaleeWeb.OrganizationAccessController do
         {"Pending invitations", "application/json",
          %Schema{type: :array, items: @pending_invitation_schema}}
     ]
+  )
+
+  operation(:bulk_invite,
+    summary: "ADR-209: email one invitation to each of up to 200 addresses",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              emails: %Schema{
+                oneOf: [
+                  %Schema{type: :array, maxItems: 1000, items: %Schema{type: :string}},
+                  %Schema{type: :string, maxLength: 100_000}
+                ],
+                description: "Addresses, or pasted text / CSV holding them"
+              },
+              role: %Schema{type: :string},
+              roles: %Schema{type: :array, items: %Schema{type: :string}},
+              all_locations: %Schema{type: :boolean},
+              location_ids: %Schema{type: :array, maxItems: 200, items: %Schema{type: :string}},
+              lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800},
+              email_locale: %Schema{type: :string}
+            },
+            required: [:emails]
+          }
+        }
+      }
+    },
+    responses: [created: {"Per-address results", "application/json", @bulk_result_schema}]
+  )
+
+  operation(:resend,
+    summary: "ADR-209: re-issue an emailed invitation and email the new link",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter, @invitation_id_parameter],
+    responses: [created: {"The new invitation", "application/json", @pending_invitation_schema}]
   )
 
   operation(:show_join_link,
@@ -310,9 +421,35 @@ defmodule PaleeWeb.OrganizationAccessController do
 
   def list_invitations(conn, _params) do
     with {:ok, invitations} <- ListOrganizationInvitations.call(conn.assigns.tenant_context) do
-      json(conn, Enum.map(invitations, &serialize_pending_invitation/1))
+      json(
+        conn,
+        invitations
+        |> InvitationEmails.with_delivery()
+        |> Enum.map(&serialize_pending_invitation/1)
+      )
     end
   end
+
+  def bulk_invite(conn, _params) do
+    with {:ok, result} <- InvitationEmails.bulk(conn.assigns.tenant_context, conn.body_params) do
+      conn |> put_status(:created) |> json(result)
+    end
+  end
+
+  def resend(conn, %{"id" => invitation_id}) do
+    with {:ok, %{invitation: invitation, message: message, address: address}} <-
+           InvitationEmails.resend(conn.assigns.tenant_context, invitation_id) do
+      conn
+      |> put_status(:created)
+      |> json(
+        serialize_pending_invitation(
+          Map.merge(invitation, %{email: address, delivery_status: delivery(message)})
+        )
+      )
+    end
+  end
+
+  defp delivery(message), do: InvitationEmails.delivery_status(message)
 
   def show_join_link(conn, _params) do
     with {:ok, join_link} <- ManageOrganizationJoinLink.get(conn.assigns.tenant_context) do
@@ -359,7 +496,10 @@ defmodule PaleeWeb.OrganizationAccessController do
       location_scope: invitation_scope(invitation),
       expires_at: invitation.expires_at,
       issued_at: invitation.inserted_at,
-      email_bound: not is_nil(invitation.intended_email_digest)
+      email_bound: not is_nil(invitation.intended_email_digest),
+      email: Map.get(invitation, :email),
+      email_locale: invitation.email_locale,
+      delivery_status: Map.get(invitation, :delivery_status)
     }
   end
 
@@ -383,6 +523,31 @@ defmodule PaleeWeb.OrganizationAccessController do
     with {:ok, memberships} <-
            ListOrganizationMemberships.call(GuardianPlug.current_resource(conn)) do
       json(conn, Enum.map(memberships, &serialize_membership/1))
+    end
+  end
+
+  # ADR-209: `send_email` mails the invitation; its token stays in the email.
+  def issue(conn, %{"send_email" => send_email}) when send_email in [true, "true"] do
+    context = conn.assigns.tenant_context
+
+    with {:ok, %{invitation: invitation, message: message, address: address}} <-
+           InvitationEmails.send(context, conn.body_params) do
+      conn
+      |> put_status(:created)
+      |> json(
+        serialize_invitation(%{
+          organization: context.organization,
+          role: invitation.role,
+          roles: invitation_roles(invitation),
+          location_scope: invitation_scope(invitation),
+          expires_at: invitation.expires_at
+        })
+        |> Map.merge(%{
+          id: invitation.id,
+          email: address,
+          delivery_status: delivery(message)
+        })
+      )
     end
   end
 
@@ -426,6 +591,12 @@ defmodule PaleeWeb.OrganizationAccessController do
       token: Map.get(invitation, :token)
     }
     |> then(fn value -> if value.token, do: value, else: Map.delete(value, :token) end)
+    |> then(fn value ->
+      case Map.fetch(invitation, :email_bound) do
+        {:ok, bound} -> Map.put(value, :email_bound, bound)
+        :error -> value
+      end
+    end)
   end
 
   # ADR-186: older invitations carry one role and work everywhere.
@@ -481,7 +652,8 @@ defmodule PaleeWeb.OrganizationAccessController do
     %{
       brand_name: settings.brand_name,
       brand_logo_url: settings.brand_logo_url,
-      brand_primary_color: settings.brand_primary_color
+      brand_primary_color: settings.brand_primary_color,
+      default_locale: Map.get(settings, :default_locale)
     }
   end
 end

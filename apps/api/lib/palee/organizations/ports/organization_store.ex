@@ -17,6 +17,11 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
               {:ok, RegistrationInvitation.t()} | {:error, Ecto.Changeset.t()}
   @callback revoke_invitation(Ecto.UUID.t(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, RegistrationInvitation.t()} | {:error, term()}
+  # ADR-209: invitations sent by email.
+  @callback mark_invitation_emailed(Ecto.UUID.t(), DateTime.t()) :: :ok | {:error, :not_found}
+  @callback get_invitation(Ecto.UUID.t(), Ecto.UUID.t()) :: RegistrationInvitation.t() | nil
+  @callback count_emailed_invitations(Ecto.UUID.t(), Ecto.UUID.t() | nil, DateTime.t()) ::
+              %{organization: non_neg_integer(), inviter: non_neg_integer()}
   @callback redeem_invitation(binary(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, :invalid_invitation | Ecto.Changeset.t()}
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil

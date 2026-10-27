@@ -443,6 +443,9 @@ defmodule PaleeWeb.Router do
 
     get("/invitations", OrganizationAccessController, :list_invitations)
     post("/invitations", OrganizationAccessController, :issue)
+    # ADR-209: invitations sent by email.
+    post("/invitations/bulk", OrganizationAccessController, :bulk_invite)
+    post("/invitations/:id/resend", OrganizationAccessController, :resend)
     get("/join-link", OrganizationAccessController, :show_join_link)
     put("/join-link", OrganizationAccessController, :update_join_link)
     delete("/invitations/:id", OrganizationAccessController, :revoke)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useFragmentInvitationToken } from "@/lib/invitation-fragment";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ApiError } from "@/api/client";
@@ -65,9 +66,14 @@ export function AdminRegistrationConsole() {
   const [busy, setBusy] = useState(false);
   const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  // ADR-209: an emailed invitation's link carries its token in the fragment;
+  // it fills the code until the person edits it.
+  const fragmentToken = useFragmentInvitationToken();
+  const [tokenEdited, setTokenEdited] = useState(false);
+  const invitationToken = form.invitation_token || (tokenEdited ? "" : fragmentToken);
 
   useEffect(() => {
-    const token = form.invitation_token.trim();
+    const token = invitationToken.trim();
     if (token.length < 20) return;
 
     let cancelled = false;
@@ -96,7 +102,7 @@ export function AdminRegistrationConsole() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [form.invitation_token, i18n]);
+  }, [invitationToken, i18n]);
 
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
@@ -127,7 +133,7 @@ export function AdminRegistrationConsole() {
 
     try {
       setSignedUpHere(true);
-      await signUpAdmin(form);
+      await signUpAdmin({ ...form, invitation_token: invitationToken });
       if (invitation) {
         rememberSelectedOrganization(invitation.organization.slug);
         router.replace(`/org/${invitation.organization.slug}/admin`);
@@ -311,11 +317,12 @@ export function AdminRegistrationConsole() {
             <input
               autoComplete="off"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-              value={form.invitation_token}
+              value={invitationToken}
               onChange={(event) => {
                 setInvitation(null);
                 setError(null);
                 setFieldErrors((current) => ({ ...current, invitation_token: [] }));
+                setTokenEdited(true);
                 setForm((current) => ({ ...current, invitation_token: event.target.value }));
               }}
               style={{

@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Questa planimetria appartiene a un’altra sede.",
     "apiErrorInvalidCleaningSchedule": "Scegli almeno un giorno e scrivi gli orari come HH:MM.",
     "apiErrorInvalidPlacement": "Scegli uno spazio e una quantità in ogni riga.",
-    "apiErrorPlacementExceedsQuantity": "Ne sono collocate più di quante la palestra ne possiede di questa macchina."
+    "apiErrorPlacementExceedsQuantity": "Ne sono collocate più di quante la palestra ne possiede di questa macchina.",
+    "apiErrorInvitationEmailUnverified": "Questo invito è per un indirizzo email confermato. Apri il link dell’email di invito o conferma prima il tuo indirizzo.",
+    "apiErrorInvitationRevoked": "Il box ha revocato questo invito."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -11576,5 +11578,55 @@
     "notifKeyExpiredTitle": "La chiave email è scaduta",
     "notifKeyExpiringBody": "La chiave SMTP di Palee scade tra {days} giorni ({date}). Crea una nuova chiave in Brevo e aggiorna il secret del server prima di allora, altrimenti Palee smette di inviare email.",
     "notifKeyExpiredBody": "La chiave SMTP di Palee è scaduta il {date}, quindi Palee non può inviare email. Crea una nuova chiave in Brevo e aggiorna il secret del server."
+  },
+  "InviteEmail": {
+    "tabBulk": "Più persone",
+    "demoNotice": "La tua attività è in modalità demo, quindi non può ancora invitare né scrivere a persone reali. La attiva il team Palee; nel frattempo prova tutto con i dati demo.",
+    "languageLabel": "Lingua dell’email",
+    "boxLanguage": "{language} (lingua del tuo box)",
+    "emailSendHint": "Inviamo l’invito via email. Solo questo indirizzo può usarlo, e aprire l’email lo conferma.",
+    "emailLinkHint": "Lascia vuoto per avere un link da copiare e condividere tu.",
+    "send": "Invia invito",
+    "sending": "Invio…",
+    "sentTo": "Invito inviato a {email}.",
+    "sentHint": "Il link è solo nell’email. Funziona una volta e scade il {date}. Lo trovi in In attesa.",
+    "sendAnother": "Invita un’altra persona",
+    "bulkLabel": "Indirizzi email",
+    "bulkHint": "Incolla gli indirizzi o scegli un file CSV, fino a {max} alla volta. Ogni persona riceve il proprio invito.",
+    "chooseCsv": "Scegli file CSV",
+    "bulkCount": "{count, plural, =0 {Ancora nessun indirizzo} one {# indirizzo} other {# indirizzi}}",
+    "bulkSend": "{count, plural, =0 {Invia inviti} one {Invia # invito} other {Invia # inviti}}",
+    "bulkDone": "{sent, plural, =0 {Nessun invito inviato.} one {# invito inviato.} other {# inviti inviati.}}",
+    "bulkFailed": "{count, plural, one {# indirizzo non ha ricevuto l’invito:} other {# indirizzi non hanno ricevuto l’invito:}}",
+    "bulkSkipped": "Non sono indirizzi email, saltati: {values}",
+    "resend": "Invia di nuovo",
+    "resent": "Inviato di nuovo a {email}. Il link precedente non funziona più.",
+    "status": {
+      "queued": "In invio",
+      "sent": "Inviato",
+      "failed": "Non consegnato",
+      "bounced": "Respinto",
+      "suppressed": "Indirizzo bloccato"
+    },
+    "errors": {
+      "invalid_address": "Inserisci un indirizzo email valido.",
+      "suppressed": "Le email a questo indirizzo vengono respinte. Controllalo o usane un altro.",
+      "throttled": "È appena partito un invito per questo indirizzo. Riprova tra qualche minuto.",
+      "over_budget": "L’invio di email è sovraccarico oggi. Riprova più tardi.",
+      "invitation_email_required": "Inserisci almeno un indirizzo email.",
+      "too_many_invitation_emails": "Fino a {max} indirizzi alla volta.",
+      "invitation_email_cap_reached": "Il tuo box ha inviato tutte le email di invito di oggi. Riprova domani.",
+      "invitation_not_emailed": "Questo invito non è stato inviato via email.",
+      "business_not_activated": "La tua attività è in modalità demo, quindi non può ancora invitare persone reali.",
+      "other": "Non è stato possibile inviarlo."
+    },
+    "revokedTitle": "Questo invito è stato revocato",
+    "revokedBody": "Il box ha ritirato questo invito. Chiedine uno nuovo se vuoi ancora unirti.",
+    "invalidTitle": "Questo invito non funziona più",
+    "invalidBody": "Forse è già stato usato o è scaduto. Chiedi al box un nuovo invito.",
+    "boundNote": "Questo invito è per un indirizzo email. Accedi o crea il tuo account con l’indirizzo a cui è stato inviato.",
+    "mismatch": "Hai effettuato l’accesso con un indirizzo email diverso da quello a cui è stato inviato l’invito. Esci, poi accedi o crea un account con l’indirizzo invitato.",
+    "unverified": "Questo invito è per un indirizzo email confermato. Apri il link dell’email di invito o conferma prima il tuo indirizzo.",
+    "signOut": "Esci"
   }
 }

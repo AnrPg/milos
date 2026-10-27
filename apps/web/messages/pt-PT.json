@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Essa planta pertence a outra filial.",
     "apiErrorInvalidCleaningSchedule": "Escolha pelo menos um dia e escreva as horas como HH:MM.",
     "apiErrorInvalidPlacement": "Escolha um espaço e uma quantidade em cada linha.",
-    "apiErrorPlacementExceedsQuantity": "Há mais colocadas do que o ginásio tem desta máquina."
+    "apiErrorPlacementExceedsQuantity": "Há mais colocadas do que o ginásio tem desta máquina.",
+    "apiErrorInvitationEmailUnverified": "Este convite é para um endereço de email confirmado. Abre a ligação do email do convite ou confirma primeiro o teu endereço.",
+    "apiErrorInvitationRevoked": "A box revogou este convite."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -11576,5 +11578,55 @@
     "notifKeyExpiredTitle": "A chave de email expirou",
     "notifKeyExpiringBody": "A chave SMTP do Palee expira dentro de {days} dias ({date}). Cria uma chave nova no Brevo e atualiza o segredo do servidor antes disso, ou o Palee deixa de enviar emails.",
     "notifKeyExpiredBody": "A chave SMTP do Palee expirou a {date}, por isso o Palee não consegue enviar emails. Cria uma chave nova no Brevo e atualiza o segredo do servidor."
+  },
+  "InviteEmail": {
+    "tabBulk": "Várias pessoas",
+    "demoNotice": "O teu negócio está em modo de demonstração, por isso ainda não pode convidar nem enviar emails a pessoas reais. A equipa Palee ativa-o; até lá, experimenta tudo com dados de demonstração.",
+    "languageLabel": "Idioma do email",
+    "boxLanguage": "{language} (idioma da tua box)",
+    "emailSendHint": "Enviamos o convite por email. Só este endereço o pode usar, e abrir o email confirma-o.",
+    "emailLinkHint": "Deixa vazio para obteres uma ligação para copiar e partilhar tu.",
+    "send": "Enviar convite",
+    "sending": "A enviar…",
+    "sentTo": "Convite enviado para {email}.",
+    "sentHint": "A ligação está apenas no email. Funciona uma vez e expira a {date}. Acompanha-o em Pendentes.",
+    "sendAnother": "Convidar outra pessoa",
+    "bulkLabel": "Endereços de email",
+    "bulkHint": "Cola endereços ou escolhe um ficheiro CSV, até {max} de cada vez. Cada pessoa recebe o seu próprio convite.",
+    "chooseCsv": "Escolher ficheiro CSV",
+    "bulkCount": "{count, plural, =0 {Ainda sem endereços} one {# endereço} other {# endereços}}",
+    "bulkSend": "{count, plural, =0 {Enviar convites} one {Enviar # convite} other {Enviar # convites}}",
+    "bulkDone": "{sent, plural, =0 {Não foi enviado nenhum convite.} one {# convite enviado.} other {# convites enviados.}}",
+    "bulkFailed": "{count, plural, one {# endereço não recebeu convite:} other {# endereços não receberam convite:}}",
+    "bulkSkipped": "Não são endereços de email, ignorados: {values}",
+    "resend": "Reenviar",
+    "resent": "Enviado de novo para {email}. A ligação anterior já não funciona.",
+    "status": {
+      "queued": "A enviar",
+      "sent": "Enviado",
+      "failed": "Não entregue",
+      "bounced": "Devolvido",
+      "suppressed": "Endereço bloqueado"
+    },
+    "errors": {
+      "invalid_address": "Escreve um endereço de email válido.",
+      "suppressed": "Os emails para este endereço são devolvidos. Verifica-o ou usa outro.",
+      "throttled": "Acabou de seguir um convite para este endereço. Tenta de novo daqui a alguns minutos.",
+      "over_budget": "O envio de emails está sobrecarregado hoje. Tenta mais tarde.",
+      "invitation_email_required": "Escreve pelo menos um endereço de email.",
+      "too_many_invitation_emails": "Até {max} endereços de cada vez.",
+      "invitation_email_cap_reached": "A tua box já enviou todos os emails de convite de hoje. Tenta amanhã.",
+      "invitation_not_emailed": "Este convite não foi enviado por email.",
+      "business_not_activated": "O teu negócio está em modo de demonstração, por isso ainda não pode convidar pessoas reais.",
+      "other": "Não foi possível enviar."
+    },
+    "revokedTitle": "Este convite foi revogado",
+    "revokedBody": "A box retirou este convite. Pede-lhe um novo se ainda quiseres juntar-te.",
+    "invalidTitle": "Este convite já não funciona",
+    "invalidBody": "Pode já ter sido usado ou ter expirado. Pede à box um novo convite.",
+    "boundNote": "Este convite é para um endereço de email. Inicia sessão ou cria a tua conta com o endereço para onde foi enviado.",
+    "mismatch": "Tens sessão iniciada com um endereço de email diferente daquele para onde este convite foi enviado. Termina a sessão e inicia sessão ou cria uma conta com o endereço convidado.",
+    "unverified": "Este convite é para um endereço de email confirmado. Abre a ligação do email do convite ou confirma primeiro o teu endereço.",
+    "signOut": "Terminar sessão"
   }
 }
