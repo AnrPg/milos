@@ -107,7 +107,7 @@ describe("AdminRegistrationConsole", () => {
     fireEvent.click(screen.getByRole("button", { name: "signOutAndContinue" }));
     expect(signOut).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByRole("button", { name: "keepThisAccount" }));
+    fireEvent.click(screen.getByRole("button", { name: "staySignedIn" }));
     expect(replace).toHaveBeenCalledWith("/");
   });
 

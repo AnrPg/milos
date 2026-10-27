@@ -70,7 +70,7 @@ msgstr ""
 msgid "Message from the box"
 msgstr ""
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr ""
 
 msgid "Challenge completed"
@@ -458,13 +458,13 @@ msgstr ""
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr ""
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr ""
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr ""
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr ""
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -521,7 +521,7 @@ msgstr ""
 msgid "The afternoon is a good moment to catch up on water."
 msgstr ""
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr ""
 
 msgid "%{nickname}: weekly wellness"
@@ -576,17 +576,17 @@ msgstr ""
 
 msgid "Training partner message"
 
-msgid "Squad invitation"
+msgid "PT squad invitation"
 msgstr ""
 
-msgid "%{nickname} invited you to the squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
 msgstr ""
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr ""
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
 msgstr ""
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
@@ -629,7 +629,7 @@ msgstr ""
 msgid "Your password was reset"
 msgstr ""
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
 msgstr ""
 
 msgid "Your demo business is waiting for you"

@@ -70,8 +70,8 @@ msgstr "Your coach sent you a message."
 msgid "Message from the box"
 msgstr "Message from the box"
 
-msgid "Your gym sent you a message."
-msgstr "Your gym sent you a message."
+msgid "Your box sent you a message."
+msgstr "Your box sent you a message."
 
 msgid "Challenge completed"
 msgstr "Challenge completed"
@@ -460,13 +460,13 @@ msgstr "Time for a new measurement"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "A new snapshot helps you see your trend. It takes a minute."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "A check-in buddy invitation"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} asks you to be their check-in buddy."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "You have a check-in buddy"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "A glass of water?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "The afternoon is a good moment to catch up on water."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Check-in buddy message"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "You and %{nickname} both want to train together. Say hi."
 msgid "Training partner message"
 msgstr "Training partner message"
 
-msgid "Squad invitation"
-msgstr "Squad invitation"
+msgid "PT squad invitation"
+msgstr "PT squad invitation"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} invited you to the squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} invited you to the PT squad «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "A class has no WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) starts in an hour and still has no WOD."
@@ -634,8 +634,8 @@ msgstr "%{name} (@%{handle}) can't sign in and asked for a password reset."
 msgid "Your password was reset"
 msgstr "Your password was reset"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
 
 msgid "Your demo business is waiting for you"
 msgstr "Your demo business is waiting for you"

@@ -29,13 +29,13 @@ msgid "Workout changed"
 msgstr "L'allenamento è cambiato"
 
 msgid "Your coach changed a scheduled workout."
-msgstr "Il tuo allenatore ha modificato un allenamento programmato."
+msgstr "Il tuo coach ha modificato un allenamento programmato."
 
 msgid "Workout removed"
 msgstr "Allenamento rimosso"
 
 msgid "Your coach removed a scheduled workout."
-msgstr "Il tuo allenatore ha rimosso un allenamento programmato."
+msgstr "Il tuo coach ha rimosso un allenamento programmato."
 
 msgid "Workout rejected"
 msgstr "Allenamento rifiutato"
@@ -70,7 +70,7 @@ msgstr "Il tuo coach ti ha inviato un messaggio."
 msgid "Message from the box"
 msgstr "Messaggio dal box"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Il tuo box ti ha inviato un messaggio."
 
 msgid "Challenge completed"
@@ -460,13 +460,13 @@ msgstr "È ora di una nuova misurazione"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Una nuova istantanea ti aiuta a vedere il tuo andamento. Ci vuole un minuto."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Un invito a fare l'amicone di supporto"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} ti chiede di essere il suo amicone di supporto."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "Hai un amicone di supporto"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Un bicchiere d'acqua?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Il pomeriggio è un buon momento per recuperare con l'acqua."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Messaggio dall'amicone di supporto"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "Tu e %{nickname} volete allenarvi insieme. Saluta."
 msgid "Training partner message"
 msgstr "Messaggio dal tuo compagno di allenamento"
 
-msgid "Squad invitation"
-msgstr "Invito in una squad"
+msgid "PT squad invitation"
+msgstr "Invito in una squad PT"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} ti ha invitato nella squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} ti ha invitato nella squad PT «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "Una lezione non ha il WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "%{class} (%{when}) non ha un WOD, quindi i membri non possono vederla né prenotarla. Collegane uno per pubblicarla."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) non ha un WOD, quindi i membri del box non possono vederla né prenotarla. Collegane uno per pubblicarla."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) inizia tra un'ora e non ha ancora un WOD."
@@ -634,8 +634,8 @@ msgstr "%{name} (@%{handle}) non riesce ad accedere e ha chiesto di reimpostare 
 msgid "Your password was reset"
 msgstr "La tua password è stata reimpostata"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "La tua password è stata cambiata con un link di reimpostazione o un codice di recupero, ed è stata chiusa la sessione su tutti i dispositivi. Se non sei stato tu, contatta la tua palestra o l'assistenza Palee."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "La tua password è stata cambiata con un link di reimpostazione o un codice di recupero, ed è stata chiusa la sessione su tutti i dispositivi. Se non sei stato tu, contatta il tuo box o l'assistenza Palee."
 
 msgid "Your demo business is waiting for you"
 msgstr "La tua attività demo ti aspetta"

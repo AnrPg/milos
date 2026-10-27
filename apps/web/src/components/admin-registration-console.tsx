@@ -197,7 +197,7 @@ export function AdminRegistrationConsole() {
               type="button"
               onClick={() => router.replace("/")}
             >
-              {i18n("keepThisAccount")}
+              {i18n("staySignedIn")}
             </button>
           </div>
         </section>

@@ -70,7 +70,7 @@ msgstr "Ваш тренер отправил вам сообщение."
 msgid "Message from the box"
 msgstr "Сообщение от зала"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Ваш зал отправил вам сообщение."
 
 msgid "Challenge completed"
@@ -329,7 +329,7 @@ msgid "Group not approved"
 msgstr "Группа не одобрена"
 
 msgid "The box didn't approve «%{group}»."
-msgstr "Бокс не одобрил «%{group}»."
+msgstr "Зал не одобрил «%{group}»."
 
 msgid "Request to join"
 msgstr "Запрос на вступление"
@@ -460,13 +460,13 @@ msgstr "Время для нового замера"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Новый снимок поможет увидеть твою тенденцию. Это займёт минуту."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Приглашение стать другом на связи"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} просит тебя стать другом на связи."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "У тебя есть друг на связи"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Стакан воды?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "День — хорошее время наверстать воду."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Сообщение от друга на связи"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "Вы и %{nickname} хотите тренироваться вместе
 msgid "Training partner message"
 msgstr "Сообщение от партнёра по тренировкам"
 
-msgid "Squad invitation"
-msgstr "Приглашение в сквад"
+msgid "PT squad invitation"
+msgstr "Приглашение в PT-сквад"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} пригласил(а) тебя в сквад «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} пригласил(а) тебя в PT-сквад «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "У занятия нет WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "У занятия %{class} (%{when}) нет WOD, поэтому участники не видят его и не могут записаться. Привяжите WOD, чтобы опубликовать его."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "У занятия %{class} (%{when}) нет WOD, поэтому участники зала не видят его и не могут записаться. Привяжите WOD, чтобы опубликовать его."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "Занятие %{class} (%{when}) начнётся через час, а WOD всё ещё нет."
@@ -634,7 +634,7 @@ msgstr "%{name} (@%{handle}) не может войти и просит сбро
 msgid "Your password was reset"
 msgstr "Ваш пароль сброшен"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
 msgstr "Ваш пароль изменён по ссылке для сброса или с помощью кода восстановления, и все устройства вышли из аккаунта. Если это были не вы, свяжитесь со своим залом или со службой поддержки Palee."
 
 msgid "Your demo business is waiting for you"

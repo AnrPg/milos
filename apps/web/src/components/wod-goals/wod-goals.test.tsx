@@ -96,7 +96,7 @@ describe("WodGoalsEditorPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Reset to suggestion" }));
     expect(screen.getByRole("button", { name: "Quadriceps, Primary. Tap to change the role." })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("checkbox", { name: "Show goals to members" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Show goals to box members" }));
     fireEvent.click(screen.getByRole("button", { name: "7′" }));
     await waitFor(() => expect(puts).toHaveLength(2), { timeout: 3000 });
     expect(puts[1]).toMatchObject({ muscles, visible_to_members: true, stimulus: "7′" });
@@ -232,7 +232,7 @@ describe("inherited goals", () => {
     wrap(<WodGoalsEditorPanel workoutId="variant-1" />);
     expect(await screen.findByText("From the base workout")).toBeInTheDocument();
     expect(screen.queryByText("Suggestion · not saved yet")).not.toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Show goals to members" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Show goals to box members" })).toBeChecked();
   });
 });
 
