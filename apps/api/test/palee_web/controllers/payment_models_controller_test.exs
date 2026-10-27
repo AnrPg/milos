@@ -46,6 +46,11 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
     {user, membership}
   end
 
+  defp verified!(user) do
+    :ok = Palee.Identity.mark_email_verified(user.login_id, user.email)
+    Palee.Identity.find_by_id(user.id)
+  end
+
   defp package(type, fields, extra \\ %{}) do
     {:ok, package} =
       Finance.create_package(
@@ -250,7 +255,19 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
       |> Map.fetch!("offer")
     end
 
-    assert offer.(employee) == %{"company_name" => "Acme"}
+    # ADR-205: an unverified address in the domain is told to confirm it first.
+    assert offer.(employee) == %{"company_name" => "Acme", "needs_verification" => true}
+
+    assert %{"code" => "corporate_email_unverified"} =
+             conn
+             |> put_bearer_token(employee)
+             |> send_json(:post, "#{base}/me/corporate-enrollment", %{})
+             |> json_response(403)
+
+    refute :book_classes in capabilities(employee)
+
+    employee = verified!(employee)
+    assert offer.(employee) == %{"company_name" => "Acme", "needs_verification" => false}
     assert offer.(outsider) == nil
 
     seat =
@@ -370,6 +387,86 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
 
     assert Enum.count(seats["seats"], &(&1["status"] == "active")) == 1
     assert Enum.any?(seats["seats"], &(&1["nickname"] == employee.nickname))
+  end
+
+  test "a seat taken by the email domain ends when the email leaves the domain (ADR-205)", %{
+    conn: conn,
+    admin_conn: admin_conn,
+    base: base
+  } do
+    corporate =
+      package("corporate", %{
+        "terms.seats" => 5,
+        "terms.seat_billing" => "used",
+        "terms.enrollment" => "email_domain",
+        "terms.enrollment_domain" => "globex.test"
+      })
+
+    client =
+      admin_conn
+      |> send_json(:post, "#{base}/admin/finance/corporate-clients", %{
+        membership_package_id: corporate.id,
+        company_name: "Globex",
+        billing_email: "billing@globex.test"
+      })
+      |> json_response(201)
+      |> Map.fetch!("client")
+
+    unique = System.unique_integer([:positive])
+    {leaver, _} = member(%{email: "leaver#{unique}@globex.test"})
+    {mover, _} = member(%{email: "mover#{unique}@globex.test"})
+    {coded, _} = member(%{email: "coded#{unique}@elsewhere.test"})
+    leaver = verified!(leaver)
+    mover = verified!(mover)
+
+    enroll = fn user, body ->
+      conn
+      |> put_bearer_token(user)
+      |> send_json(:post, "#{base}/me/corporate-enrollment", body)
+      |> json_response(201)
+    end
+
+    enroll.(leaver, %{})
+    enroll.(mover, %{})
+    enroll.(coded, %{code: client["enrollment_code"]})
+
+    via = fn user ->
+      Repo.one(
+        from(s in "membership_package_subscriptions",
+          join: m in "memberships",
+          on: m.id == s.membership_id,
+          where:
+            m.user_id == type(^user.id, :binary_id) and
+              s.corporate_client_id == type(^client["id"], :binary_id),
+          select: {s.status, s.corporate_enrolled_via}
+        )
+      )
+    end
+
+    assert via.(leaver) == {"active", "email_domain"}
+    assert via.(coded) == {"active", "code"}
+
+    change_email = fn user, email ->
+      Repo.query!("UPDATE logins SET email = $1 WHERE id = $2", [
+        email,
+        Ecto.UUID.dump!(user.login_id)
+      ])
+
+      Palee.Application.CorporateSeats.email_changed(user.login_id, user.email, email)
+    end
+
+    # Leaving the domain ends the seat; moving inside it keeps it.
+    assert {:ok, 1} = change_email.(leaver, "leaver#{unique}@initech.test")
+    assert via.(leaver) == {"cancelled", "email_domain"}
+    refute :book_classes in capabilities(leaver)
+
+    assert {:ok, 0} = change_email.(mover, "mover.new#{unique}@globex.test")
+    assert via.(mover) == {"active", "email_domain"}
+
+    # A seat taken with the company's code never relied on the address.
+    assert {:ok, 0} = change_email.(coded, "coded#{unique}@initech.test")
+    assert via.(coded) == {"active", "code"}
+    assert :book_classes in capabilities(coded)
   end
 
   test "the daily run issues, marks overdue and reminds once per interval" do

@@ -602,6 +602,13 @@ defmodule Palee.Finance do
   def list_corporate_seats(context, client_id),
     do: scoped(context, fn -> FinanceStore.list_corporate_seats(client_id) end)
 
+  @doc """
+  ADR-205: ends the active corporate seats `user_ids` took by their email
+  domain whose client's domain no longer matches `email`.
+  """
+  def end_email_domain_seats(context, user_ids, email),
+    do: scoped(context, fn -> FinanceStore.end_email_domain_seats(user_ids, email) end)
+
   def generate_corporate_invoice(context, client_id, on),
     do: scoped(context, fn -> FinanceStore.generate_corporate_invoice(client_id, on) end)
 

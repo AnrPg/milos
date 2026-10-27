@@ -18329,6 +18329,37 @@
                   "allOf": [
                     {
                       "properties": {
+                        "email_delivery": {
+                          "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                          "nullable": true,
+                          "properties": {
+                            "error": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "sent_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued",
+                                "deferred",
+                                "sent",
+                                "failed",
+                                "suppressed",
+                                "not_sent"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ],
+                          "title": "BusinessActivationLinkEmail",
+                          "type": "object"
+                        },
                         "expires_at": {
                           "format": "date_time",
                           "type": "string"
@@ -18441,6 +18472,10 @@
                 "owners": {
                   "items": {
                     "properties": {
+                      "email_verified": {
+                        "description": "ADR-205: a link is only issued to a verified email",
+                        "type": "boolean"
+                      },
                       "nickname": {
                         "nullable": true,
                         "type": "string"
@@ -18451,7 +18486,8 @@
                       }
                     },
                     "required": [
-                      "user_id"
+                      "user_id",
+                      "email_verified"
                     ],
                     "type": "object"
                   },
@@ -18525,6 +18561,11 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "requester_email_verified": {
+                  "description": "Vendors (ADR-205): whether the requester verified their email",
+                  "nullable": true,
+                  "type": "boolean"
+                },
                 "status": {
                   "enum": [
                     "pending",
@@ -18559,6 +18600,37 @@
       },
       "BusinessActivationLink": {
         "properties": {
+          "email_delivery": {
+            "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+            "nullable": true,
+            "properties": {
+              "error": {
+                "nullable": true,
+                "type": "string"
+              },
+              "sent_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "queued",
+                  "deferred",
+                  "sent",
+                  "failed",
+                  "suppressed",
+                  "not_sent"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "title": "BusinessActivationLinkEmail",
+            "type": "object"
+          },
           "expires_at": {
             "format": "date_time",
             "type": "string"
@@ -18620,6 +18692,37 @@
           "inserted_at"
         ],
         "title": "BusinessActivationLink",
+        "type": "object"
+      },
+      "BusinessActivationLinkEmail": {
+        "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+        "nullable": true,
+        "properties": {
+          "error": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sent_at": {
+            "format": "date_time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "deferred",
+              "sent",
+              "failed",
+              "suppressed",
+              "not_sent"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BusinessActivationLinkEmail",
         "type": "object"
       },
       "BusinessActivationPreview": {
@@ -18934,6 +19037,11 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "requester_email_verified": {
+                    "description": "Vendors (ADR-205): whether the requester verified their email",
+                    "nullable": true,
+                    "type": "boolean"
+                  },
                   "status": {
                     "enum": [
                       "pending",
@@ -19140,6 +19248,11 @@
                 "nullable": true,
                 "type": "string"
               },
+              "requester_email_verified": {
+                "description": "Vendors (ADR-205): whether the requester verified their email",
+                "nullable": true,
+                "type": "boolean"
+              },
               "status": {
                 "enum": [
                   "pending",
@@ -19228,6 +19341,11 @@
             "nullable": true,
             "type": "string"
           },
+          "requester_email_verified": {
+            "description": "Vendors (ADR-205): whether the requester verified their email",
+            "nullable": true,
+            "type": "boolean"
+          },
           "status": {
             "enum": [
               "pending",
@@ -19256,6 +19374,37 @@
             "allOf": [
               {
                 "properties": {
+                  "email_delivery": {
+                    "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                    "nullable": true,
+                    "properties": {
+                      "error": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "sent_at": {
+                        "format": "date_time",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "queued",
+                          "deferred",
+                          "sent",
+                          "failed",
+                          "suppressed",
+                          "not_sent"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ],
+                    "title": "BusinessActivationLinkEmail",
+                    "type": "object"
+                  },
                   "expires_at": {
                     "format": "date_time",
                     "type": "string"
@@ -19428,6 +19577,11 @@
                 "nullable": true,
                 "type": "string"
               },
+              "requester_email_verified": {
+                "description": "Vendors (ADR-205): whether the requester verified their email",
+                "nullable": true,
+                "type": "boolean"
+              },
               "status": {
                 "enum": [
                   "pending",
@@ -19517,6 +19671,11 @@
                   "description": "Vendors: nickname",
                   "nullable": true,
                   "type": "string"
+                },
+                "requester_email_verified": {
+                  "description": "Vendors (ADR-205): whether the requester verified their email",
+                  "nullable": true,
+                  "type": "boolean"
                 },
                 "status": {
                   "enum": [
@@ -93471,6 +93630,11 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "requester_email_verified": {
+                          "description": "Vendors (ADR-205): whether the requester verified their email",
+                          "nullable": true,
+                          "type": "boolean"
+                        },
                         "status": {
                           "enum": [
                             "pending",
@@ -101565,6 +101729,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "requester_email_verified": {
+                            "description": "Vendors (ADR-205): whether the requester verified their email",
+                            "nullable": true,
+                            "type": "boolean"
+                          },
                           "status": {
                             "enum": [
                               "pending",
@@ -101720,6 +101889,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
+                    },
                     "status": {
                       "enum": [
                         "pending",
@@ -101834,6 +102008,11 @@
                       "description": "Vendors: nickname",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
                     },
                     "status": {
                       "enum": [
@@ -137810,6 +137989,11 @@
                               "nullable": true,
                               "type": "string"
                             },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
+                            },
                             "status": {
                               "enum": [
                                 "pending",
@@ -137980,6 +138164,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
+                    },
                     "status": {
                       "enum": [
                         "pending",
@@ -138095,6 +138284,11 @@
                               "description": "Vendors: nickname",
                               "nullable": true,
                               "type": "string"
+                            },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
                             },
                             "status": {
                               "enum": [
@@ -138266,6 +138460,11 @@
                               "description": "Vendors: nickname",
                               "nullable": true,
                               "type": "string"
+                            },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
                             },
                             "status": {
                               "enum": [
@@ -209038,10 +209237,15 @@
                       "properties": {
                         "company_name": {
                           "type": "string"
+                        },
+                        "needs_verification": {
+                          "description": "ADR-205: the account email matches but is not verified yet; joining waits for the confirmation",
+                          "type": "boolean"
                         }
                       },
                       "required": [
-                        "company_name"
+                        "company_name",
+                        "needs_verification"
                       ],
                       "type": "object"
                     }
@@ -209139,6 +209343,17 @@
               }
             },
             "description": "Seat"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The matching email is not verified yet"
           },
           "404": {
             "content": {
@@ -247912,6 +248127,37 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "email_delivery": {
+                      "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                      "nullable": true,
+                      "properties": {
+                        "error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed",
+                            "not_sent"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ],
+                      "title": "BusinessActivationLinkEmail",
+                      "type": "object"
+                    },
                     "expires_at": {
                       "format": "date_time",
                       "type": "string"
@@ -248009,6 +248255,37 @@
                             "allOf": [
                               {
                                 "properties": {
+                                  "email_delivery": {
+                                    "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                                    "nullable": true,
+                                    "properties": {
+                                      "error": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "sent_at": {
+                                        "format": "date_time",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "enum": [
+                                          "queued",
+                                          "deferred",
+                                          "sent",
+                                          "failed",
+                                          "suppressed",
+                                          "not_sent"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "status"
+                                    ],
+                                    "title": "BusinessActivationLinkEmail",
+                                    "type": "object"
+                                  },
                                   "expires_at": {
                                     "format": "date_time",
                                     "type": "string"
@@ -248121,6 +248398,10 @@
                           "owners": {
                             "items": {
                               "properties": {
+                                "email_verified": {
+                                  "description": "ADR-205: a link is only issued to a verified email",
+                                  "type": "boolean"
+                                },
                                 "nickname": {
                                   "nullable": true,
                                   "type": "string"
@@ -248131,7 +248412,8 @@
                                 }
                               },
                               "required": [
-                                "user_id"
+                                "user_id",
+                                "email_verified"
                               ],
                               "type": "object"
                             },
@@ -248204,6 +248486,11 @@
                             "description": "Vendors: nickname",
                             "nullable": true,
                             "type": "string"
+                          },
+                          "requester_email_verified": {
+                            "description": "Vendors (ADR-205): whether the requester verified their email",
+                            "nullable": true,
+                            "type": "boolean"
                           },
                           "status": {
                             "enum": [
@@ -248314,6 +248601,37 @@
                       "allOf": [
                         {
                           "properties": {
+                            "email_delivery": {
+                              "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                              "nullable": true,
+                              "properties": {
+                                "error": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "sent_at": {
+                                  "format": "date_time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "queued",
+                                    "deferred",
+                                    "sent",
+                                    "failed",
+                                    "suppressed",
+                                    "not_sent"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "status"
+                              ],
+                              "title": "BusinessActivationLinkEmail",
+                              "type": "object"
+                            },
                             "expires_at": {
                               "format": "date_time",
                               "type": "string"
@@ -248485,6 +248803,11 @@
                           "description": "Vendors: nickname",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "requester_email_verified": {
+                          "description": "Vendors (ADR-205): whether the requester verified their email",
+                          "nullable": true,
+                          "type": "boolean"
                         },
                         "status": {
                           "enum": [
@@ -248958,6 +249281,37 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "email_delivery": {
+                      "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                      "nullable": true,
+                      "properties": {
+                        "error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed",
+                            "not_sent"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ],
+                      "title": "BusinessActivationLinkEmail",
+                      "type": "object"
+                    },
                     "expires_at": {
                       "format": "date_time",
                       "type": "string"

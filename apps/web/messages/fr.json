@@ -11514,5 +11514,23 @@
     "sendNewLink": "Envoyer un nouveau lien",
     "newLinkSent": "Un nouveau lien arrive à {email}.",
     "signInForNewLink": "Connecte-toi pour recevoir un nouveau lien"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Confirmez votre adresse e-mail pour rejoindre la formule de {company}. Nous vous avons envoyé un lien à l'inscription.",
+      "resend": "Renvoyer le lien",
+      "sending": "Envoi…",
+      "sent": "Envoyé. Ouvrez le lien dans l'e-mail, puis revenez ici."
+    },
+    "vendor": {
+      "emailNotConfirmed": "E-mail non confirmé",
+      "emailNotConfirmedHint": "Ce compte n'a pas encore confirmé son e-mail : il ne peut donc pas recevoir de lien d'activation. Demandez-lui de le confirmer d'abord.",
+      "email": {
+        "sent": "Envoyé par e-mail au compte",
+        "pending": "E-mail en cours d'envoi",
+        "failed": "L'e-mail n'est pas arrivé. Copiez le lien et envoyez-le vous-même, ou envoyez-en un nouveau."
+      },
+      "resend": "Envoyer un nouveau lien"
+    }
   }
 }

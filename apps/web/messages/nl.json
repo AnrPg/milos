@@ -11514,5 +11514,23 @@
     "sendNewLink": "Nieuwe link sturen",
     "newLinkSent": "Er is een nieuwe link onderweg naar {email}.",
     "signInForNewLink": "Log in voor een nieuwe link"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Bevestig je e-mailadres om mee te doen met het abonnement van {company}. We stuurden je een link toen je je aanmeldde.",
+      "resend": "Link opnieuw sturen",
+      "sending": "Versturen…",
+      "sent": "Verstuurd. Open de link in de e-mail en kom dan hier terug."
+    },
+    "vendor": {
+      "emailNotConfirmed": "E-mail niet bevestigd",
+      "emailNotConfirmedHint": "Dit account heeft zijn e-mailadres nog niet bevestigd en kan dus geen activeringslink krijgen. Vraag om het eerst te bevestigen.",
+      "email": {
+        "sent": "Per e-mail naar het account gestuurd",
+        "pending": "E-mail onderweg",
+        "failed": "De e-mail is niet aangekomen. Kopieer de link en stuur hem zelf, of stuur een nieuwe."
+      },
+      "resend": "Nieuwe link sturen"
+    }
   }
 }

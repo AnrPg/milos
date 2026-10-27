@@ -76,6 +76,7 @@ const businessRequest = (extra: Record<string, unknown> = {}) => ({
   message: null,
   organization_id: "org-1",
   requested_by: "Apostolos",
+  requester_email_verified: true,
   inserted_at: NOW,
   decided_at: null,
   decision_note: null,
@@ -90,9 +91,10 @@ const activationLink = (extra: Record<string, unknown> = {}) => ({
   role: "owner",
   state: "live",
   token: "act-token",
-  path: "/activate-business?token=act-token",
+  path: "/activate-business#token=act-token",
   expires_at: "2026-10-30T09:00:00Z",
   inserted_at: NOW,
+  email_delivery: { status: "queued", error: null, sent_at: null },
   ...extra,
 });
 
@@ -306,41 +308,47 @@ test.describe("demo mode", () => {
 });
 
 test.describe("activation link", () => {
-  test("the link shows what activation does, activates the business and opens its console", async ({ page }) => {
-    const sent: { inspected: unknown[]; redeemed: unknown[] } = { inspected: [], redeemed: [] };
-    await signedIn(page, OWNER, [ownerMembership("demo")]);
-    await page.route("**/api/business-activation/inspect", (route) => {
-      sent.inspected.push(route.request().postDataJSON());
-      return route.fulfill(
-        json({
-          organization: organization(),
-          role: "owner",
-          demo: { rows: 42, people: 8, sections: ["members", "schedule"] },
-          expires_at: "2026-10-30T09:00:00Z",
-        }),
-      );
+  // ADR-205: emails carry the token in the fragment; older links in the query.
+  for (const [form, url] of [
+    ["fragment", "/activate-business#token=act-token"],
+    ["query", "/activate-business?token=act-token"],
+  ] as const) {
+    test(`the link (${form} form) shows what activation does, activates the business and opens its console`, async ({ page }) => {
+      const sent: { inspected: unknown[]; redeemed: unknown[] } = { inspected: [], redeemed: [] };
+      await signedIn(page, OWNER, [ownerMembership("demo")]);
+      await page.route("**/api/business-activation/inspect", (route) => {
+        sent.inspected.push(route.request().postDataJSON());
+        return route.fulfill(
+          json({
+            organization: organization(),
+            role: "owner",
+            demo: { rows: 42, people: 8, sections: ["members", "schedule"] },
+            expires_at: "2026-10-30T09:00:00Z",
+          }),
+        );
+      });
+      await page.route("**/api/business-activation/redeem", (route) => {
+        sent.redeemed.push(route.request().postDataJSON());
+        return route.fulfill(
+          json({ organization: organization({ activation: "active", activated_at: NOW }), removed: { rows: 42, people: 8 }, roles: ["owner"] }),
+        );
+      });
+      await page.goto(url);
+
+      const main = page.getByRole("main");
+      await expect(main.getByText("Box Kypseli", { exact: true })).toBeVisible();
+      await expect(main.getByText("Gym or box · Owner")).toBeVisible();
+      await expect(main.getByText("The demo data is removed (42 records, including 8 demo people).")).toBeVisible();
+      expect(sent.inspected).toEqual([{ token: "act-token" }]);
+
+      await page.getByRole("button", { name: "Activate", exact: true }).click();
+      await expect(page.getByText("Box Kypseli is active.", { exact: false })).toBeVisible();
+      expect(sent.redeemed).toEqual([{ token: "act-token" }]);
+
+      await page.getByRole("button", { name: "Go to my console" }).click();
+      await expect(page).toHaveURL(/\/org\/kypseli\/admin/);
     });
-    await page.route("**/api/business-activation/redeem", (route) => {
-      sent.redeemed.push(route.request().postDataJSON());
-      return route.fulfill(
-        json({ organization: organization({ activation: "active", activated_at: NOW }), removed: { rows: 42, people: 8 }, roles: ["owner"] }),
-      );
-    });
-    await page.goto("/activate-business?token=act-token");
-
-    const main = page.getByRole("main");
-    await expect(main.getByText("Box Kypseli", { exact: true })).toBeVisible();
-    await expect(main.getByText("Gym or box · Owner")).toBeVisible();
-    await expect(main.getByText("The demo data is removed (42 records, including 8 demo people).")).toBeVisible();
-    expect(sent.inspected).toEqual([{ token: "act-token" }]);
-
-    await page.getByRole("button", { name: "Activate", exact: true }).click();
-    await expect(page.getByText("Box Kypseli is active.", { exact: false })).toBeVisible();
-    expect(sent.redeemed).toEqual([{ token: "act-token" }]);
-
-    await page.getByRole("button", { name: "Go to my console" }).click();
-    await expect(page).toHaveURL(/\/org\/kypseli\/admin/);
-  });
+  }
 });
 
 test.describe("vendor queue", () => {
@@ -354,7 +362,7 @@ test.describe("vendor queue", () => {
           demo_businesses: [
             {
               organization: organization({ id: "org-2", slug: "maria-coaching", name: "Maria Coaching", provider_kind: "coach" }),
-              owners: [{ user_id: "maria-1", nickname: "Maria" }],
+              owners: [{ user_id: "maria-1", nickname: "Maria", email_verified: true }],
               link: null,
             },
           ],
@@ -373,7 +381,7 @@ test.describe("vendor queue", () => {
       sent.links.push(body);
       return route.fulfill(
         json(
-          activationLink({ id: "link-2", organization_id: "org-2", user_id: body.user_id, nickname: "Maria", role: body.role, token: "maria-token", path: "/activate-business?token=maria-token" }),
+          activationLink({ id: "link-2", organization_id: "org-2", user_id: body.user_id, nickname: "Maria", role: body.role, token: "maria-token", path: "/activate-business#token=maria-token" }),
           201,
         ),
       );
@@ -388,13 +396,65 @@ test.describe("vendor queue", () => {
     await request.getByRole("button", { name: "Issue activation link" }).click();
 
     await expect(request.getByText("Activation link (Admin).", { exact: false })).toBeVisible();
-    await expect(request.getByRole("textbox", { name: "Activation link" })).toHaveValue(/\/activate-business\?token=act-token$/);
+    await expect(request.getByRole("textbox", { name: "Activation link" })).toHaveValue(/\/activate-business#token=act-token$/);
+    // ADR-205: the link is also emailed to the account.
+    await expect(request.getByText("Email on its way")).toBeVisible();
     expect(sent.decisions).toEqual([{ decision: "approve", note: null, role: "admin" }]);
 
     const demo = page.getByRole("region", { name: "In demo mode" }).getByRole("article").filter({ hasText: "Maria Coaching" });
     await expect(demo.getByText("Independent coach · /maria-coaching", { exact: false })).toBeVisible();
     await demo.getByRole("button", { name: "Issue activation link" }).click();
-    await expect(demo.getByRole("textbox", { name: "Activation link" })).toHaveValue(/\/activate-business\?token=maria-token$/);
+    await expect(demo.getByRole("textbox", { name: "Activation link" })).toHaveValue(/\/activate-business#token=maria-token$/);
     expect(sent.links).toEqual([{ role: "owner", user_id: "maria-1" }]);
+
+    // «Send a new link» issues a fresh link (and email) for the same account and role.
+    await demo.getByRole("button", { name: "Send a new link" }).click();
+    await expect.poll(() => sent.links.length).toBe(2);
+    expect(sent.links[1]).toEqual({ role: "owner", user_id: "maria-1" });
+  });
+
+  // ADR-205: a link goes only to a confirmed email.
+  test("an account without a confirmed email is flagged and gets no link; a failed email says so", async ({ page }) => {
+    await signedIn(page, VENDOR);
+    await page.route("**/api/platform/business-accounts", (route) =>
+      route.fulfill(
+        json({
+          requests: [businessRequest({ requester_email_verified: false })],
+          demo_businesses: [
+            {
+              organization: organization({ id: "org-2", slug: "maria-coaching", name: "Maria Coaching", provider_kind: "coach" }),
+              owners: [{ user_id: "maria-1", nickname: "Maria", email_verified: false }],
+              link: null,
+            },
+            {
+              organization: organization({ id: "org-3", slug: "nikos-box", name: "Nikos Box" }),
+              owners: [{ user_id: "nikos-1", nickname: "Nikos", email_verified: true }],
+              link: activationLink({
+                id: "link-3",
+                organization_id: "org-3",
+                user_id: "nikos-1",
+                nickname: "Nikos",
+                token: null,
+                path: null,
+                email_delivery: { status: "failed", error: null, sent_at: null },
+              }),
+            },
+          ],
+        }),
+      ),
+    );
+    await page.goto("/platform/business-accounts");
+
+    const request = page.getByRole("region", { name: "Requests" }).getByRole("article").filter({ hasText: "Box Kypseli" });
+    await expect(request.getByText("Email not confirmed")).toBeVisible();
+    await expect(request.getByRole("button", { name: "Issue activation link" })).toBeDisabled();
+
+    const demos = page.getByRole("region", { name: "In demo mode" });
+    const maria = demos.getByRole("article").filter({ hasText: "Maria Coaching" });
+    await expect(maria.getByText("Email not confirmed")).toBeVisible();
+    await expect(maria.getByRole("button", { name: "Issue activation link" })).toBeDisabled();
+
+    const nikos = demos.getByRole("article").filter({ hasText: "Nikos Box" });
+    await expect(nikos.getByText("The email didn't arrive.", { exact: false })).toBeVisible();
   });
 });

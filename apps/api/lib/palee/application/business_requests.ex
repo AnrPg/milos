@@ -11,7 +11,8 @@ defmodule Palee.Application.BusinessRequests do
 
   A vendor (`/platform/business-accounts`):
   - sees the pending requests and the businesses in demo mode with their
-    owners and live links (`queue/1`);
+    owners and live links (`queue/1`), whether each account's email is
+    verified and how the live link's email fared (ADR-205);
   - **approves a conversion**: the business is created, in demo mode, owned
     by the requester, and its activation request is queued;
   - **approves an activation request**: issues the activation link for the
@@ -94,7 +95,23 @@ defmodule Palee.Application.BusinessRequests do
         Enum.map(requests, & &1.user_id) ++
           Enum.map(links, & &1.user_id) ++ Enum.flat_map(businesses, & &1.owner_ids)
 
-      {:ok, %{requests: requests, demo_businesses: businesses, accounts: accounts(user_ids)}}
+      people = user_ids |> Enum.uniq() |> Identity.list_by_ids()
+
+      live =
+        Enum.filter(
+          links,
+          &(BusinessAccounts.activation_link_state(&1, DateTime.utc_now()) == :live)
+        )
+
+      {:ok,
+       %{
+         requests: requests,
+         demo_businesses: businesses,
+         accounts: Map.new(people, &{&1.id, &1.nickname}),
+         # ADR-205: a link goes only to a verified email; the queue shows who is not.
+         verified: people |> Enum.filter(&Identity.email_verified?/1) |> MapSet.new(& &1.id),
+         emails: BusinessActivation.email_deliveries(live)
+       }}
     end
   end
 
@@ -166,14 +183,6 @@ defmodule Palee.Application.BusinessRequests do
       owner_ids: owners,
       link: Enum.find(links, &(&1.organization_id == organization.id))
     }
-  end
-
-  # Nicknames of the requesters, link holders and owners, in one read.
-  defp accounts(user_ids) do
-    user_ids
-    |> Enum.uniq()
-    |> Identity.list_by_ids()
-    |> Map.new(&{&1.id, &1.nickname})
   end
 
   defp owner(context) do

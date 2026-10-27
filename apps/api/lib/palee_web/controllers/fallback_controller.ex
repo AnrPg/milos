@@ -21,6 +21,8 @@ defmodule PaleeWeb.FallbackController do
     invalid_activation_lifetime:
       {:unprocessable_entity, "A link lasts between one hour and 30 days"},
     account_not_found: {:not_found, "No account matches"},
+    activation_email_unverified:
+      {:unprocessable_entity, "The account has not confirmed its email address yet"},
     unknown_demo_section: {:unprocessable_entity, "There is no demo data for this screen"},
     demo_source_not_deletable:
       {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
@@ -2552,6 +2554,8 @@ defmodule PaleeWeb.FallbackController do
     corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
     invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
     corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
+    corporate_email_unverified:
+      {:forbidden, "Confirm your email address to join your company's plan"},
     corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
     add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
     last_owner: {:conflict, "A gym needs at least one owner"},

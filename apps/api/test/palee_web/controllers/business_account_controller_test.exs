@@ -7,12 +7,13 @@ defmodule PaleeWeb.BusinessAccountControllerTest do
   """
   use PaleeWeb.ConnCase, async: false
 
+  import Palee.EmailCase
   import Palee.TestFixtures
 
   alias Palee.{BusinessAccounts, Identity, Notifications, Organizations}
 
   setup %{conn: conn} do
-    owner = user_fixture()
+    owner = verified!(user_fixture())
     vendor = user_fixture()
     {:ok, _vendor} = Organizations.grant_vendor(vendor.id)
 
@@ -22,6 +23,12 @@ defmodule PaleeWeb.BusinessAccountControllerTest do
       vendor: vendor,
       as: fn user -> put_bearer_token(conn, user) end
     }
+  end
+
+  # ADR-205: an activation link goes only to a verified email.
+  defp verified!(user) do
+    :ok = Identity.mark_email_verified(user.login_id, user.email)
+    Identity.find_by_id(user.id)
   end
 
   defp send_json(conn, method, path, body \\ %{}) do
@@ -278,7 +285,7 @@ defmodule PaleeWeb.BusinessAccountControllerTest do
                })
                |> json_response(409)
 
-      partner = user_fixture()
+      partner = verified!(user_fixture())
 
       assert %{"code" => "account_not_found"} =
                ctx.as.(ctx.vendor)
@@ -325,6 +332,123 @@ defmodule PaleeWeb.BusinessAccountControllerTest do
                |> json_response(200)
 
       assert NaiveDateTime.diff(trial_ends_at(org_id), NaiveDateTime.utc_now(), :day) >= 29
+    end
+  end
+
+  describe "verified email and the emailed link (ADR-205)" do
+    test "an unverified account gets no link; a verified one gets it by email", ctx do
+      %{"id" => org_id} = sign_up!(ctx)
+      admin = user_fixture(%{email: "admin#{System.unique_integer([:positive])}@example.com"})
+
+      issue = fn body ->
+        ctx.as.(ctx.vendor)
+        |> send_json(:post, "/api/platform/organizations/#{org_id}/activation-links", body)
+      end
+
+      assert %{"code" => "activation_email_unverified"} =
+               issue.(%{role: "admin", user_id: admin.id}) |> json_response(422)
+
+      refute_email_enqueued(kind: :business_activation_link, user_id: admin.id)
+
+      # The queue shows who has not confirmed.
+      queue = ctx.as.(ctx.vendor) |> get("/api/platform/business-accounts") |> json_response(200)
+      business = Enum.find(queue["demo_businesses"], &(&1["organization"]["id"] == org_id))
+      assert [%{"user_id" => owner_id, "email_verified" => true}] = business["owners"]
+      assert owner_id == ctx.owner.id
+      request = Enum.find(queue["requests"], &(&1["organization_id"] == org_id))
+      assert request["requester_email_verified"] == true
+
+      # The queue flags a requester who has not confirmed their email.
+      unverified = user_fixture()
+      age_account!(unverified)
+
+      %{"id" => conversion_id} =
+        ctx.as.(unverified)
+        |> send_json(:post, "/api/me/business-requests", %{
+          business_kind: "gym",
+          business_name: "Unverified Box #{System.unique_integer([:positive])}"
+        })
+        |> json_response(201)
+
+      queue = ctx.as.(ctx.vendor) |> get("/api/platform/business-accounts") |> json_response(200)
+
+      assert %{"requester_email_verified" => false} =
+               Enum.find(queue["requests"], &(&1["id"] == conversion_id))
+
+      # The verified owner: the link is emailed in their language, with the fragment form.
+      Palee.Repo.query!("UPDATE users SET preferred_locale = 'el' WHERE id = $1", [
+        Ecto.UUID.dump!(ctx.owner.id)
+      ])
+
+      assert %{
+               "token" => token,
+               "id" => link_id,
+               "path" => "/activate-business#token=" <> token,
+               "email_delivery" => %{"status" => "queued"}
+             } = issue.(%{role: "owner", user_id: ctx.owner.id}) |> json_response(201)
+
+      email =
+        assert_email_enqueued(
+          kind: :business_activation_link,
+          to: ctx.owner.email,
+          category: :account,
+          idempotency_key: "business_activation_link:#{link_id}"
+        )
+
+      assert email.locale == "el"
+      assert email.subject =~ "Ενεργοποιήστε"
+      assert email.text =~ "/activate-business#token=" <> token
+      assert email.html =~ "/activate-business#token=" <> token
+
+      # The queue shows how the email fared.
+      assert deliver_enqueued_emails() >= 1
+      queue = ctx.as.(ctx.vendor) |> get("/api/platform/business-accounts") |> json_response(200)
+      business = Enum.find(queue["demo_businesses"], &(&1["organization"]["id"] == org_id))
+      assert %{"id" => ^link_id, "email_delivery" => %{"status" => "sent"}} = business["link"]
+    end
+
+    test "opening the emailed link marks the address verified", ctx do
+      %{"id" => org_id} = sign_up!(ctx)
+
+      assert %{"token" => token} =
+               ctx.as.(ctx.vendor)
+               |> send_json(:post, "/api/platform/organizations/#{org_id}/activation-links", %{
+                 role: "owner",
+                 user_id: ctx.owner.id
+               })
+               |> json_response(201)
+
+      # The verification was lost since (say, an email change back and forth).
+      Palee.Repo.query!("UPDATE logins SET email_verified_at = NULL WHERE id = $1", [
+        Ecto.UUID.dump!(ctx.owner.login_id)
+      ])
+
+      refute Identity.email_verified?(Identity.find_by_id(ctx.owner.id))
+
+      ctx.as.(ctx.owner)
+      |> send_json(:post, "/api/business-activation/inspect", %{token: token})
+      |> json_response(200)
+
+      assert Identity.email_verified?(Identity.find_by_id(ctx.owner.id))
+    end
+
+    test "a refused email never undoes the link", ctx do
+      %{"id" => org_id} = sign_up!(ctx)
+      {:ok, _} = Palee.Email.suppress(ctx.owner.email, :bounce)
+
+      assert %{
+               "token" => token,
+               "email_delivery" => %{"status" => "not_sent", "error" => "suppressed"}
+             } =
+               ctx.as.(ctx.vendor)
+               |> send_json(:post, "/api/platform/organizations/#{org_id}/activation-links", %{
+                 role: "owner",
+                 user_id: ctx.owner.id
+               })
+               |> json_response(201)
+
+      assert is_binary(token)
+      refute_email_enqueued(kind: :business_activation_link)
     end
   end
 
