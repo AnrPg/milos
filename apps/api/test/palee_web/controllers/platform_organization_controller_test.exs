@@ -363,6 +363,36 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
     refute Map.has_key?(delivery, "to_address")
   end
 
+  test "ADR-210: the owner who signs up through the emailed link has a verified email",
+       context do
+    gym = provision_emailed_gym(context)
+
+    json_response(
+      email_invitation(context, gym.organization_id, %{
+        email: "owner@example.test",
+        token: gym.token
+      }),
+      202
+    )
+
+    register_conn =
+      context.conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/auth/register-admin",
+        Jason.encode!(%{
+          nickname: "emailed_owner",
+          password: "S3cur3P@ss!42",
+          invitation_token: gym.token,
+          email: "owner@example.test"
+        })
+      )
+
+    assert %{"access_token" => _} = json_response(register_conn, 201)
+    assert Identity.email_verified?(Identity.find_by_nickname("emailed_owner"))
+  end
+
   test "ADR-210: the vendor's language pick wins; sending again is idempotent, resend is not",
        context do
     gym = provision_emailed_gym(context)

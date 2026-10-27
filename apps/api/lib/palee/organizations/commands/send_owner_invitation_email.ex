@@ -21,7 +21,7 @@ defmodule Palee.Organizations.Commands.SendOwnerInvitationEmail do
   """
 
   alias Palee.Application.PublicURL
-  alias Palee.Email
+  alias Palee.{Email, Organizations}
   alias Palee.Identity.Domain.Locale
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Organizations.{OrganizationStore, PlatformContext}
@@ -96,7 +96,7 @@ defmodule Palee.Organizations.Commands.SendOwnerInvitationEmail do
                  context.user_id,
                  InvitationEmail.digest(to)
                ),
-             :ok <- mark_emailed(invitation.id, now) do
+             :ok <- Organizations.mark_invitation_emailed(invitation.id, now) do
           {:ok, message}
         end
       end)
@@ -104,14 +104,6 @@ defmodule Palee.Organizations.Commands.SendOwnerInvitationEmail do
     |> case do
       {:ok, message} -> Email.status(message.id)
       error -> error
-    end
-  end
-
-  defp mark_emailed(invitation_id, now) do
-    case Palee.Organizations.mark_invitation_emailed(invitation_id, now) do
-      :ok -> :ok
-      {:ok, _invitation} -> :ok
-      {:error, _reason} = error -> error
     end
   end
 

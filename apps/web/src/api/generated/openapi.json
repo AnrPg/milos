@@ -127847,6 +127847,96 @@
         ]
       }
     },
+    "/api/me/share-links/email": {
+      "post": {
+        "callbacks": {},
+        "description": "The link is rebuilt from `token` and must be yours and still usable. Needs a verified email; at most 10 a day. The same link to the same address is sent once.",
+        "operationId": "PaleeWeb.ShareLinkEmailController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "link": {
+                    "enum": [
+                      "guest_pass",
+                      "buddy_invite",
+                      "referral"
+                    ],
+                    "type": "string"
+                  },
+                  "to": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "token": {
+                    "description": "The guest pass or buddy invite token, or the referral code",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "link",
+                  "token",
+                  "to"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "delivery"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email one of your share links to an address (ADR-210)",
+        "tags": [
+          "Share links"
+        ]
+      }
+    },
     "/api/me/social": {
       "get": {
         "callbacks": {},
@@ -249145,6 +249235,14 @@
                   "email": {
                     "type": "string"
                   },
+                  "locale": {
+                    "description": "The email's language (ADR-210)",
+                    "type": "string"
+                  },
+                  "resend": {
+                    "description": "Queue another email",
+                    "type": "boolean"
+                  },
                   "token": {
                     "type": "string"
                   }
@@ -249160,8 +249258,63 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "Invitation email sent"
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery": {
+                      "properties": {
+                        "attempts": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "attempts",
+                        "inserted_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "delivery"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued invitation email"
           }
         },
         "security": [
@@ -249170,6 +249323,104 @@
           }
         ],
         "summary": "Email an already-issued invitation's setup link to its recipient",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/invitations/{invitation_id}/email": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformOrganizationController.invitation_deliveries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deliveries": {
+                      "items": {
+                        "properties": {
+                          "attempts": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "sent_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued",
+                              "deferred",
+                              "sent",
+                              "failed",
+                              "suppressed"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "attempts",
+                          "inserted_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "deliveries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deliveries"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The delivery status of an invitation's setup emails, newest first (ADR-210)",
         "tags": [
           "Platform Organizations"
         ]

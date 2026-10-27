@@ -3431,6 +3431,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/share-links/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email one of your share links to an address (ADR-210)
+         * @description The link is rebuilt from `token` and must be yours and still usable. Needs a verified email; at most 10 a day. The same link to the same address is sent once.
+         */
+        post: operations["PaleeWeb.ShareLinkEmailController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/social": {
         parameters: {
             query?: never;
@@ -12062,6 +12082,23 @@ export interface paths {
         put?: never;
         /** Email an already-issued invitation's setup link to its recipient */
         post: operations["PaleeWeb.PlatformOrganizationController.invitation_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/invitations/{invitation_id}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The delivery status of an invitation's setup emails, newest first (ADR-210) */
+        get: operations["PaleeWeb.PlatformOrganizationController.invitation_deliveries"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -55808,6 +55845,44 @@ export interface operations {
                             nickname?: string;
                             role?: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShareLinkEmailController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    link: "guest_pass" | "buddy_invite" | "referral";
+                    /** Format: email */
+                    to: string;
+                    /** @description The guest pass or buddy invite token, or the referral code */
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        delivery: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
                     };
                 };
             };
@@ -100199,17 +100274,74 @@ export interface operations {
             content: {
                 "application/json": {
                     email: string;
+                    /** @description The email's language (ADR-210) */
+                    locale?: string;
+                    /** @description Queue another email */
+                    resend?: boolean;
                     token: string;
                 };
             };
         };
         responses: {
-            /** @description Invitation email sent */
-            204: {
+            /** @description Queued invitation email */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        delivery: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformOrganizationController.invitation_deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deliveries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deliveries: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        }[];
+                    };
+                };
             };
         };
     };
