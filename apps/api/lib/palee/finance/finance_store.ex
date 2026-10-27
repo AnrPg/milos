@@ -289,6 +289,10 @@ defmodule Palee.Finance.FinanceStore do
   def list_corporate_seats(client_id), do: adapter().list_corporate_seats(client_id)
 
   @impl true
+  def end_email_domain_seats(user_ids, email),
+    do: adapter().end_email_domain_seats(user_ids, email)
+
+  @impl true
   def generate_corporate_invoice(client_id, on),
     do: adapter().generate_corporate_invoice(client_id, on)
 
