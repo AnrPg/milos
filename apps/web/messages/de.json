@@ -9509,7 +9509,7 @@
     "handleTaken": "Vergeben",
     "handleTakenError": "Dieser Benutzername ist schon vergeben.",
     "handleTryInstead": "Wie wäre es mit @{handle}?",
-    "emailNotice": "Nimm eine E-Mail-Adresse, auf die du Zugriff hast. Falls du dein Passwort einmal vergisst, schicken wir den Link zum Zurücksetzen dorthin. Sie ist dein Weg zurück, wenn auch deine Wiederherstellungscodes weg sind.",
+    "emailNotice": "Nimm eine E-Mail-Adresse, auf die du Zugriff hast. Wir schicken dir dorthin einen Link zur Bestätigung, und dorthin kommt auch der Link zum Zurücksetzen, falls du einmal dein Passwort vergisst.",
     "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
     "emailInUseCount": "Diese E-Mail-Adresse hat schon {count} von {limit} Konten.",
     "emailInUseAddProfile": "Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",
@@ -11489,5 +11489,48 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "emailVerification": {
+    "bannerText": "Bestätige deine E-Mail-Adresse. Wir haben einen Link an {email} geschickt.",
+    "resend": "Erneut senden",
+    "resending": "Wird gesendet…",
+    "resent": "Gesendet. Schau in dein Postfach.",
+    "throttled": "Gerade wurde ein Link gesendet. Versuch es in {seconds} s noch einmal.",
+    "throttledLong": "Du hast heute schon mehrere Links angefordert. Versuch es später noch einmal.",
+    "changeEmail": "E-Mail ändern",
+    "dismiss": "Vorerst ausblenden",
+    "pageTitle": "E-Mail bestätigen",
+    "confirming": "Deine E-Mail-Adresse wird bestätigt…",
+    "verifiedTitle": "E-Mail bestätigt",
+    "verifiedBody": "Danke, deine E-Mail-Adresse ist bestätigt.",
+    "alreadyVerifiedBody": "Deine E-Mail-Adresse ist schon bestätigt.",
+    "continue": "Weiter",
+    "signIn": "Anmelden",
+    "problemTitle": "Dieser Link kann nicht verwendet werden",
+    "invalidBody": "Dieser Link ist ungültig. Fordere in der App einen neuen an.",
+    "usedBody": "Dieser Link wurde schon verwendet. Melde dich an, um zu sehen, ob deine E-Mail-Adresse bestätigt ist, oder fordere einen neuen Link an.",
+    "expiredBody": "Dieser Link ist abgelaufen. Fordere einen neuen an.",
+    "emailChangedBody": "Die E-Mail-Adresse deines Kontos hat sich geändert, nachdem dieser Link gesendet wurde. Nimm den Link, den wir an die neue Adresse geschickt haben.",
+    "sendNewLink": "Neuen Link senden",
+    "newLinkSent": "Ein neuer Link ist unterwegs an {email}.",
+    "signInForNewLink": "Melde dich an, um einen neuen Link zu bekommen"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Bestätige deine E-Mail-Adresse, um dem Tarif von {company} beizutreten. Wir haben dir bei der Registrierung einen Link geschickt.",
+      "resend": "Link erneut senden",
+      "sending": "Wird gesendet…",
+      "sent": "Gesendet. Öffne den Link in der E-Mail und komm dann hierher zurück."
+    },
+    "vendor": {
+      "emailNotConfirmed": "E-Mail nicht bestätigt",
+      "emailNotConfirmedHint": "Dieses Konto hat seine E-Mail-Adresse noch nicht bestätigt und kann daher keinen Aktivierungslink erhalten. Bitte es, sie zuerst zu bestätigen.",
+      "email": {
+        "sent": "Per E-Mail an das Konto gesendet",
+        "pending": "E-Mail unterwegs",
+        "failed": "Die E-Mail ist nicht angekommen. Kopiere den Link und schick ihn selbst oder sende einen neuen."
+      },
+      "resend": "Neuen Link senden"
+    }
   }
 }

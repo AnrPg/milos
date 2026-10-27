@@ -256,37 +256,4 @@ defmodule Palee.Application.EmailChangeTest do
       assert {:error, :expired_link} = EmailChange.revert(raw)
     end
   end
-
-  describe "EmailChangeHooks" do
-    setup do
-      previous = Application.get_env(:palee, :email_change_hooks)
-      Application.put_env(:palee, :email_change_hooks, [{__MODULE__.Hook, :changed}, {Nope, :x}])
-      Process.register(self(), :email_change_hook_test)
-
-      on_exit(fn ->
-        if previous,
-          do: Application.put_env(:palee, :email_change_hooks, previous),
-          else: Application.delete_env(:palee, :email_change_hooks)
-      end)
-    end
-
-    test "run after a confirmed change and after a revert; a missing module is skipped", %{
-      user: user
-    } do
-      old = user.email
-      {_status, token} = request!(user, "new@box.test")
-      {:ok, _} = EmailChange.confirm(token)
-      login_id = user.login_id
-      assert_received {:hook, ^login_id, ^old, "new@box.test"}
-
-      {:ok, raw, _} = LinkTokens.issue(:email_change_revert, login_id, target_email: old)
-      {:ok, _} = EmailChange.revert(raw)
-      assert_received {:hook, ^login_id, "new@box.test", ^old}
-    end
-  end
-
-  defmodule Hook do
-    def changed(login_id, old, new),
-      do: send(:email_change_hook_test, {:hook, login_id, old, new})
-  end
 end

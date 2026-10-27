@@ -170,3 +170,25 @@ export function activationUrl(path: string | null | undefined) {
   if (typeof window === "undefined") return path;
   return `${window.location.origin}${path}`;
 }
+
+/**
+ * ADR-205: the activation token a link brings: the fragment form
+ * (`#token=…`, what emails and the copy button use) or the older query form.
+ */
+export function activationTokenFrom(queryToken: string | null | undefined, hash: string): string {
+  const fromHash = new URLSearchParams(hash.replace(/^#/, "")).get("token")?.trim();
+  return fromHash || queryToken?.trim() || "";
+}
+
+/** ADR-205: the code a vendor gets for an account whose email is not confirmed. */
+export const ACTIVATION_EMAIL_UNVERIFIED_CODE = "activation_email_unverified";
+
+export type ActivationEmailDelivery = NonNullable<BusinessActivationLink["email_delivery"]>;
+
+/** How the vendor console words a link's email: sent, on its way, or not delivered. */
+export function activationEmailState(delivery: ActivationEmailDelivery | null | undefined) {
+  if (!delivery) return null;
+  if (delivery.status === "sent") return "sent" as const;
+  if (delivery.status === "queued" || delivery.status === "deferred") return "pending" as const;
+  return "failed" as const;
+}

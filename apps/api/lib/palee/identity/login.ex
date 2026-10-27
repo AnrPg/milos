@@ -43,6 +43,12 @@ defmodule Palee.Identity.Login do
     |> then(fn changeset ->
       if get_change(changeset, :email), do: validate_email(changeset), else: changeset
     end)
+    # ADR-213: a new address is unverified until a link to it is opened.
+    |> then(fn changeset ->
+      if get_change(changeset, :email),
+        do: put_change(changeset, :email_verified_at, nil),
+        else: changeset
+    end)
     |> then(fn changeset ->
       if get_change(changeset, :password), do: validate_password(changeset), else: changeset
     end)

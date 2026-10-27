@@ -31,6 +31,37 @@ msgstr "Hallo %{name},"
 msgid "Hello,"
 msgstr "Hallo,"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Bestätigen Sie Ihre E-Mail-Adresse"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Bitte bestätigen Sie, dass %{email} Ihre E-Mail-Adresse ist. So kommen Sie wieder in Ihr Konto, falls Sie einmal Ihr Passwort vergessen."
+
+msgid "Confirm email"
+msgstr "E-Mail-Adresse bestätigen"
+
+msgid "This link expires in 48 hours."
+msgstr "Dieser Link ist 48 Stunden gültig."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Wenn Sie kein %{product}-Konto erstellt haben, können Sie diese E-Mail ignorieren."
+msgid "Activate %{business} on %{product}"
+msgstr "Aktivieren Sie „%{business}“ auf %{product}"
+msgid "Your business is ready to go live"
+msgstr "Ihr Unternehmen ist startklar"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Das %{product}-Team hat „%{business}“ freigegeben. Öffnen Sie den Link, während Sie in Ihrem Konto angemeldet sind, um es zu aktivieren: Die Demodaten werden entfernt und das Unternehmen geht live."
+msgid "Your role: owner."
+msgstr "Ihre Rolle: Inhaber."
+msgid "Your role: admin."
+msgstr "Ihre Rolle: Administrator."
+msgid "Activate business"
+msgstr "Unternehmen aktivieren"
+msgid "It opens only for your own account."
+msgstr "Er funktioniert nur für Ihr eigenes Konto."
+
 msgid "Confirm your new email address"
 msgstr "Bestätigen Sie Ihre neue E-Mail-Adresse"
 

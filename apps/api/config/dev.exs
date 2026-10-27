@@ -69,3 +69,7 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# ADR-213: AUTO_VERIFY_EMAIL=true marks new logins' email verified instead of
+# emailing a link (the link also works: see /dev/mailbox). Dev only.
+config :palee, :auto_verify_email, System.get_env("AUTO_VERIFY_EMAIL") in ~w(true 1)

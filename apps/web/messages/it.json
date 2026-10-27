@@ -9509,7 +9509,7 @@
     "handleTaken": "Già in uso",
     "handleTakenError": "Questo nome utente è già in uso.",
     "handleTryInstead": "Prova @{handle}",
-    "emailNotice": "Usa un'email che puoi aprire. Se un giorno dimentichi la password, ti manderemo lì il link per reimpostarla. È la tua via d'accesso se hai perso anche i codici di recupero.",
+    "emailNotice": "Usa un'email che puoi aprire. Ti manderemo lì un link per confermarla, ed è lì che arriverà il link per reimpostare la password se un giorno la dimentichi.",
     "emailInvalid": "Inserisci un indirizzo email valido.",
     "emailInUseCount": "Questa email ha già {count} account su {limit}.",
     "emailInUseAddProfile": "Per aggiungere un altro profilo, accedi e aggiungilo da Impostazioni → Profili.",
@@ -11489,5 +11489,48 @@
     "placementSpace": "Spazio",
     "placementPickSpace": "Scegli uno spazio",
     "placementQuantity": "Quanti"
+  },
+  "emailVerification": {
+    "bannerText": "Conferma la tua email. Ti abbiamo inviato un link a {email}.",
+    "resend": "Invia di nuovo",
+    "resending": "Invio…",
+    "resent": "Inviato. Controlla la posta in arrivo.",
+    "throttled": "Abbiamo appena inviato un link. Riprova tra {seconds} s.",
+    "throttledLong": "Oggi hai già chiesto diversi link. Riprova più tardi.",
+    "changeEmail": "Cambia email",
+    "dismiss": "Nascondi per ora",
+    "pageTitle": "Conferma la tua email",
+    "confirming": "Stiamo confermando la tua email…",
+    "verifiedTitle": "Email confermata",
+    "verifiedBody": "Grazie, la tua email è confermata.",
+    "alreadyVerifiedBody": "La tua email è già confermata.",
+    "continue": "Continua",
+    "signIn": "Accedi",
+    "problemTitle": "Questo link non si può usare",
+    "invalidBody": "Questo link non è valido. Chiedine uno nuovo dall'app.",
+    "usedBody": "Questo link è già stato usato. Accedi per vedere se la tua email è confermata, oppure chiedi un nuovo link.",
+    "expiredBody": "Questo link è scaduto. Chiedine uno nuovo.",
+    "emailChangedBody": "L'email del tuo account è cambiata dopo l'invio di questo link. Usa il link che abbiamo inviato al nuovo indirizzo.",
+    "sendNewLink": "Invia un nuovo link",
+    "newLinkSent": "Un nuovo link sta arrivando a {email}.",
+    "signInForNewLink": "Accedi per ricevere un nuovo link"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Conferma il tuo indirizzo email per entrare nel piano di {company}. Ti abbiamo inviato un link al momento della registrazione.",
+      "resend": "Invia di nuovo il link",
+      "sending": "Invio…",
+      "sent": "Inviato. Apri il link nell'email, poi torna qui."
+    },
+    "vendor": {
+      "emailNotConfirmed": "Email non confermata",
+      "emailNotConfirmedHint": "Questo account non ha ancora confermato la sua email, quindi non può ricevere un link di attivazione. Chiedigli di confermarla prima.",
+      "email": {
+        "sent": "Inviato via email all'account",
+        "pending": "Email in arrivo",
+        "failed": "L'email non è arrivata. Copia il link e invialo tu, oppure inviane uno nuovo."
+      },
+      "resend": "Invia un nuovo link"
+    }
   }
 }

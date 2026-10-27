@@ -31,6 +31,37 @@ msgstr "שלום %{name},"
 msgid "Hello,"
 msgstr "שלום,"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "אישור כתובת המייל"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "נא לאשר ש-%{email} היא כתובת המייל שלכם. כך תוכלו לחזור לחשבון אם תשכחו אי פעם את הסיסמה."
+
+msgid "Confirm email"
+msgstr "אישור המייל"
+
+msgid "This link expires in 48 hours."
+msgstr "הקישור יפוג בעוד 48 שעות."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "אם לא יצרתם חשבון ב-%{product}, אפשר פשוט להתעלם מהמייל הזה."
+msgid "Activate %{business} on %{product}"
+msgstr "הפעילו את „%{business}” ב־%{product}"
+msgid "Your business is ready to go live"
+msgstr "העסק שלכם מוכן לעלות לאוויר"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "צוות %{product} אישר את „%{business}”. פתחו את הקישור כשאתם מחוברים לחשבון שלכם כדי להפעיל אותו: נתוני ההדגמה יוסרו והעסק יעלה לאוויר."
+msgid "Your role: owner."
+msgstr "התפקיד שלכם: בעלים."
+msgid "Your role: admin."
+msgstr "התפקיד שלכם: מנהל."
+msgid "Activate business"
+msgstr "הפעלת העסק"
+msgid "It opens only for your own account."
+msgstr "הוא נפתח רק עבור החשבון שלכם."
+
 msgid "Confirm your new email address"
 msgstr "אשרו את כתובת המייל החדשה"
 

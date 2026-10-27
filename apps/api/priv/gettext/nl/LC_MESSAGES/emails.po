@@ -31,6 +31,37 @@ msgstr "Beste %{name},"
 msgid "Hello,"
 msgstr "Hallo,"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Bevestig uw e-mailadres"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Bevestig dat %{email} uw e-mailadres is. Zo komt u weer in uw account als u ooit uw wachtwoord vergeet."
+
+msgid "Confirm email"
+msgstr "E-mailadres bevestigen"
+
+msgid "This link expires in 48 hours."
+msgstr "Deze link verloopt over 48 uur."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Als u geen %{product}-account hebt aangemaakt, kunt u deze e-mail negeren."
+msgid "Activate %{business} on %{product}"
+msgstr "Activeer ‘%{business}’ op %{product}"
+msgid "Your business is ready to go live"
+msgstr "Uw bedrijf is klaar om live te gaan"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Het %{product}-team heeft ‘%{business}’ goedgekeurd. Open de link terwijl u bent ingelogd op uw account om het te activeren: de demogegevens worden verwijderd en het bedrijf gaat live."
+msgid "Your role: owner."
+msgstr "Uw rol: eigenaar."
+msgid "Your role: admin."
+msgstr "Uw rol: beheerder."
+msgid "Activate business"
+msgstr "Bedrijf activeren"
+msgid "It opens only for your own account."
+msgstr "De link werkt alleen voor uw eigen account."
+
 msgid "Confirm your new email address"
 msgstr "Bevestig uw nieuwe e-mailadres"
 

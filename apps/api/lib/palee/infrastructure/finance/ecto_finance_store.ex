@@ -1703,7 +1703,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       params =
         params
         |> string_key_map()
-        |> Map.take(["starts_on"])
+        |> Map.take(["starts_on", "corporate_enrolled_via"])
         |> Map.put("corporate_client_id", client.id)
 
       subscription = insert_subscription!(membership, package, params)
@@ -1736,6 +1736,45 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       refresh_entitlement_snapshot(ended.membership_id)
       normalize_subscription(ended)
     end)
+  end
+
+  @impl true
+  def end_email_domain_seats(user_ids, email) when is_list(user_ids) do
+    Repo.transaction(fn ->
+      MembershipPackageSubscription
+      |> tenant_scope()
+      |> join(:inner, [subscription], membership in Membership,
+        on: membership.id == subscription.membership_id
+      )
+      |> where([subscription, membership], membership.user_id in ^user_ids)
+      |> where([subscription], subscription.corporate_enrolled_via == "email_domain")
+      |> where([subscription], subscription.status == "active")
+      |> lock("FOR UPDATE")
+      |> Repo.all()
+      |> Enum.reject(fn subscription ->
+        client = fetch_corporate_client(subscription.corporate_client_id)
+        terms = client && corporate_client_terms(client)
+
+        PaymentModelPolicy.email_in_domain?(email, terms && terms[:enrollment_domain])
+      end)
+      |> Enum.map(fn subscription ->
+        {:ok, ended} =
+          subscription
+          |> MembershipPackageSubscription.changeset(%{
+            "status" => "cancelled",
+            "ends_on" => GymClock.today()
+          })
+          |> Repo.update()
+
+        refresh_entitlement_snapshot(ended.membership_id)
+        normalize_subscription(ended)
+      end)
+    end)
+  end
+
+  defp corporate_client_terms(client) do
+    package = Repo.get(MembershipPackage, client.membership_package_id)
+    package_terms(package && package.params)
   end
 
   @impl true
@@ -5720,6 +5759,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       activated_on: subscription.activated_on,
       base_subscription_id: subscription.base_subscription_id,
       corporate_client_id: subscription.corporate_client_id,
+      corporate_enrolled_via: subscription.corporate_enrolled_via,
       referral_reward_applied: subscription.referral_reward_applied,
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at

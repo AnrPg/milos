@@ -9509,7 +9509,7 @@
     "handleTaken": "Ocupado",
     "handleTakenError": "Ese usuario ya está ocupado.",
     "handleTryInstead": "Prueba con @{handle}",
-    "emailNotice": "Usa un correo al que tengas acceso. Si algún día olvidas tu contraseña, te enviaremos ahí el enlace para restablecerla. Es tu forma de volver a entrar si también has perdido tus códigos de recuperación.",
+    "emailNotice": "Usa un correo al que tengas acceso. Te enviaremos ahí un enlace para confirmarlo, y ahí llegará el enlace para restablecer la contraseña si algún día la olvidas.",
     "emailInvalid": "Escribe un correo electrónico válido.",
     "emailInUseCount": "Este correo ya tiene {count} de {limit} cuentas.",
     "emailInUseAddProfile": "Para añadir otro perfil, inicia sesión y añádelo desde Ajustes → Perfiles.",
@@ -11489,5 +11489,48 @@
     "placementSpace": "Espacio",
     "placementPickSpace": "Elige un espacio",
     "placementQuantity": "Cuántas"
+  },
+  "emailVerification": {
+    "bannerText": "Confirma tu correo. Te enviamos un enlace a {email}.",
+    "resend": "Reenviar",
+    "resending": "Enviando…",
+    "resent": "Enviado. Revisa tu bandeja de entrada.",
+    "throttled": "Acabamos de enviar un enlace. Vuelve a intentarlo en {seconds} s.",
+    "throttledLong": "Hoy ya has pedido varios enlaces. Vuelve a intentarlo más tarde.",
+    "changeEmail": "Cambiar correo",
+    "dismiss": "Ocultar por ahora",
+    "pageTitle": "Confirma tu correo",
+    "confirming": "Confirmando tu correo…",
+    "verifiedTitle": "Correo confirmado",
+    "verifiedBody": "Gracias, tu correo está confirmado.",
+    "alreadyVerifiedBody": "Tu correo ya está confirmado.",
+    "continue": "Continuar",
+    "signIn": "Iniciar sesión",
+    "problemTitle": "Este enlace no se puede usar",
+    "invalidBody": "Este enlace no es válido. Pide uno nuevo desde la app.",
+    "usedBody": "Este enlace ya se usó. Inicia sesión para ver si tu correo está confirmado o pide un enlace nuevo.",
+    "expiredBody": "Este enlace ha caducado. Pide uno nuevo.",
+    "emailChangedBody": "El correo de tu cuenta cambió después de enviar este enlace. Usa el enlace que enviamos a la nueva dirección.",
+    "sendNewLink": "Enviar un enlace nuevo",
+    "newLinkSent": "Un enlace nuevo va de camino a {email}.",
+    "signInForNewLink": "Inicia sesión para recibir un enlace nuevo"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Confirma tu dirección de email para unirte al plan de {company}. Te enviamos un enlace al registrarte.",
+      "resend": "Reenviar el enlace",
+      "sending": "Enviando…",
+      "sent": "Enviado. Abre el enlace del email y vuelve aquí."
+    },
+    "vendor": {
+      "emailNotConfirmed": "Email sin confirmar",
+      "emailNotConfirmedHint": "Esta cuenta aún no ha confirmado su email, así que no puede recibir un enlace de activación. Pídele que lo confirme primero.",
+      "email": {
+        "sent": "Enviado por email a la cuenta",
+        "pending": "Email en camino",
+        "failed": "El email no llegó. Copia el enlace y envíalo tú o envía uno nuevo."
+      },
+      "resend": "Enviar un enlace nuevo"
+    }
   }
 }

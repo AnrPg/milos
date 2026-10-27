@@ -437,6 +437,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verification-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: email the signed-in person a new verification link */
+        post: operations["PaleeWeb.EmailVerificationController.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: confirm the login's email with the emailed link's token */
+        post: operations["PaleeWeb.EmailVerificationController.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-vocabulary": {
         parameters: {
             query?: never;
@@ -18662,6 +18696,17 @@ export interface components {
         BusinessAccountsQueue: {
             demo_businesses: {
                 link?: {
+                    /**
+                     * BusinessActivationLinkEmail
+                     * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                     */
+                    email_delivery?: {
+                        error?: string | null;
+                        /** Format: date_time */
+                        sent_at?: string | null;
+                        /** @enum {string} */
+                        status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                    } | null;
                     /** Format: date_time */
                     expires_at: string;
                     /** Format: uuid */
@@ -18697,6 +18742,8 @@ export interface components {
                     slug: string;
                 };
                 owners: {
+                    /** @description ADR-205: a link is only issued to a verified email */
+                    email_verified: boolean;
                     nickname?: string | null;
                     /** Format: uuid */
                     user_id: string;
@@ -18722,12 +18769,25 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             }[];
         };
         /** BusinessActivationLink */
         BusinessActivationLink: {
+            /**
+             * BusinessActivationLinkEmail
+             * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+             */
+            email_delivery?: {
+                error?: string | null;
+                /** Format: date_time */
+                sent_at?: string | null;
+                /** @enum {string} */
+                status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+            } | null;
             /** Format: date_time */
             expires_at: string;
             /** Format: uuid */
@@ -18748,6 +18808,17 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         };
+        /**
+         * BusinessActivationLinkEmail
+         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+         */
+        BusinessActivationLinkEmail: {
+            error?: string | null;
+            /** Format: date_time */
+            sent_at?: string | null;
+            /** @enum {string} */
+            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+        } | null;
         /** BusinessActivationPreview */
         BusinessActivationPreview: {
             demo: {
@@ -18844,6 +18915,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             } | null;
@@ -18906,6 +18979,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             };
@@ -18931,12 +19006,25 @@ export interface components {
             phone?: string | null;
             /** @description Vendors: nickname */
             requested_by?: string | null;
+            /** @description Vendors (ADR-205): whether the requester verified their email */
+            requester_email_verified?: boolean | null;
             /** @enum {string} */
             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
         };
         /** BusinessRequestDecision */
         BusinessRequestDecision: {
             activation_link?: {
+                /**
+                 * BusinessActivationLinkEmail
+                 * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                 */
+                email_delivery?: {
+                    error?: string | null;
+                    /** Format: date_time */
+                    sent_at?: string | null;
+                    /** @enum {string} */
+                    status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                } | null;
                 /** Format: date_time */
                 expires_at: string;
                 /** Format: uuid */
@@ -18991,6 +19079,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             };
@@ -19017,6 +19107,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             }[];
@@ -39983,6 +40075,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -40098,6 +40192,8 @@ export interface operations {
                         display_name: string;
                         /** @description The login's email, shared by its profiles */
                         email?: string;
+                        /** @description ADR-213: whether the login opened an emailed link to its current email */
+                        email_verified: boolean;
                         /** @description ADR-187: the unique @handle */
                         handle: string;
                         /** Format: uuid */
@@ -40426,6 +40522,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -40775,6 +40873,139 @@ export interface operations {
             };
             /** @description Not a profile of this login */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sent, or nothing to do */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "already_verified" | "sent";
+                    };
+                };
+            };
+            /** @description The address can't get email */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description A link was sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        retry_after_seconds: number;
+                    };
+                };
+            };
+            /** @description Email is busy today */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Email verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email_verified: boolean;
+                    };
+                };
+            };
+            /** @description Link already used, or the email changed since */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Link expired */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Unknown link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -43261,6 +43492,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         };
@@ -46175,6 +46408,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         }[];
@@ -46229,6 +46464,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -46273,6 +46510,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -60110,6 +60349,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -60168,6 +60409,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -60220,6 +60463,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -60273,6 +60518,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -86430,6 +86677,8 @@ export interface operations {
                     "application/json": {
                         offer: {
                             company_name: string;
+                            /** @description ADR-205: the account email matches but is not verified yet; joining waits for the confirmation */
+                            needs_verification: boolean;
                         } | null;
                     };
                 };
@@ -86473,6 +86722,17 @@ export interface operations {
                         } & {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+            /** @description The matching email is not verified yet */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -100034,6 +100294,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * BusinessActivationLinkEmail
+                         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                         */
+                        email_delivery?: {
+                            error?: string | null;
+                            /** Format: date_time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                        } | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */
@@ -100076,6 +100347,17 @@ export interface operations {
                     "application/json": {
                         demo_businesses: {
                             link?: {
+                                /**
+                                 * BusinessActivationLinkEmail
+                                 * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                                 */
+                                email_delivery?: {
+                                    error?: string | null;
+                                    /** Format: date_time */
+                                    sent_at?: string | null;
+                                    /** @enum {string} */
+                                    status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                                } | null;
                                 /** Format: date_time */
                                 expires_at: string;
                                 /** Format: uuid */
@@ -100111,6 +100393,8 @@ export interface operations {
                                 slug: string;
                             };
                             owners: {
+                                /** @description ADR-205: a link is only issued to a verified email */
+                                email_verified: boolean;
                                 nickname?: string | null;
                                 /** Format: uuid */
                                 user_id: string;
@@ -100136,6 +100420,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         }[];
@@ -100176,6 +100462,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         activation_link?: {
+                            /**
+                             * BusinessActivationLinkEmail
+                             * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                             */
+                            email_delivery?: {
+                                error?: string | null;
+                                /** Format: date_time */
+                                sent_at?: string | null;
+                                /** @enum {string} */
+                                status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                            } | null;
                             /** Format: date_time */
                             expires_at: string;
                             /** Format: uuid */
@@ -100230,6 +100527,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         };
@@ -100437,6 +100736,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * BusinessActivationLinkEmail
+                         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                         */
+                        email_delivery?: {
+                            error?: string | null;
+                            /** Format: date_time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                        } | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */

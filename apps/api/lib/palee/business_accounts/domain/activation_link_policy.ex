@@ -35,8 +35,12 @@ defmodule Palee.BusinessAccounts.Domain.ActivationLinkPolicy do
 
   def decode(_token), do: {:error, :invalid_activation_link}
 
-  @doc "The web path that opens a link."
-  def path(token), do: "/activate-business?token=" <> token
+  @doc """
+  The web path that opens a link. ADR-205: the token rides in the fragment,
+  so it never reaches a server log or a `Referer`; the page still reads the
+  older `?token=` form.
+  """
+  def path(token), do: "/activate-business#token=" <> token
 
   @doc """
   Validates what a vendor asks for: a role and an optional lifetime in

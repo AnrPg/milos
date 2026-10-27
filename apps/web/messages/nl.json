@@ -9509,7 +9509,7 @@
     "handleTaken": "Bezet",
     "handleTakenError": "Deze gebruikersnaam is al bezet.",
     "handleTryInstead": "Probeer @{handle}",
-    "emailNotice": "Gebruik een e-mailadres dat je kunt openen. Vergeet je ooit je wachtwoord, dan sturen we de herstellink daarheen. Zo kom je er weer in als je ook je herstelcodes kwijt bent.",
+    "emailNotice": "Gebruik een e-mailadres dat je kunt openen. We sturen er een link heen om het te bevestigen, en daar komt ook de herstellink als je ooit je wachtwoord vergeet.",
     "emailInvalid": "Vul een geldig e-mailadres in.",
     "emailInUseCount": "Dit e-mailadres heeft al {count} van {limit} accounts.",
     "emailInUseAddProfile": "Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
@@ -11489,5 +11489,48 @@
     "placementSpace": "Ruimte",
     "placementPickSpace": "Kies een ruimte",
     "placementQuantity": "Aantal"
+  },
+  "emailVerification": {
+    "bannerText": "Bevestig je e-mailadres. We hebben een link gestuurd naar {email}.",
+    "resend": "Opnieuw sturen",
+    "resending": "Versturen…",
+    "resent": "Verstuurd. Kijk in je inbox.",
+    "throttled": "Er is net een link gestuurd. Probeer het over {seconds} s opnieuw.",
+    "throttledLong": "Je hebt vandaag al meerdere links aangevraagd. Probeer het later opnieuw.",
+    "changeEmail": "E-mailadres wijzigen",
+    "dismiss": "Nu verbergen",
+    "pageTitle": "Bevestig je e-mailadres",
+    "confirming": "Je e-mailadres wordt bevestigd…",
+    "verifiedTitle": "E-mailadres bevestigd",
+    "verifiedBody": "Bedankt, je e-mailadres is bevestigd.",
+    "alreadyVerifiedBody": "Je e-mailadres is al bevestigd.",
+    "continue": "Doorgaan",
+    "signIn": "Inloggen",
+    "problemTitle": "Deze link kan niet worden gebruikt",
+    "invalidBody": "Deze link is niet geldig. Vraag in de app een nieuwe aan.",
+    "usedBody": "Deze link is al gebruikt. Log in om te zien of je e-mailadres is bevestigd, of vraag een nieuwe link aan.",
+    "expiredBody": "Deze link is verlopen. Vraag een nieuwe aan.",
+    "emailChangedBody": "Het e-mailadres van je account is gewijzigd nadat deze link is verstuurd. Gebruik de link die we naar het nieuwe adres hebben gestuurd.",
+    "sendNewLink": "Nieuwe link sturen",
+    "newLinkSent": "Er is een nieuwe link onderweg naar {email}.",
+    "signInForNewLink": "Log in voor een nieuwe link"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Bevestig je e-mailadres om mee te doen met het abonnement van {company}. We stuurden je een link toen je je aanmeldde.",
+      "resend": "Link opnieuw sturen",
+      "sending": "Versturen…",
+      "sent": "Verstuurd. Open de link in de e-mail en kom dan hier terug."
+    },
+    "vendor": {
+      "emailNotConfirmed": "E-mail niet bevestigd",
+      "emailNotConfirmedHint": "Dit account heeft zijn e-mailadres nog niet bevestigd en kan dus geen activeringslink krijgen. Vraag om het eerst te bevestigen.",
+      "email": {
+        "sent": "Per e-mail naar het account gestuurd",
+        "pending": "E-mail onderweg",
+        "failed": "De e-mail is niet aangekomen. Kopieer de link en stuur hem zelf, of stuur een nieuwe."
+      },
+      "resend": "Nieuwe link sturen"
+    }
   }
 }

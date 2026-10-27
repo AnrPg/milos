@@ -7,7 +7,9 @@ import { useFormatter, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
+  ACTIVATION_EMAIL_UNVERIFIED_CODE,
   PLATFORM_BUSINESS_KEY,
+  activationEmailState,
   activationUrl,
   decideBusinessRequest,
   fetchBusinessQueue,
@@ -32,7 +34,10 @@ const buttonClass = "min-h-10 px-4 text-sm font-semibold disabled:opacity-50";
 /**
  * Platform console › Επαγγελματικοί λογαριασμοί (ADR-184): requests to turn
  * an account into a business or to activate one, and every business still
- * in demo mode with its activation link.
+ * in demo mode with its activation link. ADR-205: a link goes only to an
+ * account with a confirmed email («email not confirmed» badge otherwise),
+ * and it is emailed to that account; the console shows how the email fared
+ * and can send a new link, and the link can still be copied.
  */
 export function PlatformBusinessAccountsPage() {
   const t = useTranslations("Business");
@@ -85,9 +90,29 @@ function RoleSelect({ value, onChange }: { value: ActivationRole; onChange: (rol
   );
 }
 
+function EmailNotConfirmed() {
+  const t = useTranslations("VerifiedGates");
+  return (
+    <span
+      className="inline-flex items-center border border-[var(--border)] bg-[var(--panel-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--warning)]"
+      title={t("vendor.emailNotConfirmedHint")}
+    >
+      {t("vendor.emailNotConfirmed")}
+    </span>
+  );
+}
+
+/** The console's error line: the unconfirmed-email refusal in its own words. */
+function VendorError({ error }: { error: unknown }) {
+  const t = useTranslations("VerifiedGates");
+  const i18n = useUiTranslations();
+  if (!error) return null;
+  const unverified = error instanceof ApiError && error.payload.code === ACTIVATION_EMAIL_UNVERIFIED_CODE;
+  return <ErrorNotice>{unverified ? t("vendor.emailNotConfirmedHint") : localizeError(error, i18n)}</ErrorNotice>;
+}
+
 function RequestCard({ token, request }: { token: string; request: BusinessRequest }) {
   const t = useTranslations("Business");
-  const i18n = useUiTranslations();
   const format = useFormatter();
   const queryClient = useQueryClient();
   const [note, setNote] = useState("");
@@ -105,6 +130,16 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
       void queryClient.invalidateQueries({ queryKey: PLATFORM_BUSINESS_KEY });
     },
   });
+  const resend = useMutation({
+    mutationFn: (link: BusinessActivationLink) =>
+      issueActivationLink(token, link.organization_id, { role: link.role, user_id: link.user_id }),
+    onSuccess: (link) => {
+      setIssued(link);
+      void queryClient.invalidateQueries({ queryKey: PLATFORM_BUSINESS_KEY });
+    },
+  });
+  // ADR-205: an activation link needs the requester's confirmed email.
+  const unconfirmed = request.kind === "activation" && request.requester_email_verified === false;
 
   return (
     <article className="flex flex-col gap-3 border border-[var(--border)] bg-[var(--panel)] p-4">
@@ -116,14 +151,17 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
             {format.dateTime(new Date(request.inserted_at), { dateStyle: "medium", timeStyle: "short" })}
           </p>
         </div>
-        <span className="text-xs font-semibold text-[var(--text-soft)]">{t(`status.${request.status}`)}</span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-[var(--text-soft)]">
+          {request.requester_email_verified === false ? <EmailNotConfirmed /> : null}
+          {t(`status.${request.status}`)}
+        </span>
       </div>
       {[request.city, request.phone].filter(Boolean).length > 0 ? (
         <p className="text-sm text-[var(--text-soft)]">{[request.city, request.phone].filter(Boolean).join(" · ")}</p>
       ) : null}
       {request.message ? <p className="text-sm text-[var(--text)]">{request.message}</p> : null}
       {issued ? (
-        <IssuedLink link={issued} />
+        <IssuedLink link={issued} resending={resend.isPending} onResend={() => resend.mutate(issued)} />
       ) : (
         <div className="grid gap-2 sm:grid-cols-[1fr_10rem_auto_auto] sm:items-end">
           <label className="text-xs font-semibold text-[var(--text-soft)]">
@@ -141,7 +179,7 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
           <button
             type="button"
             className={`${buttonClass} bg-[var(--accent)] text-[var(--primary-contrast)]`}
-            disabled={decide.isPending}
+            disabled={decide.isPending || unconfirmed}
             onClick={() => decide.mutate("approve")}
           >
             {request.kind === "activation" ? t("console.approveActivation") : t("console.approveConversion")}
@@ -156,14 +194,13 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
           </button>
         </div>
       )}
-      {decide.error ? <ErrorNotice>{localizeError(decide.error, i18n)}</ErrorNotice> : null}
+      <VendorError error={decide.error ?? resend.error} />
     </article>
   );
 }
 
 function DemoBusinessCard({ token, business }: { token: string; business: DemoBusiness }) {
   const t = useTranslations("Business");
-  const i18n = useUiTranslations();
   const format = useFormatter();
   const queryClient = useQueryClient();
   const [role, setRole] = useState<ActivationRole>("owner");
@@ -171,7 +208,8 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
   const [issued, setIssued] = useState<BusinessActivationLink | null>(null);
   const refresh = () => void queryClient.invalidateQueries({ queryKey: PLATFORM_BUSINESS_KEY });
   const issue = useMutation({
-    mutationFn: () => issueActivationLink(token, business.organization.id, { role, user_id: userId || null }),
+    mutationFn: (target: { role: ActivationRole; user_id: string | null }) =>
+      issueActivationLink(token, business.organization.id, target),
     onSuccess: (link) => {
       setIssued(link);
       refresh();
@@ -185,6 +223,8 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
     },
   });
   const live = business.link && business.link.state === "live" ? business.link : null;
+  const selected = business.owners.find((owner) => owner.user_id === userId);
+  const unconfirmed = selected ? !selected.email_verified : false;
 
   return (
     <article className="flex flex-col gap-3 border border-[var(--border)] bg-[var(--panel)] p-4">
@@ -197,15 +237,28 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
             : ""}
         </p>
       </div>
-      {issued ? <IssuedLink link={issued} /> : null}
+      {issued ? (
+        <IssuedLink
+          link={issued}
+          resending={issue.isPending}
+          onResend={() => {
+            setRole(issued.role);
+            setUserId(issued.user_id);
+            issue.mutate({ role: issued.role, user_id: issued.user_id });
+          }}
+        />
+      ) : null}
       {live && !issued ? (
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--text-soft)]">
-          <span>
-            {t("console.liveLink", {
-              name: live.nickname ?? "—",
-              role: t(`role.${live.role}`),
-              date: format.dateTime(new Date(live.expires_at), { dateStyle: "medium" }),
-            })}
+          <span className="flex flex-col gap-1">
+            <span>
+              {t("console.liveLink", {
+                name: live.nickname ?? "—",
+                role: t(`role.${live.role}`),
+                date: format.dateTime(new Date(live.expires_at), { dateStyle: "medium" }),
+              })}
+            </span>
+            <EmailDelivery link={live} />
           </span>
           <button
             type="button"
@@ -228,6 +281,7 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
                 ))}
               </Select>
             </div>
+            {unconfirmed ? <span className="mt-1 inline-flex"><EmailNotConfirmed /></span> : null}
           </label>
           <label className="text-xs font-semibold text-[var(--text-soft)]">
             {t("console.role")}
@@ -236,22 +290,42 @@ function DemoBusinessCard({ token, business }: { token: string; business: DemoBu
           <button
             type="button"
             className={`${buttonClass} bg-[var(--accent)] text-[var(--primary-contrast)]`}
-            disabled={issue.isPending || !userId}
-            onClick={() => issue.mutate()}
+            disabled={issue.isPending || !userId || unconfirmed}
+            onClick={() => issue.mutate({ role, user_id: userId || null })}
           >
             {live ? t("console.replaceLink") : t("console.issueLink")}
           </button>
         </div>
       ) : null}
-      {issue.error ?? revoke.error ? (
-        <ErrorNotice>{localizeError(issue.error ?? revoke.error, i18n)}</ErrorNotice>
-      ) : null}
+      <VendorError error={issue.error ?? revoke.error} />
     </article>
   );
 }
 
-function IssuedLink({ link }: { link: BusinessActivationLink }) {
+/** ADR-205: how the link's email to the account fared. */
+function EmailDelivery({ link }: { link: BusinessActivationLink }) {
+  const t = useTranslations("VerifiedGates");
+  const state = activationEmailState(link.email_delivery);
+  if (!state) return null;
+  const color = state === "sent" ? "var(--success)" : state === "pending" ? "var(--text-soft)" : "var(--danger)";
+  return (
+    <span role="status" className="text-xs font-semibold" style={{ color }}>
+      {t(`vendor.email.${state}`)}
+    </span>
+  );
+}
+
+function IssuedLink({
+  link,
+  onResend,
+  resending,
+}: {
+  link: BusinessActivationLink;
+  onResend: () => void;
+  resending: boolean;
+}) {
   const t = useTranslations("Business");
+  const tv = useTranslations("VerifiedGates");
   const [copied, setCopied] = useState(false);
   const url = activationUrl(link.path);
 
@@ -270,6 +344,17 @@ function IssuedLink({ link }: { link: BusinessActivationLink }) {
           }}
         >
           {copied ? t("console.copied") : t("console.copy")}
+        </button>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <EmailDelivery link={link} />
+        <button
+          type="button"
+          className={`${buttonClass} border border-[var(--border)] text-[var(--text-soft)]`}
+          disabled={resending}
+          onClick={onResend}
+        >
+          {tv("vendor.resend")}
         </button>
       </div>
       <p className="text-xs text-[var(--dim)]">{t("console.linkHint")}</p>

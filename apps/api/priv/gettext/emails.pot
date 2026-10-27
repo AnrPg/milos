@@ -31,6 +31,35 @@ msgstr ""
 msgid "Hello,"
 msgstr ""
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr ""
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr ""
+
+msgid "Confirm email"
+msgstr ""
+
+msgid "This link expires in 48 hours."
+msgstr ""
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgid "Activate %{business} on %{product}"
+msgstr ""
+msgid "Your business is ready to go live"
+msgstr ""
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr ""
+msgid "Your role: owner."
+msgstr ""
+msgid "Your role: admin."
+msgstr ""
+msgid "Activate business"
+msgstr ""
+msgid "It opens only for your own account."
+
 # ADR-207: email change confirmation
 msgid "Confirm your new email address"
 msgstr ""

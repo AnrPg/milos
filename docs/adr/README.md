@@ -201,3 +201,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-201 | WOD variation for several people at once: each programmed as if alone, results per person | Accepted |
 | ADR-202 | Spaces: floor plans, unavailability, class spaces, cleaning schedule and machine placement | Accepted |
 | ADR-203 | Transactional email outbox: templates, single-use link tokens, budgets, suppression | Accepted |
+| ADR-213 | Email verification at sign-up: emailed link, resend, banner, `email_verified` | Accepted |
+| ADR-205 | Verified email gates: company seats by email domain, business activation links emailed to a verified address | Accepted |

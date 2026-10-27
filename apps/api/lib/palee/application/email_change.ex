@@ -19,10 +19,13 @@ defmodule Palee.Application.EmailChange do
     for 7 days; a password reset lifts the lock.
   - `resend/2`, `cancel/1` and `status/1` serve the Settings page.
 
-  `EmailChangeHooks` runs after a change or revert commits.
+  Once a change or revert commits, `CorporateSeats.email_changed/3` ends the
+  email-domain seats the new address no longer qualifies for.
   """
 
-  alias Palee.Application.{EmailChangeHooks, PasswordVerifier, PublicURL, SecurityNotices}
+  require Logger
+
+  alias Palee.Application.{CorporateSeats, PasswordVerifier, PublicURL, SecurityNotices}
   alias Palee.Email
   alias Palee.Email.LinkTokens
   alias Palee.Identity
@@ -175,7 +178,7 @@ defmodule Palee.Application.EmailChange do
   end
 
   defp after_confirm(login_id, user_id, old, new, now) do
-    EmailChangeHooks.run(login_id, old, new)
+    follow_address(login_id, old, new)
 
     account = notice_account(login_id, user_id)
 
@@ -219,7 +222,7 @@ defmodule Palee.Application.EmailChange do
       |> case do
         {:ok, replaced} ->
           unless EmailChangePolicy.same_address?(replaced, old),
-            do: EmailChangeHooks.run(token.login_id, replaced, old)
+            do: follow_address(token.login_id, replaced, old)
 
           {:ok, %{email: old}}
 
@@ -227,6 +230,17 @@ defmodule Palee.Application.EmailChange do
           error
       end
     end
+  end
+
+  # After the commit: a failure here is logged and never undoes the change.
+  defp follow_address(login_id, old, new) do
+    {:ok, _ended} = CorporateSeats.email_changed(login_id, old, new)
+    :ok
+  rescue
+    error ->
+      # The struct name only: a message could carry an address.
+      Logger.error("email change: corporate seats not updated: #{inspect(error.__struct__)}")
+      :ok
   end
 
   defp check(true, _reason), do: :ok

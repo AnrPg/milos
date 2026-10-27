@@ -406,6 +406,7 @@ Use a single enum across entry types: `private | coach_can_view | coach_reply_re
 - Copy is in neutral, non-judgmental Greek. Strings go through i18n.
 - Every error the person sees (failed sign-in, failed save, invalid field) is the same red, prominent notice (`ui/ErrorNotice`, ADR-195); blue is only for actions. Destructive buttons and badges are not errors.
 - Signed-out pages (sign in, sign up, password reset, business sign-up) carry a language picker; a new account keeps the language it signed up in (ADR-195).
+- *Decided 2026-10-27 (ADR-213):* sign-up emails a confirmation link. The app is usable right away. Until the link is opened, a quiet line under the top bar offers «Ξανά αποστολή» and «Αλλαγή email» (→ Εγώ › Ρυθμίσεις), and it can be hidden for the session. It never shows on workout execution, the class timer, check-in screens, first run or auth pages. Only features that must trust the address (e.g. email-domain corporate seats) ask for a confirmed email.
 
 ### 8.6 Health & ethics requirements (MUST)
 Food and body tracking can harm people with disordered eating:

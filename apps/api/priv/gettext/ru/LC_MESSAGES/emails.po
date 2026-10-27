@@ -31,6 +31,37 @@ msgstr "Здравствуйте, %{name}!"
 msgid "Hello,"
 msgstr "Здравствуйте!"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Подтвердите адрес электронной почты"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Подтвердите, что %{email} — ваш адрес электронной почты. Так вы сможете вернуться в свою учётную запись, если когда-нибудь забудете пароль."
+
+msgid "Confirm email"
+msgstr "Подтвердить адрес"
+
+msgid "This link expires in 48 hours."
+msgstr "Ссылка действительна 48 часов."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Если вы не создавали учётную запись в %{product}, просто проигнорируйте это письмо."
+msgid "Activate %{business} on %{product}"
+msgstr "Активируйте «%{business}» в %{product}"
+msgid "Your business is ready to go live"
+msgstr "Ваш бизнес готов к запуску"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Команда %{product} одобрила «%{business}». Откройте ссылку, войдя в свою учётную запись, чтобы активировать его: демонстрационные данные будут удалены, и бизнес начнёт работать."
+msgid "Your role: owner."
+msgstr "Ваша роль: владелец."
+msgid "Your role: admin."
+msgstr "Ваша роль: администратор."
+msgid "Activate business"
+msgstr "Активировать бизнес"
+msgid "It opens only for your own account."
+msgstr "Она открывается только для вашей учётной записи."
+
 msgid "Confirm your new email address"
 msgstr "Подтвердите новый адрес электронной почты"
 

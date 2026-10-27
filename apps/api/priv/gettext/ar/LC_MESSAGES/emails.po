@@ -31,6 +31,37 @@ msgstr "مرحبًا %{name}،"
 msgid "Hello,"
 msgstr "مرحبًا،"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "أكّدوا عنوان بريدكم الإلكتروني"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "يُرجى تأكيد أن %{email} هو عنوان بريدكم الإلكتروني. سيتيح لكم ذلك العودة إلى حسابكم إذا نسيتم كلمة المرور يومًا ما."
+
+msgid "Confirm email"
+msgstr "تأكيد البريد الإلكتروني"
+
+msgid "This link expires in 48 hours."
+msgstr "تنتهي صلاحية هذا الرابط خلال 48 ساعة."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "إذا لم تُنشئوا حسابًا على %{product}، يمكنكم تجاهل هذه الرسالة."
+msgid "Activate %{business} on %{product}"
+msgstr "فعّلوا «%{business}» على %{product}"
+msgid "Your business is ready to go live"
+msgstr "نشاطكم التجاري جاهز للانطلاق"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "وافق فريق %{product} على «%{business}». افتحوا الرابط وأنتم مسجّلو الدخول إلى حسابكم لتفعيله: تُحذف البيانات التجريبية ويبدأ النشاط التجاري بالعمل."
+msgid "Your role: owner."
+msgstr "دوركم: المالك."
+msgid "Your role: admin."
+msgstr "دوركم: مشرف."
+msgid "Activate business"
+msgstr "تفعيل النشاط التجاري"
+msgid "It opens only for your own account."
+msgstr "لا يُفتح إلا لحسابكم أنتم."
+
 msgid "Confirm your new email address"
 msgstr "أكّدوا عنوان بريدكم الإلكتروني الجديد"
 

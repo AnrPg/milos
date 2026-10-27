@@ -31,6 +31,37 @@ msgstr "Gentile %{name},"
 msgid "Hello,"
 msgstr "Salve,"
 
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Confermi il Suo indirizzo email"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Confermi che %{email} è il Suo indirizzo email. Così potrà rientrare nel Suo account se un giorno dimenticasse la password."
+
+msgid "Confirm email"
+msgstr "Conferma email"
+
+msgid "This link expires in 48 hours."
+msgstr "Questo link scade tra 48 ore."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Se non ha creato Lei un account %{product}, può ignorare questa email."
+msgid "Activate %{business} on %{product}"
+msgstr "Attivi «%{business}» su %{product}"
+msgid "Your business is ready to go live"
+msgstr "La sua attività è pronta a partire"
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Il team di %{product} ha approvato «%{business}». Apra il link dopo aver effettuato l’accesso al suo account per attivarla: i dati dimostrativi vengono rimossi e l’attività diventa operativa."
+msgid "Your role: owner."
+msgstr "Il suo ruolo: titolare."
+msgid "Your role: admin."
+msgstr "Il suo ruolo: amministratore."
+msgid "Activate business"
+msgstr "Attiva l’attività"
+msgid "It opens only for your own account."
+msgstr "Si apre solo per il suo account."
+
 msgid "Confirm your new email address"
 msgstr "Confermi il suo nuovo indirizzo email"
 

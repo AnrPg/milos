@@ -51,6 +51,7 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
       ...user,
       email: `${user.id}@example.com`,
       // The first-run product tour (ADR-107) would cover the page under test.
+      email_verified: true,
       completed_tours: ["admin", "member", "athlete", "first_run"],
       preferred_locale: "en",
       vendor: false,
