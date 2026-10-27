@@ -31,6 +31,21 @@ describe("Dialog", () => {
     expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   });
 
+  it("shows the form's error inside the dialog, outside the scrolling body and above the footer", () => {
+    render(
+      <Dialog onClose={() => {}} title="New class" closeLabel="Close" error="Some details need fixing." footer={<button type="button">Create</button>}>
+        <p>Fields</p>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole("dialog", { name: "New class" });
+    const notice = screen.getByRole("alert");
+    expect(dialog).toContainElement(notice);
+    expect(notice).toHaveTextContent("Some details need fixing.");
+    expect(screen.getByText("Fields").parentElement).not.toContainElement(notice);
+    const footer = screen.getByRole("button", { name: "Create" }).closest("footer")!;
+    expect(notice.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("fills a phone's screen in the screen variant and is a centred card from sm up", () => {
     render(
       <Dialog onClose={() => {}} title="New event" closeLabel="Close" variant="screen" size="2xl">

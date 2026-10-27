@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import type { GuideAnchor } from "@/lib/guides/anchors";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "full";
 
@@ -91,6 +92,7 @@ export function Dialog({
   titleId: titleIdProp,
   testId,
   guide,
+  error,
 }: {
   onClose: () => void;
   title?: ReactNode;
@@ -128,6 +130,12 @@ export function Dialog({
   testId?: string;
   /** The walkthrough anchor of the panel (ADR-193), e.g. "events.wizard". */
   guide?: GuideAnchor;
+  /**
+   * ADR-205: what went wrong with the form, shown inside the dialog just
+   * above the footer (never on the page behind it), so it stays in view while
+   * the body scrolls. Field-level reasons go under their own fields.
+   */
+  error?: ReactNode;
 }) {
   const generatedId = useId();
   const titleId = titleIdProp ?? `${generatedId}-title`;
@@ -246,6 +254,11 @@ export function Dialog({
               {children}
             </div>
           )}
+          {error ? (
+            <div className="shrink-0 px-5 pb-3 sm:px-6" data-dialog-error="">
+              <ErrorNotice>{error}</ErrorNotice>
+            </div>
+          ) : null}
           {footer || footerStart ? (
             <footer
               className={`flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 pt-3 sm:px-6 ${padsBottomSafeArea ? "pb-[max(0.75rem,env(safe-area-inset-bottom))]" : "pb-3"}`}

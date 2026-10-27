@@ -489,6 +489,15 @@ export function semanticLabel(value: unknown, translate: UiTranslator): string {
 export function localizeError(error: unknown, translate: UiTranslator): string {
   if (!(error instanceof ApiError)) return translate("apiErrorRequestFailed");
 
+  // ADR-205: a form that does not mark its fields still says, in plain
+  // words, what was not accepted, never "check the highlighted values".
+  if (error.status === 422 && (!error.payload.code || error.payload.code === "validation_failed")) {
+    const details = new Set(
+      Object.values(fieldMessagesOf(error.payload.errors)).map((messages) => explainFieldMessage(messages[0], translate)),
+    );
+    if (details.size > 0) return translate("apiErrorValidationFailedDetail", { details: [...details].join(" ") });
+  }
+
   const rule = error.payload.params?.rule;
   if (error.payload.code === "package_rule_violated" && typeof rule === "string" && PACKAGE_RULES.has(rule)) {
     return translate(`apiErrorPackageRule_${rule}`);
@@ -572,4 +581,52 @@ function normalizeParams(params: Record<string, unknown> | undefined, translate:
           : value,
       ]),
   );
+}
+
+/** One plain-language sentence for a validation message of the API (Ecto wording). */
+export function explainFieldMessage(rawMessage: string, translate: UiTranslator): string {
+  const message = rawMessage.trim();
+  const number = (pattern: RegExp) => message.match(pattern)?.[1];
+
+  if (message === "can't be blank" || message === "is required") return translate("formErrRequired");
+  if (message === "must be in the future") return translate("formErrMustBeFuture");
+  if (message === "has already been taken") return translate("formErrTaken");
+  if (message === "does not exist") return translate("formErrNotFound");
+  if (message === "must be accepted") return translate("formErrMustAccept");
+
+  let value: string | undefined;
+  if ((value = number(/^must be greater than or equal to (-?[\d.]+)$/))) return translate("formErrAtLeast", { number: value });
+  if ((value = number(/^must be greater than (-?[\d.]+)$/))) return translate("formErrGreaterThan", { number: value });
+  if ((value = number(/^must be less than or equal to (-?[\d.]+)$/))) return translate("formErrAtMost", { number: value });
+  if ((value = number(/^must be less than (-?[\d.]+)$/))) return translate("formErrLessThan", { number: value });
+  if ((value = number(/^must be equal to (-?[\d.]+)$/))) return translate("formErrEqualTo", { number: value });
+  if ((value = number(/^should be at most (\d+) character\(s\)$/))) return translate("formErrTooLong", { count: Number(value) });
+  if ((value = number(/^should be at least (\d+) character\(s\)$/))) return translate("formErrTooShort", { count: Number(value) });
+  if ((value = number(/^should be (\d+) character\(s\)$/))) return translate("formErrExactLength", { count: Number(value) });
+  if ((value = number(/^should have at most (\d+) item\(s\)$/))) return translate("formErrTooManyItems", { count: Number(value) });
+  if ((value = number(/^should have at least (\d+) item\(s\)$/))) return translate("formErrTooFewItems", { count: Number(value) });
+
+  return translate("formErrInvalid");
+}
+
+/** `{field: ["msg", ...]}` for every field with at least one text message (nested maps flattened with dots). */
+export function fieldMessagesOf(errors: unknown, prefix = ""): Record<string, string[]> {
+  if (!errors || typeof errors !== "object" || Array.isArray(errors)) return {};
+
+  const result: Record<string, string[]> = {};
+  for (const [field, value] of Object.entries(errors as Record<string, unknown>)) {
+    const key = prefix ? `${prefix}.${field}` : field;
+    if (typeof value === "string") {
+      result[key] = [value];
+    } else if (Array.isArray(value)) {
+      const texts = value.filter((item): item is string => typeof item === "string");
+      if (texts.length > 0) result[key] = texts;
+      value.forEach((item, index) => {
+        if (item && typeof item === "object") Object.assign(result, fieldMessagesOf(item, `${key}.${index}`));
+      });
+    } else if (value && typeof value === "object") {
+      Object.assign(result, fieldMessagesOf(value, key));
+    }
+  }
+  return result;
 }

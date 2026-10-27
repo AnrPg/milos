@@ -54,12 +54,20 @@ import { IntegerInput } from "@/components/integer-input";
 import { fetchGymStaff } from "@/api/staff";
 import { coachOptions } from "@/components/admin/staff-home";
 import { can } from "@/lib/role-navigation";
-import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ErrorNotice, FieldError } from "@/components/ui/ErrorNotice";
+import {
+  fieldBorder,
+  formErrorsFrom,
+  invalidFieldProps,
+  stillApplies,
+  type FormErrors,
+} from "@/lib/form-errors";
+import { defaultClassStart, startsInPast, todayKey } from "@/components/schedule/slot-time";
 
 /** A class may name its coach (ADR-100). */
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
-import { dateTimeLocalInZone, dateTimeLocalToIso, zoneLabel, zonedText, zonedToInstant } from "@/lib/zoned-time";
+import { dateTimeLocalInZone, dateTimeLocalToIso, formatInZone, zoneLabel, zonedText } from "@/lib/zoned-time";
 import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/organization-slug";
 import { RETURNED_WORKOUT_PARAM, newWorkoutHref } from "@/lib/workout-return";
 import { WodPicker } from "@/components/schedule/WodPicker";
@@ -68,12 +76,51 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
 
+/** The class form's fields, as the API names them (ADR-205 errors land on these). */
+const SLOT_FIELDS = [
+  "class_type_id",
+  "name",
+  "master_workout_id",
+  "scheduled_at",
+  "duration_minutes",
+  "capacity",
+  "booking_timeout_minutes",
+  "location_id",
+  "space_id",
+  "coach_user_id",
+] as const;
+type SlotField = (typeof SLOT_FIELDS)[number];
+
 type SlotEditorState = {
   slotId: string | null;
   /** ADR-200: the edited class's series; its edit can reach further. */
   seriesId?: string | null;
   values: ClassPayload;
+  /** The start the class had when the form opened: an unchanged past start may stay. */
+  originalScheduledAt?: string | null;
+  /** ADR-205: what the last save got wrong, and the values it sent. */
+  errors?: FormErrors<SlotField>;
+  sent?: ClassPayload;
 };
+
+const SERIES_FIELDS = [
+  "class_type_id",
+  "name",
+  "master_workout_id",
+  "duration_minutes",
+  "starts_on",
+  "ends_on",
+  "local_start_time",
+  "weekdays",
+  "excluded_dates",
+  "location_id",
+  "space_id",
+  "coach_user_id",
+  "capacity",
+  "booking_timeout_minutes",
+  "timezone",
+] as const;
+type SeriesField = (typeof SERIES_FIELDS)[number];
 
 type SeriesEditorState = {
   values: Omit<ClassPayload, "scheduled_at">;
@@ -83,6 +130,9 @@ type SeriesEditorState = {
   weekdays: number[];
   excludedDates: string;
   timezone: string;
+  /** ADR-205: what the last save got wrong, and the values it sent. */
+  errors?: FormErrors<SeriesField>;
+  sent?: Partial<Record<SeriesField, unknown>>;
 };
 
 /** What staff were adding when the gym turned out to have no class type yet. */
@@ -96,6 +146,13 @@ type ClassDraft =
   | { kind: "link"; slotId: string };
 
 const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !type.archived_at);
+
+/** A real "YYYY-MM-DD" day (2026-02-30 is not one). */
+function isCalendarDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
 
 // ADR-179: a class's date and time are typed on the gym's clock (`zone`),
 // whatever the device's zone; without one, the device's clock.
@@ -113,7 +170,9 @@ function defaultSlotValues(
   defaults?: SchedulingSettings,
   zone: string | null = null,
 ): ScheduleSlotPayload {
-  const date = zonedToInstant(isoDate, "09:00", zone);
+  // ADR-205: 09:00 on the gym's clock, or the next open half hour once
+  // that has passed, never a start the API refuses as past.
+  const date = defaultClassStart(isoDate, zone);
 
   return {
     // ADR-176: the WOD can be linked later; until then the class is a draft.
@@ -385,10 +444,44 @@ export function ScheduleConsole({
     router.push(newWorkoutHref(adminHref("/admin/workouts/new", organizationSlug), window.location.pathname));
   }
 
+  // ADR-205: "it is 23:40 at the gym now", on the gym's clock.
+  const gymNowText = () => formatInZone(new Date(), gymZone, locale, "time");
+  const pastStartMessage = () => i18n("formErrClassStartPassed", { time: gymNowText(), zone: zoneLabel(gymZone) });
+
+  /** The class's start is in the past and was set or changed in this form. */
+  function editorStartProblem(state: SlotEditorState): string | null {
+    const changed = !state.slotId || state.values.scheduled_at !== state.originalScheduledAt;
+    return changed && startsInPast(state.values.scheduled_at) ? pastStartMessage() : null;
+  }
+
+  function slotErrorsFrom(reason: unknown, fallback: string): FormErrors<SlotField> {
+    return formErrorsFrom(reason, i18n, SLOT_FIELDS, {
+      fallback,
+      overrides: { scheduled_at: (message) => (message === "must be in the future" ? pastStartMessage() : null) },
+    });
+  }
+
   const editorDateValue = useMemo(() => {
     if (!editor) return "";
     return formatDateTimeLocal(editor.values.scheduled_at, gymZone);
   }, [editor, gymZone]);
+
+  // ADR-205: each field's reason, from the last save or from what the form
+  // can already tell (a start that has passed).
+  const editorStart = editor ? editorStartProblem(editor) : null;
+  const editorFieldErrors: Partial<Record<SlotField, string>> = editor
+    ? { ...stillApplies(editor.errors, editor.sent, editor.values), ...(editorStart ? { scheduled_at: editorStart } : {}) }
+    : {};
+  const seriesFieldErrors: Partial<Record<SeriesField, string>> = seriesEditor
+    ? { ...stillApplies(seriesEditor.errors, seriesEditor.sent, seriesFieldValues(seriesEditor)), ...seriesProblems(seriesEditor) }
+    : {};
+  const slotInputStyle = (field: SlotField) => ({
+    background: "var(--panel-muted)",
+    border: fieldBorder(editorFieldErrors[field]),
+    color: "var(--text)",
+  });
+  const seriesInputStyle = (field: SeriesField) =>
+    seriesFieldErrors[field] ? { border: fieldBorder(seriesFieldErrors[field]) } : undefined;
 
   async function handleBook() {
     if (!tokens?.access_token || !bookingTarget) return;
@@ -459,8 +552,11 @@ export function ScheduleConsole({
 
   async function saveSlot() {
     if (!tokens?.access_token || !editor) return;
+    // ADR-205: a past start is explained on the field; nothing is sent.
+    if (editorStartProblem(editor)) return;
 
     setBusy(true);
+    const sent = editor.values;
 
     try {
       if (!editor.slotId && manyBranches) {
@@ -490,7 +586,9 @@ export function ScheduleConsole({
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToSaveSlot"));
+      // ADR-205: the reasons stay in the form, on the fields they concern.
+      const errors = slotErrorsFrom(requestError, t("failedToSaveSlot"));
+      setEditor((current) => (current ? { ...current, errors, sent } : current));
     } finally {
       setBusy(false);
     }
@@ -514,7 +612,7 @@ export function ScheduleConsole({
     } catch (requestError) {
       const message =
         requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
-      setError(message);
+      setEditor((current) => (current ? { ...current, errors: { fields: {}, message }, sent: current.values } : current));
     } finally {
       setBusy(false);
     }
@@ -542,6 +640,8 @@ export function ScheduleConsole({
     }
 
     const base = defaultSlotValues(startDate, types, schedulingDefaults, gymZone);
+    // ADR-205: a series starts today at the earliest, on the gym's calendar.
+    const seriesStart = startDate < todayKey(gymZone) ? todayKey(gymZone) : startDate;
     setCreateBranches(defaultAppliesTo(adminLocations));
     setSeriesEditor({
       values: {
@@ -553,10 +653,10 @@ export function ScheduleConsole({
         auto_approve: base.auto_approve,
         booking_timeout_minutes: base.booking_timeout_minutes,
       },
-      startDate,
+      startDate: seriesStart,
       endDate: "",
       time: "09:00",
-      weekdays: [new Date(`${startDate}T12:00:00`).getDay() || 7],
+      weekdays: [new Date(`${seriesStart}T12:00:00`).getDay() || 7],
       excludedDates: "",
       timezone: gymZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC"),
     });
@@ -564,8 +664,10 @@ export function ScheduleConsole({
 
   async function saveSeries() {
     if (!seriesEditor || !tokens?.access_token) return;
+    if (Object.keys(seriesProblems(seriesEditor)).length > 0) return;
     setBusy(true);
     setError(null);
+    const sent = seriesFieldValues(seriesEditor);
     try {
       const result = await createScheduleSeries(tokens.access_token, {
         ...seriesEditor.values,
@@ -591,10 +693,39 @@ export function ScheduleConsole({
       setSeriesEditor(null);
       await loadSchedule();
     } catch (reason) {
-      setError(reason instanceof Error ? localizeError(reason, i18n) : i18n("featureSeriesCreateFailed"));
+      const errors = formErrorsFrom(reason, i18n, SERIES_FIELDS, { fallback: i18n("featureSeriesCreateFailed") });
+      setSeriesEditor((current) => (current ? { ...current, errors, sent } : current));
     } finally {
       setBusy(false);
     }
+  }
+
+  /** The series form's values keyed as the API names them (to tell a corrected field). */
+  function seriesFieldValues(state: SeriesEditorState): Partial<Record<SeriesField, unknown>> {
+    return {
+      ...state.values,
+      starts_on: state.startDate,
+      ends_on: state.endDate,
+      local_start_time: state.time,
+      weekdays: state.weekdays,
+      excluded_dates: state.excludedDates,
+      timezone: state.timezone,
+    };
+  }
+
+  /** ADR-205: what the series form can tell before sending, in plain words. */
+  function seriesProblems(state: SeriesEditorState): Partial<Record<SeriesField, string>> {
+    const problems: Partial<Record<SeriesField, string>> = {};
+    if (!state.startDate) problems.starts_on = i18n("formErrRequired");
+    else if (state.startDate < todayKey(gymZone)) problems.starts_on = i18n("formErrDayPassed");
+    if (state.endDate && state.startDate && state.endDate < state.startDate) problems.ends_on = i18n("formErrEndsBeforeStart");
+    if (state.weekdays.length === 0) problems.weekdays = i18n("formErrPickWeekday");
+    const badDates = state.excludedDates
+      .split(",")
+      .map((date) => date.trim())
+      .filter((date) => date && !isCalendarDate(date));
+    if (badDates.length > 0) problems.excluded_dates = i18n("formErrExcludedDates", { dates: badDates.join(", ") });
+    return problems;
   }
 
   function slotValues(slot: ScheduleSlot): ClassPayload {
@@ -615,7 +746,7 @@ export function ScheduleConsole({
 
   function openUpdateEditor(slot: ScheduleSlot) {
     setSeriesScope({ scope: "this" });
-    setEditor({ slotId: slot.id, seriesId: slot.class_series_id ?? null, values: slotValues(slot) });
+    setEditor({ slotId: slot.id, seriesId: slot.class_series_id ?? null, values: slotValues(slot), originalScheduledAt: slot.scheduled_at });
   }
 
   // A new class like this one, outside any series, at its branch; staff
@@ -861,6 +992,7 @@ export function ScheduleConsole({
       {editor ? (
         <Dialog
           onClose={() => setEditor(null)}
+          error={editor.errors?.message}
           eyebrow={t("adminSlotEditor")}
           title={editor.slotId ? t("editScheduledClass") : t("createScheduledClass")}
           size="2xl"
@@ -889,7 +1021,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || (!editor.slotId && manyBranches && createBranches.length === 0) || (Boolean(editor.seriesId) && !seriesScopeReady(seriesScope))}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim() || Boolean(editorFieldErrors.scheduled_at) || (!editor.slotId && manyBranches && createBranches.length === 0) || (Boolean(editor.seriesId) && !seriesScopeReady(seriesScope))}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -901,14 +1033,14 @@ export function ScheduleConsole({
         >
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { label: t("classType"), type: "select-type" as const },
-                { label: i18n("featureClassName"), type: "name" as const },
-                { label: t("workout"), type: "select" as const },
-                { label: t("scheduledAt"), type: "datetime" as const },
-                { label: i18n("featureDurationMinutes"), type: "number-duration" as const },
-                { label: t("capacity"), type: "number-cap" as const },
-                { label: t("timeoutMinutes"), type: "number-timeout" as const },
-              ].map(({ label, type }) =>
+                { label: t("classType"), type: "select-type" as const, field: "class_type_id" as const },
+                { label: i18n("featureClassName"), type: "name" as const, field: "name" as const },
+                { label: t("workout"), type: "select" as const, field: "master_workout_id" as const },
+                { label: t("scheduledAt"), type: "datetime" as const, field: "scheduled_at" as const },
+                { label: i18n("featureDurationMinutes"), type: "number-duration" as const, field: "duration_minutes" as const },
+                { label: t("capacity"), type: "number-cap" as const, field: "capacity" as const },
+                { label: t("timeoutMinutes"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
+              ].map(({ label, type, field }) =>
                 type === "select" ? (
                   <div key={label} className="md:col-span-2">
                     <WodPicker
@@ -925,6 +1057,7 @@ export function ScheduleConsole({
                       }
                       onCreateNew={() => createNewWod({ kind: "slot", editor })}
                     />
+                    <FieldError id="slot-error-master_workout_id">{editorFieldErrors.master_workout_id}</FieldError>
                   </div>
                 ) : (
                 <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
@@ -932,7 +1065,8 @@ export function ScheduleConsole({
                   {type === "select-type" ? (
                     <Select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       onValueChange={(value) =>
                         setEditor((current) =>
                           current ? { ...current, values: { ...current.values, class_type_id: value } } : current,
@@ -947,7 +1081,8 @@ export function ScheduleConsole({
                   ) : type === "name" ? (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       maxLength={120}
                       onChange={(event) =>
                         setEditor((current) =>
@@ -959,7 +1094,8 @@ export function ScheduleConsole({
                   ) : type === "number-duration" ? (
                     <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       min={1}
                       max={1440}
                       emptyValue={1}
@@ -974,13 +1110,15 @@ export function ScheduleConsole({
                     <>
                     <DateTimeInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       onValueChange={(value) =>
                         setEditor((current) =>
                           current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(value, gymZone) } } : current,
                         )
                       }
                       value={editorDateValue}
+                      min={editor.slotId ? undefined : `${todayKey(gymZone)}T00:00`}
                     />
                     {gymZone ? (
                       <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{i18n("zonedTimeGymClock", { zone: zoneLabel(gymZone) })}</p>
@@ -989,7 +1127,8 @@ export function ScheduleConsole({
                   ) : type === "number-cap" ? (
                     <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       min={1}
                       emptyValue={1}
                       onValueChange={(capacity) =>
@@ -1002,7 +1141,8 @@ export function ScheduleConsole({
                   ) : (
                     <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      style={slotInputStyle(field)}
+                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
                       min={1}
                       emptyValue={1}
                       onValueChange={(timeoutMinutes) =>
@@ -1013,6 +1153,7 @@ export function ScheduleConsole({
                       value={editor.values.booking_timeout_minutes}
                     />
                   )}
+                  <FieldError id={`slot-error-${field}`}>{editorFieldErrors[field]}</FieldError>
                 </label>
                 ),
               )}
@@ -1049,19 +1190,21 @@ export function ScheduleConsole({
                   setEditor((current) => (current ? { ...current, values: { ...current.values, location_id: locationId } } : current))
                 }
                 selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
-                selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                selectStyle={slotInputStyle("location_id")}
                 value={editor.values.location_id}
               />
             )}
+            <FieldError id="slot-error-location_id">{editorFieldErrors.location_id}</FieldError>
             {/* ADR-202: the space of the class, among those of its branch. */}
             <SlotSpaceSelect
               className="mt-4 block space-y-2 text-sm font-semibold"
               locationIds={!editor.slotId && manyBranches ? createBranches : [editor.values.location_id]}
               onChange={(spaceId) => setEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))}
               selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
-              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              selectStyle={slotInputStyle("space_id")}
               value={editor.values.space_id}
             />
+            <FieldError id="slot-error-space_id">{editorFieldErrors.space_id}</FieldError>
 
             {canManageSchedule ? (
               <ClassCoachSelect
@@ -1073,10 +1216,11 @@ export function ScheduleConsole({
                   setEditor((current) => (current ? { ...current, values: { ...current.values, coach_user_id: coachUserId } } : current))
                 }
                 selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
-                selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                selectStyle={slotInputStyle("coach_user_id")}
                 value={editor.values.coach_user_id}
               />
             ) : null}
+            <FieldError id="slot-error-coach_user_id">{editorFieldErrors.coach_user_id}</FieldError>
 
             {editor.slotId && editor.seriesId ? (
               <SeriesScopePicker
@@ -1108,16 +1252,17 @@ export function ScheduleConsole({
       {seriesEditor ? (
         <Dialog
           onClose={() => setSeriesEditor(null)}
+          error={seriesEditor.errors?.message}
           eyebrow={i18n("featureBatchScheduling")}
           title={i18n("featureCreateClassSeries")}
           size="2xl"
           footer={
-            <div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim() || (manyBranches && createBranches.length === 0)} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div>
+            <div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || Object.keys(seriesProblems(seriesEditor)).length > 0 || !seriesEditor.values.name.trim() || (manyBranches && createBranches.length === 0)} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div>
           }
         >
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">{i18n("featureClassType")}<Select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
-              <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureClassType")}<Select className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("class_type_id")} {...invalidFieldProps(seriesFieldErrors.class_type_id, "series-error-class_type_id")} value={seriesEditor.values.class_type_id} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select><FieldError id="series-error-class_type_id">{seriesFieldErrors.class_type_id}</FieldError></label>
+              <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("name")} {...invalidFieldProps(seriesFieldErrors.name, "series-error-name")} maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /><FieldError id="series-error-name">{seriesFieldErrors.name}</FieldError></label>
               <div className="sm:col-span-2">
                 <WodPicker
                   label={i18n("classSeriesWod")}
@@ -1130,13 +1275,14 @@ export function ScheduleConsole({
                   onCreateNew={() => createNewWod({ kind: "series", editor: seriesEditor })}
                   noneHint={i18n("classSeriesWodHint")}
                 />
+                <FieldError id="series-error-master_workout_id">{seriesFieldErrors.master_workout_id}</FieldError>
               </div>
-              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureStarts")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.startDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, startDate: value })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} value={seriesEditor.endDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, endDate: value })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureTime")}<TimeInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.time} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, time: value })} /></label>
-              <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
-              <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
+              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("duration_minutes")} {...invalidFieldProps(seriesFieldErrors.duration_minutes, "series-error-duration_minutes")} min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /><FieldError id="series-error-duration_minutes">{seriesFieldErrors.duration_minutes}</FieldError></label>
+              <label className="text-sm font-semibold">{i18n("featureStarts")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("starts_on")} {...invalidFieldProps(seriesFieldErrors.starts_on, "series-error-starts_on")} min={todayKey(gymZone)} value={seriesEditor.startDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, startDate: value })} /><FieldError id="series-error-starts_on">{seriesFieldErrors.starts_on}</FieldError></label>
+              <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("ends_on")} {...invalidFieldProps(seriesFieldErrors.ends_on, "series-error-ends_on")} min={seriesEditor.startDate} value={seriesEditor.endDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, endDate: value })} /><FieldError id="series-error-ends_on">{seriesFieldErrors.ends_on}</FieldError></label>
+              <label className="text-sm font-semibold">{i18n("featureTime")}<TimeInput className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("local_start_time")} {...invalidFieldProps(seriesFieldErrors.local_start_time, "series-error-local_start_time")} value={seriesEditor.time} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, time: value })} /><FieldError id="series-error-local_start_time">{seriesFieldErrors.local_start_time}</FieldError></label>
+              <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div><FieldError id="series-error-weekdays">{seriesFieldErrors.weekdays}</FieldError></div>
+              <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" style={seriesInputStyle("excluded_dates")} {...invalidFieldProps(seriesFieldErrors.excluded_dates, "series-error-excluded_dates")} placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span><FieldError id="series-error-excluded_dates">{seriesFieldErrors.excluded_dates}</FieldError></label>
               {manyBranches ? (
                 <div className="sm:col-span-2">
                   <AppliesToBranches
@@ -1147,13 +1293,16 @@ export function ScheduleConsole({
                   />
                 </div>
               ) : (
-                <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
+                <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" selectStyle={seriesInputStyle("location_id")} value={seriesEditor.values.location_id} />
               )}
-              <SlotSpaceSelect className="text-sm font-semibold" locationIds={manyBranches ? createBranches : [seriesEditor.values.location_id]} onChange={(spaceId) => setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.space_id} />
-              {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
-              <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
+              <FieldError id="series-error-location_id">{seriesFieldErrors.location_id}</FieldError>
+              <SlotSpaceSelect className="text-sm font-semibold" locationIds={manyBranches ? createBranches : [seriesEditor.values.location_id]} onChange={(spaceId) => setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, space_id: spaceId } } : current))} selectClassName="mt-2 w-full rounded-xl px-3 py-2" selectStyle={seriesInputStyle("space_id")} value={seriesEditor.values.space_id} />
+              <FieldError id="series-error-space_id">{seriesFieldErrors.space_id}</FieldError>
+              {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" selectStyle={seriesInputStyle("coach_user_id")} value={seriesEditor.values.coach_user_id} /> : null}
+              <FieldError id="series-error-coach_user_id">{seriesFieldErrors.coach_user_id}</FieldError>
+              <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /><FieldError id="series-error-timezone">{seriesFieldErrors.timezone}</FieldError></label>
             </div>
-            <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
+            <details className="mt-5 rounded-2xl p-4" open={seriesFieldErrors.capacity || seriesFieldErrors.booking_timeout_minutes ? true : undefined} style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("capacity")} {...invalidFieldProps(seriesFieldErrors.capacity, "series-error-capacity")} min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /><FieldError id="series-error-capacity">{seriesFieldErrors.capacity}</FieldError></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("booking_timeout_minutes")} {...invalidFieldProps(seriesFieldErrors.booking_timeout_minutes, "series-error-booking_timeout_minutes")} min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /><FieldError id="series-error-booking_timeout_minutes">{seriesFieldErrors.booking_timeout_minutes}</FieldError></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
         </Dialog>
       ) : null}
     </main>

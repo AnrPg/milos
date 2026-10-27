@@ -70,6 +70,20 @@ export function ErrorNotice({
   );
 }
 
+/**
+ * ADR-205: the plain-language reason under a wrong field. Give the field
+ * `aria-invalid` and `aria-describedby={id}` (see `invalidFieldProps`).
+ * Renders nothing without a message, so it can sit under every field.
+ */
+export function FieldError({ id, children }: { id: string; children?: ReactNode }) {
+  if (!children) return null;
+  return (
+    <ErrorNotice id={id} variant="text" className="mt-1.5 text-xs font-medium" live="polite">
+      {children}
+    </ErrorNotice>
+  );
+}
+
 function ErrorIcon({ className }: { className: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={className}>
