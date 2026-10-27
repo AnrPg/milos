@@ -1,9 +1,9 @@
 {
   "$comment": "ADR-171: the web app each build of the store apps loads. PALEE_APP_URL overrides the url. extraNavigationHosts may open inside the app's web view as well; every other host opens in the system browser.",
-  "appId": "app.milos.member",
+  "appId": "app.palee.member",
   "appName": "Palee",
   "environments": {
-    "production": { "url": "https://milos.4kq.net" },
+    "production": { "url": "https://palee.app" },
     "staging": { "url": null },
     "development": { "url": "http://localhost:18080" }
   },

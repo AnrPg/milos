@@ -1,4 +1,4 @@
-package app.milos.member
+package app.palee.member
 
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin

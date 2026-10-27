@@ -17,7 +17,7 @@ public class PaleeWidgetsPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
 
     /// Shared with the widget extension; the App Group is an owner action (ADR-173).
-    static let appGroup = "group.app.milos.member"
+    static let appGroup = "group.app.palee.member"
 
     private var shared: UserDefaults? { UserDefaults(suiteName: Self.appGroup) }
 

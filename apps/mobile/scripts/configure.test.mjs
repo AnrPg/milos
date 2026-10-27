@@ -11,10 +11,10 @@ const xml = { open: "<!--", close: "-->" };
 
 test("production loads the https web app and allows its host", () => {
   const env = resolveEnvironment({ PALEE_APP_ENV: "production" });
-  assert.equal(env.url, "https://milos.4kq.net");
-  assert.equal(env.appId, "app.milos.member");
+  assert.equal(env.url, "https://palee.app");
+  assert.equal(env.appId, "app.palee.member");
   assert.equal(env.cleartext, false);
-  assert.ok(env.navigationHosts.includes("milos.4kq.net"));
+  assert.ok(env.navigationHosts.includes("palee.app"));
 });
 
 test("PALEE_APP_URL overrides the URL and production refuses http", () => {

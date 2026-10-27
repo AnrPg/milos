@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 // ADR-173: the iOS home-screen widgets («+1 νερό», Σήμερα, Check-in), a
-// WidgetKit extension sharing the App Group `group.app.milos.member` with the
+// WidgetKit extension sharing the App Group `group.app.palee.member` with the
 // app. The app's `PaleeWidgets` plugin writes the widget token, the host, the
 // words and the tap paths there; the widgets read GET /api/widget/snapshot and
 // post «+1 νερό» (iOS 17 interactive button) with that token.
@@ -11,10 +11,10 @@ import WidgetKit
 // The extension target is added once in Xcode (ADR-173 «Owner actions»):
 // File › New › Target › Widget Extension named `PaleeWidgets`, replace its
 // generated files with this folder, deployment target iOS 17, App Groups
-// capability with `group.app.milos.member` on both targets.
+// capability with `group.app.palee.member` on both targets.
 
 enum PaleeShared {
-    static let group = UserDefaults(suiteName: "group.app.milos.member")
+    static let group = UserDefaults(suiteName: "group.app.palee.member")
 
     static var token: String? { group?.string(forKey: "token") }
     static var baseUrl: String? { group?.string(forKey: "baseUrl") }

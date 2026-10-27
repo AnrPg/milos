@@ -1,4 +1,4 @@
-package app.milos.member;
+package app.palee.member;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

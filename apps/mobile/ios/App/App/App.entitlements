@@ -10,7 +10,7 @@
     <!-- ADR-173: the App Group shared with the widget extension, and writing NFC tags. -->
     <key>com.apple.security.application-groups</key>
     <array>
-        <string>group.app.milos.member</string>
+        <string>group.app.palee.member</string>
     </array>
     <key>com.apple.developer.nfc.readersession.formats</key>
     <array>
@@ -19,7 +19,7 @@
     <!-- palee:app-links begin -->
     <key>com.apple.developer.associated-domains</key>
     <array>
-        <string>applinks:milos.4kq.net</string>
+        <string>applinks:palee.app</string>
     </array>
     <key>aps-environment</key>
     <string>production</string>

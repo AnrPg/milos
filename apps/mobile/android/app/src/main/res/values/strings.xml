@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Palee</string>
     <string name="title_activity_main">Palee</string>
-    <string name="package_name">app.milos.member</string>
-    <string name="custom_url_scheme">app.milos.member</string>
+    <string name="package_name">app.palee.member</string>
+    <string name="custom_url_scheme">app.palee.member</string>
     <!-- ADR-172: the page Health Connect links to from its permission screens. -->
     <string name="palee_health_privacy_path" translatable="false">/me/devices</string>
 </resources>

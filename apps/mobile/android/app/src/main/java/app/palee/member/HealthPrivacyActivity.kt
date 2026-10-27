@@ -1,4 +1,4 @@
-package app.milos.member
+package app.palee.member
 
 import android.app.Activity
 import android.content.Intent
@@ -22,6 +22,6 @@ class HealthPrivacyActivity : Activity() {
     }
 
     companion object {
-        private const val DEFAULT_URL = "https://milos.4kq.net"
+        private const val DEFAULT_URL = "https://palee.app"
     }
 }

@@ -1,4 +1,4 @@
-package app.milos.member
+package app.palee.member
 
 import android.Manifest
 import android.os.Build

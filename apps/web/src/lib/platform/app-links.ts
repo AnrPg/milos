@@ -16,13 +16,13 @@ function list(value: string | undefined) {
 
 /**
  * The apple-app-site-association document, or null until the Apple team id
- * is configured (APPLE_TEAM_ID; IOS_BUNDLE_ID defaults to app.milos.member).
+ * is configured (APPLE_TEAM_ID; IOS_BUNDLE_ID defaults to app.palee.member).
  */
 export function appleAppSiteAssociation(env: Env = process.env) {
   const teamId = env.APPLE_TEAM_ID?.trim();
   if (!teamId) return null;
   const bundleIds = list(env.IOS_BUNDLE_ID);
-  const appIDs = (bundleIds.length ? bundleIds : ["app.milos.member"]).map((bundleId) => `${teamId}.${bundleId}`);
+  const appIDs = (bundleIds.length ? bundleIds : ["app.palee.member"]).map((bundleId) => `${teamId}.${bundleId}`);
 
   return {
     applinks: {
@@ -40,12 +40,12 @@ export function appleAppSiteAssociation(env: Env = process.env) {
 /**
  * The Digital Asset Links statement list, or null until the signing
  * certificate fingerprints are configured (ANDROID_SHA256_CERT_FINGERPRINTS,
- * comma separated; ANDROID_PACKAGE_NAME defaults to app.milos.member).
+ * comma separated; ANDROID_PACKAGE_NAME defaults to app.palee.member).
  */
 export function assetLinks(env: Env = process.env) {
   const fingerprints = list(env.ANDROID_SHA256_CERT_FINGERPRINTS).map((value) => value.toUpperCase());
   if (fingerprints.length === 0) return null;
-  const packageName = env.ANDROID_PACKAGE_NAME?.trim() || "app.milos.member";
+  const packageName = env.ANDROID_PACKAGE_NAME?.trim() || "app.palee.member";
 
   return [
     {

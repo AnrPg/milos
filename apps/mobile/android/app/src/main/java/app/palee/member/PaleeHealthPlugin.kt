@@ -1,4 +1,4 @@
-package app.milos.member
+package app.palee.member
 
 import android.content.Intent
 import android.net.Uri
