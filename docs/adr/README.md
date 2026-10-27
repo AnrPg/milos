@@ -203,3 +203,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-203 | Transactional email outbox: templates, single-use link tokens, budgets, suppression | Accepted |
 | ADR-213 | Email verification at sign-up: emailed link, resend, banner, `email_verified` | Accepted |
 | ADR-205 | Verified email gates: company seats by email domain, business activation links emailed to a verified address | Accepted |
+| ADR-207 | Email change confirmed by a link to the new address, revert link to the old one, 7-day lock | Accepted |
