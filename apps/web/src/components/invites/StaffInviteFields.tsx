@@ -7,7 +7,7 @@ import { listAdminLocations } from "@/api/facility";
 import type { RoleName } from "@/api/roles";
 import { BranchScopePicker } from "@/components/admin/users/BranchScopePicker";
 import { grantableRoles } from "@/components/admin/users/MemberRolesEditor";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel } from "@/components/semantic-label";
 import { hasSeveralBranches, membershipLocationScope, type LocationScope } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { membershipRoles } from "@/lib/role-navigation";
@@ -85,7 +85,7 @@ export function StaffInviteFields({
                   color: on ? "var(--primary-contrast)" : "var(--text-soft)",
                 }}
               >
-                <SemanticLabel value={role} />
+                <RoleLabel role={role} />
               </button>
             );
           })}

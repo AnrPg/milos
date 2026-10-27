@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { listAdminLocations } from "@/api/facility";
 import { ALL_ROLES, updateCoachScope, updateLocationScope, updateMemberRoles, type RoleName } from "@/api/roles";
 import { localizeError } from "@/i18n/presentation";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel } from "@/components/semantic-label";
 import { BranchScopePicker } from "@/components/admin/users/BranchScopePicker";
 import {
   hasSeveralBranches,
@@ -135,7 +135,7 @@ export function MemberRolesEditor({
                   color: selected ? "var(--primary-contrast)" : "var(--text-soft)",
                 }}
               >
-                <SemanticLabel value={role} />
+                <RoleLabel role={role} />
               </button>
             );
           })}

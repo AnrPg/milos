@@ -5,12 +5,22 @@ import {
   formatScore,
   localizeAdminAssignmentError,
   localizeError,
+  roleLabel,
   semanticLabel,
 } from "@/i18n/presentation";
 
 const translate = vi.fn((key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key,
 );
+
+describe("roleLabel", () => {
+  it("names every business role, including the ones semanticLabel only humanises", () => {
+    expect(roleLabel("janitor", translate)).toBe("roleJanitor");
+    expect(roleLabel("front_desk", translate)).toBe("roleFrontDesk");
+    expect(roleLabel("member", translate)).toBe("roleMember");
+    expect(roleLabel("in_progress", translate)).toBe("semanticInProgress");
+  });
+});
 
 describe("semanticLabel", () => {
   it("translates canonical values without changing the stored value", () => {

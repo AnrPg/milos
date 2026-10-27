@@ -41,7 +41,7 @@ import { HoverHint } from "@/components/HelpTooltip";
 import { LocalizedScore } from "@/components/localized-score";
 import { CommentList } from "@/components/journal/CommentList";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel, SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
@@ -677,7 +677,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     label: `${semanticLabel(incident.body_area, i18n)} · ${date(incident.started_on)}`,
   }));
   const overviewItems: Array<[string, React.ReactNode]> = [
-    [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
+    [i18n("rolec3f104d"), <RoleLabel key="role" role={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
     [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
     [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
@@ -698,7 +698,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={profile.identity} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><SemanticLabel value={profile.identity.role} /></p>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><RoleLabel role={profile.identity.role} /></p>
             <h1 className="mt-4 truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
             <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
           </div>
@@ -848,7 +848,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                           className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
                           style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}
                         >
-                          <SemanticLabel value={role} />
+                          <RoleLabel role={role} />
                         </button>
                       );
                     })}

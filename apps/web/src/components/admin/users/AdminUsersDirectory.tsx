@@ -11,7 +11,7 @@ import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar"
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { InviteClientsButton } from "@/components/invites/InviteClients";
 import { PageHeader } from "@/components/PageHeader";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel, SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -292,7 +292,7 @@ function RoleBadge({ role }: { role: AdminUserDirectoryEntry["role"] }) {
   return (
     <span className="inline-flex items-center gap-1 font-semibold uppercase tracking-[0.12em]" style={{ color }}>
       <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-      <SemanticLabel value={role} />
+      <RoleLabel role={role} />
     </span>
   );
 }
