@@ -2530,7 +2530,6 @@
     "quickTextAcknowledgeWarnings": "Revisei esses avisos e quero publicar exatamente esta revisão.",
     "quickTextDiagnosticPosition": "Linha {line}, coluna {column}",
     "quickTextCloseManual": "Fechar manual",
-    "quickTextRevisionConflict": "Existem alterações mais recentes – é necessário recarregar",
     "editorUnderline": "Sublinhado",
     "editorStrike": "Tachado",
     "editorHighlight": "Destaque",
@@ -4578,7 +4577,30 @@
     "apiErrorFloorPlanWrongBranch": "Essa planta pertence a outra filial.",
     "apiErrorInvalidCleaningSchedule": "Escolha pelo menos um dia e escreva as horas como HH:MM.",
     "apiErrorInvalidPlacement": "Escolha um espaço e uma quantidade em cada linha.",
-    "apiErrorPlacementExceedsQuantity": "Há mais colocadas do que o ginásio tem desta máquina."
+    "apiErrorPlacementExceedsQuantity": "Há mais colocadas do que o ginásio tem desta máquina.",
+    "formErrFixHighlighted": "Há dados a corrigir. Veja os campos assinalados a vermelho.",
+    "formErrRequired": "Este campo não pode ficar vazio. Preencha-o.",
+    "formErrMustBeFuture": "Esta hora já passou. Escolha uma hora mais tarde.",
+    "formErrClassStartPassed": "Esta hora já passou: na box são agora {time} ({zone}). Escolha uma hora mais tarde ou outro dia.",
+    "formErrDayPassed": "Este dia já passou. Escolha hoje ou um dia posterior.",
+    "formErrEndsBeforeStart": "A data de fim é anterior à data de início. Escolha uma data de fim igual ou posterior ao início.",
+    "formErrPickWeekday": "Escolha pelo menos um dia da semana para as aulas.",
+    "formErrExcludedDates": "Não é possível ler estas datas: {dates}. Escreva cada data como 2026-12-25 e separe-as com vírgulas.",
+    "formErrTaken": "Isto já está a ser usado. Escolha outro.",
+    "formErrNotFound": "Esta opção já não existe. Escolha outra.",
+    "formErrMustAccept": "Assinale esta caixa para continuar.",
+    "formErrAtLeast": "Introduza {number} ou mais.",
+    "formErrGreaterThan": "Introduza um número superior a {number}.",
+    "formErrAtMost": "Introduza {number} ou menos.",
+    "formErrLessThan": "Introduza um número inferior a {number}.",
+    "formErrEqualTo": "O valor tem de ser {number}.",
+    "formErrTooLong": "Demasiado longo: no máximo {count} caracteres.",
+    "formErrTooShort": "Demasiado curto: pelo menos {count} caracteres.",
+    "formErrExactLength": "São necessários exatamente {count} caracteres.",
+    "formErrTooManyItems": "Escolheu demasiados: no máximo {count}.",
+    "formErrTooFewItems": "Escolha pelo menos {count}.",
+    "formErrInvalid": "Este valor não é aceite. Verifique-o e tente novamente.",
+    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}"
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -11496,5 +11518,17 @@
     "placementSpace": "Espaço",
     "placementPickSpace": "Escolha um espaço",
     "placementQuantity": "Quantas"
+  },
+  "DraftConflict": {
+    "title": "Este WOD foi alterado noutro sítio",
+    "body": "Foi guardada uma versão diferente deste WOD depois de o abrires, talvez noutro separador, noutro dispositivo ou por outro coach. Para nada ser substituído por engano, as tuas últimas alterações aqui ainda não foram guardadas.",
+    "question": "Que versão queres manter?",
+    "keepMine": "Manter a minha versão",
+    "keepMineHint": "Guarda o que vês aqui em vez da outra versão.",
+    "loadSaved": "Carregar a outra versão",
+    "loadSavedHint": "Mostra a versão guardada noutro sítio. As tuas alterações não guardadas aqui perdem-se.",
+    "working": "Um momento…",
+    "failed": "Não resultou. Verifica a ligação e tenta novamente.",
+    "status": "Não guardado: alterado noutro sítio"
   }
 }

@@ -743,7 +743,8 @@ export function WorkoutAdminConsole() {
               </section>
             ) : null}
 
-            {error ? (
+            {/* ADR-214: while the folder form is open, its errors show inside it. */}
+            {error && !folderModalOpen ? (
               <ErrorNotice>
                 {error}
               </ErrorNotice>
@@ -821,6 +822,7 @@ export function WorkoutAdminConsole() {
                       style={{ color: "var(--text-soft)" }}
                       onClick={() => {
                         setFolderParentId(currentFolder?.id ?? "");
+                        setError(null);
                         setFolderModalOpen(true);
                       }}
                     >
@@ -891,6 +893,7 @@ export function WorkoutAdminConsole() {
       {folderModalOpen ? (
         <Dialog
           onClose={() => setFolderModalOpen(false)}
+          error={error}
           eyebrow={i18n("featureNewFolder")}
           title={i18n("featureAddFolder")}
           closeLabel={i18n("closebbfa773")}

@@ -576,7 +576,7 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{
       code: "stale_dsl_revision",
       error:
-        "The Quick Text source changed in another editor. Reload before saving or publishing."
+        "This workout was saved somewhere else after you opened it. Choose whether to keep your version or load the saved one."
     })
   end
 

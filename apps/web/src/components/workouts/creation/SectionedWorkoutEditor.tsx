@@ -13,10 +13,11 @@ import {
   createDraftWorkout,
   fetchAdminWorkout,
   publishWorkoutDraft,
-  updateDraftWorkout,
   type WorkoutRecord,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { useDraftSaver } from "@/hooks/useDraftSaver";
+import { DraftConflictError, type DraftSaveStatus } from "@/lib/draft-saver";
 import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel";
 import { useUiTranslations } from "@/i18n/ui";
 import {
@@ -43,6 +44,7 @@ import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-d
 import { getFormatLabels, type SectionFormat, type WorkoutType } from "@/types/workout";
 
 import { AssistantSwitch } from "./AssistantSwitch";
+import { DraftConflictNotice } from "./DraftConflictNotice";
 import { EditorTabs } from "./EditorTabs";
 import { SectionScoringField } from "./SectionScoringField";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
@@ -59,8 +61,6 @@ type Props = {
   onUseAssistant: () => void;
 };
 
-type SaveStatus = "idle" | "saving" | "saved" | "error";
-
 const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
 
 /**
@@ -72,6 +72,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
+  const conflictT = useTranslations("DraftConflict");
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
@@ -82,8 +83,15 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   const [type, setType] = useState<WorkoutType | "">("");
   const [sections, setSections] = useState<EditorTextSection[]>(() => [emptySection()]);
   const [loaded, setLoaded] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  /** The draft could not be created or loaded. */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [draftSaves, setDraftSaves] = useState(0);
+  const { saver, status: draftSaveStatus } = useDraftSaver<SectionedDraftPayload>({
+    accessToken,
+    draftId,
+    onSaved: () => setDraftSaves((count) => count + 1),
+  });
+  const saveStatus: DraftSaveStatus = loadFailed ? "error" : draftSaveStatus;
   const [publishing, setPublishing] = useState(false);
   const [showProblems, setShowProblems] = useState(false);
   const [serverProblems, setServerProblems] = useState<SectionProblem[] | null>(null);
@@ -92,85 +100,67 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   const [openTab, setOpenTab] = useState<"details" | "goals" | null>("details");
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const metadataRef = useRef<Record<string, unknown>>({});
-  const revisionRef = useRef<number | null>(null);
   const loadedDraftRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!accessToken || draftId || loadedDraftRef.current === "creating") return;
     loadedDraftRef.current = "creating";
     createDraftWorkout(accessToken, folderId)
-      .then((draft) => {
-        revisionRef.current = draft.dsl_source_revision ?? 0;
-        onDraftReady(draft.id);
-      })
+      .then((draft) => onDraftReady(draft.id))
       .catch(() => {
         loadedDraftRef.current = null;
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
   }, [accessToken, draftId, folderId, onDraftReady]);
+
+  /** Puts a stored draft into the editor and arms autosave at its revision. */
+  const applyWorkout = useCallback(
+    (workout: WorkoutRecord) => {
+      setTitle(workout.title ?? "");
+      setType(WORKOUT_TYPES.includes(workout.type as WorkoutType) ? (workout.type as WorkoutType) : "");
+      metadataRef.current = workout.workout_metadata ?? {};
+      // A free-text draft switched to sections keeps its text as section 1
+      // and its whole-workout timer as that section's timer.
+      setSections(
+        editorSectionsFrom(workout, parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY])),
+      );
+      // A save based on an older revision is refused, so autosave starts here.
+      saver.start(workout.dsl_source_revision ?? 0);
+      setLoaded(true);
+    },
+    [saver],
+  );
 
   useEffect(() => {
     if (!accessToken || !draftId || loadedDraftRef.current === draftId) return;
     loadedDraftRef.current = draftId;
     fetchAdminWorkout(accessToken, draftId)
-      .then((workout: WorkoutRecord) => {
-        setTitle(workout.title ?? "");
-        if (WORKOUT_TYPES.includes(workout.type as WorkoutType)) setType(workout.type as WorkoutType);
-        metadataRef.current = workout.workout_metadata ?? {};
-        revisionRef.current = workout.dsl_source_revision ?? 0;
-        // A free-text draft switched to sections keeps its text as section 1
-        // and its whole-workout timer as that section's timer.
-        setSections(
-          editorSectionsFrom(workout, parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY])),
-        );
-        setLoaded(true);
-      })
+      .then(applyWorkout)
       .catch(() => {
         loadedDraftRef.current = null;
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
-  }, [accessToken, draftId]);
+  }, [accessToken, applyWorkout, draftId]);
 
-  const buildPayload = useCallback(() => {
-    const metadata = { ...metadataRef.current };
-    delete metadata[FREE_TEXT_TIMER_METADATA_KEY];
-    const payloadSections = sectionsPayload(sections);
-    const workoutType = type || null;
-    return {
-      title,
-      type: workoutType,
-      authoring_mode: SECTIONED_TEXT_MODE,
-      workout_metadata: metadata,
-      sections: payloadSections,
-      expected_source_revision: revisionRef.current,
-      draft_data: {
-        title,
-        type: workoutType,
-        authoring_mode: SECTIONED_TEXT_MODE,
-        workout_metadata: metadata,
-        sections: payloadSections,
-      },
-    };
-  }, [sections, title, type]);
+  const buildPayload = useCallback(() => sectionedPayload(title, type, sections, metadataRef.current), [sections, title, type]);
 
-  const saveDraft = useCallback(async () => {
-    if (!accessToken || !draftId || !loaded) return;
-    setSaveStatus("saving");
-    try {
-      const draft = await updateDraftWorkout(accessToken, draftId, buildPayload());
-      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
-      setSaveStatus("saved");
-      setDraftSaves((count) => count + 1);
-    } catch {
-      setSaveStatus("error");
-    }
-  }, [accessToken, buildPayload, draftId, loaded]);
-
+  // Autosave: one request at a time, a second after the last change.
   useEffect(() => {
-    if (!draftId || !loaded) return;
-    const timer = window.setTimeout(() => void saveDraft(), 1_000);
-    return () => window.clearTimeout(timer);
-  }, [draftId, loaded, saveDraft]);
+    if (!loaded) return;
+    saver.schedule(buildPayload());
+  }, [buildPayload, loaded, saver]);
+
+  async function keepMyVersion() {
+    if (!accessToken || !draftId) return;
+    const latest = await fetchAdminWorkout(accessToken, draftId);
+    saver.schedule(buildPayload());
+    await saver.overwrite(latest.dsl_source_revision ?? 0);
+  }
+
+  async function loadSavedVersion() {
+    if (!accessToken || !draftId) return;
+    applyWorkout(await fetchAdminWorkout(accessToken, draftId));
+  }
 
   const problems = useMemo(() => sectionProblems(sections), [sections]);
   const visibleProblems = serverProblems ?? (showProblems ? problems : []);
@@ -214,7 +204,13 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   }
 
   async function switchToAssistant() {
-    await saveDraft();
+    if (!saver.started) return;
+    try {
+      await saver.saveNow(buildPayload());
+    } catch {
+      // Not saved: stay here so nothing is lost (the status or notice says why).
+      return;
+    }
     onUseAssistant();
   }
 
@@ -230,16 +226,22 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
     setPublishing(true);
     try {
       const payload = buildPayload();
-      const draft = await updateDraftWorkout(accessToken, draftId, payload);
-      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
-      await publishWorkoutDraft(accessToken, draftId, { ...payload, expected_source_revision: revisionRef.current });
+      // The final save and the publish run back to back in the save queue.
+      await saver.saveNow(payload, async (revision) => {
+        saver.close();
+        try {
+          await publishWorkoutDraft(accessToken, draftId, { ...payload, expected_source_revision: revision });
+        } catch (error) {
+          saver.reopen();
+          throw error;
+        }
+      });
       router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
     } catch (error) {
       const details = error instanceof ApiError ? (error.payload?.details as { sections?: SectionProblem[] } | undefined) : undefined;
       if (details?.sections?.length) {
         setServerProblems(details.sections);
-      } else {
-        setSaveStatus("error");
+      } else if (!(error instanceof DraftConflictError)) {
         setNotice(assistantT("publishFailed"));
       }
     } finally {
@@ -249,6 +251,11 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
 
   return (
     <div className="mx-auto flex min-h-[calc(100dvh-6.5rem)] w-full max-w-3xl min-w-0 flex-col gap-4 px-4 pb-5 sm:px-6">
+      {saveStatus === "conflict" ? (
+        <div className="-mx-4 sm:-mx-6">
+          <DraftConflictNotice onKeepMine={keepMyVersion} onLoadSaved={loadSavedVersion} />
+        </div>
+      ) : null}
       <div className="-mx-4 sm:-mx-6">
         <EditorTabs
           label={i18n("workoutEditorTabsLabel")}
@@ -269,7 +276,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
           trailing={
             <>
               <span className="hidden text-xs font-semibold sm:inline" role="status" style={{ color: "var(--muted)" }}>
-                {saveStatusText(saveStatus, i18n)}
+                {saveStatus === "conflict" ? conflictT("status") : saveStatusText(saveStatus, i18n)}
               </span>
               <AssistantSwitch enabled={false} available={assistantAvailable} onChange={() => void switchToAssistant()} />
             </>
@@ -616,7 +623,35 @@ function IconButton({
   );
 }
 
-function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTranslations>) {
+type SectionedDraftPayload = ReturnType<typeof sectionedPayload>;
+
+function sectionedPayload(
+  title: string,
+  type: WorkoutType | "",
+  sections: EditorTextSection[],
+  storedMetadata: Record<string, unknown>,
+) {
+  const metadata = { ...storedMetadata };
+  delete metadata[FREE_TEXT_TIMER_METADATA_KEY];
+  const payloadSections = sectionsPayload(sections);
+  const workoutType = type || null;
+  return {
+    title,
+    type: workoutType,
+    authoring_mode: SECTIONED_TEXT_MODE,
+    workout_metadata: metadata,
+    sections: payloadSections,
+    draft_data: {
+      title,
+      type: workoutType,
+      authoring_mode: SECTIONED_TEXT_MODE,
+      workout_metadata: metadata,
+      sections: payloadSections,
+    },
+  };
+}
+
+function saveStatusText(status: Exclude<DraftSaveStatus, "conflict">, i18n: ReturnType<typeof useUiTranslations>) {
   switch (status) {
     case "saving":
       return i18n("quickTextSaving");

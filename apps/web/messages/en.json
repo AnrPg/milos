@@ -2530,7 +2530,6 @@
     "quickTextAcknowledgeWarnings": "I reviewed these warnings and want to publish this exact revision.",
     "quickTextDiagnosticPosition": "Line {line}, column {column}",
     "quickTextCloseManual": "Close manual",
-    "quickTextRevisionConflict": "Newer changes exist — reload required",
     "editorUnderline": "Underline",
     "editorStrike": "Strikethrough",
     "editorHighlight": "Highlight",
@@ -4578,7 +4577,30 @@
     "apiErrorFloorPlanWrongBranch": "That floor plan belongs to another branch.",
     "apiErrorInvalidCleaningSchedule": "Choose at least one day, and write times as HH:MM.",
     "apiErrorInvalidPlacement": "Choose a space and a quantity for each row.",
-    "apiErrorPlacementExceedsQuantity": "More are placed than the box owns of this machine."
+    "apiErrorPlacementExceedsQuantity": "More are placed than the box owns of this machine.",
+    "formErrFixHighlighted": "Some details need fixing. Look for the fields marked in red.",
+    "formErrRequired": "This can't be left empty. Fill it in.",
+    "formErrMustBeFuture": "This time has already passed. Pick a later time.",
+    "formErrClassStartPassed": "This time has already passed: it is {time} at the box now ({zone}). Pick a later time or another day.",
+    "formErrDayPassed": "This day has already passed. Pick today or a later day.",
+    "formErrEndsBeforeStart": "The end date is before the start date. Pick an end date on or after the start date.",
+    "formErrPickWeekday": "Pick at least one day of the week for the classes.",
+    "formErrExcludedDates": "These dates can't be read: {dates}. Write each date like 2026-12-25 and separate them with commas.",
+    "formErrTaken": "This is already taken. Pick a different one.",
+    "formErrNotFound": "This choice no longer exists. Pick another one.",
+    "formErrMustAccept": "Tick this box to continue.",
+    "formErrAtLeast": "Enter {number} or more.",
+    "formErrGreaterThan": "Enter a number above {number}.",
+    "formErrAtMost": "Enter {number} or less.",
+    "formErrLessThan": "Enter a number below {number}.",
+    "formErrEqualTo": "This has to be {number}.",
+    "formErrTooLong": "Too long: use at most {count} characters.",
+    "formErrTooShort": "Too short: use at least {count} characters.",
+    "formErrExactLength": "This needs exactly {count} characters.",
+    "formErrTooManyItems": "Too many chosen: pick at most {count}.",
+    "formErrTooFewItems": "Pick at least {count}.",
+    "formErrInvalid": "This value isn't accepted. Check it and try again.",
+    "apiErrorValidationFailedDetail": "Some details weren't accepted: {details}"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -11496,5 +11518,17 @@
     "placementSpace": "Space",
     "placementPickSpace": "Choose a space",
     "placementQuantity": "How many"
+  },
+  "DraftConflict": {
+    "title": "This WOD was changed somewhere else",
+    "body": "A different version of this WOD was saved after you opened it, maybe in another tab, on another device or by another coach. So nothing gets overwritten by mistake, your latest changes here are not saved yet.",
+    "question": "Which version do you want to keep?",
+    "keepMine": "Keep my version",
+    "keepMineHint": "Saves what you see here in place of the other version.",
+    "loadSaved": "Load the other version",
+    "loadSavedHint": "Shows the version saved elsewhere. Your unsaved changes here are dropped.",
+    "working": "One moment…",
+    "failed": "That didn't work. Check your connection and try again.",
+    "status": "Not saved: changed elsewhere"
   }
 }
