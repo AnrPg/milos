@@ -352,6 +352,9 @@ defmodule PaleeWeb.Router do
     post("/password-reset-requests", PasswordRecoveryController, :request)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
+    # ADR-207: the links of an email change (new address, then old address).
+    post("/email-change/confirm", EmailChangeController, :confirm)
+    post("/email-change/revert", EmailChangeController, :revert)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -1398,6 +1401,11 @@ defmodule PaleeWeb.Router do
     ])
 
     patch("/profile", MeController, :update_profile)
+    # ADR-207: the login's pending email change.
+    get("/email-change", EmailChangeController, :show)
+    post("/email-change", EmailChangeController, :create)
+    post("/email-change/resend", EmailChangeController, :resend)
+    delete("/email-change", EmailChangeController, :delete)
     post("/tours/:audience/complete", MeController, :complete_tour)
     put("/time-zone", MeController, :update_time_zone)
     post("/avatar/upload-url", MeController, :avatar_upload_url)

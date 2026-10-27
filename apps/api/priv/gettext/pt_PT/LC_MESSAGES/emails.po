@@ -30,3 +30,18 @@ msgstr "Olá %{name},"
 
 msgid "Hello,"
 msgstr "Olá,"
+
+msgid "Confirm your new email address"
+msgstr "Confirme o seu novo endereço de email"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "Foi pedido que este endereço passe a ser o endereço de início de sessão de uma conta %{product}. Confirme-o para concluir a alteração. Até lá, a conta mantém o endereço atual."
+
+msgid "Confirm this address"
+msgstr "Confirmar este endereço"
+
+msgid "The link works for 24 hours."
+msgstr "A ligação é válida durante 24 horas."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "Está a receber este email porque foi pedido que este endereço fosse usado numa conta %{product}."

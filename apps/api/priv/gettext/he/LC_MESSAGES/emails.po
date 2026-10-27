@@ -30,3 +30,18 @@ msgstr "שלום %{name},"
 
 msgid "Hello,"
 msgstr "שלום,"
+
+msgid "Confirm your new email address"
+msgstr "אשרו את כתובת המייל החדשה"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "התבקש להפוך את הכתובת הזו לכתובת הכניסה של חשבון ב-%{product}. אשרו אותה כדי להשלים את השינוי. עד אז החשבון שומר על הכתובת הנוכחית שלו."
+
+msgid "Confirm this address"
+msgstr "אישור הכתובת"
+
+msgid "The link works for 24 hours."
+msgstr "הקישור בתוקף למשך 24 שעות."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "קיבלתם את המייל הזה כי התבקש להשתמש בכתובת הזו עבור חשבון ב-%{product}."
