@@ -158,7 +158,10 @@ test.describe("business sign-up", () => {
     await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ error: "unauthorized" }, 401)));
     await page.route("**/api/auth/register", (route) => {
       sent.registered.push(route.request().postDataJSON());
-      return route.fulfill(json({ access_token: tokenFor(persona), refresh_token: "refresh" }, 201));
+      // ADR-211: a new account's answer also says where the link went.
+      return route.fulfill(
+        json({ access_token: tokenFor(persona), confirmation: "email_sent", email: "maria@example.com" }, 201),
+      );
     });
     await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
     await page.route("**/api/memberships", (route) => route.fulfill(json([])));
