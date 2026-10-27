@@ -28,7 +28,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
-                <data android:host="milos.4kq.net" />
+                <data android:host="palee.app" />
                 <data android:pathPrefix="/c/" />
                 <data android:pathPrefix="/join/" />
                 <data android:pathPrefix="/b/" />
@@ -41,7 +41,7 @@
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="https" />
-                <data android:host="milos.4kq.net" />
+                <data android:host="palee.app" />
                 <data android:pathPrefix="/c/" />
             </intent-filter>
             <!-- palee:app-links end -->
@@ -73,7 +73,7 @@
         <receiver android:name=".WaterWidgetProvider" android:exported="false" android:label="@string/palee_widget_water_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="app.milos.member.widget.ADD_WATER" />
+                <action android:name="app.palee.member.widget.ADD_WATER" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/palee_widget_water" />
         </receiver>

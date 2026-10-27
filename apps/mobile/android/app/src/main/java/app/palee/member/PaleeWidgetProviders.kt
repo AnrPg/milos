@@ -1,4 +1,4 @@
-package app.milos.member
+package app.palee.member
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -111,7 +111,7 @@ class WaterWidgetProvider : PaleeWidgetProvider() {
     }
 
     companion object {
-        const val ACTION_ADD_WATER = "app.milos.member.widget.ADD_WATER"
+        const val ACTION_ADD_WATER = "app.palee.member.widget.ADD_WATER"
     }
 }
 

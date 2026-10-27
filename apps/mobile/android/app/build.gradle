@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    namespace = "app.milos.member"
+    namespace = "app.palee.member"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "app.milos.member"
+        applicationId "app.palee.member"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

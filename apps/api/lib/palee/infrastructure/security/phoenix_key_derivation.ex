@@ -12,7 +12,7 @@ defmodule Palee.Infrastructure.Security.PhoenixKeyDerivation do
     base = PaleeWeb.Endpoint.config(:secret_key_base)
 
     purpose_key =
-      Plug.Crypto.KeyGenerator.generate(base, "milos:" <> purpose,
+      Plug.Crypto.KeyGenerator.generate(base, "palee:" <> purpose,
         length: 32,
         cache: Plug.Crypto.Keys
       )

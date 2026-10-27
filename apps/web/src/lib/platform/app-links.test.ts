@@ -15,9 +15,9 @@ describe("app links", () => {
 
   it("builds the apple-app-site-association from the team and bundle ids", () => {
     const document = appleAppSiteAssociation({ APPLE_TEAM_ID: "ABCDE12345" });
-    expect(document?.applinks.details[0].appIDs).toEqual(["ABCDE12345.app.milos.member"]);
+    expect(document?.applinks.details[0].appIDs).toEqual(["ABCDE12345.app.palee.member"]);
     expect(document?.applinks.details[0].components).toContainEqual({ "/": "/c/*" });
-    expect(document?.webcredentials.apps).toEqual(["ABCDE12345.app.milos.member"]);
+    expect(document?.webcredentials.apps).toEqual(["ABCDE12345.app.palee.member"]);
     expect(
       appleAppSiteAssociation({ APPLE_TEAM_ID: "T", IOS_BUNDLE_ID: "a.b, a.b.dev" })?.applinks.details[0].appIDs,
     ).toEqual(["T.a.b", "T.a.b.dev"]);
@@ -29,7 +29,7 @@ describe("app links", () => {
     expect(statements).toEqual([
       {
         relation: ["delegate_permission/common.handle_all_urls"],
-        target: { namespace: "android_app", package_name: "app.milos.member", sha256_cert_fingerprints: ["AA:BB", "CC:DD"] },
+        target: { namespace: "android_app", package_name: "app.palee.member", sha256_cert_fingerprints: ["AA:BB", "CC:DD"] },
       },
     ]);
   });

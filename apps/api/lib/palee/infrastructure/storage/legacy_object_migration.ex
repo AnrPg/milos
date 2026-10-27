@@ -302,10 +302,10 @@ defmodule Palee.Infrastructure.Storage.LegacyObjectMigration do
   end
 
   defp document_bucket,
-    do: Application.get_env(:palee, :minio_bucket, "milos-invoices")
+    do: Application.get_env(:palee, :minio_bucket, "palee-invoices")
 
   defp avatar_bucket,
-    do: Application.get_env(:palee, :minio_avatar_bucket, "milos-avatars")
+    do: Application.get_env(:palee, :minio_avatar_bucket, "palee-avatars")
 
   defp avatar_public_url(bucket, key) do
     "#{String.trim_trailing(public_endpoint(), "/")}/#{bucket}/#{key}"

@@ -8,8 +8,8 @@ defmodule Palee.Organizations.T4OwnershipFoundationTest do
   test "the stable legacy organization owns transitional tenant data" do
     user = user_fixture()
 
-    assert %{id: legacy_organization_id} =
-             Organizations.get_by_slug(Organizations.legacy_organization_slug())
+    assert {:ok, %{id: legacy_organization_id}} =
+             Organizations.ensure_legacy_organization_for_migration()
 
     {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(user, :owner)
 

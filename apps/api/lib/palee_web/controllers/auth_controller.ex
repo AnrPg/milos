@@ -616,7 +616,7 @@ defmodule PaleeWeb.AuthController do
     put_resp_cookie(conn, refresh_cookie_name(), token, refresh_cookie_options())
   end
 
-  defp refresh_cookie_name, do: "milos_refresh"
+  defp refresh_cookie_name, do: "palee_refresh"
 
   defp refresh_cookie_options do
     [

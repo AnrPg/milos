@@ -9,7 +9,7 @@ defmodule PaleeWeb.AdminCoachingControllerTest do
   import Palee.TestFixtures
 
   defp legacy_org_with_members!(members) do
-    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+    legacy_organization = elem(Organizations.ensure_legacy_organization_for_migration(), 1)
 
     for {user, role} <- members do
       case Organizations.OrganizationStore.get_membership(legacy_organization.id, user.id) do

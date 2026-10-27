@@ -6,7 +6,7 @@ defmodule Palee.Infrastructure.Auth.Guardian do
   def subject_for_token(user, _claims), do: {:ok, user.id}
 
   def fetch_issuer do
-    System.get_env("GUARDIAN_ISSUER", "milos_training")
+    System.get_env("GUARDIAN_ISSUER", "palee")
   end
 
   def fetch_secret do

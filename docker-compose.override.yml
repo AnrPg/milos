@@ -51,8 +51,8 @@ services:
       MINIO_PUBLIC_ENDPOINT: http://localhost:${MINIO_API_HOST_PORT:-19000}
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      MINIO_BUCKET: ${MINIO_BUCKET:-milos-invoices}
-      MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}
+      MINIO_BUCKET: ${MINIO_BUCKET:-palee-invoices}
+      MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-palee-avatars}
     depends_on:
       api_setup:
         condition: service_completed_successfully

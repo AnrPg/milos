@@ -2,4 +2,5 @@ defmodule Palee.Application.Ports.PRSearchIndex do
   @callback enqueue_upsert(map()) :: :ok | {:error, term()}
   @callback enqueue_delete(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok | {:error, term()}
   @callback search(Ecto.UUID.t(), String.t()) :: {:ok, [Ecto.UUID.t()]} | {:error, term()}
+  @callback replace_documents([map()]) :: :ok | {:error, term()}
 end

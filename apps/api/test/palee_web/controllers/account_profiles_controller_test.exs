@@ -108,7 +108,7 @@ defmodule PaleeWeb.AccountProfilesControllerTest do
 
     conn = post(authed(token), "/api/auth/switch-profile", Jason.encode!(%{user_id: pt_id}))
     assert %{"access_token" => _, "user" => %{"id" => ^pt_id}} = json_response(conn, 200)
-    assert conn.resp_cookies["milos_refresh"]
+    assert conn.resp_cookies["palee_refresh"]
 
     %{"access_token" => other_token} = other
     {:ok, claims} = Palee.Infrastructure.Auth.Guardian.decode_and_verify(other_token)

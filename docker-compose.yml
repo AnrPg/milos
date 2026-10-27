@@ -4,13 +4,13 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: ecto://${DB_RUNTIME_USER:-milos_runtime}:${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}@postgres/${DB_NAME:-palee_dev}
+      DATABASE_URL: ecto://${DB_RUNTIME_USER:-palee_runtime}:${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}@postgres/${DB_NAME:-palee_dev}
       MIGRATION_DATABASE_URL: ecto://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres/${DB_NAME:-palee_dev}
       DB_HOST: postgres
       DB_NAME: ${DB_NAME:-palee_dev}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_USER: ${DB_USER:-postgres}
-      GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-milos_training}
+      GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-palee}
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
       MEILI_URL: http://meilisearch:7700
@@ -22,9 +22,9 @@ services:
       MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-palee_minio}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-palee-minio-change-me}
-      MINIO_BUCKET: ${MINIO_BUCKET:-milos-invoices}
-      MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}
-      MINIO_MEDIA_BUCKET: ${MINIO_MEDIA_BUCKET:-milos-media}
+      MINIO_BUCKET: ${MINIO_BUCKET:-palee-invoices}
+      MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-palee-avatars}
+      MINIO_MEDIA_BUCKET: ${MINIO_MEDIA_BUCKET:-palee-media}
       PHX_HOST: ${PHX_HOST:-localhost}
       PHX_SERVER: "true"
       PORT: 4000
@@ -74,7 +74,7 @@ services:
       DB_NAME: ${DB_NAME:-palee_dev}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_USER: ${DB_USER:-postgres}
-      GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-milos_training}
+      GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-palee}
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
       MEILI_URL: http://meilisearch:7700
@@ -156,7 +156,7 @@ services:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-palee_dev}
-      POSTGRES_RUNTIME_USER: ${DB_RUNTIME_USER:-milos_runtime}
+      POSTGRES_RUNTIME_USER: ${DB_RUNTIME_USER:-palee_runtime}
       POSTGRES_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}
     volumes:
       - ./.postgres-data:/var/lib/postgresql/data

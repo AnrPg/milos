@@ -26,7 +26,7 @@ defmodule Palee.Application.UpdateAvatarTest do
     avatar_key = "avatars/#{user.id}/avatar.jpg"
 
     assert {:ok, updated_user} = UpdateAvatar.call(user.id, avatar_key)
-    assert updated_user.avatar_url == "https://s3-milos.4kq.net/milos-avatars/#{avatar_key}"
+    assert updated_user.avatar_url == "https://media.palee.app/palee-avatars/#{avatar_key}"
     assert Identity.find_by_id(user.id).avatar_url == updated_user.avatar_url
   end
 
@@ -39,7 +39,7 @@ defmodule Palee.Application.UpdateAvatarTest do
     @impl true
     def validate_uploaded(user_id, "avatars/" <> _rest = key) do
       if String.starts_with?(key, "avatars/#{user_id}/") do
-        {:ok, "https://s3-milos.4kq.net/milos-avatars/#{key}"}
+        {:ok, "https://media.palee.app/palee-avatars/#{key}"}
       else
         {:error, :invalid_avatar_upload}
       end

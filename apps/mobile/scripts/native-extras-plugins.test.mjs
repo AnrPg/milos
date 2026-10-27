@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { androidNdefFilter } from "./configure.mjs";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
-const kotlin = (name) => read(`../android/app/src/main/java/app/milos/member/${name}`);
+const kotlin = (name) => read(`../android/app/src/main/java/app/palee/member/${name}`);
 
 const PLUGINS = [
   { js: "PaleeWidgets", swift: "PaleeWidgetsPlugin", kt: "PaleeWidgetsPlugin", web: "widgets.ts", methods: ["setSession", "clear"] },
@@ -55,10 +55,10 @@ test("the iOS plugins are compiled and registered by the app's controller", () =
     assert.match(plist, new RegExp(`<key>${key}</key>`), key);
   }
   const entitlements = read("../ios/App/App/App.entitlements");
-  assert.match(entitlements, /group\.app\.milos\.member/);
+  assert.match(entitlements, /group\.app\.palee\.member/);
   assert.match(entitlements, /com\.apple\.developer\.nfc\.readersession\.formats/);
-  assert.match(read("../ios/App/PaleeWidgets/PaleeWidgets.entitlements"), /group\.app\.milos\.member/);
-  assert.match(read("../ios/App/App/PaleeWidgetsPlugin.swift"), /"group\.app\.milos\.member"/);
+  assert.match(read("../ios/App/PaleeWidgets/PaleeWidgets.entitlements"), /group\.app\.palee\.member/);
+  assert.match(read("../ios/App/App/PaleeWidgetsPlugin.swift"), /"group\.app\.palee\.member"/);
 });
 
 test("the Android plugins, widgets and receivers are registered", () => {
@@ -76,7 +76,7 @@ test("the Android plugins, widgets and receivers are registered", () => {
   for (const name of ["water", "today", "checkin"]) {
     assert.match(read(`../android/app/src/main/res/xml/palee_widget_${name}.xml`), new RegExp(`@layout/widget_${name}`));
   }
-  assert.match(kotlin("PaleeWidgetProviders.kt"), /"app\.milos\.member\.widget\.ADD_WATER"/);
+  assert.match(kotlin("PaleeWidgetProviders.kt"), /"app\.palee\.member\.widget\.ADD_WATER"/);
 });
 
 test("widgets and the web agree on the snapshot and tap paths", () => {

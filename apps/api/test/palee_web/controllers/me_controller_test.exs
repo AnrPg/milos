@@ -52,7 +52,7 @@ defmodule PaleeWeb.MeControllerTest do
         |> json_response(200)
 
       assert body["user"]["avatar_url"] ==
-               "https://s3-milos.4kq.net/milos-avatars/#{avatar_key}"
+               "https://media.palee.app/palee-avatars/#{avatar_key}"
 
       assert Identity.find_by_id(user.id).avatar_url == body["user"]["avatar_url"]
     end
@@ -85,7 +85,7 @@ defmodule PaleeWeb.MeControllerTest do
       @impl true
       def validate_uploaded(user_id, "avatars/" <> _rest = key) do
         if String.starts_with?(key, "avatars/#{user_id}/") do
-          {:ok, "https://s3-milos.4kq.net/milos-avatars/#{key}"}
+          {:ok, "https://media.palee.app/palee-avatars/#{key}"}
         else
           {:error, :avatar_key_forbidden}
         end

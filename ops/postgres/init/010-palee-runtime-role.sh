@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-runtime_user="${POSTGRES_RUNTIME_USER:-milos_runtime}"
+runtime_user="${POSTGRES_RUNTIME_USER:-palee_runtime}"
 runtime_password="${POSTGRES_RUNTIME_PASSWORD:?POSTGRES_RUNTIME_PASSWORD is required}"
 
 psql --set=ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \

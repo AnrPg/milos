@@ -112,9 +112,9 @@ config :palee,
   minio_public_endpoint: minio_public_endpoint,
   minio_access_key: minio_access_key,
   minio_secret_key: minio_secret_key,
-  minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
-  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars"),
-  minio_media_bucket: System.get_env("MINIO_MEDIA_BUCKET", "milos-media")
+  minio_bucket: System.get_env("MINIO_BUCKET", "palee-invoices"),
+  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "palee-avatars"),
+  minio_media_bucket: System.get_env("MINIO_MEDIA_BUCKET", "palee-media")
 
 meili_url =
   System.get_env("MEILI_URL") ||
@@ -321,9 +321,18 @@ if config_env() == :prod do
   config :palee, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
   config :palee, :public_base_url, "https://#{host}"
 
+  smtp_relay = System.get_env("SMTP_RELAY")
+
+  # Mail never falls back to an internal host such as *.4kq.net: with a relay
+  # configured, a missing MAIL_FROM_ADDRESS on such a host stops the boot.
+  mail_from_address =
+    System.get_env("MAIL_FROM_ADDRESS") ||
+      if(smtp_relay, do: Palee.Mailer.default_from_address(host), else: "no-reply@#{host}")
+
   config :palee, :mail_from,
     name: System.get_env("MAIL_FROM_NAME") || "Palee",
-    address: System.get_env("MAIL_FROM_ADDRESS") || "no-reply@#{host}"
+    address: mail_from_address,
+    reply_to: System.get_env("MAIL_REPLY_TO")
 
   # Optional on purpose: absent SMTP_RELAY must not crash boot over a
   # feature (owner-invitation email) the app worked without until now.
@@ -331,10 +340,12 @@ if config_env() == :prod do
   # caller already treats a delivery failure as a clean {:error, _} rather
   # than crashing (see SendOwnerInvitationEmail.safe_deliver/1) - so this
   # stays a degraded feature, not an outage, until these are set.
-  if smtp_relay = System.get_env("SMTP_RELAY") do
+  if smtp_relay do
     config :palee, Palee.Mailer,
       adapter: Swoosh.Adapters.SMTP,
       relay: smtp_relay,
+      # The HELO name; gen_smtp otherwise sends the pod's hostname.
+      hostname: System.get_env("SMTP_HELO_HOST") || Palee.Mailer.domain_of(mail_from_address),
       port: String.to_integer(System.get_env("SMTP_PORT") || "587"),
       username: System.get_env("SMTP_USERNAME"),
       password: System.get_env("SMTP_PASSWORD"),

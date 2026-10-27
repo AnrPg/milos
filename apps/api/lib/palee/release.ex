@@ -29,6 +29,12 @@ defmodule Palee.Release do
     end)
   end
 
+  @doc "Rebuilds the search indexes; run on the live node (`bin/palee rpc`)."
+  def reindex_search do
+    {:ok, summary} = Palee.Application.ReindexSearch.call()
+    IO.puts("Search reindexed: #{inspect(summary)}")
+  end
+
   defp repos do
     Application.fetch_env!(@app, :ecto_repos)
   end

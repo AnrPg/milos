@@ -53,7 +53,7 @@ defmodule Palee.Organizations do
     ResolveTenantContext
   }
 
-  @legacy_organization %{name: "Milos Training", slug: "legacy-milos-training"}
+  @legacy_organization %{name: "Legacy organization", slug: "legacy-organization"}
 
   def legacy_organization_slug, do: @legacy_organization.slug
   def legacy_organization_name, do: @legacy_organization.name

@@ -3,7 +3,7 @@ set -eu
 
 : "${DB_USER:=postgres}"
 : "${DB_NAME:=palee_dev}"
-: "${DB_RUNTIME_USER:=milos_runtime}"
+: "${DB_RUNTIME_USER:=palee_runtime}"
 : "${DB_RUNTIME_PASSWORD:?DB_RUNTIME_PASSWORD is required}"
 
 docker compose exec -T \

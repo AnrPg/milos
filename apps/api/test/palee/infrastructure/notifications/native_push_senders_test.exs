@@ -50,7 +50,7 @@ defmodule Palee.Infrastructure.Notifications.NativePushSendersTest do
       team_id: "TEAM123456",
       key_id: "KEY1234567",
       private_key: pem(key),
-      topic: "app.milos.member",
+      topic: "app.palee.member",
       req_options: [plug: {Req.Test, ApnsSender}]
     )
 
@@ -176,7 +176,7 @@ defmodule Palee.Infrastructure.Notifications.NativePushSendersTest do
       assert payload["aps"]["alert"]["title"] == "Νέο μήνυμα"
       assert payload["url"] == "/messages"
       headers = Map.new(headers)
-      assert headers["apns-topic"] == "app.milos.member"
+      assert headers["apns-topic"] == "app.palee.member"
       assert headers["apns-push-type"] == "alert"
 
       "bearer " <> jwt = headers["authorization"]

@@ -4,23 +4,23 @@ defmodule Palee.Infrastructure.Storage.MinioStorageTest do
   alias Palee.Infrastructure.Storage.MinioStorage
 
   test "bucket probe uses a body-bearing GET operation compatible with Hackney" do
-    operation = MinioStorage.bucket_probe_operation("milos-avatars")
+    operation = MinioStorage.bucket_probe_operation("palee-avatars")
 
     assert operation.http_method == :get
-    assert operation.bucket == "milos-avatars"
+    assert operation.bucket == "palee-avatars"
     assert operation.resource == "location"
   end
 
   test "the public media bucket exposes only avatars and tenant logos (ADR-121)" do
     %{Statement: [%{Action: action, Resource: resource}]} =
-      MinioStorage.public_read_policy("milos-avatars")
+      MinioStorage.public_read_policy("palee-avatars")
 
     assert action == ["s3:GetObject"]
 
     assert resource == [
-             "arn:aws:s3:::milos-avatars/users/*/avatars/*",
-             "arn:aws:s3:::milos-avatars/organizations/*/branding/logo/*",
-             "arn:aws:s3:::milos-avatars/organizations/*/media/public/*"
+             "arn:aws:s3:::palee-avatars/users/*/avatars/*",
+             "arn:aws:s3:::palee-avatars/organizations/*/branding/logo/*",
+             "arn:aws:s3:::palee-avatars/organizations/*/media/public/*"
            ]
   end
 
@@ -48,10 +48,10 @@ defmodule Palee.Infrastructure.Storage.MinioStorageTest do
   end
 
   test "avatar metadata probe uses a bounded body-bearing GET" do
-    operation = MinioStorage.avatar_probe_operation("milos-avatars", "avatars/user/avatar.jpg")
+    operation = MinioStorage.avatar_probe_operation("palee-avatars", "avatars/user/avatar.jpg")
 
     assert operation.http_method == :get
-    assert operation.bucket == "milos-avatars"
+    assert operation.bucket == "palee-avatars"
     assert operation.path == "avatars/user/avatar.jpg"
     assert operation.headers["range"] == "bytes=0-15"
   end
@@ -128,7 +128,7 @@ defmodule Palee.Infrastructure.Storage.MinioStorageTest do
     body = """
     <?xml version="1.0" encoding="UTF-8"?>
     <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-      <Name>milos-invoices</Name><IsTruncated>true</IsTruncated>
+      <Name>palee-invoices</Name><IsTruncated>true</IsTruncated>
       <NextContinuationToken>tok&amp;en</NextContinuationToken>
       <Contents><Key>organizations/o/invoices/1/a&amp;b.pdf</Key><Size>42</Size></Contents>
       <Contents><Key>organizations/o/branding/logo.png</Key><Size>7</Size></Contents>

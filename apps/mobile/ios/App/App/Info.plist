@@ -79,7 +79,7 @@
     <!-- palee:app-links begin -->
     <key>WKAppBoundDomains</key>
     <array>
-        <string>milos.4kq.net</string>
+        <string>palee.app</string>
         <string>connect.garmin.com</string>
     </array>
     <!-- palee:app-links end -->

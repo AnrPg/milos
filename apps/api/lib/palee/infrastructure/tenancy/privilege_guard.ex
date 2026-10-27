@@ -2,7 +2,7 @@ defmodule Palee.Infrastructure.Tenancy.PrivilegeGuard do
   @moduledoc """
   Row Level Security only enforces tenant isolation if the runtime database
   connection is neither a superuser nor BYPASSRLS. In production this is
-  enforced by the `milos_runtime` role (see ops/postgres/init), but nothing
+  enforced by the `palee_runtime` role (see ops/postgres/init), but nothing
   previously verified that at boot - a misconfigured DATABASE_URL pointing at
   a superuser role would silently disable every RLS policy in the app.
   """
