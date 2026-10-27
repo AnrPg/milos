@@ -98,7 +98,7 @@ test.describe("/verify-email", () => {
     );
 
     await page.goto("/verify-email#token=old");
-    await expect(page.getByRole("alert")).toContainText("This link has expired.");
+    await expect(page.locator("[data-error-notice]")).toContainText("This link has expired.");
     await expect(page.getByRole("link", { name: "Sign in to get a new link" })).toBeVisible();
   });
 
@@ -110,7 +110,7 @@ test.describe("/verify-email", () => {
     await page.route("**/api/auth/verification-email", (route) => route.fulfill(json({ status: "sent" })));
 
     await page.goto("/verify-email#token=spent");
-    await expect(page.getByRole("alert")).toContainText("This link was already used.");
+    await expect(page.locator("[data-error-notice]")).toContainText("This link was already used.");
     await page.getByRole("button", { name: "Send a new link" }).click();
     await expect(page.getByText("A new link is on its way to maria@example.com.")).toBeVisible();
   });
@@ -118,6 +118,6 @@ test.describe("/verify-email", () => {
   test("without a token the link is invalid", async ({ page }) => {
     await stubSignedOut(page);
     await page.goto("/verify-email");
-    await expect(page.getByRole("alert")).toContainText("This link isn't valid.");
+    await expect(page.locator("[data-error-notice]")).toContainText("This link isn't valid.");
   });
 });

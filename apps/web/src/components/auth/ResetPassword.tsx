@@ -45,31 +45,28 @@ export function ResetPassword() {
 
   // The fragment only exists in the browser. The token is kept in memory and
   // taken out of the address bar, so it stays out of history and referrers.
+  // Read and checked once: a second run of the effect (React's development
+  // double mount) would find the address bar already cleared.
+  const readRef = useRef(false);
   useEffect(() => {
-    let cancelled = false;
+    if (readRef.current) return;
+    readRef.current = true;
     const found = resetTokenFromLocation(window.location.hash, window.location.search);
     if (found) window.history.replaceState(window.history.state, "", window.location.pathname);
     queueMicrotask(() => {
-      if (cancelled) return;
       setToken(found);
       if (!found) setLinkState("missing");
     });
     if (found) {
       inspectPasswordReset(found)
-        .then(() => {
-          if (!cancelled) setLinkState("ready");
-        })
+        .then(() => setLinkState("ready"))
         .catch((caught: unknown) => {
-          if (cancelled) return;
           const kind = resetFailure(caught);
           // Offline or a server hiccup: let the person try; submitting tells.
           if (kind === "other" || kind === "weak_password") setLinkState("ready");
           else setFailure(kind);
         });
     }
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   // Every session ended with the reset, this one included.

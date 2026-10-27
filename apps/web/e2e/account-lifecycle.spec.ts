@@ -73,7 +73,7 @@ test.describe("sign-up without an account-existence leak", () => {
 
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await expect(page.getByText("We sent a link to maria@example.com.")).toBeVisible();
-    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.locator("[data-error-notice]")).toHaveCount(0);
     await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page.getByLabel("Email or @handle", { exact: true })).toHaveValue("maria@example.com");
@@ -88,12 +88,14 @@ test.describe("sign-up without an account-existence leak", () => {
     );
     await page.route("**/api/auth/me", (route) => route.fulfill(json(fresh)));
     await page.route("**/api/memberships", (route) => route.fulfill(json([])));
+    await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [], unread_count: 0 })));
     await fillSignUp(page);
 
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await expect(page.getByText("We sent a link to maria@example.com.")).toBeVisible();
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("heading", { name: "Save recovery codes?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your account is ready" })).toBeVisible();
+    await expect(page.getByText("Save recovery codes?")).toBeVisible();
   });
 });
 
@@ -189,6 +191,8 @@ test.describe("account deletion", () => {
     await page.getByRole("button", { name: "Keep my account" }).click();
     await expect(page.getByText("The deletion is cancelled. You can sign in as before.")).toBeVisible();
 
+    // Opening the link again is a fresh load (the same URL would only change the hash).
+    await page.goto("about:blank");
     await page.goto(`/account-deletion/undo#token=${LINK_TOKEN}`);
     await page.getByRole("button", { name: "Keep my account" }).click();
     await expect(page.getByText("This link doesn't work. It may have been used already.")).toBeVisible();

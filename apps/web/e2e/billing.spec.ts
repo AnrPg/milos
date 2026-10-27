@@ -195,7 +195,7 @@ test.describe("billing", () => {
 
     await expect(page.getByRole("heading", { name: "Payments" })).toBeVisible();
     // One provider: no picker.
-    await expect(page.getByRole("combobox", { name: "Choose a gym or coach" })).toHaveCount(0);
+    await expect(page.getByRole("combobox", { name: "Choose a box or coach" })).toHaveCount(0);
     await expect(page.getByText("12 visits").first()).toBeVisible();
     await expect(page.getByText("5 of 12 sessions left")).toBeVisible();
     await expect(page.getByRole("progressbar", { name: "Validity" })).toBeVisible();
@@ -340,13 +340,13 @@ test.describe("billing", () => {
     );
 
     await page.goto("/me/payments");
-    const picker = page.getByRole("combobox", { name: "Choose a gym or coach" });
+    const picker = page.getByRole("combobox", { name: "Choose a box or coach" });
     await expect(picker).toBeVisible();
     await expect(page.getByText("5 of 12 sessions left")).toBeVisible();
 
     await chooseOption(page, picker, "nikos");
     await expect(page).toHaveURL(/box=nikos/);
-    await expect(page.getByText("Personal coach")).toBeVisible();
+    await expect(page.getByText("Independent coach")).toBeVisible();
     await expect(page.getByText("No active package right now.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Message your coach" })).toHaveAttribute("href", "/messages?filter=coach");
   });

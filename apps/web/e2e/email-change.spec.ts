@@ -40,6 +40,7 @@ async function stubSignedIn(page: Page, { locked = false } = {}) {
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: token(), user })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
   await page.route("**/api/memberships", (route) => route.fulfill(json([])));
+  await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [], unread_count: 0 })));
   await page.route("**/api/auth/profiles", (route) =>
     route.fulfill(json({ profiles: [{ ...user, user_id: user.id, current: true }], profile_limit: 3 })),
   );
@@ -144,7 +145,7 @@ test.describe("email change", () => {
     );
     await page.goto("/confirm-email-change#token=tok_123");
     await page.getByRole("button", { name: "Confirm new email" }).click();
-    await expect(page.getByRole("alert")).toContainText("This address can't be used for your account.");
+    await expect(page.locator("[data-error-notice]")).toContainText("This address can't be used for your account.");
   });
 
   test("\"this wasn't me\" restores the old email and points to a password reset", async ({ page }) => {
@@ -166,6 +167,6 @@ test.describe("email change", () => {
     );
     await page.goto("/revert-email-change#token=old");
     await page.getByRole("button", { name: "Restore my email" }).click();
-    await expect(page.getByRole("alert")).toContainText("This link has expired.");
+    await expect(page.locator("[data-error-notice]")).toContainText("This link has expired.");
   });
 });
