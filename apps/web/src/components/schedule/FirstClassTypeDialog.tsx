@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 
 import { createClassType, type ClassTypeRecord } from "@/api/schedule";
 import { Dialog } from "@/components/ui/Dialog";
-import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
-import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { FieldError } from "@/components/ui/ErrorNotice";
+import { fieldBorder, formErrorsFrom, invalidFieldProps, stillApplies, type FormErrors } from "@/lib/form-errors";
 
 /**
  * A gym without any active class type can't hold a class yet (the type is
@@ -28,17 +28,19 @@ export function FirstClassTypeDialog({
   const i18n = useUiTranslations();
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // ADR-214: the reason sits under the name; anything else inside the dialog.
+  const [errors, setErrors] = useState<{ result: FormErrors<"name">; sent: string } | null>(null);
   const trimmed = name.trim();
+  const nameError = stillApplies(errors?.result, { name: errors?.sent }, { name: trimmed }).name;
 
   async function create() {
     if (trimmed.length < 2 || busy) return;
     setBusy(true);
-    setError(null);
+    setErrors(null);
     try {
       onCreated(await createClassType(token, { name: trimmed }));
     } catch (cause) {
-      setError(cause instanceof Error ? localizeError(cause, i18n) : t("firstClassTypeFailed"));
+      setErrors({ result: formErrorsFrom(cause, i18n, ["name"], { fallback: t("firstClassTypeFailed") }), sent: trimmed });
       setBusy(false);
     }
   }
@@ -48,6 +50,7 @@ export function FirstClassTypeDialog({
       onClose={onClose}
       title={t("firstClassTypeTitle")}
       size="md"
+      error={errors?.result.message}
       footer={
         <div className="flex gap-3">
           <button
@@ -85,18 +88,15 @@ export function FirstClassTypeDialog({
           <input
             autoFocus
             className="w-full rounded-2xl px-4 py-3 outline-none"
-            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+            style={{ background: "var(--panel-muted)", border: fieldBorder(nameError), color: "var(--text)" }}
+            {...invalidFieldProps(nameError, "first-class-type-name-error")}
             maxLength={120}
             onChange={(event) => setName(event.target.value)}
             placeholder={t("firstClassTypePlaceholder")}
             value={name}
           />
+          <FieldError id="first-class-type-name-error">{nameError}</FieldError>
         </label>
-        {error ? (
-          <ErrorNotice>
-            {error}
-          </ErrorNotice>
-        ) : null}
       </form>
     </Dialog>
   );
