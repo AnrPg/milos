@@ -57,7 +57,14 @@ defmodule Palee.Organizations.Commands.SendOwnerInvitationEmail do
   # provider outage/timeout would raise the same way, so this is worth
   # having regardless of which adapter ends up configured for prod.
   defp safe_deliver(email) do
-    Mailer.deliver(email)
+    case Mailer.deliver(email) do
+      {:ok, _metadata} = sent ->
+        sent
+
+      {:error, reason} = error ->
+        Logger.error("Palee.Mailer.deliver/1 failed: #{inspect(reason)}")
+        error
+    end
   catch
     :exit, reason ->
       Logger.error("Palee.Mailer.deliver/1 exited: #{inspect(reason)}")

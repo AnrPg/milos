@@ -93,7 +93,14 @@ defmodule Palee.Application.CorporateInvoicing do
   # A mail provider outage must not crash the run or the request (see
   # SendOwnerInvitationEmail): Swoosh exits rather than returning an error.
   defp safe_deliver(email) do
-    Mailer.deliver(email)
+    case Mailer.deliver(email) do
+      {:ok, _metadata} = sent ->
+        sent
+
+      {:error, reason} = error ->
+        Logger.error("Palee.Mailer.deliver/1 failed: #{inspect(reason)}")
+        error
+    end
   catch
     :exit, reason ->
       Logger.error("Palee.Mailer.deliver/1 exited: #{inspect(reason)}")

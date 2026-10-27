@@ -350,6 +350,18 @@ if config_env() == :prod do
       username: System.get_env("SMTP_USERNAME"),
       password: System.get_env("SMTP_PASSWORD"),
       tls: :always,
+      # OTP 26+ verifies TLS peers by default; without CA certificates and the
+      # relay's name to check against, STARTTLS failed (:tls_failed).
+      tls_options: [
+        versions: [:"tlsv1.2", :"tlsv1.3"],
+        verify: :verify_peer,
+        cacerts: :public_key.cacerts_get(),
+        server_name_indication: String.to_charlist(smtp_relay),
+        depth: 99,
+        customize_hostname_check: [
+          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+        ]
+      ],
       auth: :always,
       ssl: System.get_env("SMTP_SSL") in ~w(true 1)
   end
