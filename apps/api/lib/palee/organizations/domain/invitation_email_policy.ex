@@ -97,7 +97,11 @@ defmodule Palee.Organizations.Domain.InvitationEmailPolicy do
   def delivery_status(_failed, _suppressed?), do: "failed"
 
   @doc "The lifetime, in seconds, of an invitation that replaces `invitation`."
-  @spec resend_lifetime(%{inserted_at: DateTime.t(), expires_at: DateTime.t()}) :: pos_integer()
+  @spec resend_lifetime(%{
+          required(:inserted_at) => DateTime.t(),
+          required(:expires_at) => DateTime.t(),
+          optional(atom()) => any()
+        }) :: pos_integer()
   def resend_lifetime(%{inserted_at: inserted_at, expires_at: expires_at}) do
     expires_at
     |> DateTime.diff(inserted_at, :second)

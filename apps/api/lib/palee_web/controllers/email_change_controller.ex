@@ -89,9 +89,13 @@ defmodule PaleeWeb.EmailChangeController do
   )
 
   def create(conn, _params) do
-    %{email: email, current_password: password} = conn.body_params
+    body = conn.body_params
 
-    case EmailChange.request(GuardianPlug.current_resource(conn), email, password) do
+    case EmailChange.request(
+           GuardianPlug.current_resource(conn),
+           body.email,
+           body.current_password
+         ) do
       {:ok, status} -> conn |> put_status(:accepted) |> json(render_status(status))
       error -> respond_error(conn, error)
     end

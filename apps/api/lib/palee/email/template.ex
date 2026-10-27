@@ -57,8 +57,10 @@ defmodule Palee.Email.Template do
       @impl Palee.Email.Template
       def category, do: unquote(category)
 
-      @compile {:nowarn_unused_function, [t: 2, t: 3]}
-      defp t(locale, message, bindings \\ %{}),
+      # Public so it is never pruned when a template uses only one arity
+      # (a pruned local listed in nowarn_unused_function breaks dialyzer).
+      @doc false
+      def t(locale, message, bindings \\ %{}),
         do: Palee.Email.Layout.t(locale, message, bindings)
     end
   end
