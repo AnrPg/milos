@@ -212,9 +212,19 @@ defmodule Palee.Application.AccountDeletionTest do
       {:ok, %{scheduled_for: at}} = AccountDeletion.confirm(token, @now)
 
       assert {:error, {:account_deletion_scheduled, _}} = sign_in(account.email)
+
+      notice =
+        assert_email_enqueued(kind: :security_account_deletion_scheduled, to: account.email)
+
+      assert notice.text =~ "/account-deletion/undo#token="
+
       assert AccountDeletion.execute_due(at) == 1
       assert Identity.list_profiles(account.login_id) == []
       assert Identity.find_login_by_email(account.email) == nil
+
+      # One notice for the whole login, kept although the login is gone.
+      assert %{login_id: nil, user_id: nil} =
+               assert_email_enqueued(kind: :security_account_deleted, to: account.email)
     end
 
     test "a profile a business must keep in its accounts is anonymised, not deleted" do
@@ -268,11 +278,11 @@ defmodule Palee.Application.AccountDeletionTest do
     end
 
     test "by the emailed link", %{account: account, deletion: deletion} do
-      {:ok, raw, _token} =
-        LinkTokens.issue(:account_deletion_undo, account.login_id,
-          metadata: %{"deletion_id" => deletion.id},
-          now: @now
-        )
+      notice =
+        assert_email_enqueued(kind: :security_account_deletion_scheduled, to: account.email)
+
+      [_, raw] = Regex.run(~r/undo#token=([A-Za-z0-9_-]{43})/, notice.text)
+      assert deletion.status == :scheduled
 
       assert {:ok, %{status: :none}} = AccountDeletion.cancel_by_link(raw, @now)
       assert {:error, :invalid_deletion_link} = AccountDeletion.cancel_by_link(raw, @now)

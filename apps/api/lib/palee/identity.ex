@@ -1,6 +1,6 @@
 defmodule Palee.Identity do
   alias Palee.Identity.Commands.{RegisterUser, UpdateRole}
-  alias Palee.Identity.Domain.Locale
+  alias Palee.Identity.Domain.{Locale, SignInDevice}
   alias Palee.Identity.Queries.FindUser
   alias Palee.Identity.UserStore
 
@@ -113,6 +113,23 @@ defmodule Palee.Identity do
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore
+  defdelegate bump_login_security_version(login_id), to: UserStore
+
+  @doc """
+  ADR-208: remembers the device a login signs in (`:sign_in`) or signs up
+  (`:sign_up`) from. Returns `{outcome, description}`: `:new` only when the
+  login has signed in before and never from this device.
+  """
+  def remember_sign_in_device(login_id, device_id, user_agent, source, now \\ DateTime.utc_now()) do
+    description = SignInDevice.describe(user_agent)
+    hash = SignInDevice.hash(device_id, description)
+
+    {Palee.Identity.LoginDeviceStore.remember(login_id, hash, description, source, now),
+     description}
+  end
+
+  defdelegate valid_device_id?(id), to: SignInDevice, as: :valid_id?
+  defdelegate generate_device_id(), to: SignInDevice, as: :generate_id
   defdelegate supported_locales(), to: Locale, as: :supported
 
   # Remembered filters of list surfaces (ADR-151).

@@ -10,6 +10,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
+import { useFragmentInvitationToken } from "@/lib/invitation-fragment";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -115,9 +116,12 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [invitationToken, setInvitationToken] = useState(
-    () => searchParams.get("token") ?? "",
+  // ADR-209: an emailed invitation's link carries its token in the fragment.
+  const fragmentToken = useFragmentInvitationToken();
+  const [typedToken, setInvitationToken] = useState<string | null>(
+    () => searchParams.get("token"),
   );
+  const invitationToken = typedToken ?? fragmentToken;
   const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
 
   useEffect(() => {

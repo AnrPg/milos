@@ -20,6 +20,8 @@ defmodule Palee.BusinessAccounts.ActivationLink do
     field :token_digest, :binary, redact: true
     field :expires_at, :utc_datetime_usec
     field :created_by_id, :binary_id
+    # ADR-205: the verified address the link was issued for and emailed to.
+    field :email, :string
     field :redeemed_at, :utc_datetime_usec
     field :revoked_at, :utc_datetime_usec
 
@@ -30,7 +32,15 @@ defmodule Palee.BusinessAccounts.ActivationLink do
 
   def issue_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:organization_id, :user_id, :role, :token_digest, :expires_at, :created_by_id])
+    |> cast(attrs, [
+      :organization_id,
+      :user_id,
+      :role,
+      :token_digest,
+      :expires_at,
+      :created_by_id,
+      :email
+    ])
     |> validate_required([:organization_id, :user_id, :role, :token_digest, :expires_at])
     |> validate_inclusion(:role, ActivationLinkPolicy.roles())
     |> unique_constraint(:organization_id, name: :business_activation_links_one_live_index)

@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "Eigenaar"
+
+msgid "Admin"
+msgstr "Beheerder"
+
+msgid "Coach"
+msgstr "Coach"
+
+msgid "Front desk"
+msgstr "Receptie"
+
+msgid "Accountant"
+msgstr "Boekhouder"
+
+msgid "Cleaning staff"
+msgstr "Schoonmaakpersoneel"
+
+msgid "Box member"
+msgstr "Boxlid"
+
+msgid "Athlete"
+msgstr "Atleet"
+
+msgid "Your invitation to %{business}"
+msgstr "Uw uitnodiging voor ‘%{business}’"
+
+msgid "You're invited to %{business}"
+msgstr "U bent uitgenodigd door ‘%{business}’"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "%{inviter} nodigt u uit om lid te worden van ‘%{business}’ op %{product}."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "‘%{business}’ nodigt u uit om lid te worden op %{product}."
+
+msgid "Accept the invitation"
+msgstr "Uitnodiging accepteren"
+
+msgid "Joins as"
+msgstr "Wordt lid als"
+
+msgid "Branches"
+msgstr "Vestigingen"
+
+msgid "All branches"
+msgstr "Alle vestigingen"
+
+msgid "The link works once and expires on %{date}."
+msgstr "De link werkt één keer en verloopt op %{date}."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "Maak een account aan of log in met dit e-mailadres om te accepteren."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "Verwachtte u deze uitnodiging niet, dan kunt u deze e-mail negeren."

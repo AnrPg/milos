@@ -13,8 +13,11 @@ defmodule Palee.Infrastructure.Email.SwooshSender do
 
   alias Palee.Mailer
 
+  # ADR-212: the only extra headers an outbox email may carry.
+  @extra_headers ~w(List-Unsubscribe List-Unsubscribe-Post)
+
   @impl true
-  def deliver(%{to: to, subject: subject, text: text, html: html, message_id: message_id}) do
+  def deliver(%{to: to, subject: subject, text: text, html: html, message_id: message_id} = email) do
     mail_from = Application.fetch_env!(:palee, :mail_from)
 
     new()
@@ -24,13 +27,22 @@ defmodule Palee.Infrastructure.Email.SwooshSender do
     |> text_body(text)
     |> html_body(html)
     |> header("Message-ID", message_id)
+    |> extra_headers(Map.get(email, :headers) || %{})
     |> safe_deliver()
+  end
+
+  defp extra_headers(email, headers) do
+    headers
+    |> Map.take(@extra_headers)
+    |> Enum.reduce(email, fn {name, value}, email ->
+      header(email, name, String.replace(value, ~r/[\r\n]+/, ""))
+    end)
   end
 
   # Swoosh's Local adapter (dev only) talks to a GenServer a release does not
   # start, and a provider timeout raises the same way: Mailer.deliver/1 exits
-  # the calling process instead of returning an error (see
-  # SendOwnerInvitationEmail). The worker must see a plain error to retry.
+  # the calling process instead of returning an error. The worker must see a
+  # plain error to retry.
   defp safe_deliver(email) do
     case Mailer.deliver(email) do
       {:ok, _metadata} = sent ->

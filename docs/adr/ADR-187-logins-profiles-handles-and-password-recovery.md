@@ -47,6 +47,9 @@ exists (the gym knows its members) and needs no infrastructure.
 ## Consequences
 - After the MVP, an own mail service sends verification links at sign-up and reset links automatically;
   the handler flow stays as a fallback.
+- 2026-10-27, ADR-213: sign-up now emails a verification link (ADR-203 outbox); the app stays usable
+  while unverified, and the sign-up form says a confirmation link was sent. The "no email verification
+  for the MVP" decision above is superseded on that point.
 - Display-name renames propagate to notification snapshots only when the old name is no longer used by
   any profile (`palee_propagate_notification_nickname` now checks display names).
 

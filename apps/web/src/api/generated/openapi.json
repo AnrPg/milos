@@ -18329,6 +18329,37 @@
                   "allOf": [
                     {
                       "properties": {
+                        "email_delivery": {
+                          "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                          "nullable": true,
+                          "properties": {
+                            "error": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "sent_at": {
+                              "format": "date_time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued",
+                                "deferred",
+                                "sent",
+                                "failed",
+                                "suppressed",
+                                "not_sent"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ],
+                          "title": "BusinessActivationLinkEmail",
+                          "type": "object"
+                        },
                         "expires_at": {
                           "format": "date_time",
                           "type": "string"
@@ -18441,6 +18472,10 @@
                 "owners": {
                   "items": {
                     "properties": {
+                      "email_verified": {
+                        "description": "ADR-205: a link is only issued to a verified email",
+                        "type": "boolean"
+                      },
                       "nickname": {
                         "nullable": true,
                         "type": "string"
@@ -18451,7 +18486,8 @@
                       }
                     },
                     "required": [
-                      "user_id"
+                      "user_id",
+                      "email_verified"
                     ],
                     "type": "object"
                   },
@@ -18525,6 +18561,11 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "requester_email_verified": {
+                  "description": "Vendors (ADR-205): whether the requester verified their email",
+                  "nullable": true,
+                  "type": "boolean"
+                },
                 "status": {
                   "enum": [
                     "pending",
@@ -18559,6 +18600,37 @@
       },
       "BusinessActivationLink": {
         "properties": {
+          "email_delivery": {
+            "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+            "nullable": true,
+            "properties": {
+              "error": {
+                "nullable": true,
+                "type": "string"
+              },
+              "sent_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "queued",
+                  "deferred",
+                  "sent",
+                  "failed",
+                  "suppressed",
+                  "not_sent"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "title": "BusinessActivationLinkEmail",
+            "type": "object"
+          },
           "expires_at": {
             "format": "date_time",
             "type": "string"
@@ -18620,6 +18692,37 @@
           "inserted_at"
         ],
         "title": "BusinessActivationLink",
+        "type": "object"
+      },
+      "BusinessActivationLinkEmail": {
+        "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+        "nullable": true,
+        "properties": {
+          "error": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sent_at": {
+            "format": "date_time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "deferred",
+              "sent",
+              "failed",
+              "suppressed",
+              "not_sent"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BusinessActivationLinkEmail",
         "type": "object"
       },
       "BusinessActivationPreview": {
@@ -18934,6 +19037,11 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "requester_email_verified": {
+                    "description": "Vendors (ADR-205): whether the requester verified their email",
+                    "nullable": true,
+                    "type": "boolean"
+                  },
                   "status": {
                     "enum": [
                       "pending",
@@ -19140,6 +19248,11 @@
                 "nullable": true,
                 "type": "string"
               },
+              "requester_email_verified": {
+                "description": "Vendors (ADR-205): whether the requester verified their email",
+                "nullable": true,
+                "type": "boolean"
+              },
               "status": {
                 "enum": [
                   "pending",
@@ -19228,6 +19341,11 @@
             "nullable": true,
             "type": "string"
           },
+          "requester_email_verified": {
+            "description": "Vendors (ADR-205): whether the requester verified their email",
+            "nullable": true,
+            "type": "boolean"
+          },
           "status": {
             "enum": [
               "pending",
@@ -19256,6 +19374,37 @@
             "allOf": [
               {
                 "properties": {
+                  "email_delivery": {
+                    "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                    "nullable": true,
+                    "properties": {
+                      "error": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "sent_at": {
+                        "format": "date_time",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "queued",
+                          "deferred",
+                          "sent",
+                          "failed",
+                          "suppressed",
+                          "not_sent"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ],
+                    "title": "BusinessActivationLinkEmail",
+                    "type": "object"
+                  },
                   "expires_at": {
                     "format": "date_time",
                     "type": "string"
@@ -19428,6 +19577,11 @@
                 "nullable": true,
                 "type": "string"
               },
+              "requester_email_verified": {
+                "description": "Vendors (ADR-205): whether the requester verified their email",
+                "nullable": true,
+                "type": "boolean"
+              },
               "status": {
                 "enum": [
                   "pending",
@@ -19517,6 +19671,11 @@
                   "description": "Vendors: nickname",
                   "nullable": true,
                   "type": "string"
+                },
+                "requester_email_verified": {
+                  "description": "Vendors (ADR-205): whether the requester verified their email",
+                  "nullable": true,
+                  "type": "boolean"
                 },
                 "status": {
                   "enum": [
@@ -85943,8 +86102,34 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "description": "ADR-209 (inspect): the invitation is for one email address, never shown",
+                      "type": "boolean"
+                    },
                     "expires_at": {
                       "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ADR-209: issue responses only",
+                      "format": "uuid",
                       "type": "string"
                     },
                     "location_scope": {
@@ -86022,6 +86207,7 @@
                       "type": "array"
                     },
                     "token": {
+                      "description": "The link token; never returned for an invitation sent by email (ADR-209)",
                       "nullable": true,
                       "type": "string"
                     }
@@ -86129,6 +86315,11 @@
                         "brand_primary_color": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
                         }
                       },
                       "type": "object"
@@ -86218,6 +86409,10 @@
                           "description": "The login's email, shared by its profiles",
                           "type": "string"
                         },
+                        "email_verified": {
+                          "description": "ADR-213: whether the login opened an emailed link to its current email",
+                          "type": "boolean"
+                        },
                         "handle": {
                           "description": "ADR-187: the unique @handle",
                           "type": "string"
@@ -86276,14 +86471,15 @@
                         }
                       },
                       "required": [
+                        "completed_tours",
+                        "display_name",
+                        "email_verified",
+                        "handle",
                         "id",
                         "nickname",
-                        "display_name",
-                        "handle",
-                        "role",
-                        "vendor",
                         "preferred_locale",
-                        "completed_tours"
+                        "role",
+                        "vendor"
                       ],
                       "type": "object"
                     }
@@ -86429,6 +86625,10 @@
                       "description": "The login's email, shared by its profiles",
                       "type": "string"
                     },
+                    "email_verified": {
+                      "description": "ADR-213: whether the login opened an emailed link to its current email",
+                      "type": "boolean"
+                    },
                     "handle": {
                       "description": "ADR-187: the unique @handle",
                       "type": "string"
@@ -86487,14 +86687,15 @@
                     }
                   },
                   "required": [
+                    "completed_tours",
+                    "display_name",
+                    "email_verified",
+                    "handle",
                     "id",
                     "nickname",
-                    "display_name",
-                    "handle",
-                    "role",
-                    "vendor",
                     "preferred_locale",
-                    "completed_tours"
+                    "role",
+                    "vendor"
                   ],
                   "type": "object"
                 }
@@ -86611,7 +86812,7 @@
                 }
               }
             },
-            "description": "Expired link"
+            "description": "Expired or used link"
           },
           "422": {
             "content": {
@@ -86633,6 +86834,7 @@
     "/api/auth/password-reset-requests": {
       "post": {
         "callbacks": {},
+        "description": "A verified email gets a one-hour reset link; otherwise, or with `cant_access_email`, the request goes to the people who can vouch for the person. The answer never says which happened, or whether the account exists.",
         "operationId": "PaleeWeb.PasswordRecoveryController.request",
         "parameters": [],
         "requestBody": {
@@ -86640,7 +86842,13 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "cant_access_email": {
+                    "type": "boolean"
+                  },
                   "identifier": {
+                    "type": "string"
+                  },
+                  "locale": {
                     "type": "string"
                   }
                 },
@@ -86658,14 +86866,95 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "sent"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
                   "type": "object"
                 }
               }
             },
-            "description": "Request sent"
+            "description": "Request taken"
           }
         },
         "summary": "Ask for a password reset (always answered the same way)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.inspect_link",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Usable link"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired or used link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          }
+        },
+        "summary": "Check a reset link before the new password is typed (never spends it)",
         "tags": [
           "Password recovery"
         ]
@@ -87056,6 +87345,10 @@
                           "description": "The login's email, shared by its profiles",
                           "type": "string"
                         },
+                        "email_verified": {
+                          "description": "ADR-213: whether the login opened an emailed link to its current email",
+                          "type": "boolean"
+                        },
                         "handle": {
                           "description": "ADR-187: the unique @handle",
                           "type": "string"
@@ -87114,14 +87407,15 @@
                         }
                       },
                       "required": [
+                        "completed_tours",
+                        "display_name",
+                        "email_verified",
+                        "handle",
                         "id",
                         "nickname",
-                        "display_name",
-                        "handle",
-                        "role",
-                        "vendor",
                         "preferred_locale",
-                        "completed_tours"
+                        "role",
+                        "vendor"
                       ],
                       "type": "object"
                     }
@@ -87677,6 +87971,94 @@
         ]
       }
     },
+    "/api/auth/sign-out-everywhere": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SecurityLinkController.sign_out_everywhere",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Every session ended"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_link",
+                        "expired_link",
+                        "used_link"
+                      ],
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired or already used link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_link",
+                        "expired_link",
+                        "used_link"
+                      ],
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          }
+        },
+        "summary": "Sign every device of the login out with a security notice's emailed link",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/auth/switch-profile": {
       "post": {
         "callbacks": {},
@@ -87741,6 +88123,243 @@
           }
         ],
         "summary": "Open a session for another profile of the same login",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/verification-email": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailVerificationController.resend",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "already_verified",
+                        "sent"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sent, or nothing to do"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The address can't get email"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "retry_after_seconds": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error",
+                    "retry_after_seconds"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A link was sent just now"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email is busy today"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-213: email the signed-in person a new verification link",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailVerificationController.verify",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email_verified": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "email_verified"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email verified"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link already used, or the email changed since"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link expired"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rate limited"
+          }
+        },
+        "summary": "ADR-213: confirm the login's email with the emailed link's token",
         "tags": [
           "Authentication"
         ]
@@ -93837,6 +94456,11 @@
                           "description": "Vendors: nickname",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "requester_email_verified": {
+                          "description": "Vendors (ADR-205): whether the requester verified their email",
+                          "nullable": true,
+                          "type": "boolean"
                         },
                         "status": {
                           "enum": [
@@ -101932,6 +102556,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "requester_email_verified": {
+                            "description": "Vendors (ADR-205): whether the requester verified their email",
+                            "nullable": true,
+                            "type": "boolean"
+                          },
                           "status": {
                             "enum": [
                               "pending",
@@ -102087,6 +102716,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
+                    },
                     "status": {
                       "enum": [
                         "pending",
@@ -102201,6 +102835,11 @@
                       "description": "Vendors: nickname",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
                     },
                     "status": {
                       "enum": [
@@ -128466,6 +129105,96 @@
         ]
       }
     },
+    "/api/me/share-links/email": {
+      "post": {
+        "callbacks": {},
+        "description": "The link is rebuilt from `token` and must be yours and still usable. Needs a verified email; at most 10 a day. The same link to the same address is sent once.",
+        "operationId": "PaleeWeb.ShareLinkEmailController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "link": {
+                    "enum": [
+                      "guest_pass",
+                      "buddy_invite",
+                      "referral"
+                    ],
+                    "type": "string"
+                  },
+                  "to": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "token": {
+                    "description": "The guest pass or buddy invite token, or the referral code",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "link",
+                  "token",
+                  "to"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "delivery"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email one of your share links to an address (ADR-210)",
+        "tags": [
+          "Share links"
+        ]
+      }
+    },
     "/api/me/social": {
       "get": {
         "callbacks": {},
@@ -134870,6 +135599,11 @@
                           "brand_primary_color": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "default_locale": {
+                            "description": "ADR-209: the box's language (its emails default to it)",
+                            "nullable": true,
+                            "type": "string"
                           }
                         },
                         "type": "object"
@@ -135037,6 +135771,11 @@
                         "brand_primary_color": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
                         }
                       },
                       "type": "object"
@@ -135173,6 +135912,11 @@
                           "type": "string"
                         },
                         "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
                           "nullable": true,
                           "type": "string"
                         }
@@ -135350,6 +136094,11 @@
                           "type": "string"
                         },
                         "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
                           "nullable": true,
                           "type": "string"
                         }
@@ -138177,6 +138926,11 @@
                               "nullable": true,
                               "type": "string"
                             },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
+                            },
                             "status": {
                               "enum": [
                                 "pending",
@@ -138347,6 +139101,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "requester_email_verified": {
+                      "description": "Vendors (ADR-205): whether the requester verified their email",
+                      "nullable": true,
+                      "type": "boolean"
+                    },
                     "status": {
                       "enum": [
                         "pending",
@@ -138462,6 +139221,11 @@
                               "description": "Vendors: nickname",
                               "nullable": true,
                               "type": "string"
+                            },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
                             },
                             "status": {
                               "enum": [
@@ -138633,6 +139397,11 @@
                               "description": "Vendors: nickname",
                               "nullable": true,
                               "type": "string"
+                            },
+                            "requester_email_verified": {
+                              "description": "Vendors (ADR-205): whether the requester verified their email",
+                              "nullable": true,
+                              "type": "boolean"
                             },
                             "status": {
                               "enum": [
@@ -207883,8 +208652,29 @@
                 "schema": {
                   "items": {
                     "properties": {
+                      "delivery_status": {
+                        "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                        "enum": [
+                          "queued",
+                          "sent",
+                          "failed",
+                          "bounced",
+                          "suppressed"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "email": {
+                        "description": "ADR-209: the address an invitation sent by email went to",
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "email_bound": {
                         "type": "boolean"
+                      },
+                      "email_locale": {
+                        "nullable": true,
+                        "type": "string"
                       },
                       "expires_at": {
                         "format": "date_time",
@@ -207976,6 +208766,10 @@
                     "description": "ADR-186: staff work at every branch («Όλα τα καταστήματα»)",
                     "type": "boolean"
                   },
+                  "email_locale": {
+                    "description": "ADR-209: the email's language; defaults to the box's language",
+                    "type": "string"
+                  },
                   "intended_email": {
                     "type": "string"
                   },
@@ -208024,6 +208818,10 @@
                     },
                     "minItems": 1,
                     "type": "array"
+                  },
+                  "send_email": {
+                    "description": "ADR-209: email the invitation to `intended_email`; the token is then not returned",
+                    "type": "boolean"
                   }
                 },
                 "type": "object"
@@ -208038,8 +208836,34 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "description": "ADR-209 (inspect): the invitation is for one email address, never shown",
+                      "type": "boolean"
+                    },
                     "expires_at": {
                       "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ADR-209: issue responses only",
+                      "format": "uuid",
                       "type": "string"
                     },
                     "location_scope": {
@@ -208117,6 +208941,7 @@
                       "type": "array"
                     },
                     "token": {
+                      "description": "The link token; never returned for an invitation sent by email (ADR-209)",
                       "nullable": true,
                       "type": "string"
                     }
@@ -208139,6 +208964,150 @@
           }
         ],
         "summary": "Issue a one-time organization invitation",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/bulk": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.bulk_invite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "all_locations": {
+                    "type": "boolean"
+                  },
+                  "email_locale": {
+                    "type": "string"
+                  },
+                  "emails": {
+                    "description": "Addresses, or pasted text / CSV holding them",
+                    "oneOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "maxItems": 1000,
+                        "type": "array"
+                      },
+                      {
+                        "maxLength": 100000,
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "lifetime_seconds": {
+                    "maximum": 604800,
+                    "minimum": 300,
+                    "type": "integer"
+                  },
+                  "location_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "roles": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "emails"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "failed": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "items": {
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "description": "Why this address got no invitation",
+                            "type": "string"
+                          },
+                          "invitation_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "email"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "sent": {
+                      "type": "integer"
+                    },
+                    "skipped": {
+                      "description": "Pasted values that are not email addresses",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "results",
+                    "sent",
+                    "failed",
+                    "skipped"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Per-address results"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-209: email one invitation to each of up to 200 addresses",
         "tags": [
           "Organizations"
         ]
@@ -208178,6 +209147,126 @@
           }
         ],
         "summary": "Revoke an active organization invitation",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/{id}/resend": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.resend",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery_status": {
+                      "description": "ADR-209: delivery of the invitation email (null when it was not emailed)",
+                      "enum": [
+                        "queued",
+                        "sent",
+                        "failed",
+                        "bounced",
+                        "suppressed"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "ADR-209: the address an invitation sent by email went to",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email_bound": {
+                      "type": "boolean"
+                    },
+                    "email_locale": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "issued_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "expires_at",
+                    "issued_at",
+                    "email_bound"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The new invitation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-209: re-issue an emailed invitation and email the new link",
         "tags": [
           "Organizations"
         ]
@@ -209405,10 +210494,15 @@
                       "properties": {
                         "company_name": {
                           "type": "string"
+                        },
+                        "needs_verification": {
+                          "description": "ADR-205: the account email matches but is not verified yet; joining waits for the confirmation",
+                          "type": "boolean"
                         }
                       },
                       "required": [
-                        "company_name"
+                        "company_name",
+                        "needs_verification"
                       ],
                       "type": "object"
                     }
@@ -209506,6 +210600,17 @@
               }
             },
             "description": "Seat"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The matching email is not verified yet"
           },
           "404": {
             "content": {
@@ -248279,6 +249384,37 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "email_delivery": {
+                      "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                      "nullable": true,
+                      "properties": {
+                        "error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed",
+                            "not_sent"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ],
+                      "title": "BusinessActivationLinkEmail",
+                      "type": "object"
+                    },
                     "expires_at": {
                       "format": "date_time",
                       "type": "string"
@@ -248376,6 +249512,37 @@
                             "allOf": [
                               {
                                 "properties": {
+                                  "email_delivery": {
+                                    "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                                    "nullable": true,
+                                    "properties": {
+                                      "error": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "sent_at": {
+                                        "format": "date_time",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "enum": [
+                                          "queued",
+                                          "deferred",
+                                          "sent",
+                                          "failed",
+                                          "suppressed",
+                                          "not_sent"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "status"
+                                    ],
+                                    "title": "BusinessActivationLinkEmail",
+                                    "type": "object"
+                                  },
                                   "expires_at": {
                                     "format": "date_time",
                                     "type": "string"
@@ -248488,6 +249655,10 @@
                           "owners": {
                             "items": {
                               "properties": {
+                                "email_verified": {
+                                  "description": "ADR-205: a link is only issued to a verified email",
+                                  "type": "boolean"
+                                },
                                 "nickname": {
                                   "nullable": true,
                                   "type": "string"
@@ -248498,7 +249669,8 @@
                                 }
                               },
                               "required": [
-                                "user_id"
+                                "user_id",
+                                "email_verified"
                               ],
                               "type": "object"
                             },
@@ -248571,6 +249743,11 @@
                             "description": "Vendors: nickname",
                             "nullable": true,
                             "type": "string"
+                          },
+                          "requester_email_verified": {
+                            "description": "Vendors (ADR-205): whether the requester verified their email",
+                            "nullable": true,
+                            "type": "boolean"
                           },
                           "status": {
                             "enum": [
@@ -248681,6 +249858,37 @@
                       "allOf": [
                         {
                           "properties": {
+                            "email_delivery": {
+                              "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                              "nullable": true,
+                              "properties": {
+                                "error": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "sent_at": {
+                                  "format": "date_time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "queued",
+                                    "deferred",
+                                    "sent",
+                                    "failed",
+                                    "suppressed",
+                                    "not_sent"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "status"
+                              ],
+                              "title": "BusinessActivationLinkEmail",
+                              "type": "object"
+                            },
                             "expires_at": {
                               "format": "date_time",
                               "type": "string"
@@ -248852,6 +250060,11 @@
                           "description": "Vendors: nickname",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "requester_email_verified": {
+                          "description": "Vendors (ADR-205): whether the requester verified their email",
+                          "nullable": true,
+                          "type": "boolean"
                         },
                         "status": {
                           "enum": [
@@ -249325,6 +250538,37 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "email_delivery": {
+                      "description": "ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.",
+                      "nullable": true,
+                      "properties": {
+                        "error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed",
+                            "not_sent"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ],
+                      "title": "BusinessActivationLinkEmail",
+                      "type": "object"
+                    },
                     "expires_at": {
                       "format": "date_time",
                       "type": "string"
@@ -249764,6 +251008,14 @@
                   "email": {
                     "type": "string"
                   },
+                  "locale": {
+                    "description": "The email's language (ADR-210)",
+                    "type": "string"
+                  },
+                  "resend": {
+                    "description": "Queue another email",
+                    "type": "boolean"
+                  },
                   "token": {
                     "type": "string"
                   }
@@ -249779,8 +251031,63 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "Invitation email sent"
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delivery": {
+                      "properties": {
+                        "attempts": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "deferred",
+                            "sent",
+                            "failed",
+                            "suppressed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "attempts",
+                        "inserted_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "delivery"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued invitation email"
           }
         },
         "security": [
@@ -249789,6 +251096,104 @@
           }
         ],
         "summary": "Email an already-issued invitation's setup link to its recipient",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/invitations/{invitation_id}/email": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformOrganizationController.invitation_deliveries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deliveries": {
+                      "items": {
+                        "properties": {
+                          "attempts": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "sent_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued",
+                              "deferred",
+                              "sent",
+                              "failed",
+                              "suppressed"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "attempts",
+                          "inserted_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "deliveries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deliveries"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The delivery status of an invitation's setup emails, newest first (ADR-210)",
         "tags": [
           "Platform Organizations"
         ]

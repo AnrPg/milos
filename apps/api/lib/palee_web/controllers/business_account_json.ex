@@ -28,7 +28,7 @@ defmodule PaleeWeb.BusinessAccountJSON do
     }
   end
 
-  def request(request, accounts \\ %{}) do
+  def request(request, accounts \\ %{}, verified \\ nil) do
     %{
       id: request.id,
       kind: request.kind,
@@ -42,11 +42,12 @@ defmodule PaleeWeb.BusinessAccountJSON do
       decision_note: request.decision_note,
       decided_at: request.decided_at,
       requested_by: Map.get(accounts, request.user_id),
+      requester_email_verified: verified && MapSet.member?(verified, request.user_id),
       inserted_at: request.inserted_at
     }
   end
 
-  def link(link, accounts \\ %{}, now \\ DateTime.utc_now(), issued \\ nil) do
+  def link(link, accounts \\ %{}, now \\ DateTime.utc_now(), issued \\ nil, emails \\ %{}) do
     %{
       id: link.id,
       organization_id: link.organization_id,
@@ -57,24 +58,47 @@ defmodule PaleeWeb.BusinessAccountJSON do
       expires_at: link.expires_at,
       inserted_at: link.inserted_at,
       token: issued && issued.token,
-      path: issued && issued.path
+      path: issued && issued.path,
+      email_delivery:
+        email_delivery((issued && Map.get(issued, :email)) || Map.get(emails, link.id))
     }
   end
 
   def issued_link(%{link: link} = issued), do: link(link, %{}, DateTime.utc_now(), issued)
 
-  def queue(%{requests: requests, demo_businesses: businesses, accounts: accounts}) do
+  # ADR-205: how the link's email fared (`Palee.Email` summary), or a
+  # refusal at enqueue (`not_sent` with the error code).
+  defp email_delivery(nil), do: nil
+
+  defp email_delivery(summary) do
+    %{
+      status: summary.status,
+      error: Map.get(summary, :error),
+      sent_at: Map.get(summary, :sent_at)
+    }
+  end
+
+  def queue(%{requests: requests, demo_businesses: businesses, accounts: accounts} = queue) do
     now = DateTime.utc_now()
+    verified = Map.get(queue, :verified, MapSet.new())
+    emails = Map.get(queue, :emails, %{})
 
     %{
-      requests: Enum.map(requests, &request(&1, accounts)),
+      requests: Enum.map(requests, &request(&1, accounts, verified)),
       demo_businesses:
         Enum.map(businesses, fn business ->
           %{
             organization: organization(business.organization),
             owners:
-              Enum.map(business.owner_ids, &%{user_id: &1, nickname: Map.get(accounts, &1)}),
-            link: business.link && link(business.link, accounts, now)
+              Enum.map(
+                business.owner_ids,
+                &%{
+                  user_id: &1,
+                  nickname: Map.get(accounts, &1),
+                  email_verified: MapSet.member?(verified, &1)
+                }
+              ),
+            link: business.link && link(business.link, accounts, now, nil, emails)
           }
         end)
     }

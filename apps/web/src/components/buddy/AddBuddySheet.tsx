@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { BUDDIES_KEY, createBuddyInviteLink, fetchBuddyCandidates, inviteBuddy, type BuddyCandidate } from "@/api/buddies";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { SendLinkByEmail } from "@/components/share/SendLinkByEmail";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -33,7 +34,7 @@ export function AddBuddySheet({ onClose, inviteDays }: { onClose: () => void; in
   const queryClient = useQueryClient();
   const [term, setTerm] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [shared, setShared] = useState<{ url: string; copied: boolean } | null>(null);
+  const [shared, setShared] = useState<{ url: string; token: string; copied: boolean } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(term.trim()), 250);
@@ -63,7 +64,7 @@ export function AddBuddySheet({ onClose, inviteDays }: { onClose: () => void; in
       try {
         if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
           await navigator.share(payload);
-          setShared({ url, copied: false });
+          setShared({ url, token: data.token, copied: false });
           return;
         }
       } catch {
@@ -76,7 +77,7 @@ export function AddBuddySheet({ onClose, inviteDays }: { onClose: () => void; in
       } catch {
         copied = false;
       }
-      setShared({ url, copied });
+      setShared({ url, token: data.token, copied });
     },
   });
 
@@ -145,6 +146,7 @@ export function AddBuddySheet({ onClose, inviteDays }: { onClose: () => void; in
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                 data-testid="buddy-invite-url"
               />
+              <SendLinkByEmail link="buddy_invite" token={shared.token} />
             </div>
           ) : null}
           <ErrorLine message={buddyErrorMessage(link.error, t, tUi)} />

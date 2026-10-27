@@ -139,9 +139,10 @@ case Mix.env() do
     admin_password = System.get_env("DEV_ADMIN_PASSWORD", "AdminPass123!")
     admin_email = System.get_env("DEV_ADMIN_EMAIL", "admin@example.com")
 
-    admin_nickname
-    |> ensure_admin.(admin_password, admin_email)
-    |> ensure_dev_organization.(System.get_env("DEV_ORGANIZATION_NAME", "Demo Gym"))
+    admin = ensure_admin.(admin_nickname, admin_password, admin_email)
+    # ADR-213: the dev admin's email counts as verified (no banner locally).
+    if admin.login_id, do: Identity.mark_email_verified(admin.login_id, admin_email)
+    ensure_dev_organization.(admin, System.get_env("DEV_ORGANIZATION_NAME", "Demo Gym"))
 
   :prod ->
     admin_nickname = System.get_env("PROD_ADMIN_NICKNAME", "xristoforos_coach")

@@ -8,6 +8,9 @@
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(self), geolocation=()"
 	}
+	# ADR-206: a reset link's page never sends its URL on as a referrer.
+	@reset_pages path /reset-password /forgot-password
+	header @reset_pages Referrer-Policy "no-referrer"
 	@secure protocol https
 	header @secure Strict-Transport-Security "max-age=31536000; includeSubDomains"
 	reverse_proxy /api/* api:4000 {

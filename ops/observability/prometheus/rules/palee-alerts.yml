@@ -239,6 +239,58 @@ groups:
           summary: "Shop revenue does not reconcile"
           description: "At least one business day drifted in the last nightly reconciliation: shop order totals, shop-stream invoice lines and shop payments minus refunds disagree. Search the logs for shop_revenue_drift (organization_id, day, the three figures) and follow docs/operations/shop-revenue-reconciliation.md."
 
+  # ADR-212: transactional email (Brevo). Runbook:
+  # docs/operations/email-deliverability.md
+  - name: palee-email
+    rules:
+      - alert: PaleeEmailBudgetHigh
+        # 5 x sent >= 4 x budget is 80% without float rounding (0.8 * 280 > 224).
+        expr: max(palee_email_sent_today) * 5 >= max(palee_email_daily_budget) * 4 and max(palee_email_daily_budget) > 0
+        for: 5m
+        labels:
+          severity: warning
+          signal: email_budget
+        annotations:
+          summary: "Email sending reached 80% of the daily budget"
+          description: "Today's sent emails reached 80% of EMAIL_DAILY_BUDGET. Past the budget, non-security mail waits until the next UTC day and security mail stops at EMAIL_DAILY_HARD_CAP. Look for a loop or a burst of invitations before raising the budget (Brevo's free plan sends 300 a day)."
+
+      - alert: PaleeEmailDeferred
+        expr: max(palee_email_deferred_messages) > 0
+        for: 10m
+        labels:
+          severity: warning
+          signal: email_budget
+        annotations:
+          summary: "{{ $value | humanize }} emails deferred to tomorrow"
+          description: "The daily budget is spent, so emails wait for the next UTC day (00:01). They are not lost, but people are waiting for them."
+
+      - alert: PaleeEmailSmtpKeyExpiring
+        expr: min(palee_email_smtp_key_days_left) <= 30
+        labels:
+          severity: warning
+          signal: smtp_key
+        annotations:
+          summary: "The SMTP key expires in {{ $value | humanize }} days"
+          description: "SMTP_KEY_EXPIRES_ON is within 30 days. Create a new SMTP key in Brevo, update the milos-smtp secret and SMTP_KEY_EXPIRES_ON (docs/operations/email-deliverability.md, 'Rotating the SMTP key')."
+
+      - alert: PaleeEmailSmtpKeyExpired
+        expr: min(palee_email_smtp_key_days_left) < 0
+        labels:
+          severity: critical
+          signal: smtp_key
+        annotations:
+          summary: "The SMTP key has expired: no email is sent"
+          description: "SMTP_KEY_EXPIRES_ON is in the past, so Brevo refuses the key and every email fails. Rotate the key now."
+
+      - alert: PaleeEmailComplaints
+        expr: sum(increase(palee_email_complained_total[1d])) > 0
+        labels:
+          severity: warning
+          signal: email_reputation
+        annotations:
+          summary: "A reader marked a Palee email as spam"
+          description: "Brevo reported {{ $value | humanize }} spam complaints in the last day; the addresses are suppressed. Complaints hurt the sending domain's reputation: check which kind of email it was (email_messages.status = 'complained')."
+
   - name: palee-monitoring-meta
     rules:
       - alert: AlertmanagerNotificationsFailing

@@ -49,6 +49,7 @@ export type ProvisionOrganizationResult = {
   organization: PlatformOrganization["organization"];
   settings: OrganizationSettings;
   initial_owner_invitation: {
+    id: string;
     token: string;
     expires_at: string;
     role: "admin";
@@ -79,6 +80,7 @@ export type PlatformOrganizationAccess = {
 
 export type PlatformInvitationResult = {
   invitation: {
+    id: string;
     token: string;
     expires_at: string;
     role: OrganizationMembershipRole;
@@ -172,16 +174,32 @@ export function issuePlatformOrganizationInvitation(
   });
 }
 
+/** ADR-210: one queued owner invitation email, as the console shows it. */
+export type OwnerInvitationDelivery = {
+  id: string;
+  status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+  attempts: number;
+  inserted_at: string;
+  scheduled_at: string | null;
+  sent_at: string | null;
+};
+
 export function sendOwnerInvitationEmail(
   token: string,
   organizationId: string,
-  input: { email: string; token: string },
+  input: { email: string; token: string; locale?: string; resend?: boolean },
 ) {
-  return apiRequest<void>(`/platform/organizations/${organizationId}/invitations/email`, {
-    method: "POST",
-    token,
-    body: input,
-  });
+  return apiRequest<{ delivery: OwnerInvitationDelivery }>(
+    `/platform/organizations/${organizationId}/invitations/email`,
+    { method: "POST", token, body: input },
+  );
+}
+
+export function fetchOwnerInvitationDeliveries(token: string, organizationId: string, invitationId: string) {
+  return apiRequest<{ deliveries: OwnerInvitationDelivery[] }>(
+    `/platform/organizations/${organizationId}/invitations/${invitationId}/email`,
+    { token },
+  );
 }
 
 export function updatePlatformOrganizationMembershipRole(

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
@@ -13,19 +13,22 @@ import { passwordLongEnough, type FieldErrors } from "@/components/auth/auth-err
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
-type View = "request" | "sent" | "code";
+type View = "request" | "sent" | "noEmail" | "helpSent" | "code";
 
 const linkClass = "text-sm font-semibold";
 const linkStyle = { color: "var(--primary)" } as const;
 
 /**
- * ADR-187: "Forgot password". The request is always answered the same way so
- * it never reveals whether an account exists; people who know the person
- * confirm it is them and email a reset link. A recovery code is the
- * self-service way back in.
+ * ADR-187, ADR-206: "Forgot password". The request is always answered the
+ * same way so it never reveals whether an account exists. A confirmed email
+ * gets a reset link automatically; "I can't access my email" (or an
+ * unconfirmed email) goes to people who know the person, who confirm it is
+ * them and send a link. A recovery code is the self-service way back in.
  */
 export function ForgotPassword() {
   const t = useTranslations("authRecovery");
+  const pr = useTranslations("passwordReset");
+  const locale = useLocale();
   const ui = useUiTranslations();
   const router = useRouter();
 
@@ -43,7 +46,7 @@ export function ForgotPassword() {
     setFieldErrors({});
   }
 
-  async function submitRequest() {
+  async function submitRequest(cantAccessEmail: boolean) {
     if (identifier.trim().length === 0) {
       setFieldErrors({ identifier: [t("identifierRequired")] });
       return;
@@ -52,8 +55,8 @@ export function ForgotPassword() {
     setError(null);
     setFieldErrors({});
     try {
-      await requestPasswordReset(identifier.trim());
-      setView("sent");
+      await requestPasswordReset(identifier.trim(), { cantAccessEmail, locale });
+      setView(cantAccessEmail ? "helpSent" : "sent");
     } catch (caught) {
       setError(localizeError(caught, ui));
     } finally {
@@ -86,20 +89,70 @@ export function ForgotPassword() {
     }
   }
 
-  if (view === "sent") {
+  if (view === "sent" || view === "helpSent") {
     return (
-      <AuthShell title={t("requestSentTitle")}>
+      <AuthShell title={view === "sent" ? pr("sentTitle") : pr("helpSentTitle")}>
         <div className="space-y-5 text-center">
           <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }} role="status">
-            {t("requestSentBody")}
+            {view === "sent" ? pr("sentBody") : pr("helpSentBody")}
           </p>
+          {view === "sent" ? (
+            <p className="text-sm leading-6" style={{ color: "var(--dim)" }}>
+              {pr("sentNoEmail")}
+            </p>
+          ) : null}
           <Link className={`block ${primaryButtonClass}`} style={primaryButtonStyle} href="/login">
             {t("backToSignIn")}
           </Link>
-          <button type="button" className={linkClass} style={linkStyle} onClick={() => show("code")}>
-            {t("haveRecoveryCode")}
-          </button>
+          <div className="flex flex-col items-center gap-3">
+            {view === "sent" ? (
+              <button type="button" className={linkClass} style={linkStyle} onClick={() => show("noEmail")}>
+                {pr("cantAccessEmail")}
+              </button>
+            ) : null}
+            <button type="button" className={linkClass} style={linkStyle} onClick={() => show("code")}>
+              {t("haveRecoveryCode")}
+            </button>
+          </div>
         </div>
+      </AuthShell>
+    );
+  }
+
+  if (view === "noEmail") {
+    return (
+      <AuthShell title={pr("noEmailTitle")}>
+        <form
+          className="space-y-4"
+          noValidate
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submitRequest(true);
+          }}
+        >
+          <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+            {pr("noEmailIntro")}
+          </p>
+          <AuthField
+            label={t("identifierLabel")}
+            value={identifier}
+            autoComplete="username"
+            errors={fieldErrors.identifier}
+            onChange={setIdentifier}
+          />
+          {error ? <AuthNotice>{error}</AuthNotice> : null}
+          <button className={primaryButtonClass} style={primaryButtonStyle} disabled={busy} type="submit">
+            {busy ? t("sending") : pr("askForHelp")}
+          </button>
+          <div className="flex flex-col items-center gap-3 pt-1">
+            <button type="button" className={linkClass} style={linkStyle} onClick={() => show("code")}>
+              {t("haveRecoveryCode")}
+            </button>
+            <button type="button" className={linkClass} style={{ color: "var(--dim)" }} onClick={() => show("request")}>
+              {pr("backToEmail")}
+            </button>
+          </div>
+        </form>
       </AuthShell>
     );
   }
@@ -148,7 +201,7 @@ export function ForgotPassword() {
           </button>
           <div className="text-center">
             <button type="button" className={linkClass} style={linkStyle} onClick={() => show("request")}>
-              {t("askForHelpInstead")}
+              {pr("noCodeInstead")}
             </button>
           </div>
         </form>
@@ -163,11 +216,11 @@ export function ForgotPassword() {
         noValidate
         onSubmit={(event) => {
           event.preventDefault();
-          void submitRequest();
+          void submitRequest(false);
         }}
       >
         <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-          {t("forgotIntro")}
+          {pr("forgotIntro")}
         </p>
         <AuthField
           label={t("identifierLabel")}
@@ -178,9 +231,12 @@ export function ForgotPassword() {
         />
         {error ? <AuthNotice>{error}</AuthNotice> : null}
         <button className={primaryButtonClass} style={primaryButtonStyle} disabled={busy} type="submit">
-          {busy ? t("sending") : t("sendRequest")}
+          {busy ? t("sending") : pr("sendLink")}
         </button>
         <div className="flex flex-col items-center gap-3 pt-1">
+          <button type="button" className={linkClass} style={linkStyle} onClick={() => show("noEmail")}>
+            {pr("cantAccessEmail")}
+          </button>
           <button type="button" className={linkClass} style={linkStyle} onClick={() => show("code")}>
             {t("haveRecoveryCode")}
           </button>

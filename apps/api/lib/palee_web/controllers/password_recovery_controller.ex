@@ -16,9 +16,10 @@ end
 
 defmodule PaleeWeb.PasswordRecoveryController do
   @moduledoc """
-  ADR-187: password recovery without a mail service. The person asks for a
-  reset, and a handler (vendor, box staff, their coach) claims the request
-  and mails them a one-time link; or the person uses a recovery code.
+  ADR-187 and ADR-206: password recovery. The person asks for a reset; a
+  verified email gets a one-hour link automatically, otherwise a handler
+  (vendor, box staff, their coach) claims the request and mails them a
+  one-time link; or the person uses a recovery code.
   """
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -76,12 +77,48 @@ defmodule PaleeWeb.PasswordRecoveryController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:request, :complete, :redeem_code, :generate_codes]
+       when action in [:request, :inspect_link, :complete, :redeem_code, :generate_codes]
 
   operation(:request,
     summary: "Ask for a password reset (always answered the same way)",
-    request_body: Body.json(%{identifier: %Schema{type: :string}}, [:identifier]),
-    responses: [accepted: {"Request sent", "application/json", %Schema{type: :object}}]
+    description:
+      "A verified email gets a one-hour reset link; otherwise, or with `cant_access_email`, " <>
+        "the request goes to the people who can vouch for the person. The answer never " <>
+        "says which happened, or whether the account exists.",
+    request_body:
+      Body.json(
+        %{
+          identifier: %Schema{type: :string},
+          cant_access_email: %Schema{type: :boolean},
+          locale: %Schema{type: :string}
+        },
+        [:identifier]
+      ),
+    responses: [
+      accepted:
+        {"Request taken", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{status: %Schema{type: :string, enum: ["sent"]}},
+           required: [:status]
+         }}
+    ]
+  )
+
+  operation(:inspect_link,
+    summary: "Check a reset link before the new password is typed (never spends it)",
+    request_body: Body.json(%{token: %Schema{type: :string}}, [:token]),
+    responses: [
+      ok:
+        {"Usable link", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{expires_at: %Schema{type: :string, format: :"date-time"}},
+           required: [:expires_at]
+         }},
+      unprocessable_entity: {"Unknown link", "application/json", %Schema{type: :object}},
+      gone: {"Expired or used link", "application/json", %Schema{type: :object}}
+    ]
   )
 
   operation(:complete,
@@ -95,7 +132,7 @@ defmodule PaleeWeb.PasswordRecoveryController do
       no_content: "Password changed",
       unprocessable_entity:
         {"Invalid link or password", "application/json", %Schema{type: :object}},
-      gone: {"Expired link", "application/json", %Schema{type: :object}}
+      gone: {"Expired or used link", "application/json", %Schema{type: :object}}
     ]
   )
 
@@ -251,17 +288,36 @@ defmodule PaleeWeb.PasswordRecoveryController do
     ]
   )
 
+  # ADR-206: the same short path whatever the account: the work is queued.
   def request(conn, _params) do
-    :ok = PasswordRecovery.request(conn.body_params.identifier)
+    body = conn.body_params
+
+    :ok =
+      PasswordRecovery.submit_request(body.identifier,
+        cant_access_email: Map.get(body, :cant_access_email) == true,
+        locale: Map.get(body, :locale),
+        requester_key: requester_key(conn)
+      )
 
     conn
+    |> private_response()
     |> put_status(:accepted)
     |> json(%{status: "sent"})
   end
 
+  def inspect_link(conn, _params) do
+    with {:ok, link} <- PasswordRecovery.inspect_link(conn.body_params.token) do
+      conn
+      |> private_response()
+      |> json(link)
+    end
+  end
+
   def complete(conn, _params) do
     with :ok <- PasswordRecovery.complete(conn.body_params.token, conn.body_params.password) do
-      send_resp(conn, :no_content, "")
+      conn
+      |> private_response()
+      |> send_resp(:no_content, "")
     end
   end
 
@@ -320,6 +376,19 @@ defmodule PaleeWeb.PasswordRecoveryController do
     with :ok <- PasswordRecovery.close(GuardianPlug.current_resource(conn), id, outcome) do
       send_resp(conn, :no_content, "")
     end
+  end
+
+  # An HMAC of the client's IP: enough to count its requests, useless to
+  # anyone reading the table.
+  defp requester_key(conn) do
+    ip = conn.remote_ip |> :inet.ntoa() |> to_string()
+    :crypto.mac(:hmac, :sha256, conn.secret_key_base || "", "password_reset:" <> ip)
+  end
+
+  defp private_response(conn) do
+    conn
+    |> put_resp_header("cache-control", "no-store")
+    |> put_resp_header("referrer-policy", "no-referrer")
   end
 
   defp respond(conn, {:ok, request}), do: json(conn, %{request: request})

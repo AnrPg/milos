@@ -20,9 +20,13 @@ const EVENTS = new Set([
   "recovery_code_used",
 ]);
 
+/** ADR-206: steps of the automatic reset email, labelled in the `passwordReset` namespace. */
+const EMAIL_EVENTS = new Set(["link_emailed", "throttled"]);
+
 /** ADR-187: the vendor's security log of every password reset step, newest first. */
 export function PasswordResetLogPage() {
   const t = useTranslations("passwordResets");
+  const pr = useTranslations("passwordReset");
   const locale = useLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token;
@@ -78,7 +82,11 @@ export function PasswordResetLogPage() {
                   <time dateTime={entry.inserted_at}>{when(entry.inserted_at)}</time>
                 </td>
                 <td className="col-span-2 font-semibold text-[var(--text)] sm:py-3 sm:pe-3">
-                  {EVENTS.has(entry.event) ? t(`event_${entry.event}`) : entry.event}
+                  {EVENTS.has(entry.event)
+                    ? t(`event_${entry.event}`)
+                    : EMAIL_EVENTS.has(entry.event)
+                      ? pr(`event_${entry.event}`)
+                      : entry.event}
                 </td>
                 <td className="truncate text-[var(--text-soft)] sm:py-3 sm:pe-3">
                   {entry.handle ? `@${entry.handle}` : "—"}

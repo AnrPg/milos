@@ -17,7 +17,7 @@ defmodule Palee.Email.Domain.LinkTokenPolicy do
     "password_reset" => %{ttl_seconds: 3_600, replaces_previous: true},
     "account_deletion" => %{ttl_seconds: 24 * 3_600, replaces_previous: true},
     "account_deletion_undo" => %{ttl_seconds: 7 * 24 * 3_600, replaces_previous: true},
-    "sign_out_everywhere" => %{ttl_seconds: 7 * 24 * 3_600, replaces_previous: true}
+    "sign_out_everywhere" => %{ttl_seconds: 7 * 24 * 3_600, replaces_previous: false}
   }
 
   @token_bytes 32

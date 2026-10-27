@@ -66,4 +66,14 @@ defmodule Palee.Email.Domain.SendingPolicyTest do
     assert {:ok, :account} = SendingPolicy.category(:account)
     assert :error = SendingPolicy.category("marketing")
   end
+
+  test "the 80% budget warning fires for exactly one count a day (ADR-212)" do
+    budget = %{daily_budget: 280, hard_cap: 295}
+
+    assert SendingPolicy.budget_warning?(224, budget)
+    refute SendingPolicy.budget_warning?(223, budget)
+    refute SendingPolicy.budget_warning?(225, budget)
+    assert SendingPolicy.budget_warning?(9, %{budget | daily_budget: 11})
+    refute SendingPolicy.budget_warning?(0, %{budget | daily_budget: 0})
+  end
 end

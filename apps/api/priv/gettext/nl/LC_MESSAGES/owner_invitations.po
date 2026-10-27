@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Set up your admin account for %{business}"
+msgstr "Stel uw beheerdersaccount voor ‘%{business}’ in"
+
+msgid "Set up your owner account for %{business}"
+msgstr "Stel uw eigenaarsaccount voor ‘%{business}’ in"
+
+msgid "Welcome to %{product}"
+msgstr "Welkom bij %{product}"
+
+msgid "Set up my account"
+msgstr "Mijn account instellen"
+
+msgid "If you weren't expecting this email, you can ignore it."
+msgstr "Verwachtte u deze e-mail niet? Dan kunt u hem negeren."
+
+msgid "The %{product} team made you an admin of %{business}. Create your account to get started."
+msgstr "Het %{product}-team heeft u beheerder van ‘%{business}’ gemaakt. Maak uw account aan om te beginnen."
+
+msgid "The %{product} team made you the owner of %{business}. Create your account to get started."
+msgstr "Het %{product}-team heeft u eigenaar van ‘%{business}’ gemaakt. Maak uw account aan om te beginnen."
+
+msgid "If it has expired, ask the %{product} team for a new invitation."
+msgstr "Is hij verlopen? Vraag het %{product}-team dan om een nieuwe uitnodiging."
+
+msgid "You're receiving this email because the %{product} team set up %{business} with this address."
+msgstr "U ontvangt deze e-mail omdat het %{product}-team ‘%{business}’ met dit adres heeft ingesteld."

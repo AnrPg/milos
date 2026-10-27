@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "Владелец"
+
+msgid "Admin"
+msgstr "Администратор"
+
+msgid "Coach"
+msgstr "Коуч"
+
+msgid "Front desk"
+msgstr "Ресепшен"
+
+msgid "Accountant"
+msgstr "Бухгалтер"
+
+msgid "Cleaning staff"
+msgstr "Уборка"
+
+msgid "Box member"
+msgstr "Участник бокса"
+
+msgid "Athlete"
+msgstr "Атлет"
+
+msgid "Your invitation to %{business}"
+msgstr "Ваше приглашение в «%{business}»"
+
+msgid "You're invited to %{business}"
+msgstr "Вас приглашают в «%{business}»"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "%{inviter} приглашает вас присоединиться к «%{business}» в %{product}."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "«%{business}» приглашает вас присоединиться в %{product}."
+
+msgid "Accept the invitation"
+msgstr "Принять приглашение"
+
+msgid "Joins as"
+msgstr "Роль"
+
+msgid "Branches"
+msgstr "Филиалы"
+
+msgid "All branches"
+msgstr "Все филиалы"
+
+msgid "The link works once and expires on %{date}."
+msgstr "Ссылка работает один раз и действует до %{date}."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "Чтобы принять приглашение, создайте аккаунт или войдите с этим адресом электронной почты."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "Если вы не ждали этого приглашения, просто проигнорируйте это письмо."

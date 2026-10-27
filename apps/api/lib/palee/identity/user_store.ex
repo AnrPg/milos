@@ -80,6 +80,9 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def bump_security_version(user_id), do: impl().bump_security_version(user_id)
 
+  @impl true
+  def bump_login_security_version(login_id), do: impl().bump_login_security_version(login_id)
+
   defp impl do
     Application.fetch_env!(:palee, :identity_user_store)
   end

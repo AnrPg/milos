@@ -13,7 +13,8 @@ export function parseJoinInput(raw: string): JoinInput {
   if (url) {
     const join = url.pathname.match(/\/join\/([^/]+)\/?$/);
     if (join) return { kind: "join", slug: decodeURIComponent(join[1]) };
-    const token = url.searchParams.get("token")?.trim();
+    // ADR-209: emailed links keep the token in the fragment (`/invite#token=…`).
+    const token = (url.searchParams.get("token") ?? new URLSearchParams(url.hash.replace(/^#/, "")).get("token"))?.trim();
     return token ? { kind: "invite", token } : null;
   }
 

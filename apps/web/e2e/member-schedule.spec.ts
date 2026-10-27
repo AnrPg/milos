@@ -11,6 +11,7 @@ const user = {
   nickname: "Maria L",
   role: "member",
   email: "member-1@example.com",
+  email_verified: true,
   completed_tours: ["admin", "member", "athlete", "first_run"],
   preferred_locale: "el",
   vendor: false,

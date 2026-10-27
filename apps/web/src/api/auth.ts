@@ -1,5 +1,6 @@
 import type { paths } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
+import { deviceHeaders } from "@/lib/device-id";
 
 export type RegisterRequest =
   NonNullable<
@@ -35,15 +36,23 @@ export type RegisterResponse =
   paths["/api/auth/register"]["post"]["responses"]["201"]["content"]["application/json"];
 
 export function registerUser(payload: RegisterRequest) {
-  return apiRequest<RegisterResponse>("/auth/register", { method: "POST", body: payload });
+  return apiRequest<RegisterResponse>("/auth/register", { method: "POST", body: payload, headers: deviceHeaders() });
 }
 
 export function registerAdminUser(payload: AdminRegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register-admin", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/register-admin", {
+    method: "POST",
+    body: payload,
+    headers: deviceHeaders(),
+  });
 }
 
 export function registerInvitedUser(payload: InvitedRegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register-member", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/register-member", {
+    method: "POST",
+    body: payload,
+    headers: deviceHeaders(),
+  });
 }
 
 export function inspectInvitation(invitation_token: string) {
@@ -54,7 +63,7 @@ export function inspectInvitation(invitation_token: string) {
 }
 
 export function loginUser(payload: LoginRequest) {
-  return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload, headers: deviceHeaders() });
 }
 
 export function refreshSession() {
@@ -92,17 +101,41 @@ export function suggestHandle(displayName: string, signal?: AbortSignal) {
   );
 }
 
-/** Always answered "sent"; never reveals whether the account exists. */
-export function requestPasswordReset(identifier: string) {
+/**
+ * Always answered "sent"; never reveals whether the account exists (ADR-206).
+ * A confirmed email gets a reset link; otherwise, or with `cantAccessEmail`,
+ * people who know the person help.
+ */
+export function requestPasswordReset(
+  identifier: string,
+  options: { cantAccessEmail?: boolean; locale?: string } = {},
+) {
   return apiRequest<unknown>("/auth/password-reset-requests", {
     method: "POST",
-    body: { identifier },
+    body: {
+      identifier,
+      ...(options.cantAccessEmail ? { cant_access_email: true } : {}),
+      ...(options.locale ? { locale: options.locale } : {}),
+    },
+  });
+}
+
+/** ADR-206: whether a reset link can still be used. Never spends it. */
+export function inspectPasswordReset(token: string) {
+  return apiRequest<{ expires_at: string }>("/auth/password-reset/inspect", {
+    method: "POST",
+    body: { token },
   });
 }
 
 /** Sets a new password with a reset link's token; signs every device out. */
 export function completePasswordReset(token: string, password: string) {
   return apiRequest<void>("/auth/password-reset", { method: "POST", body: { token, password } });
+}
+
+/** ADR-208: a security notice's "sign out everywhere" link; ends every session of the login. */
+export function signOutEverywhereWithLink(token: string) {
+  return apiRequest<void>("/auth/sign-out-everywhere", { method: "POST", body: { token } }, false);
 }
 
 /** Sets a new password with a one-time recovery code. */

@@ -16,6 +16,7 @@ function persona(slug = "kypseli") {
     nickname: "Maria",
     role: "member",
     email: `${id}@example.com`,
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,

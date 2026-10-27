@@ -296,9 +296,18 @@ defmodule Palee.Application.AccountDeletion do
         :ok = AccountDeletionStore.delete(deletion.id)
         :ok = AccountDeletionStore.delete_login_if_empty(deletion.login_id)
 
-        Enum.each(profiles, fn profile ->
-          notify(:account_deleted, profile, %{scope: deletion.scope, to: profile.email})
-        end)
+        # One notice per deletion, to the address the login had. The rows it
+        # pointed at are gone, so the outbox row must not reference them.
+        case profiles do
+          [profile | _rest] ->
+            notify(:account_deleted, %{profile | id: nil, login_id: nil}, %{
+              scope: deletion.scope,
+              to: profile.email
+            })
+
+          [] ->
+            :ok
+        end
 
         :ok
 
