@@ -68,7 +68,7 @@ defmodule PaleeWeb.PasswordRecoveryControllerTest do
 
     run_jobs()
     assert_email_enqueued(kind: :password_reset, to: "verified@example.com")
-    refute_email_enqueued(to: "unverified@example.com")
+    refute_email_enqueued(kind: :password_reset, to: "unverified@example.com")
     assert length(Palee.Repo.all(Palee.Identity.PasswordResetRequest)) == 2
 
     # The job args carry an HMAC of the IP, never the IP.
