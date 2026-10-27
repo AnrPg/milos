@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "المالك"
+
+msgid "Admin"
+msgstr "المسؤول"
+
+msgid "Coach"
+msgstr "المدرب"
+
+msgid "Front desk"
+msgstr "الاستقبال"
+
+msgid "Accountant"
+msgstr "المحاسب"
+
+msgid "Cleaning staff"
+msgstr "طاقم التنظيف"
+
+msgid "Box member"
+msgstr "عضو في البوكس"
+
+msgid "Athlete"
+msgstr "رياضي"
+
+msgid "Your invitation to %{business}"
+msgstr "دعوتك إلى «%{business}»"
+
+msgid "You're invited to %{business}"
+msgstr "لديك دعوة من «%{business}»"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "دعاك %{inviter} للانضمام إلى «%{business}» على %{product}."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "دعاك «%{business}» للانضمام على %{product}."
+
+msgid "Accept the invitation"
+msgstr "قبول الدعوة"
+
+msgid "Joins as"
+msgstr "الانضمام بصفة"
+
+msgid "Branches"
+msgstr "الفروع"
+
+msgid "All branches"
+msgstr "جميع الفروع"
+
+msgid "The link works once and expires on %{date}."
+msgstr "يعمل الرابط مرة واحدة وتنتهي صلاحيته في %{date}."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "لقبول الدعوة، أنشئ حسابك أو سجّل الدخول بعنوان البريد الإلكتروني هذا."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "إذا لم تكن تتوقع هذه الدعوة، يمكنك تجاهل هذه الرسالة."

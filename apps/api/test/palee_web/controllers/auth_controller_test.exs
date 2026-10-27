@@ -195,10 +195,12 @@ defmodule PaleeWeb.AuthControllerTest do
     } do
       {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
 
+      # ADR-209: sent by email, so signing up through it proves the inbox.
       {:ok, %{token: bound_token}} =
         Organizations.issue_invitation(context, %{
           role: :admin,
-          intended_email: "invited@example.com"
+          intended_email: "invited@example.com",
+          deliver_by_email: %{address: "invited@example.com", locale: "en"}
         })
 
       # Wrong address: rejected, and the invitation must survive for the
@@ -236,6 +238,37 @@ defmodule PaleeWeb.AuthControllerTest do
       account = Identity.find_by_nickname("right_person")
       assert account.email == "invited@example.com"
       assert account.role == :admin
+      assert Identity.email_verified?(Identity.find_by_id(account.id))
+    end
+
+    test "ADR-209: a bound link that was not emailed refuses a new, unverified account", %{
+      conn: conn,
+      owner: owner,
+      organization: organization
+    } do
+      {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+
+      {:ok, %{token: bound_token}} =
+        Organizations.issue_invitation(context, %{
+          role: :admin,
+          intended_email: "copied@example.com"
+        })
+
+      refused =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "copied_person",
+            password: "S3cur3P@ss!42",
+            invitation_token: bound_token,
+            email: "copied@example.com"
+          })
+        )
+
+      assert %{"code" => "invitation_email_unverified"} = json_response(refused, 403)
+      refute Identity.find_by_nickname("copied_person")
     end
 
     test "rejects an invalid invitation without creating an account", %{conn: conn} do

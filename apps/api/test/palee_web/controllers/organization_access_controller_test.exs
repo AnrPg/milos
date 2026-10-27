@@ -134,7 +134,8 @@ defmodule PaleeWeb.OrganizationAccessControllerTest do
       |> delete("/api/org/#{context.organization.slug}/invitations/#{inspected.invitation_id}")
 
     assert response(revoked, 204)
-    assert {:error, :invalid_invitation} = Organizations.inspect_invitation(token)
+    # ADR-209: the holder of a revoked link is told the box revoked it.
+    assert {:error, :invitation_revoked} = Organizations.inspect_invitation(token)
   end
 
   test "an owner can issue an email-bound organization invitation through the API", context do
