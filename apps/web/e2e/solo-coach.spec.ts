@@ -73,7 +73,7 @@ test.describe("Solo coach", () => {
     );
 
     await page.goto("/box");
-    await expect(page.getByText("Nikos P. · Personal coach")).toBeVisible();
+    await expect(page.getByText("Nikos P. · Independent coach")).toBeVisible();
     await expect(page.getByText("Personal session · Online · 45 min")).toBeVisible();
     await expect(page.getByRole("link", { name: "Join call" })).toHaveAttribute("href", "https://meet.example.com/nikos-maria");
     const actions = page.getByRole("navigation", { name: "Coach actions" });

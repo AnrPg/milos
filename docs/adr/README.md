@@ -200,4 +200,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-200 | Series edits, pause / cancel / delete reach this class, all upcoming classes or a date range, every nth; duplicate a class | Accepted |
 | ADR-201 | WOD variation for several people at once: each programmed as if alone, results per person | Accepted |
 | ADR-202 | Spaces: floor plans, unavailability, class spaces, cleaning schedule and machine placement | Accepted |
+| ADR-204 | An existing profile accepts an owner or staff invitation; an email with an account is told to use its password or sign in | Accepted |
 | ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |

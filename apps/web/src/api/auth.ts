@@ -45,6 +45,21 @@ export function inspectInvitation(invitation_token: string) {
   });
 }
 
+export type AcceptedInvitation =
+  paths["/api/auth/accept-invitation"]["post"]["responses"]["200"]["content"]["application/json"];
+
+/**
+ * ADR-204: the signed-in profile accepts an invitation itself. When that
+ * lifts its role, its old sessions end and a new one comes back.
+ */
+export function acceptInvitation(token: string, invitationToken: string) {
+  return apiRequest<AcceptedInvitation>("/auth/accept-invitation", {
+    method: "POST",
+    token,
+    body: { invitation_token: invitationToken },
+  });
+}
+
 export function loginUser(payload: LoginRequest) {
   return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload });
 }
