@@ -9,7 +9,7 @@ import {
 export { explainFieldMessage, fieldMessagesOf };
 
 /**
- * ADR-205: how a form shows what went wrong. A wrong field turns red and says,
+ * ADR-214: how a form shows what went wrong. A wrong field turns red and says,
  * right under it and in plain words, why it is wrong and how to fix it; what
  * belongs to no field shows as one notice inside the same form (the dialog's
  * `error` slot), never on the page behind it.

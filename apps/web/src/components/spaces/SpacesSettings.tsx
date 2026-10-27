@@ -44,6 +44,8 @@ import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import { DateTimeInput } from "@/components/ui/DateInput";
 import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
+import { FieldError } from "@/components/ui/ErrorNotice";
+import { fieldBorder, formErrorsFrom, invalidFieldProps } from "@/lib/form-errors";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { preparePhoto } from "@/lib/media-files";
@@ -442,6 +444,10 @@ function UploadError({ error }: { error: unknown }) {
   return <StatusText tone="error">{error instanceof Error && error.name === "PresignedUploadError" ? t("uploadFailed") : localizeError(error, ui)}</StatusText>;
 }
 
+/** ADR-214: the space form's fields, as the API names them. */
+const SPACE_FIELDS = ["name", "description", "directions", "location_id", "floor_plan_id", "tasks"] as const;
+type SpaceField = (typeof SPACE_FIELDS)[number];
+
 function SpaceForm({
   token,
   space,
@@ -487,10 +493,21 @@ function SpaceForm({
     },
     onSuccess: onSaved,
   });
+  // ADR-214: a refused save marks its fields; editing any field clears it.
+  const errors = save.isError ? formErrorsFrom(save.error, ui, SPACE_FIELDS) : null;
+  const edited = <T,>(set: (value: T) => void) => (value: T) => {
+    if (save.isError) save.reset();
+    set(value);
+  };
+  const field = (key: SpaceField) => ({
+    style: errors?.fields[key] ? { ...inputStyle, border: fieldBorder(errors.fields[key]) } : inputStyle,
+    ...invalidFieldProps(errors?.fields[key], `space-error-${key}`),
+  });
 
   return (
     <Dialog
       title={space ? t("editTitle", { name: space.name }) : t("add")}
+      error={errors?.message}
       size="lg"
       testId="space-form"
       onClose={onClose}
@@ -510,23 +527,26 @@ function SpaceForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block sm:col-span-2">
           <span className={captionClass} style={captionStyle}>{t("name")}</span>
-          <input className={inputClass} style={inputStyle} maxLength={80} value={name} data-testid="space-name" onChange={(event) => setName(event.target.value)} />
+          <input className={inputClass} {...field("name")} maxLength={80} value={name} data-testid="space-name" onChange={(event) => edited(setName)(event.target.value)} />
+          <FieldError id="space-error-name">{errors?.fields.name}</FieldError>
         </label>
         <label className="block sm:col-span-2">
           <span className={captionClass} style={captionStyle}>{t("description")}</span>
-          <textarea className={inputClass} style={inputStyle} rows={2} maxLength={2000} value={description} onChange={(event) => setDescription(event.target.value)} />
+          <textarea className={inputClass} {...field("description")} rows={2} maxLength={2000} value={description} onChange={(event) => edited(setDescription)(event.target.value)} />
+          <FieldError id="space-error-description">{errors?.fields.description}</FieldError>
         </label>
         <label className="block sm:col-span-2">
           <span className={captionClass} style={captionStyle}>{t("directions")}</span>
           <textarea
             className={inputClass}
-            style={inputStyle}
+            {...field("directions")}
             rows={2}
             maxLength={2000}
             value={directions}
             placeholder={t("directionsPlaceholder")}
-            onChange={(event) => setDirections(event.target.value)}
+            onChange={(event) => edited(setDirections)(event.target.value)}
           />
+          <FieldError id="space-error-directions">{errors?.fields.directions}</FieldError>
         </label>
         {rights.manage ? (
           <>
@@ -534,39 +554,37 @@ function SpaceForm({
               <span className={captionClass} style={captionStyle}>{t("branch")}</span>
               <Select
                 className={inputClass}
-                style={inputStyle}
+                {...field("location_id")}
                 value={locationId}
                 data-testid="space-branch"
-                onValueChange={(value) => {
+                onValueChange={edited((value: string) => {
                   setLocationId(value);
                   setPlanId("");
-                }}
+                })}
               >
                 <option value={WHOLE_GYM}>{t("wholeGym")}</option>
                 {branches.map((location) => (
                   <option key={location.id} value={location.id}>{location.name}</option>
                 ))}
               </Select>
+              <FieldError id="space-error-location_id">{errors?.fields.location_id}</FieldError>
             </label>
             <label className="block">
               <span className={captionClass} style={captionStyle}>{t("floorPlan")}</span>
-              <Select className={inputClass} style={inputStyle} value={planId} onValueChange={setPlanId}>
+              <Select className={inputClass} {...field("floor_plan_id")} value={planId} onValueChange={edited(setPlanId)}>
                 <option value="">{t("noPlan")}</option>
                 {branchPlans.map((plan) => (
                   <option key={plan.id} value={plan.id}>{plan.name}</option>
                 ))}
               </Select>
+              <FieldError id="space-error-floor_plan_id">{errors?.fields.floor_plan_id}</FieldError>
             </label>
             <label className="block sm:col-span-2">
               <span className={captionClass} style={captionStyle}>{t("tasks")}</span>
-              <textarea className={inputClass} style={inputStyle} rows={3} value={tasks} onChange={(event) => setTasks(event.target.value)} />
+              <textarea className={inputClass} {...field("tasks")} rows={3} value={tasks} onChange={(event) => edited(setTasks)(event.target.value)} />
+              <FieldError id="space-error-tasks">{errors?.fields.tasks}</FieldError>
             </label>
           </>
-        ) : null}
-        {save.isError ? (
-          <div className="sm:col-span-2">
-            <StatusText tone="error">{localizeError(save.error, ui)}</StatusText>
-          </div>
         ) : null}
       </div>
     </Dialog>

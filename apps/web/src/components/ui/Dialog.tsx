@@ -131,7 +131,7 @@ export function Dialog({
   /** The walkthrough anchor of the panel (ADR-193), e.g. "events.wizard". */
   guide?: GuideAnchor;
   /**
-   * ADR-205: what went wrong with the form, shown inside the dialog just
+   * ADR-214: what went wrong with the form, shown inside the dialog just
    * above the footer (never on the page behind it), so it stays in view while
    * the body scrolls. Field-level reasons go under their own fields.
    */

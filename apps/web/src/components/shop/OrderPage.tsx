@@ -137,11 +137,13 @@ function OrderBody({ order, slug, locale }: { order: ShopOrder; slug: string; lo
           {t("cancelOrder")}
         </button>
       ) : null}
-      {cancel.isError ? <ErrorNotice message={t("cancelFailed")} /> : null}
+      {cancel.isError && !confirming ? <ErrorNotice message={t("cancelFailed")} /> : null}
 
       {confirming ? (
         <Dialog
           onClose={() => setConfirming(false)}
+          // ADR-214: a failed cancel keeps the dialog open and says so inside it.
+          error={cancel.isError ? t("cancelFailed") : undefined}
           title={t("cancelTitle", { number: orderReference(order) })}
           variant="center"
           size="sm"
@@ -152,7 +154,7 @@ function OrderBody({ order, slug, locale }: { order: ShopOrder; slug: string; lo
               <DialogButton
                 tone="danger"
                 disabled={cancel.isPending}
-                onClick={() => cancel.mutate(order.id, { onSettled: () => setConfirming(false) })}
+                onClick={() => cancel.mutate(order.id, { onSuccess: () => setConfirming(false) })}
               >
                 {t("cancelOrder")}
               </DialogButton>

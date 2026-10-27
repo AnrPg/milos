@@ -91,6 +91,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
         return await archiveClassType(token, source.id, replacementId);
       } catch (cause) {
         if (cause instanceof ApiError && cause.status === 409 && !replacementId) {
+          setError(null);
           setArchiveMapping({
             source,
             futureCount: cause.payload.future_class_count ?? 0,
@@ -228,11 +229,13 @@ export function ClassTypeSettings({ token }: { token: string }) {
         </details>
       ) : null}
 
-      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
+      {/* ADR-214: while the mapping dialog is open, its errors show inside it. */}
+      {error && !archiveMapping ? <ErrorNotice>{error}</ErrorNotice> : null}
 
       {archiveMapping ? (
         <Dialog
           onClose={() => setArchiveMapping(null)}
+          error={error}
           eyebrow={<span style={{ color: "var(--danger)" }}>{i18n("replacementRequireda658534")}</span>}
           title={i18n("mapFutureClassesBeforeRemoval544f152")}
           size="lg"

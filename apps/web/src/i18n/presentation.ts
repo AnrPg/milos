@@ -489,7 +489,7 @@ export function semanticLabel(value: unknown, translate: UiTranslator): string {
 export function localizeError(error: unknown, translate: UiTranslator): string {
   if (!(error instanceof ApiError)) return translate("apiErrorRequestFailed");
 
-  // ADR-205: a form that does not mark its fields still says, in plain
+  // ADR-214: a form that does not mark its fields still says, in plain
   // words, what was not accepted, never "check the highlighted values".
   if (error.status === 422 && (!error.payload.code || error.payload.code === "validation_failed")) {
     const details = new Set(

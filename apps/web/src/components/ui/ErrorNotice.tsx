@@ -71,7 +71,7 @@ export function ErrorNotice({
 }
 
 /**
- * ADR-205: the plain-language reason under a wrong field. Give the field
+ * ADR-214: the plain-language reason under a wrong field. Give the field
  * `aria-invalid` and `aria-describedby={id}` (see `invalidFieldProps`).
  * Renders nothing without a message, so it can sit under every field.
  */

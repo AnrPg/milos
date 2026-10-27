@@ -62,7 +62,7 @@ import {
   stillApplies,
   type FormErrors,
 } from "@/lib/form-errors";
-import { defaultClassStart, startsInPast, todayKey } from "@/components/schedule/slot-time";
+import { defaultClassStart, earliestPickable, startsInPast, todayKey } from "@/components/schedule/slot-time";
 
 /** A class may name its coach (ADR-100). */
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
@@ -76,7 +76,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
 
-/** The class form's fields, as the API names them (ADR-205 errors land on these). */
+/** The class form's fields, as the API names them (ADR-214 errors land on these). */
 const SLOT_FIELDS = [
   "class_type_id",
   "name",
@@ -98,7 +98,7 @@ type SlotEditorState = {
   values: ClassPayload;
   /** The start the class had when the form opened: an unchanged past start may stay. */
   originalScheduledAt?: string | null;
-  /** ADR-205: what the last save got wrong, and the values it sent. */
+  /** ADR-214: what the last save got wrong, and the values it sent. */
   errors?: FormErrors<SlotField>;
   sent?: ClassPayload;
 };
@@ -130,7 +130,7 @@ type SeriesEditorState = {
   weekdays: number[];
   excludedDates: string;
   timezone: string;
-  /** ADR-205: what the last save got wrong, and the values it sent. */
+  /** ADR-214: what the last save got wrong, and the values it sent. */
   errors?: FormErrors<SeriesField>;
   sent?: Partial<Record<SeriesField, unknown>>;
 };
@@ -150,8 +150,9 @@ const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !t
 /** A real "YYYY-MM-DD" day (2026-02-30 is not one). */
 function isCalendarDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const date = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
 // ADR-179: a class's date and time are typed on the gym's clock (`zone`),
@@ -170,7 +171,7 @@ function defaultSlotValues(
   defaults?: SchedulingSettings,
   zone: string | null = null,
 ): ScheduleSlotPayload {
-  // ADR-205: 09:00 on the gym's clock, or the next open half hour once
+  // ADR-214: 09:00 on the gym's clock, or the next open half hour once
   // that has passed, never a start the API refuses as past.
   const date = defaultClassStart(isoDate, zone);
 
@@ -444,7 +445,7 @@ export function ScheduleConsole({
     router.push(newWorkoutHref(adminHref("/admin/workouts/new", organizationSlug), window.location.pathname));
   }
 
-  // ADR-205: "it is 23:40 at the gym now", on the gym's clock.
+  // ADR-214: "it is 23:40 at the gym now", on the gym's clock.
   const gymNowText = () => formatInZone(new Date(), gymZone, locale, "time");
   const pastStartMessage = () => i18n("formErrClassStartPassed", { time: gymNowText(), zone: zoneLabel(gymZone) });
 
@@ -466,7 +467,7 @@ export function ScheduleConsole({
     return formatDateTimeLocal(editor.values.scheduled_at, gymZone);
   }, [editor, gymZone]);
 
-  // ADR-205: each field's reason, from the last save or from what the form
+  // ADR-214: each field's reason, from the last save or from what the form
   // can already tell (a start that has passed).
   const editorStart = editor ? editorStartProblem(editor) : null;
   const editorFieldErrors: Partial<Record<SlotField, string>> = editor
@@ -552,7 +553,7 @@ export function ScheduleConsole({
 
   async function saveSlot() {
     if (!tokens?.access_token || !editor) return;
-    // ADR-205: a past start is explained on the field; nothing is sent.
+    // ADR-214: a past start is explained on the field; nothing is sent.
     if (editorStartProblem(editor)) return;
 
     setBusy(true);
@@ -586,7 +587,7 @@ export function ScheduleConsole({
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
-      // ADR-205: the reasons stay in the form, on the fields they concern.
+      // ADR-214: the reasons stay in the form, on the fields they concern.
       const errors = slotErrorsFrom(requestError, t("failedToSaveSlot"));
       setEditor((current) => (current ? { ...current, errors, sent } : current));
     } finally {
@@ -640,7 +641,7 @@ export function ScheduleConsole({
     }
 
     const base = defaultSlotValues(startDate, types, schedulingDefaults, gymZone);
-    // ADR-205: a series starts today at the earliest, on the gym's calendar.
+    // ADR-214: a series starts today at the earliest, on the gym's calendar.
     const seriesStart = startDate < todayKey(gymZone) ? todayKey(gymZone) : startDate;
     setCreateBranches(defaultAppliesTo(adminLocations));
     setSeriesEditor({
@@ -713,7 +714,7 @@ export function ScheduleConsole({
     };
   }
 
-  /** ADR-205: what the series form can tell before sending, in plain words. */
+  /** ADR-214: what the series form can tell before sending, in plain words. */
   function seriesProblems(state: SeriesEditorState): Partial<Record<SeriesField, string>> {
     const problems: Partial<Record<SeriesField, string>> = {};
     if (!state.startDate) problems.starts_on = i18n("formErrRequired");
@@ -1118,7 +1119,7 @@ export function ScheduleConsole({
                         )
                       }
                       value={editorDateValue}
-                      min={editor.slotId ? undefined : `${todayKey(gymZone)}T00:00`}
+                      min={editor.slotId ? undefined : earliestPickable(gymZone)}
                     />
                     {gymZone ? (
                       <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{i18n("zonedTimeGymClock", { zone: zoneLabel(gymZone) })}</p>

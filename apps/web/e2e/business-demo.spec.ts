@@ -217,7 +217,7 @@ test.describe("demo mode", () => {
     await expect(popover).toBeVisible();
 
     // This screen is Members.
-    await popover.getByRole("button", { name: "Add demo members" }).click();
+    await popover.getByRole("button", { name: "Add mock people" }).click();
     await expect(popover.getByRole("button", { name: "This screen has demo data" })).toBeDisabled();
     expect(calls.seeds).toEqual([{ section: "members" }]);
 
@@ -232,7 +232,7 @@ test.describe("demo mode", () => {
     expect(calls.removes).toBe(0);
     await popover.getByRole("button", { name: "Remove demo data" }).click();
     await popover.getByRole("button", { name: "Remove", exact: true }).click();
-    await expect(popover.getByRole("button", { name: "Add demo members" })).toBeEnabled();
+    await expect(popover.getByRole("button", { name: "Add mock people" })).toBeEnabled();
     await expect(popover.getByRole("button", { name: "Remove demo data" })).toBeHidden();
     expect(calls.removes).toBe(1);
 

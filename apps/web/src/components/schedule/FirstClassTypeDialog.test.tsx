@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ApiError } from "@/api/client";
+
 import { FirstClassTypeDialog } from "./FirstClassTypeDialog";
 
 const createClassType = vi.fn();
@@ -41,5 +43,24 @@ describe("FirstClassTypeDialog", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("firstClassTypeFailed");
     expect(onCreated).not.toHaveBeenCalled();
+  });
+
+  it("marks the name red and explains under it when the API refuses it", async () => {
+    createClassType.mockRejectedValueOnce(
+      new ApiError(422, "name: has already been taken", { code: "validation_failed", errors: { name: ["has already been taken"] } }),
+    );
+
+    render(<FirstClassTypeDialog token="tok" onClose={() => undefined} onCreated={vi.fn()} />);
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "CrossFit" } });
+    fireEvent.click(screen.getByRole("button", { name: "firstClassTypeCreate" }));
+
+    await waitFor(() => expect(input).toHaveAttribute("aria-invalid", "true"));
+    expect(document.getElementById(input.getAttribute("aria-describedby")!)).toHaveTextContent("formErrTaken");
+    expect(screen.getByRole("alert")).toHaveTextContent("formErrFixHighlighted");
+
+    // Correcting the name clears its mark straight away.
+    fireEvent.change(input, { target: { value: "CrossFit 2" } });
+    expect(input).not.toHaveAttribute("aria-invalid");
   });
 });

@@ -13,7 +13,7 @@ function pad(value: number) {
 
 /**
  * The first half hour on the gym's clock that is at least LEAD_MINUTES ahead
- * of `now` (ADR-205). Crosses into the next day when the day is over.
+ * of `now` (ADR-214). Crosses into the next day when the day is over.
  */
 export function nextOpenStart(now: Date, zone: string | null): Date {
   const earliest = new Date(now.getTime() + LEAD_MINUTES * 60_000);
@@ -26,7 +26,7 @@ export function nextOpenStart(now: Date, zone: string | null): Date {
 }
 
 /**
- * Where a new class on `dateKey` starts (ADR-205): 09:00 on the gym's clock,
+ * Where a new class on `dateKey` starts (ADR-214): 09:00 on the gym's clock,
  * or, when that has passed, the next open half hour, so the form never
  * suggests a time the API refuses.
  */
@@ -45,4 +45,9 @@ export function startsInPast(scheduledAt: string, now: Date = new Date()): boole
 /** The gym's today, for date pickers that must not offer past days. */
 export function todayKey(zone: string | null, now: Date = new Date()): string {
   return dateKeyInZone(now, zone);
+}
+
+/** The earliest value a new class's date-and-time picker offers: today on the gym's clock. */
+export function earliestPickable(zone: string | null, now: Date = new Date()): string {
+  return `${todayKey(zone, now)}T00:00`;
 }
