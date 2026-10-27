@@ -70,7 +70,7 @@ msgstr "Je coach heeft je een bericht gestuurd."
 msgid "Message from the box"
 msgstr "Bericht van de box"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Je box heeft je een bericht gestuurd."
 
 msgid "Challenge completed"
@@ -460,13 +460,13 @@ msgstr "Tijd voor een nieuwe meting"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Een nieuwe momentopname laat je je trend zien. Het kost een minuut."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Een uitnodiging als steunmaatje"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} vraagt je om hun steunmaatje te zijn."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "Je hebt een steunmaatje"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Een glas water?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "De middag is een goed moment om je water in te halen."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Bericht van je steunmaatje"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "Jij en %{nickname} willen samen trainen. Zeg hallo."
 msgid "Training partner message"
 msgstr "Bericht van je trainingsmaatje"
 
-msgid "Squad invitation"
-msgstr "Uitnodiging voor een squad"
+msgid "PT squad invitation"
+msgstr "Uitnodiging voor een PT-squad"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} heeft je uitgenodigd voor de squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} heeft je uitgenodigd voor de PT-squad «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "Een les heeft geen WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "%{class} (%{when}) heeft geen WOD, dus leden kunnen de les niet zien of boeken. Koppel er een om de les te publiceren."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) heeft geen WOD, dus leden van de box kunnen de les niet zien of boeken. Koppel er een om de les te publiceren."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) begint over een uur en heeft nog geen WOD."
@@ -634,8 +634,8 @@ msgstr "%{name} (@%{handle}) kan niet inloggen en heeft gevraagd om het wachtwoo
 msgid "Your password was reset"
 msgstr "Je wachtwoord is hersteld"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "Je wachtwoord is gewijzigd met een herstellink of een herstelcode, en je bent op alle apparaten uitgelogd. Was jij dit niet? Neem dan contact op met je sportschool of met Palee-support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "Je wachtwoord is gewijzigd met een herstellink of een herstelcode, en je bent op alle apparaten uitgelogd. Was jij dit niet? Neem dan contact op met je box of met Palee-support."
 
 msgid "Your demo business is waiting for you"
 msgstr "Je demobedrijf wacht op je"

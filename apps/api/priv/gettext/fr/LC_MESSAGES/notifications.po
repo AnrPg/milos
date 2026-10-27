@@ -29,7 +29,7 @@ msgid "Workout changed"
 msgstr "L'entraînement a changé"
 
 msgid "Your coach changed a scheduled workout."
-msgstr "Votre entraîneur a modifié un entraînement programmé."
+msgstr "Votre coach a modifié un entraînement programmé."
 
 msgid "Workout removed"
 msgstr "Entraînement supprimé"
@@ -70,7 +70,7 @@ msgstr "Ton coach t'a envoyé un message."
 msgid "Message from the box"
 msgstr "Message de la box"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Ta box t'a envoyé un message."
 
 msgid "Challenge completed"
@@ -460,13 +460,13 @@ msgstr "C’est le moment d’une nouvelle mesure"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Un nouvel instantané t’aide à voir ta tendance. Cela prend une minute."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Une invitation à devenir pote de soutien"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} te demande d'être son pote de soutien."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "Tu as un pote de soutien"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Un verre d'eau ?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "L'après-midi est un bon moment pour rattraper ton eau."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Message de ton pote de soutien"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "Vous et %{nickname} voulez vous entraîner ensemble. Dites bonjour."
 msgid "Training partner message"
 msgstr "Message de votre partenaire d'entraînement"
 
-msgid "Squad invitation"
-msgstr "Invitation à une squad"
+msgid "PT squad invitation"
+msgstr "Invitation à une squad PT"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} t'a invité·e dans la squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} t'a invité·e dans la squad PT «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "Un cours n'a pas de WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "%{class} (%{when}) n'a pas de WOD : les membres ne peuvent ni le voir ni le réserver. Associez-en un pour le publier."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) n'a pas de WOD : les membres de la box ne peuvent ni le voir ni le réserver. Associez-en un pour le publier."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) commence dans une heure et n'a toujours pas de WOD."
@@ -634,8 +634,8 @@ msgstr "%{name} (@%{handle}) n’arrive pas à se connecter et a demandé à ré
 msgid "Your password was reset"
 msgstr "Votre mot de passe a été réinitialisé"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre salle ou le support Palee."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "Votre mot de passe a été modifié avec un lien de réinitialisation ou un code de récupération, et tous les appareils ont été déconnectés. Si ce n’était pas vous, contactez votre box ou le support Palee."
 
 msgid "Your demo business is waiting for you"
 msgstr "Votre entreprise de démonstration vous attend"

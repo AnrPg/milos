@@ -2,18 +2,19 @@ import type { ChatThread } from "@/api/messaging";
 
 /**
  * The one inbox (vision §6.1–6.3, ADR-196): Feed Μηνύματα and `Box › Coach` open the
- * same list, segmented «Όλα · Άτομα · Coach · Clubs · Partners». `/messages`
+ * same list, segmented «Όλα · Άτομα · Coach · Box · Συναθλητές». `/messages`
  * is its address; `?filter=` picks the segment and `?thread=` opens a
  * conversation. «Άτομα» holds chats with other people (person conversations,
- * message requests and other direct chats, ANR 2026-10-25).
+ * message requests, check-in buddy chats and other direct chats, ANR
+ * 2026-10-25, ontology §5.1). The segment ids `clubs` and `partners` predate
+ * the labels «Box» and «Συναθλητές» and stay, as addresses use them.
  */
 export const INBOX_SEGMENTS = ["all", "people", "coach", "clubs", "partners"] as const;
 export type InboxSegment = (typeof INBOX_SEGMENTS)[number];
 
 /**
- * The segments offered: «Partners» (training partners and check-in buddies)
- * only once the person has one, so no tab opens onto nothing (vision §4
- * principle 2, ANR 2026-10-25).
+ * The segments offered: «Συναθλητές» (training partners) only once the person
+ * has one, so no tab opens onto nothing (vision §4 principle 2, ANR 2026-10-25).
  */
 export function visibleSegments({ hasPartners }: { hasPartners: boolean }): InboxSegment[] {
   return INBOX_SEGMENTS.filter((segment) => segment !== "partners" || hasPartners);
@@ -49,7 +50,8 @@ export type ThreadSegmentContext = {
 
 /**
  * Where a gym thread files: a workout thread or a chat with my coach (or my
- * client) is «Coach»; the box's thread and a class's thread are «Clubs»; any
+ * client) is «Coach»; the box's thread and a class's thread are «Box» (group
+ * chats, ontology §5.8); any
  * other direct chat is with another person: «Άτομα».
  */
 export function threadSegment(thread: ChatThread, context: ThreadSegmentContext): InboxSegment | null {

@@ -166,7 +166,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
   def build("box_message", payload, localize) do
     %{
       title: localize.("Message from the box", %{}),
-      body: payload["body"] || localize.("Your gym sent you a message.", %{}),
+      body: payload["body"] || localize.("Your box sent you a message.", %{}),
       url: payload["url"] || "/"
     }
   end
@@ -416,9 +416,9 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
   # ADR-168: PT squads.
   def build("community_squad_invited", payload, localize) do
     %{
-      title: localize.("Squad invitation", %{}),
+      title: localize.("PT squad invitation", %{}),
       body:
-        localize.("%{nickname} invited you to the squad «%{group}».", %{
+        localize.("%{nickname} invited you to the PT squad «%{group}».", %{
           nickname: payload["person_nickname"],
           group: payload["group_name"]
         }),
@@ -617,9 +617,9 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
   # shows in the app, a craving's details never travel.
   def build("buddy_invite", payload, localize) do
     %{
-      title: localize.("A buddy invitation", %{}),
+      title: localize.("A check-in buddy invitation", %{}),
       body:
-        localize.("%{nickname} asks you to be their support buddy.", %{
+        localize.("%{nickname} asks you to be their check-in buddy.", %{
           nickname: payload["nickname"] || ""
         }),
       url: payload["url"] || "/me/buddies"
@@ -628,7 +628,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
 
   def build("buddy_accepted", payload, localize) do
     %{
-      title: localize.("You have a support buddy", %{}),
+      title: localize.("You have a check-in buddy", %{}),
       body:
         localize.("%{nickname} accepted. They hear from you only when you ask.", %{
           nickname: payload["nickname"] || ""
@@ -743,7 +743,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
   # ADR-160 §2: who wrote, never what (lock-screen safe).
   def build("buddy_message", payload, localize) do
     %{
-      title: localize.("Buddy message", %{}),
+      title: localize.("Check-in buddy message", %{}),
       body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
       url: payload["url"] || "/me/buddies"
     }
@@ -973,7 +973,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       title: localize.("Your password was reset", %{}),
       body:
         localize.(
-          "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
+          "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support.",
           %{}
         ),
       url: payload["url"] || "/me/settings#security"
@@ -1001,7 +1001,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       cond do
         payload["published"] in [false, "false"] ->
           localize.(
-            "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it.",
+            "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it.",
             values
           )
 

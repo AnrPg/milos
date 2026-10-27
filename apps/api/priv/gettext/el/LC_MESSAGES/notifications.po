@@ -29,13 +29,13 @@ msgid "Workout changed"
 msgstr "Η προπόνηση άλλαξε"
 
 msgid "Your coach changed a scheduled workout."
-msgstr "Ο προπονητής σας άλλαξε μια προγραμματισμένη προπόνηση."
+msgstr "Ο coach σας άλλαξε μια προγραμματισμένη προπόνηση."
 
 msgid "Workout removed"
 msgstr "Η προπόνηση καταργήθηκε"
 
 msgid "Your coach removed a scheduled workout."
-msgstr "Ο προπονητής σας αφαίρεσε μια προγραμματισμένη προπόνηση."
+msgstr "Ο coach σας αφαίρεσε μια προγραμματισμένη προπόνηση."
 
 msgid "Workout rejected"
 msgstr "Η προπόνηση απορρίφθηκε"
@@ -70,7 +70,7 @@ msgstr "Ο coach σου σού έστειλε μήνυμα."
 msgid "Message from the box"
 msgstr "Μήνυμα από το box"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Το box σου σού έστειλε μήνυμα."
 
 msgid "Challenge completed"
@@ -134,13 +134,13 @@ msgid "Class bookings approved"
 msgstr "Εγκρίθηκαν κρατήσεις μαθημάτων"
 
 msgid "Your coach approved one or more class booking requests."
-msgstr "Ο προπονητής σας ενέκρινε ένα ή περισσότερα αιτήματα κράτησης μαθημάτων."
+msgstr "Ο coach σας ενέκρινε ένα ή περισσότερα αιτήματα κράτησης μαθημάτων."
 
 msgid "New workouts assigned"
 msgstr "Ανατέθηκαν νέες προπονήσεις"
 
 msgid "Your coach assigned one or more workouts to you."
-msgstr "Ο προπονητής σας ανέθεσε μία ή περισσότερες προπονήσεις."
+msgstr "Ο coach σας ανέθεσε μία ή περισσότερες προπονήσεις."
 
 msgid "You got a spot"
 msgstr "Βρέθηκε θέση για σένα"
@@ -164,7 +164,7 @@ msgid "Your form review is ready"
 msgstr "Η αξιολόγηση τεχνικής σου είναι έτοιμη"
 
 msgid "Your coach left feedback on your video."
-msgstr "Ο προπονητής σου άφησε σχόλια στο βίντεό σου."
+msgstr "Ο coach σου άφησε σχόλια στο βίντεό σου."
 
 msgid "A client is waiting for a reply"
 msgstr "Ένας πελάτης περιμένει απάντηση"
@@ -460,13 +460,13 @@ msgstr "Ώρα για νέα μέτρηση"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Ένα νέο στιγμιότυπο σε βοηθά να δεις την τάση σου. Παίρνει ένα λεπτό."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Πρόσκληση για φιλαράκι στήριξης"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "Ο/Η %{nickname} σου ζητά να γίνεις φιλαράκι στήριξης."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "Έχεις φιλαράκι στήριξης"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Ένα ποτήρι νερό;"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Μήνυμα από φιλαράκι στήριξης"
 
 msgid "%{nickname}: weekly wellness"
@@ -572,26 +572,26 @@ msgid "%{box} cancelled %{season}."
 msgstr "Το %{box} ακύρωσε το %{season}."
 
 msgid "You found a training partner"
-msgstr "Βρήκες training partner"
+msgstr "Βρήκες συναθλητή"
 
 msgid "You and %{nickname} both want to train together. Say hi."
 msgstr "Εσύ και το %{nickname} θέλετε να προπονηθείτε μαζί. Πείτε ένα γεια."
 
 msgid "Training partner message"
-msgstr "Μήνυμα από training partner"
+msgstr "Μήνυμα από συναθλητή"
 
-msgid "Squad invitation"
-msgstr "Πρόσκληση σε squad"
+msgid "PT squad invitation"
+msgstr "Πρόσκληση σε ομάδα του coach"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "Ο/Η %{nickname} σε προσκάλεσε στο squad «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "Ο/Η %{nickname} σε προσκάλεσε στην ομάδα του coach «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "Μάθημα χωρίς WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "Το %{class} (%{when}) δεν έχει WOD, οπότε τα μέλη δεν το βλέπουν και δεν μπορούν να κλείσουν θέση. Σύνδεσε ένα για να δημοσιευτεί."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "Το %{class} (%{when}) δεν έχει WOD, οπότε τα μέλη του box δεν το βλέπουν και δεν μπορούν να κλείσουν θέση. Σύνδεσε ένα για να δημοσιευτεί."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "Το %{class} (%{when}) ξεκινά σε μία ώρα και ακόμη δεν έχει WOD."
@@ -634,8 +634,8 @@ msgstr "Ο/Η %{name} (@%{handle}) δεν μπορεί να συνδεθεί κ�
 msgid "Your password was reset"
 msgstr "Ο κωδικός σου άλλαξε"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "Ο κωδικός σου άλλαξε με σύνδεσμο επαναφοράς ή με κωδικό ανάκτησης, και αποσυνδέθηκαν όλες οι συσκευές. Αν δεν ήσουν εσύ, επικοινώνησε με το γυμναστήριό σου ή με την υποστήριξη του Palee."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "Ο κωδικός σου άλλαξε με σύνδεσμο επαναφοράς ή με κωδικό ανάκτησης, και αποσυνδέθηκαν όλες οι συσκευές. Αν δεν ήσουν εσύ, επικοινώνησε με το box σου ή με την υποστήριξη του Palee."
 
 msgid "Your demo business is waiting for you"
 msgstr "Η demo επιχείρησή σου σε περιμένει"

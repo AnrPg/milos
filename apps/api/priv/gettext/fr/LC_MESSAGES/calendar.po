@@ -50,7 +50,7 @@ msgid "Trial status: %{status}."
 msgstr "Statut de la séance d'essai : %{status}."
 
 msgid "Waiting for the box"
-msgstr "En attente de la salle"
+msgstr "En attente de la box"
 
 msgid "Booked"
 msgstr "Réservée"
