@@ -57,7 +57,7 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
 
 async function openChecklist(page: Page, start: string) {
   await page.goto(start);
-  const dialog = page.getByRole("dialog", { name: "Welcome! Let’s get your gym ready" });
+  const dialog = page.getByRole("dialog", { name: "Welcome! Let’s get your box ready" });
   await expect(dialog).toBeVisible();
   return dialog;
 }
@@ -123,6 +123,29 @@ test.describe("admin setup checklist", () => {
     await toggle.click();
     await expect(panel.getByRole("link", { name: "Set up classes" })).toBeVisible();
     await expect(panel.getByRole("button", { name: "Hide steps" })).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("«Open settings» while on Settings folds the steps and shows the settings", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await stubApi(page);
+    const popup = await openChecklist(page, "/org/kypseli/admin/settings");
+    await popup.getByRole("button", { name: "Remind me later" }).click();
+    await expect(popup).toBeHidden();
+
+    const panel = page.locator("#setup-checklist");
+    await panel.getByRole("button", { name: "Show steps" }).click();
+    await expect(panel.getByRole("link", { name: "Set up classes" })).toBeVisible();
+
+    await panel.getByRole("link", { name: "Open settings" }).click();
+    await expect(page).toHaveURL(/\/org\/kypseli\/admin\/settings$/);
+    await expect(panel.getByRole("button", { name: "Show steps" })).toHaveAttribute("aria-expanded", "false");
+    await expect(panel.getByRole("link", { name: "Set up classes" })).toHaveCount(0);
+    // The phone now shows the settings below the checklist, not its steps.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    const next = page.locator("#setup-checklist + *");
+    await expect(next).toBeInViewport();
+    const top = await next.evaluate((element) => element.getBoundingClientRect().top);
+    expect(Math.abs(top)).toBeLessThan(5);
   });
 
   test("a finished checklist stays collapsed without the highlight", async ({ page }) => {
