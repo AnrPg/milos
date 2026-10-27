@@ -35,6 +35,8 @@ describe("hidden routes", () => {
       "/register",
       "/forgot-password",
       "/reset-password",
+      "/account-deletion/confirm",
+      "/account-deletion/undo",
       "/join/kypseli",
       "/set-admin",
       "/activate-business",

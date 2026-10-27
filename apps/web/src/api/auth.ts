@@ -26,8 +26,16 @@ export type CurrentUser =
     vendor?: boolean;
   };
 
+/**
+ * ADR-211: a new account and a sign-up with an email that already has an
+ * account (another password) are answered alike, "a link was sent to
+ * <email>"; only a new account also carries its session (`access_token`).
+ */
+export type RegisterResponse =
+  paths["/api/auth/register"]["post"]["responses"]["201"]["content"]["application/json"];
+
 export function registerUser(payload: RegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register", { method: "POST", body: payload });
+  return apiRequest<RegisterResponse>("/auth/register", { method: "POST", body: payload });
 }
 
 export function registerAdminUser(payload: AdminRegisterRequest) {

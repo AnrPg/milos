@@ -10,6 +10,7 @@ import { ApiError } from "@/api/client";
 import { signUpBusiness, type BusinessKind } from "@/api/business-accounts";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
+import { CheckInboxNotice } from "@/components/auth/CheckInboxNotice";
 import { RecoveryCodesOffer } from "@/components/auth/RecoveryCodesOffer";
 import { SignupHandleField, useHandleSuggestion } from "@/components/auth/SignupHandleField";
 import { MIN_PASSWORD_LENGTH, registerFailure, type FieldErrors } from "@/components/auth/auth-errors";
@@ -66,6 +67,8 @@ export function BusinessSignUp() {
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState<string | null>(null);
   const [registered, setRegistered] = useState(false);
+  // ADR-211: the email already had an account; nothing was created.
+  const [inboxEmail, setInboxEmail] = useState<string | null>(null);
   const pendingBusiness = useRef(false);
   const guest = status === "guest";
 
@@ -136,13 +139,19 @@ export function BusinessSignUp() {
     try {
       pendingBusiness.current = true;
       setRegistered(true);
-      await signUp({
+      const result = await signUp({
         handle: account.handle.trim(),
         display_name: account.display_name.trim(),
         email: account.email.trim(),
         password: account.password,
         role: "member",
       });
+      if (!result.user) {
+        pendingBusiness.current = false;
+        setRegistered(false);
+        setBusy(false);
+        setInboxEmail(result.email);
+      }
     } catch (caught) {
       pendingBusiness.current = false;
       setRegistered(false);
@@ -173,6 +182,14 @@ export function BusinessSignUp() {
             </button>
           )}
         </div>
+      </AuthShell>
+    );
+  }
+
+  if (inboxEmail) {
+    return (
+      <AuthShell title={t("signUp.title")}>
+        <CheckInboxNotice email={inboxEmail} onContinue={() => router.replace("/login")} />
       </AuthShell>
     );
   }
