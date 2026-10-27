@@ -68,6 +68,7 @@ function personaFor(id: string, nickname: string, role: "member" | "admin", slug
     nickname,
     role,
     email: `${id}@example.com`,
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,

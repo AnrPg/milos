@@ -11489,5 +11489,30 @@
     "placementSpace": "חלל",
     "placementPickSpace": "בחרו חלל",
     "placementQuantity": "כמה"
+  },
+  "emailVerification": {
+    "bannerText": "כדאי לאשר את המייל. שלחנו קישור אל {email}.",
+    "resend": "שליחה חוזרת",
+    "resending": "שולחים…",
+    "resent": "נשלח. כדאי לבדוק את תיבת הדואר.",
+    "throttled": "קישור נשלח זה עתה. אפשר לנסות שוב בעוד {seconds} שנ׳.",
+    "throttledLong": "ביקשת כמה קישורים היום. אפשר לנסות שוב מאוחר יותר.",
+    "changeEmail": "שינוי מייל",
+    "dismiss": "הסתרה לעכשיו",
+    "pageTitle": "אישור המייל",
+    "confirming": "מאשרים את המייל…",
+    "verifiedTitle": "המייל אושר",
+    "verifiedBody": "תודה, המייל אושר.",
+    "alreadyVerifiedBody": "המייל כבר מאושר.",
+    "continue": "המשך",
+    "signIn": "התחברות",
+    "problemTitle": "אי אפשר להשתמש בקישור הזה",
+    "invalidBody": "הקישור לא תקין. אפשר לבקש קישור חדש מתוך האפליקציה.",
+    "usedBody": "כבר השתמשו בקישור הזה. אפשר להתחבר כדי לבדוק אם המייל אושר, או לבקש קישור חדש.",
+    "expiredBody": "תוקף הקישור פג. אפשר לבקש קישור חדש.",
+    "emailChangedBody": "כתובת המייל של החשבון השתנתה אחרי שהקישור נשלח. יש להשתמש בקישור שנשלח לכתובת החדשה.",
+    "sendNewLink": "שליחת קישור חדש",
+    "newLinkSent": "קישור חדש בדרך אל {email}.",
+    "signInForNewLink": "התחברות לקבלת קישור חדש"
   }
 }

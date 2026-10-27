@@ -17,6 +17,7 @@ function persona(role: "member" | "admin") {
     nickname: role === "admin" ? "Nikos" : "Maria",
     role,
     email: `${id}@example.com`,
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,

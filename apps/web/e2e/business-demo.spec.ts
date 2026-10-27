@@ -23,6 +23,7 @@ function userFor(persona: Persona, memberships: { organization_slug: string; rol
     nickname: persona.nickname,
     role: persona.role,
     email: `${persona.id}@example.com`,
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: persona.vendor ?? false,

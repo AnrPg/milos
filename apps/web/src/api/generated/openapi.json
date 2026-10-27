@@ -85582,6 +85582,10 @@
                           "description": "The login's email, shared by its profiles",
                           "type": "string"
                         },
+                        "email_verified": {
+                          "description": "ADR-213: whether the login opened an emailed link to its current email",
+                          "type": "boolean"
+                        },
                         "handle": {
                           "description": "ADR-187: the unique @handle",
                           "type": "string"
@@ -85640,14 +85644,15 @@
                         }
                       },
                       "required": [
+                        "completed_tours",
+                        "display_name",
+                        "email_verified",
+                        "handle",
                         "id",
                         "nickname",
-                        "display_name",
-                        "handle",
-                        "role",
-                        "vendor",
                         "preferred_locale",
-                        "completed_tours"
+                        "role",
+                        "vendor"
                       ],
                       "type": "object"
                     }
@@ -85793,6 +85798,10 @@
                       "description": "The login's email, shared by its profiles",
                       "type": "string"
                     },
+                    "email_verified": {
+                      "description": "ADR-213: whether the login opened an emailed link to its current email",
+                      "type": "boolean"
+                    },
                     "handle": {
                       "description": "ADR-187: the unique @handle",
                       "type": "string"
@@ -85851,14 +85860,15 @@
                     }
                   },
                   "required": [
+                    "completed_tours",
+                    "display_name",
+                    "email_verified",
+                    "handle",
                     "id",
                     "nickname",
-                    "display_name",
-                    "handle",
-                    "role",
-                    "vendor",
                     "preferred_locale",
-                    "completed_tours"
+                    "role",
+                    "vendor"
                   ],
                   "type": "object"
                 }
@@ -86420,6 +86430,10 @@
                           "description": "The login's email, shared by its profiles",
                           "type": "string"
                         },
+                        "email_verified": {
+                          "description": "ADR-213: whether the login opened an emailed link to its current email",
+                          "type": "boolean"
+                        },
                         "handle": {
                           "description": "ADR-187: the unique @handle",
                           "type": "string"
@@ -86478,14 +86492,15 @@
                         }
                       },
                       "required": [
+                        "completed_tours",
+                        "display_name",
+                        "email_verified",
+                        "handle",
                         "id",
                         "nickname",
-                        "display_name",
-                        "handle",
-                        "role",
-                        "vendor",
                         "preferred_locale",
-                        "completed_tours"
+                        "role",
+                        "vendor"
                       ],
                       "type": "object"
                     }
@@ -87122,6 +87137,243 @@
           }
         ],
         "summary": "Open a session for another profile of the same login",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/verification-email": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailVerificationController.resend",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "already_verified",
+                        "sent"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sent, or nothing to do"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The address can't get email"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "retry_after_seconds": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error",
+                    "retry_after_seconds"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A link was sent just now"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email is busy today"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-213: email the signed-in person a new verification link",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailVerificationController.verify",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email_verified": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "email_verified"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Email verified"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link already used, or the email changed since"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link expired"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rate limited"
+          }
+        },
+        "summary": "ADR-213: confirm the login's email with the emailed link's token",
         "tags": [
           "Authentication"
         ]

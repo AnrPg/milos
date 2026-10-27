@@ -9,6 +9,7 @@ const user = {
   nickname: "Apostolos",
   role: "admin",
   email: "owner-1@example.com",
+  email_verified: true,
   completed_tours: [],
   preferred_locale: "en",
   vendor: false,

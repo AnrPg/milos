@@ -11489,5 +11489,30 @@
     "placementSpace": "Espace",
     "placementPickSpace": "Choisir un espace",
     "placementQuantity": "Combien"
+  },
+  "emailVerification": {
+    "bannerText": "Confirme ton adresse e-mail. Nous avons envoyé un lien à {email}.",
+    "resend": "Renvoyer",
+    "resending": "Envoi…",
+    "resent": "Envoyé. Regarde ta boîte de réception.",
+    "throttled": "Un lien vient d'être envoyé. Réessaie dans {seconds} s.",
+    "throttledLong": "Tu as demandé plusieurs liens aujourd'hui. Réessaie plus tard.",
+    "changeEmail": "Changer d'adresse e-mail",
+    "dismiss": "Masquer pour l'instant",
+    "pageTitle": "Confirmer ton adresse e-mail",
+    "confirming": "Confirmation de ton adresse e-mail…",
+    "verifiedTitle": "Adresse e-mail confirmée",
+    "verifiedBody": "Merci, ton adresse e-mail est confirmée.",
+    "alreadyVerifiedBody": "Ton adresse e-mail est déjà confirmée.",
+    "continue": "Continuer",
+    "signIn": "Se connecter",
+    "problemTitle": "Ce lien ne peut pas être utilisé",
+    "invalidBody": "Ce lien n'est pas valide. Demandes-en un nouveau depuis l'application.",
+    "usedBody": "Ce lien a déjà été utilisé. Connecte-toi pour voir si ton adresse e-mail est confirmée, ou demande un nouveau lien.",
+    "expiredBody": "Ce lien a expiré. Demandes-en un nouveau.",
+    "emailChangedBody": "L'adresse e-mail de ton compte a changé après l'envoi de ce lien. Utilise le lien envoyé à la nouvelle adresse.",
+    "sendNewLink": "Envoyer un nouveau lien",
+    "newLinkSent": "Un nouveau lien arrive à {email}.",
+    "signInForNewLink": "Connecte-toi pour recevoir un nouveau lien"
   }
 }
