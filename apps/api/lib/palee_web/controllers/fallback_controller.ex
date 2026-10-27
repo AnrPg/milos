@@ -354,6 +354,7 @@ defmodule PaleeWeb.FallbackController do
       when reason in [
              :invalid_reset_link,
              :expired_reset_link,
+             :used_reset_link,
              :invalid_recovery_code,
              :weak_password,
              :claimed_by_other,
@@ -366,6 +367,10 @@ defmodule PaleeWeb.FallbackController do
 
         :expired_reset_link ->
           {:gone, "This reset link has expired"}
+
+        # ADR-206: an emailed link that was already used.
+        :used_reset_link ->
+          {:gone, "This reset link was already used"}
 
         :invalid_recovery_code ->
           {:unprocessable_entity, "The account or recovery code is wrong"}

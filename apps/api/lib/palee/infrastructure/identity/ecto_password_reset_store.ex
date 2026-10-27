@@ -43,6 +43,32 @@ defmodule Palee.Infrastructure.Identity.EctoPasswordResetStore do
     do: Repo.get_by(PasswordResetRequest, link_token_hash: hash)
 
   @impl true
+  def lock_request_by_token_hash(hash) do
+    PasswordResetRequest
+    |> where([request], request.link_token_hash == ^hash)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  @impl true
+  def count_requests_from(requester_key, since) do
+    PasswordResetRequest
+    |> where([request], request.requester_key == ^requester_key)
+    |> where([request], request.inserted_at >= ^since)
+    |> Repo.aggregate(:count)
+  end
+
+  @impl true
+  def transaction(fun) do
+    Repo.transaction(fn ->
+      case fun.() do
+        {:ok, value} -> value
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
   def create_request(params) do
     params
     |> PasswordResetRequest.create_changeset()

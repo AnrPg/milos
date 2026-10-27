@@ -348,8 +348,9 @@ defmodule PaleeWeb.Router do
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
-    # ADR-187: password recovery without a mail service.
+    # ADR-187, ADR-206: password recovery (emailed link, handlers, codes).
     post("/password-reset-requests", PasswordRecoveryController, :request)
+    post("/password-reset/inspect", PasswordRecoveryController, :inspect_link)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
   end

@@ -30,3 +30,24 @@ msgstr "Здравейте, %{name},"
 
 msgid "Hello,"
 msgstr "Здравейте,"
+
+msgid "Reset your %{product} password"
+msgstr "Възстановяване на паролата за %{product}"
+
+msgid "Reset your password"
+msgstr "Възстановяване на паролата"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "Поискано е възстановяване на паролата за вашия профил в %{product}. За да зададете нова парола, използвайте бутона по-долу."
+
+msgid "Choose a new password"
+msgstr "Задаване на нова парола"
+
+msgid "This link works for 1 hour."
+msgstr "Връзката е валидна 1 час."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "С новата парола излизате от профила си на всички устройства."
+
+msgid "Your password has not been changed."
+msgstr "Паролата ви не е променена."

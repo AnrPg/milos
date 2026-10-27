@@ -30,3 +30,24 @@ msgstr "Γεια σας %{name},"
 
 msgid "Hello,"
 msgstr "Γεια σας,"
+
+msgid "Reset your %{product} password"
+msgstr "Επαναφορά κωδικού πρόσβασης στο %{product}"
+
+msgid "Reset your password"
+msgstr "Επαναφορά κωδικού πρόσβασης"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "Ζητήθηκε επαναφορά του κωδικού πρόσβασης του λογαριασμού σας στο %{product}. Για να ορίσετε νέο κωδικό, πατήστε το παρακάτω κουμπί."
+
+msgid "Choose a new password"
+msgstr "Ορισμός νέου κωδικού"
+
+msgid "This link works for 1 hour."
+msgstr "Ο σύνδεσμος ισχύει για 1 ώρα."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "Με τον νέο κωδικό αποσυνδέεστε από όλες τις συσκευές σας."
+
+msgid "Your password has not been changed."
+msgstr "Ο κωδικός σας δεν έχει αλλάξει."

@@ -7,15 +7,46 @@ defmodule Palee.Identity.Domain.PasswordResetPolicy do
   can always take a request over. An issued reset link works once, for 24
   hours; after that the request shows as expired until a handler sends a
   new link or dismisses it.
+
+  ADR-206: a login whose email is verified gets its reset link emailed
+  automatically (one hour, single use). One login gets at most one such
+  email every 10 minutes and five a day; one client (by the HMAC of its IP)
+  files at most three handler requests a day.
   """
 
   @claim_idle_minutes 30
   @link_ttl_hours 24
+  @email_link_ttl_seconds 3600
+  @email_min_interval_seconds 600
+  @emails_per_day 5
+  @handler_requests_per_requester_per_day 3
+  @day_seconds 86_400
 
   def claim_idle_minutes, do: @claim_idle_minutes
   def link_ttl_hours, do: @link_ttl_hours
 
   def link_expires_at(now), do: DateTime.add(now, @link_ttl_hours * 3600, :second)
+
+  @doc "How long an emailed reset link works (handler-issued links keep 24 hours)."
+  def email_link_ttl_seconds, do: @email_link_ttl_seconds
+
+  @doc "Since when a day of past reset emails and handler requests counts."
+  def window_start(now), do: DateTime.add(now, -@day_seconds, :second)
+
+  @doc """
+  Whether the login may get one more reset email, given when its earlier
+  ones (queued or sent, not failed) were inserted.
+  """
+  def email_allowed?(sent_at, now) when is_list(sent_at) do
+    recent = Enum.filter(sent_at, &(DateTime.diff(now, &1, :second) < @day_seconds))
+
+    length(recent) < @emails_per_day and
+      Enum.all?(recent, &(DateTime.diff(now, &1, :second) >= @email_min_interval_seconds))
+  end
+
+  @doc "Whether one client may file another handler request today."
+  def handler_request_allowed?(filed_today) when is_integer(filed_today),
+    do: filed_today < @handler_requests_per_requester_per_day
 
   @doc "Whether the request's link was issued and has lapsed."
   def expired?(%{status: "link_issued", link_expires_at: %DateTime{} = expires_at}, now),

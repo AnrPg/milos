@@ -30,3 +30,24 @@ msgstr "שלום %{name},"
 
 msgid "Hello,"
 msgstr "שלום,"
+
+msgid "Reset your %{product} password"
+msgstr "איפוס הסיסמה ל-%{product}"
+
+msgid "Reset your password"
+msgstr "איפוס הסיסמה"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "התקבלה בקשה לאפס את הסיסמה של החשבון שלך ב-%{product}. כדי לבחור סיסמה חדשה, יש ללחוץ על הכפתור למטה."
+
+msgid "Choose a new password"
+msgstr "בחירת סיסמה חדשה"
+
+msgid "This link works for 1 hour."
+msgstr "הקישור תקף למשך שעה אחת."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "הגדרת סיסמה חדשה מנתקת אותך מכל המכשירים."
+
+msgid "Your password has not been changed."
+msgstr "הסיסמה שלך לא שונתה."

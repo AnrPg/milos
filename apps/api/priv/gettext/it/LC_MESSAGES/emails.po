@@ -30,3 +30,24 @@ msgstr "Gentile %{name},"
 
 msgid "Hello,"
 msgstr "Salve,"
+
+msgid "Reset your %{product} password"
+msgstr "Reimposta la password di %{product}"
+
+msgid "Reset your password"
+msgstr "Reimposta la password"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "È stato chiesto di reimpostare la password del suo account %{product}. Per scegliere una nuova password, usi il pulsante qui sotto."
+
+msgid "Choose a new password"
+msgstr "Scegli una nuova password"
+
+msgid "This link works for 1 hour."
+msgstr "Il link è valido per 1 ora."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "Con la nuova password verrà disconnesso da tutti i dispositivi."
+
+msgid "Your password has not been changed."
+msgstr "La sua password non è stata modificata."

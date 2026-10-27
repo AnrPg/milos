@@ -30,3 +30,24 @@ msgstr "مرحبًا %{name}،"
 
 msgid "Hello,"
 msgstr "مرحبًا،"
+
+msgid "Reset your %{product} password"
+msgstr "إعادة تعيين كلمة مرور %{product}"
+
+msgid "Reset your password"
+msgstr "إعادة تعيين كلمة المرور"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "طُلبت إعادة تعيين كلمة مرور حسابك على %{product}. لاختيار كلمة مرور جديدة، استخدم الزر أدناه."
+
+msgid "Choose a new password"
+msgstr "اختيار كلمة مرور جديدة"
+
+msgid "This link works for 1 hour."
+msgstr "يعمل هذا الرابط لمدة ساعة واحدة."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "عند تعيين كلمة مرور جديدة، سيتم تسجيل خروجك من جميع أجهزتك."
+
+msgid "Your password has not been changed."
+msgstr "لم تتغير كلمة المرور الخاصة بك."

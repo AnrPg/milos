@@ -30,3 +30,24 @@ msgstr "Hello %{name},"
 
 msgid "Hello,"
 msgstr "Hello,"
+
+msgid "Reset your %{product} password"
+msgstr "Reset your %{product} password"
+
+msgid "Reset your password"
+msgstr "Reset your password"
+
+msgid "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+msgstr "Someone asked to reset the password of your %{product} account. To choose a new password, use the button below."
+
+msgid "Choose a new password"
+msgstr "Choose a new password"
+
+msgid "This link works for 1 hour."
+msgstr "This link works for 1 hour."
+
+msgid "Setting a new password signs you out on every device."
+msgstr "Setting a new password signs you out on every device."
+
+msgid "Your password has not been changed."
+msgstr "Your password has not been changed."
