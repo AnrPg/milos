@@ -11628,5 +11628,24 @@
     "mismatch": "Je bent ingelogd met een ander e-mailadres dan het adres waarnaar deze uitnodiging ging. Log uit en log in of maak een account aan met het uitgenodigde adres.",
     "unverified": "Deze uitnodiging is voor een bevestigd e-mailadres. Open de link in de uitnodigingsmail of bevestig eerst je e-mailadres.",
     "signOut": "Uitloggen"
+  },
+  "ShareByEmail": {
+    "action": "Per e-mail sturen",
+    "label": "E-mailadres",
+    "placeholder": "naam@example.com",
+    "send": "Sturen",
+    "sending": "Bezig met sturen…",
+    "sent": "Gestuurd naar {email}",
+    "hint": "We sturen alleen deze link en je naam.",
+    "errors": {
+      "unverified": "Bevestig eerst je eigen e-mailadres, daarna kun je links per e-mail sturen.",
+      "dailyLimit": "Je hebt vandaag het maximum aantal links per e-mail gestuurd. Deel of kopieer de link.",
+      "throttled": "Dit adres heeft vandaag genoeg uitnodigingen gekregen.",
+      "suppressed": "E-mails naar dit adres komen terug. Controleer het of gebruik een ander.",
+      "invalidAddress": "Vul een geldig e-mailadres in.",
+      "demo": "Het bedrijf staat nog in demomodus en kan nog geen e-mails sturen.",
+      "unavailable": "Deze link kan niet meer gestuurd worden. Maak een nieuwe.",
+      "generic": "De e-mail kon niet worden gestuurd. Probeer het opnieuw."
+    }
   }
 }

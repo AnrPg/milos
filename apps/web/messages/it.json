@@ -11628,5 +11628,24 @@
     "mismatch": "Hai effettuato l’accesso con un indirizzo email diverso da quello a cui è stato inviato l’invito. Esci, poi accedi o crea un account con l’indirizzo invitato.",
     "unverified": "Questo invito è per un indirizzo email confermato. Apri il link dell’email di invito o conferma prima il tuo indirizzo.",
     "signOut": "Esci"
+  },
+  "ShareByEmail": {
+    "action": "Invia per email",
+    "label": "Il suo indirizzo email",
+    "placeholder": "nome@example.com",
+    "send": "Invia",
+    "sending": "Invio…",
+    "sent": "Inviato a {email}",
+    "hint": "Inviamo solo questo link e il tuo nome.",
+    "errors": {
+      "unverified": "Conferma prima il tuo indirizzo email, poi potrai inviare link per email.",
+      "dailyLimit": "Hai inviato il massimo di link per email per oggi. Condividilo o copialo.",
+      "throttled": "Questo indirizzo ha già ricevuto abbastanza inviti oggi.",
+      "suppressed": "Le email a questo indirizzo tornano indietro. Controllalo o usane un altro.",
+      "invalidAddress": "Inserisci un indirizzo email valido.",
+      "demo": "L'attività è ancora in modalità demo e non può ancora inviare email.",
+      "unavailable": "Questo link non si può più inviare. Creane uno nuovo.",
+      "generic": "Non è stato possibile inviare l'email. Riprova."
+    }
   }
 }

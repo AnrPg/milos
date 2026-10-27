@@ -7,7 +7,6 @@ defmodule Palee.MailerTest do
   alias Palee.Finance.Emails.CorporateInvoiceEmail
   alias Palee.Localization
   alias Palee.Mailer
-  alias Palee.Organizations.Emails.OwnerInvitationEmail
   alias Swoosh.Adapters.SMTP.Helpers
 
   @from {"Palee", "no-reply@palee.app"}
@@ -39,7 +38,6 @@ defmodule Palee.MailerTest do
     localize = &Localization.translate("en", &1, &2, "corporate_invoices")
 
     [
-      OwnerInvitationEmail.build(%{organization_name: "Gym", to: "owner@gym.test", token: "t"}),
       CorporateInvoiceEmail.build(
         :issued,
         %{invoice: invoice, client: client, gym_name: "Gym", from: @from},

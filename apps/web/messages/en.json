@@ -11628,5 +11628,24 @@
     "mismatch": "You’re signed in with a different email address from the one this invitation was sent to. Sign out, then sign in or create an account with the invited address.",
     "unverified": "This invitation is for a confirmed email address. Open the link in the invitation email, or confirm your email address first.",
     "signOut": "Sign out"
+  },
+  "ShareByEmail": {
+    "action": "Send by email",
+    "label": "Their email address",
+    "placeholder": "name@example.com",
+    "send": "Send",
+    "sending": "Sending…",
+    "sent": "Sent to {email}",
+    "hint": "We send only this link and your name.",
+    "errors": {
+      "unverified": "Confirm your own email address first, then you can send links by email.",
+      "dailyLimit": "You've sent the most links by email for today. Share or copy it instead.",
+      "throttled": "This address has had enough invitations for today.",
+      "suppressed": "Emails to this address bounce. Check it or use another.",
+      "invalidAddress": "Enter a valid email address.",
+      "demo": "The business is still in demo mode, so it can't email people yet.",
+      "unavailable": "This link can't be sent any more. Make a new one.",
+      "generic": "The email couldn't be sent. Try again."
+    }
   }
 }

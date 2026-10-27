@@ -197,6 +197,28 @@ test.describe("Buddy για στήριξη", () => {
     const invite = page.waitForRequest((request) => request.url().endsWith("/api/me/buddies") && request.method() === "POST");
     await page.getByRole("button", { name: "Invite Nikos" }).click();
     expect(bodyOf(await invite)).toEqual({ user_id: "u-7" });
+
+    // ADR-210: a link for someone not on Palee can also go by email.
+    await page.route("**/api/me/buddies/invite-links", (route) =>
+      route.fulfill(
+        json(
+          { token: "tok2", path: "/buddy-invite/tok2", url: "http://127.0.0.1/buddy-invite/tok2", expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(), link: link("link-8", "Someone", { status: "pending" }) },
+          201,
+        ),
+      ),
+    );
+    const emailed: unknown[] = [];
+    await page.route("**/api/me/share-links/email", (route) => {
+      emailed.push(route.request().postDataJSON());
+      return route.fulfill(json({ delivery: { id: "message-1", status: "queued" } }, 202));
+    });
+    await page.getByRole("button", { name: "Send a link to someone not on Palee" }).click();
+    await expect(page.getByTestId("buddy-invite-url")).toHaveValue(/\/buddy\/tok2$/);
+    await page.getByRole("button", { name: "Send by email" }).click();
+    await page.getByLabel("Their email address").fill("friend@example.com");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByText("Sent to friend@example.com")).toBeVisible();
+    expect(emailed).toEqual([{ link: "buddy_invite", token: "tok2", to: "friend@example.com" }]);
   });
 
   test("«I need support» sends with a five-second undo", async ({ page }) => {

@@ -11628,5 +11628,24 @@
     "mismatch": "Has iniciado sesión con una dirección de correo distinta de la que recibió esta invitación. Cierra sesión e inicia sesión o crea una cuenta con la dirección invitada.",
     "unverified": "Esta invitación es para una dirección de correo confirmada. Abre el enlace del correo de invitación o confirma primero tu dirección.",
     "signOut": "Cerrar sesión"
+  },
+  "ShareByEmail": {
+    "action": "Enviar por email",
+    "label": "Su dirección de email",
+    "placeholder": "nombre@example.com",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "sent": "Enviado a {email}",
+    "hint": "Solo enviamos este enlace y tu nombre.",
+    "errors": {
+      "unverified": "Confirma primero tu propio email y luego podrás enviar enlaces por email.",
+      "dailyLimit": "Has enviado el máximo de enlaces por email por hoy. Compártelo o cópialo.",
+      "throttled": "Esta dirección ya ha recibido bastantes invitaciones hoy.",
+      "suppressed": "Los emails a esta dirección rebotan. Revísala o usa otra.",
+      "invalidAddress": "Escribe una dirección de email válida.",
+      "demo": "El negocio sigue en modo demo y todavía no puede enviar emails.",
+      "unavailable": "Este enlace ya no se puede enviar. Crea uno nuevo.",
+      "generic": "No se pudo enviar el email. Inténtalo de nuevo."
+    }
   }
 }

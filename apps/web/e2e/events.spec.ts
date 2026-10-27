@@ -247,6 +247,18 @@ test.describe("events", () => {
     await expect(sheet.getByLabel("Invitation link")).toHaveValue(/\/events\/event-1\?invite=guest-token$/);
     await expect(page.getByText("2 guests left")).toBeVisible();
     expect(calls.invites).toBe(1);
+
+    // ADR-210: or by email, with the same guest pass.
+    const emailed: unknown[] = [];
+    await page.route("**/api/me/share-links/email", (route) => {
+      emailed.push(route.request().postDataJSON());
+      return route.fulfill(json({ delivery: { id: "message-1", status: "queued" } }, 202));
+    });
+    await sheet.getByRole("button", { name: "Send by email" }).click();
+    await sheet.getByLabel("Their email address").fill("guest@example.com");
+    await sheet.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(sheet.getByText("Sent to guest@example.com")).toBeVisible();
+    expect(emailed).toEqual([{ link: "guest_pass", token: "guest-token", to: "guest@example.com" }]);
   });
 
   test("signed out, a guest pass link signs in and comes back to the invitation", async ({ page }) => {

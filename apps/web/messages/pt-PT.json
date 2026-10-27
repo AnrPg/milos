@@ -11628,5 +11628,24 @@
     "mismatch": "Tens sessão iniciada com um endereço de email diferente daquele para onde este convite foi enviado. Termina a sessão e inicia sessão ou cria uma conta com o endereço convidado.",
     "unverified": "Este convite é para um endereço de email confirmado. Abre a ligação do email do convite ou confirma primeiro o teu endereço.",
     "signOut": "Terminar sessão"
+  },
+  "ShareByEmail": {
+    "action": "Enviar por email",
+    "label": "O email dessa pessoa",
+    "placeholder": "nome@example.com",
+    "send": "Enviar",
+    "sending": "A enviar…",
+    "sent": "Enviado para {email}",
+    "hint": "Enviamos apenas este link e o teu nome.",
+    "errors": {
+      "unverified": "Confirma primeiro o teu email e depois já podes enviar links por email.",
+      "dailyLimit": "Já enviaste o máximo de links por email hoje. Partilha ou copia o link.",
+      "throttled": "Este endereço já recebeu convites suficientes hoje.",
+      "suppressed": "Os emails para este endereço são devolvidos. Verifica-o ou usa outro.",
+      "invalidAddress": "Escreve um endereço de email válido.",
+      "demo": "O negócio ainda está em modo demo e ainda não pode enviar emails.",
+      "unavailable": "Este link já não pode ser enviado. Cria um novo.",
+      "generic": "Não foi possível enviar o email. Tenta outra vez."
+    }
   }
 }

@@ -1336,6 +1336,12 @@ defmodule PaleeWeb.Router do
       :invitation_email
     )
 
+    get(
+      "/organizations/:id/invitations/:invitation_id/email",
+      PlatformOrganizationController,
+      :invitation_deliveries
+    )
+
     patch(
       "/organizations/:id/memberships/:membership_id/role",
       PlatformOrganizationController,
@@ -1680,6 +1686,8 @@ defmodule PaleeWeb.Router do
     put("/me/buddies/settings", MyBuddiesController, :update_settings)
     post("/me/buddies", MyBuddiesController, :invite)
     post("/me/buddies/invite-links", MyBuddiesController, :create_invite_link)
+    # ADR-210: "Send by email" of a guest pass, buddy invite link or «Φέρε φίλο».
+    post("/me/share-links/email", ShareLinkEmailController, :create)
     post("/me/buddies/:id/accept", MyBuddiesController, :accept)
     post("/me/buddies/:id/decline", MyBuddiesController, :decline)
     post("/me/buddies/:id/leave", MyBuddiesController, :leave)
