@@ -12,6 +12,7 @@ import { reportMyTimeZone } from "@/api/profile";
 import { deviceTimeZone } from "@/lib/zoned-time";
 
 import {
+  acceptInvitation as acceptInvitationRequest,
   fetchCurrentUser,
   loginUser,
   logoutSession,
@@ -19,6 +20,7 @@ import {
   registerAdminUser,
   registerInvitedUser,
   registerUser,
+  type AcceptedInvitation,
   type AdminRegisterRequest,
   type AuthTokens,
   type CurrentUser,
@@ -54,6 +56,8 @@ type SessionContextValue = {
   signUp: (payload: RegisterRequest) => Promise<CurrentUser>;
   signUpAdmin: (payload: AdminRegisterRequest) => Promise<CurrentUser>;
   signUpInvited: (payload: InvitedRegisterRequest) => Promise<CurrentUser>;
+  /** ADR-204: the signed-in profile accepts an invitation, keeping the session alive if its role changes. */
+  acceptInvitation: (invitationToken: string) => Promise<AcceptedInvitation>;
   rotate: () => Promise<void>;
   /** ADR-187: takes over a session issued for another profile of the same login. */
   switchSession: (issuedTokens: AuthTokens) => Promise<CurrentUser>;
@@ -178,6 +182,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   async function signUpInvited(payload: InvitedRegisterRequest) {
     const issuedTokens = await registerInvitedUser(withPageLocale(payload));
     return establishSession(issuedTokens);
+  }
+
+  async function acceptInvitation(invitationToken: string) {
+    if (!tokens) throw new Error(tSession("expiredMessage"));
+    const accepted = await acceptInvitationRequest(tokens.access_token, invitationToken);
+    if (accepted.access_token && accepted.user) {
+      commitSession({ access_token: accepted.access_token, user: accepted.user }, accepted.user);
+    }
+    return accepted;
   }
 
   // Another profile is another person to the app: drop what belonged to the
@@ -317,6 +330,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signUpAdmin,
         signUpInvited,
+        acceptInvitation,
         rotate,
         switchSession,
         signOut,

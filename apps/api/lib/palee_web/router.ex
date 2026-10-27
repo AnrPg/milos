@@ -397,6 +397,8 @@ defmodule PaleeWeb.Router do
 
     post("/memberships/redeem", OrganizationAccessController, :redeem)
     post("/memberships/join/:slug", OrganizationAccessController, :join)
+    # ADR-204: same as redeem, plus the staff surface role and a new session.
+    post("/auth/accept-invitation", AuthController, :accept_invitation)
   end
 
   scope "/api/org/:organization_slug", PaleeWeb do

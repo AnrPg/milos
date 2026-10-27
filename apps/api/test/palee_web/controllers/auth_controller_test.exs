@@ -238,6 +238,62 @@ defmodule PaleeWeb.AuthControllerTest do
       assert account.role == :admin
     end
 
+    # ADR-187/204: an email that already has a login takes the owner profile
+    # only with that login's password; otherwise the answer is the count.
+    test "an email with accounts needs its own password to add the invited profile", %{
+      conn: conn,
+      invitation_token: token,
+      organization: organization
+    } do
+      existing =
+        Palee.TestFixtures.user_fixture(%{
+          nickname: "vendor_like",
+          email: "vendor@example.test",
+          password: "vendor-secret"
+        })
+
+      wrong =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "new_owner",
+            password: "1234",
+            invitation_token: token,
+            email: "vendor@example.test"
+          })
+        )
+
+      assert %{"code" => "email_in_use", "profile_count" => 1, "profile_limit" => 3} =
+               json_response(wrong, 409)
+
+      refute Identity.find_by_nickname("new_owner")
+
+      right =
+        build_conn()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "new_owner",
+            password: "vendor-secret",
+            invitation_token: token,
+            email: "Vendor@Example.test"
+          })
+        )
+
+      assert %{"access_token" => _} = json_response(right, 201)
+      profile = Identity.find_by_nickname("new_owner")
+      assert profile.role == :admin
+      assert profile.login_id == Identity.find_by_id(existing.id).login_id
+
+      assert [%{organization: %{id: organization_id}}] =
+               Organizations.list_memberships(profile.id)
+
+      assert organization_id == organization.id
+    end
+
     test "rejects an invalid invitation without creating an account", %{conn: conn} do
       params = %{
         nickname: "false_admin",
@@ -704,6 +760,123 @@ defmodule PaleeWeb.AuthControllerTest do
         )
 
       assert %{"error" => "Not found"} = json_response(conn, 404)
+    end
+  end
+
+  describe "POST /api/auth/accept-invitation" do
+    setup do
+      owner = Palee.TestFixtures.user_fixture()
+      {:ok, organization} = Organizations.create_organization(%{name: "Accept Gym"})
+
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: owner.id,
+          role: :owner,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+
+      {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+      %{organization: organization, context: context}
+    end
+
+    defp accept(conn, user, token) do
+      conn
+      |> put_bearer_token(user)
+      |> put_req_header("content-type", "application/json")
+      |> post("/api/auth/accept-invitation", Jason.encode!(%{invitation_token: token}))
+    end
+
+    test "a member profile takes an owner invitation and gets a new staff session", %{
+      conn: conn,
+      context: context,
+      organization: organization
+    } do
+      {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :owner})
+      member = Palee.TestFixtures.user_fixture()
+
+      conn = accept(conn, member, token)
+
+      assert %{
+               "organization" => %{"slug" => slug},
+               "roles" => ["owner"],
+               "access_token" => access_token,
+               "user" => %{"id" => user_id, "role" => "admin"}
+             } = json_response(conn, 200)
+
+      assert slug == organization.slug
+      assert user_id == member.id
+      assert is_binary(access_token)
+      assert conn.resp_cookies["palee_refresh"].http_only
+      assert Identity.find_by_id(member.id).role == :admin
+
+      assert [%{membership: %{roles: [:owner], status: :active}}] =
+               Organizations.list_memberships(member.id)
+    end
+
+    test "a staff profile keeps its session when the role does not change", %{
+      conn: conn,
+      context: context
+    } do
+      {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :admin})
+      admin = Palee.TestFixtures.admin_fixture()
+
+      conn = accept(conn, admin, token)
+
+      assert %{"roles" => ["admin"], "access_token" => nil, "user" => nil} =
+               json_response(conn, 200)
+
+      refute conn.resp_cookies["palee_refresh"]
+    end
+
+    test "an invitation for another email is refused and stays redeemable", %{
+      conn: conn,
+      context: context
+    } do
+      {:ok, %{token: token}} =
+        Organizations.issue_invitation(context, %{
+          role: :owner,
+          intended_email: "boss@example.test"
+        })
+
+      stranger = Palee.TestFixtures.user_fixture()
+
+      assert %{"code" => "invitation_email_mismatch"} =
+               json_response(accept(conn, stranger, token), 403)
+
+      assert Organizations.list_memberships(stranger.id) == []
+
+      boss = Palee.TestFixtures.user_fixture(%{email: "boss@example.test"})
+      assert %{"roles" => ["owner"]} = json_response(accept(build_conn(), boss, token), 200)
+    end
+
+    test "a used or unknown invitation answers like an invalid one", %{
+      conn: conn,
+      context: context
+    } do
+      {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :owner})
+      first = Palee.TestFixtures.user_fixture()
+      assert json_response(accept(conn, first, token), 200)
+
+      second = Palee.TestFixtures.user_fixture()
+
+      assert %{"code" => "invalid_invitation"} =
+               json_response(accept(build_conn(), second, token), 404)
+
+      assert %{"code" => "invalid_invitation"} =
+               json_response(accept(build_conn(), second, String.duplicate("x", 43)), 404)
+    end
+
+    test "requires a signed-in profile", %{conn: conn, context: context} do
+      {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :owner})
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/auth/accept-invitation", Jason.encode!(%{invitation_token: token}))
+
+      assert json_response(conn, 401)
     end
   end
 end

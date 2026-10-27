@@ -75,6 +75,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/accept-invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-204: the signed-in profile accepts an organization invitation */
+        post: operations["PaleeWeb.AuthController.accept_invitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/handle-available": {
         parameters: {
             query?: never;
@@ -39589,6 +39606,90 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AuthController.accept_invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    invitation_token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A new session when the profile's role changed (its old sessions end); null otherwise */
+                        access_token: string | null;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        roles: string[];
+                        /** @description The profile as it is now, with access_token */
+                        user: {
+                            avatar_url?: string | null;
+                            completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
+                            display_name: string;
+                            /** @description The login's email, shared by its profiles */
+                            email?: string;
+                            /** @description ADR-187: the unique @handle */
+                            handle: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description ADR-187: the display name (free, not unique); same as display_name */
+                            nickname: string;
+                            /** @enum {string} */
+                            preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                            /**
+                             * @description The member's own theme: graphite (dark) or frost (light); null is frost
+                             * @enum {string|null}
+                             */
+                            preferred_theme_slug?: "frost" | "graphite" | null;
+                            profile_count?: number;
+                            profile_limit?: number;
+                            role: string;
+                            /** @description ADR-179: the zone this account's device last reported */
+                            time_zone?: string | null;
+                            vendor: boolean;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Invitation issued to another email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid invitation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PaleeWeb.AuthController.handle_available": {
         parameters: {
             query: {
@@ -40442,6 +40543,18 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invitation issued to another email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
             /** @description Invalid invitation */
             404: {
                 headers: {
@@ -40450,6 +40563,20 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+            /** @description The email has accounts and the password is not theirs */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                        profile_count?: number;
+                        profile_limit?: number;
                     };
                 };
             };
@@ -40518,6 +40645,18 @@ export interface operations {
                     };
                 };
             };
+            /** @description Invitation issued to another email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
             /** @description Invalid invitation */
             404: {
                 headers: {
@@ -40525,6 +40664,20 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+            /** @description The email has accounts and the password is not theirs */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                        profile_count?: number;
+                        profile_limit?: number;
+                    };
                 };
             };
         };

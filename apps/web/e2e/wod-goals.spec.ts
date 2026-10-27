@@ -131,7 +131,7 @@ test("coach shows goals to members and edits them on the chips and in the picker
   await expect(totals).toContainText("Latissimus dorsi9");
   await expect(totals).toContainText("Goals nobody felt: Glutes");
 
-  await panel.getByRole("checkbox", { name: "Show goals to members" }).check();
+  await panel.getByRole("checkbox", { name: "Show goals to box members" }).check();
   await panel.getByRole("button", { name: "Quadriceps, Primary. Tap to change the role." }).click();
   await expect(panel.getByRole("button", { name: "Quadriceps, Secondary. Tap to change the role." })).toBeVisible();
   await panel.getByRole("button", { name: "heavy", exact: true }).click();

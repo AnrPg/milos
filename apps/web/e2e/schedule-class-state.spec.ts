@@ -131,7 +131,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await page.getByTestId("class-actions").getByRole("button", { name: "Cancel class" }).click();
     const dialog = page.getByRole("dialog", { name: "Cancel this class?" });
     await expect(dialog.getByRole("radio", { name: "Only this class" })).toHaveAttribute("aria-checked", "true");
-    await dialog.getByLabel("Reason (members see it)").fill("Water leak");
+    await dialog.getByLabel("Reason (box members see it)").fill("Water leak");
     await dialog.getByRole("button", { name: "Cancel class" }).click();
 
     await expect.poll(() => sent?.action).toBe("cancel");

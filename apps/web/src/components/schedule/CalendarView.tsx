@@ -57,6 +57,8 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
   const i18n = useUiTranslations();
   const locale = useLocale();
   const todayKey = dateKeyInZone(new Date(), timeZone);
+  // ADR-214: a class cannot start in the past, so past days offer no "+ Slot".
+  const canAddOn = (date: string) => isAdmin && date >= todayKey;
   const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days, timeZone);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {
     acc[date] = [];
@@ -115,7 +117,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                   >
                     {dayNum}
                   </span>
-                  {isAdmin && !outsideMonth ? (
+                  {canAddOn(date) && !outsideMonth ? (
                     <button
                       className="text-[11px] font-bold leading-none text-[var(--primary)] hover:opacity-70"
                       onClick={() => onCreateSlot(date)}
@@ -190,7 +192,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                   )}
                 </div>
 
-                {isAdmin ? (
+                {canAddOn(date) ? (
                     <button
                       className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
                       style={SPARK_CREATE_STYLE}
@@ -204,7 +206,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
 
               <div className="mt-4 space-y-3">
                 {daySlots.length === 0 ? (
-                  isAdmin ? (
+                  canAddOn(date) ? (
                     <button
                       className="w-full rounded-[1.2rem] px-4 py-6 text-start text-sm transition-colors"
                       style={{ border: "1px dashed var(--border)", color: "var(--border-strong)" }}

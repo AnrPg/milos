@@ -9,6 +9,7 @@ import Typography from "@tiptap/extension-typography";
 import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
@@ -27,12 +28,13 @@ import {
   fetchWorkoutDslManual,
   parseWorkoutDsl,
   publishWorkoutDsl,
-  updateDraftWorkout,
   type WorkoutDslDiagnostic,
   type WorkoutDslManual,
   type WorkoutDslPreview,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { useDraftSaver } from "@/hooks/useDraftSaver";
+import { DraftConflictError, type DraftSaveStatus } from "@/lib/draft-saver";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { workoutPublishedHref } from "@/lib/workout-return";
@@ -48,6 +50,7 @@ import {
   type WorkoutDslVocabulary,
 } from "@/lib/workout-dsl-suggestions";
 import { Dialog } from "@/components/ui/Dialog";
+import { DraftConflictNotice } from "./DraftConflictNotice";
 import { Select } from "@/components/ui/Select";
 
 const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
@@ -72,7 +75,6 @@ type Props = {
   onSwitchToStructured: (id: string) => void;
 };
 
-type SaveStatus = "idle" | "saving" | "saved" | "error" | "conflict";
 
 type SuggestionAnchor = {
   left: number;
@@ -92,6 +94,7 @@ export function QuickTextWorkoutEditor({
   const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
+  const conflictT = useTranslations("DraftConflict");
   const [source, setSource] = useState(DEFAULT_WORKOUT_DSL_SOURCE);
   const [preview, setPreview] = useState<WorkoutDslPreview | null>(null);
   const [diagnostics, setDiagnostics] = useState<WorkoutDslDiagnostic[]>([]);
@@ -101,8 +104,15 @@ export function QuickTextWorkoutEditor({
   const [parsing, setParsing] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [warningsAcknowledged, setWarningsAcknowledged] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  /** The draft could not be created or loaded. */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [sourceRevision, setSourceRevision] = useState(0);
+  const { saver, status: draftSaveStatus } = useDraftSaver<Record<string, unknown>>({
+    accessToken,
+    draftId,
+    onSaved: setSourceRevision,
+  });
+  const saveStatus: DraftSaveStatus = loadFailed ? "error" : draftSaveStatus;
   const [suggestions, setSuggestions] = useState<WorkoutDslSuggestion[]>([]);
   const [suggestionAnchor, setSuggestionAnchor] = useState<SuggestionAnchor | null>(null);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
@@ -110,7 +120,6 @@ export function QuickTextWorkoutEditor({
   const loadedDraftRef = useRef<string | null>(null);
   const parseRequestRef = useRef(0);
   const sourceRef = useRef(source);
-  const revisionRef = useRef(sourceRevision);
   const updateSuggestionsRef = useRef<(currentEditor?: Editor | null) => void>(() => undefined);
 
   const editor = useEditor({
@@ -232,10 +241,6 @@ export function QuickTextWorkoutEditor({
   }, [source]);
 
   useEffect(() => {
-    revisionRef.current = sourceRevision;
-  }, [sourceRevision]);
-
-  useEffect(() => {
     if (!tokens?.access_token || manual) return;
     fetchWorkoutDslManual(tokens.access_token)
       .then(setManual)
@@ -247,17 +252,30 @@ export function QuickTextWorkoutEditor({
 
     loadedDraftRef.current = "creating";
     createDraftWorkout(tokens.access_token, folderId)
-      .then((draft) => {
-        const revision = draft.dsl_source_revision ?? 0;
-        revisionRef.current = revision;
-        setSourceRevision(revision);
-        onDraftReady(draft.id);
-      })
+      .then((draft) => onDraftReady(draft.id))
       .catch(() => {
         loadedDraftRef.current = null;
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
   }, [draftId, folderId, onDraftReady, tokens?.access_token]);
+
+  /** Puts the stored source into the editor and arms autosave at its revision. */
+  const applyAuthoring = useCallback(
+    (authoring: { source?: string | null; source_revision?: number | null; diagnostics?: WorkoutDslDiagnostic[] | null; document?: JSONContent | null }) => {
+      if (!editor) return;
+      const nextSource = authoring.source || DEFAULT_WORKOUT_DSL_SOURCE;
+      const nextRevision = authoring.source_revision ?? 0;
+      sourceRef.current = nextSource;
+      setSource(nextSource);
+      setSourceRevision(nextRevision);
+      setDiagnostics(authoring.diagnostics ?? []);
+      editor.commands.setContent(authoring.document ?? sourceToDocument(nextSource));
+      // A save based on an older revision is refused, so autosave starts here.
+      saver.start(nextRevision);
+      setAuthoringReady(true);
+    },
+    [editor, saver],
+  );
 
   useEffect(() => {
     if (!tokens?.access_token || !draftId || loadedDraftRef.current === draftId || !editor) return;
@@ -265,23 +283,13 @@ export function QuickTextWorkoutEditor({
     setAuthoringReady(false);
     loadedDraftRef.current = draftId;
     fetchWorkoutDslAuthoring(tokens.access_token, draftId)
-      .then((authoring) => {
-        const nextSource = authoring.source || DEFAULT_WORKOUT_DSL_SOURCE;
-        const nextRevision = authoring.source_revision ?? 0;
-        sourceRef.current = nextSource;
-        revisionRef.current = nextRevision;
-        setSource(nextSource);
-        setSourceRevision(nextRevision);
-        setDiagnostics(authoring.diagnostics ?? []);
-        editor.commands.setContent(authoring.document ?? sourceToDocument(nextSource));
-        setAuthoringReady(true);
-      })
+      .then(applyAuthoring)
       .catch(() => {
         loadedDraftRef.current = null;
         setAuthoringReady(false);
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
-  }, [draftId, editor, tokens?.access_token]);
+  }, [applyAuthoring, draftId, editor, tokens?.access_token]);
 
   useEffect(() => {
     if (!tokens?.access_token || !source.trim()) return;
@@ -311,55 +319,28 @@ export function QuickTextWorkoutEditor({
     return () => window.clearTimeout(timer);
   }, [source, tokens?.access_token]);
 
-  const saveDraftSnapshot = useCallback(
-    async (snapshot: string, document: JSONContent | null, expectedRevision: number) => {
-      if (!accessToken || !draftId) throw new Error();
-      setSaveStatus("saving");
-
-      try {
-        const draft = await updateDraftWorkout(accessToken, draftId, {
-          draft_data: {
-            authoring_mode: "quick_text",
-            dsl_version: 1,
-            dsl_source: snapshot,
-            dsl_document: document,
-          },
-          authoring_mode: "quick_text",
-          dsl_version: 1,
-          dsl_source: snapshot,
-          dsl_document: document,
-          last_dsl_diagnostics: diagnostics,
-          expected_source_revision: expectedRevision,
-        });
-        const nextRevision = draft.dsl_source_revision ?? expectedRevision + 1;
-        revisionRef.current = nextRevision;
-        setSourceRevision(nextRevision);
-        setSaveStatus("saved");
-        return nextRevision;
-      } catch (error) {
-        if (error instanceof ApiError && error.payload.code === "stale_dsl_revision") {
-          setSaveStatus("conflict");
-        } else {
-          setSaveStatus("error");
-        }
-        throw error;
-      }
-    },
-    [accessToken, diagnostics, draftId],
+  const draftPayload = useCallback(
+    (snapshot: string, document: JSONContent | null) => quickTextPayload(snapshot, document, diagnostics),
+    [diagnostics],
   );
 
+  // Autosave: one request at a time, shortly after the last change.
   useEffect(() => {
-    if (!draftId || loadedDraftRef.current !== draftId || !editor) return;
+    if (!authoringReady || !editor) return;
+    saver.schedule(draftPayload(source, editor.getJSON()));
+  }, [authoringReady, draftPayload, editor, saver, source]);
 
-    const snapshot = source;
-    const document = editor.getJSON();
-    const expectedRevision = revisionRef.current;
-    const timer = window.setTimeout(() => {
-      void saveDraftSnapshot(snapshot, document, expectedRevision).catch(() => undefined);
-    }, 1_200);
+  async function keepMyVersion() {
+    if (!tokens?.access_token || !draftId || !editor) return;
+    const latest = await fetchWorkoutDslAuthoring(tokens.access_token, draftId);
+    saver.schedule(draftPayload(sourceRef.current, editor.getJSON()));
+    await saver.overwrite(latest.source_revision ?? 0);
+  }
 
-    return () => window.clearTimeout(timer);
-  }, [draftId, editor, saveDraftSnapshot, source]);
+  async function loadSavedVersion() {
+    if (!tokens?.access_token || !draftId) return;
+    applyAuthoring(await fetchWorkoutDslAuthoring(tokens.access_token, draftId));
+  }
 
   useEffect(() => {
     updateSuggestions();
@@ -449,7 +430,7 @@ export function QuickTextWorkoutEditor({
 
     try {
       const snapshot = sourceRef.current;
-      await updateDraftWorkout(tokens.access_token, draftId, {
+      await saver.saveNow({
         ...preview.workout,
         draft_data: {
           ...preview.workout,
@@ -459,22 +440,17 @@ export function QuickTextWorkoutEditor({
         dsl_version: preview.version,
         dsl_source: snapshot,
         dsl_document: editor?.getJSON() ?? null,
-        expected_source_revision: revisionRef.current,
       });
-      setSaveStatus("saved");
+      saver.close();
       onSwitchToStructured(draftId);
-    } catch (error) {
-      setSaveStatus(
-        error instanceof ApiError && error.payload.code === "stale_dsl_revision"
-          ? "conflict"
-          : "error",
-      );
+    } catch {
+      // The save status (or the conflict notice) says why; nothing switches.
     }
   }
 
   async function publish() {
     if (
-      !tokens?.access_token ||
+      !accessToken ||
       !draftId ||
       !editor ||
       !preview ||
@@ -489,20 +465,28 @@ export function QuickTextWorkoutEditor({
     setPublishing(true);
 
     try {
-      const revision = await saveDraftSnapshot(snapshot, document, revisionRef.current);
-      if (sourceRef.current !== snapshot) {
-        setSaveStatus("error");
-        return;
-      }
-
-      await publishWorkoutDsl(tokens.access_token, draftId, {
-        source: snapshot,
-        document,
-        expected_source_revision: revision,
-        acknowledge_warnings: warningsAcknowledged,
+      // The final save and the publish run back to back in the save queue.
+      const published = await saver.saveNow(draftPayload(snapshot, document), async (revision) => {
+        // Typed on while saving: autosave keeps the newer text; publish again.
+        if (sourceRef.current !== snapshot) return false;
+        saver.close();
+        try {
+          await publishWorkoutDsl(accessToken, draftId, {
+            source: snapshot,
+            document,
+            expected_source_revision: revision,
+            acknowledge_warnings: warningsAcknowledged,
+          });
+        } catch (error) {
+          saver.reopen();
+          throw error;
+        }
+        return true;
       });
+      if (!published) return;
       router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
     } catch (error) {
+      if (error instanceof DraftConflictError) return;
       if (
         error instanceof ApiError &&
         error.payload.code === "dsl_warnings_require_acknowledgement"
@@ -529,6 +513,7 @@ export function QuickTextWorkoutEditor({
   return (
     <div className={correctionsOpen ? "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]" : "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1"}>
       <section className="flex min-h-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
+        {saveStatus === "conflict" ? <DraftConflictNotice onKeepMine={keepMyVersion} onLoadSaved={loadSavedVersion} /> : null}
         <div className="border-b px-5 py-4" style={{ borderColor: "var(--dim)" }}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -540,7 +525,7 @@ export function QuickTextWorkoutEditor({
               </p>
             </div>
             <div className="text-end text-xs font-semibold" style={{ color: "var(--muted)" }}>
-              <div>{saveStatusText(saveStatus, i18n)}</div>
+              <div>{saveStatus === "conflict" ? conflictT("status") : saveStatusText(saveStatus, i18n)}</div>
               <div aria-live="polite">{statusLabel}</div>
               <div>{i18n("quickTextRevision", { revision: sourceRevision })}</div>
             </div>
@@ -937,7 +922,23 @@ function setEditorLink(editor: Editor, promptLabel: string) {
   editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
 }
 
-function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTranslations>) {
+function quickTextPayload(snapshot: string, document: JSONContent | null, diagnostics: WorkoutDslDiagnostic[]) {
+  return {
+    draft_data: {
+      authoring_mode: "quick_text",
+      dsl_version: 1,
+      dsl_source: snapshot,
+      dsl_document: document,
+    },
+    authoring_mode: "quick_text",
+    dsl_version: 1,
+    dsl_source: snapshot,
+    dsl_document: document,
+    last_dsl_diagnostics: diagnostics,
+  };
+}
+
+function saveStatusText(status: Exclude<DraftSaveStatus, "conflict">, i18n: ReturnType<typeof useUiTranslations>) {
   switch (status) {
     case "saving":
       return i18n("quickTextSaving");
@@ -945,8 +946,6 @@ function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTransla
       return i18n("quickTextSaved");
     case "error":
       return i18n("quickTextSaveError");
-    case "conflict":
-      return i18n("quickTextRevisionConflict");
     case "idle":
       return "";
   }

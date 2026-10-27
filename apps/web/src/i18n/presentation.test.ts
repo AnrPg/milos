@@ -34,6 +34,16 @@ describe("semanticLabel", () => {
 });
 
 describe("localizeError", () => {
+  it("says in plain words what was not accepted instead of promising highlighted values", () => {
+    const error = new ApiError(422, "scheduled_at: must be in the future", {
+      code: "validation_failed",
+      errors: { scheduled_at: ["must be in the future"], capacity: ["must be greater than 0"] },
+    });
+    expect(localizeError(error, translate)).toBe(
+      `apiErrorValidationFailedDetail:${JSON.stringify({ details: 'formErrMustBeFuture formErrGreaterThan:{"number":"0"}' })}`,
+    );
+  });
+
   it("prefers a stable backend error code and interpolation params", () => {
     const error = new ApiError(409, "English compatibility copy", {
       code: "class_type_replacement_required",

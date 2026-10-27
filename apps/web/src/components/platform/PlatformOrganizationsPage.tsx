@@ -37,6 +37,9 @@ import { platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug"
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { FieldError } from "@/components/ui/ErrorNotice";
+import { useUiTranslations } from "@/i18n/ui";
+import { fieldBorder, formErrorsFrom, invalidFieldProps, type FormErrors } from "@/lib/form-errors";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
@@ -59,8 +62,24 @@ type GeneratedInvitation = PlatformInvitationResult["invitation"] & {
   issued_at: string;
 };
 
+/** ADR-214: the fields of the vendor's organisation forms, as the API names them. */
+const ORGANIZATION_FIELDS = [
+  "name",
+  "slug",
+  "timezone",
+  "default_locale",
+  "invitation_lifetime_seconds",
+  "initial_owner_email",
+  "brand_name",
+  "brand_logo_url",
+] as const;
+type OrganizationField = (typeof ORGANIZATION_FIELDS)[number];
+
 export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
+  const i18n = useUiTranslations();
+  // ADR-214: what the open dialog's last save got wrong, shown inside it.
+  const [dialogErrors, setDialogErrors] = useState<FormErrors<OrganizationField> | null>(null);
   const copy = platformOrganizationsCopy(locale);
   const purgeCopy = platformOrganizationPurgeCopy(locale);
   const slugCopy = platformOrganizationSlugCopy(locale);
@@ -114,7 +133,7 @@ export function PlatformOrganizationsPage() {
     event.preventDefault();
     if (!accessToken) return;
     setSubmitting(true);
-    setError(null);
+    setDialogErrors(null);
 
     try {
       const result = await provisionPlatformOrganization(accessToken, compact(form));
@@ -132,8 +151,8 @@ export function PlatformOrganizationsPage() {
         issued_at: new Date().toISOString(),
       });
       await organizationsQuery.refetch();
-    } catch {
-      setError(copy.provisionError);
+    } catch (reason) {
+      setDialogErrors(formErrorsFrom(reason, i18n, ORGANIZATION_FIELDS, { fallback: copy.provisionError }));
     } finally {
       setSubmitting(false);
     }
@@ -167,6 +186,7 @@ export function PlatformOrganizationsPage() {
   async function updateLifecycle(organizationId: string, status: OrganizationStatus) {
     if (!accessToken) return;
     setError(null);
+    setDialogErrors(null);
     setLifecycleSubmitting(`${organizationId}:${status}`);
 
     try {
@@ -174,7 +194,9 @@ export function PlatformOrganizationsPage() {
       await organizationsQuery.refetch();
       setConfirmingArchive(null);
     } catch {
-      setError(copy.lifecycleError);
+      // The archive dialog shows it; a status change without one, the page.
+      if (status === "archived") setDialogErrors({ fields: {}, message: copy.lifecycleError });
+      else setError(copy.lifecycleError);
     } finally {
       setLifecycleSubmitting(null);
     }
@@ -182,7 +204,7 @@ export function PlatformOrganizationsPage() {
 
   async function saveSettings(name: string, settings: OrganizationSettings) {
     if (!accessToken || !editing) return;
-    setError(null);
+    setDialogErrors(null);
 
     try {
       if (name !== editing.organization.name) {
@@ -200,8 +222,8 @@ export function PlatformOrganizationsPage() {
       );
       await organizationsQuery.refetch();
       setEditing(null);
-    } catch {
-      setError(copy.settingsError);
+    } catch (reason) {
+      setDialogErrors(formErrorsFrom(reason, i18n, ORGANIZATION_FIELDS, { fallback: copy.settingsError }));
     }
   }
 
@@ -492,7 +514,11 @@ export function PlatformOrganizationsPage() {
           accessToken={accessToken}
           copy={copy}
           organization={editing}
-          onCancel={() => setEditing(null)}
+          errors={dialogErrors}
+          onCancel={() => {
+            setEditing(null);
+            setDialogErrors(null);
+          }}
           onLogoChanged={() => void organizationsQuery.refetch()}
           onSave={saveSettings}
         />
@@ -514,7 +540,11 @@ export function PlatformOrganizationsPage() {
           copy={copy}
           form={form}
           submitting={submitting}
-          onCancel={() => setProvisioningOpen(false)}
+          errors={dialogErrors}
+          onCancel={() => {
+            setProvisioningOpen(false);
+            setDialogErrors(null);
+          }}
           onChange={setForm}
           onSubmit={provision}
         />
@@ -524,7 +554,11 @@ export function PlatformOrganizationsPage() {
           copy={copy}
           organization={confirmingArchive}
           submitting={lifecycleSubmitting === `${confirmingArchive.organization.id}:archived`}
-          onCancel={() => setConfirmingArchive(null)}
+          error={dialogErrors?.message ?? null}
+          onCancel={() => {
+            setConfirmingArchive(null);
+            setDialogErrors(null);
+          }}
           onConfirm={() => void updateLifecycle(confirmingArchive.organization.id, "archived")}
         />
       ) : null}
@@ -573,22 +607,29 @@ function invitationSetupUrl(invitation: Pick<PlatformInvitationResult["invitatio
 }
 
 
-function TextField({ label, value, onChange, type = "text", ...inputProps }: {
+function TextField({ label, value, onChange, type = "text", error, errorId, ...inputProps }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
+  /** ADR-214: why the value is wrong, shown under the field (which turns red). */
+  error?: string;
+  errorId?: string;
 } & Pick<React.InputHTMLAttributes<HTMLInputElement>, "required" | "min">) {
+  const describedBy = errorId ?? `field-error-${label.replace(/\W+/g, "-").toLowerCase()}`;
   return (
     <label className="block text-sm font-medium text-[var(--text)]">
       <span className="mb-1.5 block">{label}</span>
       <input
         {...inputProps}
+        {...invalidFieldProps(error, describedBy)}
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2.5 outline-none focus:border-[var(--accent)]"
+        style={error ? { border: fieldBorder(error) } : undefined}
       />
+      <FieldError id={describedBy}>{error}</FieldError>
     </label>
   );
 }
@@ -816,10 +857,11 @@ function GeneratedInvitationsList({
   );
 }
 
-function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit }: {
+function ProvisionDialog({ copy, form, submitting, errors, onCancel, onChange, onSubmit }: {
   copy: ReturnType<typeof platformOrganizationsCopy>;
   form: ProvisionOrganizationInput;
   submitting: boolean;
+  errors: FormErrors<OrganizationField> | null;
   onCancel: () => void;
   onChange: (form: ProvisionOrganizationInput) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -832,6 +874,7 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
       ariaLabel={copy.create}
       size="lg"
       variant="center"
+      error={errors?.message}
       onSubmit={onSubmit}
       footer={
         <div className="w-full flex justify-end gap-3">
@@ -843,30 +886,32 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
       }
     >
         <div className="space-y-4">
-          <TextField label={copy.name} value={form.name} required onChange={(name) => onChange({ ...form, name })} />
-          <TextField label={copy.slug} value={form.slug ?? ""} onChange={(slug) => onChange({ ...form, slug })} />
-          <TextField label={copy.timezone} value={form.timezone} required onChange={(timezone) => onChange({ ...form, timezone })} />
-          <TextField label={copy.locale} value={form.default_locale} required onChange={(default_locale) => onChange({ ...form, default_locale })} />
+          <TextField label={copy.name} error={errors?.fields.name} value={form.name} required onChange={(name) => onChange({ ...form, name })} />
+          <TextField label={copy.slug} error={errors?.fields.slug} value={form.slug ?? ""} onChange={(slug) => onChange({ ...form, slug })} />
+          <TextField label={copy.timezone} error={errors?.fields.timezone} value={form.timezone} required onChange={(timezone) => onChange({ ...form, timezone })} />
+          <TextField label={copy.locale} error={errors?.fields.default_locale} value={form.default_locale} required onChange={(default_locale) => onChange({ ...form, default_locale })} />
           <TextField
             label={copy.invitationLifetime}
+            error={errors?.fields.invitation_lifetime_seconds}
             type="number"
             min={1}
             value={String(form.invitation_lifetime_seconds / 3600)}
             required
             onChange={(hours) => onChange({ ...form, invitation_lifetime_seconds: Number(hours) * 3600 })}
           />
-          <TextField label={copy.ownerEmail} type="email" required value={form.initial_owner_email ?? ""} onChange={(initial_owner_email) => onChange({ ...form, initial_owner_email })} />
-          <TextField label={copy.brandName} value={form.brand_name ?? ""} onChange={(brand_name) => onChange({ ...form, brand_name })} />
-          <TextField label={copy.brandLogo} type="url" value={form.brand_logo_url ?? ""} onChange={(brand_logo_url) => onChange({ ...form, brand_logo_url })} />
+          <TextField label={copy.ownerEmail} error={errors?.fields.initial_owner_email} type="email" required value={form.initial_owner_email ?? ""} onChange={(initial_owner_email) => onChange({ ...form, initial_owner_email })} />
+          <TextField label={copy.brandName} error={errors?.fields.brand_name} value={form.brand_name ?? ""} onChange={(brand_name) => onChange({ ...form, brand_name })} />
+          <TextField label={copy.brandLogo} error={errors?.fields.brand_logo_url} type="url" value={form.brand_logo_url ?? ""} onChange={(brand_logo_url) => onChange({ ...form, brand_logo_url })} />
         </div>
     </Dialog>
   );
 }
 
-function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: {
+function ArchiveDialog({ copy, organization, submitting, error, onCancel, onConfirm }: {
   copy: ReturnType<typeof platformOrganizationsCopy>;
   organization: PlatformOrganization;
   submitting: boolean;
+  error: string | null;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -878,6 +923,7 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
       ariaLabel={copy.archiveTitle}
       size="md"
       variant="center"
+      error={error}
       footer={
         <div className="w-full flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
@@ -893,10 +939,11 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
   );
 }
 
-function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onLogoChanged }: {
+function SettingsDialog({ accessToken, copy, organization, errors, onCancel, onSave, onLogoChanged }: {
   accessToken: string | undefined;
   copy: ReturnType<typeof platformOrganizationsCopy>;
   organization: PlatformOrganization;
+  errors: FormErrors<OrganizationField> | null;
   onCancel: () => void;
   onSave: (name: string, settings: OrganizationSettings) => Promise<void>;
   onLogoChanged: () => void;
@@ -917,6 +964,7 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
       ariaLabel={copy.settings}
       size="lg"
       variant="center"
+      error={errors?.message}
       onSubmit={async (event) => {
           event.preventDefault();
           setSaving(true);
@@ -931,11 +979,11 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
       }
     >
         <div className="space-y-4">
-          <TextField label={copy.name} value={name} required onChange={setName} />
-          <TextField label={copy.timezone} value={settings.timezone} required onChange={(timezone) => setSettings({ ...settings, timezone })} />
-          <TextField label={copy.locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
-          <TextField label={copy.invitationLifetime} type="number" min={1} value={String(settings.invitation_lifetime_seconds / 3600)} required onChange={(hours) => setSettings({ ...settings, invitation_lifetime_seconds: Number(hours) * 3600 })} />
-          <TextField label={copy.brandName} value={settings.brand_name ?? ""} onChange={(brand_name) => setSettings({ ...settings, brand_name })} />
+          <TextField label={copy.name} error={errors?.fields.name} value={name} required onChange={setName} />
+          <TextField label={copy.timezone} error={errors?.fields.timezone} value={settings.timezone} required onChange={(timezone) => setSettings({ ...settings, timezone })} />
+          <TextField label={copy.locale} error={errors?.fields.default_locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
+          <TextField label={copy.invitationLifetime} error={errors?.fields.invitation_lifetime_seconds} type="number" min={1} value={String(settings.invitation_lifetime_seconds / 3600)} required onChange={(hours) => setSettings({ ...settings, invitation_lifetime_seconds: Number(hours) * 3600 })} />
+          <TextField label={copy.brandName} error={errors?.fields.brand_name} value={settings.brand_name ?? ""} onChange={(brand_name) => setSettings({ ...settings, brand_name })} />
           {logoApi ? (
             <div>
               <span className="text-sm font-semibold text-[var(--text)]">{copy.brandLogoUpload}</span>
