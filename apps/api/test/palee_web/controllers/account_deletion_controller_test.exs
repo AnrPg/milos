@@ -53,14 +53,21 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
   end
 
   test "refuses a wrong password and an unknown scope", %{token: token} do
-    conn = post_json(authed(token), "/api/auth/account-deletion", %{scope: "login", password: "nope"})
+    conn =
+      post_json(authed(token), "/api/auth/account-deletion", %{scope: "login", password: "nope"})
+
     assert %{"code" => "invalid_password"} = json_response(conn, 422)
 
-    conn = post_json(authed(token), "/api/auth/account-deletion", %{scope: "all", password: @password})
+    conn =
+      post_json(authed(token), "/api/auth/account-deletion", %{scope: "all", password: @password})
+
     assert json_response(conn, 422)
   end
 
-  test "an unverified email confirms by typing it; the session ends", %{token: token, email: email} do
+  test "an unverified email confirms by typing it; the session ends", %{
+    token: token,
+    email: email
+  } do
     conn =
       post_json(authed(token), "/api/auth/account-deletion", %{
         scope: "login",
@@ -84,7 +91,9 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
     assert get(authed(token), "/api/auth/me").status == 401
 
     conn = post_json(build_conn(), "/api/auth/login", %{identifier: email, password: @password})
-    assert %{"code" => "account_deletion_scheduled", "scheduled_for" => ^at} = json_response(conn, 403)
+
+    assert %{"code" => "account_deletion_scheduled", "scheduled_for" => ^at} =
+             json_response(conn, 403)
 
     # Wrong credentials say only that.
     conn = post_json(build_conn(), "/api/auth/login", %{identifier: email, password: "nope"})
@@ -106,14 +115,20 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
 
     assert %{"access_token" => fresh, "user" => %{"email" => ^email}} = json_response(conn, 200)
     assert conn.resp_cookies["palee_refresh"]
-    assert %{"status" => "none"} = json_response(get(authed(fresh), "/api/auth/account-deletion"), 200)
+
+    assert %{"status" => "none"} =
+             json_response(get(authed(fresh), "/api/auth/account-deletion"), 200)
   end
 
   test "a verified email gets the link; opening it schedules the deletion",
        %{token: token, email: email} do
     verify!(email)
 
-    conn = post_json(authed(token), "/api/auth/account-deletion", %{scope: "login", password: @password})
+    conn =
+      post_json(authed(token), "/api/auth/account-deletion", %{
+        scope: "login",
+        password: @password
+      })
 
     assert %{"status" => "awaiting_confirmation", "scope" => "login", "email" => ^email} =
              json_response(conn, 202)
@@ -130,7 +145,9 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
     assert %{"code" => "invalid_deletion_link"} = json_response(conn, 422)
 
     conn =
-      post_json(build_conn(), "/api/auth/account-deletion/undo", %{token: String.duplicate("a", 43)})
+      post_json(build_conn(), "/api/auth/account-deletion/undo", %{
+        token: String.duplicate("a", 43)
+      })
 
     assert %{"code" => "invalid_deletion_link"} = json_response(conn, 422)
   end
@@ -139,7 +156,11 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
     account = Identity.find_by_email(email)
     {organization, _owner, _context} = Palee.AnalyticsHelpers.organization_fixture(account)
 
-    conn = post_json(authed(token), "/api/auth/account-deletion", %{scope: "login", password: @password})
+    conn =
+      post_json(authed(token), "/api/auth/account-deletion", %{
+        scope: "login",
+        password: @password
+      })
 
     assert %{"code" => "sole_owner", "organizations" => [name]} = json_response(conn, 409)
     assert name == organization.name
@@ -152,6 +173,8 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
 
     post_json(authed(token), "/api/auth/account-deletion", %{scope: "login", password: @password})
     assert response(delete(authed(token), "/api/auth/account-deletion"), 204)
-    assert %{"status" => "none"} = json_response(get(authed(token), "/api/auth/account-deletion"), 200)
+
+    assert %{"status" => "none"} =
+             json_response(get(authed(token), "/api/auth/account-deletion"), 200)
   end
 end

@@ -5,7 +5,10 @@ defmodule Palee.Email.Templates.AccountLifecycleTemplatesTest do
   alias Palee.Email.Templates.{AccountDeletionConfirm, SignupAttemptExisting}
 
   @locales ~w(ar bg de el en es fr he it nl pt_PT ru)
-  @attempt %{sign_in_url: "https://palee.app/login", reset_url: "https://palee.app/forgot-password"}
+  @attempt %{
+    sign_in_url: "https://palee.app/login",
+    reset_url: "https://palee.app/forgot-password"
+  }
   @confirm %{
     scope: :profile,
     handle: "maria.k",
@@ -15,7 +18,10 @@ defmodule Palee.Email.Templates.AccountLifecycleTemplatesTest do
 
   test "every locale renders both emails with every placeholder filled" do
     for locale <- @locales,
-        {module, assigns} <- [{SignupAttemptExisting, @attempt}, {AccountDeletionConfirm, @confirm}] do
+        {module, assigns} <- [
+          {SignupAttemptExisting, @attempt},
+          {AccountDeletionConfirm, @confirm}
+        ] do
       subject = module.subject(assigns, locale)
       text = module.text(assigns, locale)
       html = module.html(assigns, locale)
@@ -25,7 +31,8 @@ defmodule Palee.Email.Templates.AccountLifecycleTemplatesTest do
       end
 
       if locale != "en" do
-        refute subject == module.subject(assigns, "en"), "#{locale} #{inspect(module)} untranslated"
+        refute subject == module.subject(assigns, "en"),
+               "#{locale} #{inspect(module)} untranslated"
       end
     end
   end
