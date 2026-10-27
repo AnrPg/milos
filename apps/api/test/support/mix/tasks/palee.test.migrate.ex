@@ -3,7 +3,7 @@ defmodule Mix.Tasks.Palee.Test.Migrate do
 
   @moduledoc """
   Prepares the test database the way production runs it: owned by a login
-  role that is not a superuser (`milos_migrations` in prod, which has
+  role that is not a superuser (`palee_migrations` in prod, which has
   BYPASSRLS and nothing more), with the extensions installed beforehand by
   an administrator. The migrations run as that role, and the test suite
   connects as that role too (`Palee.Repo` in `config/test.exs`).

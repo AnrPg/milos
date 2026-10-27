@@ -28,8 +28,8 @@ defmodule PaleeWeb.AuthControllerTest do
 
       assert %{"access_token" => _} = json_response(conn, 201)
       refute Map.has_key?(json_response(conn, 201), "refresh_token")
-      assert conn.resp_cookies["milos_refresh"].http_only
-      assert conn.resp_cookies["milos_refresh"].same_site == "Strict"
+      assert conn.resp_cookies["palee_refresh"].http_only
+      assert conn.resp_cookies["palee_refresh"].same_site == "Strict"
     end
 
     test "keeps the language the sign-up page was shown in (ADR-195)", %{conn: conn} do
@@ -174,7 +174,7 @@ defmodule PaleeWeb.AuthControllerTest do
         |> post("/api/auth/register-admin", Jason.encode!(params))
 
       assert %{"access_token" => _} = json_response(conn, 201)
-      assert conn.resp_cookies["milos_refresh"].http_only
+      assert conn.resp_cookies["palee_refresh"].http_only
       account = Identity.find_by_nickname("athena_admin")
       assert account.role == :admin
 
@@ -280,7 +280,7 @@ defmodule PaleeWeb.AuthControllerTest do
 
       assert json_response(conn, 200)["access_token"]
       refute Map.has_key?(json_response(conn, 200), "refresh_token")
-      assert conn.resp_cookies["milos_refresh"].http_only
+      assert conn.resp_cookies["palee_refresh"].http_only
 
       # ADR-178: the user comes with the tokens, so no /auth/me round trip.
       assert %{"nickname" => "hermes", "role" => "member", "vendor" => false} =
@@ -438,24 +438,24 @@ defmodule PaleeWeb.AuthControllerTest do
           })
         )
 
-      refresh_token = register_conn.resp_cookies["milos_refresh"].value
+      refresh_token = register_conn.resp_cookies["palee_refresh"].value
 
       refresh_conn =
         build_conn()
-        |> put_req_cookie("milos_refresh", refresh_token)
+        |> put_req_cookie("palee_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/refresh", %{})
 
       assert %{"access_token" => _, "user" => %{"nickname" => "apollo"}} =
                json_response(refresh_conn, 200)
 
-      rotated_refresh_token = refresh_conn.resp_cookies["milos_refresh"].value
+      rotated_refresh_token = refresh_conn.resp_cookies["palee_refresh"].value
 
       refute rotated_refresh_token == refresh_token
 
       replay_conn =
         build_conn()
-        |> put_req_cookie("milos_refresh", refresh_token)
+        |> put_req_cookie("palee_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/refresh", %{})
 
@@ -477,7 +477,7 @@ defmodule PaleeWeb.AuthControllerTest do
           })
         )
 
-      refresh_token = register_conn.resp_cookies["milos_refresh"].value
+      refresh_token = register_conn.resp_cookies["palee_refresh"].value
 
       original = Application.get_env(:palee, :token_store)
 
@@ -493,7 +493,7 @@ defmodule PaleeWeb.AuthControllerTest do
 
       failing_refresh_conn =
         build_conn()
-        |> put_req_cookie("milos_refresh", refresh_token)
+        |> put_req_cookie("palee_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/refresh", %{})
 
@@ -504,12 +504,12 @@ defmodule PaleeWeb.AuthControllerTest do
 
       retry_refresh_conn =
         build_conn()
-        |> put_req_cookie("milos_refresh", refresh_token)
+        |> put_req_cookie("palee_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/refresh", %{})
 
       assert %{"access_token" => _} = json_response(retry_refresh_conn, 200)
-      assert retry_refresh_conn.resp_cookies["milos_refresh"].value != refresh_token
+      assert retry_refresh_conn.resp_cookies["palee_refresh"].value != refresh_token
     end
   end
 
@@ -529,7 +529,7 @@ defmodule PaleeWeb.AuthControllerTest do
         )
 
       %{"access_token" => access_token} = json_response(login_conn, 201)
-      refresh_token = login_conn.resp_cookies["milos_refresh"].value
+      refresh_token = login_conn.resp_cookies["palee_refresh"].value
 
       login_conn
       |> recycle()
@@ -543,7 +543,7 @@ defmodule PaleeWeb.AuthControllerTest do
       |> json_response(401)
 
       build_conn()
-      |> put_req_cookie("milos_refresh", refresh_token)
+      |> put_req_cookie("palee_refresh", refresh_token)
       |> post("/api/auth/refresh", %{})
       |> json_response(401)
     end

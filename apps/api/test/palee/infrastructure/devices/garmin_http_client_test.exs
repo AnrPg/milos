@@ -139,6 +139,6 @@ defmodule Palee.Infrastructure.Devices.GarminHttpClientTest do
 
     {:ok, dumped} = EncryptedBinary.dump("token-2")
     assert {:ok, "token-2"} = EncryptedBinary.load(dumped)
-    assert {:ok, nil} = EncryptedBinary.load("v1" <> :crypto.strong_rand_bytes(40))
+    assert {:ok, nil} = EncryptedBinary.load("v2" <> :crypto.strong_rand_bytes(40))
   end
 end

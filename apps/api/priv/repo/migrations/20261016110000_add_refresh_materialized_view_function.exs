@@ -4,7 +4,7 @@ defmodule Palee.Repo.Migrations.AddRefreshMaterializedViewFunction do
   # TD-092 / ADR-131: `REFRESH MATERIALIZED VIEW` requires ownership of the
   # view. The three aggregate views are created (and owned) by the migration
   # role, while the application connects as the non-owner runtime role
-  # (`milos_runtime`), so every refresh - RefreshLeaderboardJob, the inline
+  # (`palee_runtime`), so every refresh - RefreshLeaderboardJob, the inline
   # refresh after a leaderboard opt-in, RefreshCoachingAggregatesJob,
   # RefreshFinanceAggregatesJob - failed with "must be owner of materialized
   # view" in production and the leaderboard / dashboards never moved.

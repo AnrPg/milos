@@ -34,9 +34,4 @@ ENV HOME=/app
 
 COPY --from=build /app/_build/prod/rel/palee ./
 
-# The deployed manifests still start `bin/milos_training` and run
-# `MilosTraining.Release.migrate()` (TD-109). Keep that entry point until the
-# infrastructure rename lands, then drop this link and LegacyReleaseEntrypoint.
-RUN ln -s palee bin/milos_training
-
 CMD ["./bin/palee", "start"]

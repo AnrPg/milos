@@ -444,7 +444,7 @@ defmodule Palee.Infrastructure.Storage.MinioStorage do
     public_endpoint = public_endpoint(endpoint)
     access_key = Application.get_env(:palee, :minio_access_key, "minioadmin")
     secret_key = Application.get_env(:palee, :minio_secret_key, "minioadmin")
-    bucket = Application.get_env(:palee, :minio_bucket, "milos-invoices")
+    bucket = Application.get_env(:palee, :minio_bucket, "palee-invoices")
 
     {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
@@ -455,7 +455,7 @@ defmodule Palee.Infrastructure.Storage.MinioStorage do
     public_endpoint = public_endpoint(endpoint)
     access_key = Application.get_env(:palee, :minio_access_key, "minioadmin")
     secret_key = Application.get_env(:palee, :minio_secret_key, "minioadmin")
-    bucket = Application.get_env(:palee, :minio_avatar_bucket, "milos-avatars")
+    bucket = Application.get_env(:palee, :minio_avatar_bucket, "palee-avatars")
 
     {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
@@ -466,7 +466,7 @@ defmodule Palee.Infrastructure.Storage.MinioStorage do
     public_endpoint = public_endpoint(endpoint)
     access_key = Application.get_env(:palee, :minio_access_key, "minioadmin")
     secret_key = Application.get_env(:palee, :minio_secret_key, "minioadmin")
-    bucket = Application.get_env(:palee, :minio_media_bucket, "milos-media")
+    bucket = Application.get_env(:palee, :minio_media_bucket, "palee-media")
 
     {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}

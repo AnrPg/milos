@@ -572,7 +572,7 @@ defmodule PaleeWeb.AuthController do
 
     with :ok <- SignOutAllDevices.call(user) do
       conn
-      |> delete_resp_cookie(refresh_cookie_name(), refresh_cookie_options())
+        |> delete_resp_cookie(refresh_cookie_name(), refresh_cookie_options())
       |> send_resp(:no_content, "")
     end
   end
@@ -616,7 +616,8 @@ defmodule PaleeWeb.AuthController do
     put_resp_cookie(conn, refresh_cookie_name(), token, refresh_cookie_options())
   end
 
-  defp refresh_cookie_name, do: "milos_refresh"
+  defp refresh_cookie_name, do: "palee_refresh"
+
 
   defp refresh_cookie_options do
     [
