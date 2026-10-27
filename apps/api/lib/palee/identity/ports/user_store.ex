@@ -53,4 +53,6 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback count_by_role(atom() | String.t()) :: non_neg_integer()
   @callback bump_security_version(Ecto.UUID.t()) ::
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  @doc "ADR-208: revokes the sessions of every profile of a login."
+  @callback bump_login_security_version(Ecto.UUID.t()) :: :ok | {:error, :not_found}
 end

@@ -175,6 +175,21 @@ defmodule Palee.Application.EmailChangeTest do
     end
   end
 
+  describe "security notices to the old address" do
+    test "at request time, then with a working revert link after the change", %{user: user} do
+      {_status, token} = request!(user, "new@box.test")
+      assert_email_enqueued(kind: :security_email_change_requested, to: user.email)
+
+      {:ok, _} = EmailChange.confirm(token)
+      notice = assert_email_enqueued(kind: :security_email_changed, to: user.email)
+      [_, revert] = Regex.run(~r{/revert-email-change#token=([A-Za-z0-9_-]+)}, notice.text)
+
+      assert {:ok, %{email: email}} = EmailChange.revert(revert)
+      assert email == user.email
+      assert login(user).email == user.email
+    end
+  end
+
   describe "revert/2" do
     defp changed!(user) do
       {_status, token} = request!(user, "new@box.test")

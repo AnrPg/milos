@@ -7,6 +7,7 @@ import {
   registerFailure,
   resetFailure,
   resetTokenFromHash,
+  resetTokenFromLocation,
   type Translate,
 } from "@/components/auth/auth-errors";
 
@@ -83,6 +84,7 @@ describe("registerFailure", () => {
 describe("resetFailure", () => {
   it("tells expired, invalid and weak-password answers apart", () => {
     expect(resetFailure(new ApiError(410, "", { code: "expired_reset_link" }))).toBe("expired");
+    expect(resetFailure(new ApiError(410, "", { code: "used_reset_link" }))).toBe("used");
     expect(resetFailure(new ApiError(422, "", { code: "invalid_reset_link" }))).toBe("invalid");
     expect(resetFailure(new ApiError(422, "", { code: "weak_password" }))).toBe("weak_password");
     expect(resetFailure(new ApiError(500, "", {}))).toBe("other");
@@ -117,5 +119,15 @@ describe("passwordLongEnough", () => {
     expect(passwordLongEnough("καλή")).toBe(true);
     expect(passwordLongEnough(" 1 2 3 ")).toBe(false);
     expect(passwordLongEnough("    ")).toBe(false);
+  });
+});
+
+describe("resetTokenFromLocation (ADR-206)", () => {
+  it("prefers the fragment and still reads the old ?token= links handlers sent", () => {
+    expect(resetTokenFromLocation("#token=fromHash", "?token=fromQuery")).toBe("fromHash");
+    expect(resetTokenFromLocation("", "?token=fromQuery")).toBe("fromQuery");
+    expect(resetTokenFromLocation("", "token=bare")).toBe("bare");
+    expect(resetTokenFromLocation("", "?other=1")).toBeNull();
+    expect(resetTokenFromLocation("", "")).toBeNull();
   });
 });

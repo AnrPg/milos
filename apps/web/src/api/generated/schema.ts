@@ -274,8 +274,28 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Ask for a password reset (always answered the same way) */
+        /**
+         * Ask for a password reset (always answered the same way)
+         * @description A verified email gets a one-hour reset link; otherwise, or with `cant_access_email`, the request goes to the people who can vouch for the person. The answer never says which happened, or whether the account exists.
+         */
         post: operations["PaleeWeb.PasswordRecoveryController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password-reset/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a reset link before the new password is typed (never spends it) */
+        post: operations["PaleeWeb.PasswordRecoveryController.inspect_link"];
         delete?: never;
         options?: never;
         head?: never;
@@ -414,6 +434,23 @@ export interface paths {
         put?: never;
         /** Invalidate every session for the authenticated user */
         post: operations["PaleeWeb.AuthController.sign_out_all"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/sign-out-everywhere": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign every device of the login out with a security notice's emailed link */
+        post: operations["PaleeWeb.SecurityLinkController.sign_out_everywhere"];
         delete?: never;
         options?: never;
         head?: never;
@@ -40276,7 +40313,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Expired link */
+            /** @description Expired or used link */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -40306,13 +40343,65 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    cant_access_email?: boolean;
                     identifier: string;
+                    locale?: string;
                 };
             };
         };
         responses: {
-            /** @description Request sent */
+            /** @description Request taken */
             202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "sent";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.inspect_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Usable link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                    };
+                };
+            };
+            /** @description Expired or used link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Unknown link */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -40840,6 +40929,56 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "PaleeWeb.SecurityLinkController.sign_out_everywhere": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Every session ended */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Expired or already used link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        code: "invalid_link" | "expired_link" | "used_link";
+                        error: string;
+                    };
+                };
+            };
+            /** @description Unknown link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        code: "invalid_link" | "expired_link" | "used_link";
+                        error: string;
+                    };
+                };
             };
         };
     };

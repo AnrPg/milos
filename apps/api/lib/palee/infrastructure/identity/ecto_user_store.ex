@@ -796,6 +796,20 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end
   end
 
+  @doc "ADR-208: one more on the login's version, which every profile's tokens carry."
+  @impl true
+  def bump_login_security_version(login_id) do
+    case Login
+         |> where([l], l.id == ^login_id)
+         |> update([l],
+           set: [security_version: fragment("COALESCE(?, 0) + 1", l.security_version)]
+         )
+         |> Repo.update_all([]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
   defp to_account(nil), do: nil
 
   defp to_account(%User{login: %Login{} = login} = user) do

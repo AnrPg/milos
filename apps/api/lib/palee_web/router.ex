@@ -348,12 +348,15 @@ defmodule PaleeWeb.Router do
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
-    # ADR-187: password recovery without a mail service.
+    # ADR-187, ADR-206: password recovery (emailed link, handlers, codes).
     post("/password-reset-requests", PasswordRecoveryController, :request)
+    post("/password-reset/inspect", PasswordRecoveryController, :inspect_link)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
     # ADR-213: the emailed link's page posts its token here.
     post("/verify-email", EmailVerificationController, :verify)
+    # ADR-208: a security notice's emailed "sign out everywhere" link.
+    post("/sign-out-everywhere", SecurityLinkController, :sign_out_everywhere)
     # ADR-207: the links of an email change (new address, then old address).
     post("/email-change/confirm", EmailChangeController, :confirm)
     post("/email-change/revert", EmailChangeController, :revert)

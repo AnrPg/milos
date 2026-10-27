@@ -65,6 +65,8 @@ type ApiRequestOptions = {
    * `/me/progress` with their older per-gym versions.
    */
   scope?: "tenant" | "account";
+  /** Extra request headers (ADR-208: the sign-in device id). */
+  headers?: Record<string, string>;
 };
 
 function organizationSlugFromPath() {
@@ -367,6 +369,7 @@ export async function apiRequest<T>(
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(organizationSlug ? { "X-Organization-Slug": organizationSlug } : {}),
+      ...options.headers,
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",

@@ -21,6 +21,10 @@ defmodule Palee.Application.UpdateProfile do
             |> Oban.insert()
           end
 
+          # ADR-208: a new password is told by email (never the password).
+          if new_password?(params),
+            do: Palee.Application.SecurityNotices.notify(:password_changed, updated_user)
+
           {:ok, updated_user}
 
         {:error, _} = error ->
@@ -53,6 +57,11 @@ defmodule Palee.Application.UpdateProfile do
     if is_binary(nickname) and is_nil(display),
       do: Map.put(params, :display_name, nickname),
       else: params
+  end
+
+  defp new_password?(params) do
+    password = Map.get(params, :password) || Map.get(params, "password")
+    is_binary(password) and password != ""
   end
 
   defp maybe_verify_current_password(user, params) do

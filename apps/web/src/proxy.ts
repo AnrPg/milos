@@ -59,11 +59,17 @@ export async function proxy(request: NextRequest) {
       })
     : NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
-  return applySecurityHeaders(response);
+  return applySecurityHeaders(response, destination ?? request.nextUrl.pathname);
 }
 
-function applySecurityHeaders(response: NextResponse) {
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+/** ADR-206: pages a reset link opens never leak their URL to another site. */
+const NO_REFERRER_PAGES = /^\/(?:reset-password|forgot-password)\/?$/;
+
+function applySecurityHeaders(response: NextResponse, pathname = "") {
+  response.headers.set(
+    "Referrer-Policy",
+    NO_REFERRER_PAGES.test(pathname) ? "no-referrer" : "strict-origin-when-cross-origin",
+  );
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)");
   return response;

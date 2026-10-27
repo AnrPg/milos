@@ -35,6 +35,7 @@ describe("hidden routes", () => {
       "/register",
       "/forgot-password",
       "/reset-password",
+      "/sign-out-everywhere",
       "/confirm-email-change",
       "/revert-email-change",
       "/join/kypseli",
