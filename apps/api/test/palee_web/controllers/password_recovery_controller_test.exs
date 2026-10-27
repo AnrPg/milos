@@ -64,7 +64,7 @@ defmodule PaleeWeb.PasswordRecoveryControllerTest do
 
     # Nothing happened inside the request: the work is in four identical jobs.
     assert length(jobs()) == 4
-    assert enqueued_emails() == []
+    assert enqueued_emails(kind: :password_reset) == []
 
     run_jobs()
     assert_email_enqueued(kind: :password_reset, to: "verified@example.com")

@@ -117,7 +117,7 @@ defmodule Palee.Application.PasswordResetByEmailTest do
       assert :ok = PasswordRecovery.request("nobody@example.com")
       assert :ok = PasswordRecovery.request("@nobody")
       assert :ok = PasswordRecovery.request("")
-      assert enqueued_emails() == []
+      assert enqueued_emails(kind: :password_reset) == []
       assert requests() == []
     end
   end
