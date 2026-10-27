@@ -1,5 +1,6 @@
 import type { paths } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
+import { deviceHeaders } from "@/lib/device-id";
 
 export type RegisterRequest =
   NonNullable<
@@ -27,15 +28,23 @@ export type CurrentUser =
   };
 
 export function registerUser(payload: RegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/register", { method: "POST", body: payload, headers: deviceHeaders() });
 }
 
 export function registerAdminUser(payload: AdminRegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register-admin", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/register-admin", {
+    method: "POST",
+    body: payload,
+    headers: deviceHeaders(),
+  });
 }
 
 export function registerInvitedUser(payload: InvitedRegisterRequest) {
-  return apiRequest<AuthTokens>("/auth/register-member", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/register-member", {
+    method: "POST",
+    body: payload,
+    headers: deviceHeaders(),
+  });
 }
 
 export function inspectInvitation(invitation_token: string) {
@@ -46,7 +55,7 @@ export function inspectInvitation(invitation_token: string) {
 }
 
 export function loginUser(payload: LoginRequest) {
-  return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload });
+  return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload, headers: deviceHeaders() });
 }
 
 export function refreshSession() {
@@ -95,6 +104,11 @@ export function requestPasswordReset(identifier: string) {
 /** Sets a new password with a reset link's token; signs every device out. */
 export function completePasswordReset(token: string, password: string) {
   return apiRequest<void>("/auth/password-reset", { method: "POST", body: { token, password } });
+}
+
+/** ADR-208: a security notice's "sign out everywhere" link; ends every session of the login. */
+export function signOutEverywhereWithLink(token: string) {
+  return apiRequest<void>("/auth/sign-out-everywhere", { method: "POST", body: { token } }, false);
 }
 
 /** Sets a new password with a one-time recovery code. */

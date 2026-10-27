@@ -11489,5 +11489,20 @@
     "placementSpace": "Spazio",
     "placementPickSpace": "Scegli uno spazio",
     "placementQuantity": "Quanti"
+  },
+  "securityNotices": {
+    "title": "Uscire da tutti i dispositivi?",
+    "body": "Verranno disconnessi tutti i dispositivi collegati al tuo account, compreso questo. Fallo se hai ricevuto un’email di sicurezza per qualcosa che non hai fatto tu.",
+    "confirm": "Esci da tutti i dispositivi",
+    "working": "Disconnessione…",
+    "doneTitle": "Tutti i dispositivi sono stati disconnessi",
+    "doneBody": "Tutti i dispositivi sono stati disconnessi dal tuo account. Ora scegli una nuova password, così nessun altro potrà rientrare.",
+    "chooseNewPassword": "Scegli una nuova password",
+    "signIn": "Accedi",
+    "linkProblemTitle": "Questo link non si può usare",
+    "linkExpired": "Questo link è scaduto (vale 7 giorni).",
+    "linkUsed": "Questo link è già stato usato, quindi quei dispositivi sono già disconnessi.",
+    "linkInvalid": "Questo link non è valido. Riaprilo dall’email, senza modificarlo.",
+    "linkProblemHelp": "Puoi anche accedere e disconnettere tutti i dispositivi dalle Impostazioni."
   }
 }

@@ -11489,5 +11489,20 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "securityNotices": {
+    "title": "Überall abmelden?",
+    "body": "Damit wird jedes Gerät abgemeldet, das in deinem Konto angemeldet ist, auch dieses. Tu das, wenn du eine Sicherheits-E-Mail zu etwas bekommen hast, das du nicht getan hast.",
+    "confirm": "Überall abmelden",
+    "working": "Wird abgemeldet…",
+    "doneTitle": "Überall abgemeldet",
+    "doneBody": "Alle Geräte wurden von deinem Konto abgemeldet. Wähle jetzt ein neues Passwort, damit sich niemand Fremdes wieder anmelden kann.",
+    "chooseNewPassword": "Neues Passwort wählen",
+    "signIn": "Anmelden",
+    "linkProblemTitle": "Dieser Link funktioniert nicht",
+    "linkExpired": "Dieser Link ist abgelaufen (Links gelten 7 Tage).",
+    "linkUsed": "Dieser Link wurde schon benutzt, die Geräte sind also bereits abgemeldet.",
+    "linkInvalid": "Dieser Link ist ungültig. Öffne ihn noch einmal unverändert aus der E-Mail.",
+    "linkProblemHelp": "Du kannst dich auch anmelden und in den Einstellungen alle Geräte abmelden."
   }
 }
