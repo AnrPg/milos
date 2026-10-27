@@ -104,6 +104,8 @@ config :palee, :readiness_checker, Palee.Infrastructure.Readiness.Live
 config :palee, :identity_user_store, Palee.Infrastructure.Identity.EctoUserStore
 config :palee, :password_reset_store, Palee.Infrastructure.Identity.EctoPasswordResetStore
 config :palee, :login_device_store, Palee.Infrastructure.Identity.EctoLoginDeviceStore
+# ADR-206: "forgot password" requests are worked out in a background job.
+config :palee, :password_reset_queue, Palee.Infrastructure.Identity.ObanPasswordResetQueue
 
 config :palee,
        :organization_store,

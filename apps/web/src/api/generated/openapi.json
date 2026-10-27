@@ -86144,7 +86144,7 @@
                 }
               }
             },
-            "description": "Expired link"
+            "description": "Expired or used link"
           },
           "422": {
             "content": {
@@ -86166,6 +86166,7 @@
     "/api/auth/password-reset-requests": {
       "post": {
         "callbacks": {},
+        "description": "A verified email gets a one-hour reset link; otherwise, or with `cant_access_email`, the request goes to the people who can vouch for the person. The answer never says which happened, or whether the account exists.",
         "operationId": "PaleeWeb.PasswordRecoveryController.request",
         "parameters": [],
         "requestBody": {
@@ -86173,7 +86174,13 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "cant_access_email": {
+                    "type": "boolean"
+                  },
                   "identifier": {
+                    "type": "string"
+                  },
+                  "locale": {
                     "type": "string"
                   }
                 },
@@ -86191,14 +86198,95 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "sent"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
                   "type": "object"
                 }
               }
             },
-            "description": "Request sent"
+            "description": "Request taken"
           }
         },
         "summary": "Ask for a password reset (always answered the same way)",
+        "tags": [
+          "Password recovery"
+        ]
+      }
+    },
+    "/api/auth/password-reset/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PasswordRecoveryController.inspect_link",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Usable link"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired or used link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          }
+        },
+        "summary": "Check a reset link before the new password is typed (never spends it)",
         "tags": [
           "Password recovery"
         ]

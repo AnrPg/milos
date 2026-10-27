@@ -11547,5 +11547,28 @@
     "linkUsed": "Dieser Link wurde schon benutzt, die Geräte sind also bereits abgemeldet.",
     "linkInvalid": "Dieser Link ist ungültig. Öffne ihn noch einmal unverändert aus der E-Mail.",
     "linkProblemHelp": "Du kannst dich auch anmelden und in den Einstellungen alle Geräte abmelden."
+  },
+  "passwordReset": {
+    "forgotIntro": "Gib deine E-Mail-Adresse oder deinen @Benutzernamen ein. Ist deine E-Mail-Adresse bestätigt, schicken wir dir einen Link, mit dem du ein neues Passwort festlegst.",
+    "sendLink": "Link senden",
+    "cantAccessEmail": "Ich habe keinen Zugriff auf meine E-Mails",
+    "sentTitle": "Sieh in deinen E-Mails nach",
+    "sentBody": "Wenn es zu deiner Eingabe ein Konto gibt, haben wir Anweisungen an seine E-Mail-Adresse geschickt. Der Link ist 1 Stunde gültig und funktioniert nur einmal. Sieh auch im Spam-Ordner nach.",
+    "sentNoEmail": "Nichts angekommen oder deine E-Mail-Adresse ist noch nicht bestätigt? Dann bitte um Hilfe.",
+    "noEmailTitle": "Kein Zugriff auf deine E-Mails?",
+    "noEmailIntro": "Gib deine E-Mail-Adresse oder deinen @Benutzernamen ein. Jemand aus deinem Gym, dein Coach oder das Palee-Team prüft, ob du es wirklich bist, und lässt dir einen Link zum Zurücksetzen zukommen.",
+    "askForHelp": "Um Hilfe bitten",
+    "backToEmail": "Link lieber per E-Mail schicken",
+    "noCodeInstead": "Kein Code? Hol dir stattdessen einen Link",
+    "helpSentTitle": "Anfrage gesendet",
+    "helpSentBody": "Wenn es zu deiner Eingabe ein Konto gibt, prüft jemand aus deinem Gym, dein Coach oder das Palee-Team, ob du es wirklich bist, und lässt dir einen Link zum Zurücksetzen zukommen. Dieser Link ist 24 Stunden gültig.",
+    "checkingLink": "Link wird geprüft…",
+    "linkInvalid": "Dieser Link zum Zurücksetzen ist ungültig. Fordere einen neuen an.",
+    "linkExpired": "Dieser Link zum Zurücksetzen ist abgelaufen. Fordere einen neuen an.",
+    "linkUsedTitle": "Dieser Link wurde schon benutzt",
+    "linkUsed": "Mit diesem Link wurde bereits ein Passwort festgelegt. Warst du das nicht, fordere sofort einen neuen Link an.",
+    "handlerNote": "Wer eine bestätigte E-Mail-Adresse hat, bekommt den Link zum Zurücksetzen automatisch per E-Mail. Hier landen Anfragen von Menschen, deren E-Mail-Adresse nicht bestätigt ist oder die sie nicht öffnen können.",
+    "event_link_emailed": "Link per E-Mail gesendet",
+    "event_throttled": "Zu viele Anfragen (nichts gesendet)"
   }
 }

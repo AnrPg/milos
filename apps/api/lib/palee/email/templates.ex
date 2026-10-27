@@ -24,7 +24,8 @@ defmodule Palee.Email.Templates do
     security_recovery_code_used: Palee.Email.Templates.SecurityRecoveryCodeUsed,
     security_recovery_codes_regenerated: Palee.Email.Templates.SecurityRecoveryCodesRegenerated,
     security_recovery_codes_running_low: Palee.Email.Templates.SecurityRecoveryCodesRunningLow,
-    security_signed_out_everywhere: Palee.Email.Templates.SecuritySignedOutEverywhere
+    security_signed_out_everywhere: Palee.Email.Templates.SecuritySignedOutEverywhere,
+    password_reset: Palee.Email.Templates.PasswordReset
   }
 
   @doc "Every kind and its template."

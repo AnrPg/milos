@@ -11547,5 +11547,28 @@
     "linkUsed": "Este enlace ya se usó, así que esos dispositivos ya tienen la sesión cerrada.",
     "linkInvalid": "Este enlace no es válido. Vuelve a abrirlo desde el correo, sin cambiarlo.",
     "linkProblemHelp": "También puedes iniciar sesión y cerrar la sesión en todos los dispositivos desde Ajustes."
+  },
+  "passwordReset": {
+    "forgotIntro": "Escribe tu correo o tu @usuario. Si tu correo está confirmado, te enviaremos un enlace para elegir una contraseña nueva.",
+    "sendLink": "Enviar enlace",
+    "cantAccessEmail": "No puedo acceder a mi correo",
+    "sentTitle": "Revisa tu correo",
+    "sentBody": "Si hay una cuenta que coincide con lo que escribiste, hemos enviado instrucciones a su correo. El enlace es válido 1 hora y solo una vez. Revisa también la carpeta de spam.",
+    "sentNoEmail": "¿No te ha llegado nada o tu correo aún no está confirmado? Pide ayuda.",
+    "noEmailTitle": "¿No puedes abrir tu correo?",
+    "noEmailIntro": "Escribe tu correo o tu @usuario. Alguien de tu gimnasio, tu entrenador o el equipo de Palee comprobará que eres tú de verdad y te hará llegar un enlace para restablecer la contraseña.",
+    "askForHelp": "Pedir ayuda",
+    "backToEmail": "Mejor envíame el enlace por correo",
+    "noCodeInstead": "¿No tienes código? Pide un enlace",
+    "helpSentTitle": "Solicitud enviada",
+    "helpSentBody": "Si hay una cuenta que coincide con lo que escribiste, alguien de tu gimnasio, tu entrenador o el equipo de Palee comprobará que eres tú de verdad y te hará llegar un enlace para restablecer la contraseña. Ese enlace es válido 24 horas.",
+    "checkingLink": "Comprobando el enlace…",
+    "linkInvalid": "Este enlace para restablecer la contraseña no es válido. Pide uno nuevo.",
+    "linkExpired": "Este enlace para restablecer la contraseña ha caducado. Pide uno nuevo.",
+    "linkUsedTitle": "Este enlace ya se ha usado",
+    "linkUsed": "Con este enlace ya se ha establecido una contraseña. Si no fuiste tú, pide un enlace nuevo enseguida.",
+    "handlerNote": "Quien tiene el correo confirmado recibe automáticamente el enlace por correo. Aquí llegan las solicitudes de personas cuyo correo no está confirmado o que no pueden abrirlo.",
+    "event_link_emailed": "Enlace enviado por correo",
+    "event_throttled": "Demasiadas solicitudes (no se envió nada)"
   }
 }

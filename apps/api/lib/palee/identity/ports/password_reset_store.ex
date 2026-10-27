@@ -22,6 +22,16 @@ defmodule Palee.Identity.Ports.PasswordResetStore do
   @callback get_request(Ecto.UUID.t()) :: PasswordResetRequest.t() | nil
   @callback get_request_for_login(Ecto.UUID.t()) :: PasswordResetRequest.t() | nil
   @callback get_request_by_token_hash(binary()) :: PasswordResetRequest.t() | nil
+  @doc "ADR-206: the request holding the link, locked for the rest of the transaction."
+  @callback lock_request_by_token_hash(binary()) :: PasswordResetRequest.t() | nil
+  @doc "ADR-206: how many requests the client filed since `since` (still open)."
+  @callback count_requests_from(binary(), DateTime.t()) :: non_neg_integer()
+  @doc """
+  ADR-206: runs `fun` in one database transaction; `{:error, reason}` from
+  `fun` rolls everything back (link tokens and outbox rows included).
+  """
+  @callback transaction((-> {:ok, term()} | {:error, term()})) ::
+              {:ok, term()} | {:error, term()}
   @callback create_request(map()) :: {:ok, PasswordResetRequest.t()} | {:error, term()}
   @callback update_request_locked(
               Ecto.UUID.t(),
