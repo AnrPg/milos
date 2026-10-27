@@ -21,7 +21,7 @@ defmodule Palee.Application.ScheduleRealtimeTest do
       })
 
     legacy_organization =
-      Organizations.get_by_slug(Organizations.legacy_organization_slug())
+      elem(Organizations.ensure_legacy_organization_for_migration(), 1)
 
     Phoenix.PubSub.subscribe(Palee.PubSub, "schedule:#{organization.id}")
     Phoenix.PubSub.subscribe(Palee.PubSub, "schedule:#{legacy_organization.id}")

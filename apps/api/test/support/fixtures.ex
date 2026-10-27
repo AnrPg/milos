@@ -104,9 +104,11 @@ defmodule Palee.TestFixtures do
   def slot_fixture(workout, attrs \\ %{}) do
     context = Map.get(attrs, :tenant_context) || workout_tenant_context(workout)
 
+    # A new database seeds no class types (the pre-tenancy defaults left with
+    # the retired legacy organization), so the first slot brings its own.
     default_class_type =
       List.first(Scheduling.list_class_types(context)) ||
-        class_type_fixture(%{tenant_context: context})
+        class_type_fixture(%{tenant_context: context, name: "CrossFit"})
 
     params =
       %{

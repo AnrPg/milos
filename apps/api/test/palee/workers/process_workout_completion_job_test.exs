@@ -32,7 +32,7 @@ defmodule Palee.Workers.ProcessWorkoutCompletionJobTest do
   # `Execution.get_execution/1`, which is scoped by `app.user_id` — must set
   # that same organization/user context in the session first.
   defp set_legacy_tenant_context!(user) do
-    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+    legacy_organization = elem(Organizations.ensure_legacy_organization_for_migration(), 1)
 
     Repo.query!("SELECT set_config($1, $2, false)", [
       "app.organization_id",

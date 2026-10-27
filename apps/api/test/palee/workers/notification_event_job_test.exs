@@ -71,11 +71,13 @@ defmodule Palee.Workers.NotificationEventJobTest do
   defmodule FailingNotificationStore do
     @behaviour Palee.Notifications.Ports.NotificationStore
 
-    def create_notification(%{user_id: user_id}) do
+    # The healthy recipient may be served first (membership order is not
+    # fixed), and dispatch then reads the stored notification's type.
+    def create_notification(%{user_id: user_id} = attrs) do
       if user_id == Process.get(:fail_user_id) do
         {:error, :store_down}
       else
-        {:ok, %{id: Ecto.UUID.generate(), user_id: user_id, payload: %{}}}
+        {:ok, %{id: Ecto.UUID.generate(), user_id: user_id, type: attrs[:type], payload: %{}}}
       end
     end
 

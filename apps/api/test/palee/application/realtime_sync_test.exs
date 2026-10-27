@@ -175,7 +175,7 @@ defmodule Palee.Application.RealtimeSyncTest do
   # Reading/mutating them back through tenant-scoped queries therefore
   # requires operating within that same legacy organization's context.
   defp legacy_organization,
-    do: Organizations.get_by_slug(Organizations.legacy_organization_slug())
+    do: elem(Organizations.ensure_legacy_organization_for_migration(), 1)
 
   defp add_legacy_membership!(user, role) do
     organization = legacy_organization()
