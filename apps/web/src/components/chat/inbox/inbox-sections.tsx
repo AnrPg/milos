@@ -2,9 +2,7 @@
 
 import type { ComponentType } from "react";
 
-import { overviewLists } from "@/components/buddy/buddy-model";
 import { BuddyThreads } from "@/components/buddy/BuddyThreads";
-import { useBuddies } from "@/components/buddy/use-buddies";
 import { ConversationList, MessageRequestsEntry } from "@/components/conversations/ConversationList";
 import { PartnerThreads } from "@/components/partners/PartnerThreads";
 import { usePartnerMatches } from "@/components/partners/use-partners";
@@ -50,14 +48,12 @@ function PersonConversations({ onNavigate }: InboxSectionProps) {
 }
 
 /**
- * Whether «Partners» has anything: a training-partner match (ADR-169) or a
- * started check-in buddy link (ADR-160), the rows its two sources render.
+ * Whether «Συναθλητές» has anything: a training-partner match (ADR-169). Check-in
+ * buddy chats are with one person, so they file under «Άτομα» (ontology §5.1).
  */
 export function useHasPartners() {
   const matches = usePartnerMatches();
-  const buddies = useBuddies();
-  const { buddies: links, supporting } = overviewLists(buddies.data);
-  return (matches.data?.length ?? 0) > 0 || [...links, ...supporting].some((link) => link.started_at && link.person);
+  return (matches.data?.length ?? 0) > 0;
 }
 
 export const INBOX_SOURCES: readonly InboxSource[] = [
@@ -65,5 +61,5 @@ export const INBOX_SOURCES: readonly InboxSource[] = [
   { id: "person-conversations", segments: ["people"], placement: "top", Section: PersonConversations },
   { id: "box-conversations", segments: ["clubs"], placement: "bottom", Section: BoxConversations },
   { id: "partners", segments: ["partners"], placement: "bottom", Section: PartnerThreads },
-  { id: "buddies", segments: ["partners"], placement: "bottom", Section: BuddyThreads },
+  { id: "buddies", segments: ["people"], placement: "bottom", Section: BuddyThreads },
 ];
