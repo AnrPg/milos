@@ -34,6 +34,15 @@ defmodule PaleeWeb.FallbackController do
     invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
   }
 
+  # ADR-203: what `Palee.Email.enqueue/4` refuses. `:not_live` answers as
+  # ADR-184's `business_not_activated`.
+  @email_errors %{
+    invalid_address: {:unprocessable_entity, "Enter a valid email address"},
+    suppressed: {:unprocessable_entity, "Emails to this address bounce. Check it or use another"},
+    throttled: {:too_many_requests, "An email like this was sent just now. Try again later"},
+    over_budget: {:service_unavailable, "Email is busy today. Try again later"}
+  }
+
   # ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
   @space_errors %{
     space_not_found: {:not_found, "Space not found"},
@@ -71,6 +80,16 @@ defmodule PaleeWeb.FallbackController do
       class_starts_at: Map.get(window, :class_starts_at)
     })
   end
+
+  def call(conn, {:error, reason}) when is_map_key(@email_errors, reason) do
+    {status, message} = Map.fetch!(@email_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, :not_live}), do: call(conn, {:error, :business_not_activated})
 
   def call(conn, {:error, reason}) when is_map_key(@notification_preference_errors, reason) do
     {status, message} = Map.fetch!(@notification_preference_errors, reason)

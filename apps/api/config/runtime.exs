@@ -334,6 +334,13 @@ if config_env() == :prod do
     address: mail_from_address,
     reply_to: System.get_env("MAIL_REPLY_TO")
 
+  # ADR-203: the outbox's daily budget. The provider's free plan sends 300 a
+  # day; non-security mail stops at the budget (deferred to the next UTC
+  # day), security mail at the hard cap.
+  config :palee, :email_budget,
+    daily_budget: String.to_integer(System.get_env("EMAIL_DAILY_BUDGET") || "280"),
+    hard_cap: String.to_integer(System.get_env("EMAIL_DAILY_HARD_CAP") || "295")
+
   # Optional on purpose: absent SMTP_RELAY must not crash boot over a
   # feature (owner-invitation email) the app worked without until now.
   # Falls back to config.exs's Local adapter - dev-mailbox-only, and every

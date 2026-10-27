@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "You're receiving this email because you have a %{product} account."
+msgstr "קיבלתם את המייל הזה כי יש לכם חשבון ב-%{product}."
+
+msgid "You're receiving this email because %{business} sent it to you through %{product}."
+msgstr "קיבלתם את המייל הזה מ-%{business} דרך %{product}."
+
+msgid "This email was sent automatically by %{product}."
+msgstr "המייל הזה נשלח אוטומטית על ידי %{product}."
+
+msgid "If the button doesn't work, copy this link into your browser:"
+msgstr "אם הכפתור לא עובד, העתיקו את הקישור הזה לדפדפן:"
+
+msgid "If you didn't ask for this, you can safely ignore this email."
+msgstr "אם לא ביקשתם זאת, אפשר פשוט להתעלם מהמייל הזה."
+
+msgid "You're receiving this email because you are the billing contact of %{company} at %{business}."
+msgstr "קיבלתם את המייל הזה כי %{business} רשם אתכם כאנשי הקשר לחשבוניות של %{company}."
+
+msgid "This link works only once."
+msgstr "הקישור הזה עובד פעם אחת בלבד."
+
+msgid "Hello %{name},"
+msgstr "שלום %{name},"
+
+msgid "Hello,"
+msgstr "שלום,"

@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "You're receiving this email because you have a %{product} account."
+msgstr "Получавате този имейл, защото имате профил в %{product}."
+
+msgid "You're receiving this email because %{business} sent it to you through %{product}."
+msgstr "Получавате този имейл, защото „%{business}“ ви го изпрати чрез %{product}."
+
+msgid "This email was sent automatically by %{product}."
+msgstr "Този имейл е изпратен автоматично от %{product}."
+
+msgid "If the button doesn't work, copy this link into your browser:"
+msgstr "Ако бутонът не работи, копирайте тази връзка в браузъра си:"
+
+msgid "If you didn't ask for this, you can safely ignore this email."
+msgstr "Ако не сте поискали това, можете спокойно да пренебрегнете този имейл."
+
+msgid "You're receiving this email because you are the billing contact of %{company} at %{business}."
+msgstr "Получавате този имейл, защото „%{business}“ ви е посочил(а) като лице за контакт по фактурите на „%{company}“."
+
+msgid "This link works only once."
+msgstr "Тази връзка работи само веднъж."
+
+msgid "Hello %{name},"
+msgstr "Здравейте, %{name},"
+
+msgid "Hello,"
+msgstr "Здравейте,"

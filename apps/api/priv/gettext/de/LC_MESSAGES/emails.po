@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "You're receiving this email because you have a %{product} account."
+msgstr "Sie erhalten diese E-Mail, weil Sie ein %{product}-Konto haben."
+
+msgid "You're receiving this email because %{business} sent it to you through %{product}."
+msgstr "Sie erhalten diese E-Mail, weil %{business} sie Ihnen über %{product} gesendet hat."
+
+msgid "This email was sent automatically by %{product}."
+msgstr "Diese E-Mail wurde automatisch von %{product} versendet."
+
+msgid "If the button doesn't work, copy this link into your browser:"
+msgstr "Falls die Schaltfläche nicht funktioniert, kopieren Sie diesen Link in Ihren Browser:"
+
+msgid "If you didn't ask for this, you can safely ignore this email."
+msgstr "Falls Sie das nicht angefordert haben, können Sie diese E-Mail einfach ignorieren."
+
+msgid "You're receiving this email because you are the billing contact of %{company} at %{business}."
+msgstr "Sie erhalten diese E-Mail, weil %{business} Sie als Ansprechperson für die Rechnungen von %{company} angegeben hat."
+
+msgid "This link works only once."
+msgstr "Dieser Link funktioniert nur einmal."
+
+msgid "Hello %{name},"
+msgstr "Hallo %{name},"
+
+msgid "Hello,"
+msgstr "Hallo,"

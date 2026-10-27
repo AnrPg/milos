@@ -68,7 +68,10 @@ config :palee, Oban,
     gamification: 5,
     analytics: 3,
     # ADR-157: photo and video processing is CPU-bound.
-    media: 2
+    media: 2,
+    # ADR-203: outbox delivery. Two at a time keeps the daily budget close
+    # to exact (each job counts today's sent mail before it sends).
+    email: 2
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -457,6 +460,12 @@ config :palee, Palee.Mailer, adapter: Swoosh.Adapters.Local
 # Overridden for prod in runtime.exs (MAIL_FROM_NAME/MAIL_FROM_ADDRESS); this
 # default is fine for dev/test, where mail never actually leaves the box.
 config :palee, :mail_from, name: "Palee", address: "no-reply@example.com"
+
+# ADR-203: the transactional email outbox, its links and the sender.
+config :palee, :email_message_store, Palee.Infrastructure.Email.EctoMessageStore
+config :palee, :email_link_token_store, Palee.Infrastructure.Email.EctoLinkTokenStore
+config :palee, :email_sender, Palee.Infrastructure.Email.SwooshSender
+config :palee, :email_budget, daily_budget: 280, hard_cap: 295
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,
