@@ -539,6 +539,11 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         joined_at: DateTime.utc_now()
       })
 
+    {:ok, tenant} = Organizations.resolve_tenant_context(stale_client, organization.slug)
+
+    {:ok, %{token: open_invitation}} =
+      Organizations.issue_invitation(tenant, %{role: :coach, intended_email: "next@example.test"})
+
     exported!(context, organization)
 
     conn =
@@ -549,6 +554,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
     assert response(conn, 204) == ""
     refute Repo.get(Organization, organization.id)
     refute Identity.find_by_id(stale_client.id)
+    # The gym's open invitations go with it: its link no longer works.
+    assert {:error, _gone} = Organizations.inspect_invitation(open_invitation)
 
     assert {:ok, fresh_client} =
              Identity.register(%{

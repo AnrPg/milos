@@ -668,6 +668,8 @@ export function DateTimeInput({
       />
       <TimeInput
         aria-label={rest["aria-label"]}
+        aria-invalid={rest["aria-invalid"]}
+        aria-describedby={rest["aria-describedby"]}
         value={shownTime}
         onValueChange={(next) => commit(shownDay, next)}
         onBlur={onBlur}
