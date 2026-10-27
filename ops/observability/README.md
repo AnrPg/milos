@@ -138,6 +138,10 @@ boundaries are in `prometheus/tests/palee-alerts.test.yml`.
 | `PaleeUploadVerificationFailing` | > 3 missing/unverified / 15m | Usually MinIO, bucket policy or CORS/public-endpoint misconfiguration |
 | `PaleeOtelCollectorDown` / `PaleeTracesNotArriving` | collector down 5m / no traces for 12h | Trace-derived alerts are blind (`OTEL_EXPORTER_OTLP_ENDPOINT` unset?) |
 | `PaleeShopRevenueDrift` (warning) | any drifted day reported by the nightly reconciliation in 26h | Shop orders, shop invoice lines and shop payments minus refunds must agree to the cent (ADR-192); any drift is a bookkeeping bug. 26h covers one nightly run. See `docs/operations/shop-revenue-reconciliation.md` |
+| `PaleeEmailBudgetHigh` (warning) | sent today >= 80% of `EMAIL_DAILY_BUDGET` for 5m | Past the budget, non-security mail waits a day and security mail stops at the hard cap (ADR-203/212). Integer-exact (`sent * 5 >= budget * 4`) |
+| `PaleeEmailDeferred` (warning) | any deferred email for 10m | People are waiting until 00:01 UTC for their email |
+| `PaleeEmailSmtpKeyExpiring` / `Expired` | `SMTP_KEY_EXPIRES_ON` within 30 days / past | Brevo keys last a year; an expired key stops all email. See `docs/operations/email-deliverability.md` |
+| `PaleeEmailComplaints` (warning) | any spam complaint in 1d | Complaints hurt the sending domain's reputation; the address is already suppressed |
 | `AlertmanagerNotificationsFailing`, `PrometheusRuleEvaluationFailing` | sustained failures | The alerting pipeline itself is broken |
 
 `invalid_token` and `unauthenticated` auth anomalies are mostly expired
