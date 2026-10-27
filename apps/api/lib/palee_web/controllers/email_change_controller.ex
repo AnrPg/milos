@@ -80,8 +80,9 @@ defmodule PaleeWeb.EmailChangeController do
       ]),
     responses: [
       accepted: {"Pending", "application/json", @status_schema},
-      unauthorized: {"Wrong current password", "application/json", @error_schema},
-      unprocessable_entity: {"Invalid or unchanged address", "application/json", @error_schema},
+      unprocessable_entity:
+        {"Wrong current password, or an invalid or unchanged address", "application/json",
+         @error_schema},
       conflict: {"Changes are locked for now", "application/json", @error_schema},
       too_many_requests: {"Sent just now", "application/json", @error_schema}
     ]

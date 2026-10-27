@@ -85173,6 +85173,246 @@
         ]
       }
     },
+    "/api/auth/email-change/confirm": {
+      "post": {
+        "callbacks": {},
+        "description": "Every session of every profile ends. A browser holding a session of the same login gets a fresh one (access_token in the answer, refresh cookie).",
+        "operationId": "PaleeWeb.EmailChangeController.confirm",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "access_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Changed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Address no longer available"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown or used link"
+          }
+        },
+        "summary": "Open the link mailed to the new address",
+        "tags": [
+          "Email change"
+        ]
+      }
+    },
+    "/api/auth/email-change/revert": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailChangeController.revert",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "email"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reverted"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Address no longer available"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown or used link"
+          }
+        },
+        "summary": "\"This wasn't me\": put the old address back and lock email changes",
+        "tags": [
+          "Email change"
+        ]
+      }
+    },
     "/api/auth/handle-available": {
       "get": {
         "callbacks": {},
@@ -113751,6 +113991,379 @@
         ]
       }
     },
+    "/api/me/email-change": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailChangeController.delete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locked_until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pending": {
+                      "nullable": true,
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "email",
+                        "requested_at",
+                        "expires_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pending",
+                    "locked_until"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel the pending email change",
+        "tags": [
+          "Email change"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailChangeController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locked_until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pending": {
+                      "nullable": true,
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "email",
+                        "requested_at",
+                        "expires_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pending",
+                    "locked_until"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The login's pending email change, if any",
+        "tags": [
+          "Email change"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Mails a 24 h link to the new address; the login keeps its email until it is opened. The answer is the same whether or not the address already has an account.",
+        "operationId": "PaleeWeb.EmailChangeController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "current_password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "current_password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locked_until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pending": {
+                      "nullable": true,
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "email",
+                        "requested_at",
+                        "expires_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pending",
+                    "locked_until"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Pending"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Changes are locked for now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong current password, or an invalid or unchanged address"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sent just now"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask to change the login's email (needs the current password)",
+        "tags": [
+          "Email change"
+        ]
+      }
+    },
+    "/api/me/email-change/resend": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.EmailChangeController.resend",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locked_until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pending": {
+                      "nullable": true,
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "email",
+                        "requested_at",
+                        "expires_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pending",
+                    "locked_until"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Pending"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Nothing pending"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "locked_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sent just now"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mail the pending change's link again",
+        "tags": [
+          "Email change"
+        ]
+      }
+    },
     "/api/me/event-hosts": {
       "get": {
         "callbacks": {},
@@ -126587,6 +127200,7 @@
                     "type": "string"
                   },
                   "email": {
+                    "description": "ADR-207: only the current address; a new one goes through /api/me/email-change",
                     "format": "email",
                     "nullable": true,
                     "type": "string"
