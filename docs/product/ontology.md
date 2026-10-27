@@ -8,7 +8,10 @@ How to use it:
 - One thing, one name, in each language. If a screen needs a name that is not here, add it
   here first.
 - «Not to be confused with» lists the near names that caused confusion so far.
-- Greek uses the English loanword where the app already does (Box, club, coach, squad, PR).
+- Greek uses the English loanword only where Greek users already say it (Box, club, coach, PR, WOD).
+  Abbreviations that Greeks don't use (PT) and words they don't know (squad) are written in Greek.
+- A person's role is always a word for the person, never the department (λογιστής, not «Λογιστήριο»).
+- Never write a bare "member" / «μέλος»: always say what of (box member, club member).
 
 ## 1. The layers at a glance
 
@@ -45,13 +48,13 @@ flowchart TB
 
   subgraph ROLES["Roles in a business"]
     STAFF["Staff: owner · admin · coach (head coach) · front desk · accountant · cleaning"]
-    CLIENT["Client: member · athlete"]
+    CLIENT["Client: box member · athlete"]
   end
 
   subgraph SPACES["Community spaces"]
     CLUB["Club: box club · open club"]
     CHANNEL["Channel"]
-    GROUP["Group (member-made)"]
+    GROUP["Member group (member-made)"]
     SQUAD["PT squad (coach + own clients)"]
     EVENT["Event"]
   end
@@ -121,15 +124,15 @@ flowchart TB
   end
 
   subgraph ROLES["Ρόλοι σε επιχείρηση"]
-    STAFF["Προσωπικό: ιδιοκτήτης · διαχειριστής · coach (head coach) · υποδοχή · λογιστήριο · καθαριότητα"]
-    CLIENT["Πελάτης: μέλος · αθλητής"]
+    STAFF["Προσωπικό: ιδιοκτήτης · διαχειριστής · coach (head coach) · υπάλληλος υποδοχής · λογιστής · προσωπικό καθαριότητας"]
+    CLIENT["Πελάτης: μέλος box · αθλητής"]
   end
 
   subgraph SPACES["Χώροι κοινότητας"]
     CLUB["Club: club του box · ανοιχτό club"]
     CHANNEL["Κανάλι"]
-    GROUP["Ομάδα (από μέλη)"]
-    SQUAD["PT squad (coach + δικοί του πελάτες)"]
+    GROUP["Ομάδα μελών (από μέλη)"]
+    SQUAD["Ομάδα του coach (coach + δικοί του πελάτες)"]
     EVENT["Εκδήλωση"]
   end
 
@@ -213,23 +216,25 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Admin | Διαχειριστής | `admin` | Runs the business; can be branch-scoped. |
 | Coach | Coach | `coach` | Leads classes, coaches own clients. |
 | Head coach | Head coach | `coach_scope: all` | A coach who sees and coaches every client, not only their own. |
-| Front desk | Υποδοχή | `front_desk` | Check-in, bookings, selling packages at the desk. (ADR-102) |
-| Accountant | Λογιστήριο | `accountant` | Money only. |
-| Cleaning staff | Καθαριότητα | `janitor` | The cleaning log only. |
+| Front desk | Υπάλληλος υποδοχής | `front_desk` | Check-in, bookings, selling packages at the desk. (ADR-102) |
+| Accountant | Λογιστής | `accountant` | Money only. |
+| Cleaning staff | Προσωπικό καθαριότητας | `janitor` | The cleaning log only. |
 | Client | Πελάτης | member or athlete role | Someone who trains with the business. Umbrella word for the two below. |
-| Member | Μέλος | `member` | Client of a box with a membership or package. |
+| Box member | Μέλος box | `member` | Client of a box with a membership or package. Where the box is known, name it: "Member of Box Kypseli" / «Μέλος στο Box Kypseli». Never a bare "Member" / «Μέλος». |
 | Athlete | Αθλητής | `athlete` | Client who gets **personal programming** from a coach. |
 
 ### 4.4 Community spaces
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
 |---|---|---|---|---|
-| Club | Club | `community_clubs` | A space with members, a feed, channels and events. Shown as a bubble in the club bar. | Box (the business). |
+| Club | Club | `community_clubs` | A space with club members («μέλη club»), a feed, channels and events. Shown as a bubble in the club bar. | Box (the business). |
 | Box club | Club του box | `kind: gym` | Every business has exactly one. Its members are the box's active clients; its staff are the box's staff. Named after the box. | |
 | Open club | Ανοιχτό club | `kind: open` | A club staff create for a theme (e.g. Saturday trail runs). Anyone who belongs to or follows the box can join or ask to join. | Group. |
 | Channel | Κανάλι | `community_channels` | A stream of posts inside a club: #ανακοινώσεις, #wod-σήμερα, #challenges, a class's channel, a season's channel. | Conversation (Μηνύματα). |
-| Group | Ομάδα | `channel kind: member_group` | A channel members propose inside their box's club; has its own admins. | Open club (staff-made, its own bubble). |
-| PT squad | PT squad | `channel kind: pt_squad` | A coach's private channel with up to 30 of their own clients. (ADR-168) | Group, class. |
+| Member group | Ομάδα μελών | `channel kind: member_group` | A channel members propose inside their box's club; has its own admins. | Open club (staff-made, its own bubble). |
+| PT squad | Ομάδα του coach | `channel kind: pt_squad` | A coach's private channel with up to 30 of their own clients. Greek formerly «PT squad». (ADR-168) | Member group, class. |
+| Class channel | Κανάλι μαθήματος | `channel kind: class_slot` | The channel of one class on the schedule. Formerly «ομάδα τάξης». | Member group. |
+| Personal training | Προσωπική προπόνηση | `pt_pack`, appointments | One-to-one sessions with a coach, sold as personal training packages («Πακέτο προσωπικών προπονήσεων»). "PT" is never written in Greek. | Class. |
 | Event | Εκδήλωση | `community_events` | A one-off or weekly happening with places, price and attendees. Run by a club or an organiser. | Class (on the schedule). |
 | Class | Μάθημα | `class_slots` | A scheduled session on the box's timetable, booked with a package. | Event. |
 
@@ -241,7 +246,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Buddies | Φιλαράκια | derived: mutual follows | Two people who follow each other. Can message each other anywhere. (ADR-193) | Check-in buddy. |
 | Training partner | Συναθλητής **(proposed)** | `partners` context | A match between two members of the same club who both said yes, to train together («Κλείστε μαζί»). Opt-in per club. (ADR-169) | Partner business. Today the Greek UI says "Partners". |
 | Check-in buddy | Φιλαράκι στήριξης | `buddy_links` | One or two people you pick to hear from you when you ask for support (cravings, motivation); can get your weekly summary. (ADR-160) | Buddies (mutual follow). |
-| Coaching | Coaching | `coaching_relationships` | A coach and a client at one business. Decides what the coach sees and who can join their squad. | Follow. |
+| Coaching | Coaching | `coaching_relationships` | A coach and a client at one business. Decides what the coach sees and who can join their PT squad. | Follow. |
 | My clients | Οι πελάτες μου | coach view | The coach's list of active coaching clients (Box › Πελάτες μου). | Members of the box. |
 | PR sharing | Κοινοποίηση PR | `pr_sharing_grants` | A person lets a specific person see all their PRs. | Follow. |
 
@@ -291,7 +296,7 @@ Each needs ANR's choice before the UI changes. The recommended option is first.
    the e-shop.
    - **Proposal:** Branch = «Παράρτημα»; Shop = «Κατάστημα».
 6. **Coach vs «προπονητής» in Greek.**
-   - **Proposal:** «coach» everywhere (the app already says Box › Coach, PT squad, head coach).
+   - **Proposal:** «coach» everywhere (the app already says Box › Coach, head coach).
 7. **Followers in Greek** appear as «followers», «Όσοι με ακολουθούν» and «Ακολουθείς».
    - **Proposal:** noun «ακόλουθοι», verb «ακολουθώ».
 8. **«Clubs» tab in Μηνύματα** lists the box's and classes' group chats, not clubs.

@@ -193,6 +193,17 @@ test.describe("PT squads", () => {
     await expect(page).toHaveURL(/\/clubs\/club-1$/);
   });
 
+  test("in Greek it is «Ομάδα του coach», never «squad» or «PT» (ontology)", async ({ page }) => {
+    await client(page);
+    await page.context().addCookies([{ name: "palee_locale", value: "el", url: "http://127.0.0.1" }]);
+    const { user } = persona("client-1", "Anna", ["member"]);
+    await page.route("**/api/auth/me", (route) => route.fulfill(json({ ...user, preferred_locale: "el" })));
+    await page.goto("/clubs/club-1/squads/squad-1");
+
+    await expect(page.getByText("σε προσκάλεσε σε αυτή την ομάδα. Μπες για να δεις αναρτήσεις και μέλη.")).toBeVisible();
+    await expect(page.locator("main")).not.toContainText(/squad|\bPT\b/i);
+  });
+
   test("a client answers from Box", async ({ page }) => {
     const calls = await client(page);
     await page.goto("/box");

@@ -461,6 +461,24 @@ export function allowanceLabel(
   return semanticLabel(key, translate);
 }
 
+// Staff and client roles read as a word for the person, never the department,
+// and a member always says what of (docs/product/ontology.md §4.3).
+const ROLE_KEYS: Record<string, string> = {
+  owner: "roleOwner",
+  admin: "roleAdmin",
+  coach: "roleCoach",
+  front_desk: "roleFrontDesk",
+  accountant: "roleAccountant",
+  janitor: "roleJanitor",
+  member: "roleMember",
+  athlete: "roleAthlete",
+};
+
+export function roleLabel(value: unknown, translate: UiTranslator): string {
+  const key = ROLE_KEYS[String(value ?? "").toLowerCase()];
+  return key ? translate(key) : semanticLabel(value, translate);
+}
+
 export function semanticLabel(value: unknown, translate: UiTranslator): string {
   if (value == null || value === "") return "";
   const canonical = String(value).toLowerCase();

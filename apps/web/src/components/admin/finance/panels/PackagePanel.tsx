@@ -8,7 +8,7 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel } from "@/components/semantic-label";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -346,7 +346,7 @@ export function PackagePanel({
             <div className="mt-5 space-y-3">
               {affectedRoles.map((role) => (
                 <label key={role} className="block space-y-1">
-                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><SemanticLabel value={role} /> {i18n("replacement898d79a")} {i18n("userCount", { count: affectedByRole[role] })}</span>
+                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><RoleLabel role={role} /> {i18n("replacement898d79a")} {i18n("userCount", { count: affectedByRole[role] })}</span>
                   <Select
                     className="w-full rounded-xl px-3 py-2 text-sm"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchRoleAccess, updateRoleAccess } from "@/api/roles";
 import { localizeError } from "@/i18n/presentation";
-import { SemanticLabel } from "@/components/semantic-label";
+import { RoleLabel } from "@/components/semantic-label";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
@@ -40,7 +40,7 @@ export function RoleAccessSettings({ token }: { token: string }) {
         return (
           <fieldset key={role} className="space-y-3">
             <legend className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              <SemanticLabel value={role} />
+              <RoleLabel role={role} />
             </legend>
             <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("roleAccessAlwaysOn")}</p>
             {grantable.map((capability) => {
