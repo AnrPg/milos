@@ -183,7 +183,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
 |---|---|---|---|---|
-| Palee | Palee | `Palee` | The app and the company behind it. | Gitea/infra names still say `milos` (TD-109). |
+| Palee | Palee | `Palee` | The app and the company behind it. | Hosted at palee.app; the infrastructure was renamed too (TD-109). |
 | Palee team | Ομάδα Palee | `vendor` role, `/platform` | The people who run Palee: activate businesses, set plans, handle password resets. Shown as "Palee" to users. (ADR-089) | Business owner. "Vendor" is a code word only. |
 | Account | Λογαριασμός | `logins` | One email and one password. Holds up to 3 profiles. (ADR-187) | Profile. |
 | Profile | Προφίλ | `users` | Who you appear as: unique Latin **@handle** plus a free **display name**. Everything social and every role hangs on a profile. | Account. |

@@ -9,7 +9,7 @@ current no-hard-delete policy.
 ## Runtime database role
 
 New PostgreSQL volumes run `ops/postgres/init/010-palee-runtime-role.sh` automatically.
-The API connects as the non-owner `milos_runtime` role; releases and migrations use
+The API connects as the non-owner `palee_runtime` role; releases and migrations use
 the migration-owner URL.
 
 For an existing volume, set `DB_RUNTIME_PASSWORD` and run:
@@ -24,7 +24,7 @@ superuser and does not have `BYPASSRLS`:
 ```sql
 SELECT rolname, rolsuper, rolbypassrls
 FROM pg_roles
-WHERE rolname = 'milos_runtime';
+WHERE rolname = 'palee_runtime';
 ```
 
 ## Platform-owner bootstrap
@@ -131,7 +131,7 @@ drill gate before image builds.
 TD-039 is closed by an operator-controlled migration task for pre-tenancy object
 keys. New uploads already use canonical prefixes, but older rows can still point at
 `invoices/...` document keys or public avatar URLs containing
-`/milos-avatars/avatars/<user_id>/...`.
+`/palee-avatars/avatars/<user_id>/...`.
 
 Run the dry-run first:
 
