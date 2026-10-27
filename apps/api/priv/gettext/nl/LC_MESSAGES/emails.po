@@ -190,3 +190,20 @@ msgid "You're unsubscribed"
 msgstr "U bent afgemeld"
 msgid "This unsubscribe link is not valid."
 msgstr "Deze afmeldlink is niet geldig."
+
+
+
+msgid "Confirm your new email address"
+msgstr "Bevestig uw nieuwe e-mailadres"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "Er is gevraagd om dit adres het aanmeldadres van een %{product}-account te maken. Bevestig het om de wijziging af te ronden. Tot die tijd houdt het account zijn huidige adres."
+
+msgid "Confirm this address"
+msgstr "Dit adres bevestigen"
+
+msgid "The link works for 24 hours."
+msgstr "De link is 24 uur geldig."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "U ontvangt deze e-mail omdat is gevraagd dit adres te gebruiken voor een %{product}-account."

@@ -190,3 +190,20 @@ msgid "You're unsubscribed"
 msgstr "تم إلغاء اشتراكك"
 msgid "This unsubscribe link is not valid."
 msgstr "رابط إلغاء الاشتراك هذا غير صالح."
+
+
+
+msgid "Confirm your new email address"
+msgstr "أكّدوا عنوان بريدكم الإلكتروني الجديد"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "طُلب أن يصبح هذا العنوان عنوان تسجيل الدخول لحساب على %{product}. أكّدوه لإتمام التغيير. وحتى ذلك الحين يحتفظ الحساب بعنوانه الحالي."
+
+msgid "Confirm this address"
+msgstr "تأكيد هذا العنوان"
+
+msgid "The link works for 24 hours."
+msgstr "الرابط صالح لمدة 24 ساعة."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "تصلكم هذه الرسالة لأنه طُلب استخدام هذا العنوان لحساب على %{product}."

@@ -36,6 +36,8 @@ describe("hidden routes", () => {
       "/forgot-password",
       "/reset-password",
       "/sign-out-everywhere",
+      "/confirm-email-change",
+      "/revert-email-change",
       "/account-deletion/confirm",
       "/account-deletion/undo",
       "/join/kypseli",

@@ -185,4 +185,21 @@ msgstr ""
 msgid "You're unsubscribed"
 msgstr ""
 msgid "This unsubscribe link is not valid."
+
+
+
+# ADR-207: email change confirmation
+msgid "Confirm your new email address"
+msgstr ""
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr ""
+
+msgid "Confirm this address"
+msgstr ""
+
+msgid "The link works for 24 hours."
+msgstr ""
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr ""

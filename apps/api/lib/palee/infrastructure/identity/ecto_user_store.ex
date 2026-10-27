@@ -13,6 +13,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     Identity.Domain.ProfilePolicy,
     Identity.Login,
     Identity.PasswordHasher,
+    Identity.PendingEmailChange,
     Identity.User,
     Repo
   }
@@ -215,14 +216,21 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         {:error, :not_found}
 
       login ->
+        # ADR-207: a reset proves the inbox, so it lifts the "this wasn't me"
+        # lock and drops a pending email change.
         login
         |> Login.credentials_changeset(%{password: password})
         |> maybe_put_password_hash()
         |> maybe_bump_login_security()
+        |> Ecto.Changeset.put_change(:email_change_locked_until, nil)
         |> Repo.update()
         |> case do
-          {:ok, _login} -> :ok
-          {:error, changeset} -> {:error, changeset}
+          {:ok, _login} ->
+            Repo.delete_all(from(p in PendingEmailChange, where: p.login_id == ^login_id))
+            :ok
+
+          {:error, changeset} ->
+            {:error, changeset}
         end
     end
   end
@@ -456,10 +464,11 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end
   end
 
-  # Profile fields change on the profile; email and password on its login.
-  # One transaction so a bad password never leaves a half-applied edit.
+  # Profile fields change on the profile; the password on its login (the
+  # email only through ADR-207's confirmed change). One transaction so a bad
+  # password never leaves a half-applied edit.
   defp update_profile_and_credentials(user, params) do
-    credential_params = Map.take(stringify(params), ["email", "password"])
+    credential_params = Map.take(stringify(params), ["password"])
     now = DateTime.utc_now()
 
     Repo.transaction(fn ->

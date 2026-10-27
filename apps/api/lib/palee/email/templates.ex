@@ -13,6 +13,7 @@ defmodule Palee.Email.Templates do
     business_activation_link: Palee.Email.Templates.BusinessActivationLink,
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
     corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
+    email_change_confirm: Palee.Email.Templates.EmailChangeConfirm,
     organization_invitation: Palee.Email.Templates.OrganizationInvitation,
     owner_invitation: Palee.Email.Templates.OwnerInvitation,
     password_reset: Palee.Email.Templates.PasswordReset,

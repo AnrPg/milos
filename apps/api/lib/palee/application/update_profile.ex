@@ -4,11 +4,14 @@ defmodule Palee.Application.UpdateProfile do
   alias Palee.Workers.PropagateNicknameJob
 
   def call(user, params) do
-    with :ok <- maybe_verify_current_password(user, params) do
+    with :ok <- refuse_direct_email_change(user, params),
+         :ok <- maybe_verify_current_password(user, params) do
       old_nickname = user.nickname
 
       profile_params =
-        params |> Map.drop([:current_password, "current_password"]) |> display_name_alias()
+        params
+        |> Map.drop([:current_password, "current_password", :email, "email"])
+        |> display_name_alias()
 
       case Identity.update_profile(user.id, profile_params) do
         {:ok, updated_user} ->
@@ -30,9 +33,21 @@ defmodule Palee.Application.UpdateProfile do
     end
   end
 
-  # ADR-187: the email and password belong to the login every profile of it
-  # shares (and the email is where a reset link goes), so changing either
-  # needs the current password.
+  # ADR-207: a new email takes effect only once its inbox confirms it
+  # (`Palee.Application.EmailChange`), never through a profile edit. The
+  # unchanged address may still come along with the form.
+  defp refuse_direct_email_change(user, params) do
+    new_email = Map.get(params, :email) || Map.get(params, "email")
+
+    if is_binary(new_email) and new_email != "" and
+         Palee.Organizations.Domain.InvitationEmail.normalize(new_email) !=
+           Palee.Organizations.Domain.InvitationEmail.normalize(user.email),
+       do: {:error, :email_change_needs_confirmation},
+       else: :ok
+  end
+
+  # ADR-187: the password belongs to the login every profile of it shares,
+  # so changing it needs the current password.
   # `nickname` is the historical name of the display name (ADR-187).
   defp display_name_alias(params) do
     nickname = Map.get(params, :nickname) || Map.get(params, "nickname")
@@ -51,14 +66,9 @@ defmodule Palee.Application.UpdateProfile do
 
   defp maybe_verify_current_password(user, params) do
     new_password = Map.get(params, :password) || Map.get(params, "password")
-    new_email = Map.get(params, :email) || Map.get(params, "email")
     current_password = Map.get(params, :current_password) || Map.get(params, "current_password")
 
-    email_changed? =
-      is_binary(new_email) and
-        Palee.Organizations.Domain.InvitationEmail.normalize(new_email) != user.email
-
-    if new_password || email_changed? do
+    if new_password do
       if PasswordVerifier.verify(current_password || "", user.password_hash) do
         :ok
       else
