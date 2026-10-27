@@ -22,9 +22,11 @@ import {
   createDraftWorkout,
   fetchAdminWorkout,
   publishWorkoutDraft,
-  updateDraftWorkout,
+  type WorkoutRecord,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { useDraftSaver } from "@/hooks/useDraftSaver";
+import { DraftConflictError, type DraftSaveStatus } from "@/lib/draft-saver";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
@@ -58,6 +60,7 @@ import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel"
 import { editorSectionsFrom, SECTIONED_TEXT_MODE, sectionsToFreeText } from "@/lib/text-sections";
 
 import { AssistantSwitch } from "./AssistantSwitch";
+import { DraftConflictNotice } from "./DraftConflictNotice";
 import { EditorTabs } from "./EditorTabs";
 import { InlineSuggestionBubble } from "./InlineSuggestionBubble";
 import {
@@ -81,7 +84,6 @@ type Props = {
   onUseSections?: () => void;
 };
 
-type SaveStatus = "idle" | "saving" | "saved" | "error";
 type AsideTab = "assistant" | "preview";
 type EditorTabKey = "details" | "timer" | "goals" | "tools";
 
@@ -98,6 +100,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
+  const conflictT = useTranslations("DraftConflict");
   const locale = useUiLocale();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
@@ -107,9 +110,18 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   const [type, setType] = useState<WorkoutType | "">("");
   const [body, setBody] = useState("");
   const [html, setHtml] = useState("");
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  /** The draft could not be created or loaded. */
+  const [loadFailed, setLoadFailed] = useState(false);
+  /** The draft is loaded into the editor; nothing is saved before that. */
+  const [loaded, setLoaded] = useState(false);
   /** Counts draft autosaves; the goals panel re-reads its suggestion on each. */
   const [draftSaves, setDraftSaves] = useState(0);
+  const { saver, status: draftSaveStatus } = useDraftSaver<FreeTextDraftPayload>({
+    accessToken,
+    draftId,
+    onSaved: () => setDraftSaves((count) => count + 1),
+  });
+  const saveStatus: DraftSaveStatus = loadFailed ? "error" : draftSaveStatus;
   const [publishing, setPublishing] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(true);
   const [asideTab, setAsideTab] = useState<AsideTab>("assistant");
@@ -127,7 +139,6 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   const metadataRef = useRef<Record<string, unknown>>({});
   const formatLabels = useMemo(() => getFormatLabels(i18n), [i18n]);
   const loadedDraftRef = useRef<string | null>(null);
-  const revisionRef = useRef<number | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -170,78 +181,97 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
 
     loadedDraftRef.current = "creating";
     createDraftWorkout(accessToken, folderId)
-      .then((draft) => {
-        revisionRef.current = draft.dsl_source_revision ?? 0;
-        onDraftReady(draft.id);
-      })
+      .then((draft) => onDraftReady(draft.id))
       .catch(() => {
         loadedDraftRef.current = null;
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
   }, [accessToken, draftId, folderId, onDraftReady]);
+
+  /** Puts a stored draft into the editor and arms autosave at its revision. */
+  const applyWorkout = useCallback(
+    (workout: WorkoutRecord) => {
+      if (!editor) return;
+      setTitle(workout.title ?? "");
+      setType(WORKOUT_TYPES.includes(workout.type as WorkoutType) ? (workout.type as WorkoutType) : "");
+      const storedReview = (workout.draft_data as { free_text_review?: ReviewState } | null)?.free_text_review;
+      const hasReview = Boolean(storedReview?.analysis && storedReview.workout);
+      setReview(hasReview ? storedReview! : null);
+      setAnalysisStatus(hasReview ? "ready" : "idle");
+      metadataRef.current = workout.workout_metadata ?? {};
+      setTimerPreset(parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY]));
+      // ADR-180: a workout written in sections comes back as one text, a
+      // heading per titled section; the assistant reads its timers from it.
+      const fromSections =
+        workout.authoring_mode === SECTIONED_TEXT_MODE ? sectionsToFreeText(editorSectionsFrom(workout, null)) : null;
+      const nextBody = fromSections?.body ?? workout.free_text_body ?? "";
+      setBody(nextBody);
+      editor.commands.setContent(fromSections?.document ?? workout.free_text_document ?? textToDocument(nextBody));
+      setHtml(editor.getHTML());
+      // The revision the editor now shows; a save based on an older one is
+      // refused by the API, so autosave starts only from here.
+      saver.start(workout.dsl_source_revision ?? 0);
+      setLoaded(true);
+    },
+    [editor, saver],
+  );
 
   useEffect(() => {
     if (!accessToken || !draftId || loadedDraftRef.current === draftId || !editor) return;
 
     loadedDraftRef.current = draftId;
+    setLoaded(false);
     fetchAdminWorkout(accessToken, draftId)
-      .then((workout) => {
-        setTitle(workout.title ?? "");
-        if (WORKOUT_TYPES.includes(workout.type as WorkoutType)) {
-          setType(workout.type as WorkoutType);
-        }
-        const storedReview = (workout.draft_data as { free_text_review?: ReviewState } | null)?.free_text_review;
-        if (storedReview?.analysis && storedReview.workout) {
-          setReview(storedReview);
-          setAnalysisStatus("ready");
-        }
-        metadataRef.current = workout.workout_metadata ?? {};
-        setTimerPreset(parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY]));
-        revisionRef.current = workout.dsl_source_revision ?? 0;
-        // ADR-180: a workout written in sections comes back as one text, a
-        // heading per titled section; the assistant reads its timers from it.
-        const fromSections =
-          workout.authoring_mode === SECTIONED_TEXT_MODE ? sectionsToFreeText(editorSectionsFrom(workout, null)) : null;
-        const nextBody = fromSections?.body ?? workout.free_text_body ?? "";
-        setBody(nextBody);
-        editor.commands.setContent(fromSections?.document ?? workout.free_text_document ?? textToDocument(nextBody));
-        setHtml(editor.getHTML());
-      })
+      .then(applyWorkout)
       .catch(() => {
         loadedDraftRef.current = null;
-        setSaveStatus("error");
+        setLoadFailed(true);
       });
-  }, [accessToken, draftId, editor]);
+  }, [accessToken, applyWorkout, draftId, editor]);
 
-  const saveDraft = useCallback(async () => {
-    if (!accessToken || !draftId || !editor) return;
-    setSaveStatus("saving");
+  /** What the server should hold for the text and settings on screen now. */
+  const draftPayload = useCallback(
+    (overrides?: { title?: string; type?: WorkoutType | ""; review?: ReviewState | null }) =>
+      editor
+        ? buildPayload({
+            title: overrides?.title ?? title,
+            type: overrides?.type ?? type,
+            body,
+            document: editor.getJSON(),
+            review: overrides && "review" in overrides ? overrides.review ?? null : review,
+            metadata: withTimerPreset(metadataRef.current, timerPreset),
+          })
+        : null,
+    [body, editor, review, timerPreset, title, type],
+  );
 
-    try {
-      const draft = await updateDraftWorkout(accessToken, draftId, buildPayload({
-        title,
-        type,
-        body,
-        document: editor.getJSON(),
-        expectedSourceRevision: revisionRef.current,
-        review,
-        metadata: withTimerPreset(metadataRef.current, timerPreset),
-      }));
-      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
-      setSaveStatus("saved");
-      setDraftSaves((count) => count + 1);
-    } catch {
-      setSaveStatus("error");
-    }
-  }, [accessToken, body, draftId, editor, review, timerPreset, title, type]);
-
+  // Autosave: one request at a time, a second after the last change. `html`
+  // also catches formatting-only changes, which leave `body` as it was.
   useEffect(() => {
-    if (!draftId || loadedDraftRef.current !== draftId) return;
-    const timer = window.setTimeout(() => {
-      void saveDraft();
-    }, 1_000);
-    return () => window.clearTimeout(timer);
-  }, [body, draftId, review, saveDraft, timerPreset, title, type]);
+    if (!loaded) return;
+    const payload = draftPayload();
+    if (payload) saver.schedule(payload);
+  }, [draftPayload, html, loaded, saver]);
+
+  /** Saves the current content now (before leaving this editor). */
+  async function saveNow() {
+    const payload = draftPayload();
+    if (!payload || !saver.started) return;
+    await saver.saveNow(payload);
+  }
+
+  async function keepMyVersion() {
+    if (!accessToken || !draftId) return;
+    const latest = await fetchAdminWorkout(accessToken, draftId);
+    const payload = draftPayload();
+    if (payload) saver.schedule(payload);
+    await saver.overwrite(latest.dsl_source_revision ?? 0);
+  }
+
+  async function loadSavedVersion() {
+    if (!accessToken || !draftId) return;
+    applyWorkout(await fetchAdminWorkout(accessToken, draftId));
+  }
 
   // ADR-181: the open issues' words are marked in the text, coloured by kind.
   const openIssueList = useMemo(() => (review ? openIssues(review) : []), [review]);
@@ -387,27 +417,25 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
       return;
     }
 
+    const payload = draftPayload({ title: effectiveTitle, type: effectiveType, review: current });
+    if (!payload) return;
     setPublishing(true);
     try {
-      const payload = buildPayload({
-        title: effectiveTitle,
-        type: effectiveType,
-        body,
-        document: editor.getJSON(),
-        expectedSourceRevision: revisionRef.current,
-        review: current,
-        metadata: withTimerPreset(metadataRef.current, timerPreset),
-      });
-      const draft = await updateDraftWorkout(accessToken, draftId, payload);
-      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
-      await publishWorkoutDraft(accessToken, draftId, {
-        ...payload,
-        expected_source_revision: revisionRef.current,
+      // The final save and the publish run back to back in the save queue,
+      // after any autosave still running and before any later one.
+      await saver.saveNow(payload, async (revision) => {
+        saver.close();
+        try {
+          await publishWorkoutDraft(accessToken, draftId, { ...payload, expected_source_revision: revision });
+        } catch (error) {
+          saver.reopen();
+          throw error;
+        }
       });
       router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
-    } catch {
-      setSaveStatus("error");
-      setNotice(assistantT("publishFailed"));
+    } catch (error) {
+      // A conflict is explained by the notice above the editor.
+      if (!(error instanceof DraftConflictError)) setNotice(assistantT("publishFailed"));
     } finally {
       setPublishing(false);
     }
@@ -416,6 +444,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   return (
     <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_26rem]" : "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_4rem]"}>
       <section className="flex min-h-0 min-w-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
+        {saveStatus === "conflict" ? <DraftConflictNotice onKeepMine={keepMyVersion} onLoadSaved={loadSavedVersion} /> : null}
         <EditorTabs
           label={i18n("workoutEditorTabsLabel")}
           tabs={[
@@ -429,7 +458,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
           trailing={
             <>
               <span className="hidden text-xs font-semibold sm:inline" role="status" style={{ color: "var(--muted)" }}>
-                {saveStatusText(saveStatus, i18n)}
+                {saveStatus === "conflict" ? conflictT("status") : saveStatusText(saveStatus, i18n)}
               </span>
               {onUseSections ? (
                 <AssistantSwitch
@@ -437,7 +466,8 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
                   available
                   onChange={(enabled) => {
                     if (enabled) return;
-                    void saveDraft().then(onUseSections);
+                    // Switch only once the text is safely saved.
+                    saveNow().then(onUseSections, () => undefined);
                   }}
                 />
               ) : null}
@@ -892,12 +922,13 @@ function findWordRangeAt($pos: ResolvedPos) {
   };
 }
 
+type FreeTextDraftPayload = ReturnType<typeof buildPayload>;
+
 function buildPayload({
   title,
   type,
   body,
   document,
-  expectedSourceRevision,
   review,
   metadata,
 }: {
@@ -905,7 +936,6 @@ function buildPayload({
   type: WorkoutType | "";
   body: string;
   document: JSONContent;
-  expectedSourceRevision?: number | null;
   review: ReviewState | null;
   metadata: Record<string, unknown>;
 }) {
@@ -925,7 +955,6 @@ function buildPayload({
     free_text_body: body,
     free_text_document: document,
     workout_metadata: workoutMetadata,
-    expected_source_revision: expectedSourceRevision,
     draft_data: {
       ...canonical,
       title,
@@ -1005,7 +1034,7 @@ function normalizeEditorColor(value: unknown) {
   return `#${channels.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 }
 
-function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTranslations>) {
+function saveStatusText(status: Exclude<DraftSaveStatus, "conflict">, i18n: ReturnType<typeof useUiTranslations>) {
   switch (status) {
     case "saving":
       return i18n("quickTextSaving");

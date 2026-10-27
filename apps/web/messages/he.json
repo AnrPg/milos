@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "סקרתי את האזהרות האלה וברצוני לפרסם את הגרסה המדויקת הזו.",
     "quickTextDiagnosticPosition": "שורה {line}, עמודה {column}",
     "quickTextCloseManual": "סגור מדריך",
-    "quickTextRevisionConflict": "קיימים שינויים חדשים יותר - נדרשת טעינה מחדש",
     "editorUnderline": "קו תחתון",
     "editorStrike": "חוצה",
     "editorHighlight": "הדגש",
@@ -11489,5 +11488,17 @@
     "placementSpace": "חלל",
     "placementPickSpace": "בחרו חלל",
     "placementQuantity": "כמה"
+  },
+  "DraftConflict": {
+    "title": "ה-WOD הזה שונה במקום אחר",
+    "body": "גרסה אחרת של ה-WOD הזה נשמרה אחרי שפתחת אותו, אולי בכרטיסייה אחרת, במכשיר אחר או על ידי מאמן אחר. כדי ששום דבר לא יידרס בטעות, השינויים האחרונים שלך כאן עדיין לא נשמרו.",
+    "question": "איזו גרסה לשמור?",
+    "keepMine": "שמור את הגרסה שלי",
+    "keepMineHint": "שומר את מה שמוצג כאן במקום הגרסה האחרת.",
+    "loadSaved": "טען את הגרסה האחרת",
+    "loadSavedHint": "מציג את הגרסה שנשמרה במקום אחר. השינויים שלא נשמרו כאן יאבדו.",
+    "working": "רגע…",
+    "failed": "זה לא הצליח. בדוק את החיבור ונסה שוב.",
+    "status": "לא נשמר: שונה במקום אחר"
   }
 }

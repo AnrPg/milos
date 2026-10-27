@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "Ik heb deze waarschuwingen gelezen en wil deze exacte herziening publiceren.",
     "quickTextDiagnosticPosition": "Regel {line}, kolom {column}",
     "quickTextCloseManual": "Handleiding sluiten",
-    "quickTextRevisionConflict": "Er zijn nieuwere wijzigingen - opnieuw laden vereist",
     "editorUnderline": "Onderstreep",
     "editorStrike": "Doorhalen",
     "editorHighlight": "Hoogtepunt",
@@ -11489,5 +11488,17 @@
     "placementSpace": "Ruimte",
     "placementPickSpace": "Kies een ruimte",
     "placementQuantity": "Aantal"
+  },
+  "DraftConflict": {
+    "title": "Deze WOD is ergens anders gewijzigd",
+    "body": "Nadat je deze WOD opende, is er een andere versie van opgeslagen, misschien in een ander tabblad, op een ander apparaat of door een andere coach. Zodat er niets per ongeluk wordt overschreven, zijn je laatste wijzigingen hier nog niet opgeslagen.",
+    "question": "Welke versie wil je houden?",
+    "keepMine": "Mijn versie houden",
+    "keepMineHint": "Slaat op wat je hier ziet in plaats van de andere versie.",
+    "loadSaved": "Andere versie laden",
+    "loadSavedHint": "Toont de versie die ergens anders is opgeslagen. Je niet-opgeslagen wijzigingen hier vervallen.",
+    "working": "Een moment…",
+    "failed": "Dat lukte niet. Controleer je verbinding en probeer het opnieuw.",
+    "status": "Niet opgeslagen: ergens anders gewijzigd"
   }
 }
