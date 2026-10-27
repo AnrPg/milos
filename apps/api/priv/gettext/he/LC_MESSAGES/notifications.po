@@ -70,7 +70,7 @@ msgstr "המאמן שלך שלח לך הודעה."
 msgid "Message from the box"
 msgstr "הודעה מהמכון"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "המכון שלך שלח לך הודעה."
 
 msgid "Challenge completed"
@@ -329,7 +329,7 @@ msgid "Group not approved"
 msgstr "הקבוצה לא אושרה"
 
 msgid "The box didn't approve «%{group}»."
-msgstr "הבוקס לא אישר את «%{group}»."
+msgstr "המכון לא אישר את «%{group}»."
 
 msgid "Request to join"
 msgstr "בקשת הצטרפות"
@@ -419,7 +419,7 @@ msgid "%{nickname} subscribed."
 msgstr "%{nickname} נרשם/ה למנוי."
 
 msgid "%{nickname} joined the box."
-msgstr "%{nickname} הצטרף/ה לבוקס."
+msgstr "%{nickname} הצטרף/ה למכון."
 
 msgid "Referral reward"
 msgstr "פרס הפניה"
@@ -460,13 +460,13 @@ msgstr "הגיע הזמן למדידה חדשה"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "תמונת מצב חדשה עוזרת לך לראות את המגמה שלך. זה לוקח דקה."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "הזמנה להיות חבר לתמיכה"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} מבקש/ת שתהיה החבר/ה לתמיכה שלו/ה."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "יש לך חבר/ה לתמיכה"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "כוס מים?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "הודעה מחבר/ה לתמיכה"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "את/ה ו-%{nickname} רוצים להתאמן יחד. תגידו שלו
 msgid "Training partner message"
 msgstr "הודעה משותף לאימונים"
 
-msgid "Squad invitation"
-msgstr "הזמנה לסקוואד"
+msgid "PT squad invitation"
+msgstr "הזמנה לסקוואד PT"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} הזמין/ה אותך לסקוואד «%{group}»."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} הזמין/ה אותך לסקוואד PT «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "לשיעור אין WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "ל־%{class} (%{when}) אין WOD, ולכן המתאמנים לא רואים אותו ולא יכולים להירשם. קשרו WOD כדי לפרסם אותו."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "ל־%{class} (%{when}) אין WOD, ולכן חברי המכון לא רואים אותו ולא יכולים להירשם. קשרו WOD כדי לפרסם אותו."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) מתחיל בעוד שעה ועדיין אין לו WOD."
@@ -634,7 +634,7 @@ msgstr "%{name} (@%{handle}) לא מצליח/ה להתחבר וביקש/ה לא�
 msgid "Your password was reset"
 msgstr "הסיסמה שלך אופסה"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
 msgstr "הסיסמה שלך שונתה באמצעות קישור איפוס או קוד שחזור, וכל המכשירים נותקו מהחשבון. אם זה לא היית את/ה, פנה/י למכון שלך או לתמיכה של Palee."
 
 msgid "Your demo business is waiting for you"

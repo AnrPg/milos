@@ -29,13 +29,13 @@ msgid "Workout changed"
 msgstr "Das Training hat sich geändert"
 
 msgid "Your coach changed a scheduled workout."
-msgstr "Ihr Trainer hat ein geplantes Training geändert."
+msgstr "Ihr Coach hat ein geplantes Training geändert."
 
 msgid "Workout removed"
 msgstr "Training entfernt"
 
 msgid "Your coach removed a scheduled workout."
-msgstr "Ihr Trainer hat ein geplantes Training entfernt."
+msgstr "Ihr Coach hat ein geplantes Training entfernt."
 
 msgid "Workout rejected"
 msgstr "Training abgelehnt"
@@ -70,7 +70,7 @@ msgstr "Dein Coach hat dir eine Nachricht geschickt."
 msgid "Message from the box"
 msgstr "Nachricht von der Box"
 
-msgid "Your gym sent you a message."
+msgid "Your box sent you a message."
 msgstr "Deine Box hat dir eine Nachricht geschickt."
 
 msgid "Challenge completed"
@@ -460,13 +460,13 @@ msgstr "Zeit für eine neue Messung"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Ein neuer Schnappschuss zeigt dir deinen Trend. Es dauert nur eine Minute."
 
-msgid "A buddy invitation"
+msgid "A check-in buddy invitation"
 msgstr "Eine Check-in-Kumpel-Einladung"
 
-msgid "%{nickname} asks you to be their support buddy."
+msgid "%{nickname} asks you to be their check-in buddy."
 msgstr "%{nickname} bittet dich, Check-in-Kumpel zu sein."
 
-msgid "You have a support buddy"
+msgid "You have a check-in buddy"
 msgstr "Du hast einen Check-in-Kumpel"
 
 msgid "%{nickname} accepted. They hear from you only when you ask."
@@ -523,7 +523,7 @@ msgstr "Ein Glas Wasser?"
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Der Nachmittag ist ein guter Moment, beim Wasser aufzuholen."
 
-msgid "Buddy message"
+msgid "Check-in buddy message"
 msgstr "Nachricht vom Check-in-Kumpel"
 
 msgid "%{nickname}: weekly wellness"
@@ -580,18 +580,18 @@ msgstr "Du und %{nickname} wollt zusammen trainieren. Sag hallo."
 msgid "Training partner message"
 msgstr "Nachricht von deinem Trainingspartner"
 
-msgid "Squad invitation"
-msgstr "Einladung in eine Squad"
+msgid "PT squad invitation"
+msgstr "Einladung in eine PT-Squad"
 
-msgid "%{nickname} invited you to the squad «%{group}»."
-msgstr "%{nickname} hat dich in die Squad «%{group}» eingeladen."
+msgid "%{nickname} invited you to the PT squad «%{group}»."
+msgstr "%{nickname} hat dich in die PT-Squad «%{group}» eingeladen."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
 msgstr "Eine Stunde hat kein WOD"
 
-msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
-msgstr "%{class} (%{when}) hat kein WOD, daher können Mitglieder sie weder sehen noch buchen. Verknüpfe eines, um sie zu veröffentlichen."
+msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) hat kein WOD, daher können Box-Mitglieder sie weder sehen noch buchen. Verknüpfe eines, um sie zu veröffentlichen."
 
 msgid "%{class} (%{when}) starts in an hour and still has no WOD."
 msgstr "%{class} (%{when}) beginnt in einer Stunde und hat noch kein WOD."
@@ -634,8 +634,8 @@ msgstr "%{name} (@%{handle}) kann sich nicht anmelden und bittet darum, das Pass
 msgid "Your password was reset"
 msgstr "Dein Passwort wurde zurückgesetzt"
 
-msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
-msgstr "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an dein Studio oder den Palee-Support."
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your box or Palee support."
+msgstr "Dein Passwort wurde über einen Reset-Link oder einen Wiederherstellungscode geändert, und alle Geräte wurden abgemeldet. Wenn du das nicht warst, wende dich an deine Box oder den Palee-Support."
 
 msgid "Your demo business is waiting for you"
 msgstr "Dein Demo-Unternehmen wartet auf dich"
