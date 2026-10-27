@@ -95,7 +95,7 @@ test.describe("Settings › Spaces", () => {
 
     await page.goto("/admin/spaces");
     await expect(page.getByRole("heading", { name: "Kifisia" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Whole gym" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Whole box" })).toBeVisible();
     await expect(page.getByTestId("plan-area-space-mats")).toHaveText("Mats area");
     await expect(page.getByTestId("space-space-gym")).toContainText("Main floor");
 

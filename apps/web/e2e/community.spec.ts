@@ -191,17 +191,17 @@ test.describe("community", () => {
     await page.goto("/clubs/club-1");
 
     const tabs = page.getByRole("tablist", { name: "Box Kypseli" });
-    await expect(tabs.getByRole("tab")).toHaveText(["Feed", "Channels", "Events", "Members"]);
+    await expect(tabs.getByRole("tab")).toHaveText(["Feed", "Channels", "Events", "Club members"]);
     await tabs.getByRole("tab", { name: "Events" }).click();
     await expect(page.getByText("No upcoming events.")).toBeVisible();
 
-    await tabs.getByRole("tab", { name: "Members" }).click();
+    await tabs.getByRole("tab", { name: "Club members" }).click();
     await expect(page.getByText("3 members")).toBeVisible();
     const people = page.getByRole("link", { name: /Stelios|Eleni|Petros/ });
     await expect(people).toHaveCount(3);
     await expect(people.first()).toContainText("Stelios");
     await expect(people.first()).toContainText("Coach");
-    await page.getByPlaceholder("Search members").fill("ele");
+    await page.getByPlaceholder("Search club members").fill("ele");
     await expect(page.getByText("1 member", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: /Eleni/ })).toHaveAttribute("href", "/people/member-2");
   });
@@ -333,8 +333,8 @@ test.describe("community", () => {
     await page.goto("/clubs/find");
 
     await expect(page.getByRole("heading", { name: "Find clubs and people" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Hyrox crew/ })).toContainText("CrossFit Gazi · 14 members");
-    await expect(page.getByText("Groups in your gyms")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Hyrox crew/ })).toContainText("CrossFit Gazi · 14 club members");
+    await expect(page.getByText("Groups in your boxes")).toBeVisible();
 
     await page.getByRole("link", { name: /Hyrox crew/ }).click();
     await expect(page).toHaveURL(/\/clubs\/open-1$/);
@@ -428,7 +428,7 @@ test.describe("staff community", () => {
     expect(actions).toEqual([{ target_type: "post", target_id: "post-1", action: "hide" }]);
 
     await page.getByRole("tab", { name: /Open clubs/ }).click();
-    await expect(page.getByRole("button", { name: /Hyrox crew/ })).toContainText("14 members · Anyone · 1 request");
+    await expect(page.getByRole("button", { name: /Hyrox crew/ })).toContainText("14 club members · Anyone · 1 request");
     await expect(page.getByRole("button", { name: "+ New open club" })).toBeVisible();
   });
 });

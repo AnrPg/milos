@@ -264,7 +264,7 @@ test.describe("member schedule", () => {
   test("picks a location from the list over the map", async ({ page }) => {
     await page.goto("/box/schedule/location");
     await expect(page.getByRole("heading", { name: "Τοποθεσία" })).toBeVisible();
-    await expect(page.getByText("Όλες οι τοποθεσίες του Box Kypseli")).toBeVisible();
+    await expect(page.getByText("Όλα τα παραρτήματα του Box Kypseli")).toBeVisible();
     await expect(page.getByText("Η βάση σου")).toBeVisible();
     await shot(page, "location");
   });

@@ -153,7 +153,7 @@ test.describe("partners", () => {
     await expect(section).toContainText("A match needs you both");
 
     await section.getByRole("button", { name: "Set up my profile" }).click();
-    const sheet = page.getByRole("dialog", { name: "Your partner profile" });
+    const sheet = page.getByRole("dialog", { name: "Your training partner profile" });
     await expect(sheet.getByRole("button", { name: "Turn on" })).toBeDisabled();
     await sheet.getByRole("button", { name: "Early morning" }).click();
     await sheet.getByRole("button", { name: "Strength" }).click();
@@ -303,7 +303,7 @@ test.describe("partners", () => {
     await page.route("**/api/me/wellness-summary-sharing/access-log", (route) => route.fulfill(json({ entries: [] })));
 
     await page.goto("/me/sharing");
-    const toggle = page.getByTestId("partner-visibility").getByRole("switch", { name: /Show me in Partners/ });
+    const toggle = page.getByTestId("partner-visibility").getByRole("switch", { name: /Show me in Training partners/ });
     await expect(toggle).toBeChecked();
     await expect(page.getByTestId("partner-visibility")).toContainText("Your profiles in 2 clubs");
     await toggle.click();

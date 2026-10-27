@@ -58,7 +58,7 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
 
 async function openChecklist(page: Page, start: string) {
   await page.goto(start);
-  const dialog = page.getByRole("dialog", { name: "Welcome! Let’s get your gym ready" });
+  const dialog = page.getByRole("dialog", { name: "Welcome! Let’s get your box ready" });
   await expect(dialog).toBeVisible();
   return dialog;
 }

@@ -171,13 +171,13 @@ test.describe("PT squads", () => {
     await row.click();
 
     await expect(page).toHaveURL(/\/clubs\/club-1\/squads\/squad-1$/);
-    await expect(page.getByText("Only Nikos and the squad's members see what's posted here.")).toBeVisible();
+    await expect(page.getByText("Only Nikos and the PT squad's members see what's posted here.")).toBeVisible();
     await page.getByRole("tab", { name: "People" }).click();
     await expect(page.getByRole("link", { name: /Petros/ })).toBeVisible();
     await expect(page.getByText("Coach", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Leave", exact: true }).click();
-    const sheet = page.getByRole("dialog", { name: "Leave this squad?" });
+    const sheet = page.getByRole("dialog", { name: "Leave this PT squad?" });
     await sheet.getByRole("button", { name: "Leave" }).click();
     await expect.poll(() => calls.left).toBe(1);
     await expect(page).toHaveURL(/\/clubs\/club-1$/);
@@ -187,7 +187,7 @@ test.describe("PT squads", () => {
     const calls = await client(page);
     await page.goto("/clubs/club-1/squads/squad-1");
 
-    await expect(page.getByText("Nikos invited you to this squad. Join to see its posts and people.")).toBeVisible();
+    await expect(page.getByText("Nikos invited you to this PT squad. Join to see its posts and people.")).toBeVisible();
     await expect(page.getByRole("tab", { name: "Posts" })).toHaveCount(0);
     await page.getByRole("button", { name: "Decline" }).click();
     await expect.poll(() => calls.answers).toEqual([{ accept: false }]);
@@ -201,7 +201,7 @@ test.describe("PT squads", () => {
     await page.route("**/api/auth/me", (route) => route.fulfill(json({ ...user, preferred_locale: "el" })));
     await page.goto("/clubs/club-1/squads/squad-1");
 
-    await expect(page.getByText("σε προσκάλεσε σε αυτή την ομάδα. Μπες για να δεις αναρτήσεις και μέλη.")).toBeVisible();
+    await expect(page.getByText("σε προσκάλεσε σε αυτή την ομάδα του coach. Μπες για να δεις αναρτήσεις και μέλη.")).toBeVisible();
     await expect(page.locator("main")).not.toContainText(/squad|\bPT\b/i);
   });
 
@@ -250,8 +250,8 @@ test.describe("PT squads", () => {
 
     await page.goto("/box");
     await expect(page.getByRole("link", { name: /Morning PT/ })).toContainText("3 members");
-    await page.getByRole("button", { name: "+ New squad" }).click();
-    const sheet = page.getByRole("dialog", { name: "New squad" });
+    await page.getByRole("button", { name: "+ New PT squad" }).click();
+    const sheet = page.getByRole("dialog", { name: "New PT squad" });
     await sheet.getByLabel("Name").fill("Hyrox crew");
     await sheet.getByRole("checkbox", { name: "Anna" }).check();
     await sheet.getByRole("button", { name: "Create" }).click();
@@ -260,7 +260,7 @@ test.describe("PT squads", () => {
     await expect(page.getByRole("link", { name: /Hyrox crew/ })).toContainText("1 invitation open");
 
     await page.goto("/clubs/club-1/squads/squad-1");
-    await expect(page.getByText("Only your active clients can be in it. When coaching ends, they leave the squad.")).toBeVisible();
+    await expect(page.getByText("Only your active clients can be in it. When coaching ends, they leave the PT squad.")).toBeVisible();
     await page.getByRole("button", { name: "Invite", exact: true }).click();
     const invite = page.getByRole("dialog", { name: "Invite clients" });
     await expect(invite.getByRole("checkbox")).toHaveCount(1);

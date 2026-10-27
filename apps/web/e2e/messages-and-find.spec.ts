@@ -94,7 +94,7 @@ for (const width of [320, 375, 430, 1024]) {
     await stub(page, { partners: true });
     await page.goto("/messages");
 
-    await expectSegments(page, ["All", "People", "Coach", "Clubs", "Partners"]);
+    await expectSegments(page, ["All", "People", "Coach", "Clubs", "Training partners"]);
 
     const tabs = page.getByRole("tablist", { name: "Which messages to show" }).getByRole("tab");
     for (const tab of await tabs.all()) {

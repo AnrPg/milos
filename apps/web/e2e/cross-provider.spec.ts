@@ -146,7 +146,7 @@ test.describe("One journal across providers", () => {
 
     await page.getByRole("button", { name: "Box Kypseli, switch provider" }).click();
     const sheet = page.getByRole("dialog", { name: "Who trains you" });
-    await expect(sheet.getByText("Personal coach · 1 message")).toBeVisible();
+    await expect(sheet.getByText("Independent coach · 1 message")).toBeVisible();
     await sheet.getByRole("button", { name: "Past providers (1)" }).click();
     await expect(sheet.getByText("Old Box")).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Add a box or coach" })).toHaveAttribute("href", "/me/clubs#join");
