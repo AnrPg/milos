@@ -17,7 +17,6 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
 const inputStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
-const labelClass = "block text-xs font-semibold uppercase tracking-[0.18em]";
 const quietButtonClass = "rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50";
 const quietButtonStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 
@@ -104,7 +103,7 @@ export function EmailChangeField() {
   return (
     <div className="space-y-3" data-testid="email-change">
       <div className="space-y-1.5">
-        <p className={labelClass} style={{ color: "var(--muted)" }}>
+        <p className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
           {t("label")}
         </p>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -177,7 +176,7 @@ export function EmailChangeField() {
       {editing ? (
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label htmlFor="email-change-new" className={labelClass} style={{ color: "var(--muted)" }}>
+            <label htmlFor="email-change-new" className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
               {t("newLabel")}
             </label>
             <input
@@ -193,7 +192,7 @@ export function EmailChangeField() {
             />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="email-change-password" className={labelClass} style={{ color: "var(--muted)" }}>
+            <label htmlFor="email-change-password" className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
               {t("passwordLabel")}
             </label>
             <input
