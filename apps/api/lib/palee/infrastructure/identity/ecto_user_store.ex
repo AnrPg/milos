@@ -99,6 +99,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         %{
           id: login.id,
           email: login.email,
+          email_verified_at: login.email_verified_at,
           password_hash: login.password_hash,
           last_used_user_id: login.last_used_user_id,
           profile_count: count_profiles(login.id)
@@ -170,6 +171,28 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   end
 
   @doc "ADR-187: sets a new password on a login and revokes every profile's sessions."
+  @impl true
+  def mark_email_verified(login_id, email, now) do
+    normalized = InvitationEmail.normalize(email)
+
+    {count, _rows} =
+      Login
+      |> where([l], l.id == ^login_id and fragment("lower(?)", l.email) == ^normalized)
+      |> where([l], is_nil(l.email_verified_at))
+      |> Repo.update_all(set: [email_verified_at: now, updated_at: now])
+
+    if count == 1 or email_verified_as?(login_id, normalized),
+      do: :ok,
+      else: {:error, :email_mismatch}
+  end
+
+  defp email_verified_as?(login_id, normalized) do
+    Login
+    |> where([l], l.id == ^login_id and fragment("lower(?)", l.email) == ^normalized)
+    |> where([l], not is_nil(l.email_verified_at))
+    |> Repo.exists?()
+  end
+
   @impl true
   def reset_login_password(login_id, password) do
     case Repo.get(Login, login_id) do
@@ -787,6 +810,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       preferred_theme_slug: user.preferred_theme_slug,
       time_zone: user.time_zone,
       email: login.email,
+      email_verified_at: login.email_verified_at,
       inserted_at: user.inserted_at,
       demo_organization_id: user.demo_organization_id,
       completed_tours: user.completed_tours || []

@@ -25,6 +25,8 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback handle_available?(String.t(), Ecto.UUID.t() | nil) :: boolean()
   @callback update_credentials(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback mark_email_verified(Ecto.UUID.t(), String.t(), DateTime.t()) ::
+              :ok | {:error, :email_mismatch}
   @callback reset_login_password(Ecto.UUID.t(), String.t()) ::
               :ok | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_user(Account.t()) :: :ok | {:error, term()}

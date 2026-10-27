@@ -28,6 +28,10 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def update_credentials(user_id, params), do: impl().update_credentials(user_id, params)
   @impl true
+  def mark_email_verified(login_id, email, now),
+    do: impl().mark_email_verified(login_id, email, now)
+
+  @impl true
   def reset_login_password(login_id, password),
     do: impl().reset_login_password(login_id, password)
 

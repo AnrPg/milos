@@ -62,6 +62,18 @@ defmodule Palee.Identity do
   defdelegate handle_available?(handle, except_user_id \\ nil), to: UserStore
   defdelegate update_credentials(user_id, params), to: UserStore
   defdelegate reset_login_password(login_id, password), to: UserStore
+
+  @doc """
+  Records that the login can read `email` (an emailed link to it was
+  opened). Only marks the login's current address; `{:error, :email_mismatch}`
+  when the login's email changed since the link was sent.
+  """
+  def mark_email_verified(login_id, email, now \\ DateTime.utc_now()),
+    do: UserStore.mark_email_verified(login_id, email, now)
+
+  @doc "Whether the account's login has proved it reads its email."
+  def email_verified?(%{email_verified_at: %DateTime{}}), do: true
+  def email_verified?(_account), do: false
   defdelegate max_profiles(), to: Palee.Identity.Domain.ProfilePolicy
   defdelegate find_by_id(id), to: FindUser, as: :by_id
   defdelegate list_by_ids(ids), to: FindUser, as: :list_by_ids
