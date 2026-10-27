@@ -190,3 +190,20 @@ msgid "You're unsubscribed"
 msgstr "Η εγγραφή σας καταργήθηκε"
 msgid "This unsubscribe link is not valid."
 msgstr "Αυτός ο σύνδεσμος διακοπής δεν είναι έγκυρος."
+
+
+
+msgid "Confirm your new email address"
+msgstr "Επιβεβαιώστε τη νέα σας διεύθυνση email"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "Ζητήθηκε αυτή η διεύθυνση να γίνει η διεύθυνση σύνδεσης ενός λογαριασμού στο %{product}. Επιβεβαιώστε την για να ολοκληρωθεί η αλλαγή. Μέχρι τότε, ο λογαριασμός κρατά την τρέχουσα διεύθυνσή του."
+
+msgid "Confirm this address"
+msgstr "Επιβεβαίωση διεύθυνσης"
+
+msgid "The link works for 24 hours."
+msgstr "Ο σύνδεσμος ισχύει για 24 ώρες."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "Λαμβάνετε αυτό το email επειδή ζητήθηκε να χρησιμοποιηθεί αυτή η διεύθυνση για έναν λογαριασμό στο %{product}."

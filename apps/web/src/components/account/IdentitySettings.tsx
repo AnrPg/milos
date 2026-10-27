@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { SESSION_UPDATED_EVENT } from "@/api/client";
 import { updateProfile, type ProfileUpdate } from "@/api/profile";
 import { cleanHandleInput, describeAccountError } from "@/components/account/account-model";
+import { EmailChangeField } from "@/components/account/EmailChangeField";
 import { HandleField } from "@/components/account/HandleField";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
@@ -35,7 +36,8 @@ function Field({ id, label, hint, children }: { id: string; label: string; hint?
 /**
  * Ρυθμίσεις › Personal info (ADR-187): this profile's display name and
  * @handle, and the login's email and password (shared by every profile of
- * it, so changing either asks for the current password).
+ * it, so changing either asks for the current password). The email changes
+ * by a link to the new address (ADR-207, `EmailChangeField`).
  */
 export function IdentitySettings() {
   const t = useTranslations("accountProfiles");
@@ -43,15 +45,13 @@ export function IdentitySettings() {
   const { tokens, currentUser, signOut } = useSession();
   const [displayName, setDisplayName] = useState(currentUser?.display_name ?? currentUser?.nickname ?? "");
   const [handle, setHandle] = useState(currentUser?.handle ?? "");
-  const [email, setEmail] = useState(currentUser?.email ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const emailChanged = email.trim() !== "" && email.trim().toLowerCase() !== (currentUser?.email ?? "").toLowerCase();
-  const needsPassword = emailChanged || newPassword !== "";
+  const needsPassword = newPassword !== "";
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -64,7 +64,6 @@ export function IdentitySettings() {
     const nextHandle = cleanHandleInput(handle);
     if (nextName && nextName !== (currentUser.display_name ?? currentUser.nickname)) payload.display_name = nextName;
     if (nextHandle && nextHandle !== currentUser.handle) payload.handle = nextHandle;
-    if (emailChanged) payload.email = email.trim();
     if (newPassword) payload.password = newPassword;
     if (needsPassword) {
       if (!currentPassword) {
@@ -89,7 +88,6 @@ export function IdentitySettings() {
       );
       setDisplayName(result.user.display_name ?? result.user.nickname ?? nextName);
       setHandle(result.user.handle ?? nextHandle);
-      setEmail(result.user.email ?? email);
       setCurrentPassword("");
       setNewPassword("");
       if (payload.password) {
@@ -129,18 +127,7 @@ export function IdentitySettings() {
 
       <div className="space-y-4 border-t pt-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-xs leading-5" style={{ color: "var(--muted)" }}>{t("loginSharedNote")}</p>
-        <Field id="identity-email" label={t("emailLabel")}>
-          <input
-            id="identity-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
-            style={inputStyle}
-            dir="ltr"
-          />
-        </Field>
+        <EmailChangeField />
         <Field id="identity-new-password" label={t("newPasswordLabel")} hint={t("newPasswordHint")}>
           <input
             id="identity-new-password"

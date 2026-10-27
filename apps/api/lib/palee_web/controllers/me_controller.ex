@@ -109,7 +109,13 @@ defmodule PaleeWeb.MeController do
                 description: "Required to change the login's email or password"
               },
               password: %Schema{type: :string, minLength: 4},
-              email: %Schema{type: :string, format: :email, nullable: true},
+              email: %Schema{
+                type: :string,
+                format: :email,
+                nullable: true,
+                description:
+                  "ADR-207: only the current address; a new one goes through /api/me/email-change"
+              },
               preferred_locale: %Schema{
                 type: :string,
                 enum: Palee.Identity.supported_locales()
@@ -267,21 +273,38 @@ defmodule PaleeWeb.MeController do
     user = Guardian.Plug.current_resource(conn)
     params = conn.body_params
 
-    with {:ok, updated_user} <- UpdateProfile.call(user, params) do
-      json(conn, %{
-        user: %{
-          id: updated_user.id,
-          nickname: updated_user.nickname,
-          display_name: updated_user.nickname,
-          handle: updated_user.handle,
-          email: updated_user.email,
-          role: to_string(updated_user.role),
-          avatar_url: updated_user.avatar_url,
-          preferred_locale: updated_user.preferred_locale,
-          preferred_theme_slug: updated_user.preferred_theme_slug
-        }
-      })
+    case UpdateProfile.call(user, params) do
+      {:ok, updated_user} ->
+        render_profile(conn, updated_user)
+
+      # ADR-207: a new address goes through POST /api/me/email-change.
+      {:error, :email_change_needs_confirmation} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{
+          code: "email_change_needs_confirmation",
+          error: "Change the email from Settings: the new address confirms it by a link"
+        })
+
+      error ->
+        error
     end
+  end
+
+  defp render_profile(conn, updated_user) do
+    json(conn, %{
+      user: %{
+        id: updated_user.id,
+        nickname: updated_user.nickname,
+        display_name: updated_user.nickname,
+        handle: updated_user.handle,
+        email: updated_user.email,
+        role: to_string(updated_user.role),
+        avatar_url: updated_user.avatar_url,
+        preferred_locale: updated_user.preferred_locale,
+        preferred_theme_slug: updated_user.preferred_theme_slug
+      }
+    })
   end
 
   def update_avatar(conn, _params) do

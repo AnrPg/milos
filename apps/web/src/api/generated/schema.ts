@@ -75,6 +75,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/email-change/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open the link mailed to the new address
+         * @description Every session of every profile ends. A browser holding a session of the same login gets a fresh one (access_token in the answer, refresh cookie).
+         */
+        post: operations["PaleeWeb.EmailChangeController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/email-change/revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** "This wasn't me": put the old address back and lock email changes */
+        post: operations["PaleeWeb.EmailChangeController.revert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/handle-available": {
         parameters: {
             query?: never;
@@ -2399,6 +2436,45 @@ export interface paths {
         put?: never;
         /** The device card was seen: it hides until something new arrives */
         post: operations["PaleeWeb.DevicesController.seen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/email-change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The login's pending email change, if any */
+        get: operations["PaleeWeb.EmailChangeController.show"];
+        put?: never;
+        /**
+         * Ask to change the login's email (needs the current password)
+         * @description Mails a 24 h link to the new address; the login keeps its email until it is opened. The answer is the same whether or not the address already has an account.
+         */
+        post: operations["PaleeWeb.EmailChangeController.create"];
+        /** Cancel the pending email change */
+        delete: operations["PaleeWeb.EmailChangeController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/email-change/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mail the pending change's link again */
+        post: operations["PaleeWeb.EmailChangeController.resend"];
         delete?: never;
         options?: never;
         head?: never;
@@ -39769,6 +39845,148 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.EmailChangeController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string | null;
+                        email: string;
+                        user?: Record<string, never> | null;
+                    };
+                };
+            };
+            /** @description Address no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Unknown or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reverted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: string;
+                    };
+                };
+            };
+            /** @description Address no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Unknown or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AuthController.handle_available": {
         parameters: {
             query: {
@@ -51023,6 +51241,203 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.EmailChangeController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    current_password: string;
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pending */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Changes are locked for now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Wrong current password, or an invalid or unchanged address */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Nothing pending */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.CommunityEventController.hosts": {
         parameters: {
             query?: never;
@@ -55826,7 +56241,10 @@ export interface operations {
                     /** @description Required to change the login's email or password */
                     current_password?: string;
                     display_name?: string;
-                    /** Format: email */
+                    /**
+                     * Format: email
+                     * @description ADR-207: only the current address; a new one goes through /api/me/email-change
+                     */
                     email?: string | null;
                     /** @description ADR-187: the unique @handle (once per 14 days) */
                     handle?: string;

@@ -190,3 +190,20 @@ msgid "You're unsubscribed"
 msgstr "Vous êtes désabonné(e)"
 msgid "This unsubscribe link is not valid."
 msgstr "Ce lien de désabonnement n’est pas valide."
+
+
+
+msgid "Confirm your new email address"
+msgstr "Confirmez votre nouvelle adresse e-mail"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "Il a été demandé que cette adresse devienne l’adresse de connexion d’un compte %{product}. Confirmez-la pour terminer le changement. D’ici là, le compte conserve son adresse actuelle."
+
+msgid "Confirm this address"
+msgstr "Confirmer cette adresse"
+
+msgid "The link works for 24 hours."
+msgstr "Le lien est valable 24 heures."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "Vous recevez cet e-mail parce qu’il a été demandé d’utiliser cette adresse pour un compte %{product}."

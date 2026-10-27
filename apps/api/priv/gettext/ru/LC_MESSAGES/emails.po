@@ -190,3 +190,20 @@ msgid "You're unsubscribed"
 msgstr "Вы отписались"
 msgid "This unsubscribe link is not valid."
 msgstr "Эта ссылка для отписки недействительна."
+
+
+
+msgid "Confirm your new email address"
+msgstr "Подтвердите новый адрес электронной почты"
+
+msgid "Someone asked to make this the sign-in address of a %{product} account. Confirm it to finish the change. Until then, the account keeps its current address."
+msgstr "Поступил запрос сделать этот адрес адресом для входа в учётную запись %{product}. Подтвердите его, чтобы завершить изменение. До тех пор у учётной записи остаётся текущий адрес."
+
+msgid "Confirm this address"
+msgstr "Подтвердить адрес"
+
+msgid "The link works for 24 hours."
+msgstr "Ссылка действительна 24 часа."
+
+msgid "You're receiving this email because someone asked to use this address for a %{product} account."
+msgstr "Вы получили это письмо, потому что поступил запрос использовать этот адрес для учётной записи %{product}."
