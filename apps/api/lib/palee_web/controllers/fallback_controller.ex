@@ -40,7 +40,14 @@ defmodule PaleeWeb.FallbackController do
     invalid_address: {:unprocessable_entity, "Enter a valid email address"},
     suppressed: {:unprocessable_entity, "Emails to this address bounce. Check it or use another"},
     throttled: {:too_many_requests, "An email like this was sent just now. Try again later"},
-    over_budget: {:service_unavailable, "Email is busy today. Try again later"}
+    over_budget: {:service_unavailable, "Email is busy today. Try again later"},
+    # ADR-210: "Send by email" of a share link.
+    share_link_invalid: {:not_found, "This link is no longer yours to share"},
+    share_link_sender_unverified:
+      {:forbidden, "Confirm your own email address before sending links by email"},
+    share_link_daily_limit:
+      {:too_many_requests,
+       "You've sent the most links by email for today. Share or copy it instead"}
   }
 
   # ADR-202: spaces, floor plans, the cleaning schedule and machine placement.

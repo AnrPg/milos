@@ -10,7 +10,9 @@ defmodule Palee.Email.Templates do
 
   @templates %{
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
-    corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder
+    corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
+    owner_invitation: Palee.Email.Templates.OwnerInvitation,
+    share_link: Palee.Email.Templates.ShareLink
   }
 
   @doc "Every kind and its template."

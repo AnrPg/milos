@@ -663,8 +663,14 @@ defmodule Palee.Organizations do
 
   def resolve_slug_alias(slug), do: ResolveSlugAlias.call(slug)
 
-  def send_owner_invitation_email(context, organization_id, params),
-    do: SendOwnerInvitationEmail.call(context, organization_id, params)
+  def send_owner_invitation_email(context, organization_id, params, now \\ DateTime.utc_now()),
+    do: SendOwnerInvitationEmail.call(context, organization_id, params, now)
+
+  @doc "ADR-210: the delivery status of an invitation's setup emails, newest first."
+  def owner_invitation_deliveries(%Palee.Organizations.PlatformContext{}, invitation_id),
+    do: {:ok, SendOwnerInvitationEmail.deliveries(invitation_id)}
+
+  def owner_invitation_deliveries(_context, _invitation_id), do: {:error, :vendor_required}
 
   def update_organization_settings(
         context,

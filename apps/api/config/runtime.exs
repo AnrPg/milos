@@ -345,7 +345,7 @@ if config_env() == :prod do
   # feature (owner-invitation email) the app worked without until now.
   # Falls back to config.exs's Local adapter - dev-mailbox-only, and every
   # caller already treats a delivery failure as a clean {:error, _} rather
-  # than crashing (see SendOwnerInvitationEmail.safe_deliver/1) - so this
+  # than crashing (see SwooshSender.safe_deliver/1) - so this
   # stays a degraded feature, not an outage, until these are set.
   if smtp_relay do
     config :palee, Palee.Mailer,

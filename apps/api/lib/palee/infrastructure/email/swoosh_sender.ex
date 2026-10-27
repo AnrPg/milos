@@ -29,8 +29,8 @@ defmodule Palee.Infrastructure.Email.SwooshSender do
 
   # Swoosh's Local adapter (dev only) talks to a GenServer a release does not
   # start, and a provider timeout raises the same way: Mailer.deliver/1 exits
-  # the calling process instead of returning an error (see
-  # SendOwnerInvitationEmail). The worker must see a plain error to retry.
+  # the calling process instead of returning an error. The worker must see a
+  # plain error to retry.
   defp safe_deliver(email) do
     case Mailer.deliver(email) do
       {:ok, _metadata} = sent ->

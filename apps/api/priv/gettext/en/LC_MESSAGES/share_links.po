@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%{name} invited you to an event"
+msgstr "%{name} invited you to an event"
+
+msgid "%{name} asked you to be their check-in buddy"
+msgstr "%{name} asked you to be their check-in buddy"
+
+msgid "%{name} invited you to train together"
+msgstr "%{name} invited you to train together"
+
+msgid "Open the invitation"
+msgstr "Open the invitation"
+
+msgid "%{name} invited you to an event on %{product} as their guest. Open the invitation to see it and say if you're coming."
+msgstr "%{name} invited you to an event on %{product} as their guest. Open the invitation to see it and say if you're coming."
+
+msgid "%{name} asked you to be their check-in buddy on %{product}: someone they can turn to for support."
+msgstr "%{name} asked you to be their check-in buddy on %{product}: someone they can turn to for support."
+
+msgid "%{name} invited you to train together on %{product}."
+msgstr "%{name} invited you to train together on %{product}."
+
+msgid "%{name} typed in your address to send you this link. If you don't know them, ignore this email."
+msgstr "%{name} typed in your address to send you this link. If you don't know them, ignore this email."
+
+msgid "You're receiving this email because %{name} sent you an invitation through %{product}."
+msgstr "You're receiving this email because %{name} sent you an invitation through %{product}."

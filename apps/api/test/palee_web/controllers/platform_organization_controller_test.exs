@@ -4,6 +4,7 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
   # fails here instead of silently returning nothing in production.
   use PaleeWeb.ConnCase, async: false
   import Swoosh.TestAssertions
+  import Palee.EmailCase
 
   alias Palee.{Identity, Organizations}
 
@@ -275,47 +276,179 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
            )
   end
 
-  test "emails the initial owner their setup link and audits the send", context do
+  defp provision_emailed_gym(context, attrs \\ %{}) do
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)
-      |> post("/api/platform/organizations", %{
-        name: "Emailed Gym",
-        timezone: "Europe/Athens",
-        default_locale: "el",
-        initial_owner_email: "owner@example.test"
-      })
+      |> post(
+        "/api/platform/organizations",
+        Map.merge(
+          %{
+            name: "Emailed Gym",
+            timezone: "Europe/Athens",
+            default_locale: "el",
+            initial_owner_email: "owner@example.test"
+          },
+          attrs
+        )
+      )
 
     %{
       "organization" => %{"id" => organization_id},
-      "initial_owner_invitation" => %{"token" => token}
-    } =
-      json_response(conn, 201)
+      "initial_owner_invitation" => %{"id" => invitation_id, "token" => token}
+    } = json_response(conn, 201)
+
+    %{organization_id: organization_id, invitation_id: invitation_id, token: token}
+  end
+
+  defp email_invitation(context, organization_id, params) do
+    context.conn
+    |> recycle()
+    |> put_bearer_token(context.platform_user)
+    |> post("/api/platform/organizations/#{organization_id}/invitations/email", params)
+  end
+
+  test "ADR-210: queues the owner's setup link in the business's language and audits it",
+       context do
+    gym = provision_emailed_gym(context)
 
     email_conn =
-      context.conn
-      |> recycle()
-      |> put_bearer_token(context.platform_user)
-      |> post("/api/platform/organizations/#{organization_id}/invitations/email", %{
+      email_invitation(context, gym.organization_id, %{
         email: "Owner@Example.test",
-        token: token
+        token: gym.token
       })
 
-    assert response(email_conn, 204) == ""
+    assert %{"delivery" => %{"id" => delivery_id, "status" => "queued", "attempts" => 0}} =
+             json_response(email_conn, 202)
 
-    assert_email_sent(fn email ->
-      assert email.to == [{"", "owner@example.test"}]
-      assert email.subject =~ "Emailed Gym"
-      assert email.text_body =~ token
-      assert email.html_body =~ token
-    end)
+    message =
+      assert_email_enqueued(
+        kind: :owner_invitation,
+        to: "owner@example.test",
+        idempotency_key: "owner_invitation:#{gym.invitation_id}"
+      )
+
+    assert message.id == delivery_id
+    assert message.category == "account"
+    assert message.locale == "el"
+    assert message.subject =~ "«Emailed Gym»"
+    # The link only: the raw setup code is never in the mail.
+    assert message.text =~ "/set-admin?token=#{URI.encode_www_form(gym.token)}"
+    refute String.replace(message.text, URI.encode_www_form(gym.token), "") =~ gym.token
+    refute message.html =~ "Setup code"
 
     assert Repo.exists?(
              from event in OrganizationProvisioningEvent,
                where:
-                 event.organization_id == ^organization_id and
+                 event.organization_id == ^gym.organization_id and
                    event.event == "organization_invitation_emailed"
            )
+
+    assert Repo.get!(RegistrationInvitation, gym.invitation_id).emailed_at
+
+    assert deliver_enqueued_emails() == 1
+    assert_email_sent(fn email -> assert email.to == [{"", "owner@example.test"}] end)
+
+    deliveries_conn =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> get(
+        "/api/platform/organizations/#{gym.organization_id}/invitations/#{gym.invitation_id}/email"
+      )
+
+    assert %{"deliveries" => [%{"id" => ^delivery_id, "status" => "sent"} = delivery]} =
+             json_response(deliveries_conn, 200)
+
+    refute Map.has_key?(delivery, "to_address")
+  end
+
+  test "ADR-210: the vendor's language pick wins; sending again is idempotent, resend is not",
+       context do
+    gym = provision_emailed_gym(context)
+    params = %{email: "owner@example.test", token: gym.token, locale: "de"}
+
+    first = json_response(email_invitation(context, gym.organization_id, params), 202)
+    again = json_response(email_invitation(context, gym.organization_id, params), 202)
+    assert first["delivery"]["id"] == again["delivery"]["id"]
+
+    assert [%{locale: "de"}] = enqueued_emails(kind: :owner_invitation)
+
+    # The outbox's per-address throttle spaces resends a minute apart.
+    deliver_enqueued_emails()
+
+    resend =
+      email_invitation(
+        context,
+        gym.organization_id,
+        Map.put(params, :resend, true)
+      )
+
+    assert json_response(resend, 429)["code"] == "throttled"
+  end
+
+  test "ADR-210: a bound invitation goes only to its own address", context do
+    gym = provision_emailed_gym(context)
+
+    conn =
+      email_invitation(context, gym.organization_id, %{
+        email: "someone@else.test",
+        token: gym.token
+      })
+
+    assert %{"code" => "invitation_email_mismatch"} = json_response(conn, 403)
+    refute_email_enqueued(kind: :owner_invitation)
+  end
+
+  test "ADR-210: an unknown token or another business's invitation is refused", context do
+    gym = provision_emailed_gym(context)
+    {:ok, other} = Organizations.create_organization(%{name: "Other Gym"})
+
+    for {organization_id, token} <- [
+          {gym.organization_id, "not-a-real-invitation-token-at-all"},
+          {other.id, gym.token}
+        ] do
+      conn =
+        email_invitation(context, organization_id, %{email: "owner@example.test", token: token})
+
+      assert %{"code" => "invalid_invitation"} = json_response(conn, 404)
+    end
+
+    refute_email_enqueued(kind: :owner_invitation)
+  end
+
+  test "ADR-210: a suppressed address is refused and nothing is audited", context do
+    gym = provision_emailed_gym(context)
+    {:ok, _suppression} = Palee.Email.suppress("owner@example.test", :bounce)
+
+    conn =
+      email_invitation(context, gym.organization_id, %{
+        email: "owner@example.test",
+        token: gym.token
+      })
+
+    assert %{"code" => "suppressed"} = json_response(conn, 422)
+
+    refute Repo.exists?(
+             from event in OrganizationProvisioningEvent,
+               where: event.event == "organization_invitation_emailed"
+           )
+
+    refute Repo.get!(RegistrationInvitation, gym.invitation_id).emailed_at
+  end
+
+  test "ADR-210: only a vendor reads delivery status", context do
+    gym = provision_emailed_gym(context)
+
+    conn =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.ordinary_user)
+      |> get(
+        "/api/platform/organizations/#{gym.organization_id}/invitations/#{gym.invitation_id}/email"
+      )
+
+    assert %{"code" => "vendor_required"} = json_response(conn, 403)
   end
 
   test "rejects sending an invitation email without an email or token", context do

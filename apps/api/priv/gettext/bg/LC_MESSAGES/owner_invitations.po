@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Set up your admin account for %{business}"
+msgstr "Настройте администраторския си профил за „%{business}“"
+
+msgid "Set up your owner account for %{business}"
+msgstr "Настройте профила си на собственик за „%{business}“"
+
+msgid "Welcome to %{product}"
+msgstr "Добре дошли в %{product}"
+
+msgid "Set up my account"
+msgstr "Настройване на профила ми"
+
+msgid "If you weren't expecting this email, you can ignore it."
+msgstr "Ако не сте очаквали този имейл, можете да го пренебрегнете."
+
+msgid "The %{product} team made you an admin of %{business}. Create your account to get started."
+msgstr "Екипът на %{product} ви определи за администратор на „%{business}“. Създайте профила си, за да започнете."
+
+msgid "The %{product} team made you the owner of %{business}. Create your account to get started."
+msgstr "Екипът на %{product} ви определи за собственик на „%{business}“. Създайте профила си, за да започнете."
+
+msgid "If it has expired, ask the %{product} team for a new invitation."
+msgstr "Ако връзката е изтекла, поискайте нова покана от екипа на %{product}."
+
+msgid "You're receiving this email because the %{product} team set up %{business} with this address."
+msgstr "Получавате този имейл, защото екипът на %{product} създаде „%{business}“ с този адрес."
