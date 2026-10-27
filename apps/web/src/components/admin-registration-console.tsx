@@ -53,7 +53,10 @@ export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signUpAdmin, status } = useSession();
+  const { signUpAdmin, signOut, status, currentUser } = useSession();
+  // Set once this page creates the account, so only that sign-in moves on to
+  // the invited organization.
+  const [signedUpHere, setSignedUpHere] = useState(false);
   const [form, setForm] = useState<AdminRegisterForm>(() => ({
     ...INITIAL_FORM,
     invitation_token: searchParams.get("token") ?? "",
@@ -95,16 +98,6 @@ export function AdminRegistrationConsole() {
     };
   }, [form.invitation_token, i18n]);
 
-  useEffect(() => {
-    if (status !== "authenticated") return;
-
-    if (invitation) {
-      rememberSelectedOrganization(invitation.organization.slug);
-      router.replace(`/org/${invitation.organization.slug}/admin`);
-    } else {
-      router.replace("/");
-    }
-  }, [invitation, router, status]);
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
   const validPassword = validRegistrationPassword(form.password);
@@ -133,12 +126,14 @@ export function AdminRegistrationConsole() {
     setFieldErrors({});
 
     try {
+      setSignedUpHere(true);
       await signUpAdmin(form);
       if (invitation) {
         rememberSelectedOrganization(invitation.organization.slug);
         router.replace(`/org/${invitation.organization.slug}/admin`);
       }
     } catch (caught) {
+      setSignedUpHere(false);
       if (caught instanceof ApiError) {
         const nextFieldErrors = flatFieldErrors(caught.payload.errors);
         setFieldErrors(nextFieldErrors);
@@ -162,6 +157,52 @@ export function AdminRegistrationConsole() {
     } finally {
       setBusy(false);
     }
+  }
+
+  // The invitation creates a new owner account. Opened while another account
+  // is signed in (any tab of this browser), it asks before anything happens
+  // instead of carrying on as that account.
+  if (status === "authenticated" && !signedUpHere) {
+    const handle = currentUser?.handle ?? currentUser?.nickname ?? "";
+
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6 py-10" style={{ background: "var(--bg)" }}>
+        <section
+          className="w-full max-w-md rounded-[2rem] p-7"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
+            {i18n("adminRegistration")}
+          </p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+            {i18n("invitationSignedInAs", { handle })}
+          </h1>
+          <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
+            {invitation
+              ? i18n("invitationForAnotherAccount", { organization: invitation.organization.name })
+              : i18n("invitationForAnotherAccountGeneric")}
+          </p>
+          <div className="mt-6 space-y-3">
+            <button
+              className="w-full rounded-2xl px-4 py-3 font-semibold"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+              type="button"
+              onClick={() => signOut()}
+            >
+              {i18n("signOutAndContinue")}
+            </button>
+            <button
+              className="w-full rounded-2xl px-4 py-3 font-semibold"
+              style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border)" }}
+              type="button"
+              onClick={() => router.replace("/")}
+            >
+              {i18n("keepThisAccount")}
+            </button>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   const nicknameErrors = fieldErrors.nickname ?? [];

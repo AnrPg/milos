@@ -7,6 +7,11 @@ import { ApiError, SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 
 const replace = vi.fn();
 const signUpAdmin = vi.fn();
+const signOut = vi.fn();
+const session: { status: string; currentUser: { handle?: string; nickname: string } | null } = {
+  status: "guest",
+  currentUser: null,
+};
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace }),
@@ -14,7 +19,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/components/session-provider", () => ({
-  useSession: () => ({ signUpAdmin, status: "guest" }),
+  useSession: () => ({ signUpAdmin, signOut, ...session }),
 }));
 
 vi.mock("@/api/auth", async (importOriginal) => {
@@ -26,7 +31,8 @@ vi.mock("@/api/auth", async (importOriginal) => {
 });
 
 vi.mock("@/i18n/ui", () => ({
-  useUiTranslations: () => (key: string) => key,
+  useUiTranslations: () => (key: string, values?: Record<string, string>) =>
+    values ? `${key} ${Object.values(values).join(" ")}` : key,
 }));
 
 vi.mock("@/i18n/presentation", () => ({
@@ -36,6 +42,8 @@ vi.mock("@/i18n/presentation", () => ({
 describe("AdminRegistrationConsole", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    session.status = "guest";
+    session.currentUser = null;
     window.localStorage.clear();
     vi.mocked(inspectInvitation).mockResolvedValue({
       role: "admin",
@@ -82,6 +90,25 @@ describe("AdminRegistrationConsole", () => {
 
     expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("palee-method");
     expect(replace).toHaveBeenCalledWith("/org/palee-method/admin");
+  });
+
+  it("asks before going on when another account is already signed in", async () => {
+    session.status = "authenticated";
+    session.currentUser = { handle: "prod_owner_regas", nickname: "Regas" };
+
+    render(<AdminRegistrationConsole />);
+
+    expect(await screen.findByText("invitationSignedInAs prod_owner_regas")).toBeInTheDocument();
+    expect(await screen.findByText("invitationForAnotherAccount Palee Method")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "createAdminAccount" })).not.toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "signOutAndContinue" }));
+    expect(signOut).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "keepThisAccount" }));
+    expect(replace).toHaveBeenCalledWith("/");
   });
 
   it("requires only the backend-compatible minimum password length before submitting", async () => {
