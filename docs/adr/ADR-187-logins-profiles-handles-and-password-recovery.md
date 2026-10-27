@@ -21,7 +21,8 @@ was no password recovery at all, and there is no mail service (no external servi
   14 days and the old one stays reserved for its owner for 30 days.
 - **Sign-up.** No email verification for the MVP; the form explains that the email must be one the person
   can open. A repeated email gets only the count of profiles (never which); more profiles are added
-  after signing in.
+  after signing in. (ADR-211: the public sign-up no longer tells even that; it answers a known email like a
+  new one.)
 - **Password recovery without mail.** A request (email or @handle, always answered "sent") reaches the
   vendor, the owner/admin/front desk of the person's boxes and their coach
   (`palee_password_reset_handlers`, a definer function since the links live in tenant tables). The first
