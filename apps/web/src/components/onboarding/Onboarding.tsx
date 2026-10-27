@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   completeProductTour,
@@ -253,6 +253,7 @@ function ChecklistView({
   busy,
   onAction,
   onNavigate,
+  onSamePage,
   onTour,
   onInvite,
 }: {
@@ -261,6 +262,8 @@ function ChecklistView({
   busy: boolean;
   onAction: (action: OnboardingAction, step?: OnboardingStepId) => void;
   onNavigate?: () => void;
+  /** A step links to the page that is already open: show that page instead of navigating. */
+  onSamePage?: (hash: string | null) => void;
   onTour: () => void;
   onInvite: () => void;
 }) {
@@ -332,11 +335,18 @@ function ChecklistView({
                         ) : href ? (
                           <Link
                             href={href}
-                            onClick={() => {
+                            onClick={(event) => {
                               enterStaffView();
                               onNavigate?.();
-                              // Already on that page (the popup opened over it): show its top.
-                              if (href.split("?")[0] === pathname) window.scrollTo({ top: 0 });
+                              const target = new URL(href, window.location.href);
+                              if (target.pathname !== pathname || target.search !== window.location.search) return;
+                              // Already on that page (the popup over it, or the
+                              // Settings panel): a same-URL navigation does
+                              // nothing visible, so show the page ourselves.
+                              event.preventDefault();
+                              const hash = target.hash ? target.hash.slice(1) : null;
+                              if (onSamePage) onSamePage(hash);
+                              else showOnPage(hash, null);
                             }}
                             className="inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold" style={ctaStyle}>
                             {t(`steps.${step.id}.cta`)}
@@ -368,6 +378,21 @@ function ChecklistView({
   );
 }
 
+/**
+ * Shows the page a step links to when it is already open: its `hash` section,
+ * else what follows `after` (the Settings checklist), else the page top. Runs
+ * after the next paint so a checklist that just collapsed has its new height.
+ */
+function showOnPage(hash: string | null, after: HTMLElement | null) {
+  window.requestAnimationFrame(() => {
+    const section = hash ? document.getElementById(hash) : null;
+    if (hash && section) window.history.replaceState(window.history.state, "", `#${hash}`);
+    const target = section ?? (after?.nextElementSibling as HTMLElement | null);
+    if (target) target.scrollIntoView({ block: "start" });
+    else window.scrollTo({ top: 0 });
+  });
+}
+
 /** Utility → App configuration: the same checklist, always available. */
 export function AdminOnboardingPanel() {
   const t = useTranslations("Onboarding");
@@ -378,6 +403,7 @@ export function AdminOnboardingPanel() {
   // Collapsed by default: open, it fills the settings page, and a step that
   // links here (e.g. «Open settings») looked like it did nothing.
   const [collapsed, setCollapsed] = useState(true);
+  const panelRef = useRef<HTMLElement>(null);
   const checklist = query.data;
 
   if (!isOwnerOrAdmin || !checklist) return null;
@@ -388,6 +414,7 @@ export function AdminOnboardingPanel() {
 
   return (
     <section
+      ref={panelRef}
       id="setup-checklist"
       data-pending={pending ? "true" : undefined}
       className="rounded-[2rem] p-5"
@@ -427,6 +454,12 @@ export function AdminOnboardingPanel() {
             slug={slug}
             busy={mutation.isPending}
             onAction={(action, step) => mutation.mutate({ action, step })}
+            onSamePage={(hash) => {
+              // «Open settings» while on Settings: fold the steps away and
+              // show the settings below them, as a fresh visit would.
+              setCollapsed(true);
+              showOnPage(hash, panelRef.current);
+            }}
             onTour={openProductTour}
             onInvite={() => setInviteOpen(true)}
           />
