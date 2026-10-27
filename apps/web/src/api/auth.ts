@@ -84,11 +84,30 @@ export function suggestHandle(displayName: string, signal?: AbortSignal) {
   );
 }
 
-/** Always answered "sent"; never reveals whether the account exists. */
-export function requestPasswordReset(identifier: string) {
+/**
+ * Always answered "sent"; never reveals whether the account exists (ADR-206).
+ * A confirmed email gets a reset link; otherwise, or with `cantAccessEmail`,
+ * people who know the person help.
+ */
+export function requestPasswordReset(
+  identifier: string,
+  options: { cantAccessEmail?: boolean; locale?: string } = {},
+) {
   return apiRequest<unknown>("/auth/password-reset-requests", {
     method: "POST",
-    body: { identifier },
+    body: {
+      identifier,
+      ...(options.cantAccessEmail ? { cant_access_email: true } : {}),
+      ...(options.locale ? { locale: options.locale } : {}),
+    },
+  });
+}
+
+/** ADR-206: whether a reset link can still be used. Never spends it. */
+export function inspectPasswordReset(token: string) {
+  return apiRequest<{ expires_at: string }>("/auth/password-reset/inspect", {
+    method: "POST",
+    body: { token },
   });
 }
 

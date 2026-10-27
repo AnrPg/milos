@@ -11489,5 +11489,28 @@
     "placementSpace": "Space",
     "placementPickSpace": "Choose a space",
     "placementQuantity": "How many"
+  },
+  "passwordReset": {
+    "forgotIntro": "Enter your email or @handle. If your email is confirmed, we'll email you a link to choose a new password.",
+    "sendLink": "Send reset link",
+    "cantAccessEmail": "I can't access my email",
+    "sentTitle": "Check your email",
+    "sentBody": "If an account matches what you entered, we've sent instructions to its email. A reset link works for 1 hour and only once. Check your spam folder too.",
+    "sentNoEmail": "Nothing arrived, or your email isn't confirmed yet? Ask for help instead.",
+    "noEmailTitle": "Can't open your email?",
+    "noEmailIntro": "Enter your email or @handle. Someone from your box, your coach or the Palee team will check that it's really you and get a reset link to you.",
+    "askForHelp": "Ask for help",
+    "backToEmail": "Send the link by email instead",
+    "noCodeInstead": "No code? Get a reset link instead",
+    "helpSentTitle": "Request sent",
+    "helpSentBody": "If an account matches what you entered, someone from your box, your coach or the Palee team will check that it's really you and get a reset link to you. Their link works for 24 hours.",
+    "checkingLink": "Checking the link…",
+    "linkInvalid": "This reset link isn't valid. Ask for a new one.",
+    "linkExpired": "This reset link has expired. Ask for a new one.",
+    "linkUsedTitle": "This link was already used",
+    "linkUsed": "This reset link was already used to set a password. If that wasn't you, ask for a new link right away.",
+    "handlerNote": "People whose email is confirmed get a reset link by email automatically. Requests here come from people whose email isn't confirmed or who can't open it.",
+    "event_link_emailed": "Reset link emailed",
+    "event_throttled": "Too many requests (nothing sent)"
   }
 }

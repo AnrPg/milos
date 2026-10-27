@@ -11489,5 +11489,28 @@
     "placementSpace": "Ruimte",
     "placementPickSpace": "Kies een ruimte",
     "placementQuantity": "Aantal"
+  },
+  "passwordReset": {
+    "forgotIntro": "Vul je e-mailadres of @gebruikersnaam in. Is je e-mailadres bevestigd, dan mailen we je een link om een nieuw wachtwoord te kiezen.",
+    "sendLink": "Link versturen",
+    "cantAccessEmail": "Ik kan niet bij mijn e-mail",
+    "sentTitle": "Kijk in je e-mail",
+    "sentBody": "Als er een account bij je invoer hoort, hebben we instructies naar het e-mailadres ervan gestuurd. De link is 1 uur geldig en werkt maar één keer. Kijk ook in je spammap.",
+    "sentNoEmail": "Niets ontvangen, of is je e-mailadres nog niet bevestigd? Vraag dan om hulp.",
+    "noEmailTitle": "Kun je je e-mail niet openen?",
+    "noEmailIntro": "Vul je e-mailadres of @gebruikersnaam in. Iemand van je sportschool, je coach of het Palee-team controleert of jij het echt bent en bezorgt je een herstellink.",
+    "askForHelp": "Om hulp vragen",
+    "backToEmail": "Stuur de link toch per e-mail",
+    "noCodeInstead": "Geen code? Vraag een herstellink aan",
+    "helpSentTitle": "Verzoek verstuurd",
+    "helpSentBody": "Als er een account bij je invoer hoort, controleert iemand van je sportschool, je coach of het Palee-team of jij het echt bent en bezorgt je een herstellink. Die link is 24 uur geldig.",
+    "checkingLink": "Link controleren…",
+    "linkInvalid": "Deze herstellink is niet geldig. Vraag een nieuwe aan.",
+    "linkExpired": "Deze herstellink is verlopen. Vraag een nieuwe aan.",
+    "linkUsedTitle": "Deze link is al gebruikt",
+    "linkUsed": "Met deze link is al een wachtwoord ingesteld. Was jij dat niet? Vraag dan meteen een nieuwe link aan.",
+    "handlerNote": "Wie een bevestigd e-mailadres heeft, krijgt de herstellink automatisch per e-mail. Hier komen verzoeken van mensen van wie het e-mailadres niet bevestigd is of die het niet kunnen openen.",
+    "event_link_emailed": "Herstellink gemaild",
+    "event_throttled": "Te veel verzoeken (niets verstuurd)"
   }
 }

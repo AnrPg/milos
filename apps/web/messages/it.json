@@ -11489,5 +11489,28 @@
     "placementSpace": "Spazio",
     "placementPickSpace": "Scegli uno spazio",
     "placementQuantity": "Quanti"
+  },
+  "passwordReset": {
+    "forgotIntro": "Inserisci la tua email o il tuo @nomeutente. Se la tua email è confermata, ti mandiamo un link per scegliere una nuova password.",
+    "sendLink": "Invia il link",
+    "cantAccessEmail": "Non riesco ad accedere alla mia email",
+    "sentTitle": "Controlla la tua email",
+    "sentBody": "Se c'è un account che corrisponde a quello che hai inserito, abbiamo mandato le istruzioni alla sua email. Il link vale 1 ora e una sola volta. Controlla anche lo spam.",
+    "sentNoEmail": "Non è arrivato niente o la tua email non è ancora confermata? Chiedi aiuto.",
+    "noEmailTitle": "Non riesci ad aprire la tua email?",
+    "noEmailIntro": "Inserisci la tua email o il tuo @nomeutente. Qualcuno della tua palestra, il tuo coach o il team di Palee verificherà che sei davvero tu e ti farà avere un link per reimpostare la password.",
+    "askForHelp": "Chiedi aiuto",
+    "backToEmail": "Mandami il link via email",
+    "noCodeInstead": "Niente codice? Ricevi un link",
+    "helpSentTitle": "Richiesta inviata",
+    "helpSentBody": "Se c'è un account che corrisponde a quello che hai inserito, qualcuno della tua palestra, il tuo coach o il team di Palee verificherà che sei davvero tu e ti farà avere un link per reimpostare la password. Quel link vale 24 ore.",
+    "checkingLink": "Controllo del link…",
+    "linkInvalid": "Questo link per reimpostare la password non è valido. Chiedine uno nuovo.",
+    "linkExpired": "Questo link per reimpostare la password è scaduto. Chiedine uno nuovo.",
+    "linkUsedTitle": "Questo link è già stato usato",
+    "linkUsed": "Con questo link è già stata impostata una password. Se non sei stato tu, chiedi subito un nuovo link.",
+    "handlerNote": "Chi ha l'email confermata riceve il link in automatico via email. Qui arrivano le richieste di chi non ha confermato l'email o non riesce ad aprirla.",
+    "event_link_emailed": "Link inviato via email",
+    "event_throttled": "Troppe richieste (non è stato inviato nulla)"
   }
 }

@@ -89,11 +89,15 @@ export function registerFailure(
     : { fieldErrors: {}, message: fallback(error) };
 }
 
-export type ResetFailure = "invalid" | "expired" | "weak_password" | "other";
+export type ResetFailure = "invalid" | "expired" | "used" | "weak_password" | "other";
 
-/** The reset-link page tells an expired link (410) from an unknown or used one (422). */
+/**
+ * The reset-link page tells a used link (410 `used_reset_link`), an expired
+ * one (410) and an unknown one (422) apart.
+ */
 export function resetFailure(error: unknown): ResetFailure {
   if (!(error instanceof ApiError)) return "other";
+  if (error.payload.code === "used_reset_link") return "used";
   if (error.status === 410 || error.payload.code === "expired_reset_link") return "expired";
   if (error.payload.code === "invalid_reset_link") return "invalid";
   if (error.payload.code === "weak_password") return "weak_password";
@@ -104,6 +108,18 @@ export function resetFailure(error: unknown): ResetFailure {
 export function resetTokenFromHash(hash: string): string | null {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const token = params.get("token")?.trim();
+  return token ? token : null;
+}
+
+/**
+ * ADR-206: the token of a reset link: from the fragment (`#token=...`, every
+ * new link), or from the query (`?token=...`) of links handlers sent before
+ * the fragment form.
+ */
+export function resetTokenFromLocation(hash: string, search: string): string | null {
+  const fromHash = resetTokenFromHash(hash);
+  if (fromHash) return fromHash;
+  const token = new URLSearchParams(search.replace(/^\?/, "")).get("token")?.trim();
   return token ? token : null;
 }
 
