@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "I reviewed these warnings and want to publish this exact revision.",
     "quickTextDiagnosticPosition": "Line {line}, column {column}",
     "quickTextCloseManual": "Close manual",
-    "quickTextRevisionConflict": "Newer changes exist — reload required",
     "editorUnderline": "Underline",
     "editorStrike": "Strikethrough",
     "editorHighlight": "Highlight",
@@ -11512,5 +11511,17 @@
     "placementSpace": "Space",
     "placementPickSpace": "Choose a space",
     "placementQuantity": "How many"
+  },
+  "DraftConflict": {
+    "title": "This WOD was changed somewhere else",
+    "body": "A different version of this WOD was saved after you opened it, maybe in another tab, on another device or by another coach. So nothing gets overwritten by mistake, your latest changes here are not saved yet.",
+    "question": "Which version do you want to keep?",
+    "keepMine": "Keep my version",
+    "keepMineHint": "Saves what you see here in place of the other version.",
+    "loadSaved": "Load the other version",
+    "loadSavedHint": "Shows the version saved elsewhere. Your unsaved changes here are dropped.",
+    "working": "One moment…",
+    "failed": "That didn't work. Check your connection and try again.",
+    "status": "Not saved: changed elsewhere"
   }
 }

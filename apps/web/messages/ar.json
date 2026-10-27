@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "لقد راجعت هذه التحذيرات وأريد نشر هذه المراجعة بالضبط.",
     "quickTextDiagnosticPosition": "السطر {line}، العمود {column}",
     "quickTextCloseManual": "إغلاق الدليل",
-    "quickTextRevisionConflict": "توجد تغييرات أحدث — يلزم إعادة التحميل",
     "editorUnderline": "تسطير",
     "editorStrike": "يتوسطه خط",
     "editorHighlight": "تسليط الضوء",
@@ -11512,5 +11511,17 @@
     "placementSpace": "المساحة",
     "placementPickSpace": "اختر مساحة",
     "placementQuantity": "الكمية"
+  },
+  "DraftConflict": {
+    "title": "تم تغيير هذا الـ WOD في مكان آخر",
+    "body": "حُفظت نسخة مختلفة من هذا الـ WOD بعد أن فتحته، ربما في علامة تبويب أخرى أو على جهاز آخر أو من قِبل مدرب آخر. حتى لا يُستبدل أي شيء عن طريق الخطأ، لم تُحفظ تغييراتك الأخيرة هنا بعد.",
+    "question": "أي نسخة تريد الاحتفاظ بها؟",
+    "keepMine": "احتفظ بنسختي",
+    "keepMineHint": "يحفظ ما تراه هنا بدلًا من النسخة الأخرى.",
+    "loadSaved": "حمّل النسخة الأخرى",
+    "loadSavedHint": "يعرض النسخة المحفوظة في مكان آخر. تُفقد تغييراتك غير المحفوظة هنا.",
+    "working": "لحظة…",
+    "failed": "لم ينجح ذلك. تحقق من اتصالك وحاول مرة أخرى.",
+    "status": "لم يُحفظ: تغيّر في مكان آخر"
   }
 }

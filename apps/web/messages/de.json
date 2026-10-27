@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "Ich habe diese Warnungen überprüft und möchte genau diese Überarbeitung veröffentlichen.",
     "quickTextDiagnosticPosition": "Zeile {line}, Spalte {column}",
     "quickTextCloseManual": "Handbuch schließen",
-    "quickTextRevisionConflict": "Es sind neuere Änderungen vorhanden – Neuladen erforderlich",
     "editorUnderline": "Unterstreichen",
     "editorStrike": "Durchgestrichen",
     "editorHighlight": "Hervorheben",
@@ -11512,5 +11511,17 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "DraftConflict": {
+    "title": "Dieses WOD wurde woanders geändert",
+    "body": "Nachdem du dieses WOD geöffnet hast, wurde eine andere Version davon gespeichert, vielleicht in einem anderen Tab, auf einem anderen Gerät oder von einem anderen Coach. Damit nichts versehentlich überschrieben wird, sind deine letzten Änderungen hier noch nicht gespeichert.",
+    "question": "Welche Version möchtest du behalten?",
+    "keepMine": "Meine Version behalten",
+    "keepMineHint": "Speichert, was du hier siehst, anstelle der anderen Version.",
+    "loadSaved": "Andere Version laden",
+    "loadSavedHint": "Zeigt die woanders gespeicherte Version. Deine ungespeicherten Änderungen hier gehen verloren.",
+    "working": "Einen Moment…",
+    "failed": "Das hat nicht geklappt. Prüfe deine Verbindung und versuche es erneut.",
+    "status": "Nicht gespeichert: woanders geändert"
   }
 }

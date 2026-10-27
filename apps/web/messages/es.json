@@ -2523,7 +2523,6 @@
     "quickTextAcknowledgeWarnings": "Revisé estas advertencias y quiero publicar esta revisión exacta.",
     "quickTextDiagnosticPosition": "Línea {line}, columna {column}",
     "quickTextCloseManual": "Cerrar manual",
-    "quickTextRevisionConflict": "Existen cambios más recientes: es necesario recargar",
     "editorUnderline": "subrayado",
     "editorStrike": "Tachado",
     "editorHighlight": "Resaltar",
@@ -11512,5 +11511,17 @@
     "placementSpace": "Espacio",
     "placementPickSpace": "Elige un espacio",
     "placementQuantity": "Cuántas"
+  },
+  "DraftConflict": {
+    "title": "Este WOD se cambió en otro lugar",
+    "body": "Se guardó una versión distinta de este WOD después de que lo abrieras, quizá en otra pestaña, en otro dispositivo o por otro coach. Para no sobrescribir nada por error, tus últimos cambios aquí aún no se han guardado.",
+    "question": "¿Qué versión quieres conservar?",
+    "keepMine": "Conservar mi versión",
+    "keepMineHint": "Guarda lo que ves aquí en lugar de la otra versión.",
+    "loadSaved": "Cargar la otra versión",
+    "loadSavedHint": "Muestra la versión guardada en otro lugar. Se descartan tus cambios sin guardar de aquí.",
+    "working": "Un momento…",
+    "failed": "No ha funcionado. Comprueba tu conexión e inténtalo de nuevo.",
+    "status": "Sin guardar: cambiado en otro lugar"
   }
 }
