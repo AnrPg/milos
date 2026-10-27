@@ -61,7 +61,8 @@ the original wording and dates for traceability.
 | TD-091–TD-094 | Resolved |
 | TD-095–TD-103 | Open |
 | TD-104–TD-106 | Open |
-| TD-109 | In progress (code done; gitops cutover pending) |
+| TD-109 | In progress (cutover done 2026-10-27; old milos-* objects pending removal) |
+| TD-205 | Open |
 
 ## Detailed Ledger
 
@@ -195,3 +196,4 @@ the original wording and dates for traceability.
 | TD-202 | E-shop / Tenant data (ADR-190) | `shop_stock_alerts` holds `user_id` and is retained with the shop for ten years like orders. Alerts are not accounting records: purge notified alerts after a short window and on member erasure. | Kept inside the shop retention policy for the first cut | Medium | 2026-10-23 |
 | TD-203 | E-shop (ADR-190) | (1) Unpaid online orders get no reminder before their seven-day hold expires (only ready orders are reminded, after 24 hours). (2) The shop console was built against `/admin/shop`; the API lives under `/api/org/:slug/staff/shop` and the console must use that base. (3) No real concurrency test for stock, promotion caps and order numbers (row and advisory locks; the Ecto sandbox serialises connections). | Follow-ups found while building the API | Low | 2026-10-23 |
 | TD-204 | Εγώ / Κοινοποίηση (ADR-196) | (1) `pr_celebrations` is stored but nothing posts automatic PR celebration cards yet; the card must read it when it ships. (2) «Αναφορά προβλήματος» in Βοήθεια & ξενάγηση is a mailto that shows only when `NEXT_PUBLIC_SUPPORT_EMAIL` is set; it should become an in-app report with device and route context. | Opt-ins and the help page landed before the features behind them | Low | 2026-10-24 |
+| TD-205 | Security / Tenancy | The `vendors` RLS policy (`20260807050000`) uses the same expression for reads and writes, `vendors.user_id = app.user_id OR palee_acting_user_is_vendor()`, so any session scoped to a user may insert an active vendor row for that user. No code path does so today (`grant_vendor/1` runs only from an operator `rpc` inside the user's own scope, which is how the production owner was granted on 2026-10-27), but the database is not the backstop it is elsewhere: split the policy so INSERT/UPDATE require an existing vendor (or a dedicated operator setting) | Found during the palee.app cutover; changing a root tenancy policy needs its own review and tests | High | 2026-10-27 |
