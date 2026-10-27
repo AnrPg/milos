@@ -696,3 +696,15 @@ msgstr "أُلغي الصف %{class} (%{time}): %{reason}. تم تحرير مك�
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "أُلغي الصف %{class} (%{time}). تم تحرير مكانك."
+
+msgid "The email key expires soon"
+msgstr "مفتاح البريد الإلكتروني سينتهي قريبًا"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "ينتهي مفتاح SMTP الخاص بـ Palee بعد %{days} يومًا (%{date}). أنشئ مفتاحًا جديدًا في Brevo وحدّث السرّ على الخادم قبل ذلك، وإلا سيتوقف Palee عن إرسال البريد الإلكتروني."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "انتهى مفتاح SMTP الخاص بـ Palee في %{date}، لذلك لا يستطيع Palee إرسال البريد الإلكتروني. أنشئ مفتاحًا جديدًا في Brevo وحدّث السرّ على الخادم."
+
+msgid "The email key has expired"
+msgstr "انتهت صلاحية مفتاح البريد الإلكتروني"

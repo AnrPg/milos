@@ -8,16 +8,22 @@ defmodule Palee.Email.Commands.EnqueueEmail do
        in demo mode is refused (`:not_live`); `security` and `account`
        mail is the platform's, not the business's, and always goes;
     3. an existing message with the same `idempotency_key` is returned as is;
-    4. the address is not suppressed (`:suppressed`);
+    4. the address is not suppressed (`:suppressed`), and transactional
+       mail does not go to an address that unsubscribed from its kind
+       (ADR-212, also `:suppressed`);
     5. the kind's per-recipient throttle (`:throttled`);
     6. the daily budget: queued now, deferred to the next UTC day, or, for
        security mail past the hard cap, refused (`:over_budget`);
     7. the template renders; the body is encrypted and the row and its job
-       are inserted in one transaction.
+       are inserted in one transaction. Transactional mail gets a one-click
+       unsubscribe link (ADR-212): `List-Unsubscribe` and
+       `List-Unsubscribe-Post` headers (RFC 8058) and a footer link.
+       Security and account mail never does.
   """
 
   alias Palee.Email.Domain.{Address, SendingPolicy}
-  alias Palee.Email.{Message, Templates}
+  alias Palee.Email.{Layout, Message, Templates}
+  alias Palee.Email.Commands.Unsubscribe
   alias Palee.Infrastructure.Security.DataCipher
   alias Palee.Organizations
   alias Palee.Workers.DeliverEmailJob
@@ -38,6 +44,7 @@ defmodule Palee.Email.Commands.EnqueueEmail do
 
         nil ->
           with :ok <- not_suppressed(store, address),
+               :ok <- not_opted_out(store, address, kind, category),
                :ok <- throttle(store, template, kind, address, category, now),
                {:ok, schedule} <- budget(store, category, now) do
             insert(store, template, kind, address, assigns, category, schedule, opts)
@@ -80,6 +87,15 @@ defmodule Palee.Email.Commands.EnqueueEmail do
   defp not_suppressed(store, address),
     do: if(store.suppressed?(Address.digest(address)), do: {:error, :suppressed}, else: :ok)
 
+  defp not_opted_out(store, address, kind, :transactional),
+    do:
+      if(store.opted_out?(Address.digest(address), kind_name(kind)),
+        do: {:error, :suppressed},
+        else: :ok
+      )
+
+  defp not_opted_out(_store, _address, _kind, _category), do: :ok
+
   defp throttle(store, template, kind, address, category, now) do
     rule =
       if function_exported?(template, :throttle, 0),
@@ -105,10 +121,9 @@ defmodule Palee.Email.Commands.EnqueueEmail do
     assigns = Map.new(assigns)
 
     body =
-      Jason.encode!(%{
-        "text" => template.text(assigns, locale),
-        "html" => template.html(assigns, locale)
-      })
+      %{"text" => template.text(assigns, locale), "html" => template.html(assigns, locale)}
+      |> with_unsubscribe(category, address, kind, locale)
+      |> Jason.encode!()
 
     {status, scheduled_at} =
       case schedule do
@@ -143,6 +158,24 @@ defmodule Palee.Email.Commands.EnqueueEmail do
       {:ok, message}
     end
   end
+
+  # ADR-212: a business's mail can be unsubscribed from in one click; the
+  # platform's own security and account mail cannot.
+  defp with_unsubscribe(body, :transactional, address, kind, locale) do
+    url = Unsubscribe.url(address, kind_name(kind), locale)
+
+    %{
+      "text" => Layout.put_unsubscribe_text(body["text"], locale, url),
+      "html" => Layout.put_unsubscribe_html(body["html"], locale, url),
+      "headers" => %{
+        "List-Unsubscribe" => "<#{url}>",
+        "List-Unsubscribe-Post" => "List-Unsubscribe=One-Click"
+      }
+    }
+  end
+
+  defp with_unsubscribe(body, _category, _address, _kind, locale),
+    do: %{body | "html" => Layout.put_unsubscribe_html(body["html"], locale, nil)}
 
   defp kind_name(kind) when is_atom(kind), do: Atom.to_string(kind)
   defp kind_name(kind) when is_binary(kind), do: kind

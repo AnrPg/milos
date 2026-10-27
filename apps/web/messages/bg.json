@@ -11489,5 +11489,11 @@
     "placementSpace": "Помещение",
     "placementPickSpace": "Изберете помещение",
     "placementQuantity": "Колко"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "Ключът за имейл изтича скоро",
+    "notifKeyExpiredTitle": "Ключът за имейл изтече",
+    "notifKeyExpiringBody": "SMTP ключът на Palee изтича след {days} дни ({date}). Дотогава създай нов ключ в Brevo и обнови тайната на сървъра, иначе Palee ще спре да изпраща имейли.",
+    "notifKeyExpiredBody": "SMTP ключът на Palee изтече на {date}, затова Palee не може да изпраща имейли. Създай нов ключ в Brevo и обнови тайната на сървъра."
   }
 }

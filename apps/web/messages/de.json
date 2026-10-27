@@ -11489,5 +11489,11 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "Der E-Mail-Schlüssel läuft bald ab",
+    "notifKeyExpiredTitle": "Der E-Mail-Schlüssel ist abgelaufen",
+    "notifKeyExpiringBody": "Der SMTP-Schlüssel von Palee läuft in {days} Tagen ab ({date}). Erstell vorher in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server, sonst verschickt Palee keine E-Mails mehr.",
+    "notifKeyExpiredBody": "Der SMTP-Schlüssel von Palee ist am {date} abgelaufen, deshalb kann Palee keine E-Mails verschicken. Erstell in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server."
   }
 }

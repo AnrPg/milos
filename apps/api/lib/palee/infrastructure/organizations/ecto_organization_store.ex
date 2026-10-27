@@ -496,6 +496,19 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     end)
   end
 
+  # ADR-212: a background job alerting the platform team has no session, and
+  # vendors' rows are visible only to a vendor or the operator scope; this
+  # read-only use of the operator scope lists who to alert.
+  @impl true
+  def list_active_vendor_user_ids do
+    RepoContext.run(%{vendor_grant: true}, fn ->
+      Vendor
+      |> where([vendor], vendor.status == :active)
+      |> select([vendor], vendor.user_id)
+      |> Repo.all()
+    end)
+  end
+
   @impl true
   def get_vendor(user_id),
     do: Repo.get_by(Vendor, user_id: user_id, status: :active)

@@ -13,6 +13,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import { emailKeyNotificationText } from "@/components/email/email-key-notifications";
 import { useTranslations } from "next-intl";
 
 import {
@@ -89,6 +90,11 @@ function NotificationCard({
   // ADR-187: a password reset request (handlers) and the reset itself (the person).
   function passwordResetText(notification: NotificationRecord, part: "title" | "body") {
     return passwordResetNotificationText(notification.type, notification.payload, part, (key, values) => tResets(key, values));
+  }
+  const tEmailDeliverability = useTranslations("emailDeliverability");
+  // ADR-212: vendors are told before the SMTP key expires.
+  function emailKeyText(notification: NotificationRecord, part: "title" | "body") {
+    return emailKeyNotificationText(notification.type, notification.payload, part, (key, values) => tEmailDeliverability(key, values));
   }
   const tConversations = useTranslations("Conversations");
   // ADR-193: a person's message and a message request (who, never what).
@@ -217,6 +223,8 @@ function NotificationCard({
   }
 
   function notificationBody(notification: NotificationRecord) {
+    const emailKey = emailKeyText(notification, "body");
+    if (emailKey !== null) return emailKey;
     const passwordReset = passwordResetText(notification, "body");
     if (passwordReset !== null) return passwordReset;
     const follow = followText(notification, "body");
@@ -505,6 +513,8 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const emailKey = emailKeyText(notification, "title");
+    if (emailKey !== null) return emailKey;
     const passwordReset = passwordResetText(notification, "title");
     if (passwordReset !== null) return passwordReset;
     const follow = followText(notification, "title");

@@ -696,3 +696,15 @@ msgstr "A aula %{class} (%{time}) foi cancelada: %{reason}. O teu lugar foi libe
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "A aula %{class} (%{time}) foi cancelada. O teu lugar foi libertado."
+
+msgid "The email key expires soon"
+msgstr "A chave de email expira em breve"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "A chave SMTP do Palee expira dentro de %{days} dias (%{date}). Cria uma chave nova no Brevo e atualiza o segredo do servidor antes disso, ou o Palee deixa de enviar emails."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "A chave SMTP do Palee expirou a %{date}, por isso o Palee não consegue enviar emails. Cria uma chave nova no Brevo e atualiza o segredo do servidor."
+
+msgid "The email key has expired"
+msgstr "A chave de email expirou"

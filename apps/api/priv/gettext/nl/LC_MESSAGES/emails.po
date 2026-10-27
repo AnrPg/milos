@@ -30,3 +30,15 @@ msgstr "Beste %{name},"
 
 msgid "Hello,"
 msgstr "Hallo,"
+
+msgid "Unsubscribe from these emails"
+msgstr "Afmelden voor deze e-mails"
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "U ontvangt dit soort e-mails niet meer van %{product}. E-mails over uw account en de beveiliging ervan blijft u ontvangen."
+
+msgid "You're unsubscribed"
+msgstr "U bent afgemeld"
+
+msgid "This unsubscribe link is not valid."
+msgstr "Deze afmeldlink is niet geldig."

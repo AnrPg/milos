@@ -26,6 +26,9 @@ defmodule Palee.Email.Layout do
 
   @domain "emails"
   @rtl_locales ~w(ar he)
+  # Where the outbox puts a transactional email's unsubscribe link (ADR-212).
+  # Escaped content can never contain "<!--", so the marker is unambiguous.
+  @unsubscribe_marker "<!--palee:unsubscribe-->"
   @font "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
   # -- strings -----------------------------------------------------------------
@@ -92,7 +95,7 @@ defmodule Palee.Email.Layout do
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" dir="#{dir}" style="max-width:560px;">
     <tr><td style="padding:16px 28px;font-family:#{@font};font-size:12px;line-height:1.5;color:#{c(:muted)};text-align:#{align};">
     #{escape(reason)}<br>
-    #{escape(t(locale, "This email was sent automatically by %{product}.", %{product: product_name()}))} <a href="#{escape(base_url)}" style="color:#{c(:muted)};">#{escape(host(base_url))}</a>
+    #{escape(t(locale, "This email was sent automatically by %{product}.", %{product: product_name()}))} <a href="#{escape(base_url)}" style="color:#{c(:muted)};">#{escape(host(base_url))}</a>#{@unsubscribe_marker}
     </td></tr>
     </table>
     </td></tr>
@@ -116,6 +119,32 @@ defmodule Palee.Email.Layout do
     Enum.join(List.flatten(blocks) |> Enum.reject(&(&1 in [nil, ""])), "\n\n") <>
       "\n\n-- \n" <> Enum.join(footer, "\n") <> "\n"
   end
+
+  # -- unsubscribe (ADR-212) ---------------------------------------------------
+
+  @doc """
+  `html` (a document from `html/3`) with the "unsubscribe" link to `url`
+  in its footer. The outbox adds it to transactional mail only; with a nil
+  `url` the placeholder is removed and nothing is added.
+  """
+  def put_unsubscribe_html(html, _locale, nil),
+    do: String.replace(html, @unsubscribe_marker, "", global: false)
+
+  def put_unsubscribe_html(html, locale, url) do
+    link =
+      ~s(<br><a href="#{escape(url)}" style="color:#{c(:muted)};">) <>
+        escape(t(locale, "Unsubscribe from these emails")) <> "</a>"
+
+    if String.contains?(html, @unsubscribe_marker),
+      do: String.replace(html, @unsubscribe_marker, link, global: false),
+      else: String.replace(html, "</body>", link <> "\n</body>", global: false)
+  end
+
+  @doc "The text twin of `put_unsubscribe_html/3`: a last footer line."
+  def put_unsubscribe_text(text, locale, url),
+    do:
+      String.trim_trailing(text) <>
+        "\n" <> t(locale, "Unsubscribe from these emails") <> ": " <> url <> "\n"
 
   # -- HTML components ---------------------------------------------------------
 

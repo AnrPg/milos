@@ -30,3 +30,15 @@ msgstr "مرحبًا %{name}،"
 
 msgid "Hello,"
 msgstr "مرحبًا،"
+
+msgid "Unsubscribe from these emails"
+msgstr "إلغاء الاشتراك في هذه الرسائل"
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "لن تصلك بعد الآن رسائل من هذا النوع من %{product}. ستستمر رسائل حسابك وأمانه في الوصول."
+
+msgid "You're unsubscribed"
+msgstr "تم إلغاء اشتراكك"
+
+msgid "This unsubscribe link is not valid."
+msgstr "رابط إلغاء الاشتراك هذا غير صالح."

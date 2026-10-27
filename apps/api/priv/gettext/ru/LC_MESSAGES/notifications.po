@@ -696,3 +696,15 @@ msgstr "Занятие %{class} (%{time}) отменено: %{reason}. Ваше 
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "Занятие %{class} (%{time}) отменено. Ваше место освобождено."
+
+msgid "The email key expires soon"
+msgstr "Ключ для email скоро истечёт"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "SMTP-ключ Palee истекает через %{days} дн. (%{date}). До этого создайте новый ключ в Brevo и обновите секрет на сервере, иначе Palee перестанет отправлять письма."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "SMTP-ключ Palee истёк %{date}, поэтому Palee не может отправлять письма. Создайте новый ключ в Brevo и обновите секрет на сервере."
+
+msgid "The email key has expired"
+msgstr "Ключ для email истёк"

@@ -11489,5 +11489,11 @@
     "placementSpace": "Ruimte",
     "placementPickSpace": "Kies een ruimte",
     "placementQuantity": "Aantal"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "De e-mailsleutel verloopt binnenkort",
+    "notifKeyExpiredTitle": "De e-mailsleutel is verlopen",
+    "notifKeyExpiringBody": "De SMTP-sleutel van Palee verloopt over {days} dagen ({date}). Maak vóór die tijd een nieuwe sleutel in Brevo en werk het secret op de server bij, anders verstuurt Palee geen e-mail meer.",
+    "notifKeyExpiredBody": "De SMTP-sleutel van Palee is op {date} verlopen, dus Palee kan geen e-mail versturen. Maak een nieuwe sleutel in Brevo en werk het secret op de server bij."
   }
 }

@@ -210,3 +210,61 @@ tests:
             exp_annotations:
               summary: "Shop revenue does not reconcile"
               description: "At least one business day drifted in the last nightly reconciliation: shop order totals, shop-stream invoice lines and shop payments minus refunds disagree. Search the logs for shop_revenue_drift (organization_id, day, the three figures) and follow docs/operations/shop-revenue-reconciliation.md."
+
+  - name: email budget at 80% and deferred mail (ADR-212)
+    interval: 1m
+    input_series:
+      - series: 'palee_email_sent_today{job="palee-api"}'
+        values: "200 223 224 224 224 224 224 224 224 224"
+      - series: 'palee_email_daily_budget{job="palee-api"}'
+        values: "280x9"
+      - series: 'palee_email_deferred_messages{job="palee-api"}'
+        values: "0 0 3 3 3 3 3 3 3 3 3 3 3 3"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: PaleeEmailBudgetHigh
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: PaleeEmailBudgetHigh
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: email_budget }
+            exp_annotations:
+              summary: "Email sending at 224 today, 80% of the daily budget"
+              description: "Today's sent emails reached 80% of EMAIL_DAILY_BUDGET. Past the budget, non-security mail waits until the next UTC day and security mail stops at EMAIL_DAILY_HARD_CAP. Look for a loop or a burst of invitations before raising the budget (Brevo's free plan sends 300 a day)."
+      - eval_time: 11m
+        alertname: PaleeEmailDeferred
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: PaleeEmailDeferred
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: email_budget }
+            exp_annotations:
+              summary: "3 emails deferred to tomorrow"
+              description: "The daily budget is spent, so emails wait for the next UTC day (00:01). They are not lost, but people are waiting for them."
+
+  - name: smtp key expiry warns at 30 days and pages once expired (ADR-212)
+    interval: 1m
+    input_series:
+      - series: 'palee_email_smtp_key_days_left{job="palee-api"}'
+        values: "31 30 0 -1"
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: PaleeEmailSmtpKeyExpiring
+        exp_alerts: []
+      - eval_time: 1m
+        alertname: PaleeEmailSmtpKeyExpiring
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: smtp_key }
+            exp_annotations:
+              summary: "The SMTP key expires in 30 days"
+              description: "SMTP_KEY_EXPIRES_ON is within 30 days. Create a new SMTP key in Brevo, update the milos-smtp secret and SMTP_KEY_EXPIRES_ON (docs/operations/email-deliverability.md, 'Rotating the SMTP key')."
+      - eval_time: 2m
+        alertname: PaleeEmailSmtpKeyExpired
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: PaleeEmailSmtpKeyExpired
+        exp_alerts:
+          - exp_labels: { severity: critical, signal: smtp_key }
+            exp_annotations:
+              summary: "The SMTP key has expired: no email is sent"
+              description: "SMTP_KEY_EXPIRES_ON is in the past, so Brevo refuses the key and every email fails. Rotate the key now."

@@ -30,3 +30,15 @@ msgstr "Bonjour %{name},"
 
 msgid "Hello,"
 msgstr "Bonjour,"
+
+msgid "Unsubscribe from these emails"
+msgstr "Se désabonner de ces e-mails"
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Vous ne recevrez plus ce type d’e-mails de %{product}. Les e-mails concernant votre compte et sa sécurité continueront de vous parvenir."
+
+msgid "You're unsubscribed"
+msgstr "Vous êtes désabonné(e)"
+
+msgid "This unsubscribe link is not valid."
+msgstr "Ce lien de désabonnement n’est pas valide."

@@ -11489,5 +11489,11 @@
     "placementSpace": "Espacio",
     "placementPickSpace": "Elige un espacio",
     "placementQuantity": "Cuántas"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "La clave de email caduca pronto",
+    "notifKeyExpiredTitle": "La clave de email ha caducado",
+    "notifKeyExpiringBody": "La clave SMTP de Palee caduca dentro de {days} días ({date}). Crea una clave nueva en Brevo y actualiza el secreto del servidor antes de esa fecha, o Palee dejará de enviar emails.",
+    "notifKeyExpiredBody": "La clave SMTP de Palee caducó el {date}, así que Palee no puede enviar emails. Crea una clave nueva en Brevo y actualiza el secreto del servidor."
   }
 }

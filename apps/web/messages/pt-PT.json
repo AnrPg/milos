@@ -11489,5 +11489,11 @@
     "placementSpace": "Espaço",
     "placementPickSpace": "Escolha um espaço",
     "placementQuantity": "Quantas"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "A chave de email expira em breve",
+    "notifKeyExpiredTitle": "A chave de email expirou",
+    "notifKeyExpiringBody": "A chave SMTP do Palee expira dentro de {days} dias ({date}). Cria uma chave nova no Brevo e atualiza o segredo do servidor antes disso, ou o Palee deixa de enviar emails.",
+    "notifKeyExpiredBody": "A chave SMTP do Palee expirou a {date}, por isso o Palee não consegue enviar emails. Cria uma chave nova no Brevo e atualiza o segredo do servidor."
   }
 }

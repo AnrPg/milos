@@ -4,12 +4,14 @@ defmodule Palee.Email.Ports.Sender do
   An adapter never raises or exits: a provider outage is `{:error, reason}`.
   """
 
+  # `headers` (ADR-212): extra headers such as List-Unsubscribe.
   @type email :: %{
-          to: String.t(),
-          subject: String.t(),
-          text: String.t(),
-          html: String.t(),
-          message_id: String.t()
+          required(:to) => String.t(),
+          required(:subject) => String.t(),
+          required(:text) => String.t(),
+          required(:html) => String.t(),
+          required(:message_id) => String.t(),
+          optional(:headers) => %{String.t() => String.t()}
         }
 
   @callback deliver(email()) :: {:ok, term()} | {:error, term()}

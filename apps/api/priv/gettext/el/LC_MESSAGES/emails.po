@@ -30,3 +30,15 @@ msgstr "Γεια σας %{name},"
 
 msgid "Hello,"
 msgstr "Γεια σας,"
+
+msgid "Unsubscribe from these emails"
+msgstr "Διακοπή αυτών των email"
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Δεν θα λαμβάνετε πλέον αυτό το είδος email από το %{product}. Τα email για τον λογαριασμό σας και την ασφάλειά του θα συνεχίσουν να φτάνουν."
+
+msgid "You're unsubscribed"
+msgstr "Η εγγραφή σας καταργήθηκε"
+
+msgid "This unsubscribe link is not valid."
+msgstr "Αυτός ο σύνδεσμος διακοπής δεν είναι έγκυρος."

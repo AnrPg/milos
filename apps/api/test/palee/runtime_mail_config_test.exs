@@ -19,7 +19,9 @@ defmodule Palee.RuntimeMailConfigTest do
     "MEILI_MASTER_KEY" => "m",
     "SMTP_RELAY" => "smtp-relay.brevo.com",
     "MAIL_FROM_ADDRESS" => "no-reply@palee.app",
-    "REDIS_URL" => "redis://redis:6379"
+    "REDIS_URL" => "redis://redis:6379",
+    "BREVO_WEBHOOK_SECRET" => "secret-from-the-environment-0123456789",
+    "SMTP_KEY_EXPIRES_ON" => "2027-10-26"
   }
 
   setup do
@@ -46,5 +48,19 @@ defmodule Palee.RuntimeMailConfigTest do
     assert tls[:verify] == :verify_peer
     assert tls[:server_name_indication] == ~c"smtp-relay.brevo.com"
     assert is_list(tls[:cacerts]) and tls[:cacerts] != []
+    assert is_function(tls[:customize_hostname_check][:match_fun], 2)
+  end
+
+  test "ADR-212: the webhook secret and the SMTP key's expiry come from the environment" do
+    config = Config.Reader.read!("config/runtime.exs", env: :prod, target: :host)
+
+    assert config[:palee][:brevo_webhook_secret] == "secret-from-the-environment-0123456789"
+    assert config[:palee][:smtp_key_expires_on] == ~D[2027-10-26]
+
+    System.put_env("SMTP_KEY_EXPIRES_ON", "26/10/2027")
+
+    assert_raise RuntimeError, ~r/SMTP_KEY_EXPIRES_ON must be a date/, fn ->
+      Config.Reader.read!("config/runtime.exs", env: :prod, target: :host)
+    end
   end
 end

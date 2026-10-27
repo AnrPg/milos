@@ -116,6 +116,9 @@ defmodule Palee.Organizations.OrganizationStore do
   def get_vendor(user_id), do: impl().get_vendor(user_id)
 
   @impl true
+  def list_active_vendor_user_ids, do: impl().list_active_vendor_user_ids()
+
+  @impl true
   def provision_organization(organization_params, invitation_params, platform_user_id, issued_at),
     do:
       impl().provision_organization(

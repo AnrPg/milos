@@ -11489,5 +11489,11 @@
     "placementSpace": "חלל",
     "placementPickSpace": "בחרו חלל",
     "placementQuantity": "כמה"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "מפתח המייל יפוג בקרוב",
+    "notifKeyExpiredTitle": "מפתח המייל פג",
+    "notifKeyExpiringBody": "מפתח ה-SMTP של Palee יפוג בעוד {days} ימים ({date}). צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת לפני כן, אחרת Palee יפסיק לשלוח מיילים.",
+    "notifKeyExpiredBody": "מפתח ה-SMTP של Palee פג ב-{date}, ולכן Palee לא יכול לשלוח מיילים. צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת."
   }
 }

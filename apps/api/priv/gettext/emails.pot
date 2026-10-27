@@ -30,3 +30,15 @@ msgstr ""
 
 msgid "Hello,"
 msgstr ""
+
+msgid "Unsubscribe from these emails"
+msgstr ""
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr ""
+
+msgid "You're unsubscribed"
+msgstr ""
+
+msgid "This unsubscribe link is not valid."
+msgstr ""

@@ -30,3 +30,15 @@ msgstr "Здравейте, %{name},"
 
 msgid "Hello,"
 msgstr "Здравейте,"
+
+msgid "Unsubscribe from these emails"
+msgstr "Отписване от тези имейли"
+
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Вече няма да получавате този вид имейли от %{product}. Имейлите за профила Ви и неговата сигурност ще продължат да пристигат."
+
+msgid "You're unsubscribed"
+msgstr "Отписахте се"
+
+msgid "This unsubscribe link is not valid."
+msgstr "Тази връзка за отписване не е валидна."
