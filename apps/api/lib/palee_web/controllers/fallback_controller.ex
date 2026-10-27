@@ -462,6 +462,10 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-211: an invitation to an address held for 7 days after an email
+  # change answers as a taken one.
+  def call(conn, {:error, :email_reserved}), do: call(conn, {:error, :email_taken})
+
   def call(conn, {:error, :email_taken}) do
     conn
     |> put_status(:conflict)

@@ -63,6 +63,29 @@ Status: Accepted
   keep `email_in_use` with the count. They need an invitation token, and
   another change owns `/set-admin`.
 
+### 1b. An address released by an email change is held for 7 days
+ADR-207 frees the old address once a change is confirmed, but its owner can
+take it back with the "this wasn't me" link for 7 days. Without a hold,
+someone could register it in between and the revert would fail.
+- `EmailChange.confirm` records the old address in
+  `released_email_reservations` for that login until 7 days later. Only
+  `InvitationEmail.digest/1` (SHA-256 of the normalised address) is stored,
+  never the address.
+- **Sign-up** (`RegisterProfile`, a new login): `{:error, :email_reserved}`.
+  The public `/api/auth/register` maps it to the neutral answer
+  (`SignUpWithExistingEmail.reserved/1`): the same field checks, `201
+  {confirmation: "email_sent", email}`, nothing created and no email sent
+  (the inbox is no longer that login's). The invitation paths answer it as
+  `email_in_use`, like a taken address.
+- **Email change to it** by another login: the usual answer (the pending
+  address shown), but no pending change is recorded and no link is sent; an
+  older pending change of that login is dropped, as a new request would.
+  A change requested before the release cannot confirm onto it
+  (`:email_unavailable`).
+- **Revert** by the original login takes the address back and ends the hold.
+  The same login may also change back to it; nobody else can until the
+  hold lapses.
+
 ### 2. Self-service deletion (`Application.AccountDeletion`)
 - **Scopes.** Settings › "Delete profile or account" offers two scopes:
   - `profile`: this profile. A login's only profile counts as the whole
@@ -171,6 +194,11 @@ Status: Accepted
     straight to "Your account is ready" with the demo business, so that
     form leaks after submit.
   - The invitation paths still answer `email_in_use` with the count.
+- **The address hold** leaks one thing to the login that tried it: after
+  a neutral email-change answer, its Settings show no pending change (it
+  was never recorded). It says only that the address was released lately,
+  not by whom. The hold table has no RLS, like `logins`, and goes with the
+  login.
 - **Anonymised profiles keep their activity rows** (workouts, posts,
   messages, wellness) linked to an anonymous id with no name, handle,
   email, avatar or login. Follow-up: an erase of personal-only tables for
@@ -207,7 +235,10 @@ Status: Accepted
   - `GET|DELETE /api/auth/account-deletion` (session);
   - `POST /api/auth/account-deletion` (session, credential rate limit);
   - `POST /api/auth/account-deletion/{confirm,undo,undo-sign-in}`.
-- **Migration** `20261224180000_account_deletions`.
+- **Migrations** `20261224180000_account_deletions`,
+  `20261224180100_released_email_reservations` (port
+  `Identity.Ports.ReleasedEmailStore`, adapter
+  `Infrastructure.Identity.EctoReleasedEmailStore`).
 - **Emails:**
   - kinds `:signup_attempt_existing` and `:account_deletion_confirm`;
   - their strings are in a gettext domain of their own,

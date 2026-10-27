@@ -61,6 +61,32 @@ defmodule Palee.Identity do
   (field rules, the handle being free), with nothing written.
   """
   defdelegate validate_new_login(params), to: UserStore
+
+  @doc """
+  ADR-211: an address a login changed away from stays held for it for
+  `reserved_email_seconds/0`, while its revert link works; nobody else may
+  sign up with it or change to it meanwhile. Only a digest is stored.
+  """
+  def reserve_released_email(email, login_id, now \\ DateTime.utc_now()),
+    do:
+      Palee.Identity.ReleasedEmailStore.reserve(
+        email,
+        login_id,
+        DateTime.add(now, reserved_email_seconds(), :second),
+        now
+      )
+
+  @doc "ADR-211: whether `email` is held for a login other than `login_id` (nil: any login)."
+  def email_reserved_for_other?(email, login_id \\ nil, now \\ DateTime.utc_now()),
+    do: Palee.Identity.ReleasedEmailStore.reserved_for_other?(email, login_id, now)
+
+  @doc "ADR-211: the login took its address back."
+  defdelegate release_reserved_email(email, login_id),
+    to: Palee.Identity.ReleasedEmailStore,
+    as: :release
+
+  @doc "How long a released address is held: the lifetime of ADR-207's revert link."
+  def reserved_email_seconds, do: 7 * 24 * 3_600
   defdelegate find_login_by_email(email), to: UserStore, as: :get_login_by_email
   defdelegate find_by_email(email), to: UserStore, as: :get_by_email
   defdelegate list_profiles(login_id), to: UserStore

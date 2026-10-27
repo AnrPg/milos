@@ -26,6 +26,19 @@ defmodule Palee.Application.SignUpWithExistingEmail do
     end
   end
 
+  @doc """
+  A sign-up with an address held for the login that changed away from it
+  (ADR-211, the ADR-207 revert window): the same answer, nothing created.
+  No email: the address's inbox no longer belongs to that login's owner.
+  """
+  @spec reserved(map()) :: {:confirmation_sent, String.t()} | {:error, Ecto.Changeset.t()}
+  def reserved(params) when is_map(params) do
+    with :ok <- Identity.validate_new_login(params) do
+      {:confirmation_sent,
+       Palee.Organizations.Domain.InvitationEmail.normalize(value(params, :email))}
+    end
+  end
+
   defp notify_owner(email) do
     account = Identity.find_by_email(email)
     base = PublicURL.base_url()

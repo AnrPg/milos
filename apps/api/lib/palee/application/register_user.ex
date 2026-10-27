@@ -4,7 +4,9 @@ defmodule Palee.Application.RegisterUser do
   with a password that is not that login's, gets the answer a new sign-up
   gets (`{:confirmation_sent, email}`, "we sent a link"), with nothing
   created and no session (`SignUpWithExistingEmail`). The right password
-  still adds a profile to the login, within the limit.
+  still adds a profile to the login, within the limit. An address held for
+  the login that changed away from it (`:email_reserved`) gets the same
+  answer, with no email to anyone.
   """
   alias Palee.Identity
   alias Palee.Application.{EmailVerification, RegisterProfile, TokenIssuer}
@@ -21,6 +23,7 @@ defmodule Palee.Application.RegisterUser do
   defp register_profile(params) do
     case RegisterProfile.call(params) do
       {:error, {:email_in_use, _count}} -> Palee.Application.SignUpWithExistingEmail.call(params)
+      {:error, :email_reserved} -> Palee.Application.SignUpWithExistingEmail.reserved(params)
       result -> result
     end
   end

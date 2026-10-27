@@ -19,6 +19,12 @@ defmodule Palee.Application.EmailChange do
     for 7 days; a password reset lifts the lock.
   - `resend/2`, `cancel/1` and `status/1` serve the Settings page.
 
+  ADR-211: a confirmed change holds the old address for this login for 7
+  days (`Identity.reserve_released_email/3`), the life of the revert link.
+  A request to an address held for another login answers as usual but
+  records and sends nothing; confirm refuses it as `:email_unavailable`;
+  a revert takes it back and ends the hold.
+
   Once a change or revert commits, `CorporateSeats.email_changed/3` ends the
   email-domain seats the new address no longer qualifies for.
   """
@@ -68,11 +74,24 @@ defmodule Palee.Application.EmailChange do
   def request(account, new_email, current_password, now \\ DateTime.utc_now()) do
     with :ok <- verify_password(account, current_password),
          {:ok, email} <- EmailChangePolicy.new_address(new_email, account.email),
-         {:ok, _pending} <- start(account, email, now) do
+         {:ok, started} <- start_unless_reserved(account, email, now) do
       SecurityNotices.notify(:email_change_requested, account, %{to: account.email})
-      {:ok, status(account, now)}
+      {:ok, request_status(started, account, email, now)}
     end
   end
+
+  defp request_status(:reserved, account, email, now) do
+    %{
+      status(account, now)
+      | pending: %{
+          email: email,
+          requested_at: now,
+          expires_at: EmailChangePolicy.pending_expires_at(now)
+        }
+    }
+  end
+
+  defp request_status(_pending, account, _email, now), do: status(account, now)
 
   @doc "A fresh link (and 24 h) for the pending change; `{:error, :no_pending_email_change}` without one."
   def resend(account, now \\ DateTime.utc_now()) do
@@ -93,6 +112,18 @@ defmodule Palee.Application.EmailChange do
   @doc "Drops the pending change; its link stops working. Always `:ok`."
   def cancel(account) do
     EmailChangeStore.delete_pending(account.login_id)
+  end
+
+  # ADR-211: an address held for another login gets the answer a request
+  # gets, and nothing else: no pending change, no link.
+  defp start_unless_reserved(account, email, now) do
+    if Identity.email_reserved_for_other?(email, account.login_id, now) do
+      # A new request ends the older one's link, as `start/3` would.
+      :ok = EmailChangeStore.delete_pending(account.login_id)
+      {:ok, :reserved}
+    else
+      start(account, email, now)
+    end
   end
 
   # One pending change per login: a new request replaces the old one, and a
@@ -172,7 +203,9 @@ defmodule Palee.Application.EmailChange do
            ),
          :ok <- check(not EmailChangePolicy.expired?(pending, now), :expired_link),
          :ok <- address_free(pending.new_email, login_id),
-         :ok <- EmailChangeStore.set_login_email(login_id, pending.new_email, now) do
+         :ok <- EmailChangeStore.set_login_email(login_id, pending.new_email, now),
+         :ok <- Identity.reserve_released_email(login.email, login_id, now),
+         :ok <- Identity.release_reserved_email(pending.new_email, login_id) do
       {:ok, %{old: login.email, new: pending.new_email}}
     end
   end
@@ -215,7 +248,8 @@ defmodule Palee.Application.EmailChange do
              :ok <-
                EmailChangeStore.set_login_email(token.login_id, old, now,
                  locked_until: EmailChangePolicy.lock_until(now)
-               ) do
+               ),
+             :ok <- Identity.release_reserved_email(old, token.login_id) do
           {:ok, login.email}
         end
       end)
@@ -246,8 +280,13 @@ defmodule Palee.Application.EmailChange do
   defp check(true, _reason), do: :ok
   defp check(false, reason), do: {:error, reason}
 
-  defp address_free(email, login_id),
-    do: check(not EmailChangeStore.email_taken?(email, login_id), :email_unavailable)
+  defp address_free(email, login_id) do
+    check(
+      not EmailChangeStore.email_taken?(email, login_id) and
+        not Identity.email_reserved_for_other?(email, login_id),
+      :email_unavailable
+    )
+  end
 
   defp consume(purpose, raw_token, now) when is_binary(raw_token) do
     case LinkTokens.consume(purpose, raw_token, now) do
