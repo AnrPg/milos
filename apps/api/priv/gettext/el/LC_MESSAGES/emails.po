@@ -30,3 +30,20 @@ msgstr "Γεια σας %{name},"
 
 msgid "Hello,"
 msgstr "Γεια σας,"
+
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Επιβεβαιώστε τη διεύθυνση email σας"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Επιβεβαιώστε ότι το %{email} είναι η διεύθυνση email σας. Έτσι θα μπορείτε να μπείτε ξανά στον λογαριασμό σας, αν ξεχάσετε ποτέ τον κωδικό σας."
+
+msgid "Confirm email"
+msgstr "Επιβεβαίωση email"
+
+msgid "This link expires in 48 hours."
+msgstr "Ο σύνδεσμος λήγει σε 48 ώρες."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Αν δεν δημιουργήσατε λογαριασμό στο %{product}, απλώς αγνοήστε αυτό το email."

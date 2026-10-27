@@ -1,5 +1,11 @@
 defmodule Palee.Application.RegisterInvitedUser do
-  alias Palee.Application.{ManageCoachingRelationships, RegisterProfile, TokenIssuer}
+  alias Palee.Application.{
+    EmailVerification,
+    ManageCoachingRelationships,
+    RegisterProfile,
+    TokenIssuer
+  }
+
   alias Palee.Organizations.Domain.MembershipPolicy
   alias Palee.{Identity, Organizations}
 
@@ -15,6 +21,9 @@ defmodule Palee.Application.RegisterInvitedUser do
          :ok <- start_invited_coaching(redemption, user),
          {:ok, user} <- align_account_role(user, account_role),
          {:ok, tokens} <- TokenIssuer.issue_pair(user) do
+      # ADR-213: a new login gets its verification link; nothing blocks on it.
+      :ok = EmailVerification.after_sign_up(user)
+
       {:ok,
        tokens
        |> Map.put(:user, user)

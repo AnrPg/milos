@@ -30,3 +30,20 @@ msgstr "Olá %{name},"
 
 msgid "Hello,"
 msgstr "Olá,"
+
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Confirme o seu endereço de email"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Confirme que %{email} é o seu endereço de email. Assim poderá voltar a entrar na sua conta se algum dia se esquecer da palavra-passe."
+
+msgid "Confirm email"
+msgstr "Confirmar email"
+
+msgid "This link expires in 48 hours."
+msgstr "Esta ligação expira dentro de 48 horas."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Se não criou uma conta no %{product}, pode simplesmente ignorar este email."
