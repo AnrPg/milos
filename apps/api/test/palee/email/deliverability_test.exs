@@ -284,4 +284,19 @@ defmodule Palee.Email.DeliverabilityTest do
     assert %{sent_today: 2, deferred: 1, daily_budget: 100_000, hard_cap: 100_000} =
              Email.sending_stats()
   end
+
+  test "the email that crosses 80% of the budget logs one warning" do
+    previous = Application.get_env(:palee, :email_budget)
+    Application.put_env(:palee, :email_budget, daily_budget: 5, hard_cap: 6)
+    on_exit(fn -> Application.put_env(:palee, :email_budget, previous) end)
+
+    for n <- 1..3, do: sent_message("n#{n}@box.test")
+
+    log = ExUnit.CaptureLog.capture_log(fn -> sent_message("n4@box.test") end)
+    assert log =~ "email_budget_warning sent_today=4 daily_budget=5 hard_cap=6"
+    refute log =~ "@box.test"
+
+    refute ExUnit.CaptureLog.capture_log(fn -> sent_message("n5@box.test") end) =~
+             "email_budget_warning"
+  end
 end

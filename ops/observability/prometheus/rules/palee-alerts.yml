@@ -244,13 +244,14 @@ groups:
   - name: palee-email
     rules:
       - alert: PaleeEmailBudgetHigh
-        expr: max(palee_email_sent_today) >= 0.8 * max(palee_email_daily_budget) and max(palee_email_daily_budget) > 0
+        # 5 x sent >= 4 x budget is 80% without float rounding (0.8 * 280 > 224).
+        expr: max(palee_email_sent_today) * 5 >= max(palee_email_daily_budget) * 4 and max(palee_email_daily_budget) > 0
         for: 5m
         labels:
           severity: warning
           signal: email_budget
         annotations:
-          summary: "Email sending at {{ $value | humanize }} today, 80% of the daily budget"
+          summary: "Email sending reached 80% of the daily budget"
           description: "Today's sent emails reached 80% of EMAIL_DAILY_BUDGET. Past the budget, non-security mail waits until the next UTC day and security mail stops at EMAIL_DAILY_HARD_CAP. Look for a loop or a burst of invitations before raising the budget (Brevo's free plan sends 300 a day)."
 
       - alert: PaleeEmailDeferred

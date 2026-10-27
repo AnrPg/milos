@@ -40,8 +40,10 @@ defmodule Palee.Email.Commands.DeliverEmail do
       :ok
     else
       case on_send(store, String.to_existing_atom(message.category), now) do
-        :send ->
-          send(store, message, last?, now)
+        {:send, sent_today} ->
+          with :ok <- send(store, message, last?, now) do
+            warn_budget(sent_today + 1)
+          end
 
         {:defer, until} ->
           {:ok, message} = store.update(message, %{status: "deferred", scheduled_at: until})
@@ -62,7 +64,25 @@ defmodule Palee.Email.Commands.DeliverEmail do
 
   defp on_send(store, category, now) do
     sent_today = store.count_sent_since(SendingPolicy.day_start(now))
-    SendingPolicy.on_send(category, sent_today, Palee.Email.budget(), now)
+
+    case SendingPolicy.on_send(category, sent_today, Palee.Email.budget(), now) do
+      :send -> {:send, sent_today}
+      deferred -> deferred
+    end
+  end
+
+  # ADR-212: one log line the day sending crosses 80% of the budget, for
+  # servers without the Prometheus alert (palee_email_sent_today).
+  defp warn_budget(sent_today) do
+    budget = Palee.Email.budget()
+
+    if SendingPolicy.budget_warning?(sent_today, budget) do
+      Logger.warning(
+        "email_budget_warning sent_today=#{sent_today} daily_budget=#{budget.daily_budget} hard_cap=#{budget.hard_cap}"
+      )
+    end
+
+    :ok
   end
 
   defp send(store, message, last?, now) do
