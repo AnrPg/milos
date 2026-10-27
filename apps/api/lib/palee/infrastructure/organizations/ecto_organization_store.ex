@@ -109,6 +109,54 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> flatten_transaction()
   end
 
+  # ADR-209: the token went only into an email. Idempotent: an invitation
+  # already marked keeps its first time.
+  @impl true
+  def mark_invitation_emailed(invitation_id, emailed_at) do
+    {count, _rows} =
+      RegistrationInvitation
+      |> where([invitation], invitation.id == ^invitation_id and is_nil(invitation.emailed_at))
+      |> Repo.update_all(set: [emailed_at: emailed_at, updated_at: emailed_at])
+
+    cond do
+      count == 1 ->
+        :ok
+
+      Repo.exists?(where(RegistrationInvitation, [invitation], invitation.id == ^invitation_id)) ->
+        :ok
+
+      true ->
+        {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def get_invitation(organization_id, invitation_id) do
+    RegistrationInvitation
+    |> where(
+      [invitation],
+      invitation.id == ^invitation_id and invitation.organization_id == ^organization_id
+    )
+    |> Repo.one()
+  end
+
+  # ADR-209: the invitations a business (and one inviter in it) emailed since
+  # `since`, for the daily caps.
+  @impl true
+  def count_emailed_invitations(organization_id, user_id, since) do
+    [organization, inviter] =
+      RegistrationInvitation
+      |> where([invitation], invitation.organization_id == ^organization_id)
+      |> where([invitation], invitation.emailed_at > ^since)
+      |> select([invitation], [
+        count(invitation.id),
+        filter(count(invitation.id), invitation.issued_by_user_id == ^user_id)
+      ])
+      |> Repo.one()
+
+    %{organization: organization, inviter: inviter}
+  end
+
   @impl true
   def redeem_invitation(digest, user_id, redeemed_at) do
     Repo.transaction(fn ->
