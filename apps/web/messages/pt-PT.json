@@ -9509,7 +9509,7 @@
     "handleTaken": "Ocupado",
     "handleTakenError": "Este nome de utilizador já está ocupado.",
     "handleTryInstead": "Experimenta @{handle}",
-    "emailNotice": "Usa um email a que tenhas acesso. Se algum dia te esqueceres da palavra-passe, é para lá que enviamos a ligação para a repor. É a tua forma de voltar a entrar se também tiveres perdido os códigos de recuperação.",
+    "emailNotice": "Usa um email a que tenhas acesso. Vamos enviar para lá uma ligação para o confirmares, e é para lá que vai a ligação de reposição se algum dia te esqueceres da palavra-passe.",
     "emailInvalid": "Introduz um email válido.",
     "emailInUseCount": "Este email já tem {count} de {limit} contas.",
     "emailInUseAddProfile": "Para adicionar outro perfil, inicia sessão e adiciona-o em Definições → Perfis.",

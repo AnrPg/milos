@@ -9509,7 +9509,7 @@
     "handleTaken": "Déjà pris",
     "handleTakenError": "Ce nom d'utilisateur est déjà pris.",
     "handleTryInstead": "Essaie @{handle}",
-    "emailNotice": "Utilise une adresse e-mail que tu consultes. Si tu oublies un jour ton mot de passe, c'est là qu'on enverra le lien de réinitialisation. C'est ton moyen de revenir si tu as aussi perdu tes codes de récupération.",
+    "emailNotice": "Utilise une adresse e-mail que tu consultes. Nous y enverrons un lien pour la confirmer, et c'est là qu'arrivera le lien de réinitialisation si tu oublies un jour ton mot de passe.",
     "emailInvalid": "Saisis une adresse e-mail valide.",
     "emailInUseCount": "Cette adresse e-mail a déjà {count} comptes sur {limit}.",
     "emailInUseAddProfile": "Pour ajouter un autre profil, connecte-toi et ajoute-le depuis Réglages → Profils.",

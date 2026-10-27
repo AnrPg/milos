@@ -9509,7 +9509,7 @@
     "handleTaken": "Vergeben",
     "handleTakenError": "Dieser Benutzername ist schon vergeben.",
     "handleTryInstead": "Wie wäre es mit @{handle}?",
-    "emailNotice": "Nimm eine E-Mail-Adresse, auf die du Zugriff hast. Falls du dein Passwort einmal vergisst, schicken wir den Link zum Zurücksetzen dorthin. Sie ist dein Weg zurück, wenn auch deine Wiederherstellungscodes weg sind.",
+    "emailNotice": "Nimm eine E-Mail-Adresse, auf die du Zugriff hast. Wir schicken dir dorthin einen Link zur Bestätigung, und dorthin kommt auch der Link zum Zurücksetzen, falls du einmal dein Passwort vergisst.",
     "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
     "emailInUseCount": "Diese E-Mail-Adresse hat schon {count} von {limit} Konten.",
     "emailInUseAddProfile": "Um ein weiteres Profil hinzuzufügen, melde dich an und füge es unter Einstellungen → Profile hinzu.",

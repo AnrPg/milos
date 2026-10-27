@@ -9509,7 +9509,7 @@
     "handleTaken": "Bezet",
     "handleTakenError": "Deze gebruikersnaam is al bezet.",
     "handleTryInstead": "Probeer @{handle}",
-    "emailNotice": "Gebruik een e-mailadres dat je kunt openen. Vergeet je ooit je wachtwoord, dan sturen we de herstellink daarheen. Zo kom je er weer in als je ook je herstelcodes kwijt bent.",
+    "emailNotice": "Gebruik een e-mailadres dat je kunt openen. We sturen er een link heen om het te bevestigen, en daar komt ook de herstellink als je ooit je wachtwoord vergeet.",
     "emailInvalid": "Vul een geldig e-mailadres in.",
     "emailInUseCount": "Dit e-mailadres heeft al {count} van {limit} accounts.",
     "emailInUseAddProfile": "Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
