@@ -425,6 +425,31 @@ defmodule Palee.Organizations do
       ),
       do: IssuePlatformInvitation.call(context, organization_id, params, issued_at)
 
+  @doc """
+  ADR-209: records that an invitation's token went only into an email, so
+  redeeming it proves the inbox and marks the bound address verified.
+  Idempotent. Runs in the caller's database scope (a vendor's or a tenant's
+  `RepoContext`, or the caller's transaction): `:ok`, or
+  `{:error, :not_found}` when the invitation is unknown or out of scope.
+  """
+  def mark_invitation_emailed(invitation_id, now \\ DateTime.utc_now()),
+    do: OrganizationStore.mark_invitation_emailed(invitation_id, now)
+
+  @doc "ADR-209: one invitation of the acting box, for a resend."
+  def get_invitation(context, invitation_id),
+    do: Palee.Organizations.Queries.EmailedInvitations.get(context, invitation_id)
+
+  @doc "ADR-209: `%{organization:, inviter:}` invitations emailed since `since`."
+  def count_emailed_invitations(context, since),
+    do: Palee.Organizations.Queries.EmailedInvitations.count_since(context, since)
+
+  @doc """
+  Runs `fun` in one database transaction (joining the caller's): `{:ok, value}`
+  commits, `{:error, reason}` rolls back. ADR-209 issues an invitation and
+  queues its email together.
+  """
+  def transaction(fun) when is_function(fun, 0), do: OrganizationStore.transaction(fun)
+
   def revoke_invitation(context, invitation_id, revoked_at \\ DateTime.utc_now()),
     do: RevokeInvitation.call(context, invitation_id, revoked_at)
 
@@ -493,6 +518,9 @@ defmodule Palee.Organizations do
     do: ResolvePlatformContext.call(account, request_metadata)
 
   def grant_vendor(user_id), do: OrganizationStore.grant_vendor(user_id)
+
+  @doc "The user ids of every active vendor, for platform alerts (ADR-212)."
+  def list_active_vendor_user_ids, do: OrganizationStore.list_active_vendor_user_ids()
 
   def revoke_vendor(user_id), do: OrganizationStore.revoke_vendor(user_id)
 
@@ -663,8 +691,14 @@ defmodule Palee.Organizations do
 
   def resolve_slug_alias(slug), do: ResolveSlugAlias.call(slug)
 
-  def send_owner_invitation_email(context, organization_id, params),
-    do: SendOwnerInvitationEmail.call(context, organization_id, params)
+  def send_owner_invitation_email(context, organization_id, params, now \\ DateTime.utc_now()),
+    do: SendOwnerInvitationEmail.call(context, organization_id, params, now)
+
+  @doc "ADR-210: the delivery status of an invitation's setup emails, newest first."
+  def owner_invitation_deliveries(%Palee.Organizations.PlatformContext{}, invitation_id),
+    do: {:ok, SendOwnerInvitationEmail.deliveries(invitation_id)}
+
+  def owner_invitation_deliveries(_context, _invitation_id), do: {:error, :vendor_required}
 
   def update_organization_settings(
         context,

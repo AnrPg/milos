@@ -2,6 +2,7 @@ defmodule Palee.Organizations.RegistrationInvitation do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Palee.Infrastructure.Security.EncryptedBinary
   alias Palee.Organizations.Domain.{InvitationPolicy, MembershipPolicy}
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -25,6 +26,13 @@ defmodule Palee.Organizations.RegistrationInvitation do
     field :roles, {:array, Ecto.Enum}, values: MembershipPolicy.roles(), default: []
     field :all_locations, :boolean, default: true
     field :location_ids, {:array, :binary_id}, default: []
+    # ADR-209: the invited address (encrypted) for resends and the pending
+    # list, the email's language, when the token went only into an email, and
+    # whether a bound invitation needs a verified address or the emailed link.
+    field :intended_email_encrypted, EncryptedBinary, redact: true
+    field :email_locale, :string
+    field :emailed_at, :utc_datetime_usec
+    field :email_verification_required, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -43,7 +51,11 @@ defmodule Palee.Organizations.RegistrationInvitation do
       :coach_user_id,
       :roles,
       :all_locations,
-      :location_ids
+      :location_ids,
+      :intended_email_encrypted,
+      :email_locale,
+      :emailed_at,
+      :email_verification_required
     ])
     |> validate_required([:organization_id, :token_digest, :role, :expires_at])
     |> validate_digest(:token_digest)

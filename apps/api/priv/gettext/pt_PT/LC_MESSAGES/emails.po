@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "Ao definir uma nova palavra-passe, termina a sessão em todos os dispositivos."
 msgid "Your password has not been changed."
 msgstr "A sua palavra-passe não foi alterada."
+msgid "Unsubscribe from these emails"
+msgstr "Cancelar a subscrição destes emails"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Deixará de receber este tipo de email do %{product}. Os emails sobre a sua conta e a respetiva segurança continuarão a chegar."
+msgid "You're unsubscribed"
+msgstr "Subscrição cancelada"
+msgid "This unsubscribe link is not valid."
+msgstr "Esta ligação para cancelar a subscrição não é válida."
+
 
 
 msgid "Confirm your new email address"

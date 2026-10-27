@@ -3578,6 +3578,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/share-links/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email one of your share links to an address (ADR-210)
+         * @description The link is rebuilt from `token` and must be yours and still usable. Needs a verified email; at most 10 a day. The same link to the same address is sent once.
+         */
+        post: operations["PaleeWeb.ShareLinkEmailController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/social": {
         parameters: {
             query?: never;
@@ -9191,6 +9211,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/invitations/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-209: email one invitation to each of up to 200 addresses */
+        post: operations["PaleeWeb.OrganizationAccessController.bulk_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations/{id}": {
         parameters: {
             query?: never;
@@ -9203,6 +9240,23 @@ export interface paths {
         post?: never;
         /** Revoke an active organization invitation */
         delete: operations["PaleeWeb.OrganizationAccessController.revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/invitations/{id}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-209: re-issue an emailed invitation and email the new link */
+        post: operations["PaleeWeb.OrganizationAccessController.resend"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -12209,6 +12263,23 @@ export interface paths {
         put?: never;
         /** Email an already-issued invitation's setup link to its recipient */
         post: operations["PaleeWeb.PlatformOrganizationController.invitation_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/invitations/{invitation_id}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The delivery status of an invitation's setup emails, newest first (ADR-210) */
+        get: operations["PaleeWeb.PlatformOrganizationController.invitation_deliveries"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -39998,8 +40069,22 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        /** @description ADR-209 (inspect): the invitation is for one email address, never shown */
+                        email_bound?: boolean;
                         /** Format: date_time */
                         expires_at: string;
+                        /**
+                         * Format: uuid
+                         * @description ADR-209: issue responses only
+                         */
+                        id?: string;
                         /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
                         location_scope?: {
                             all_locations: boolean;
@@ -40025,6 +40110,7 @@ export interface operations {
                         role: string;
                         /** @description ADR-186: the role set; `role` is its primary role */
                         roles?: string[];
+                        /** @description The link token; never returned for an invitation sent by email (ADR-209) */
                         token?: string | null;
                     };
                 };
@@ -40072,6 +40158,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -56609,6 +56697,44 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShareLinkEmailController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    link: "guest_pass" | "buddy_invite" | "referral";
+                    /** Format: email */
+                    to: string;
+                    /** @description The guest pass or buddy invite token, or the referral code */
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        delivery: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.FollowController.summary": {
         parameters: {
             query?: never;
@@ -59067,6 +59193,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     }[];
                 };
@@ -59134,6 +59262,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -59188,6 +59318,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -59260,6 +59392,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -86180,7 +86314,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
                         email_bound: boolean;
+                        email_locale?: string | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */
@@ -86213,6 +86355,8 @@ export interface operations {
                 "application/json": {
                     /** @description ADR-186: staff work at every branch («Όλα τα καταστήματα») */
                     all_locations?: boolean;
+                    /** @description ADR-209: the email's language; defaults to the box's language */
+                    email_locale?: string;
                     intended_email?: string;
                     lifetime_seconds?: number;
                     /** @description ADR-186: the branches staff work at; defaults to the issuer's own scope */
@@ -86224,6 +86368,8 @@ export interface operations {
                     role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
                     /** @description ADR-186: the role set the invited person gets */
                     roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    /** @description ADR-209: email the invitation to `intended_email`; the token is then not returned */
+                    send_email?: boolean;
                 };
             };
         };
@@ -86235,8 +86381,22 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        /** @description ADR-209 (inspect): the invitation is for one email address, never shown */
+                        email_bound?: boolean;
                         /** Format: date_time */
                         expires_at: string;
+                        /**
+                         * Format: uuid
+                         * @description ADR-209: issue responses only
+                         */
+                        id?: string;
                         /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
                         location_scope?: {
                             all_locations: boolean;
@@ -86262,7 +86422,57 @@ export interface operations {
                         role: string;
                         /** @description ADR-186: the role set; `role` is its primary role */
                         roles?: string[];
+                        /** @description The link token; never returned for an invitation sent by email (ADR-209) */
                         token?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.OrganizationAccessController.bulk_invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    email_locale?: string;
+                    /** @description Addresses, or pasted text / CSV holding them */
+                    emails: string[] | string;
+                    lifetime_seconds?: number;
+                    location_ids?: string[];
+                    role?: string;
+                    roles?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-address results */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        failed: number;
+                        results: {
+                            email: string;
+                            /** @description Why this address got no invitation */
+                            error?: string;
+                            /** Format: uuid */
+                            invitation_id?: string;
+                            /** @enum {string} */
+                            status?: "queued";
+                        }[];
+                        sent: number;
+                        /** @description Pasted values that are not email addresses */
+                        skipped: string[];
                     };
                 };
             };
@@ -86286,6 +86496,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "PaleeWeb.OrganizationAccessController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new invitation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        email_bound: boolean;
+                        email_locale?: string | null;
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        issued_at: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
+                        role: string;
+                        roles?: string[];
+                    };
+                };
             };
         };
     };
@@ -101066,17 +101322,74 @@ export interface operations {
             content: {
                 "application/json": {
                     email: string;
+                    /** @description The email's language (ADR-210) */
+                    locale?: string;
+                    /** @description Queue another email */
+                    resend?: boolean;
                     token: string;
                 };
             };
         };
         responses: {
-            /** @description Invitation email sent */
-            204: {
+            /** @description Queued invitation email */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        delivery: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformOrganizationController.invitation_deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deliveries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deliveries: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        }[];
+                    };
+                };
             };
         };
     };

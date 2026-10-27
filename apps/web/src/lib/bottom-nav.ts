@@ -45,7 +45,7 @@ export const BOTTOM_NAV_HIDDEN_ROUTES: ReadonlyArray<{ id: string; pattern: RegE
   // Onboarding / first run.
   { id: "firstRun", pattern: /^\/welcome(?:\/|$)/ },
   // Auth and account set-up.
-  { id: "auth", pattern: /^\/(?:login|register|forgot-password|reset-password|verify-email|confirm-email-change|revert-email-change|sign-out-everywhere|set-admin|activate-business|join)(?:\/|$)/ },
+  { id: "auth", pattern: /^\/(?:login|register|forgot-password|reset-password|verify-email|confirm-email-change|revert-email-change|sign-out-everywhere|set-admin|activate-business|join|invite)(?:\/|$)/ },
   // The vendor console has its own navigation.
   { id: "platform", pattern: /^\/platform(?:\/|$)/ },
 ];

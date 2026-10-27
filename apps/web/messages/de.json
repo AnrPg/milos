@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Dieser Grundriss gehört zu einer anderen Filiale.",
     "apiErrorInvalidCleaningSchedule": "Wähle mindestens einen Tag und schreibe Uhrzeiten als HH:MM.",
     "apiErrorInvalidPlacement": "Wähle in jeder Zeile einen Raum und eine Anzahl.",
-    "apiErrorPlacementExceedsQuantity": "Es sind mehr zugeordnet, als das Studio von diesem Gerät besitzt."
+    "apiErrorPlacementExceedsQuantity": "Es sind mehr zugeordnet, als das Studio von diesem Gerät besitzt.",
+    "apiErrorInvitationEmailUnverified": "Diese Einladung gilt für eine bestätigte E-Mail-Adresse. Öffne den Link aus der Einladungs-E-Mail oder bestätige zuerst deine E-Mail-Adresse.",
+    "apiErrorInvitationRevoked": "Die Box hat diese Einladung widerrufen."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -11570,6 +11572,81 @@
     "handlerNote": "Wer eine bestätigte E-Mail-Adresse hat, bekommt den Link zum Zurücksetzen automatisch per E-Mail. Hier landen Anfragen von Menschen, deren E-Mail-Adresse nicht bestätigt ist oder die sie nicht öffnen können.",
     "event_link_emailed": "Link per E-Mail gesendet",
     "event_throttled": "Zu viele Anfragen (nichts gesendet)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "Der E-Mail-Schlüssel läuft bald ab",
+    "notifKeyExpiredTitle": "Der E-Mail-Schlüssel ist abgelaufen",
+    "notifKeyExpiringBody": "Der SMTP-Schlüssel von Palee läuft in {days} Tagen ab ({date}). Erstell vorher in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server, sonst verschickt Palee keine E-Mails mehr.",
+    "notifKeyExpiredBody": "Der SMTP-Schlüssel von Palee ist am {date} abgelaufen, deshalb kann Palee keine E-Mails verschicken. Erstell in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server."
+  },
+  "InviteEmail": {
+    "tabBulk": "Mehrere Personen",
+    "demoNotice": "Dein Unternehmen ist im Demo-Modus und kann noch keine echten Personen einladen oder anschreiben. Das Palee-Team aktiviert es; bis dahin kannst du alles mit Demo-Daten ausprobieren.",
+    "languageLabel": "Sprache der E-Mail",
+    "boxLanguage": "{language} (Sprache deiner Box)",
+    "emailSendHint": "Wir senden die Einladung per E-Mail. Nur diese Adresse kann sie nutzen, und das Öffnen der E-Mail bestätigt sie.",
+    "emailLinkHint": "Leer lassen, um einen Link zum Kopieren und selbst Teilen zu erhalten.",
+    "send": "Einladung senden",
+    "sending": "Wird gesendet…",
+    "sentTo": "Einladung an {email} gesendet.",
+    "sentHint": "Der Link steht nur in der E-Mail. Er funktioniert einmal und läuft am {date} ab. Du findest sie unter Ausstehend.",
+    "sendAnother": "Weitere Person einladen",
+    "bulkLabel": "E-Mail-Adressen",
+    "bulkHint": "Füge Adressen ein oder wähle eine CSV-Datei, bis zu {max} auf einmal. Jede Person erhält ihre eigene Einladung.",
+    "chooseCsv": "CSV-Datei wählen",
+    "bulkCount": "{count, plural, =0 {Noch keine Adressen} one {# Adresse} other {# Adressen}}",
+    "bulkSend": "{count, plural, =0 {Einladungen senden} one {# Einladung senden} other {# Einladungen senden}}",
+    "bulkDone": "{sent, plural, =0 {Es wurde keine Einladung gesendet.} one {# Einladung gesendet.} other {# Einladungen gesendet.}}",
+    "bulkFailed": "{count, plural, one {# Adresse hat keine Einladung erhalten:} other {# Adressen haben keine Einladung erhalten:}}",
+    "bulkSkipped": "Keine E-Mail-Adressen, übersprungen: {values}",
+    "resend": "Erneut senden",
+    "resent": "Erneut an {email} gesendet. Der vorherige Link funktioniert nicht mehr.",
+    "status": {
+      "queued": "Wird gesendet",
+      "sent": "Gesendet",
+      "failed": "Nicht zugestellt",
+      "bounced": "Zurückgewiesen",
+      "suppressed": "Adresse gesperrt"
+    },
+    "errors": {
+      "invalid_address": "Gib eine gültige E-Mail-Adresse ein.",
+      "suppressed": "E-Mails an diese Adresse kommen zurück. Prüfe sie oder nutze eine andere.",
+      "throttled": "An diese Adresse ging gerade eine Einladung. Versuche es in ein paar Minuten erneut.",
+      "over_budget": "Der E-Mail-Versand ist heute ausgelastet. Versuche es später erneut.",
+      "invitation_email_required": "Gib mindestens eine E-Mail-Adresse ein.",
+      "too_many_invitation_emails": "Bis zu {max} Adressen auf einmal.",
+      "invitation_email_cap_reached": "Deine Box hat heute alle Einladungs-E-Mails verschickt. Versuche es morgen erneut.",
+      "invitation_not_emailed": "Diese Einladung wurde nicht per E-Mail gesendet.",
+      "business_not_activated": "Dein Unternehmen ist im Demo-Modus und kann noch keine echten Personen einladen.",
+      "other": "Sie konnte nicht gesendet werden."
+    },
+    "revokedTitle": "Diese Einladung wurde widerrufen",
+    "revokedBody": "Die Box hat diese Einladung zurückgezogen. Bitte sie um eine neue, wenn du noch beitreten möchtest.",
+    "invalidTitle": "Diese Einladung funktioniert nicht mehr",
+    "invalidBody": "Sie wurde vielleicht schon genutzt oder ist abgelaufen. Bitte die Box um eine neue Einladung.",
+    "boundNote": "Diese Einladung gilt für eine E-Mail-Adresse. Melde dich mit der Adresse an, an die sie gesendet wurde, oder erstelle damit ein Konto.",
+    "mismatch": "Du bist mit einer anderen E-Mail-Adresse angemeldet als der, an die diese Einladung ging. Melde dich ab und melde dich mit der eingeladenen Adresse an oder erstelle damit ein Konto.",
+    "unverified": "Diese Einladung gilt für eine bestätigte E-Mail-Adresse. Öffne den Link aus der Einladungs-E-Mail oder bestätige zuerst deine E-Mail-Adresse.",
+    "signOut": "Abmelden"
+  },
+  "ShareByEmail": {
+    "action": "Per E-Mail senden",
+    "label": "E-Mail-Adresse",
+    "placeholder": "name@example.com",
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "sent": "An {email} gesendet",
+    "hint": "Wir senden nur diesen Link und deinen Namen.",
+    "errors": {
+      "unverified": "Bestätige zuerst deine eigene E-Mail-Adresse, dann kannst du Links per E-Mail senden.",
+      "dailyLimit": "Du hast für heute die meisten Links per E-Mail gesendet. Teile oder kopiere ihn stattdessen.",
+      "throttled": "Diese Adresse hat für heute genug Einladungen bekommen.",
+      "suppressed": "E-Mails an diese Adresse kommen zurück. Prüfe sie oder nimm eine andere.",
+      "invalidAddress": "Gib eine gültige E-Mail-Adresse ein.",
+      "demo": "Das Business ist noch im Demo-Modus und kann noch keine E-Mails senden.",
+      "unavailable": "Dieser Link lässt sich nicht mehr senden. Erstelle einen neuen.",
+      "generic": "Die E-Mail konnte nicht gesendet werden. Versuch es noch einmal."
+    }
   },
   "emailChange": {
     "label": "E-Mail",

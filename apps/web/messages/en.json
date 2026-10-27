@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "That floor plan belongs to another branch.",
     "apiErrorInvalidCleaningSchedule": "Choose at least one day, and write times as HH:MM.",
     "apiErrorInvalidPlacement": "Choose a space and a quantity for each row.",
-    "apiErrorPlacementExceedsQuantity": "More are placed than the box owns of this machine."
+    "apiErrorPlacementExceedsQuantity": "More are placed than the box owns of this machine.",
+    "apiErrorInvitationEmailUnverified": "This invitation is for a confirmed email address. Open the link in the invitation email, or confirm your email address first.",
+    "apiErrorInvitationRevoked": "The box revoked this invitation."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -11570,6 +11572,81 @@
     "handlerNote": "People whose email is confirmed get a reset link by email automatically. Requests here come from people whose email isn't confirmed or who can't open it.",
     "event_link_emailed": "Reset link emailed",
     "event_throttled": "Too many requests (nothing sent)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "The email key expires soon",
+    "notifKeyExpiredTitle": "The email key has expired",
+    "notifKeyExpiringBody": "Palee's SMTP key expires in {days} days ({date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email.",
+    "notifKeyExpiredBody": "Palee's SMTP key expired on {date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+  },
+  "InviteEmail": {
+    "tabBulk": "Several people",
+    "demoNotice": "Your business is in demo mode, so it can’t invite or email real people yet. The Palee team activates it; until then, try everything with demo data.",
+    "languageLabel": "Email language",
+    "boxLanguage": "{language} (your box’s language)",
+    "emailSendHint": "We email the invitation. Only this address can use it, and opening the email confirms it.",
+    "emailLinkHint": "Leave it empty to get a link to copy and share yourself.",
+    "send": "Send invitation",
+    "sending": "Sending…",
+    "sentTo": "Invitation sent to {email}.",
+    "sentHint": "The link is only in the email. It works once and expires {date}. Follow it under Pending.",
+    "sendAnother": "Invite someone else",
+    "bulkLabel": "Email addresses",
+    "bulkHint": "Paste addresses or choose a CSV file, up to {max} at a time. Each person gets their own invitation.",
+    "chooseCsv": "Choose CSV file",
+    "bulkCount": "{count, plural, =0 {No addresses yet} one {# address} other {# addresses}}",
+    "bulkSend": "{count, plural, =0 {Send invitations} one {Send # invitation} other {Send # invitations}}",
+    "bulkDone": "{sent, plural, =0 {No invitations were sent.} one {# invitation sent.} other {# invitations sent.}}",
+    "bulkFailed": "{count, plural, one {# address got no invitation:} other {# addresses got no invitation:}}",
+    "bulkSkipped": "Not email addresses, skipped: {values}",
+    "resend": "Resend",
+    "resent": "Sent again to {email}. The previous link no longer works.",
+    "status": {
+      "queued": "Sending",
+      "sent": "Sent",
+      "failed": "Not delivered",
+      "bounced": "Bounced",
+      "suppressed": "Address blocked"
+    },
+    "errors": {
+      "invalid_address": "Enter a valid email address.",
+      "suppressed": "Emails to this address bounce. Check it or use another one.",
+      "throttled": "An invitation just went to this address. Try again in a few minutes.",
+      "over_budget": "Email is busy today. Try again later.",
+      "invitation_email_required": "Enter at least one email address.",
+      "too_many_invitation_emails": "Up to {max} addresses at a time.",
+      "invitation_email_cap_reached": "Your box has sent all its invitation emails for today. Try again tomorrow.",
+      "invitation_not_emailed": "This invitation wasn’t sent by email.",
+      "business_not_activated": "Your business is in demo mode, so it can’t invite real people yet.",
+      "other": "It couldn’t be sent."
+    },
+    "revokedTitle": "This invitation was revoked",
+    "revokedBody": "The box took this invitation back. Ask them for a new one if you still want to join.",
+    "invalidTitle": "This invitation doesn’t work any more",
+    "invalidBody": "It may have been used already or expired. Ask the box for a new invitation.",
+    "boundNote": "This invitation is for one email address. Sign in or create your account with the address it was sent to.",
+    "mismatch": "You’re signed in with a different email address from the one this invitation was sent to. Sign out, then sign in or create an account with the invited address.",
+    "unverified": "This invitation is for a confirmed email address. Open the link in the invitation email, or confirm your email address first.",
+    "signOut": "Sign out"
+  },
+  "ShareByEmail": {
+    "action": "Send by email",
+    "label": "Their email address",
+    "placeholder": "name@example.com",
+    "send": "Send",
+    "sending": "Sending…",
+    "sent": "Sent to {email}",
+    "hint": "We send only this link and your name.",
+    "errors": {
+      "unverified": "Confirm your own email address first, then you can send links by email.",
+      "dailyLimit": "You've sent the most links by email for today. Share or copy it instead.",
+      "throttled": "This address has had enough invitations for today.",
+      "suppressed": "Emails to this address bounce. Check it or use another.",
+      "invalidAddress": "Enter a valid email address.",
+      "demo": "The business is still in demo mode, so it can't email people yet.",
+      "unavailable": "This link can't be sent any more. Make a new one.",
+      "generic": "The email couldn't be sent. Try again."
+    }
   },
   "emailChange": {
     "label": "Email",

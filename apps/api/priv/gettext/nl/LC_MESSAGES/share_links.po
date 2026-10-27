@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%{name} invited you to an event"
+msgstr "Uitnodiging van %{name} voor een evenement"
+
+msgid "%{name} asked you to be their check-in buddy"
+msgstr "Uitnodiging van %{name} om check-in-buddy te worden"
+
+msgid "%{name} invited you to train together"
+msgstr "Uitnodiging van %{name} om samen te trainen"
+
+msgid "Open the invitation"
+msgstr "Uitnodiging openen"
+
+msgid "%{name} invited you to an event on %{product} as their guest. Open the invitation to see it and say if you're coming."
+msgstr "%{name} heeft u als gast uitgenodigd voor een evenement op %{product}. Open de uitnodiging om het te bekijken en te laten weten of u komt."
+
+msgid "%{name} asked you to be their check-in buddy on %{product}: someone they can turn to for support."
+msgstr "%{name} vraagt u om check-in-buddy te worden op %{product}: iemand bij wie diegene terechtkan voor steun."
+
+msgid "%{name} invited you to train together on %{product}."
+msgstr "%{name} heeft u uitgenodigd om samen te trainen op %{product}."
+
+msgid "%{name} typed in your address to send you this link. If you don't know them, ignore this email."
+msgstr "%{name} heeft uw adres ingevuld om u deze link te sturen. Kent u deze persoon niet? Negeer deze e-mail dan."
+
+msgid "You're receiving this email because %{name} sent you an invitation through %{product}."
+msgstr "U ontvangt deze e-mail omdat %{name} u via %{product} een uitnodiging heeft gestuurd."

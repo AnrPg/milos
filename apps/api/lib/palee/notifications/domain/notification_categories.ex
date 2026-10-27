@@ -109,6 +109,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         invoice_issued payment_reminder package_expiring
         subscription_expiring subscription_grace access_ended
         password_reset_requested password_reset_completed business_demo_idle
+        email_key_expiring
         journal_export_ready
         shop_order_ready shop_order_reminder shop_order_cancelled shop_back_in_stock
       )

@@ -39,6 +39,7 @@ describe("hidden routes", () => {
       "/confirm-email-change",
       "/revert-email-change",
       "/join/kypseli",
+      "/invite",
       "/set-admin",
       "/activate-business",
       "/platform/organizations",

@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "הגדרת סיסמה חדשה מנתקת אותך מכל המכשירים."
 msgid "Your password has not been changed."
 msgstr "הסיסמה שלך לא שונתה."
+msgid "Unsubscribe from these emails"
+msgstr "הסרה מרשימת התפוצה של מיילים אלה"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "לא יישלחו אליך עוד מיילים מסוג זה מ-%{product}. מיילים על החשבון שלך ועל האבטחה שלו ימשיכו להגיע."
+msgid "You're unsubscribed"
+msgstr "הוסרת מהרשימה"
+msgid "This unsubscribe link is not valid."
+msgstr "קישור ההסרה הזה אינו תקף."
+
 
 
 msgid "Confirm your new email address"

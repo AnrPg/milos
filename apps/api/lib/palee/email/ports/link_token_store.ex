@@ -20,4 +20,7 @@ defmodule Palee.Email.Ports.LinkTokenStore do
   @callback consume(String.t(), binary(), DateTime.t()) :: LinkToken.t() | nil
 
   @callback get_by_hash(String.t(), binary()) :: LinkToken.t() | nil
+
+  @doc "Deletes tokens used or expired before `before` (ADR-212); returns how many."
+  @callback purge_spent(DateTime.t()) :: non_neg_integer()
 end

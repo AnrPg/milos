@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "Setting a new password signs you out on every device."
 msgid "Your password has not been changed."
 msgstr "Your password has not been changed."
+msgid "Unsubscribe from these emails"
+msgstr "Unsubscribe from these emails"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgid "You're unsubscribed"
+msgstr "You're unsubscribed"
+msgid "This unsubscribe link is not valid."
+msgstr "This unsubscribe link is not valid."
+
 
 
 msgid "Confirm your new email address"

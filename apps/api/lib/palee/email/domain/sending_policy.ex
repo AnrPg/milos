@@ -100,6 +100,17 @@ defmodule Palee.Email.Domain.SendingPolicy do
   def on_send(_category, sent_today, %{daily_budget: budget}, now),
     do: if(sent_today < budget, do: :send, else: {:defer, next_day(now)})
 
+  @doc """
+  Whether the email that brought today's count to `sent_today` is the one
+  that crossed 80% of the daily budget (ADR-212): true for exactly one
+  count a day.
+  """
+  @spec budget_warning?(non_neg_integer(), budget()) :: boolean()
+  def budget_warning?(sent_today, %{daily_budget: budget}) when budget > 0,
+    do: sent_today == div(4 * budget + 4, 5)
+
+  def budget_warning?(_sent_today, _budget), do: false
+
   @doc "The start of `now`'s UTC day, from which the daily budget counts."
   def day_start(%DateTime{} = now),
     do: DateTime.new!(DateTime.to_date(DateTime.shift_zone!(now, "Etc/UTC")), ~T[00:00:00.000000])

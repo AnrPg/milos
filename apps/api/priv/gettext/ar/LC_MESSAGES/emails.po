@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "عند تعيين كلمة مرور جديدة، سيتم تسجيل خروجك من جميع أجهزتك."
 msgid "Your password has not been changed."
 msgstr "لم تتغير كلمة المرور الخاصة بك."
+msgid "Unsubscribe from these emails"
+msgstr "إلغاء الاشتراك في هذه الرسائل"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "لن تصلك بعد الآن رسائل من هذا النوع من %{product}. ستستمر رسائل حسابك وأمانه في الوصول."
+msgid "You're unsubscribed"
+msgstr "تم إلغاء اشتراكك"
+msgid "This unsubscribe link is not valid."
+msgstr "رابط إلغاء الاشتراك هذا غير صالح."
+
 
 
 msgid "Confirm your new email address"

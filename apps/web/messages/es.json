@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Ese plano de planta pertenece a otra sede.",
     "apiErrorInvalidCleaningSchedule": "Elige al menos un día y escribe las horas como HH:MM.",
     "apiErrorInvalidPlacement": "Elige un espacio y una cantidad en cada fila.",
-    "apiErrorPlacementExceedsQuantity": "Hay más colocadas de las que tiene el gimnasio de esta máquina."
+    "apiErrorPlacementExceedsQuantity": "Hay más colocadas de las que tiene el gimnasio de esta máquina.",
+    "apiErrorInvitationEmailUnverified": "Esta invitación es para una dirección de correo confirmada. Abre el enlace del correo de invitación o confirma primero tu dirección.",
+    "apiErrorInvitationRevoked": "El box revocó esta invitación."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -11570,6 +11572,81 @@
     "handlerNote": "Quien tiene el correo confirmado recibe automáticamente el enlace por correo. Aquí llegan las solicitudes de personas cuyo correo no está confirmado o que no pueden abrirlo.",
     "event_link_emailed": "Enlace enviado por correo",
     "event_throttled": "Demasiadas solicitudes (no se envió nada)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "La clave de email caduca pronto",
+    "notifKeyExpiredTitle": "La clave de email ha caducado",
+    "notifKeyExpiringBody": "La clave SMTP de Palee caduca dentro de {days} días ({date}). Crea una clave nueva en Brevo y actualiza el secreto del servidor antes de esa fecha, o Palee dejará de enviar emails.",
+    "notifKeyExpiredBody": "La clave SMTP de Palee caducó el {date}, así que Palee no puede enviar emails. Crea una clave nueva en Brevo y actualiza el secreto del servidor."
+  },
+  "InviteEmail": {
+    "tabBulk": "Varias personas",
+    "demoNotice": "Tu negocio está en modo demo, así que todavía no puede invitar ni enviar correos a personas reales. El equipo de Palee lo activa; mientras tanto, prueba todo con datos de demostración.",
+    "languageLabel": "Idioma del correo",
+    "boxLanguage": "{language} (idioma de tu box)",
+    "emailSendHint": "Enviamos la invitación por correo. Solo esta dirección puede usarla, y abrir el correo la confirma.",
+    "emailLinkHint": "Déjalo vacío para obtener un enlace que copiar y compartir tú.",
+    "send": "Enviar invitación",
+    "sending": "Enviando…",
+    "sentTo": "Invitación enviada a {email}.",
+    "sentHint": "El enlace solo está en el correo. Funciona una vez y caduca el {date}. Síguela en Pendientes.",
+    "sendAnother": "Invitar a otra persona",
+    "bulkLabel": "Direcciones de correo",
+    "bulkHint": "Pega direcciones o elige un archivo CSV, hasta {max} a la vez. Cada persona recibe su propia invitación.",
+    "chooseCsv": "Elegir archivo CSV",
+    "bulkCount": "{count, plural, =0 {Aún no hay direcciones} one {# dirección} other {# direcciones}}",
+    "bulkSend": "{count, plural, =0 {Enviar invitaciones} one {Enviar # invitación} other {Enviar # invitaciones}}",
+    "bulkDone": "{sent, plural, =0 {No se envió ninguna invitación.} one {# invitación enviada.} other {# invitaciones enviadas.}}",
+    "bulkFailed": "{count, plural, one {# dirección no recibió invitación:} other {# direcciones no recibieron invitación:}}",
+    "bulkSkipped": "No son direcciones de correo, omitidas: {values}",
+    "resend": "Reenviar",
+    "resent": "Enviada de nuevo a {email}. El enlace anterior ya no funciona.",
+    "status": {
+      "queued": "Enviando",
+      "sent": "Enviada",
+      "failed": "No entregada",
+      "bounced": "Rebotada",
+      "suppressed": "Dirección bloqueada"
+    },
+    "errors": {
+      "invalid_address": "Escribe una dirección de correo válida.",
+      "suppressed": "Los correos a esta dirección rebotan. Revísala o usa otra.",
+      "throttled": "Acaba de enviarse una invitación a esta dirección. Inténtalo de nuevo en unos minutos.",
+      "over_budget": "El envío de correos está saturado hoy. Inténtalo más tarde.",
+      "invitation_email_required": "Escribe al menos una dirección de correo.",
+      "too_many_invitation_emails": "Hasta {max} direcciones a la vez.",
+      "invitation_email_cap_reached": "Tu box ya envió todos sus correos de invitación de hoy. Inténtalo mañana.",
+      "invitation_not_emailed": "Esta invitación no se envió por correo.",
+      "business_not_activated": "Tu negocio está en modo demo, así que todavía no puede invitar a personas reales.",
+      "other": "No se pudo enviar."
+    },
+    "revokedTitle": "Esta invitación fue revocada",
+    "revokedBody": "El box retiró esta invitación. Pídele una nueva si aún quieres unirte.",
+    "invalidTitle": "Esta invitación ya no funciona",
+    "invalidBody": "Puede que ya se haya usado o que haya caducado. Pide al box una nueva invitación.",
+    "boundNote": "Esta invitación es para una dirección de correo. Inicia sesión o crea tu cuenta con la dirección a la que se envió.",
+    "mismatch": "Has iniciado sesión con una dirección de correo distinta de la que recibió esta invitación. Cierra sesión e inicia sesión o crea una cuenta con la dirección invitada.",
+    "unverified": "Esta invitación es para una dirección de correo confirmada. Abre el enlace del correo de invitación o confirma primero tu dirección.",
+    "signOut": "Cerrar sesión"
+  },
+  "ShareByEmail": {
+    "action": "Enviar por email",
+    "label": "Su dirección de email",
+    "placeholder": "nombre@example.com",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "sent": "Enviado a {email}",
+    "hint": "Solo enviamos este enlace y tu nombre.",
+    "errors": {
+      "unverified": "Confirma primero tu propio email y luego podrás enviar enlaces por email.",
+      "dailyLimit": "Has enviado el máximo de enlaces por email por hoy. Compártelo o cópialo.",
+      "throttled": "Esta dirección ya ha recibido bastantes invitaciones hoy.",
+      "suppressed": "Los emails a esta dirección rebotan. Revísala o usa otra.",
+      "invalidAddress": "Escribe una dirección de email válida.",
+      "demo": "El negocio sigue en modo demo y todavía no puede enviar emails.",
+      "unavailable": "Este enlace ya no se puede enviar. Crea uno nuevo.",
+      "generic": "No se pudo enviar el email. Inténtalo de nuevo."
+    }
   },
   "emailChange": {
     "label": "Email",

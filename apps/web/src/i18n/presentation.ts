@@ -289,6 +289,9 @@ const API_ERROR_KEYS: Record<string, string> = {
   invalid_admin_registration_code: "apiErrorInvalidAdminRegistrationCode",
   invalid_invitation: "apiErrorInvalidInvitation",
   invitation_email_mismatch: "apiErrorInvitationEmailMismatch",
+  // ADR-209: an email-bound invitation needs a confirmed address or its emailed link.
+  invitation_email_unverified: "apiErrorInvitationEmailUnverified",
+  invitation_revoked: "apiErrorInvitationRevoked",
   invalid_current_password: "apiErrorInvalidCurrentPassword",
   invalid_credentials: "apiErrorInvalidCredentials",
   invalid_refresh_token: "apiErrorInvalidRefreshToken",

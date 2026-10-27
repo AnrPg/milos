@@ -178,6 +178,14 @@ msgstr ""
 msgid "Setting a new password signs you out on every device."
 msgstr ""
 msgid "Your password has not been changed."
+msgid "Unsubscribe from these emails"
+msgstr ""
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr ""
+msgid "You're unsubscribed"
+msgstr ""
+msgid "This unsubscribe link is not valid."
+
 
 
 # ADR-207: email change confirmation

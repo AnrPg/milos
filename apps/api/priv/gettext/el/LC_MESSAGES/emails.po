@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "Με τον νέο κωδικό αποσυνδέεστε από όλες τις συσκευές σας."
 msgid "Your password has not been changed."
 msgstr "Ο κωδικός σας δεν έχει αλλάξει."
+msgid "Unsubscribe from these emails"
+msgstr "Διακοπή αυτών των email"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Δεν θα λαμβάνετε πλέον αυτό το είδος email από το %{product}. Τα email για τον λογαριασμό σας και την ασφάλειά του θα συνεχίσουν να φτάνουν."
+msgid "You're unsubscribed"
+msgstr "Η εγγραφή σας καταργήθηκε"
+msgid "This unsubscribe link is not valid."
+msgstr "Αυτός ο σύνδεσμος διακοπής δεν είναι έγκυρος."
+
 
 
 msgid "Confirm your new email address"

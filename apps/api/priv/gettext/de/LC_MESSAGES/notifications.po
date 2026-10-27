@@ -696,3 +696,15 @@ msgstr "%{class} (%{time}) wurde abgesagt: %{reason}. Dein Platz wurde freigegeb
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "%{class} (%{time}) wurde abgesagt. Dein Platz wurde freigegeben."
+
+msgid "The email key expires soon"
+msgstr "Der E-Mail-Schlüssel läuft bald ab"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "Der SMTP-Schlüssel von Palee läuft in %{days} Tagen ab (%{date}). Erstell vorher in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server, sonst verschickt Palee keine E-Mails mehr."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "Der SMTP-Schlüssel von Palee ist am %{date} abgelaufen, deshalb kann Palee keine E-Mails verschicken. Erstell in Brevo einen neuen Schlüssel und aktualisiere das Secret auf dem Server."
+
+msgid "The email key has expired"
+msgstr "Der E-Mail-Schlüssel ist abgelaufen"

@@ -4,17 +4,26 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { ApiError } from "@/api/client";
 import {
+  BULK_INVITE_MAX,
+  bulkInvite,
   fetchJoinLink,
   invitationUrl,
   issueClientInvitation,
   joinUrl,
   listPendingInvitations,
+  parseInviteAddresses,
+  resendInvitation,
   revokeInvitation,
   updateJoinLink,
+  type BulkInvitationResult,
   type ClientRole,
   type IssuedInvitation,
+  type PendingInvitation,
 } from "@/api/organizations";
+import { LOCALE_NAMES, SUPPORTED_LOCALES, isAppLocale, type AppLocale } from "@/i18n/locales";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { localizeError, semanticLabel } from "@/i18n/presentation";
@@ -29,7 +38,7 @@ import {
 } from "@/components/invites/StaffInviteFields";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
-type Tab = "link" | "public" | "pending";
+type Tab = "link" | "bulk" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
 
 const LIFETIMES = [1, 3, 7] as const;
@@ -104,6 +113,7 @@ export function ClientAccessPanel() {
 
 function ClientAccessTabs({ initialTab }: { initialTab: Tab }) {
   const t = useTranslations("Invites");
+  const emailT = useTranslations("InviteEmail");
   const [tab, setTab] = useState<Tab>(initialTab);
   const slug = useOrganizationSlug();
   const { tokens } = useSession();
@@ -116,6 +126,7 @@ function ClientAccessTabs({ initialTab }: { initialTab: Tab }) {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "link", label: t("tabPersonal") },
+    { id: "bulk", label: emailT("tabBulk") },
     { id: "public", label: t("tabPublic") },
     { id: "pending", label: t("tabPending", { count: pending.data?.length ?? 0 }) },
   ];
@@ -124,7 +135,7 @@ function ClientAccessTabs({ initialTab }: { initialTab: Tab }) {
 
   return (
     <div>
-      <div role="tablist" aria-label={t("inviteClients")} className="grid grid-cols-3 gap-1 rounded-xl p-1" style={{ background: "var(--panel-muted, var(--bg))" }}>
+      <div role="tablist" aria-label={t("inviteClients")} className="grid grid-cols-4 gap-1 rounded-xl p-1" style={{ background: "var(--panel-muted, var(--bg))" }}>
         {tabs.map((item) => (
           <button
             key={item.id}
@@ -141,6 +152,7 @@ function ClientAccessTabs({ initialTab }: { initialTab: Tab }) {
       </div>
       <div className="mt-4" role="tabpanel">
         {tab === "link" ? <PersonalInvite t={t} slug={slug} token={token} /> : null}
+        {tab === "bulk" ? <BulkInvite t={t} slug={slug} token={token} /> : null}
         {tab === "public" ? <PublicJoinLink t={t} slug={slug} token={token} /> : null}
         {tab === "pending" ? <PendingInvitations t={t} slug={slug} token={token} /> : null}
       </div>
@@ -172,35 +184,158 @@ function RolePicker({ t, value, onChange }: { t: Translate; value: ClientRole; o
   );
 }
 
-function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token: string }) {
-  const locale = useUiLocale();
-  const queryClient = useQueryClient();
-  const [role, setRole] = useState<ClientRole>("member");
-  // ADR-186: staff links carry a role set and branches.
+/** ADR-209: the box's language, the default of an invitation email. */
+function useBoxEmailLocale(): { boxLocale: AppLocale; demo: boolean } {
+  const { membership } = useSelectedMembershipRole();
+  const uiLocale = useUiLocale();
+  const stored = membership?.settings?.default_locale;
+  const boxLocale = isAppLocale(stored) ? stored : isAppLocale(uiLocale) ? uiLocale : "en";
+  return { boxLocale, demo: membership?.organization.activation === "demo" };
+}
+
+/** ADR-184: a box in demo mode invites and emails nobody; say why instead of a form. */
+function DemoNotice() {
+  const emailT = useTranslations("InviteEmail");
+  return (
+    <p role="note" className="rounded-xl p-3 text-sm leading-6" style={{ border: "1px solid var(--border)", background: "var(--panel-muted, var(--bg))", color: "var(--text-soft)" }}>
+      {emailT("demoNotice")}
+    </p>
+  );
+}
+
+function EmailLocalePicker({ value, onChange, boxLocale }: { value: AppLocale; onChange: (locale: AppLocale) => void; boxLocale: AppLocale }) {
+  const emailT = useTranslations("InviteEmail");
+  return (
+    <label className="block text-sm" style={{ color: "var(--text)" }}>
+      <span className="font-semibold">{emailT("languageLabel")}</span>
+      <Select
+        value={value}
+        onValueChange={(next) => isAppLocale(next) && onChange(next)}
+        className="mt-1 w-full rounded-xl px-3 py-2 text-sm"
+        style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        {SUPPORTED_LOCALES.map((locale) => (
+          <option key={locale} value={locale}>
+            {locale === boxLocale ? emailT("boxLanguage", { language: LOCALE_NAMES[locale] }) : LOCALE_NAMES[locale]}
+          </option>
+        ))}
+      </Select>
+    </label>
+  );
+}
+
+/** ADR-209: email errors named in the invite screens, else the shared API message. */
+function inviteErrorMessage(error: unknown, emailT: Translate, uiT: Translate) {
+  const code = error instanceof ApiError ? error.payload.code : undefined;
+  const known = ["invalid_address", "suppressed", "throttled", "over_budget", "invitation_email_required", "too_many_invitation_emails", "invitation_email_cap_reached", "invitation_not_emailed", "business_not_activated"];
+  if (code && known.includes(code)) return emailT(`errors.${code}`, { max: BULK_INVITE_MAX });
+  return localizeError(error, uiT);
+}
+
+function useInviteKind() {
   const invitableStaff = useInvitableStaffRoles();
-  const branchT = useTranslations("BranchScope");
   const [kind, setKind] = useState<"client" | "staff">("client");
+  const [role, setRole] = useState<ClientRole>("member");
   const [staff, setStaff] = useState<StaffInvite>({ roles: [], scope: null });
   const staffInvite = kind === "staff" && invitableStaff.length > 0;
   const staffIncomplete =
     staffInvite && (staff.roles.length === 0 || (Array.isArray(staff.scope) && staff.scope.length === 0));
+  return { invitableStaff, kind, setKind, role, setRole, staff, setStaff, staffInvite, staffIncomplete, body: staffInvite ? staffInvitationBody(staff) : { role } };
+}
+
+function InviteKindFields({ t, token, invite }: { t: Translate; token: string; invite: ReturnType<typeof useInviteKind> }) {
+  const branchT = useTranslations("BranchScope");
+  return (
+    <>
+      {invite.invitableStaff.length > 0 ? (
+        <div role="radiogroup" aria-label={t("joinsAs")} className="grid grid-cols-2 gap-1 rounded-xl p-1" style={{ background: "var(--panel-muted, var(--bg))" }}>
+          {(["client", "staff"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={invite.kind === option}
+              onClick={() => invite.setKind(option)}
+              className="rounded-lg px-3 py-2 text-sm font-semibold"
+              style={invite.kind === option ? { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" } : { color: "var(--muted)" }}
+            >
+              {option === "client" ? branchT("kindClient") : branchT("kindStaff")}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {invite.staffInvite ? (
+        <StaffInviteFields token={token} value={invite.staff} onChange={invite.setStaff} />
+      ) : (
+        <RolePicker t={t} value={invite.role} onChange={invite.setRole} />
+      )}
+    </>
+  );
+}
+
+function LifetimePicker({ t, value, onChange }: { t: Translate; value: (typeof LIFETIMES)[number]; onChange: (days: (typeof LIFETIMES)[number]) => void }) {
+  return (
+    <label className="block text-sm" style={{ color: "var(--text)" }}>
+      <span className="font-semibold">{t("validFor")}</span>
+      <Select
+        value={value}
+        onValueChange={(next) => onChange(Number(next) as (typeof LIFETIMES)[number])}
+        className="mt-1 w-full rounded-xl px-3 py-2 text-sm"
+        style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        {LIFETIMES.map((days) => (
+          <option key={days} value={days}>{t("days", { count: days })}</option>
+        ))}
+      </Select>
+    </label>
+  );
+}
+
+function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token: string }) {
+  const locale = useUiLocale();
+  const queryClient = useQueryClient();
+  const invite = useInviteKind();
+  const branchT = useTranslations("BranchScope");
+  const emailT = useTranslations("InviteEmail");
+  const { boxLocale, demo } = useBoxEmailLocale();
   const [email, setEmail] = useState("");
+  const [emailLocale, setEmailLocale] = useState<AppLocale | null>(null);
   const [days, setDays] = useState<(typeof LIFETIMES)[number]>(7);
   const [issued, setIssued] = useState<IssuedInvitation | null>(null);
   const uiT = useTranslations("Ui");
+  const address = email.trim();
 
   const issue = useMutation({
     mutationFn: () =>
       issueClientInvitation(token, slug, {
-        ...(staffInvite ? staffInvitationBody(staff) : { role }),
+        ...invite.body,
         lifetime_seconds: days * 86_400,
-        intended_email: email.trim() || undefined,
+        // ADR-209: with an address the invitation goes by email; its token stays in the email.
+        ...(address ? { intended_email: address, send_email: true, email_locale: emailLocale ?? boxLocale } : {}),
       }),
     onSuccess: (result) => {
       setIssued(result);
       void queryClient.invalidateQueries({ queryKey: ["pending-invitations", slug] });
     },
   });
+
+  if (demo) return <DemoNotice />;
+
+  const expiry = (value: string) => new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+
+  if (issued?.email) {
+    return (
+      <div className="space-y-3" role="status">
+        <p className="text-sm font-semibold" style={{ color: "var(--success, var(--primary))" }}>
+          {emailT("sentTo", { email: issued.email })}
+        </p>
+        <p className="text-xs" style={{ color: "var(--muted)" }}>{emailT("sentHint", { date: expiry(issued.expires_at) })}</p>
+        <button type="button" className="text-sm font-semibold underline" style={{ color: "var(--primary)" }} onClick={() => { setIssued(null); setEmail(""); }}>
+          {emailT("sendAnother")}
+        </button>
+      </div>
+    );
+  }
 
   if (issued) {
     const url = invitationUrl(window.location.origin, issued);
@@ -215,7 +350,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
         </p>
         <ShareBox t={t} url={url} message={t("inviteMessage", { organization: issued.organization.name, url })} subject={t("inviteSubject", { organization: issued.organization.name })} />
         <p className="text-xs" style={{ color: "var(--muted)" }}>
-          {t("singleUse", { date: new Date(issued.expires_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) })}
+          {t("singleUse", { date: expiry(issued.expires_at) })}
         </p>
         <button type="button" className="text-sm font-semibold underline" style={{ color: "var(--primary)" }} onClick={() => { setIssued(null); setEmail(""); }}>
           {t("createAnother")}
@@ -232,28 +367,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
         issue.mutate();
       }}
     >
-      {invitableStaff.length > 0 ? (
-        <div role="radiogroup" aria-label={t("joinsAs")} className="grid grid-cols-2 gap-1 rounded-xl p-1" style={{ background: "var(--panel-muted, var(--bg))" }}>
-          {(["client", "staff"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              role="radio"
-              aria-checked={kind === option}
-              onClick={() => setKind(option)}
-              className="rounded-lg px-3 py-2 text-sm font-semibold"
-              style={kind === option ? { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" } : { color: "var(--muted)" }}
-            >
-              {option === "client" ? branchT("kindClient") : branchT("kindStaff")}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {staffInvite ? (
-        <StaffInviteFields token={token} value={staff} onChange={setStaff} />
-      ) : (
-        <RolePicker t={t} value={role} onChange={setRole} />
-      )}
+      <InviteKindFields t={t} token={token} invite={invite} />
       <label className="block text-sm" style={{ color: "var(--text)" }}>
         <span className="font-semibold">{t("emailOptional")}</span>
         <input
@@ -264,24 +378,121 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
           className="mt-1 w-full rounded-xl px-3 py-2 text-sm"
           style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
         />
-        <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>{t("emailHint")}</span>
+        <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>{address ? emailT("emailSendHint") : emailT("emailLinkHint")}</span>
       </label>
+      {address ? <EmailLocalePicker value={emailLocale ?? boxLocale} onChange={setEmailLocale} boxLocale={boxLocale} /> : null}
+      <LifetimePicker t={t} value={days} onChange={setDays} />
+      {issue.error ? <ErrorNotice>{inviteErrorMessage(issue.error, emailT, uiT)}</ErrorNotice> : null}
+      <button type="submit" disabled={issue.isPending || invite.staffIncomplete} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
+        {issue.isPending ? (address ? emailT("sending") : t("creating")) : address ? emailT("send") : t("createLink")}
+      </button>
+    </form>
+  );
+}
+
+/** ADR-209: one invitation and email per pasted (or CSV) address. */
+function BulkInvite({ t, slug, token }: { t: Translate; slug: string; token: string }) {
+  const queryClient = useQueryClient();
+  const invite = useInviteKind();
+  const emailT = useTranslations("InviteEmail");
+  const uiT = useTranslations("Ui");
+  const { boxLocale, demo } = useBoxEmailLocale();
+  const [text, setText] = useState("");
+  const [emailLocale, setEmailLocale] = useState<AppLocale | null>(null);
+  const [days, setDays] = useState<(typeof LIFETIMES)[number]>(7);
+  const [result, setResult] = useState<BulkInvitationResult | null>(null);
+  const parsed = parseInviteAddresses(text);
+  const tooMany = parsed.emails.length > BULK_INVITE_MAX;
+
+  const send = useMutation({
+    mutationFn: () =>
+      bulkInvite(token, slug, {
+        ...invite.body,
+        emails: parsed.emails,
+        lifetime_seconds: days * 86_400,
+        email_locale: emailLocale ?? boxLocale,
+      }),
+    onSuccess: (data) => {
+      setResult(data);
+      void queryClient.invalidateQueries({ queryKey: ["pending-invitations", slug] });
+    },
+  });
+
+  if (demo) return <DemoNotice />;
+
+  if (result) {
+    const failed = result.results.filter((row) => row.error);
+    return (
+      <div className="space-y-3">
+        <p role="status" className="text-sm font-semibold" style={{ color: "var(--success, var(--primary))" }}>
+          {emailT("bulkDone", { sent: result.sent })}
+        </p>
+        {failed.length ? (
+          <div className="space-y-1">
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{emailT("bulkFailed", { count: failed.length })}</p>
+            <ul className="space-y-0.5 text-xs" style={{ color: "var(--muted)" }}>
+              {failed.map((row) => (
+                <li key={row.email}>{row.email}: {emailT.has(`errors.${row.error}`) ? emailT(`errors.${row.error}`, { max: BULK_INVITE_MAX }) : emailT("errors.other")}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {result.skipped.length ? (
+          <p className="text-xs" style={{ color: "var(--muted)" }}>{emailT("bulkSkipped", { values: result.skipped.join(", ") })}</p>
+        ) : null}
+        <button type="button" className="text-sm font-semibold underline" style={{ color: "var(--primary)" }} onClick={() => { setResult(null); setText(""); }}>
+          {emailT("sendAnother")}
+        </button>
+      </div>
+    );
+  }
+
+  async function readCsv(file: File | undefined) {
+    if (!file) return;
+    const content = await file.text();
+    setText((current) => (current.trim() ? `${current}\n${content}` : content));
+  }
+
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        send.mutate();
+      }}
+    >
+      <InviteKindFields t={t} token={token} invite={invite} />
       <label className="block text-sm" style={{ color: "var(--text)" }}>
-        <span className="font-semibold">{t("validFor")}</span>
-        <Select
-          value={days}
-          onValueChange={(value) => setDays(Number(value) as (typeof LIFETIMES)[number])}
+        <span className="font-semibold">{emailT("bulkLabel")}</span>
+        <textarea
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          rows={5}
+          autoComplete="off"
           className="mt-1 w-full rounded-xl px-3 py-2 text-sm"
           style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
-        >
-          {LIFETIMES.map((value) => (
-            <option key={value} value={value}>{t("days", { count: value })}</option>
-          ))}
-        </Select>
+        />
+        <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>{emailT("bulkHint", { max: BULK_INVITE_MAX })}</span>
       </label>
-      {issue.error ? <ErrorNotice>{localizeError(issue.error, uiT)}</ErrorNotice> : null}
-      <button type="submit" disabled={issue.isPending || staffIncomplete} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
-        {issue.isPending ? t("creating") : t("createLink")}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <label className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          {emailT("chooseCsv")}
+          <input type="file" accept=".csv,text/csv,text/plain" className="sr-only" onChange={(event) => void readCsv(event.target.files?.[0])} />
+        </label>
+        <span aria-live="polite" className="text-xs" style={{ color: tooMany ? "var(--danger)" : "var(--muted)" }}>
+          {tooMany ? emailT("errors.too_many_invitation_emails", { max: BULK_INVITE_MAX }) : emailT("bulkCount", { count: parsed.emails.length })}
+        </span>
+      </div>
+      {parsed.emails.length ? <EmailLocalePicker value={emailLocale ?? boxLocale} onChange={setEmailLocale} boxLocale={boxLocale} /> : null}
+      <LifetimePicker t={t} value={days} onChange={setDays} />
+      {send.error ? <ErrorNotice>{inviteErrorMessage(send.error, emailT, uiT)}</ErrorNotice> : null}
+      <button
+        type="submit"
+        disabled={send.isPending || invite.staffIncomplete || parsed.emails.length === 0 || tooMany}
+        className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50"
+        style={{ background: "var(--text)", color: "var(--bg)" }}
+      >
+        {send.isPending ? emailT("sending") : emailT("bulkSend", { count: parsed.emails.length })}
       </button>
     </form>
   );
@@ -353,11 +564,24 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
       void queryClient.invalidateQueries({ queryKey: ["pending-invitations", slug] });
     },
   });
+  const emailT = useTranslations("InviteEmail");
+  const [resent, setResent] = useState<string | null>(null);
+  // ADR-209: a resend re-issues the invitation; the old link stops working.
+  const resend = useMutation({
+    mutationFn: (id: string) => resendInvitation(token, slug, id),
+    onSuccess: (invitation) => {
+      setResent(invitation.email ?? null);
+      void queryClient.invalidateQueries({ queryKey: ["pending-invitations", slug] });
+    },
+  });
 
   if (pending.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("loading")}</p>;
   if (!pending.data?.length) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("noPending")}</p>;
 
   return (
+    <div className="space-y-2">
+    {resend.error ? <ErrorNotice>{inviteErrorMessage(resend.error, emailT, uiT)}</ErrorNotice> : null}
+    {resent && !resend.error ? <p role="status" className="text-xs" style={{ color: "var(--success, var(--primary))" }}>{emailT("resent", { email: resent })}</p> : null}
     <ul className="divide-y" style={{ borderColor: "var(--border)" }}>
       {pending.data.map((invitation) => (
         <li key={invitation.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
@@ -370,6 +594,12 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
                 <span className="ms-2 rounded-full px-2 py-0.5 text-[11px]" style={{ background: "var(--panel-muted, var(--bg))", color: "var(--muted)" }}>{t("emailBound")}</span>
               ) : null}
             </p>
+            {invitation.email ? (
+              <p className="flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--text-soft)" }}>
+                <span className="break-all">{invitation.email}</span>
+                {invitation.delivery_status ? <DeliveryBadge status={invitation.delivery_status} /> : null}
+              </p>
+            ) : null}
             <p className="text-xs" style={{ color: "var(--muted)" }}>
               {t("expires", { date: new Date(invitation.expires_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) })}
             </p>
@@ -384,13 +614,39 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
               </button>
             </div>
           ) : (
-            <button type="button" onClick={() => setConfirming(invitation.id)} className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
-              {t("revoke")}
-            </button>
+            <div className="flex gap-2">
+              {invitation.email ? (
+                <button type="button" onClick={() => resend.mutate(invitation.id)} disabled={resend.isPending} className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+                  {emailT("resend")}
+                </button>
+              ) : null}
+              <button type="button" onClick={() => setConfirming(invitation.id)} className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+                {t("revoke")}
+              </button>
+            </div>
           )}
         </li>
       ))}
     </ul>
+    </div>
+  );
+}
+
+type DeliveryStatus = NonNullable<PendingInvitation["delivery_status"]>;
+
+/** ADR-209: where the invitation email is: queued, sent, failed, bounced or suppressed. */
+function DeliveryBadge({ status }: { status: DeliveryStatus }) {
+  const emailT = useTranslations("InviteEmail");
+  const problem = status === "failed" || status === "bounced" || status === "suppressed";
+  return (
+    <span
+      className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
+      style={problem
+        ? { background: "color-mix(in srgb, var(--danger) 14%, transparent)", color: "var(--danger)" }
+        : { background: "var(--panel-muted, var(--bg))", color: status === "sent" ? "var(--success, var(--primary))" : "var(--muted)" }}
+    >
+      {emailT(`status.${status}`)}
+    </span>
   );
 }
 

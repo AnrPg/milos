@@ -7,7 +7,6 @@ defmodule Palee.MailerTest do
   alias Palee.Finance.Emails.CorporateInvoiceEmail
   alias Palee.Localization
   alias Palee.Mailer
-  alias Palee.Organizations.Emails.OwnerInvitationEmail
   alias Swoosh.Adapters.SMTP.Helpers
 
   @from {"Palee", "no-reply@palee.app"}
@@ -39,7 +38,6 @@ defmodule Palee.MailerTest do
     localize = &Localization.translate("en", &1, &2, "corporate_invoices")
 
     [
-      OwnerInvitationEmail.build(%{organization_name: "Gym", to: "owner@gym.test", token: "t"}),
       CorporateInvoiceEmail.build(
         :issued,
         %{invoice: invoice, client: client, gym_name: "Gym", from: @from},
@@ -86,5 +84,15 @@ defmodule Palee.MailerTest do
         Mailer.default_from_address(host)
       end
     end
+  end
+
+  test "STARTTLS to the relay verifies the peer and its name (ADR-212)" do
+    tls = Mailer.tls_options("smtp-relay.brevo.com")
+
+    assert tls[:verify] == :verify_peer
+    assert tls[:server_name_indication] == ~c"smtp-relay.brevo.com"
+    assert tls[:versions] == [:"tlsv1.2", :"tlsv1.3"]
+    assert is_function(tls[:customize_hostname_check][:match_fun], 2)
+    assert (is_list(tls[:cacerts]) and tls[:cacerts] != []) or File.exists?(tls[:cacertfile])
   end
 end

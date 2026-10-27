@@ -4571,7 +4571,9 @@
     "apiErrorFloorPlanWrongBranch": "Die plattegrond hoort bij een andere vestiging.",
     "apiErrorInvalidCleaningSchedule": "Kies minstens één dag en schrijf tijden als UU:MM.",
     "apiErrorInvalidPlacement": "Kies op elke regel een ruimte en een aantal.",
-    "apiErrorPlacementExceedsQuantity": "Er zijn meer geplaatst dan de sportschool van dit toestel heeft."
+    "apiErrorPlacementExceedsQuantity": "Er zijn meer geplaatst dan de sportschool van dit toestel heeft.",
+    "apiErrorInvitationEmailUnverified": "Deze uitnodiging is voor een bevestigd e-mailadres. Open de link in de uitnodigingsmail of bevestig eerst je e-mailadres.",
+    "apiErrorInvitationRevoked": "De box heeft deze uitnodiging ingetrokken."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -11570,6 +11572,81 @@
     "handlerNote": "Wie een bevestigd e-mailadres heeft, krijgt de herstellink automatisch per e-mail. Hier komen verzoeken van mensen van wie het e-mailadres niet bevestigd is of die het niet kunnen openen.",
     "event_link_emailed": "Herstellink gemaild",
     "event_throttled": "Te veel verzoeken (niets verstuurd)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "De e-mailsleutel verloopt binnenkort",
+    "notifKeyExpiredTitle": "De e-mailsleutel is verlopen",
+    "notifKeyExpiringBody": "De SMTP-sleutel van Palee verloopt over {days} dagen ({date}). Maak vóór die tijd een nieuwe sleutel in Brevo en werk het secret op de server bij, anders verstuurt Palee geen e-mail meer.",
+    "notifKeyExpiredBody": "De SMTP-sleutel van Palee is op {date} verlopen, dus Palee kan geen e-mail versturen. Maak een nieuwe sleutel in Brevo en werk het secret op de server bij."
+  },
+  "InviteEmail": {
+    "tabBulk": "Meerdere mensen",
+    "demoNotice": "Je bedrijf staat in demomodus en kan nog geen echte mensen uitnodigen of mailen. Het Palee-team activeert het; probeer tot die tijd alles uit met demogegevens.",
+    "languageLabel": "Taal van de e-mail",
+    "boxLanguage": "{language} (taal van je box)",
+    "emailSendHint": "We mailen de uitnodiging. Alleen dit adres kan hem gebruiken, en het openen van de e-mail bevestigt het.",
+    "emailLinkHint": "Laat leeg om een link te krijgen die je zelf kopieert en deelt.",
+    "send": "Uitnodiging versturen",
+    "sending": "Versturen…",
+    "sentTo": "Uitnodiging verstuurd naar {email}.",
+    "sentHint": "De link staat alleen in de e-mail. Hij werkt één keer en verloopt op {date}. Volg hem onder In afwachting.",
+    "sendAnother": "Iemand anders uitnodigen",
+    "bulkLabel": "E-mailadressen",
+    "bulkHint": "Plak adressen of kies een CSV-bestand, tot {max} tegelijk. Iedereen krijgt een eigen uitnodiging.",
+    "chooseCsv": "CSV-bestand kiezen",
+    "bulkCount": "{count, plural, =0 {Nog geen adressen} one {# adres} other {# adressen}}",
+    "bulkSend": "{count, plural, =0 {Uitnodigingen versturen} one {# uitnodiging versturen} other {# uitnodigingen versturen}}",
+    "bulkDone": "{sent, plural, =0 {Er is geen uitnodiging verstuurd.} one {# uitnodiging verstuurd.} other {# uitnodigingen verstuurd.}}",
+    "bulkFailed": "{count, plural, one {# adres kreeg geen uitnodiging:} other {# adressen kregen geen uitnodiging:}}",
+    "bulkSkipped": "Geen e-mailadressen, overgeslagen: {values}",
+    "resend": "Opnieuw versturen",
+    "resent": "Opnieuw verstuurd naar {email}. De vorige link werkt niet meer.",
+    "status": {
+      "queued": "Wordt verstuurd",
+      "sent": "Verstuurd",
+      "failed": "Niet bezorgd",
+      "bounced": "Teruggestuurd",
+      "suppressed": "Adres geblokkeerd"
+    },
+    "errors": {
+      "invalid_address": "Vul een geldig e-mailadres in.",
+      "suppressed": "E-mails naar dit adres komen terug. Controleer het of gebruik een ander.",
+      "throttled": "Er ging net een uitnodiging naar dit adres. Probeer het over een paar minuten opnieuw.",
+      "over_budget": "Het e-mailen is vandaag druk. Probeer het later opnieuw.",
+      "invitation_email_required": "Vul minstens één e-mailadres in.",
+      "too_many_invitation_emails": "Tot {max} adressen tegelijk.",
+      "invitation_email_cap_reached": "Je box heeft vandaag al zijn uitnodigingsmails verstuurd. Probeer het morgen opnieuw.",
+      "invitation_not_emailed": "Deze uitnodiging is niet per e-mail verstuurd.",
+      "business_not_activated": "Je bedrijf staat in demomodus en kan nog geen echte mensen uitnodigen.",
+      "other": "Versturen is niet gelukt."
+    },
+    "revokedTitle": "Deze uitnodiging is ingetrokken",
+    "revokedBody": "De box heeft deze uitnodiging ingetrokken. Vraag om een nieuwe als je nog lid wilt worden.",
+    "invalidTitle": "Deze uitnodiging werkt niet meer",
+    "invalidBody": "Misschien is ze al gebruikt of verlopen. Vraag de box om een nieuwe uitnodiging.",
+    "boundNote": "Deze uitnodiging is voor één e-mailadres. Log in of maak je account aan met het adres waarnaar ze is verstuurd.",
+    "mismatch": "Je bent ingelogd met een ander e-mailadres dan het adres waarnaar deze uitnodiging ging. Log uit en log in of maak een account aan met het uitgenodigde adres.",
+    "unverified": "Deze uitnodiging is voor een bevestigd e-mailadres. Open de link in de uitnodigingsmail of bevestig eerst je e-mailadres.",
+    "signOut": "Uitloggen"
+  },
+  "ShareByEmail": {
+    "action": "Per e-mail sturen",
+    "label": "E-mailadres",
+    "placeholder": "naam@example.com",
+    "send": "Sturen",
+    "sending": "Bezig met sturen…",
+    "sent": "Gestuurd naar {email}",
+    "hint": "We sturen alleen deze link en je naam.",
+    "errors": {
+      "unverified": "Bevestig eerst je eigen e-mailadres, daarna kun je links per e-mail sturen.",
+      "dailyLimit": "Je hebt vandaag het maximum aantal links per e-mail gestuurd. Deel of kopieer de link.",
+      "throttled": "Dit adres heeft vandaag genoeg uitnodigingen gekregen.",
+      "suppressed": "E-mails naar dit adres komen terug. Controleer het of gebruik een ander.",
+      "invalidAddress": "Vul een geldig e-mailadres in.",
+      "demo": "Het bedrijf staat nog in demomodus en kan nog geen e-mails sturen.",
+      "unavailable": "Deze link kan niet meer gestuurd worden. Maak een nieuwe.",
+      "generic": "De e-mail kon niet worden gestuurd. Probeer het opnieuw."
+    }
   },
   "emailChange": {
     "label": "E-mail",

@@ -112,6 +112,61 @@ defmodule PaleeWeb.TelemetryTest do
     end
   end
 
+  describe "ADR-212 email metrics" do
+    setup do
+      name = Module.concat(__MODULE__, "EmailExporter#{System.unique_integer([:positive])}")
+      start_supervised!({PrometheusExporter, name: name, metrics: Telemetry.prometheus_metrics()})
+      {:ok, exporter: name}
+    end
+
+    test "export the budget gauges, the key's days left and the outbox counters", %{
+      exporter: exporter
+    } do
+      :telemetry.execute(
+        [:palee, :email, :budget],
+        %{sent_today: 224, daily_budget: 280, hard_cap: 295, deferred: 3},
+        %{}
+      )
+
+      :telemetry.execute([:palee, :email, :smtp_key], %{days_left: 30}, %{})
+
+      :telemetry.execute([:palee, :email, :sent], %{count: 1}, %{
+        message_id: "m",
+        kind: "k",
+        category: "security"
+      })
+
+      :telemetry.execute([:palee, :email, :bounced], %{count: 1}, %{
+        message_id: "m",
+        kind: "k",
+        category: "transactional"
+      })
+
+      :telemetry.execute([:palee, :email, :provider_event], %{count: 1}, %{
+        provider: "brevo",
+        event: :hard_bounce,
+        result: :applied
+      })
+
+      output = exporter |> PrometheusExporter.scrape() |> IO.iodata_to_binary()
+
+      for expected <- [
+            "palee_email_sent_today 224",
+            "palee_email_daily_budget 280",
+            "palee_email_daily_hard_cap 295",
+            "palee_email_deferred_messages 3",
+            "palee_email_smtp_key_days_left 30",
+            ~s(palee_email_sent_total{category="security"} 1),
+            ~s(palee_email_bounced_total{category="transactional"} 1),
+            ~s(palee_email_provider_events_total{event="hard_bounce",result="applied"} 1)
+          ] do
+        assert output =~ expected, "missing #{expected} in:\n#{output}"
+      end
+
+      refute output =~ "message_id"
+    end
+  end
+
   describe "emit_readiness_measurements/0" do
     setup do
       previous = Application.fetch_env!(:palee, :readiness_checker)
@@ -144,6 +199,7 @@ defmodule PaleeWeb.TelemetryTest do
       refute PrometheusExporter in ids
       refute Bandit in ids
       refute :palee_outbox_probe in ids
+      refute :palee_email_probe in ids
     end
 
     test "starts the exporter, probes and an internal listener when enabled" do
@@ -156,6 +212,7 @@ defmodule PaleeWeb.TelemetryTest do
 
       assert PrometheusExporter in ids
       assert :palee_readiness_probe in ids
+      assert :palee_email_probe in ids
       assert :palee_outbox_probe in ids
 
       bandit = Enum.find(children, &(child_id(&1) == Bandit))

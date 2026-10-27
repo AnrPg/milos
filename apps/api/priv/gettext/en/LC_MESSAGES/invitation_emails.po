@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "Owner"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Coach"
+msgstr "Coach"
+
+msgid "Front desk"
+msgstr "Front desk"
+
+msgid "Accountant"
+msgstr "Accountant"
+
+msgid "Cleaning staff"
+msgstr "Cleaning staff"
+
+msgid "Box member"
+msgstr "Box member"
+
+msgid "Athlete"
+msgstr "Athlete"
+
+msgid "Your invitation to %{business}"
+msgstr "Your invitation to %{business}"
+
+msgid "You're invited to %{business}"
+msgstr "You're invited to %{business}"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "%{inviter} invited you to join %{business} on %{product}."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "%{business} invited you to join on %{product}."
+
+msgid "Accept the invitation"
+msgstr "Accept the invitation"
+
+msgid "Joins as"
+msgstr "Joins as"
+
+msgid "Branches"
+msgstr "Branches"
+
+msgid "All branches"
+msgstr "All branches"
+
+msgid "The link works once and expires on %{date}."
+msgstr "The link works once and expires on %{date}."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "Create your account or sign in with this email address to accept."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "If you weren't expecting this invitation, you can ignore this email."

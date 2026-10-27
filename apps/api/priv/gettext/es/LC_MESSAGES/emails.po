@@ -182,6 +182,15 @@ msgid "Setting a new password signs you out on every device."
 msgstr "Al establecer una nueva contraseña se cerrará su sesión en todos los dispositivos."
 msgid "Your password has not been changed."
 msgstr "Su contraseña no se ha cambiado."
+msgid "Unsubscribe from these emails"
+msgstr "Darse de baja de estos emails"
+msgid "You will no longer receive this kind of email from %{product}. Emails about your account and its security still arrive."
+msgstr "Ya no recibirá este tipo de emails de %{product}. Los emails sobre su cuenta y su seguridad le seguirán llegando."
+msgid "You're unsubscribed"
+msgstr "Se ha dado de baja"
+msgid "This unsubscribe link is not valid."
+msgstr "Este enlace para darse de baja no es válido."
+
 
 
 msgid "Confirm your new email address"

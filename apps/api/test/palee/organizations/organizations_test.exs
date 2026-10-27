@@ -83,7 +83,8 @@ defmodule Palee.OrganizationsTest do
     assert {:ok, _revoked} =
              Organizations.revoke_invitation(context.context, second_invitation.id, now)
 
-    assert {:error, :invalid_invitation} = Organizations.inspect_invitation(second_token, now)
+    # ADR-209: a revoked link says so to its holder.
+    assert {:error, :invitation_revoked} = Organizations.inspect_invitation(second_token, now)
   end
 
   test "only staff memberships may manage invitations", context do
