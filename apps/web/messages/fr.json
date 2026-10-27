@@ -11532,5 +11532,20 @@
       },
       "resend": "Envoyer un nouveau lien"
     }
+  },
+  "securityNotices": {
+    "title": "Se déconnecter partout ?",
+    "body": "Tous les appareils connectés à ton compte seront déconnectés, y compris celui-ci. Fais-le si tu as reçu un e-mail de sécurité pour quelque chose que tu n’as pas fait.",
+    "confirm": "Se déconnecter partout",
+    "working": "Déconnexion…",
+    "doneTitle": "Déconnexion de tous les appareils effectuée",
+    "doneBody": "Tous les appareils ont été déconnectés de ton compte. Choisis maintenant un nouveau mot de passe, pour que personne d’autre ne puisse se reconnecter.",
+    "chooseNewPassword": "Choisir un nouveau mot de passe",
+    "signIn": "Se connecter",
+    "linkProblemTitle": "Ce lien ne peut pas être utilisé",
+    "linkExpired": "Ce lien a expiré (il est valable 7 jours).",
+    "linkUsed": "Ce lien a déjà été utilisé : les appareils sont donc déjà déconnectés.",
+    "linkInvalid": "Ce lien n’est pas valide. Rouvre-le depuis l’e-mail, sans le modifier.",
+    "linkProblemHelp": "Tu peux aussi te connecter et déconnecter tous les appareils depuis les Réglages."
   }
 }

@@ -9,10 +9,19 @@ defmodule Palee.Application.AccountProfiles do
 
   def list(%{login_id: login_id}), do: {:ok, Identity.list_profiles(login_id)}
 
-  def add(%{login_id: login_id}, params) do
+  def add(%{login_id: login_id} = account, params) do
     case Identity.add_profile(login_id, params) do
       {:error, :profile_limit} ->
         {:error, {:profile_limit, %{profile_limit: Identity.max_profiles()}}}
+
+      {:ok, profile} = result ->
+        # ADR-208: told to the login's email, in the language and zone of
+        # the profile that added it, with a "sign out everywhere" link.
+        Palee.Application.SecurityNotices.notify(:profile_added, account, %{
+          profile: profile.handle && "@" <> profile.handle
+        })
+
+        result
 
       result ->
         result

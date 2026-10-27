@@ -11532,5 +11532,20 @@
       },
       "resend": "Nieuwe link sturen"
     }
+  },
+  "securityNotices": {
+    "title": "Overal uitloggen?",
+    "body": "Hiermee log je elk apparaat uit dat op je account is ingelogd, ook dit apparaat. Doe dit als je een beveiligingsmail kreeg over iets wat je niet zelf deed.",
+    "confirm": "Overal uitloggen",
+    "working": "Bezig met uitloggen…",
+    "doneTitle": "Overal uitgelogd",
+    "doneBody": "Alle apparaten zijn uitgelogd van je account. Kies nu een nieuw wachtwoord, zodat niemand anders opnieuw kan inloggen.",
+    "chooseNewPassword": "Nieuw wachtwoord kiezen",
+    "signIn": "Inloggen",
+    "linkProblemTitle": "Deze link werkt niet",
+    "linkExpired": "Deze link is verlopen (links zijn 7 dagen geldig).",
+    "linkUsed": "Deze link is al gebruikt, dus die apparaten zijn al uitgelogd.",
+    "linkInvalid": "Deze link is ongeldig. Open hem opnieuw vanuit de e-mail, zonder hem te wijzigen.",
+    "linkProblemHelp": "Je kunt ook inloggen en in Instellingen alle apparaten uitloggen."
   }
 }

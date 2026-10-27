@@ -12,7 +12,19 @@ defmodule Palee.Email.Templates do
     business_activation_link: Palee.Email.Templates.BusinessActivationLink,
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
     corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
-    verify_email: Palee.Email.Templates.VerifyEmail
+    verify_email: Palee.Email.Templates.VerifyEmail,
+    security_account_deleted: Palee.Email.Templates.SecurityAccountDeleted,
+    security_account_deletion_scheduled: Palee.Email.Templates.SecurityAccountDeletionScheduled,
+    security_email_change_requested: Palee.Email.Templates.SecurityEmailChangeRequested,
+    security_email_changed: Palee.Email.Templates.SecurityEmailChanged,
+    security_new_sign_in: Palee.Email.Templates.SecurityNewSignIn,
+    security_password_changed: Palee.Email.Templates.SecurityPasswordChanged,
+    security_password_reset_completed: Palee.Email.Templates.SecurityPasswordResetCompleted,
+    security_profile_added: Palee.Email.Templates.SecurityProfileAdded,
+    security_recovery_code_used: Palee.Email.Templates.SecurityRecoveryCodeUsed,
+    security_recovery_codes_regenerated: Palee.Email.Templates.SecurityRecoveryCodesRegenerated,
+    security_recovery_codes_running_low: Palee.Email.Templates.SecurityRecoveryCodesRunningLow,
+    security_signed_out_everywhere: Palee.Email.Templates.SecuritySignedOutEverywhere
   }
 
   @doc "Every kind and its template."

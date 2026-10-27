@@ -92,6 +92,7 @@ defmodule Palee.Application.PasswordRecovery do
 
       log(:recovery_code_used, person, nil)
       notify_completed(person.id)
+      :ok = Palee.Application.RecoveryCodeNotices.code_used(person, now)
       :ok
     else
       {:password, false} -> {:error, :weak_password}
@@ -105,10 +106,11 @@ defmodule Palee.Application.PasswordRecovery do
   New recovery codes for the account's login; the old ones stop working.
   Asks for the current password so a borrowed session cannot mint codes.
   """
-  def generate_codes(%{login_id: login_id, password_hash: hash}, current_password) do
+  def generate_codes(%{login_id: login_id, password_hash: hash} = account, current_password) do
     if is_binary(current_password) and PasswordVerifier.verify(current_password, hash) do
       codes = RecoveryCodes.generate()
       :ok = Store.replace_recovery_codes(login_id, Enum.map(codes, &RecoveryCodes.hash/1))
+      :ok = Palee.Application.RecoveryCodeNotices.regenerated(account)
       {:ok, codes}
     else
       {:error, :invalid_current_password}

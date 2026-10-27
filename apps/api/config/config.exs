@@ -103,6 +103,7 @@ config :palee, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :palee, :readiness_checker, Palee.Infrastructure.Readiness.Live
 config :palee, :identity_user_store, Palee.Infrastructure.Identity.EctoUserStore
 config :palee, :password_reset_store, Palee.Infrastructure.Identity.EctoPasswordResetStore
+config :palee, :login_device_store, Palee.Infrastructure.Identity.EctoLoginDeviceStore
 
 config :palee,
        :organization_store,

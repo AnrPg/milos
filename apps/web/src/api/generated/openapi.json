@@ -87232,6 +87232,94 @@
         ]
       }
     },
+    "/api/auth/sign-out-everywhere": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SecurityLinkController.sign_out_everywhere",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Every session ended"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_link",
+                        "expired_link",
+                        "used_link"
+                      ],
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired or already used link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_link",
+                        "expired_link",
+                        "used_link"
+                      ],
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown link"
+          }
+        },
+        "summary": "Sign every device of the login out with a security notice's emailed link",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/auth/switch-profile": {
       "post": {
         "callbacks": {},

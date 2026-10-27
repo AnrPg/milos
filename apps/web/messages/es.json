@@ -11532,5 +11532,20 @@
       },
       "resend": "Enviar un enlace nuevo"
     }
+  },
+  "securityNotices": {
+    "title": "¿Cerrar sesión en todas partes?",
+    "body": "Se cerrará la sesión en todos los dispositivos conectados a tu cuenta, también en este. Hazlo si te ha llegado un correo de seguridad por algo que no has hecho tú.",
+    "confirm": "Cerrar sesión en todas partes",
+    "working": "Cerrando sesión…",
+    "doneTitle": "Sesión cerrada en todas partes",
+    "doneBody": "Se ha cerrado la sesión en todos los dispositivos de tu cuenta. Ahora elige una contraseña nueva para que nadie más pueda volver a entrar.",
+    "chooseNewPassword": "Elegir una contraseña nueva",
+    "signIn": "Iniciar sesión",
+    "linkProblemTitle": "Este enlace no se puede usar",
+    "linkExpired": "Este enlace ha caducado (funciona durante 7 días).",
+    "linkUsed": "Este enlace ya se usó, así que esos dispositivos ya tienen la sesión cerrada.",
+    "linkInvalid": "Este enlace no es válido. Vuelve a abrirlo desde el correo, sin cambiarlo.",
+    "linkProblemHelp": "También puedes iniciar sesión y cerrar la sesión en todos los dispositivos desde Ajustes."
   }
 }

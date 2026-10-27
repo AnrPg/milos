@@ -11532,5 +11532,20 @@
       },
       "resend": "Enviar nova ligação"
     }
+  },
+  "securityNotices": {
+    "title": "Terminar sessão em todo o lado?",
+    "body": "Isto termina a sessão em todos os dispositivos com sessão iniciada na tua conta, incluindo este. Faz isto se recebeste um email de segurança sobre algo que não fizeste.",
+    "confirm": "Terminar sessão em todo o lado",
+    "working": "A terminar sessão…",
+    "doneTitle": "Sessão terminada em todo o lado",
+    "doneBody": "A sessão foi terminada em todos os dispositivos da tua conta. Agora escolhe uma nova palavra-passe, para que mais ninguém consiga entrar outra vez.",
+    "chooseNewPassword": "Escolher nova palavra-passe",
+    "signIn": "Iniciar sessão",
+    "linkProblemTitle": "Esta ligação não pode ser usada",
+    "linkExpired": "Esta ligação expirou (funciona durante 7 dias).",
+    "linkUsed": "Esta ligação já foi usada, por isso esses dispositivos já terminaram a sessão.",
+    "linkInvalid": "Esta ligação não é válida. Abre-a de novo a partir do email, sem a alterar.",
+    "linkProblemHelp": "Também podes iniciar sessão e terminar a sessão em todos os dispositivos nas Definições."
   }
 }
