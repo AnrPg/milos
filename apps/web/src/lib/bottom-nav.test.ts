@@ -38,6 +38,8 @@ describe("hidden routes", () => {
       "/sign-out-everywhere",
       "/confirm-email-change",
       "/revert-email-change",
+      "/account-deletion/confirm",
+      "/account-deletion/undo",
       "/join/kypseli",
       "/invite",
       "/set-admin",

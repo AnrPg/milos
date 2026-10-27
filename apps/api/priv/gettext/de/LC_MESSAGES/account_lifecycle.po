@@ -1,0 +1,50 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Jemand wollte sich mit Ihrer E-Mail-Adresse registrieren"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Jemand hat versucht, mit dieser E-Mail-Adresse ein %{product}-Konto zu erstellen."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Wenn Sie das waren, melden Sie sich an, um ein Profil hinzuzufügen, oder setzen Sie Ihr Passwort zurück, falls Sie es vergessen haben."
+
+msgid "Sign in"
+msgstr "Anmelden"
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Wenn Sie das nicht waren, können Sie diese E-Mail ignorieren. Es wurde kein Konto erstellt und nichts geändert."
+
+msgid "Confirm deleting your account"
+msgstr "Löschung Ihres Kontos bestätigen"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Sie haben die Löschung Ihres Profils @%{handle} beantragt."
+
+msgid "You asked to delete your account with all its profiles."
+msgstr "Sie haben die Löschung Ihres Kontos mit allen Profilen beantragt."
+
+msgid "Confirm deleting your profile"
+msgstr "Löschung Ihres Profils bestätigen"
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "Nach Ihrer Bestätigung erfolgt die Löschung in %{days} Tagen. Bis dahin können Sie sie rückgängig machen."
+
+msgid "Confirm deletion"
+msgstr "Löschung bestätigen"
+
+msgid "The link expires in 24 hours."
+msgstr "Der Link läuft in 24 Stunden ab."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Wenn Sie das nicht beantragt haben, öffnen Sie den Link nicht und ändern Sie Ihr Passwort: Jemand anderes kennt es."

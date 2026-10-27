@@ -1,13 +1,30 @@
 defmodule Palee.Application.RegisterUser do
+  @moduledoc """
+  Public sign-up (ADR-187). ADR-211: an email that already has a login,
+  with a password that is not that login's, gets the answer a new sign-up
+  gets (`{:confirmation_sent, email}`, "we sent a link"), with nothing
+  created and no session (`SignUpWithExistingEmail`). The right password
+  still adds a profile to the login, within the limit. An address held for
+  the login that changed away from it (`:email_reserved`) gets the same
+  answer, with no email to anyone.
+  """
   alias Palee.Identity
   alias Palee.Application.{EmailVerification, RegisterProfile, TokenIssuer}
 
   def call(params) do
-    with {:ok, user} <- RegisterProfile.call(params),
+    with {:ok, user} <- register_profile(params),
          {:ok, tokens} <- issue_tokens_or_cleanup(user) do
       # ADR-213: a new login gets its verification link; nothing blocks on it.
       :ok = EmailVerification.after_sign_up(user)
       {:ok, Map.put(tokens, :user, user)}
+    end
+  end
+
+  defp register_profile(params) do
+    case RegisterProfile.call(params) do
+      {:error, {:email_in_use, _count}} -> Palee.Application.SignUpWithExistingEmail.call(params)
+      {:error, :email_reserved} -> Palee.Application.SignUpWithExistingEmail.reserved(params)
+      result -> result
     end
   end
 

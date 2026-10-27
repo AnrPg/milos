@@ -4,6 +4,9 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def create_login_with_profile(params), do: impl().create_login_with_profile(params)
   @impl true
+  def validate_new_login(params), do: impl().validate_new_login(params)
+
+  @impl true
   def create_demo_person(organization_id, params),
     do: impl().create_demo_person(organization_id, params)
 

@@ -62,7 +62,9 @@ config :palee, Oban,
        {"47 * * * *", Palee.Workers.WorldGazetteerJob},
        # ADR-212: email retention and the SMTP key's expiry check.
        {"15 3 * * *", Palee.Workers.EmailRetentionJob},
-       {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob}
+       {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob},
+       # ADR-211: self-service account deletions whose grace is over.
+       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob}
      ]}
   ],
   queues: [

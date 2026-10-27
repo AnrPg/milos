@@ -82,19 +82,6 @@ defmodule PaleeWeb.AuthController do
     description: "ADR-195: the new profile's UI language; defaults to en"
   }
 
-  @email_in_use_schema %Schema{
-    type: :object,
-    description:
-      "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
-    properties: %{
-      code: %Schema{type: :string},
-      error: %Schema{type: :string},
-      profile_count: %Schema{type: :integer},
-      profile_limit: %Schema{type: :integer}
-    },
-    required: [:code]
-  }
-
   tags(["Authentication"])
 
   plug OpenApiSpex.Plug.CastAndValidate,
@@ -138,13 +125,18 @@ defmodule PaleeWeb.AuthController do
     },
     responses: [
       created:
-        {"Access session", "application/json",
+        {"Signed up; a link was sent to the email", "application/json",
          %Schema{
            type: :object,
-           properties: %{access_token: %Schema{type: :string}},
-           required: [:access_token]
+           description:
+             "ADR-211: an email that already has a login, with another password, gets this same answer without access_token (nothing is created)",
+           properties: %{
+             access_token: %Schema{type: :string},
+             confirmation: %Schema{type: :string, enum: ["email_sent"]},
+             email: %Schema{type: :string}
+           },
+           required: [:confirmation, :email]
          }},
-      conflict: {"Email already has accounts", "application/json", @email_in_use_schema},
       unprocessable_entity:
         {"Validation errors", "application/json",
          %Schema{
@@ -494,14 +486,22 @@ defmodule PaleeWeb.AuthController do
     json(conn, %{handle: AccountProfiles.suggest_handle(display_name)})
   end
 
+  # ADR-211: a new sign-up and one with an email that already has a login
+  # (wrong password) answer alike: 201, "a link was sent to <email>". Only a
+  # real new account also gets its session.
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token} = result} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user} = result} ->
         conn
         |> remember_device(result, :signed_up)
         |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
-        |> json(%{access_token: access_token})
+        |> json(%{access_token: access_token, confirmation: "email_sent", email: user.email})
+
+      {:confirmation_sent, email} ->
+        conn
+        |> put_status(:created)
+        |> json(%{confirmation: "email_sent", email: email})
 
       error ->
         error

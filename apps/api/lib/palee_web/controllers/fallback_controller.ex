@@ -52,6 +52,15 @@ defmodule PaleeWeb.FallbackController do
        "You've sent the most links by email for today. Share or copy it instead"}
   }
 
+  @account_deletion_errors %{
+    invalid_scope: {:unprocessable_entity, "Choose the profile or the whole login"},
+    confirmation_mismatch:
+      {:unprocessable_entity, "Type your account's email address to confirm"},
+    already_scheduled: {:conflict, "A deletion is already scheduled"},
+    invalid_deletion_link: {:unprocessable_entity, "This link is not valid or was already used"},
+    expired_deletion_link: {:gone, "This link has expired"}
+  }
+
   # ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
   @space_errors %{
     space_not_found: {:not_found, "Space not found"},
@@ -358,6 +367,36 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_password", error: "Password is incorrect"})
   end
 
+  # ADR-211: self-service account deletion.
+  def call(conn, {:error, reason}) when is_map_key(@account_deletion_errors, reason) do
+    {status, message} = Map.fetch!(@account_deletion_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:sole_owner, organizations}}) when is_list(organizations) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "sole_owner",
+      error: "Give the business another owner or close it first",
+      organizations: organizations
+    })
+  end
+
+  # Only after the right password: the person learns their own account's state.
+  def call(conn, {:error, {:account_deletion_scheduled, scheduled_for}}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "account_deletion_scheduled",
+      error: "This account is scheduled for deletion",
+      scheduled_for: scheduled_for
+    })
+  end
+
   # ADR-187: password recovery.
   def call(conn, {:error, reason})
       when reason in [
@@ -422,6 +461,10 @@ defmodule PaleeWeb.FallbackController do
       profile_limit: limit
     })
   end
+
+  # ADR-211: an invitation to an address held for 7 days after an email
+  # change answers as a taken one.
+  def call(conn, {:error, :email_reserved}), do: call(conn, {:error, :email_taken})
 
   def call(conn, {:error, :email_taken}) do
     conn

@@ -9,11 +9,14 @@ defmodule Palee.Email.Templates do
   """
 
   @templates %{
+    account_deletion_confirm: Palee.Email.Templates.AccountDeletionConfirm,
     business_activation_link: Palee.Email.Templates.BusinessActivationLink,
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
     corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
     email_change_confirm: Palee.Email.Templates.EmailChangeConfirm,
-    verify_email: Palee.Email.Templates.VerifyEmail,
+    organization_invitation: Palee.Email.Templates.OrganizationInvitation,
+    owner_invitation: Palee.Email.Templates.OwnerInvitation,
+    password_reset: Palee.Email.Templates.PasswordReset,
     security_account_deleted: Palee.Email.Templates.SecurityAccountDeleted,
     security_account_deletion_scheduled: Palee.Email.Templates.SecurityAccountDeletionScheduled,
     security_email_change_requested: Palee.Email.Templates.SecurityEmailChangeRequested,
@@ -26,10 +29,9 @@ defmodule Palee.Email.Templates do
     security_recovery_codes_regenerated: Palee.Email.Templates.SecurityRecoveryCodesRegenerated,
     security_recovery_codes_running_low: Palee.Email.Templates.SecurityRecoveryCodesRunningLow,
     security_signed_out_everywhere: Palee.Email.Templates.SecuritySignedOutEverywhere,
-    password_reset: Palee.Email.Templates.PasswordReset,
-    organization_invitation: Palee.Email.Templates.OrganizationInvitation,
-    owner_invitation: Palee.Email.Templates.OwnerInvitation,
-    share_link: Palee.Email.Templates.ShareLink
+    share_link: Palee.Email.Templates.ShareLink,
+    signup_attempt_existing: Palee.Email.Templates.SignupAttemptExisting,
+    verify_email: Palee.Email.Templates.VerifyEmail
   }
 
   @doc "Every kind and its template."

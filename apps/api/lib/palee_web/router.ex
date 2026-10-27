@@ -385,6 +385,10 @@ defmodule PaleeWeb.Router do
     # ADR-207: the links of an email change (new address, then old address).
     post("/email-change/confirm", EmailChangeController, :confirm)
     post("/email-change/revert", EmailChangeController, :revert)
+    # ADR-211: the emailed deletion links, and "undo" from the sign-in form.
+    post("/account-deletion/confirm", AccountDeletionController, :confirm)
+    post("/account-deletion/undo", AccountDeletionController, :undo)
+    post("/account-deletion/undo-sign-in", AccountDeletionController, :undo_sign_in)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -398,8 +402,18 @@ defmodule PaleeWeb.Router do
     post("/switch-profile", AccountProfilesController, :switch)
     get("/recovery-codes", PasswordRecoveryController, :codes_status)
     post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+    # ADR-211: self-service deletion of the profile or the whole login.
+    get("/account-deletion", AccountDeletionController, :show)
+    delete("/account-deletion", AccountDeletionController, :delete)
     # ADR-213: a new verification link for the signed-in login.
     post("/verification-email", EmailVerificationController, :resend)
+  end
+
+  # ADR-211: asking takes the password, so a session gets few tries.
+  scope "/api/auth", PaleeWeb do
+    pipe_through([:api, :authenticated, :auth_rate_limited])
+
+    post("/account-deletion", AccountDeletionController, :create)
   end
 
   # ADR-187: the password reset requests the signed-in person can handle

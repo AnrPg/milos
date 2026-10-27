@@ -209,3 +209,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-209 | Client and staff invitations sent by email: delivery status, resend, bulk caps, inbox binding | Accepted |
 | ADR-210 | Owner invitation email on the outbox; share links by email | Accepted |
 | ADR-207 | Email change confirmed by a link to the new address, revert link to the old one, 7-day lock | Accepted |
+| ADR-211 | Sign-up that does not reveal accounts; self-service deletion with password, emailed link and a 7-day undo | Accepted |
