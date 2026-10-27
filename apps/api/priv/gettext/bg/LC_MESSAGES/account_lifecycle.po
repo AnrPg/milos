@@ -31,8 +31,11 @@ msgstr "Потвърдете изтриването на акаунта си"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "Поискахте изтриване на профила си @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "Поискахте изтриване на входа си заедно с всичките му профили."
+msgid "You asked to delete your account with all its profiles."
+msgstr "Поискахте изтриване на акаунта си заедно с всичките му профили."
+
+msgid "Confirm deleting your profile"
+msgstr "Потвърдете изтриването на профила си"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "След потвърждение изтриването ще се извърши след %{days} дни. Дотогава можете да го отмените."

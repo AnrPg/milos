@@ -31,8 +31,11 @@ msgstr "Bevestig het verwijderen van uw account"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "U hebt gevraagd uw profiel @%{handle} te verwijderen."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "U hebt gevraagd uw login met al zijn profielen te verwijderen."
+msgid "You asked to delete your account with all its profiles."
+msgstr "U hebt gevraagd uw account met al zijn profielen te verwijderen."
+
+msgid "Confirm deleting your profile"
+msgstr "Bevestig het verwijderen van uw profiel"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "Na uw bevestiging vindt de verwijdering over %{days} dagen plaats. Tot die tijd kunt u deze ongedaan maken."

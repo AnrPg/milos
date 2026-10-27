@@ -31,8 +31,11 @@ msgstr "Подтвердите удаление аккаунта"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "Вы запросили удаление своего профиля @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "Вы запросили удаление своего входа со всеми его профилями."
+msgid "You asked to delete your account with all its profiles."
+msgstr "Вы запросили удаление своего аккаунта со всеми его профилями."
+
+msgid "Confirm deleting your profile"
+msgstr "Подтвердите удаление профиля"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "После подтверждения удаление произойдёт через %{days} дней. До этого его можно отменить."

@@ -85173,6 +85173,642 @@
         ]
       }
     },
+    "/api/auth/account-deletion": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountDeletionController.delete",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Cancelled"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "None open"
+          }
+        },
+        "summary": "Undo the login's deletion request from a signed-in profile",
+        "tags": [
+          "Account deletion"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountDeletionController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "description": "Where the confirmation link went (awaiting_confirmation only)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scope": {
+                      "enum": [
+                        "profile",
+                        "login"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "awaiting_confirmation",
+                        "scheduled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deletion state"
+          }
+        },
+        "summary": "The login's open deletion request",
+        "tags": [
+          "Account deletion"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Needs the password. A verified email gets a confirmation link; otherwise `confirm_email` (the login's email, typed) schedules it at once and the session ends.",
+        "operationId": "PaleeWeb.AccountDeletionController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "confirm_email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": [
+                      "profile",
+                      "login"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "scope",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "description": "Where the confirmation link went (awaiting_confirmation only)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scope": {
+                      "enum": [
+                        "profile",
+                        "login"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "awaiting_confirmation",
+                        "scheduled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Awaiting the emailed link, or scheduled"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sole owner of a business, or already scheduled"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong password or confirmation"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Ask to delete the current profile or the whole login",
+        "tags": [
+          "Account deletion"
+        ]
+      }
+    },
+    "/api/auth/account-deletion/confirm": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountDeletionController.confirm",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "description": "Where the confirmation link went (awaiting_confirmation only)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scope": {
+                      "enum": [
+                        "profile",
+                        "login"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "awaiting_confirmation",
+                        "scheduled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Scheduled"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid or used link"
+          }
+        },
+        "summary": "Confirm a deletion with the emailed link",
+        "tags": [
+          "Account deletion"
+        ]
+      }
+    },
+    "/api/auth/account-deletion/undo": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountDeletionController.undo",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "description": "Where the confirmation link went (awaiting_confirmation only)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scope": {
+                      "enum": [
+                        "profile",
+                        "login"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "awaiting_confirmation",
+                        "scheduled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Cancelled"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid or used link"
+          }
+        },
+        "summary": "Undo a scheduled deletion with the emailed link",
+        "tags": [
+          "Account deletion"
+        ]
+      }
+    },
+    "/api/auth/account-deletion/undo-sign-in": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AccountDeletionController.undo_sign_in",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "identifier": {
+                    "description": "The login's email or a profile's @handle",
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "access_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access session"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "organizations": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_for": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong credentials"
+          }
+        },
+        "summary": "Undo a scheduled deletion and sign in",
+        "tags": [
+          "Account deletion"
+        ]
+      }
+    },
     "/api/auth/handle-available": {
       "get": {
         "callbacks": {},
@@ -86651,47 +87287,30 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "ADR-211: an email that already has a login, with another password, gets this same answer without access_token (nothing is created)",
                   "properties": {
                     "access_token": {
                       "type": "string"
+                    },
+                    "confirmation": {
+                      "enum": [
+                        "email_sent"
+                      ],
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "access_token"
+                    "confirmation",
+                    "email"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Access session"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "error": {
-                      "type": "string"
-                    },
-                    "profile_count": {
-                      "type": "integer"
-                    },
-                    "profile_limit": {
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "code"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Email already has accounts"
+            "description": "Signed up; a link was sent to the email"
           },
           "422": {
             "content": {

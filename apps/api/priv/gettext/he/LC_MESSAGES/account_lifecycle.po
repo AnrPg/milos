@@ -31,8 +31,11 @@ msgstr "אישור מחיקת החשבון"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "ביקשת למחוק את הפרופיל @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "ביקשת למחוק את חשבון הכניסה עם כל הפרופילים שלו."
+msgid "You asked to delete your account with all its profiles."
+msgstr "ביקשת למחוק את החשבון שלך עם כל הפרופילים שלו."
+
+msgid "Confirm deleting your profile"
+msgstr "אישור מחיקת הפרופיל"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "לאחר האישור, המחיקה תתבצע בעוד %{days} ימים. עד אז אפשר לבטל אותה."

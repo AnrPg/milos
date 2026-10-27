@@ -75,6 +75,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/account-deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The login's open deletion request */
+        get: operations["PaleeWeb.AccountDeletionController.show"];
+        put?: never;
+        /**
+         * Ask to delete the current profile or the whole login
+         * @description Needs the password. A verified email gets a confirmation link; otherwise `confirm_email` (the login's email, typed) schedules it at once and the session ends.
+         */
+        post: operations["PaleeWeb.AccountDeletionController.create"];
+        /** Undo the login's deletion request from a signed-in profile */
+        delete: operations["PaleeWeb.AccountDeletionController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm a deletion with the emailed link */
+        post: operations["PaleeWeb.AccountDeletionController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo a scheduled deletion with the emailed link */
+        post: operations["PaleeWeb.AccountDeletionController.undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/undo-sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo a scheduled deletion and sign in */
+        post: operations["PaleeWeb.AccountDeletionController.undo_sign_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/handle-available": {
         parameters: {
             query?: never;
@@ -39569,6 +39642,327 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AccountDeletionController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deletion state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    confirm_email?: string;
+                    password: string;
+                    /** @enum {string} */
+                    scope: "profile" | "login";
+                };
+            };
+        };
+        responses: {
+            /** @description Awaiting the emailed link, or scheduled */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Sole owner of a business, or already scheduled */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Wrong password or confirmation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description None open */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Scheduled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Invalid or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Invalid or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.undo_sign_in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The login's email or a profile's @handle */
+                    identifier: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Access session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string;
+                        user?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Wrong credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AuthController.handle_available": {
         parameters: {
             query: {
@@ -40308,28 +40702,17 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Access session */
+            /** @description Signed up; a link was sent to the email */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        access_token: string;
-                    };
-                };
-            };
-            /** @description Email already has accounts */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        code: string;
-                        error?: string;
-                        profile_count?: number;
-                        profile_limit?: number;
+                        access_token?: string;
+                        /** @enum {string} */
+                        confirmation: "email_sent";
+                        email: string;
                     };
                 };
             };

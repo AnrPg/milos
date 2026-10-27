@@ -14,7 +14,7 @@ defmodule Palee.Email.Templates.AccountDeletionConfirm do
   @domain "account_lifecycle"
 
   @impl true
-  def subject(_assigns, locale), do: tr(locale, "Confirm deleting your account")
+  def subject(assigns, locale), do: title(assigns, locale)
 
   @impl true
   def text(%{url: url} = assigns, locale) do
@@ -34,7 +34,7 @@ defmodule Palee.Email.Templates.AccountDeletionConfirm do
     Layout.html(
       locale,
       [
-        Layout.heading(tr(locale, "Confirm deleting your account")),
+        Layout.heading(title(assigns, locale)),
         Layout.paragraph(Layout.t(locale, "Hello,")),
         Layout.paragraph(what(assigns, locale)),
         Layout.paragraph(when_(assigns, locale)),
@@ -50,11 +50,14 @@ defmodule Palee.Email.Templates.AccountDeletionConfirm do
     )
   end
 
+  defp title(%{scope: :profile}, locale), do: tr(locale, "Confirm deleting your profile")
+  defp title(_assigns, locale), do: tr(locale, "Confirm deleting your account")
+
   defp what(%{scope: :profile, handle: handle}, locale) when is_binary(handle),
     do: tr(locale, "You asked to delete your profile @%{handle}.", %{handle: handle})
 
   defp what(_assigns, locale),
-    do: tr(locale, "You asked to delete your login with all its profiles.")
+    do: tr(locale, "You asked to delete your account with all its profiles.")
 
   defp when_(%{grace_days: days}, locale),
     do:

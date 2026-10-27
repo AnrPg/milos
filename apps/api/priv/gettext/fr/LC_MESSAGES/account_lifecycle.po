@@ -31,8 +31,11 @@ msgstr "Confirmez la suppression de votre compte"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "Vous avez demandé la suppression de votre profil @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "Vous avez demandé la suppression de votre identifiant et de tous ses profils."
+msgid "You asked to delete your account with all its profiles."
+msgstr "Vous avez demandé la suppression de votre compte et de tous ses profils."
+
+msgid "Confirm deleting your profile"
+msgstr "Confirmez la suppression de votre profil"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "Après votre confirmation, la suppression aura lieu dans %{days} jours. D’ici là, vous pouvez l’annuler."

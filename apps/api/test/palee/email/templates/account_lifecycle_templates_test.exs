@@ -51,7 +51,7 @@ defmodule Palee.Email.Templates.AccountLifecycleTemplatesTest do
     assert AccountDeletionConfirm.text(@confirm, "en") =~ "delete your profile @maria.k."
 
     assert AccountDeletionConfirm.text(%{@confirm | scope: :login}, "el") =~
-             "Ζητήσατε να διαγραφεί η σύνδεσή σας μαζί με όλα τα προφίλ της."
+             "Ζητήσατε να διαγραφεί ο λογαριασμός σας μαζί με όλα τα προφίλ του."
 
     html = AccountDeletionConfirm.html(@confirm, "he")
     assert html =~ ~s(dir="rtl")

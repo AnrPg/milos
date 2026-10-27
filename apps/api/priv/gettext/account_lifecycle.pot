@@ -29,7 +29,10 @@ msgstr ""
 msgid "You asked to delete your profile @%{handle}."
 msgstr ""
 
-msgid "You asked to delete your login with all its profiles."
+msgid "You asked to delete your account with all its profiles."
+msgstr ""
+
+msgid "Confirm deleting your profile"
 msgstr ""
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."

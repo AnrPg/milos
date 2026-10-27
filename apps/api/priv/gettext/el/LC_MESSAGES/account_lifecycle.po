@@ -31,8 +31,11 @@ msgstr "Επιβεβαιώστε τη διαγραφή του λογαριασμ
 msgid "You asked to delete your profile @%{handle}."
 msgstr "Ζητήσατε να διαγραφεί το προφίλ σας @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "Ζητήσατε να διαγραφεί η σύνδεσή σας μαζί με όλα τα προφίλ της."
+msgid "You asked to delete your account with all its profiles."
+msgstr "Ζητήσατε να διαγραφεί ο λογαριασμός σας μαζί με όλα τα προφίλ του."
+
+msgid "Confirm deleting your profile"
+msgstr "Επιβεβαιώστε τη διαγραφή του προφίλ σας"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "Μόλις επιβεβαιώσετε, η διαγραφή θα γίνει σε %{days} ημέρες. Μέχρι τότε μπορείτε να την αναιρέσετε."

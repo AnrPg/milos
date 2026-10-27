@@ -31,8 +31,11 @@ msgstr "Confirme la eliminación de su cuenta"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "Ha solicitado eliminar su perfil @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "Ha solicitado eliminar su acceso con todos sus perfiles."
+msgid "You asked to delete your account with all its profiles."
+msgstr "Ha solicitado eliminar su cuenta con todos sus perfiles."
+
+msgid "Confirm deleting your profile"
+msgstr "Confirme la eliminación de su perfil"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "Cuando lo confirme, la eliminación se realizará en %{days} días. Hasta entonces puede deshacerla."

@@ -31,8 +31,11 @@ msgstr "أكّد حذف حسابك"
 msgid "You asked to delete your profile @%{handle}."
 msgstr "طلبت حذف ملفك الشخصي @%{handle}."
 
-msgid "You asked to delete your login with all its profiles."
-msgstr "طلبت حذف حساب الدخول مع جميع ملفاته الشخصية."
+msgid "You asked to delete your account with all its profiles."
+msgstr "طلبت حذف حسابك مع جميع ملفاته الشخصية."
+
+msgid "Confirm deleting your profile"
+msgstr "أكّد حذف ملفك الشخصي"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
 msgstr "بعد التأكيد، يتم الحذف خلال %{days} أيام. ويمكنك التراجع عنه حتى ذلك الحين."
