@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useFragmentInvitationToken } from "@/lib/invitation-fragment";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -12,6 +11,7 @@ import {
   type InvitationInspection,
 } from "@/api/auth";
 import { useSession } from "@/components/session-provider";
+import { useFragmentInvitationToken } from "@/lib/invitation-fragment";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";

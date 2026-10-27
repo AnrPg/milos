@@ -951,9 +951,9 @@ defmodule PaleeWeb.AuthControllerTest do
 
       assert Organizations.list_memberships(stranger.id) == []
 
+      # ADR-209: an email-bound invitation needs the address confirmed.
       boss = Palee.TestFixtures.user_fixture(%{email: "boss@example.test"})
 
-      # ADR-209: an email-bound invitation needs the address confirmed.
       assert %{"code" => "invitation_email_unverified"} =
                json_response(accept(build_conn(), boss, token), 403)
 
