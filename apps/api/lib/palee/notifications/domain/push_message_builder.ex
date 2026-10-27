@@ -993,6 +993,30 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-212: vendors, before (and after) the SMTP key expires.
+  def build("email_key_expiring", payload, localize) do
+    values = %{days: payload["days_left"] || "", date: payload["expires_on"] || ""}
+
+    {title, body} =
+      case Integer.parse(to_string(payload["days_left"] || "")) do
+        {days, ""} when days < 0 ->
+          {localize.("The email key has expired", %{}),
+           localize.(
+             "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret.",
+             values
+           )}
+
+        _expiring ->
+          {localize.("The email key expires soon", %{}),
+           localize.(
+             "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email.",
+             values
+           )}
+      end
+
+    %{title: title, body: body, url: payload["url"] || "/platform"}
+  end
+
   # ADR-176: a class still without its WOD on its day.
   def build("class_workout_missing", payload, localize) do
     values = %{class: payload["class_name"] || "", when: payload["class_when"] || ""}

@@ -11570,5 +11570,11 @@
     "handlerNote": "Chi ha l'email confermata riceve il link in automatico via email. Qui arrivano le richieste di chi non ha confermato l'email o non riesce ad aprirla.",
     "event_link_emailed": "Link inviato via email",
     "event_throttled": "Troppe richieste (non è stato inviato nulla)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "La chiave email scade presto",
+    "notifKeyExpiredTitle": "La chiave email è scaduta",
+    "notifKeyExpiringBody": "La chiave SMTP di Palee scade tra {days} giorni ({date}). Crea una nuova chiave in Brevo e aggiorna il secret del server prima di allora, altrimenti Palee smette di inviare email.",
+    "notifKeyExpiredBody": "La chiave SMTP di Palee è scaduta il {date}, quindi Palee non può inviare email. Crea una nuova chiave in Brevo e aggiorna il secret del server."
   }
 }

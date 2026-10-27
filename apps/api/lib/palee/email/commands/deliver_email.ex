@@ -34,14 +34,16 @@ defmodule Palee.Email.Commands.DeliverEmail do
   end
 
   defp attempt(store, message, last?, now) do
-    if store.suppressed?(Address.digest(message.to_address)) do
+    if refused?(store, message) do
       {:ok, message} = store.update(message, %{status: "suppressed", encrypted_body: nil})
       Palee.Email.emit(:suppressed, message)
       :ok
     else
       case on_send(store, String.to_existing_atom(message.category), now) do
-        :send ->
-          send(store, message, last?, now)
+        {:send, sent_today} ->
+          with :ok <- send(store, message, last?, now) do
+            warn_budget(sent_today + 1)
+          end
 
         {:defer, until} ->
           {:ok, message} = store.update(message, %{status: "deferred", scheduled_at: until})
@@ -51,20 +53,50 @@ defmodule Palee.Email.Commands.DeliverEmail do
     end
   end
 
+  # Suppressed since enqueue, or (transactional mail) unsubscribed from
+  # its kind since (ADR-212).
+  defp refused?(store, message) do
+    digest = Address.digest(message.to_address)
+
+    store.suppressed?(digest) or
+      (message.category == "transactional" and store.opted_out?(digest, message.kind))
+  end
+
   defp on_send(store, category, now) do
     sent_today = store.count_sent_since(SendingPolicy.day_start(now))
-    SendingPolicy.on_send(category, sent_today, Palee.Email.budget(), now)
+
+    case SendingPolicy.on_send(category, sent_today, Palee.Email.budget(), now) do
+      :send -> {:send, sent_today}
+      deferred -> deferred
+    end
+  end
+
+  # ADR-212: one log line the day sending crosses 80% of the budget, for
+  # servers without the Prometheus alert (palee_email_sent_today).
+  defp warn_budget(sent_today) do
+    budget = Palee.Email.budget()
+
+    if SendingPolicy.budget_warning?(sent_today, budget) do
+      Logger.warning(
+        "email_budget_warning sent_today=#{sent_today} daily_budget=#{budget.daily_budget} hard_cap=#{budget.hard_cap}"
+      )
+    end
+
+    :ok
   end
 
   defp send(store, message, last?, now) do
     result =
-      with {:ok, %{"text" => text, "html" => html}} <- body(message) do
+      with {:ok, %{"text" => text, "html" => html} = body} <- body(message) do
+        headers = Map.get(body, "headers") || %{}
+
         Palee.Email.sender().deliver(%{
           to: message.to_address,
           subject: message.subject,
           text: text,
           html: html,
-          message_id: message.message_id
+          message_id: message.message_id,
+          headers: headers
         })
       end
 

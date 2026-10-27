@@ -66,6 +66,8 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
               {:ok, Vendor.t()} | {:error, Ecto.Changeset.t()}
   @callback revoke_vendor(Ecto.UUID.t()) :: {:ok, Vendor.t()} | {:error, term()}
   @callback get_vendor(Ecto.UUID.t()) :: Vendor.t() | nil
+  @doc "The user ids of every active vendor (ADR-212: platform alerts)."
+  @callback list_active_vendor_user_ids() :: [Ecto.UUID.t()]
   @callback provision_organization(map(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
   @callback list_organizations() :: [map()]

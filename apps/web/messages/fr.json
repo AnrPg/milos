@@ -11570,5 +11570,11 @@
     "handlerNote": "Les personnes dont l'e-mail est confirmé reçoivent automatiquement le lien par e-mail. Ici arrivent les demandes des personnes dont l'e-mail n'est pas confirmé ou qui ne peuvent pas l'ouvrir.",
     "event_link_emailed": "Lien envoyé par e-mail",
     "event_throttled": "Trop de demandes (rien n'a été envoyé)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "La clé e-mail expire bientôt",
+    "notifKeyExpiredTitle": "La clé e-mail a expiré",
+    "notifKeyExpiringBody": "La clé SMTP de Palee expire dans {days} jours ({date}). Créez une nouvelle clé dans Brevo et mettez à jour le secret du serveur d’ici là, sinon Palee n’enverra plus d’e-mails.",
+    "notifKeyExpiredBody": "La clé SMTP de Palee a expiré le {date} : Palee ne peut plus envoyer d’e-mails. Créez une nouvelle clé dans Brevo et mettez à jour le secret du serveur."
   }
 }

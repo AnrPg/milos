@@ -169,6 +169,17 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "garmin-public")
   end
 
+  # ADR-212: Brevo's transactional webhook (bursts after a big send) and the
+  # one-click unsubscribe link of transactional email (mail apps POST it).
+  pipeline :email_provider_webhook do
+    plug(PaleeWeb.Plugs.RateLimit, max: 1200, interval: 60_000, bucket: "brevo-webhook")
+    plug(PaleeWeb.Plugs.WebhookSecret, config_key: :brevo_webhook_secret)
+  end
+
+  pipeline :email_unsubscribe do
+    plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "email-unsubscribe")
+  end
+
   # ADR-161: connecting, syncing and confirming device imports.
   pipeline :device_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit,
@@ -321,6 +332,20 @@ defmodule PaleeWeb.Router do
     get("/callback", GarminIntegrationController, :callback)
     post("/push", GarminIntegrationController, :push)
     post("/deregistration", GarminIntegrationController, :deregistration)
+  end
+
+  # ADR-212: mail provider events and the unsubscribe link (no app session).
+  scope "/api/webhooks", PaleeWeb do
+    pipe_through([:email_provider_webhook])
+
+    post("/brevo", BrevoWebhookController, :create)
+  end
+
+  scope "/api/email/unsubscribe", PaleeWeb do
+    pipe_through([:email_unsubscribe])
+
+    get("/:token", EmailUnsubscribeController, :show)
+    post("/:token", EmailUnsubscribeController, :create)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.

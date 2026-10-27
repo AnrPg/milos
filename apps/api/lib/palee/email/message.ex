@@ -6,7 +6,9 @@ defmodule Palee.Email.Message do
 
   `status`: `queued` (waiting for its job), `deferred` (over the daily
   budget, snoozed to the next UTC day), `sent`, `failed` (gave up after the
-  last attempt) or `suppressed` (the address is on the suppression list).
+  last attempt) or `suppressed` (the address is on the suppression list);
+  after sending, the provider's webhook (ADR-212) may turn it `bounced` or
+  `complained` and set `delivered_at`.
   """
 
   use Ecto.Schema
@@ -18,7 +20,7 @@ defmodule Palee.Email.Message do
 
   @type t :: %__MODULE__{}
 
-  @statuses ~w(queued sent failed suppressed deferred)
+  @statuses ~w(queued sent failed suppressed deferred bounced complained)
   @categories ~w(security account transactional)
 
   schema "email_messages" do
@@ -38,6 +40,7 @@ defmodule Palee.Email.Message do
     field :idempotency_key, :string
     field :scheduled_at, :utc_datetime_usec
     field :sent_at, :utc_datetime_usec
+    field :delivered_at, :utc_datetime_usec
 
     # Decrypted bodies, filled only by test helpers (`Palee.EmailCase`).
     field :text, :string, virtual: true, redact: true

@@ -494,6 +494,9 @@ defmodule Palee.Organizations do
 
   def grant_vendor(user_id), do: OrganizationStore.grant_vendor(user_id)
 
+  @doc "The user ids of every active vendor, for platform alerts (ADR-212)."
+  def list_active_vendor_user_ids, do: OrganizationStore.list_active_vendor_user_ids()
+
   def revoke_vendor(user_id), do: OrganizationStore.revoke_vendor(user_id)
 
   @doc """

@@ -59,7 +59,10 @@ config :palee, Oban,
        {"10 1 * * *", Palee.Workers.SeasonSweepJob},
        {"40 2 * * *", Palee.Workers.NightlyInsightsJob},
        {"27 * * * *", Palee.Workers.ScalingSuggestionScanJob},
-       {"47 * * * *", Palee.Workers.WorldGazetteerJob}
+       {"47 * * * *", Palee.Workers.WorldGazetteerJob},
+       # ADR-212: email retention and the SMTP key's expiry check.
+       {"15 3 * * *", Palee.Workers.EmailRetentionJob},
+       {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob}
      ]}
   ],
   queues: [
@@ -469,6 +472,9 @@ config :palee, :email_message_store, Palee.Infrastructure.Email.EctoMessageStore
 config :palee, :email_link_token_store, Palee.Infrastructure.Email.EctoLinkTokenStore
 config :palee, :email_sender, Palee.Infrastructure.Email.SwooshSender
 config :palee, :email_budget, daily_budget: 280, hard_cap: 295
+# ADR-212: Brevo's webhook secret and the SMTP key's expiry (runtime env).
+config :palee, :brevo_webhook_secret, nil
+config :palee, :smtp_key_expires_on, nil
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,

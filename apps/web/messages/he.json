@@ -11570,5 +11570,11 @@
     "handlerNote": "מי שהמייל שלו מאומת מקבל/ת קישור לאיפוס במייל באופן אוטומטי. לכאן מגיעות בקשות של מי שהמייל שלו לא מאומת או שאין לו גישה אליו.",
     "event_link_emailed": "נשלח קישור במייל",
     "event_throttled": "יותר מדי בקשות (לא נשלח דבר)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "מפתח המייל יפוג בקרוב",
+    "notifKeyExpiredTitle": "מפתח המייל פג",
+    "notifKeyExpiringBody": "מפתח ה-SMTP של Palee יפוג בעוד {days} ימים ({date}). צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת לפני כן, אחרת Palee יפסיק לשלוח מיילים.",
+    "notifKeyExpiredBody": "מפתח ה-SMTP של Palee פג ב-{date}, ולכן Palee לא יכול לשלוח מיילים. צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת."
   }
 }

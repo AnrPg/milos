@@ -11570,5 +11570,11 @@
     "handlerNote": "Wie een bevestigd e-mailadres heeft, krijgt de herstellink automatisch per e-mail. Hier komen verzoeken van mensen van wie het e-mailadres niet bevestigd is of die het niet kunnen openen.",
     "event_link_emailed": "Herstellink gemaild",
     "event_throttled": "Te veel verzoeken (niets verstuurd)"
+  },
+  "emailDeliverability": {
+    "notifKeyExpiringTitle": "De e-mailsleutel verloopt binnenkort",
+    "notifKeyExpiredTitle": "De e-mailsleutel is verlopen",
+    "notifKeyExpiringBody": "De SMTP-sleutel van Palee verloopt over {days} dagen ({date}). Maak vóór die tijd een nieuwe sleutel in Brevo en werk het secret op de server bij, anders verstuurt Palee geen e-mail meer.",
+    "notifKeyExpiredBody": "De SMTP-sleutel van Palee is op {date} verlopen, dus Palee kan geen e-mail versturen. Maak een nieuwe sleutel in Brevo en werk het secret op de server bij."
   }
 }

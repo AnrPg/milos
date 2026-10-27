@@ -5,6 +5,7 @@ defmodule PaleeWeb.Telemetry do
   alias Palee.Application.Readiness
 
   alias Palee.Infrastructure.Observability.{
+    EmailProbe,
     MetricsPlug,
     OutboxProbe,
     PrometheusExporter,
@@ -55,6 +56,7 @@ defmodule PaleeWeb.Telemetry do
     [
       {PrometheusExporter, metrics: prometheus_metrics()},
       probe_poller(:palee_readiness_probe, {__MODULE__, :emit_readiness_measurements, []}),
+      probe_poller(:palee_email_probe, {EmailProbe, :measure, []}),
       {Bandit,
        plug: {MetricsPlug, [token: config.token]},
        scheme: :http,
@@ -153,7 +155,57 @@ defmodule PaleeWeb.Telemetry do
       readiness_metrics() ++
       outbox_metrics() ++
       security_and_cache_metrics() ++
-      job_metrics() ++ runtime_metrics() ++ revenue_metrics() ++ shop_metrics()
+      job_metrics() ++ runtime_metrics() ++ revenue_metrics() ++ shop_metrics() ++ email_metrics()
+  end
+
+  # ADR-203/ADR-212: the transactional email outbox. `category` is a closed
+  # list (security, account, transactional); provider `event` and `result`
+  # are closed atoms; `kind` is a registered email kind.
+  defp email_metrics do
+    message_counters =
+      for event <- ~w(enqueued sent failed suppressed deferred bounced complained delivered)a do
+        counter("palee.email.#{event}.count",
+          tags: [:category],
+          description: "Outbox emails #{event}, by category",
+          reporter_options: [prometheus_name: "palee_email_#{event}_total"]
+        )
+      end
+
+    message_counters ++
+      [
+        counter("palee.email.provider_event.count",
+          tags: [:event, :result],
+          description:
+            "Mail provider webhook events, by event and result (applied, duplicate, unmatched)",
+          reporter_options: [prometheus_name: "palee_email_provider_events_total"]
+        ),
+        counter("palee.email.unsubscribed.count",
+          tags: [:kind],
+          description: "One-click unsubscribes from transactional email, by kind",
+          reporter_options: [prometheus_name: "palee_email_unsubscribes_total"]
+        ),
+        last_value("palee.email.budget.sent_today",
+          description: "Emails sent so far this UTC day",
+          reporter_options: [prometheus_name: "palee_email_sent_today"]
+        ),
+        last_value("palee.email.budget.daily_budget",
+          description:
+            "EMAIL_DAILY_BUDGET: non-security mail past it is deferred to the next UTC day",
+          reporter_options: [prometheus_name: "palee_email_daily_budget"]
+        ),
+        last_value("palee.email.budget.hard_cap",
+          description: "EMAIL_DAILY_HARD_CAP: security mail past it is refused",
+          reporter_options: [prometheus_name: "palee_email_daily_hard_cap"]
+        ),
+        last_value("palee.email.budget.deferred",
+          description: "Outbox emails deferred to the next UTC day by the budget",
+          reporter_options: [prometheus_name: "palee_email_deferred_messages"]
+        ),
+        last_value("palee.email.smtp_key.days_left",
+          description: "Days until the SMTP key expires (SMTP_KEY_EXPIRES_ON)",
+          reporter_options: [prometheus_name: "palee_email_smtp_key_days_left"]
+        )
+      ]
   end
 
   # ADR-192: money in and out per revenue stream. `stream` and `currency`

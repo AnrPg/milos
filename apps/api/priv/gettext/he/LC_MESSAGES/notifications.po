@@ -696,3 +696,15 @@ msgstr "השיעור %{class} (%{time}) בוטל: %{reason}. המקום שלך �
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "השיעור %{class} (%{time}) בוטל. המקום שלך שוחרר."
+
+msgid "The email key expires soon"
+msgstr "מפתח המייל יפוג בקרוב"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "מפתח ה-SMTP של Palee יפוג בעוד %{days} ימים (%{date}). צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת לפני כן, אחרת Palee יפסיק לשלוח מיילים."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "מפתח ה-SMTP של Palee פג ב-%{date}, ולכן Palee לא יכול לשלוח מיילים. צרו מפתח חדש ב-Brevo ועדכנו את הסוד בשרת."
+
+msgid "The email key has expired"
+msgstr "מפתח המייל פג"

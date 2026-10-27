@@ -48,4 +48,14 @@ defmodule Palee.Infrastructure.Email.EctoLinkTokenStore do
   @impl true
   def get_by_hash(purpose, token_hash),
     do: Repo.get_by(LinkToken, purpose: purpose, token_hash: token_hash)
+
+  @impl true
+  def purge_spent(%DateTime{} = before) do
+    {count, _rows} =
+      LinkToken
+      |> where([t], (not is_nil(t.used_at) and t.used_at < ^before) or t.expires_at < ^before)
+      |> Repo.delete_all()
+
+    count
+  end
 end

@@ -87,4 +87,14 @@ defmodule Palee.MailerTest do
       end
     end
   end
+
+  test "STARTTLS to the relay verifies the peer and its name (ADR-212)" do
+    tls = Mailer.tls_options("smtp-relay.brevo.com")
+
+    assert tls[:verify] == :verify_peer
+    assert tls[:server_name_indication] == ~c"smtp-relay.brevo.com"
+    assert tls[:versions] == [:"tlsv1.2", :"tlsv1.3"]
+    assert is_function(tls[:customize_hostname_check][:match_fun], 2)
+    assert (is_list(tls[:cacerts]) and tls[:cacerts] != []) or File.exists?(tls[:cacertfile])
+  end
 end
