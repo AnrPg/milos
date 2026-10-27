@@ -30,3 +30,24 @@ msgstr "Γεια σας %{name},"
 
 msgid "Hello,"
 msgstr "Γεια σας,"
+
+msgid "Activate %{business} on %{product}"
+msgstr "Ενεργοποιήστε την επιχείρηση «%{business}» στο %{product}"
+
+msgid "Your business is ready to go live"
+msgstr "Η επιχείρησή σας είναι έτοιμη να ξεκινήσει"
+
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Η ομάδα του %{product} ενέκρινε την επιχείρηση «%{business}». Ανοίξτε τον σύνδεσμο ενώ είστε συνδεδεμένοι στον λογαριασμό σας για να την ενεργοποιήσετε: τα δεδομένα επίδειξης αφαιρούνται και η επιχείρηση ξεκινά να λειτουργεί κανονικά."
+
+msgid "Your role: owner."
+msgstr "Ο ρόλος σας: ιδιοκτήτης."
+
+msgid "Your role: admin."
+msgstr "Ο ρόλος σας: διαχειριστής."
+
+msgid "Activate business"
+msgstr "Ενεργοποίηση επιχείρησης"
+
+msgid "It opens only for your own account."
+msgstr "Ανοίγει μόνο για τον δικό σας λογαριασμό."

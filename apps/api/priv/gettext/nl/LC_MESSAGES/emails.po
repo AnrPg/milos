@@ -30,3 +30,24 @@ msgstr "Beste %{name},"
 
 msgid "Hello,"
 msgstr "Hallo,"
+
+msgid "Activate %{business} on %{product}"
+msgstr "Activeer ‘%{business}’ op %{product}"
+
+msgid "Your business is ready to go live"
+msgstr "Uw bedrijf is klaar om live te gaan"
+
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Het %{product}-team heeft ‘%{business}’ goedgekeurd. Open de link terwijl u bent ingelogd op uw account om het te activeren: de demogegevens worden verwijderd en het bedrijf gaat live."
+
+msgid "Your role: owner."
+msgstr "Uw rol: eigenaar."
+
+msgid "Your role: admin."
+msgstr "Uw rol: beheerder."
+
+msgid "Activate business"
+msgstr "Bedrijf activeren"
+
+msgid "It opens only for your own account."
+msgstr "De link werkt alleen voor uw eigen account."

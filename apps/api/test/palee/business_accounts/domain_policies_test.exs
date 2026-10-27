@@ -12,7 +12,7 @@ defmodule Palee.BusinessAccounts.DomainPoliciesTest do
       assert {:ok, digest} = ActivationLinkPolicy.decode(token)
       assert digest == ActivationLinkPolicy.digest(token)
       assert {:error, :invalid_activation_link} == ActivationLinkPolicy.decode(nil)
-      assert "/activate-business?token=" <> ^token = ActivationLinkPolicy.path(token)
+      assert "/activate-business#token=" <> ^token = ActivationLinkPolicy.path(token)
     end
 
     test "a vendor picks owner or admin and a lifetime of one hour to 30 days" do

@@ -4,9 +4,15 @@ defmodule Palee.Application.BusinessActivation do
 
   1. A vendor issues an activation link for **one existing account** and a
      role (owner or admin) of the business (`issue_link/4`). A new link
-     replaces the live one; the token is shown once.
-  2. That account, signed in, opens `/activate-business?token=…`
-     (`inspect/2`) and confirms (`redeem/3`). In one transaction:
+     replaces the live one; the token is shown once. ADR-205: the account
+     must have verified its email (`:activation_email_unverified`
+     otherwise), and the link is emailed to that address
+     (`:business_activation_link`, key `business_activation_link:<link id>`),
+     in the account's language. The vendor still sees the link to copy; a
+     refused email (throttled, suppressed, over budget) never undoes it.
+  2. That account, signed in, opens `/activate-business#token=…` (or the
+     older `?token=…`) (`inspect/2`) and confirms (`redeem/3`). Opening it
+     marks the address it was emailed to as verified. In one transaction:
      - the tracked demo rows are deleted (mock people first);
      - `palee_activate_business/2` makes the business active, spends the
        link, completes the pending activation request and restarts a
@@ -19,8 +25,12 @@ defmodule Palee.Application.BusinessActivation do
   gates lift because they read the organization's activation.
   """
 
-  alias Palee.Application.DemoData
-  alias Palee.{BusinessAccounts, Identity, Organizations}
+  require Logger
+
+  alias Palee.Application.{DemoData, PublicURL}
+  alias Palee.{BusinessAccounts, Email, Identity, Organizations}
+
+  @email_kind :business_activation_link
 
   ## Vendors
 
@@ -32,16 +42,70 @@ defmodule Palee.Application.BusinessActivation do
     with {:ok, %{organization: organization, memberships: memberships}} <-
            Organizations.list_organization_memberships(platform_context, organization_id),
          :ok <- demo_business(organization),
-         {:ok, user_id} <- target_account(params, memberships) do
-      BusinessAccounts.issue_activation_link(
-        platform_context,
-        organization.id,
-        user_id,
-        params,
-        now
-      )
+         {:ok, user_id} <- target_account(params, memberships),
+         {:ok, account} <- verified_account(user_id),
+         {:ok, issued} <-
+           BusinessAccounts.issue_activation_link(
+             platform_context,
+             organization.id,
+             account,
+             params,
+             now
+           ) do
+      {:ok, Map.put(issued, :email, email_link(issued, account, organization))}
     end
   end
+
+  @doc "The idempotency key prefix of a link's email (`Palee.Email.status`)."
+  def email_key(link_id), do: "#{@email_kind}:#{link_id}"
+
+  @doc "The latest delivery of each link's email, by link id (vendors' queue)."
+  def email_deliveries(links) do
+    Map.new(links, fn link ->
+      {link.id, link.id |> email_key() |> Email.list_by_idempotency_prefix() |> List.first()}
+    end)
+  end
+
+  defp verified_account(user_id) do
+    case Identity.find_by_id(user_id) do
+      nil ->
+        {:error, :account_not_found}
+
+      account ->
+        if Identity.email_verified?(account),
+          do: {:ok, account},
+          else: {:error, :activation_email_unverified}
+    end
+  end
+
+  defp email_link(%{link: link, token: token}, account, organization) do
+    assigns = %{
+      name: account.nickname,
+      business_name: organization.name,
+      role: link.role,
+      url: PublicURL.base_url() <> BusinessAccounts.activation_path(token)
+    }
+
+    case Email.enqueue(@email_kind, account.email, assigns,
+           category: :account,
+           locale: account.preferred_locale || "en",
+           login_id: account.login_id,
+           user_id: account.id,
+           organization_id: organization.id,
+           idempotency_key: email_key(link.id)
+         ) do
+      {:ok, message} ->
+        {:ok, summary} = Email.status(message.id)
+        summary
+
+      {:error, reason} ->
+        Logger.info("business activation link not emailed: #{inspect(reason)}")
+        %{status: "not_sent", error: error_code(reason)}
+    end
+  end
+
+  defp error_code(reason) when is_atom(reason), do: Atom.to_string(reason)
+  defp error_code(_reason), do: "invalid"
 
   def revoke_link(platform_context, link_id),
     do: BusinessAccounts.revoke_activation_link(platform_context, link_id)
@@ -53,6 +117,8 @@ defmodule Palee.Application.BusinessActivation do
     with {:ok, link} <- BusinessAccounts.inspect_activation_link(account, token, now),
          %{} = organization <- Organizations.get_by_id(link.organization_id),
          :ok <- demo_business(organization) do
+      mark_verified(account, link, now)
+
       {:ok,
        %{
          link: link,
@@ -97,6 +163,15 @@ defmodule Palee.Application.BusinessActivation do
       error -> error
     end
   end
+
+  # ADR-205: the link was emailed to `link.email`; opening it signed in as
+  # its account proves the login reads that address (a no-op when the
+  # email changed since, or for links older than the email).
+  defp mark_verified(%{login_id: login_id}, %{email: email}, now)
+       when is_binary(login_id) and is_binary(email),
+       do: Identity.mark_email_verified(login_id, email, now)
+
+  defp mark_verified(_account, _link, _now), do: :ok
 
   defp demo_business(organization) do
     if Organizations.business_gated?(organization),

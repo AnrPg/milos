@@ -37,12 +37,21 @@ defmodule Palee.BusinessAccounts do
     to: ActivationLinkPolicy,
     as: :roles_after
 
+  defdelegate activation_path(token), to: ActivationLinkPolicy, as: :path
+
   @doc """
-  A vendor issues the link of `organization_id` for `user_id`. Replaces the
-  live link of that business. Returns the link, the token (shown once) and
-  the web path that opens it.
+  A vendor issues the link of `organization_id` for `account` (its `id`, and
+  the verified `email` the link is sent to). Replaces the live link of that
+  business. Returns the link, the token (shown once) and the web path that
+  opens it.
   """
-  def issue_activation_link(context, organization_id, user_id, params, now \\ DateTime.utc_now()) do
+  def issue_activation_link(
+        context,
+        organization_id,
+        %{id: user_id} = account,
+        params,
+        now \\ DateTime.utc_now()
+      ) do
     with {:ok, scope} <- vendor_scope(context),
          {:ok, %{role: role, lifetime_seconds: lifetime}} <-
            ActivationLinkPolicy.normalize_issue(params) do
@@ -54,7 +63,8 @@ defmodule Palee.BusinessAccounts do
         role: role,
         token_digest: ActivationLinkPolicy.digest(token),
         expires_at: DateTime.add(now, lifetime, :second),
-        created_by_id: context.user_id
+        created_by_id: context.user_id,
+        email: Map.get(account, :email)
       }
 
       with {:ok, link} <- BusinessAccountStore.issue_activation_link(scope, attrs, now) do

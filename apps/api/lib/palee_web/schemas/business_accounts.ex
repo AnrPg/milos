@@ -194,6 +194,11 @@ defmodule PaleeWeb.Schemas.BusinessAccounts do
         decision_note: @nullable_text,
         decided_at: @nullable_time,
         requested_by: %Schema{type: :string, nullable: true, description: "Vendors: nickname"},
+        requester_email_verified: %Schema{
+          type: :boolean,
+          nullable: true,
+          description: "Vendors (ADR-205): whether the requester verified their email"
+        },
         inserted_at: @time
       },
       required: [:id, :kind, :business_kind, :business_name, :status, :inserted_at]
@@ -223,7 +228,24 @@ defmodule PaleeWeb.Schemas.BusinessAccounts do
         expires_at: @time,
         inserted_at: @time,
         token: %Schema{type: :string, nullable: true, description: "Only when just issued"},
-        path: %Schema{type: :string, nullable: true, description: "Only when just issued"}
+        path: %Schema{type: :string, nullable: true, description: "Only when just issued"},
+        email_delivery: %Schema{
+          title: "BusinessActivationLinkEmail",
+          type: :object,
+          nullable: true,
+          description:
+            "ADR-205: the link's email to the account. `not_sent` when the outbox refused it " <>
+              "(`error` says why); the link still works and can be copied.",
+          properties: %{
+            status: %Schema{
+              type: :string,
+              enum: ["queued", "deferred", "sent", "failed", "suppressed", "not_sent"]
+            },
+            error: @nullable_text,
+            sent_at: @nullable_time
+          },
+          required: [:status]
+        }
       },
       required: [:id, :organization_id, :user_id, :role, :state, :expires_at, :inserted_at]
     }
@@ -245,8 +267,15 @@ defmodule PaleeWeb.Schemas.BusinessAccounts do
                 type: :array,
                 items: %Schema{
                   type: :object,
-                  properties: %{user_id: @uuid, nickname: @nullable_text},
-                  required: [:user_id]
+                  properties: %{
+                    user_id: @uuid,
+                    nickname: @nullable_text,
+                    email_verified: %Schema{
+                      type: :boolean,
+                      description: "ADR-205: a link is only issued to a verified email"
+                    }
+                  },
+                  required: [:user_id, :email_verified]
                 }
               },
               link: %Schema{allOf: [activation_link()], nullable: true}

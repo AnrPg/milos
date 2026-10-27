@@ -30,3 +30,24 @@ msgstr "Hello %{name},"
 
 msgid "Hello,"
 msgstr "Hello,"
+
+msgid "Activate %{business} on %{product}"
+msgstr "Activate %{business} on %{product}"
+
+msgid "Your business is ready to go live"
+msgstr "Your business is ready to go live"
+
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+
+msgid "Your role: owner."
+msgstr "Your role: owner."
+
+msgid "Your role: admin."
+msgstr "Your role: admin."
+
+msgid "Activate business"
+msgstr "Activate business"
+
+msgid "It opens only for your own account."
+msgstr "It opens only for your own account."

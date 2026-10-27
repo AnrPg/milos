@@ -30,3 +30,24 @@ msgstr "مرحبًا %{name}،"
 
 msgid "Hello,"
 msgstr "مرحبًا،"
+
+msgid "Activate %{business} on %{product}"
+msgstr "فعّلوا «%{business}» على %{product}"
+
+msgid "Your business is ready to go live"
+msgstr "نشاطكم التجاري جاهز للانطلاق"
+
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "وافق فريق %{product} على «%{business}». افتحوا الرابط وأنتم مسجّلو الدخول إلى حسابكم لتفعيله: تُحذف البيانات التجريبية ويبدأ النشاط التجاري بالعمل."
+
+msgid "Your role: owner."
+msgstr "دوركم: المالك."
+
+msgid "Your role: admin."
+msgstr "دوركم: مشرف."
+
+msgid "Activate business"
+msgstr "تفعيل النشاط التجاري"
+
+msgid "It opens only for your own account."
+msgstr "لا يُفتح إلا لحسابكم أنتم."

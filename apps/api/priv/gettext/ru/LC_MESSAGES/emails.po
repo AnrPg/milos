@@ -30,3 +30,24 @@ msgstr "Здравствуйте, %{name}!"
 
 msgid "Hello,"
 msgstr "Здравствуйте!"
+
+msgid "Activate %{business} on %{product}"
+msgstr "Активируйте «%{business}» в %{product}"
+
+msgid "Your business is ready to go live"
+msgstr "Ваш бизнес готов к запуску"
+
+msgid "The %{product} team approved %{business}. Open the link while signed in to your account to activate it: the demo data is removed and the business goes live."
+msgstr "Команда %{product} одобрила «%{business}». Откройте ссылку, войдя в свою учётную запись, чтобы активировать его: демонстрационные данные будут удалены, и бизнес начнёт работать."
+
+msgid "Your role: owner."
+msgstr "Ваша роль: владелец."
+
+msgid "Your role: admin."
+msgstr "Ваша роль: администратор."
+
+msgid "Activate business"
+msgstr "Активировать бизнес"
+
+msgid "It opens only for your own account."
+msgstr "Она открывается только для вашей учётной записи."
