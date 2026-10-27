@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ApiError } from "@/api/client";
@@ -16,6 +17,23 @@ import { rememberSelectedOrganization } from "@/lib/organization-slug";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type FieldErrors = Record<string, string[]>;
+
+// ADR-187/204: the email already holds an account. Only the profile count is
+// known before signing in; the person either proves the account with its
+// password or signs in and accepts with a profile they have.
+type ExistingAccount = { count: number | null; limit: number };
+
+const DEFAULT_PROFILE_LIMIT = 3;
+
+function existingAccountFrom(error: ApiError): ExistingAccount | null {
+  const payload = error.payload as Record<string, unknown>;
+  const code = payload.code;
+  if (code !== "email_in_use" && code !== "profile_limit") return null;
+
+  const limit = typeof payload.profile_limit === "number" ? payload.profile_limit : DEFAULT_PROFILE_LIMIT;
+  if (code === "profile_limit") return { count: limit, limit };
+  return { count: typeof payload.profile_count === "number" ? payload.profile_count : null, limit };
+}
 
 // ADR-187: the admin form still types one name, sent as the handle (the
 // display name defaults to it).
@@ -53,7 +71,7 @@ export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signUpAdmin, signOut, status, currentUser } = useSession();
+  const { signUpAdmin, acceptInvitation, signOut, status, currentUser } = useSession();
   // Set once this page creates the account, so only that sign-in moves on to
   // the invited organization.
   const [signedUpHere, setSignedUpHere] = useState(false);
@@ -65,6 +83,7 @@ export function AdminRegistrationConsole() {
   const [busy, setBusy] = useState(false);
   const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [existingAccount, setExistingAccount] = useState<ExistingAccount | null>(null);
 
   useEffect(() => {
     const token = form.invitation_token.trim();
@@ -124,6 +143,7 @@ export function AdminRegistrationConsole() {
     setBusy(true);
     setError(null);
     setFieldErrors({});
+    setExistingAccount(null);
 
     try {
       setSignedUpHere(true);
@@ -134,7 +154,11 @@ export function AdminRegistrationConsole() {
       }
     } catch (caught) {
       setSignedUpHere(false);
-      if (caught instanceof ApiError) {
+      const existing = caught instanceof ApiError ? existingAccountFrom(caught) : null;
+      if (existing) {
+        setExistingAccount(existing);
+        setFieldErrors({ email: [], password: [""] });
+      } else if (caught instanceof ApiError) {
         const nextFieldErrors = flatFieldErrors(caught.payload.errors);
         setFieldErrors(nextFieldErrors);
         setError(
@@ -159,9 +183,30 @@ export function AdminRegistrationConsole() {
     }
   }
 
-  // The invitation creates a new owner account. Opened while another account
-  // is signed in (any tab of this browser), it asks before anything happens
-  // instead of carrying on as that account.
+  async function acceptHere() {
+    const token = form.invitation_token.trim();
+    if (!invitation || busy) return;
+
+    setBusy(true);
+    setError(null);
+    try {
+      await acceptInvitation(token);
+      rememberSelectedOrganization(invitation.organization.slug);
+      router.replace(`/org/${invitation.organization.slug}/admin`);
+    } catch (caught) {
+      setError(caught instanceof Error ? localizeError(caught, i18n) : i18n("unexpectedRequestFailurea7ffd06"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const signInHref = `/login?next=${encodeURIComponent(
+    `/set-admin?token=${encodeURIComponent(form.invitation_token.trim())}`,
+  )}`;
+
+  // Opened while a profile is signed in (any tab of this browser), the page
+  // asks before anything happens: accept with that profile (ADR-204), sign out
+  // to create a separate one, or leave.
   if (status === "authenticated" && !signedUpHere) {
     const handle = currentUser?.handle ?? currentUser?.nickname ?? "";
 
@@ -182,10 +227,26 @@ export function AdminRegistrationConsole() {
               ? i18n("invitationForAnotherAccount", { organization: invitation.organization.name })
               : i18n("invitationForAnotherAccountGeneric")}
           </p>
+          {error ? <ErrorNotice className="mt-4">{error}</ErrorNotice> : null}
           <div className="mt-6 space-y-3">
+            {invitation ? (
+              <button
+                className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-50"
+                disabled={busy}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                type="button"
+                onClick={() => void acceptHere()}
+              >
+                {busy ? i18n("invitationAccepting") : i18n("invitationAcceptAs", { handle })}
+              </button>
+            ) : null}
             <button
               className="w-full rounded-2xl px-4 py-3 font-semibold"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+              style={
+                invitation
+                  ? { background: "transparent", color: "var(--text)", border: "1px solid var(--border)" }
+                  : { background: "var(--primary)", color: "var(--primary-contrast)" }
+              }
               type="button"
               onClick={() => signOut()}
             >
@@ -271,7 +332,8 @@ export function AdminRegistrationConsole() {
               value={form.email}
               onChange={(event) => {
                 setError(null);
-                setFieldErrors((current) => ({ ...current, email: [] }));
+                setFieldErrors((current) => ({ ...current, email: [], password: [] }));
+                setExistingAccount(null);
                 setForm((current) => ({ ...current, email: event.target.value }));
               }}
             />
@@ -303,8 +365,29 @@ export function AdminRegistrationConsole() {
             />
           </label>
           <p id="admin-registration-password-help" className="-mt-3 text-xs" style={{ color: "var(--muted)" }}>
-            {i18n("passwordRules0c63f14")}
+            {i18n("passwordRules0c63f14")} {i18n("adminPasswordExistingHint")}
           </p>
+
+          {existingAccount ? (
+            <ErrorNotice>
+              <span className="block">
+                {existingAccount.count !== null && existingAccount.count >= existingAccount.limit
+                  ? i18n("adminEmailProfileLimit", { limit: existingAccount.limit })
+                  : i18n("adminEmailHasProfiles", {
+                      count: existingAccount.count ?? 1,
+                      limit: existingAccount.limit,
+                    })}
+              </span>
+              <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                <Link className="font-semibold underline" href={signInHref}>
+                  {i18n("adminSignInToAccept")}
+                </Link>
+                <Link className="font-semibold underline" href="/forgot-password">
+                  {i18n("adminForgotPassword")}
+                </Link>
+              </span>
+            </ErrorNotice>
+          ) : null}
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("adminRegistrationCode")}

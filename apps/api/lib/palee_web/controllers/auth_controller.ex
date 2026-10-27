@@ -3,6 +3,7 @@ defmodule PaleeWeb.AuthController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.{
+    AcceptInvitation,
     AccountProfiles,
     LoginUser,
     LogoutSession,
@@ -90,6 +91,13 @@ defmodule PaleeWeb.AuthController do
     required: [:code]
   }
 
+  @invitation_email_mismatch_schema %Schema{
+    type: :object,
+    description: "F-10: the invitation was issued to another email address",
+    properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}},
+    required: [:code]
+  }
+
   tags(["Authentication"])
 
   plug OpenApiSpex.Plug.CastAndValidate,
@@ -98,6 +106,7 @@ defmodule PaleeWeb.AuthController do
               :register,
               :register_admin,
               :register_member,
+              :accept_invitation,
               :login,
               :refresh,
               :nickname_available,
@@ -280,6 +289,12 @@ defmodule PaleeWeb.AuthController do
            },
            required: [:error]
          }},
+      conflict:
+        {"The email has accounts and the password is not theirs", "application/json",
+         @email_in_use_schema},
+      forbidden:
+        {"Invitation issued to another email", "application/json",
+         @invitation_email_mismatch_schema},
       unprocessable_entity:
         {"Validation errors", "application/json",
          %Schema{
@@ -333,7 +348,67 @@ defmodule PaleeWeb.AuthController do
            properties: %{access_token: %Schema{type: :string}},
            required: [:access_token]
          }},
-      not_found: {"Invalid invitation", "application/json", %Schema{type: :object}}
+      not_found: {"Invalid invitation", "application/json", %Schema{type: :object}},
+      conflict:
+        {"The email has accounts and the password is not theirs", "application/json",
+         @email_in_use_schema},
+      forbidden:
+        {"Invitation issued to another email", "application/json",
+         @invitation_email_mismatch_schema}
+    ]
+  )
+
+  operation(:accept_invitation,
+    summary: "ADR-204: the signed-in profile accepts an organization invitation",
+    security: [%{"bearerAuth" => []}],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %OpenApiSpex.MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256}
+            },
+            required: [:invitation_token]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Accepted", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             organization: %Schema{
+               type: :object,
+               properties: %{
+                 id: %Schema{type: :string, format: :uuid},
+                 name: %Schema{type: :string},
+                 slug: %Schema{type: :string}
+               },
+               required: [:id, :name, :slug]
+             },
+             roles: %Schema{type: :array, items: %Schema{type: :string}},
+             access_token: %Schema{
+               type: :string,
+               nullable: true,
+               description:
+                 "A new session when the profile's role changed (its old sessions end); null otherwise"
+             },
+             user: %Schema{
+               allOf: [@current_user_schema],
+               nullable: true,
+               description: "The profile as it is now, with access_token"
+             }
+           },
+           required: [:organization, :roles, :access_token, :user]
+         }},
+      not_found: {"Invalid invitation", "application/json", %Schema{type: :object}},
+      forbidden:
+        {"Invitation issued to another email", "application/json",
+         @invitation_email_mismatch_schema}
     ]
   )
 
@@ -522,6 +597,34 @@ defmodule PaleeWeb.AuthController do
         error
     end
   end
+
+  # ADR-204: an existing profile takes the invitation instead of signing up
+  # a new one. A role change ends the profile's sessions, so the new pair
+  # replaces this browser's.
+  def accept_invitation(conn, _params) do
+    user = GuardianPlug.current_resource(conn)
+
+    with {:ok, %{redemption: redemption, user: user, tokens: tokens}} <-
+           AcceptInvitation.call(user, conn.body_params.invitation_token) do
+      organization = redemption.organization
+
+      body = %{
+        organization: %{id: organization.id, name: organization.name, slug: organization.slug},
+        roles: Enum.map(redemption.membership.roles, &to_string/1),
+        access_token: tokens && tokens.access_token,
+        user: tokens && current_user_json(user)
+      }
+
+      conn
+      |> maybe_put_refresh_cookie(tokens)
+      |> json(body)
+    end
+  end
+
+  defp maybe_put_refresh_cookie(conn, nil), do: conn
+
+  defp maybe_put_refresh_cookie(conn, %{refresh_token: token}),
+    do: put_refresh_cookie(conn, token)
 
   def login(conn, _params) do
     case LoginUser.call(conn.body_params) do
