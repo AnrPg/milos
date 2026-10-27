@@ -259,6 +259,47 @@ test.describe("billing", () => {
     });
   }
 
+  // ADR-205: an email-domain company plan waits for a confirmed email.
+  test("a company plan matched by an unconfirmed email asks to confirm it first, with a resend", async ({ page }) => {
+    await common(page, [membership("kypseli", "Box Kypseli", ["member"])], [section("kypseli", "Box Kypseli")]);
+    const sent = { enroll: 0, resend: 0 };
+    await page.route("**/api/org/kypseli/me/corporate-enrollment", (route) => {
+      if (route.request().method() === "POST") {
+        sent.enroll += 1;
+        return route.fulfill(json({ code: "corporate_email_unverified", error: "Confirm your email" }, 403));
+      }
+      return route.fulfill(json({ offer: { company_name: "Acme", needs_verification: true } }));
+    });
+    await page.route("**/api/auth/verification-email", (route) => {
+      sent.resend += 1;
+      return route.fulfill(json({ status: "sent" }));
+    });
+
+    await page.goto("/me/payments");
+    const card = page.getByRole("region", { name: "Company plan" });
+    await expect(card.getByText("Confirm your email address to join Acme's plan.", { exact: false })).toBeVisible();
+    await expect(card.getByRole("button", { name: "Join company plan" })).toHaveCount(0);
+
+    await card.getByRole("button", { name: "Send the link again" }).click();
+    await expect(card.getByText("Sent. Open the link in the email, then come back here.")).toBeVisible();
+    expect(sent).toEqual({ enroll: 0, resend: 1 });
+  });
+
+  test("a company plan matched by a confirmed email offers to join", async ({ page }) => {
+    await common(page, [membership("kypseli", "Box Kypseli", ["member"])], [section("kypseli", "Box Kypseli")]);
+    await page.route("**/api/org/kypseli/me/corporate-enrollment", (route) =>
+      route.request().method() === "POST"
+        ? route.fulfill(json({ seat: { id: "seat-1", status: "active", user_id: "member-1" } }, 201))
+        : route.fulfill(json({ offer: { company_name: "Acme", needs_verification: false } })),
+    );
+
+    await page.goto("/me/payments");
+    const card = page.getByRole("region", { name: "Company plan" });
+    await expect(card.getByText("Acme pays for a plan at this box for people with your work email.")).toBeVisible();
+    await card.getByRole("button", { name: "Join company plan" }).click();
+    await expect(card.getByText("You're in. Your company plan is now active.")).toBeVisible();
+  });
+
   test("someone without a provider sees no entry and is sent back to Εγώ", async ({ page }) => {
     // An athlete with no gym or coach (staff-only roles and demo businesses
     // are covered by the unit and API tests).

@@ -11489,5 +11489,23 @@
     "placementSpace": "Espacio",
     "placementPickSpace": "Elige un espacio",
     "placementQuantity": "Cuántas"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Confirma tu dirección de email para unirte al plan de {company}. Te enviamos un enlace al registrarte.",
+      "resend": "Reenviar el enlace",
+      "sending": "Enviando…",
+      "sent": "Enviado. Abre el enlace del email y vuelve aquí."
+    },
+    "vendor": {
+      "emailNotConfirmed": "Email sin confirmar",
+      "emailNotConfirmedHint": "Esta cuenta aún no ha confirmado su email, así que no puede recibir un enlace de activación. Pídele que lo confirme primero.",
+      "email": {
+        "sent": "Enviado por email a la cuenta",
+        "pending": "Email en camino",
+        "failed": "El email no llegó. Copia el enlace y envíalo tú o envía uno nuevo."
+      },
+      "resend": "Enviar un enlace nuevo"
+    }
   }
 }

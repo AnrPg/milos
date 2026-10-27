@@ -11489,5 +11489,23 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Bestätige deine E-Mail-Adresse, um dem Tarif von {company} beizutreten. Wir haben dir bei der Registrierung einen Link geschickt.",
+      "resend": "Link erneut senden",
+      "sending": "Wird gesendet…",
+      "sent": "Gesendet. Öffne den Link in der E-Mail und komm dann hierher zurück."
+    },
+    "vendor": {
+      "emailNotConfirmed": "E-Mail nicht bestätigt",
+      "emailNotConfirmedHint": "Dieses Konto hat seine E-Mail-Adresse noch nicht bestätigt und kann daher keinen Aktivierungslink erhalten. Bitte es, sie zuerst zu bestätigen.",
+      "email": {
+        "sent": "Per E-Mail an das Konto gesendet",
+        "pending": "E-Mail unterwegs",
+        "failed": "Die E-Mail ist nicht angekommen. Kopiere den Link und schick ihn selbst oder sende einen neuen."
+      },
+      "resend": "Neuen Link senden"
+    }
   }
 }

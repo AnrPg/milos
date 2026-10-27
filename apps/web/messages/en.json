@@ -11489,5 +11489,23 @@
     "placementSpace": "Space",
     "placementPickSpace": "Choose a space",
     "placementQuantity": "How many"
+  },
+  "VerifiedGates": {
+    "corporate": {
+      "confirmToJoin": "Confirm your email address to join {company}'s plan. We sent you a link when you signed up.",
+      "resend": "Send the link again",
+      "sending": "Sending…",
+      "sent": "Sent. Open the link in the email, then come back here."
+    },
+    "vendor": {
+      "emailNotConfirmed": "Email not confirmed",
+      "emailNotConfirmedHint": "This account hasn't confirmed its email yet, so it can't get an activation link. Ask them to confirm it first.",
+      "email": {
+        "sent": "Emailed to the account",
+        "pending": "Email on its way",
+        "failed": "The email didn't arrive. Copy the link and send it yourself, or send a new one."
+      },
+      "resend": "Send a new link"
+    }
   }
 }
