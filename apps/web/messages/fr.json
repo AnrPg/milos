@@ -11489,5 +11489,24 @@
     "placementSpace": "Espace",
     "placementPickSpace": "Choisir un espace",
     "placementQuantity": "Combien"
+  },
+  "ShareByEmail": {
+    "action": "Envoyer par e-mail",
+    "label": "Son adresse e-mail",
+    "placeholder": "nom@example.com",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "sent": "Envoyé à {email}",
+    "hint": "Nous n'envoyons que ce lien et ton nom.",
+    "errors": {
+      "unverified": "Confirme d'abord ta propre adresse e-mail, puis tu pourras envoyer des liens par e-mail.",
+      "dailyLimit": "Tu as envoyé le maximum de liens par e-mail pour aujourd'hui. Partage-le ou copie-le plutôt.",
+      "throttled": "Cette adresse a reçu assez d'invitations pour aujourd'hui.",
+      "suppressed": "Les e-mails vers cette adresse sont rejetés. Vérifie-la ou utilises-en une autre.",
+      "invalidAddress": "Saisis une adresse e-mail valide.",
+      "demo": "L'entreprise est encore en mode démo et ne peut pas encore envoyer d'e-mails.",
+      "unavailable": "Ce lien ne peut plus être envoyé. Crée-en un nouveau.",
+      "generic": "L'e-mail n'a pas pu être envoyé. Réessaie."
+    }
   }
 }

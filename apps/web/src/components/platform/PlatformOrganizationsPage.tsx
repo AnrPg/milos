@@ -14,7 +14,9 @@ import {
   listPlatformOrganizations,
   provisionPlatformOrganization,
   renamePlatformOrganization,
+  fetchOwnerInvitationDeliveries,
   sendOwnerInvitationEmail,
+  type OwnerInvitationDelivery,
   updatePlatformOrganizationMembershipRole,
   type OrganizationMembershipRole,
   type OrganizationSettings,
@@ -39,6 +41,7 @@ import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/org
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { LOCALE_NAMES, SUPPORTED_LOCALES, isAppLocale } from "@/i18n/locales";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -75,7 +78,8 @@ export function PlatformOrganizationsPage() {
   const [copied, setCopied] = useState<"token" | "link" | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSendError, setEmailSendError] = useState<string | null>(null);
-  const [emailSent, setEmailSent] = useState(false);
+  const [emailLocale, setEmailLocale] = useState<string>("el");
+  const [emailDelivery, setEmailDelivery] = useState<OwnerInvitationDelivery | null>(null);
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
   const [managingAccess, setManagingAccess] = useState<PlatformOrganization | null>(null);
   const [provisioningOpen, setProvisioningOpen] = useState(false);
@@ -121,8 +125,9 @@ export function PlatformOrganizationsPage() {
       setInvitation(result);
       setInvitationEmail(form.initial_owner_email ?? null);
       setCopied(null);
-      setEmailSent(false);
+      setEmailDelivery(null);
       setEmailSendError(null);
+      setEmailLocale(emailLocaleFor(result.settings?.default_locale ?? form.default_locale));
       setForm(defaultForm);
       setProvisioningOpen(false);
       rememberGeneratedInvitation(result.organization.id, {
@@ -146,19 +151,40 @@ export function PlatformOrganizationsPage() {
     }));
   }
 
-  async function sendInvitationEmail() {
+  // ADR-210: the email is queued, not sent in the request; while it waits,
+  // the console reads its delivery status again.
+  const deliveriesQuery = useQuery({
+    queryKey: ["owner-invitation-deliveries", invitation?.initial_owner_invitation.id, accessToken],
+    queryFn: () =>
+      fetchOwnerInvitationDeliveries(
+        accessToken!,
+        invitation!.organization.id,
+        invitation!.initial_owner_invitation.id,
+      ),
+    enabled: Boolean(accessToken && invitation && emailDelivery),
+    refetchInterval: (query) => {
+      const latest = query.state.data?.deliveries[0];
+      return latest && (latest.status === "queued" || latest.status === "deferred") ? 5000 : false;
+    },
+  });
+  const latestDelivery = deliveriesQuery.data?.deliveries[0] ?? emailDelivery;
+
+  async function sendInvitationEmail(resend = false) {
     if (!accessToken || !invitation || !invitationEmail) return;
     setSendingEmail(true);
     setEmailSendError(null);
 
     try {
-      await sendOwnerInvitationEmail(accessToken, invitation.organization.id, {
+      const result = await sendOwnerInvitationEmail(accessToken, invitation.organization.id, {
         email: invitationEmail,
         token: invitation.initial_owner_invitation.token,
+        locale: emailLocale,
+        resend,
       });
-      setEmailSent(true);
-    } catch {
-      setEmailSendError(copy.sendEmailError);
+      setEmailDelivery(result.delivery);
+      if (emailDelivery) await deliveriesQuery.refetch();
+    } catch (failure) {
+      setEmailSendError(sendEmailErrorText(failure, copy));
     } finally {
       setSendingEmail(false);
     }
@@ -328,20 +354,45 @@ export function PlatformOrganizationsPage() {
             </button>
           </div>
           {invitationEmail ? (
-            <div className="mt-4 border-t border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] pt-4">
-              <button
-                type="button"
-                disabled={sendingEmail || emailSent}
-                onClick={() => void sendInvitationEmail()}
-                className="border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--warning-contrast)] disabled:opacity-60"
-              >
-                {emailSent
-                  ? copy.emailSent
-                  : sendingEmail
+            <div className="mt-4 flex flex-col gap-3 border-t border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] pt-4">
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex flex-col gap-1 text-xs font-semibold uppercase">
+                  {copy.emailLanguage}
+                  <Select
+                    className="min-w-40 border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm normal-case"
+                    value={emailLocale}
+                    disabled={sendingEmail}
+                    onValueChange={setEmailLocale}
+                  >
+                    {SUPPORTED_LOCALES.map((entry) => <option key={entry} value={entry}>{LOCALE_NAMES[entry]}</option>)}
+                  </Select>
+                </label>
+                <button
+                  type="button"
+                  disabled={sendingEmail}
+                  onClick={() => void sendInvitationEmail(Boolean(latestDelivery))}
+                  className="border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--warning-contrast)] disabled:opacity-60"
+                >
+                  {sendingEmail
                     ? copy.sendingEmail
-                    : `${copy.sendEmail} ${invitationEmail}`}
-              </button>
-              {emailSendError ? <ErrorNotice variant="field" className="mt-2">{emailSendError}</ErrorNotice> : null}
+                    : latestDelivery
+                      ? copy.resendEmail
+                      : `${copy.sendEmail} ${invitationEmail}`}
+                </button>
+              </div>
+              {latestDelivery ? (
+                <p className="flex flex-wrap items-center gap-2 text-sm" role="status" data-testid="owner-invitation-delivery">
+                  <span className="font-semibold">{copy.deliveryStatus}:</span>
+                  <span>{deliveryStatusText(latestDelivery, copy)}</span>
+                  <span className="text-xs text-[var(--text-soft)]">
+                    {invitationEmail} · {new Date(latestDelivery.sent_at ?? latestDelivery.inserted_at).toLocaleString(locale)}
+                  </span>
+                  <button type="button" className="text-xs font-semibold underline" onClick={() => void deliveriesQuery.refetch()}>
+                    {copy.refreshDelivery}
+                  </button>
+                </p>
+              ) : null}
+              {emailSendError ? <ErrorNotice variant="field">{emailSendError}</ErrorNotice> : null}
             </div>
           ) : null}
         </section>
@@ -557,6 +608,35 @@ function compact(input: ProvisionOrganizationInput): ProvisionOrganizationInput 
   return Object.fromEntries(
     Object.entries(input).filter(([, value]) => value !== "" && value !== undefined),
   ) as ProvisionOrganizationInput;
+}
+
+/** The email's language: the business's default when Palee speaks it, else Greek. */
+function emailLocaleFor(defaultLocale: string | null | undefined) {
+  return isAppLocale(defaultLocale) ? defaultLocale : "el";
+}
+
+function deliveryStatusText(delivery: OwnerInvitationDelivery, copy: ReturnType<typeof platformOrganizationsCopy>) {
+  switch (delivery.status) {
+    case "sent":
+      return copy.deliverySent;
+    case "deferred":
+      return copy.deliveryDeferred;
+    case "failed":
+      return copy.deliveryFailed;
+    case "suppressed":
+      return copy.deliverySuppressed;
+    default:
+      return copy.deliveryQueued;
+  }
+}
+
+function sendEmailErrorText(failure: unknown, copy: ReturnType<typeof platformOrganizationsCopy>) {
+  const code = failure instanceof ApiError ? failure.payload.code : undefined;
+  if (code === "throttled") return copy.sendEmailThrottled;
+  if (code === "suppressed") return copy.sendEmailSuppressed;
+  if (code === "invitation_email_mismatch") return copy.sendEmailMismatch;
+  if (code === "invalid_invitation") return copy.sendEmailInvalid;
+  return copy.sendEmailError;
 }
 
 function ownerSetupUrl(token: string) {

@@ -11489,5 +11489,24 @@
     "placementSpace": "Raum",
     "placementPickSpace": "Raum wählen",
     "placementQuantity": "Anzahl"
+  },
+  "ShareByEmail": {
+    "action": "Per E-Mail senden",
+    "label": "E-Mail-Adresse",
+    "placeholder": "name@example.com",
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "sent": "An {email} gesendet",
+    "hint": "Wir senden nur diesen Link und deinen Namen.",
+    "errors": {
+      "unverified": "Bestätige zuerst deine eigene E-Mail-Adresse, dann kannst du Links per E-Mail senden.",
+      "dailyLimit": "Du hast für heute die meisten Links per E-Mail gesendet. Teile oder kopiere ihn stattdessen.",
+      "throttled": "Diese Adresse hat für heute genug Einladungen bekommen.",
+      "suppressed": "E-Mails an diese Adresse kommen zurück. Prüfe sie oder nimm eine andere.",
+      "invalidAddress": "Gib eine gültige E-Mail-Adresse ein.",
+      "demo": "Das Business ist noch im Demo-Modus und kann noch keine E-Mails senden.",
+      "unavailable": "Dieser Link lässt sich nicht mehr senden. Erstelle einen neuen.",
+      "generic": "Die E-Mail konnte nicht gesendet werden. Versuch es noch einmal."
+    }
   }
 }

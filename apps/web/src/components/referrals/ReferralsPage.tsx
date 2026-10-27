@@ -15,6 +15,7 @@ import {
   type ReferralOverview,
 } from "@/api/referrals";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { SendLinkByEmail } from "@/components/share/SendLinkByEmail";
 import { formatPrice, formatWhen } from "@/components/events/events";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { BackToMe } from "@/components/member-app/me/BackToMe";
@@ -202,6 +203,7 @@ function Overview({
             </SheetButton>
             <SheetButton onClick={() => setQrOpen(true)}>{t("showQr")}</SheetButton>
           </div>
+          <SendLinkByEmail link="referral" token={data.code} />
 
           {data.events.length > 0 ? (
             <HubCard eyebrow={t("events.title")}>
