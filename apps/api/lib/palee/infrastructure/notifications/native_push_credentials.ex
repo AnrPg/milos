@@ -45,7 +45,7 @@ defmodule Palee.Infrastructure.Notifications.NativePushCredentials do
          team_id: config[:team_id],
          key_id: config[:key_id],
          jwk: jwk,
-         topic: presence(config[:topic]) || "app.milos.member",
+         topic: presence(config[:topic]) || "app.palee.member",
          req_options: Keyword.get(config, :req_options, [])
        }}
     else

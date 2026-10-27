@@ -40,8 +40,8 @@ defmodule Palee.Notifications.Domain.NativePushPayloadTest do
   end
 
   test "APNs headers name the topic and the provider token" do
-    headers = NativePushPayload.apns_headers("app.milos.member", "jwt")
-    assert {"apns-topic", "app.milos.member"} in headers
+    headers = NativePushPayload.apns_headers("app.palee.member", "jwt")
+    assert {"apns-topic", "app.palee.member"} in headers
     assert {"authorization", "bearer jwt"} in headers
     assert {"apns-push-type", "alert"} in headers
   end

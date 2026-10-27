@@ -51,7 +51,7 @@ defmodule Palee.Application.CheckInGeofences do
       |> GeofencePlan.regions(bookings, rules, now)
       |> Enum.map(
         &Map.merge(&1, %{
-          id: "milos-" <> &1.location_id,
+          id: "palee-" <> &1.location_id,
           organization_id: provider.organization_id,
           box_name: provider.name
         })

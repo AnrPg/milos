@@ -37,10 +37,10 @@ defmodule Palee.Infrastructure.Storage.LegacyObjectMigrationTest do
 
     user = %User{
       id: user_id,
-      avatar_url: "https://media.localhost:18080/milos-avatars/avatars/#{user_id}/profile.jpg"
+      avatar_url: "https://media.localhost:18080/palee-avatars/avatars/#{user_id}/profile.jpg"
     }
 
-    assert %Item{} = item = LegacyObjectMigration.avatar_item(user, "milos-avatars")
+    assert %Item{} = item = LegacyObjectMigration.avatar_item(user, "palee-avatars")
     assert item.source_key == "avatars/#{user_id}/profile.jpg"
     assert item.destination_key == "users/#{user_id}/avatars/profile.jpg"
   end
@@ -48,10 +48,10 @@ defmodule Palee.Infrastructure.Storage.LegacyObjectMigrationTest do
   test "rejects avatar URLs that do not belong to the user" do
     user = %User{
       id: Ecto.UUID.generate(),
-      avatar_url: "https://media.localhost:18080/milos-avatars/avatars/other/profile.jpg"
+      avatar_url: "https://media.localhost:18080/palee-avatars/avatars/other/profile.jpg"
     }
 
-    assert is_nil(LegacyObjectMigration.avatar_item(user, "milos-avatars"))
+    assert is_nil(LegacyObjectMigration.avatar_item(user, "palee-avatars"))
   end
 
   test "dry-run migration does not touch object storage" do
@@ -74,16 +74,16 @@ defmodule Palee.Infrastructure.Storage.LegacyObjectMigrationTest do
     destination_key = "users/#{user.id}/avatars/profile.jpg"
     body = "image-bytes"
 
-    Process.put({:object, "milos-avatars", source_key}, body)
+    Process.put({:object, "palee-avatars", source_key}, body)
 
     {:ok, user} =
       user
       |> Ecto.Changeset.change(
-        avatar_url: "https://media.localhost:18080/milos-avatars/#{source_key}"
+        avatar_url: "https://media.localhost:18080/palee-avatars/#{source_key}"
       )
       |> Repo.update()
 
-    item = LegacyObjectMigration.avatar_item(user, "milos-avatars")
+    item = LegacyObjectMigration.avatar_item(user, "palee-avatars")
 
     assert {:migrated, ^item} =
              LegacyObjectMigration.migrate_item(item,
@@ -93,10 +93,10 @@ defmodule Palee.Infrastructure.Storage.LegacyObjectMigrationTest do
                avatar_config: :ignored
              )
 
-    assert Process.get({:object, "milos-avatars", destination_key}) == body
+    assert Process.get({:object, "palee-avatars", destination_key}) == body
 
     assert Repo.get!(User, user.id).avatar_url ==
-             "http://localhost:9000/milos-avatars/#{destination_key}"
+             "http://localhost:9000/palee-avatars/#{destination_key}"
   end
 
   test "apply refuses a pre-existing destination with different bytes" do

@@ -65,6 +65,21 @@ defmodule Palee.Infrastructure.Search.MeilisearchPRIndex do
     end
   end
 
+  # Rebuilds the whole index from the given PRs (Palee.Release.reindex_search/0).
+  @impl true
+  def replace_documents(prs) when is_list(prs) do
+    with :ok <- ensure_settings(),
+         {:ok, %Req.Response{status: status}} when status in 200..299 <-
+           request(:delete, index_path("/documents")),
+         {:ok, %Req.Response{status: status}} when status in 200..299 <-
+           request(:post, index_path("/documents"), json: Enum.map(prs, &serialize/1)) do
+      :ok
+    else
+      {:ok, %Req.Response{status: status, body: body}} -> {:error, {:meilisearch_status, status, body}}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   @impl true
   def search(user_id, query) do
     body = %{

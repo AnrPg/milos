@@ -7,7 +7,7 @@ import { expect, test, type Page } from "./support/test";
 // rotates freely, and re-edits the current avatar without a new file.
 // The API and the media host are stubbed.
 
-const AVATAR_URL = "http://media.localhost:18080/milos-avatars/users/member-1/avatar.png";
+const AVATAR_URL = "http://media.localhost:18080/palee-avatars/users/member-1/avatar.png";
 
 const user = {
   id: "member-1",

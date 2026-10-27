@@ -49,7 +49,7 @@ defmodule PaleeWeb.NativePushTokenControllerTest do
       provider: "fcm",
       platform: "android",
       token: @fcm_token,
-      app_id: "app.milos.member",
+      app_id: "app.palee.member",
       app_version: "1.0.0"
     }
 

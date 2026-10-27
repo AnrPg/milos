@@ -10,7 +10,7 @@ defmodule Palee.Wallet.Domain.GooglePass do
   alias Palee.BrandPalette
   alias Palee.Wallet.Domain.PassContent
 
-  @class_suffix "milos_member_card"
+  @class_suffix "palee_member_card"
   @save_url "https://pay.google.com/gp/v/save/"
 
   def save_url(jwt), do: @save_url <> jwt
