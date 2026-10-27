@@ -29,18 +29,24 @@ defmodule Palee.Organizations.Commands.IssueInvitation do
       token = InvitationToken.generate()
       lifetime = value(params, :lifetime_seconds) || @default_lifetime_seconds
 
-      invitation_params = %{
-        organization_id: context.organization_id,
-        token_digest: InvitationToken.digest(token),
-        role: MembershipPolicy.primary_role(roles),
-        roles: roles,
-        all_locations: scope == :all,
-        location_ids: if(scope == :all, do: [], else: scope),
-        expires_at: DateTime.add(issued_at, lifetime, :second),
-        issued_by_user_id: context.user_id,
-        coach_user_id: invited_coach(context, roles, params),
-        intended_email_digest: InvitationEmail.digest(value(params, :intended_email))
-      }
+      invitation_params =
+        %{
+          organization_id: context.organization_id,
+          token_digest: InvitationToken.digest(token),
+          role: MembershipPolicy.primary_role(roles),
+          roles: roles,
+          all_locations: scope == :all,
+          location_ids: if(scope == :all, do: [], else: scope),
+          expires_at: DateTime.add(issued_at, lifetime, :second),
+          issued_by_user_id: context.user_id,
+          coach_user_id: invited_coach(context, roles, params),
+          intended_email_digest: InvitationEmail.digest(value(params, :intended_email)),
+          # ADR-209: a business's bound invitation needs a verified address or
+          # the emailed link.
+          email_verification_required:
+            not is_nil(InvitationEmail.digest(value(params, :intended_email)))
+        }
+        |> Map.merge(email_delivery(params, issued_at))
 
       # registration_invitations is a root tenant table (TD-046).
       case RepoContext.run(context, fn ->
@@ -96,6 +102,10 @@ defmodule Palee.Organizations.Commands.IssueInvitation do
 
   # A coach inviting a client becomes that client's coach (ADR-100); a coach
   # who also manages the gym chooses with `as_my_client`.
+  # ADR-209: a resend keeps the replaced invitation's coach.
+  defp invited_coach(_context, _invited_roles, %{reissue_coach_user_id: {:keep, coach_id}}),
+    do: coach_id
+
   defp invited_coach(context, invited_roles, params) do
     roles = TenantAuthorization.roles(context)
     manager? = Enum.any?(roles, &(&1 in [:owner, :admin]))
@@ -106,6 +116,14 @@ defmodule Palee.Organizations.Commands.IssueInvitation do
             (not manager? and as_my_client not in [false, "false"])),
        do: context.user_id
   end
+
+  # ADR-209: `deliver_by_email` (set by the application service that sends
+  # it, never by a request) keeps the address encrypted for resends and
+  # records that the token goes only into the email.
+  defp email_delivery(%{deliver_by_email: %{address: address, locale: locale}}, issued_at),
+    do: %{intended_email_encrypted: address, email_locale: locale, emailed_at: issued_at}
+
+  defp email_delivery(_params, _issued_at), do: %{}
 
   defp normalize_role(role) when is_atom(role), do: role
 

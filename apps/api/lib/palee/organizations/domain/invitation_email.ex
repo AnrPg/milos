@@ -45,4 +45,26 @@ defmodule Palee.Organizations.Domain.InvitationEmail do
       actual -> :crypto.hash_equals(expected_digest, actual)
     end
   end
+
+  @doc """
+  ADR-209: what lets a matching account redeem a bound invitation.
+
+    * the token went only into an email (`emailed_at`): opening the link
+      proves the inbox, so `{:ok, proof}` asks the caller to mark the
+      address verified;
+    * a business-issued bound invitation (`email_verification_required`)
+      otherwise needs an already verified address, else
+      `{:error, :invitation_email_unverified}`;
+    * older and platform invitations need only the match: `{:ok, nil}`.
+  """
+  def redemption_proof(invitation, verified?, proof)
+
+  def redemption_proof(%{emailed_at: %DateTime{}}, _verified?, proof), do: {:ok, proof}
+
+  def redemption_proof(%{email_verification_required: true}, true, _proof), do: {:ok, nil}
+
+  def redemption_proof(%{email_verification_required: true}, _verified?, _proof),
+    do: {:error, :invitation_email_unverified}
+
+  def redemption_proof(_invitation, _verified?, _proof), do: {:ok, nil}
 end

@@ -425,6 +425,31 @@ defmodule Palee.Organizations do
       ),
       do: IssuePlatformInvitation.call(context, organization_id, params, issued_at)
 
+  @doc """
+  ADR-209: records that an invitation's token went only into an email, so
+  redeeming it proves the inbox and marks the bound address verified.
+  Idempotent. Runs in the caller's database scope (a vendor's or a tenant's
+  `RepoContext`, or the caller's transaction): `:ok`, or
+  `{:error, :not_found}` when the invitation is unknown or out of scope.
+  """
+  def mark_invitation_emailed(invitation_id, now \\ DateTime.utc_now()),
+    do: OrganizationStore.mark_invitation_emailed(invitation_id, now)
+
+  @doc "ADR-209: one invitation of the acting box, for a resend."
+  def get_invitation(context, invitation_id),
+    do: Palee.Organizations.Queries.EmailedInvitations.get(context, invitation_id)
+
+  @doc "ADR-209: `%{organization:, inviter:}` invitations emailed since `since`."
+  def count_emailed_invitations(context, since),
+    do: Palee.Organizations.Queries.EmailedInvitations.count_since(context, since)
+
+  @doc """
+  Runs `fun` in one database transaction (joining the caller's): `{:ok, value}`
+  commits, `{:error, reason}` rolls back. ADR-209 issues an invitation and
+  queues its email together.
+  """
+  def transaction(fun) when is_function(fun, 0), do: OrganizationStore.transaction(fun)
+
   def revoke_invitation(context, invitation_id, revoked_at \\ DateTime.utc_now()),
     do: RevokeInvitation.call(context, invitation_id, revoked_at)
 
