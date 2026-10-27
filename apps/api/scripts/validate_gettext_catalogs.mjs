@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const locales = ["en", "el", "ar", "ru", "de", "es", "pt_PT", "he", "it", "bg", "nl", "fr"];
-const domains = ["notifications", "calendar", "sharing", "receipts", "corporate_invoices"];
+const domains = ["notifications", "calendar", "sharing", "receipts", "corporate_invoices", "account_lifecycle"];
 
 function entries(source) {
   return new Map(
