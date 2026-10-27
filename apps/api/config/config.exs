@@ -59,7 +59,9 @@ config :palee, Oban,
        {"10 1 * * *", Palee.Workers.SeasonSweepJob},
        {"40 2 * * *", Palee.Workers.NightlyInsightsJob},
        {"27 * * * *", Palee.Workers.ScalingSuggestionScanJob},
-       {"47 * * * *", Palee.Workers.WorldGazetteerJob}
+       {"47 * * * *", Palee.Workers.WorldGazetteerJob},
+       # ADR-211: self-service account deletions whose grace is over.
+       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob}
      ]}
   ],
   queues: [

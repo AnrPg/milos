@@ -4,10 +4,14 @@ defmodule Palee.Application.AccountProfiles do
   a session of one of them, which is the proof of owning the email; adding
   one or switching to one stays inside that login.
   """
-  alias Palee.Application.TokenIssuer
+  alias Palee.Application.{AccountDeletion, TokenIssuer}
   alias Palee.Identity
 
-  def list(%{login_id: login_id}), do: {:ok, Identity.list_profiles(login_id)}
+  # ADR-211: a profile scheduled for deletion is out of the list until undone.
+  def list(%{login_id: login_id}),
+    do:
+      {:ok,
+       Enum.filter(Identity.list_profiles(login_id), &(AccountDeletion.ensure_open(&1) == :ok))}
 
   def add(%{login_id: login_id}, params) do
     case Identity.add_profile(login_id, params) do
@@ -22,6 +26,7 @@ defmodule Palee.Application.AccountProfiles do
   @doc "A new session for another profile of the same login."
   def switch(%{login_id: login_id, id: current_id}, target_id) when is_binary(target_id) do
     with %{} = target <- Enum.find(Identity.list_profiles(login_id), &(&1.id == target_id)),
+         :ok <- AccountDeletion.ensure_open(target),
          {:ok, tokens} <- TokenIssuer.issue_pair(target) do
       if target.id != current_id, do: Identity.touch_last_used(login_id, target.id)
       {:ok, Map.put(tokens, :user, target)}

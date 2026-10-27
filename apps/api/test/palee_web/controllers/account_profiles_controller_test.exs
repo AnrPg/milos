@@ -1,6 +1,7 @@
 defmodule PaleeWeb.AccountProfilesControllerTest do
   @moduledoc "ADR-187: one login per email, up to three profiles, sign-in by email or @handle."
   use PaleeWeb.ConnCase, async: false
+  import Palee.EmailCase
 
   alias Palee.Infrastructure.Security.{MemoryRateLimiter, MemoryTokenStore}
 
@@ -30,19 +31,96 @@ defmodule PaleeWeb.AccountProfilesControllerTest do
 
   @base %{password: "1537", role: "athlete", email: "tolaras@placeholder.invalid"}
 
-  test "a repeat email with another password learns only the count", _ctx do
-    assert %{"access_token" => _} =
-             json_response(
-               register(Map.merge(@base, %{handle: "tolaras", display_name: "Τολάρας"})),
-               201
-             )
+  describe "ADR-211: a repeat email with another password" do
+    setup do
+      first = register(Map.merge(@base, %{handle: "tolaras", display_name: "Τολάρας"}))
 
-    conn = register(Map.merge(@base, %{handle: "tolaras_two", password: "9999"}))
+      assert %{"access_token" => _, "confirmation" => "email_sent", "email" => email} =
+               json_response(first, 201)
 
-    assert %{"code" => "email_in_use", "profile_count" => 1, "profile_limit" => 3} =
-             json_response(conn, 409)
+      assert email == @base.email
+      assert first.resp_cookies["palee_refresh"]
+      :ok
+    end
 
-    refute conn.resp_body =~ ~s("tolaras")
+    test "is answered like a new sign-up, creates nothing and tells the owner" do
+      conn = register(Map.merge(@base, %{handle: "tolaras_two", password: "9999"}))
+
+      assert json_response(conn, 201) == %{
+               "confirmation" => "email_sent",
+               "email" => "tolaras@placeholder.invalid"
+             }
+
+      refute conn.resp_cookies["palee_refresh"]
+      refute conn.resp_body =~ "tolaras\""
+      assert Palee.Identity.find_by_handle("tolaras_two") == nil
+
+      login = Palee.Identity.find_login_by_email(@base.email)
+      assert login.profile_count == 1
+
+      email =
+        assert_email_enqueued(
+          kind: :signup_attempt_existing,
+          to: "tolaras@placeholder.invalid",
+          category: :account,
+          login_id: login.id
+        )
+
+      assert email.text =~ "Someone tried to create a Palee account with this email address."
+      assert email.text =~ "/login"
+      assert email.text =~ "/forgot-password"
+      # The email follows the existing profile's language, not the form's.
+      refute email.text =~ "Τολάρας"
+    end
+
+    test "an email in another case is the same login" do
+      conn =
+        register(
+          Map.merge(@base, %{
+            handle: "tolaras_two",
+            password: "9999",
+            email: "TOLARAS@placeholder.invalid"
+          })
+        )
+
+      assert %{"confirmation" => "email_sent", "email" => "tolaras@placeholder.invalid"} =
+               json_response(conn, 201)
+
+      refute Map.has_key?(json_response(conn, 201), "access_token")
+    end
+
+    test "is throttled quietly: the answer stays the same" do
+      for _attempt <- 1..3 do
+        conn = register(Map.merge(@base, %{handle: "tolaras_two", password: "9999"}))
+        assert %{"confirmation" => "email_sent"} = json_response(conn, 201)
+      end
+
+      assert length(enqueued_emails(kind: :signup_attempt_existing)) == 1
+    end
+
+    test "gets the same field checks a new sign-up gets" do
+      # A handle that is taken, as for a new email.
+      conn = register(Map.merge(@base, %{handle: "tolaras", password: "9999"}))
+      assert %{"errors" => %{"handle" => [_ | _]}} = json_response(conn, 422)
+
+      fresh =
+        register(Map.merge(@base, %{handle: "tolaras", email: "someone@placeholder.invalid"}))
+
+      assert %{"errors" => %{"handle" => [_ | _]}} = json_response(fresh, 422)
+
+      # A password too weak to be anyone's.
+      weak = register(Map.merge(@base, %{handle: "tolaras_two", password: "  ab  "}))
+      assert %{"errors" => %{"password" => [_ | _]}} = json_response(weak, 422)
+
+      refute_email_enqueued(kind: :signup_attempt_existing)
+    end
+
+    test "the right password still adds a profile and signs in" do
+      conn = register(Map.merge(@base, %{handle: "tolaras_two"}))
+      assert %{"access_token" => _, "confirmation" => "email_sent"} = json_response(conn, 201)
+      assert Palee.Identity.find_login_by_email(@base.email).profile_count == 2
+      refute_email_enqueued(kind: :signup_attempt_existing)
+    end
   end
 
   test "the same email and password add profiles up to three, then stop" do

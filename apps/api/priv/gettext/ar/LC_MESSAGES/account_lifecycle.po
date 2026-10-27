@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "حاول شخص ما التسجيل باستخدام بريدك الإلكتروني"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "حاول شخص ما إنشاء حساب على %{product} بعنوان البريد الإلكتروني هذا."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "إذا كنت أنت، فسجّل الدخول لإضافة ملف شخصي، أو أعد تعيين كلمة المرور إذا نسيتها."
+
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+msgid "Reset password"
+msgstr "إعادة تعيين كلمة المرور"
+
+msgid "Forgot your password?"
+msgstr "هل نسيت كلمة المرور؟"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "إذا لم تكن أنت، فيمكنك تجاهل هذه الرسالة. لم يُنشأ أي حساب ولم يتغير شيء."
+
+msgid "Confirm deleting your account"
+msgstr "أكّد حذف حسابك"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "طلبت حذف ملفك الشخصي @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "طلبت حذف حساب الدخول مع جميع ملفاته الشخصية."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "بعد التأكيد، يتم الحذف خلال %{days} أيام. ويمكنك التراجع عنه حتى ذلك الحين."
+
+msgid "Confirm deletion"
+msgstr "تأكيد الحذف"
+
+msgid "The link expires in 24 hours."
+msgstr "تنتهي صلاحية الرابط خلال 24 ساعة."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "إذا لم تطلب ذلك، فلا تفتح الرابط وغيّر كلمة المرور: شخص آخر يعرفها."

@@ -18,7 +18,7 @@ defmodule Palee.Email.Domain.LinkTokenPolicyTest do
 
   test "every purpose has a lifetime" do
     assert LinkTokenPolicy.purposes() ==
-             ~w(account_deletion email_change email_change_revert password_reset sign_out_everywhere verify_email)
+             ~w(account_deletion account_deletion_undo email_change email_change_revert password_reset sign_out_everywhere verify_email)
 
     assert LinkTokenPolicy.ttl_seconds("password_reset") == 3_600
     assert LinkTokenPolicy.ttl_seconds("verify_email") == 48 * 3_600

@@ -55,6 +55,12 @@ defmodule Palee.Identity do
   # ADR-187: logins (one per email) and their up to three profiles.
   defdelegate create_login_with_profile(params), to: UserStore
   defdelegate add_profile(login_id, params), to: UserStore
+
+  @doc """
+  ADR-211: the validation a new login and its first profile would get
+  (field rules, the handle being free), with nothing written.
+  """
+  defdelegate validate_new_login(params), to: UserStore
   defdelegate find_login_by_email(email), to: UserStore, as: :get_login_by_email
   defdelegate find_by_email(email), to: UserStore, as: :get_by_email
   defdelegate list_profiles(login_id), to: UserStore

@@ -9,8 +9,10 @@ defmodule Palee.Email.Templates do
   """
 
   @templates %{
+    account_deletion_confirm: Palee.Email.Templates.AccountDeletionConfirm,
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
-    corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder
+    corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
+    signup_attempt_existing: Palee.Email.Templates.SignupAttemptExisting
   }
 
   @doc "Every kind and its template."

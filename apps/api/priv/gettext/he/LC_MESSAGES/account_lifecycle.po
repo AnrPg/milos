@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "מישהו ניסה להירשם עם כתובת האימייל שלך"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "מישהו ניסה ליצור חשבון %{product} עם כתובת האימייל הזו."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "אם זה היית את/ה, יש להתחבר כדי להוסיף פרופיל, או לאפס את הסיסמה אם שכחת אותה."
+
+msgid "Sign in"
+msgstr "התחברות"
+
+msgid "Reset password"
+msgstr "איפוס סיסמה"
+
+msgid "Forgot your password?"
+msgstr "שכחת את הסיסמה?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "אם זה לא היית את/ה, אפשר להתעלם מהאימייל הזה. לא נוצר חשבון ושום דבר לא השתנה."
+
+msgid "Confirm deleting your account"
+msgstr "אישור מחיקת החשבון"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "ביקשת למחוק את הפרופיל @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "ביקשת למחוק את חשבון הכניסה עם כל הפרופילים שלו."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "לאחר האישור, המחיקה תתבצע בעוד %{days} ימים. עד אז אפשר לבטל אותה."
+
+msgid "Confirm deletion"
+msgstr "אישור המחיקה"
+
+msgid "The link expires in 24 hours."
+msgstr "הקישור יפוג בעוד 24 שעות."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "אם לא ביקשת זאת, אין לפתוח את הקישור ויש לשנות את הסיסמה: מישהו אחר יודע אותה."

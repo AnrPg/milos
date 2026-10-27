@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Кто-то пытался зарегистрироваться с вашим адресом электронной почты"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Кто-то пытался создать аккаунт %{product} с этим адресом электронной почты."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Если это были вы, войдите, чтобы добавить профиль, или сбросьте пароль, если вы его забыли."
+
+msgid "Sign in"
+msgstr "Войти"
+
+msgid "Reset password"
+msgstr "Сбросить пароль"
+
+msgid "Forgot your password?"
+msgstr "Забыли пароль?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Если это были не вы, просто проигнорируйте это письмо. Аккаунт не создан, ничего не изменилось."
+
+msgid "Confirm deleting your account"
+msgstr "Подтвердите удаление аккаунта"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Вы запросили удаление своего профиля @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "Вы запросили удаление своего входа со всеми его профилями."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "После подтверждения удаление произойдёт через %{days} дней. До этого его можно отменить."
+
+msgid "Confirm deletion"
+msgstr "Подтвердить удаление"
+
+msgid "The link expires in 24 hours."
+msgstr "Ссылка действует 24 часа."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Если вы этого не запрашивали, не открывайте ссылку и смените пароль: его знает кто-то другой."

@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Qualcuno ha provato a registrarsi con la sua email"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Qualcuno ha provato a creare un account %{product} con questo indirizzo email."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Se è stato lei, acceda per aggiungere un profilo oppure reimposti la password se l’ha dimenticata."
+
+msgid "Sign in"
+msgstr "Accedi"
+
+msgid "Reset password"
+msgstr "Reimposta la password"
+
+msgid "Forgot your password?"
+msgstr "Ha dimenticato la password?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Se non è stato lei, può ignorare questa email. Non è stato creato alcun account e non è cambiato nulla."
+
+msgid "Confirm deleting your account"
+msgstr "Confermi l’eliminazione del suo account"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Ha chiesto di eliminare il suo profilo @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "Ha chiesto di eliminare il suo accesso con tutti i suoi profili."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "Dopo la conferma, l’eliminazione avverrà tra %{days} giorni. Fino ad allora può annullarla."
+
+msgid "Confirm deletion"
+msgstr "Conferma l’eliminazione"
+
+msgid "The link expires in 24 hours."
+msgstr "Il link scade tra 24 ore."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Se non l’ha chiesto lei, non apra il link e cambi la password: qualcun altro la conosce."

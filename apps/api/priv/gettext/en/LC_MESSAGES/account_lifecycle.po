@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Someone tried to sign up with your email"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Someone tried to create a %{product} account with this email address."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "If it was you, sign in to add a profile, or reset your password if you forgot it."
+
+msgid "Sign in"
+msgstr "Sign in"
+
+msgid "Reset password"
+msgstr "Reset password"
+
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+
+msgid "Confirm deleting your account"
+msgstr "Confirm deleting your account"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "You asked to delete your profile @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "You asked to delete your login with all its profiles."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+
+msgid "Confirm deletion"
+msgstr "Confirm deletion"
+
+msgid "The link expires in 24 hours."
+msgstr "The link expires in 24 hours."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "If you didn't ask for this, don't open the link and change your password: someone else knows it."

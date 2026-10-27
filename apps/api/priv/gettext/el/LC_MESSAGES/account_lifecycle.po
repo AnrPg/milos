@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Κάποιος προσπάθησε να εγγραφεί με το email σας"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Κάποιος προσπάθησε να δημιουργήσει λογαριασμό στο %{product} με αυτή τη διεύθυνση email."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Αν ήσασταν εσείς, συνδεθείτε για να προσθέσετε προφίλ ή επαναφέρετε τον κωδικό σας, αν τον ξεχάσατε."
+
+msgid "Sign in"
+msgstr "Σύνδεση"
+
+msgid "Reset password"
+msgstr "Επαναφορά κωδικού"
+
+msgid "Forgot your password?"
+msgstr "Ξεχάσατε τον κωδικό σας;"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Αν δεν ήσασταν εσείς, αγνοήστε αυτό το email. Δεν δημιουργήθηκε λογαριασμός και δεν άλλαξε τίποτα."
+
+msgid "Confirm deleting your account"
+msgstr "Επιβεβαιώστε τη διαγραφή του λογαριασμού σας"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Ζητήσατε να διαγραφεί το προφίλ σας @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "Ζητήσατε να διαγραφεί η σύνδεσή σας μαζί με όλα τα προφίλ της."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "Μόλις επιβεβαιώσετε, η διαγραφή θα γίνει σε %{days} ημέρες. Μέχρι τότε μπορείτε να την αναιρέσετε."
+
+msgid "Confirm deletion"
+msgstr "Επιβεβαίωση διαγραφής"
+
+msgid "The link expires in 24 hours."
+msgstr "Ο σύνδεσμος λήγει σε 24 ώρες."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Αν δεν το ζητήσατε εσείς, μην ανοίξετε τον σύνδεσμο και αλλάξτε τον κωδικό σας: κάποιος άλλος τον γνωρίζει."

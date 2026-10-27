@@ -352,6 +352,10 @@ defmodule PaleeWeb.Router do
     post("/password-reset-requests", PasswordRecoveryController, :request)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
+    # ADR-211: the emailed deletion links, and "undo" from the sign-in form.
+    post("/account-deletion/confirm", AccountDeletionController, :confirm)
+    post("/account-deletion/undo", AccountDeletionController, :undo)
+    post("/account-deletion/undo-sign-in", AccountDeletionController, :undo_sign_in)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -365,6 +369,16 @@ defmodule PaleeWeb.Router do
     post("/switch-profile", AccountProfilesController, :switch)
     get("/recovery-codes", PasswordRecoveryController, :codes_status)
     post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+    # ADR-211: self-service deletion of the profile or the whole login.
+    get("/account-deletion", AccountDeletionController, :show)
+    delete("/account-deletion", AccountDeletionController, :delete)
+  end
+
+  # ADR-211: asking takes the password, so a session gets few tries.
+  scope "/api/auth", PaleeWeb do
+    pipe_through([:api, :authenticated, :auth_rate_limited])
+
+    post("/account-deletion", AccountDeletionController, :create)
   end
 
   # ADR-187: the password reset requests the signed-in person can handle

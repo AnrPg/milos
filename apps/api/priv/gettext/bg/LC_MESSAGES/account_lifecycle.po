@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Някой се опита да се регистрира с вашия имейл"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Някой се опита да създаде акаунт в %{product} с този имейл адрес."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Ако сте били вие, влезте, за да добавите профил, или нулирайте паролата си, ако сте я забравили."
+
+msgid "Sign in"
+msgstr "Вход"
+
+msgid "Reset password"
+msgstr "Нулиране на паролата"
+
+msgid "Forgot your password?"
+msgstr "Забравили сте паролата си?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Ако не сте били вие, можете да пренебрегнете този имейл. Не е създаден акаунт и нищо не е променено."
+
+msgid "Confirm deleting your account"
+msgstr "Потвърдете изтриването на акаунта си"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Поискахте изтриване на профила си @%{handle}."
+
+msgid "You asked to delete your login with all its profiles."
+msgstr "Поискахте изтриване на входа си заедно с всичките му профили."
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "След потвърждение изтриването ще се извърши след %{days} дни. Дотогава можете да го отмените."
+
+msgid "Confirm deletion"
+msgstr "Потвърждаване на изтриването"
+
+msgid "The link expires in 24 hours."
+msgstr "Връзката изтича след 24 часа."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Ако не сте поискали това, не отваряйте връзката и сменете паролата си: някой друг я знае."

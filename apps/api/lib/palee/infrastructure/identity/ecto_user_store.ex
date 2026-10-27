@@ -23,6 +23,21 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   @impl true
   def create_login_with_profile(params), do: create_login(params, nil)
 
+  # ADR-211: the same checks, in the same order, as `create_login/2` runs
+  # before it writes, so a sign-up that only pretends (an email that already
+  # has a login) refuses exactly what a real one would.
+  @impl true
+  def validate_new_login(params) do
+    profile_changeset = User.profile_create_changeset(%User{}, nil, params)
+
+    with {:ok, _profile} <- Ecto.Changeset.apply_action(profile_changeset, :insert),
+         :ok <- ensure_handle_free(Ecto.Changeset.get_field(profile_changeset, :handle), nil),
+         {:ok, _login} <-
+           params |> Login.create_changeset() |> Ecto.Changeset.apply_action(:insert) do
+      :ok
+    end
+  end
+
   # ADR-184: a mock person of a demo business, marked for good at insert.
   @impl true
   def create_demo_person(organization_id, params) when is_binary(organization_id),
