@@ -352,6 +352,8 @@ defmodule PaleeWeb.Router do
     post("/password-reset-requests", PasswordRecoveryController, :request)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
+    # ADR-213: the emailed link's page posts its token here.
+    post("/verify-email", EmailVerificationController, :verify)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -365,6 +367,8 @@ defmodule PaleeWeb.Router do
     post("/switch-profile", AccountProfilesController, :switch)
     get("/recovery-codes", PasswordRecoveryController, :codes_status)
     post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+    # ADR-213: a new verification link for the signed-in login.
+    post("/verification-email", EmailVerificationController, :resend)
   end
 
   # ADR-187: the password reset requests the signed-in person can handle

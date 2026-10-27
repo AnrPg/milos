@@ -400,6 +400,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verification-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: email the signed-in person a new verification link */
+        post: operations["PaleeWeb.EmailVerificationController.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: confirm the login's email with the emailed link's token */
+        post: operations["PaleeWeb.EmailVerificationController.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-vocabulary": {
         parameters: {
             query?: never;
@@ -39765,6 +39799,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -39880,6 +39916,8 @@ export interface operations {
                         display_name: string;
                         /** @description The login's email, shared by its profiles */
                         email?: string;
+                        /** @description ADR-213: whether the login opened an emailed link to its current email */
+                        email_verified: boolean;
                         /** @description ADR-187: the unique @handle */
                         handle: string;
                         /** Format: uuid */
@@ -40208,6 +40246,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -40557,6 +40597,139 @@ export interface operations {
             };
             /** @description Not a profile of this login */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sent, or nothing to do */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "already_verified" | "sent";
+                    };
+                };
+            };
+            /** @description The address can't get email */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description A link was sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        retry_after_seconds: number;
+                    };
+                };
+            };
+            /** @description Email is busy today */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Email verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email_verified: boolean;
+                    };
+                };
+            };
+            /** @description Link already used, or the email changed since */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Link expired */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Unknown link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

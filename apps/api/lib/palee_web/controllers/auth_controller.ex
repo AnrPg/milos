@@ -32,6 +32,10 @@ defmodule PaleeWeb.AuthController do
       display_name: %Schema{type: :string},
       handle: %Schema{type: :string, description: "ADR-187: the unique @handle"},
       email: %Schema{type: :string, description: "The login's email, shared by its profiles"},
+      email_verified: %Schema{
+        type: :boolean,
+        description: "ADR-213: whether the login opened an emailed link to its current email"
+      },
       profile_count: %Schema{type: :integer},
       profile_limit: %Schema{type: :integer},
       role: %Schema{type: :string},
@@ -58,14 +62,15 @@ defmodule PaleeWeb.AuthController do
       }
     },
     required: [
+      :completed_tours,
+      :display_name,
+      :email_verified,
+      :handle,
       :id,
       :nickname,
-      :display_name,
-      :handle,
-      :role,
-      :vendor,
       :preferred_locale,
-      :completed_tours
+      :role,
+      :vendor
     ]
   }
 
@@ -595,6 +600,7 @@ defmodule PaleeWeb.AuthController do
       display_name: user.nickname,
       handle: Map.get(user, :handle) || Map.get(user, :normalized_nickname),
       email: Map.get(user, :email),
+      email_verified: Palee.Identity.email_verified?(user),
       profile_count: profile_count,
       profile_limit: Palee.Identity.max_profiles(),
       role: to_string(user.role),

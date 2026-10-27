@@ -577,6 +577,16 @@ defmodule PaleeWeb.AuthControllerTest do
       assert body["role"] == "member"
       assert body["vendor"] == false
       assert body["preferred_locale"] == "en"
+      # ADR-213: unverified until an emailed link is opened.
+      assert body["email_verified"] == false
+
+      :ok = Identity.mark_email_verified(user.login_id, user.email)
+
+      assert %{"email_verified" => true} =
+               build_conn()
+               |> put_req_header("authorization", "Bearer " <> access_token)
+               |> get("/api/auth/me")
+               |> json_response(200)
     end
 
     test "marks vendor accounts", %{conn: conn} do

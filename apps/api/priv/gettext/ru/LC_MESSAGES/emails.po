@@ -30,3 +30,20 @@ msgstr "Здравствуйте, %{name}!"
 
 msgid "Hello,"
 msgstr "Здравствуйте!"
+
+# ADR-213: verify_email
+
+msgid "Confirm your email address"
+msgstr "Подтвердите адрес электронной почты"
+
+msgid "Please confirm that %{email} is your email address. It lets you get back into your account if you ever forget your password."
+msgstr "Подтвердите, что %{email} — ваш адрес электронной почты. Так вы сможете вернуться в свою учётную запись, если когда-нибудь забудете пароль."
+
+msgid "Confirm email"
+msgstr "Подтвердить адрес"
+
+msgid "This link expires in 48 hours."
+msgstr "Ссылка действительна 48 часов."
+
+msgid "If you didn't create a %{product} account, you can ignore this email."
+msgstr "Если вы не создавали учётную запись в %{product}, просто проигнорируйте это письмо."
