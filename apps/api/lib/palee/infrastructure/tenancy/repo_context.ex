@@ -30,6 +30,13 @@ defmodule Palee.Infrastructure.Tenancy.RepoContext do
     with_settings(contextual_settings(context), fun)
   end
 
+  # TD-205: granting or revoking a vendor is an operator action (the
+  # palee.platform.*_vendor tasks, or a release rpc). The vendors write policy
+  # admits it only under this setting, which no request path sets.
+  def run(%{vendor_grant: true} = context, fun) when is_function(fun, 0) do
+    with_settings([{"app.vendor_grant", "true"} | contextual_settings(context)], fun)
+  end
+
   def run(_context, _fun), do: {:error, :missing_ownership_scope}
 
   # The settings this process holds on its checked-out connection while inside

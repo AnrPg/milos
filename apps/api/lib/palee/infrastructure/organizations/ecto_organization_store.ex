@@ -466,28 +466,34 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Repo.one()
   end
 
+  # Operator actions: the vendors table admits writes only from a vendor or
+  # under the operator scope (TD-205).
   @impl true
   def grant_vendor(user_id) do
-    %Vendor{}
-    |> Vendor.changeset(%{user_id: user_id, status: :active})
-    |> Repo.insert(
-      on_conflict: {:replace, [:status, :updated_at]},
-      conflict_target: [:user_id],
-      returning: true
-    )
+    RepoContext.run(%{vendor_grant: true}, fn ->
+      %Vendor{}
+      |> Vendor.changeset(%{user_id: user_id, status: :active})
+      |> Repo.insert(
+        on_conflict: {:replace, [:status, :updated_at]},
+        conflict_target: [:user_id],
+        returning: true
+      )
+    end)
   end
 
   @impl true
   def revoke_vendor(user_id) do
-    case Repo.get_by(Vendor, user_id: user_id) do
-      nil ->
-        {:error, :not_found}
+    RepoContext.run(%{vendor_grant: true}, fn ->
+      case Repo.get_by(Vendor, user_id: user_id) do
+        nil ->
+          {:error, :not_found}
 
-      %Vendor{} = vendor ->
-        vendor
-        |> Vendor.changeset(%{status: :revoked})
-        |> Repo.update()
-    end
+        %Vendor{} = vendor ->
+          vendor
+          |> Vendor.changeset(%{status: :revoked})
+          |> Repo.update()
+      end
+    end)
   end
 
   @impl true
