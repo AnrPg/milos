@@ -210,3 +210,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-210 | Owner invitation email on the outbox; share links by email | Accepted |
 | ADR-207 | Email change confirmed by a link to the new address, revert link to the old one, 7-day lock | Accepted |
 | ADR-211 | Sign-up that does not reveal accounts; self-service deletion with password, emailed link and a 7-day undo | Accepted |
+| ADR-204 | An existing profile accepts an owner or staff invitation; an email with an account is told to use its password or sign in | Accepted |
+| ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |

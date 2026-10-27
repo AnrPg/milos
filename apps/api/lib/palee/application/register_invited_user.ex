@@ -1,6 +1,7 @@
 defmodule Palee.Application.RegisterInvitedUser do
   alias Palee.Application.{
     EmailVerification,
+    InvitationAccountRole,
     ManageCoachingRelationships,
     RegisterProfile,
     TokenIssuer
@@ -15,7 +16,7 @@ defmodule Palee.Application.RegisterInvitedUser do
 
     with {:ok, invitation} <- Organizations.inspect_invitation(token),
          :ok <- authorize_role(invitation.role, allowed_roles),
-         account_role = account_role_for_invitation(invitation.role),
+         account_role = InvitationAccountRole.for_invitation(invitation.role),
          {:ok, user} <- RegisterProfile.call(registration_params(params, account_role)),
          {:ok, redemption} <- redeem_or_cleanup(token, user),
          :ok <- start_invited_coaching(redemption, user),
@@ -52,14 +53,6 @@ defmodule Palee.Application.RegisterInvitedUser do
 
   defp start_invited_coaching(%{invitation: invitation, organization: organization}, user),
     do: ManageCoachingRelationships.start_invited(organization.id, invitation, user.id)
-
-  # ADR-095 surface role: every staff role works in the staff shell.
-  defp account_role_for_invitation(role)
-       when role in [:owner, :admin, :coach, :front_desk, :accountant, :janitor],
-       do: :admin
-
-  defp account_role_for_invitation(:athlete), do: :athlete
-  defp account_role_for_invitation(_role), do: :member
 
   defp self_registration_role(:athlete), do: :athlete
   defp self_registration_role(_role), do: :member

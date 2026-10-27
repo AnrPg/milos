@@ -147,7 +147,7 @@ test.describe("partners", () => {
     });
 
     await page.goto("/clubs/club-1");
-    await page.getByRole("tab", { name: "Members" }).click();
+    await page.getByRole("tab", { name: "Club members" }).click();
     const section = page.getByTestId("partners-section");
     await expect(section).toContainText("Find a training partner");
     await expect(section).toContainText("A match needs you both");

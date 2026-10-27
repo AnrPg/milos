@@ -85332,6 +85332,230 @@
         ]
       }
     },
+    "/api/auth/accept-invitation": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AuthController.accept_invitation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "description": "A new session when the profile's role changed (its old sessions end); null otherwise",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "user": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "completed_tours": {
+                              "items": {
+                                "enum": [
+                                  "admin",
+                                  "member",
+                                  "athlete",
+                                  "first_run"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "display_name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "description": "The login's email, shared by its profiles",
+                              "type": "string"
+                            },
+                            "email_verified": {
+                              "description": "ADR-213: whether the login opened an emailed link to its current email",
+                              "type": "boolean"
+                            },
+                            "handle": {
+                              "description": "ADR-187: the unique @handle",
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "description": "ADR-187: the display name (free, not unique); same as display_name",
+                              "type": "string"
+                            },
+                            "preferred_locale": {
+                              "enum": [
+                                "en",
+                                "el",
+                                "ar",
+                                "ru",
+                                "de",
+                                "es",
+                                "pt-PT",
+                                "he",
+                                "it",
+                                "bg",
+                                "nl",
+                                "fr"
+                              ],
+                              "type": "string"
+                            },
+                            "preferred_theme_slug": {
+                              "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                              "enum": [
+                                "frost",
+                                "graphite",
+                                null
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "profile_count": {
+                              "type": "integer"
+                            },
+                            "profile_limit": {
+                              "type": "integer"
+                            },
+                            "role": {
+                              "type": "string"
+                            },
+                            "time_zone": {
+                              "description": "ADR-179: the zone this account's device last reported",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "vendor": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "completed_tours",
+                            "display_name",
+                            "email_verified",
+                            "handle",
+                            "id",
+                            "nickname",
+                            "preferred_locale",
+                            "role",
+                            "vendor"
+                          ],
+                          "type": "object"
+                        }
+                      ],
+                      "description": "The profile as it is now, with access_token",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "roles",
+                    "access_token",
+                    "user"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "F-10: the invitation was issued to another email address",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation issued to another email"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid invitation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-204: the signed-in profile accepts an organization invitation",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/auth/account-deletion": {
       "delete": {
         "callbacks": {},
@@ -88020,6 +88244,28 @@
             },
             "description": "Access session"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "F-10: the invitation was issued to another email address",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation issued to another email"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -88037,6 +88283,34 @@
               }
             },
             "description": "Invalid invitation"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The email has accounts and the password is not theirs"
           },
           "422": {
             "content": {
@@ -88173,6 +88447,28 @@
             },
             "description": "Access session"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "F-10: the invitation was issued to another email address",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation issued to another email"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -88182,6 +88478,34 @@
               }
             },
             "description": "Invalid invitation"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "ADR-187: the email holds profiles and the password is not theirs; only the count is disclosed",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "profile_count": {
+                      "type": "integer"
+                    },
+                    "profile_limit": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The email has accounts and the password is not theirs"
           }
         },
         "summary": "Register through an organization invitation",

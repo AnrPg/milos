@@ -283,7 +283,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const items = (schedule?.items ?? []).filter((item) => itemDate(item) === day);
-          return <button key={day} type="button" className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))" : "var(--panel-muted)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => { setSelectedDate(day); setSelectedSlotId(""); setAssignmentModalOpen(true); }}>
+          return <button key={day} type="button" className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))" : "var(--panel-muted)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => { setSelectedDate(day); setSelectedSlotId(""); setError(null); setAssignmentModalOpen(true); }}>
             <span className="block text-xs font-semibold">{new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric" }).format(new Date(`${day}T12:00:00`))}</span>
             <span className="mt-2 block text-xs" style={{ color: "var(--muted)" }}>{items.length ? i18n("featureScheduledCount", { count: items.length }) : i18n("featureOpenDay")}</span>
             {items.slice(0, 2).map((item) => <span key={itemId(item)} className="mt-1 block truncate text-xs">
@@ -295,7 +295,8 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
       </div>
 
       {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
-      {error ? <ErrorNotice>{error}</ErrorNotice> : null}
+      {/* ADR-214: while the dialog is open, its errors show only inside it. */}
+      {error && !assignmentModalOpen ? <ErrorNotice>{error}</ErrorNotice> : null}
       <GroupOutcomeList rows={outcomeRows} />
 
       {assignmentModalOpen ? <Dialog onClose={() => setAssignmentModalOpen(false)} eyebrow={i18n("featureScheduleProgramming")} title={selectedDate} size="3xl" variant="center">
