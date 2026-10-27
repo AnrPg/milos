@@ -30,3 +30,167 @@ msgstr "Beste %{name},"
 
 msgid "Hello,"
 msgstr "Hallo,"
+
+# ADR-208: security notices
+
+msgid "You're receiving this security notice because it concerns your %{product} account. Security notices can't be turned off."
+msgstr "U ontvangt deze beveiligingsmelding omdat die over uw %{product}-account gaat. Beveiligingsmeldingen kunt u niet uitzetten."
+
+msgid "%{product} app"
+msgstr "%{product}-app"
+
+msgid "%{product} app on %{platform}"
+msgstr "%{product}-app op %{platform}"
+
+msgid "%{client} on %{platform}"
+msgstr "%{client} op %{platform}"
+
+msgid "Your password was changed"
+msgstr "Uw wachtwoord is gewijzigd"
+
+msgid "The password of your %{product} account was changed in Settings."
+msgstr "Het wachtwoord van uw %{product}-account is gewijzigd in Instellingen."
+
+msgid "Your password was reset"
+msgstr "Uw wachtwoord is opnieuw ingesteld"
+
+msgid "The password of your %{product} account was reset, and every device was signed out."
+msgstr "Het wachtwoord van uw %{product}-account is opnieuw ingesteld en alle apparaten zijn afgemeld."
+
+msgid "Someone signed in to your %{product} account asked to change its email address to %{email}. Nothing changes until the new address is confirmed."
+msgstr "Iemand die is ingelogd op uw %{product}-account heeft gevraagd het e-mailadres te wijzigen in %{email}. Er verandert niets tot het nieuwe adres is bevestigd."
+
+msgid "Someone signed in to your %{product} account asked to change its email address. Nothing changes until the new address is confirmed."
+msgstr "Iemand die is ingelogd op uw %{product}-account heeft gevraagd het e-mailadres te wijzigen. Er verandert niets tot het nieuwe adres is bevestigd."
+
+msgid "A change of your email address was requested"
+msgstr "Wijziging van uw e-mailadres aangevraagd"
+
+msgid "The email address of your %{product} account was changed to %{email}. Emails about your account now go there."
+msgstr "Het e-mailadres van uw %{product}-account is gewijzigd in %{email}. E-mails over uw account gaan nu daarheen."
+
+msgid "The email address of your %{product} account was changed. Emails about your account now go to the new address."
+msgstr "Het e-mailadres van uw %{product}-account is gewijzigd. E-mails over uw account gaan nu naar het nieuwe adres."
+
+msgid "Your email address was changed"
+msgstr "Uw e-mailadres is gewijzigd"
+
+msgid "If this was you, there's nothing else to do."
+msgstr "Was u dit zelf, dan hoeft u verder niets te doen."
+
+msgid "If this wasn't you, undo the change right away. Then sign out everywhere and choose a new password."
+msgstr "Was u dit niet, maak de wijziging dan meteen ongedaan. Meld u daarna overal af en kies een nieuw wachtwoord."
+
+msgid "Undo this change"
+msgstr "Deze wijziging ongedaan maken"
+
+msgid "A recovery code was used"
+msgstr "Er is een herstelcode gebruikt"
+
+msgid "One of your recovery codes was used to set a new password for your %{product} account, and every device was signed out."
+msgstr "Met een van uw herstelcodes is een nieuw wachtwoord ingesteld voor uw %{product}-account, en alle apparaten zijn afgemeld."
+
+msgid "New recovery codes were created"
+msgstr "Er zijn nieuwe herstelcodes gemaakt"
+
+msgid "New recovery codes were created for your %{product} account. The old codes no longer work."
+msgstr "Er zijn nieuwe herstelcodes gemaakt voor uw %{product}-account. De oude codes werken niet meer."
+
+msgid "You have no unused recovery codes left."
+msgstr "U hebt geen ongebruikte herstelcodes meer."
+
+msgid "You have only one unused recovery code left."
+msgstr "U hebt nog maar één ongebruikte herstelcode."
+
+msgid "You have only two unused recovery codes left."
+msgstr "U hebt nog maar twee ongebruikte herstelcodes."
+
+msgid "You're running out of recovery codes"
+msgstr "Uw herstelcodes raken op"
+
+msgid "Create new codes in Settings and keep them somewhere safe, so you can always get back into your account."
+msgstr "Maak nieuwe codes in Instellingen en bewaar ze op een veilige plek, zodat u altijd weer in uw account kunt."
+
+msgid "Open Settings"
+msgstr "Instellingen openen"
+
+msgid "You were signed out everywhere"
+msgstr "Overal afgemeld"
+
+msgid "Every device signed in to your %{product} account was signed out."
+msgstr "Alle apparaten die op uw %{product}-account waren ingelogd, zijn afgemeld."
+
+msgid "If this wasn't you, choose a new password right away."
+msgstr "Was u dit niet, kies dan meteen een nieuw wachtwoord."
+
+msgid "Choose a new password"
+msgstr "Nieuw wachtwoord kiezen"
+
+msgid "A new profile was added to your %{product} account: %{profile}."
+msgstr "Er is een nieuw profiel aan uw %{product}-account toegevoegd: %{profile}."
+
+msgid "A new profile was added to your %{product} account."
+msgstr "Er is een nieuw profiel aan uw %{product}-account toegevoegd."
+
+msgid "A profile was added to your account"
+msgstr "Er is een profiel aan uw account toegevoegd"
+
+msgid "New sign-in to your account"
+msgstr "Nieuwe aanmelding op uw account"
+
+msgid "Your %{product} account was just used to sign in on a device it hasn't been used on before."
+msgstr "Er is zojuist op uw %{product}-account ingelogd vanaf een apparaat dat daar nog nooit voor is gebruikt."
+
+msgid "Your profile will be deleted"
+msgstr "Uw profiel wordt verwijderd"
+
+msgid "Your profile %{profile} on %{product} will be deleted on %{date}."
+msgstr "Uw profiel %{profile} op %{product} wordt verwijderd op %{date}."
+
+msgid "Your account will be deleted"
+msgstr "Uw account wordt verwijderd"
+
+msgid "Your %{product} account and all its profiles will be deleted on %{date}."
+msgstr "Uw %{product}-account en al zijn profielen worden verwijderd op %{date}."
+
+msgid "Changed your mind? You can undo it until then."
+msgstr "Bedacht? Tot dan kunt u het ongedaan maken."
+
+msgid "If this wasn't you, undo the deletion right away. Then sign out everywhere and choose a new password."
+msgstr "Was u dit niet, maak de verwijdering dan meteen ongedaan. Meld u daarna overal af en kies een nieuw wachtwoord."
+
+msgid "Undo the deletion"
+msgstr "Verwijdering ongedaan maken"
+
+msgid "Your profile was deleted"
+msgstr "Uw profiel is verwijderd"
+
+msgid "Your profile %{profile} on %{product} was deleted, as you asked."
+msgstr "Uw profiel %{profile} op %{product} is verwijderd, zoals u had gevraagd."
+
+msgid "Your account was deleted"
+msgstr "Uw account is verwijderd"
+
+msgid "Your %{product} account and all its profiles were deleted, as you asked."
+msgstr "Uw %{product}-account en al zijn profielen zijn verwijderd, zoals u had gevraagd."
+
+msgid "If this wasn't you, sign out everywhere right away, then choose a new password."
+msgstr "Was u dit niet, meld u dan meteen overal af en kies daarna een nieuw wachtwoord."
+
+msgid "Sign out everywhere"
+msgstr "Overal afmelden"
+
+msgid "The sign-out link signs out every device, including this one, and works for 7 days."
+msgstr "De afmeldlink meldt alle apparaten af, ook dit apparaat, en werkt 7 dagen."
+
+msgid "When"
+msgstr "Wanneer"
+
+msgid "Device"
+msgstr "Apparaat"
+
+msgid "Location"
+msgstr "Locatie"
+
+msgid "IP address"
+msgstr "IP-adres"

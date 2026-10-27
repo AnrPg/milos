@@ -1,5 +1,6 @@
 defmodule PaleeWeb.AuthControllerTest do
   use PaleeWeb.ConnCase, async: false
+  use Palee.EmailCase
 
   alias Palee.Identity
   alias Palee.Organizations
@@ -411,6 +412,66 @@ defmodule PaleeWeb.AuthControllerTest do
         )
 
       assert %{"error" => "Authentication service unavailable"} = json_response(conn, 500)
+    end
+  end
+
+  describe "new-sign-in alert (ADR-208)" do
+    @chrome "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36"
+
+    setup do
+      {:ok, _user} =
+        Identity.register(%{
+          nickname: "traveller",
+          password: "S3cur3P@ss!42",
+          role: :member,
+          email: "traveller@example.com"
+        })
+
+      :ok
+    end
+
+    defp sign_in(conn, device_id) do
+      conn
+      |> put_req_header("content-type", "application/json")
+      |> put_req_header("user-agent", @chrome)
+      |> then(&if(device_id, do: put_req_header(&1, "x-palee-device-id", device_id), else: &1))
+      |> post(
+        "/api/auth/login",
+        Jason.encode!(%{identifier: "traveller", password: "S3cur3P@ss!42"})
+      )
+    end
+
+    test "remembers the device in a long-lived cookie and alerts only on a new one", %{conn: conn} do
+      laptop = String.duplicate("L", 32)
+      first = sign_in(conn, laptop)
+      assert json_response(first, 200)["access_token"]
+      assert %{value: ^laptop, http_only: true} = first.resp_cookies["palee_device"]
+      refute_email_enqueued(kind: :security_new_sign_in)
+
+      # Same device again (cookie only): known.
+      build_conn() |> put_req_cookie("palee_device", laptop) |> sign_in(nil) |> json_response(200)
+      refute_email_enqueued(kind: :security_new_sign_in)
+
+      # A device never seen, without any id: the API gives it one, and alerts.
+      fresh = build_conn() |> sign_in(nil)
+      assert json_response(fresh, 200)
+      assert fresh.resp_cookies["palee_device"].value != laptop
+      message = assert_email_enqueued(kind: :security_new_sign_in, to: "traveller@example.com")
+      assert message.text =~ "Chrome on Windows"
+    end
+
+    test "a token refresh is not a sign-in", %{conn: conn} do
+      signed_in = sign_in(conn, String.duplicate("A", 32))
+      refresh_token = signed_in.resp_cookies["palee_refresh"].value
+
+      build_conn()
+      |> put_req_cookie("palee_refresh", refresh_token)
+      |> put_req_header("x-palee-device-id", String.duplicate("B", 32))
+      |> post("/api/auth/refresh", %{})
+      |> json_response(200)
+
+      assert [_one] = Palee.Repo.all(Palee.Identity.LoginDevice)
+      refute_email_enqueued(kind: :security_new_sign_in)
     end
   end
 

@@ -30,3 +30,167 @@ msgstr "Здравейте, %{name},"
 
 msgid "Hello,"
 msgstr "Здравейте,"
+
+# ADR-208: security notices
+
+msgid "You're receiving this security notice because it concerns your %{product} account. Security notices can't be turned off."
+msgstr "Получавате това известие за сигурност, защото засяга акаунта ви в %{product}. Известията за сигурност не могат да се изключат."
+
+msgid "%{product} app"
+msgstr "Приложението %{product}"
+
+msgid "%{product} app on %{platform}"
+msgstr "Приложението %{product} на %{platform}"
+
+msgid "%{client} on %{platform}"
+msgstr "%{client} на %{platform}"
+
+msgid "Your password was changed"
+msgstr "Паролата ви беше променена"
+
+msgid "The password of your %{product} account was changed in Settings."
+msgstr "Паролата на акаунта ви в %{product} беше променена от Настройки."
+
+msgid "Your password was reset"
+msgstr "Паролата ви беше нулирана"
+
+msgid "The password of your %{product} account was reset, and every device was signed out."
+msgstr "Паролата на акаунта ви в %{product} беше нулирана и всички устройства бяха отписани."
+
+msgid "Someone signed in to your %{product} account asked to change its email address to %{email}. Nothing changes until the new address is confirmed."
+msgstr "Някой, влязъл в акаунта ви в %{product}, поиска имейл адресът му да бъде сменен с %{email}. Нищо не се променя, докато новият адрес не бъде потвърден."
+
+msgid "Someone signed in to your %{product} account asked to change its email address. Nothing changes until the new address is confirmed."
+msgstr "Някой, влязъл в акаунта ви в %{product}, поиска имейл адресът му да бъде сменен. Нищо не се променя, докато новият адрес не бъде потвърден."
+
+msgid "A change of your email address was requested"
+msgstr "Поискана е смяна на имейл адреса ви"
+
+msgid "The email address of your %{product} account was changed to %{email}. Emails about your account now go there."
+msgstr "Имейл адресът на акаунта ви в %{product} беше сменен с %{email}. Имейлите за акаунта ви вече отиват там."
+
+msgid "The email address of your %{product} account was changed. Emails about your account now go to the new address."
+msgstr "Имейл адресът на акаунта ви в %{product} беше сменен. Имейлите за акаунта ви вече отиват на новия адрес."
+
+msgid "Your email address was changed"
+msgstr "Имейл адресът ви беше сменен"
+
+msgid "If this was you, there's nothing else to do."
+msgstr "Ако сте били вие, не е нужно да правите нищо повече."
+
+msgid "If this wasn't you, undo the change right away. Then sign out everywhere and choose a new password."
+msgstr "Ако не сте били вие, отменете промяната веднага. След това излезте от всички устройства и изберете нова парола."
+
+msgid "Undo this change"
+msgstr "Отмяна на промяната"
+
+msgid "A recovery code was used"
+msgstr "Беше използван код за възстановяване"
+
+msgid "One of your recovery codes was used to set a new password for your %{product} account, and every device was signed out."
+msgstr "Един от кодовете ви за възстановяване беше използван за задаване на нова парола на акаунта ви в %{product} и всички устройства бяха отписани."
+
+msgid "New recovery codes were created"
+msgstr "Създадени са нови кодове за възстановяване"
+
+msgid "New recovery codes were created for your %{product} account. The old codes no longer work."
+msgstr "Създадени са нови кодове за възстановяване за акаунта ви в %{product}. Старите кодове вече не важат."
+
+msgid "You have no unused recovery codes left."
+msgstr "Не ви остана нито един неизползван код за възстановяване."
+
+msgid "You have only one unused recovery code left."
+msgstr "Остана ви само един неизползван код за възстановяване."
+
+msgid "You have only two unused recovery codes left."
+msgstr "Останаха ви само два неизползвани кода за възстановяване."
+
+msgid "You're running out of recovery codes"
+msgstr "Кодовете ви за възстановяване свършват"
+
+msgid "Create new codes in Settings and keep them somewhere safe, so you can always get back into your account."
+msgstr "Създайте нови кодове от Настройки и ги пазете на сигурно място, за да можете винаги да влезете отново в акаунта си."
+
+msgid "Open Settings"
+msgstr "Към Настройки"
+
+msgid "You were signed out everywhere"
+msgstr "Излязохте от всички устройства"
+
+msgid "Every device signed in to your %{product} account was signed out."
+msgstr "Всички устройства, влезли в акаунта ви в %{product}, бяха отписани."
+
+msgid "If this wasn't you, choose a new password right away."
+msgstr "Ако не сте били вие, изберете нова парола веднага."
+
+msgid "Choose a new password"
+msgstr "Изберете нова парола"
+
+msgid "A new profile was added to your %{product} account: %{profile}."
+msgstr "Към акаунта ви в %{product} беше добавен нов профил: %{profile}."
+
+msgid "A new profile was added to your %{product} account."
+msgstr "Към акаунта ви в %{product} беше добавен нов профил."
+
+msgid "A profile was added to your account"
+msgstr "Към акаунта ви беше добавен профил"
+
+msgid "New sign-in to your account"
+msgstr "Ново влизане в акаунта ви"
+
+msgid "Your %{product} account was just used to sign in on a device it hasn't been used on before."
+msgstr "Току-що в акаунта ви в %{product} се влезе от устройство, от което досега не е влизано."
+
+msgid "Your profile will be deleted"
+msgstr "Профилът ви ще бъде изтрит"
+
+msgid "Your profile %{profile} on %{product} will be deleted on %{date}."
+msgstr "Профилът ви %{profile} в %{product} ще бъде изтрит на %{date}."
+
+msgid "Your account will be deleted"
+msgstr "Акаунтът ви ще бъде изтрит"
+
+msgid "Your %{product} account and all its profiles will be deleted on %{date}."
+msgstr "Акаунтът ви в %{product} и всичките му профили ще бъдат изтрити на %{date}."
+
+msgid "Changed your mind? You can undo it until then."
+msgstr "Размислихте ли? Дотогава можете да го отмените."
+
+msgid "If this wasn't you, undo the deletion right away. Then sign out everywhere and choose a new password."
+msgstr "Ако не сте били вие, отменете изтриването веднага. След това излезте от всички устройства и изберете нова парола."
+
+msgid "Undo the deletion"
+msgstr "Отмяна на изтриването"
+
+msgid "Your profile was deleted"
+msgstr "Профилът ви беше изтрит"
+
+msgid "Your profile %{profile} on %{product} was deleted, as you asked."
+msgstr "Профилът ви %{profile} в %{product} беше изтрит, както поискахте."
+
+msgid "Your account was deleted"
+msgstr "Акаунтът ви беше изтрит"
+
+msgid "Your %{product} account and all its profiles were deleted, as you asked."
+msgstr "Акаунтът ви в %{product} и всичките му профили бяха изтрити, както поискахте."
+
+msgid "If this wasn't you, sign out everywhere right away, then choose a new password."
+msgstr "Ако не сте били вие, излезте веднага от всички устройства и след това изберете нова парола."
+
+msgid "Sign out everywhere"
+msgstr "Изход от всички устройства"
+
+msgid "The sign-out link signs out every device, including this one, and works for 7 days."
+msgstr "Връзката отписва всички устройства, включително това, и важи 7 дни."
+
+msgid "When"
+msgstr "Кога"
+
+msgid "Device"
+msgstr "Устройство"
+
+msgid "Location"
+msgstr "Местоположение"
+
+msgid "IP address"
+msgstr "IP адрес"

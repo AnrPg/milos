@@ -352,6 +352,8 @@ defmodule PaleeWeb.Router do
     post("/password-reset-requests", PasswordRecoveryController, :request)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
+    # ADR-208: a security notice's emailed "sign out everywhere" link.
+    post("/sign-out-everywhere", SecurityLinkController, :sign_out_everywhere)
   end
 
   scope "/api/auth", PaleeWeb do

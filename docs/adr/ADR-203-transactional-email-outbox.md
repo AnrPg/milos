@@ -163,7 +163,7 @@ status of one record.
 | `email_change_revert` | 7 days | **no**, every change keeps its revert link |
 | `password_reset` | 1 h | yes |
 | `account_deletion` | 24 h | yes |
-| `sign_out_everywhere` | 7 days | yes |
+| `sign_out_everywhere` | 7 days | **no** since ADR-208, every security notice keeps its own link |
 
 Purposes are accepted as atoms or strings. An unknown purpose raises
 `ArgumentError` on `issue` and returns `{:error, :invalid}` elsewhere. A

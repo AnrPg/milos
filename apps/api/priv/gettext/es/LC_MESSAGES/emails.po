@@ -30,3 +30,167 @@ msgstr "Hola, %{name}:"
 
 msgid "Hello,"
 msgstr "Hola:"
+
+# ADR-208: security notices
+
+msgid "You're receiving this security notice because it concerns your %{product} account. Security notices can't be turned off."
+msgstr "Recibe este aviso de seguridad porque afecta a su cuenta de %{product}. Los avisos de seguridad no se pueden desactivar."
+
+msgid "%{product} app"
+msgstr "App de %{product}"
+
+msgid "%{product} app on %{platform}"
+msgstr "App de %{product} en %{platform}"
+
+msgid "%{client} on %{platform}"
+msgstr "%{client} en %{platform}"
+
+msgid "Your password was changed"
+msgstr "Se ha cambiado su contraseña"
+
+msgid "The password of your %{product} account was changed in Settings."
+msgstr "La contraseña de su cuenta de %{product} se ha cambiado en Ajustes."
+
+msgid "Your password was reset"
+msgstr "Se ha restablecido su contraseña"
+
+msgid "The password of your %{product} account was reset, and every device was signed out."
+msgstr "La contraseña de su cuenta de %{product} se ha restablecido y se ha cerrado la sesión en todos los dispositivos."
+
+msgid "Someone signed in to your %{product} account asked to change its email address to %{email}. Nothing changes until the new address is confirmed."
+msgstr "Alguien con la sesión iniciada en su cuenta de %{product} ha pedido cambiar su dirección de correo a %{email}. No cambia nada hasta que se confirme la nueva dirección."
+
+msgid "Someone signed in to your %{product} account asked to change its email address. Nothing changes until the new address is confirmed."
+msgstr "Alguien con la sesión iniciada en su cuenta de %{product} ha pedido cambiar su dirección de correo. No cambia nada hasta que se confirme la nueva dirección."
+
+msgid "A change of your email address was requested"
+msgstr "Se ha pedido cambiar su dirección de correo"
+
+msgid "The email address of your %{product} account was changed to %{email}. Emails about your account now go there."
+msgstr "La dirección de correo de su cuenta de %{product} se ha cambiado a %{email}. Los correos sobre su cuenta llegan ahora allí."
+
+msgid "The email address of your %{product} account was changed. Emails about your account now go to the new address."
+msgstr "La dirección de correo de su cuenta de %{product} se ha cambiado. Los correos sobre su cuenta llegan ahora a la nueva dirección."
+
+msgid "Your email address was changed"
+msgstr "Se ha cambiado su dirección de correo"
+
+msgid "If this was you, there's nothing else to do."
+msgstr "Si ha sido usted, no tiene que hacer nada más."
+
+msgid "If this wasn't you, undo the change right away. Then sign out everywhere and choose a new password."
+msgstr "Si no ha sido usted, deshaga el cambio ahora mismo. Después cierre la sesión en todas partes y elija una contraseña nueva."
+
+msgid "Undo this change"
+msgstr "Deshacer este cambio"
+
+msgid "A recovery code was used"
+msgstr "Se ha usado un código de recuperación"
+
+msgid "One of your recovery codes was used to set a new password for your %{product} account, and every device was signed out."
+msgstr "Se ha usado uno de sus códigos de recuperación para poner una contraseña nueva en su cuenta de %{product}, y se ha cerrado la sesión en todos los dispositivos."
+
+msgid "New recovery codes were created"
+msgstr "Se han creado códigos de recuperación nuevos"
+
+msgid "New recovery codes were created for your %{product} account. The old codes no longer work."
+msgstr "Se han creado códigos de recuperación nuevos para su cuenta de %{product}. Los códigos antiguos ya no sirven."
+
+msgid "You have no unused recovery codes left."
+msgstr "No le queda ningún código de recuperación sin usar."
+
+msgid "You have only one unused recovery code left."
+msgstr "Solo le queda un código de recuperación sin usar."
+
+msgid "You have only two unused recovery codes left."
+msgstr "Solo le quedan dos códigos de recuperación sin usar."
+
+msgid "You're running out of recovery codes"
+msgstr "Se le acaban los códigos de recuperación"
+
+msgid "Create new codes in Settings and keep them somewhere safe, so you can always get back into your account."
+msgstr "Cree códigos nuevos en Ajustes y guárdelos en un lugar seguro para poder volver siempre a su cuenta."
+
+msgid "Open Settings"
+msgstr "Abrir Ajustes"
+
+msgid "You were signed out everywhere"
+msgstr "Se ha cerrado su sesión en todas partes"
+
+msgid "Every device signed in to your %{product} account was signed out."
+msgstr "Se ha cerrado la sesión en todos los dispositivos conectados a su cuenta de %{product}."
+
+msgid "If this wasn't you, choose a new password right away."
+msgstr "Si no ha sido usted, elija una contraseña nueva ahora mismo."
+
+msgid "Choose a new password"
+msgstr "Elegir una contraseña nueva"
+
+msgid "A new profile was added to your %{product} account: %{profile}."
+msgstr "Se ha añadido un perfil nuevo a su cuenta de %{product}: %{profile}."
+
+msgid "A new profile was added to your %{product} account."
+msgstr "Se ha añadido un perfil nuevo a su cuenta de %{product}."
+
+msgid "A profile was added to your account"
+msgstr "Se ha añadido un perfil a su cuenta"
+
+msgid "New sign-in to your account"
+msgstr "Nuevo inicio de sesión en su cuenta"
+
+msgid "Your %{product} account was just used to sign in on a device it hasn't been used on before."
+msgstr "Acaban de iniciar sesión en su cuenta de %{product} desde un dispositivo que nunca se había usado con ella."
+
+msgid "Your profile will be deleted"
+msgstr "Su perfil se va a eliminar"
+
+msgid "Your profile %{profile} on %{product} will be deleted on %{date}."
+msgstr "Su perfil %{profile} en %{product} se eliminará el %{date}."
+
+msgid "Your account will be deleted"
+msgstr "Su cuenta se va a eliminar"
+
+msgid "Your %{product} account and all its profiles will be deleted on %{date}."
+msgstr "Su cuenta de %{product} y todos sus perfiles se eliminarán el %{date}."
+
+msgid "Changed your mind? You can undo it until then."
+msgstr "¿Ha cambiado de opinión? Puede deshacerlo hasta entonces."
+
+msgid "If this wasn't you, undo the deletion right away. Then sign out everywhere and choose a new password."
+msgstr "Si no ha sido usted, deshaga la eliminación ahora mismo. Después cierre la sesión en todas partes y elija una contraseña nueva."
+
+msgid "Undo the deletion"
+msgstr "Deshacer la eliminación"
+
+msgid "Your profile was deleted"
+msgstr "Se ha eliminado su perfil"
+
+msgid "Your profile %{profile} on %{product} was deleted, as you asked."
+msgstr "Su perfil %{profile} en %{product} se ha eliminado, como pidió."
+
+msgid "Your account was deleted"
+msgstr "Se ha eliminado su cuenta"
+
+msgid "Your %{product} account and all its profiles were deleted, as you asked."
+msgstr "Su cuenta de %{product} y todos sus perfiles se han eliminado, como pidió."
+
+msgid "If this wasn't you, sign out everywhere right away, then choose a new password."
+msgstr "Si no ha sido usted, cierre la sesión en todas partes ahora mismo y después elija una contraseña nueva."
+
+msgid "Sign out everywhere"
+msgstr "Cerrar sesión en todas partes"
+
+msgid "The sign-out link signs out every device, including this one, and works for 7 days."
+msgstr "El enlace cierra la sesión en todos los dispositivos, también en este, y funciona durante 7 días."
+
+msgid "When"
+msgstr "Cuándo"
+
+msgid "Device"
+msgstr "Dispositivo"
+
+msgid "Location"
+msgstr "Ubicación"
+
+msgid "IP address"
+msgstr "Dirección IP"

@@ -201,3 +201,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-201 | WOD variation for several people at once: each programmed as if alone, results per person | Accepted |
 | ADR-202 | Spaces: floor plans, unavailability, class spaces, cleaning schedule and machine placement | Accepted |
 | ADR-203 | Transactional email outbox: templates, single-use link tokens, budgets, suppression | Accepted |
+| ADR-208 | Security notices by email, new-sign-in alert and the "sign out everywhere" link | Accepted |

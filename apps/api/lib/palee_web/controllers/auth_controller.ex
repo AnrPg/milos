@@ -491,8 +491,9 @@ defmodule PaleeWeb.AuthController do
 
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token} = result} ->
         conn
+        |> remember_device(result, :signed_up)
         |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
         |> json(%{access_token: access_token})
@@ -512,8 +513,9 @@ defmodule PaleeWeb.AuthController do
 
   defp register_invited(conn, allowed_roles) do
     case RegisterInvitedUser.call(conn.body_params, allowed_roles) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token} = result} ->
         conn
+        |> remember_device(result, :signed_up)
         |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
         |> json(%{access_token: access_token})
@@ -525,8 +527,9 @@ defmodule PaleeWeb.AuthController do
 
   def login(conn, _params) do
     case LoginUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user} = result} ->
         conn
+        |> remember_device(result, :signed_in)
         |> put_refresh_cookie(refresh_token)
         |> json(%{access_token: access_token, user: current_user_json(user)})
 
@@ -534,6 +537,21 @@ defmodule PaleeWeb.AuthController do
         error
     end
   end
+
+  # ADR-208: remember the device; a password sign-in from a new one alerts.
+  defp remember_device(conn, %{user: user}, step) do
+    {conn, context} = PaleeWeb.SignInDevice.context(conn)
+
+    :ok =
+      case step do
+        :signed_in -> Palee.Application.SignInDevices.signed_in(user, context)
+        :signed_up -> Palee.Application.SignInDevices.signed_up(user, context)
+      end
+
+    conn
+  end
+
+  defp remember_device(conn, _result, _step), do: conn
 
   def refresh(conn, _params) do
     conn = fetch_cookies(conn)

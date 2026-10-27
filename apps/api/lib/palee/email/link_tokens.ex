@@ -6,7 +6,7 @@ defmodule Palee.Email.LinkTokens do
   Purposes and their default lifetimes are in `LinkTokenPolicy`:
   `verify_email` (48 h), `email_change` (24 h), `email_change_revert`
   (7 days, never replaced), `password_reset` (1 h), `account_deletion`
-  (24 h), `sign_out_everywhere` (7 days). An unknown purpose raises
+  (24 h), `sign_out_everywhere` (7 days, never replaced; ADR-208). An unknown purpose raises
   `ArgumentError` on `issue/3` and is `{:error, :invalid}` elsewhere.
 
   The raw token is returned once, by `issue/3`, to be put in the link; only
