@@ -206,11 +206,11 @@ test.describe("shop console", () => {
     const calls = await shopApi(page);
 
     await page.goto("/admin/shop");
-    await expect(page.getByRole("heading", { name: "Sell to your members from the app" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sell to your box members from the app" })).toBeVisible();
     await expect(page.getByText("Add your first product")).toBeVisible();
     await expect(page.getByText("Check the pickup point")).toBeVisible();
     await expect(page.getByText("Publish to open the shop")).toBeVisible();
-    await expect(page.getByTestId("shop-open-state")).toHaveText("Closed to members");
+    await expect(page.getByTestId("shop-open-state")).toHaveText("Closed to box members");
     // No till before there is anything to sell.
     await expect(page.getByRole("link", { name: "Till" })).toHaveCount(0);
 

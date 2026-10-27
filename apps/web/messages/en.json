@@ -8799,7 +8799,7 @@
       "sectionTitle": "Workouts",
       "sectionDescription": "Defaults for new workouts.",
       "visibleByDefault": "Goals visible by default",
-      "visibleByDefaultHint": "The starting value of «Show goals to members» on workouts without goals of their own.",
+      "visibleByDefaultHint": "The starting value of «Show goals to box members» on workouts without goals of their own.",
       "feltPrompt": "«How did it feel?» without goals too",
       "feltPromptHint": "After a workout without goals, offer to mark on the body what you felt."
     },

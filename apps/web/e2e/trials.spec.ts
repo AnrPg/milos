@@ -178,7 +178,7 @@ test.describe("trials", () => {
     await page.getByRole("button", { name: "I want to join" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/b/${box.slug}/chat\\?draft=join`));
-    await expect(page.getByText("Offer for new members")).toBeVisible();
+    await expect(page.getByText("Offer for new box members")).toBeVisible();
     await expect(page.getByLabel("Write a message")).toHaveValue(/I'd like to join/);
   });
 });
