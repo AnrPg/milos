@@ -2,7 +2,7 @@ defmodule Palee.TestSupport.SampleEmail do
   @moduledoc """
   `:sample_notice`, a template registered only in tests (config/test.exs)
   for the outbox's own tests: a heading, a paragraph and a button.
-  Assigns: `name`, `url`, and optionally `throttle` (none by default).
+  Assigns: `name`, `url`. No throttle of its own: the category's default.
   """
 
   use Palee.Email.Template, category: :transactional
@@ -17,7 +17,4 @@ defmodule Palee.TestSupport.SampleEmail do
   @impl true
   def html(%{name: name, url: url}, locale),
     do: Layout.html(locale, [Layout.heading("Hello #{name}"), Layout.button("Open", url)])
-
-  @impl true
-  def throttle, do: %{min_interval_seconds: 0, max_per_day: 1_000}
 end

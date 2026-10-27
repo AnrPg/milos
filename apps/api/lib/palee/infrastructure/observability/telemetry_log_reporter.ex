@@ -120,6 +120,9 @@ defmodule Palee.Infrastructure.Observability.TelemetryLogReporter do
     do: {:ok, value}
 
   defp normalize_tag(value) when is_atom(value), do: {:ok, Atom.to_string(value)}
+  # A struct (an Oban.PerformError as a failed job's `reason`) has no JSON
+  # encoding; encoding it crashed the reporter on every failed job.
+  defp normalize_tag(%_{}), do: :drop
   defp normalize_tag(value) when is_map(value) or is_list(value), do: {:ok, Jason.encode!(value)}
   defp normalize_tag(_value), do: :drop
 end

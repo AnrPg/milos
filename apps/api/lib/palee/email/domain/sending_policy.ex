@@ -58,7 +58,11 @@ defmodule Palee.Email.Domain.SendingPolicy do
   (or queued) to it in the last 24 hours: `count` and the `last_at` of the
   newest one.
   """
-  @spec throttle(throttle(), %{count: non_neg_integer(), last_at: DateTime.t() | nil}, DateTime.t()) ::
+  @spec throttle(
+          throttle(),
+          %{count: non_neg_integer(), last_at: DateTime.t() | nil},
+          DateTime.t()
+        ) ::
           :ok | {:error, :throttled}
   def throttle(%{min_interval_seconds: interval, max_per_day: max}, recent, %DateTime{} = now) do
     cond do

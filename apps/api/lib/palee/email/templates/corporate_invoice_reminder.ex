@@ -13,7 +13,8 @@ defmodule Palee.Email.Templates.CorporateInvoiceReminder do
   alias Palee.Finance.Emails.CorporateInvoiceEmail
 
   @impl true
-  def subject(assigns, locale), do: CorporateInvoiceEmail.render(:reminder, assigns, locale).subject
+  def subject(assigns, locale),
+    do: CorporateInvoiceEmail.render(:reminder, assigns, locale).subject
 
   @impl true
   def text(assigns, locale), do: CorporateInvoiceEmail.render(:reminder, assigns, locale).text

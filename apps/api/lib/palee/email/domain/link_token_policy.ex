@@ -51,7 +51,9 @@ defmodule Palee.Email.Domain.LinkTokenPolicy do
   def hash(raw) when is_binary(raw), do: :crypto.hash(:sha256, raw)
 
   @doc "Whether a raw token is shaped like one `generate/0` makes (no lookup for junk)."
-  def well_formed?(raw) when is_binary(raw), do: byte_size(raw) == 43 and raw =~ ~r/\A[A-Za-z0-9_-]+\z/
+  def well_formed?(raw) when is_binary(raw),
+    do: byte_size(raw) == 43 and raw =~ ~r/\A[A-Za-z0-9_-]+\z/
+
   def well_formed?(_raw), do: false
 
   @doc "Whether the link's lifetime is over at `now`."

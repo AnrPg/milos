@@ -105,9 +105,16 @@ defmodule Palee.Email.Commands.DeliverEmail do
       if permanent?, do: {:cancel, reason}, else: {:error, reason}
     else
       {:ok, _message} =
-        store.update(message, %{status: "queued", attempts: message.attempts + 1, last_error: error})
+        store.update(message, %{
+          status: "queued",
+          attempts: message.attempts + 1,
+          last_error: error
+        })
 
-      Logger.warning("email_delivery_retry message=#{message.id} kind=#{message.kind} reason=#{error}")
+      Logger.warning(
+        "email_delivery_retry message=#{message.id} kind=#{message.kind} reason=#{error}"
+      )
+
       {:error, reason}
     end
   end

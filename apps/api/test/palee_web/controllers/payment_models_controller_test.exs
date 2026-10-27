@@ -5,6 +5,7 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
 
   alias Palee.{Finance, Organizations, Repo}
 
+  import Palee.EmailCase
   import Palee.TestFixtures
   import Swoosh.TestAssertions
 
@@ -349,6 +350,8 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
     assert %{"invoice" => %{"status" => "issued"}} =
              admin_conn |> send_json(:post, "#{invoice_path}/send", %{}) |> json_response(200)
 
+    assert_email_enqueued(kind: :corporate_invoice_issued, to: "billing@acme.test")
+    assert deliver_enqueued_emails() == 1
     assert_email_sent(to: [{"", "billing@acme.test"}])
 
     admin_conn
@@ -398,6 +401,7 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
       gym_today() |> Date.beginning_of_month() |> Date.shift(month: 1) |> Date.add(2)
 
     assert %{issued: 1, reminded: 0} = CorporateInvoicing.run(tenant, issue_day)
+    assert deliver_enqueued_emails() == 1
     assert_email_sent(fn email -> String.starts_with?(email.subject, "Invoice ") end)
 
     assert [%{total_cents: 6000, status: "issued", due_on: due_on}] =
@@ -408,9 +412,14 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
 
     late = Date.add(due_on, 1)
     assert %{overdue: 1, reminded: 1} = CorporateInvoicing.run(tenant, late)
+    assert deliver_enqueued_emails() == 1
     assert_email_sent(fn email -> String.starts_with?(email.subject, "Reminder: invoice ") end)
     assert %{reminded: 0} = CorporateInvoicing.run(tenant, Date.add(late, 3))
     assert %{reminded: 1} = CorporateInvoicing.run(tenant, Date.add(late, 7))
+
+    # ADR-203: the run's emails are idempotent per invoice and reminder day.
+    assert %{reminded: 0} = CorporateInvoicing.run(tenant, Date.add(late, 7))
+    assert length(enqueued_emails(kind: :corporate_invoice_reminder, to: "ap@initech.test")) == 2
 
     assert [%{status: "overdue", reminder_count: 2}] =
              Finance.list_corporate_invoices(context, client.id)

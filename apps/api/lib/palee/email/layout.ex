@@ -49,10 +49,14 @@ defmodule Palee.Email.Layout do
 
   def reason(locale, {:business, name}),
     do:
-      t(locale, "You're receiving this email because %{business} sent it to you through %{product}.", %{
-        business: name,
-        product: product_name()
-      })
+      t(
+        locale,
+        "You're receiving this email because %{business} sent it to you through %{product}.",
+        %{
+          business: name,
+          product: product_name()
+        }
+      )
 
   @doc "Whether `locale` is written right to left."
   def rtl?(locale), do: locale in @rtl_locales
@@ -126,7 +130,8 @@ defmodule Palee.Email.Layout do
 
   @doc "Small print under the content (lifetimes, \"if this wasn't you\")."
   def note(text),
-    do: ~s(<p style="margin:16px 0 0;font-size:13px;color:#{c(:text_soft)};">#{escape(text)}</p>\n)
+    do:
+      ~s(<p style="margin:16px 0 0;font-size:13px;color:#{c(:text_soft)};">#{escape(text)}</p>\n)
 
   @doc "The call to action: a button linking to `url`."
   def button(label, url) do
@@ -168,7 +173,8 @@ defmodule Palee.Email.Layout do
   def text_button(label, url), do: "#{label}:\n#{url}"
 
   @doc "The text twin of `details/1`."
-  def text_details(rows), do: Enum.map_join(rows, "\n", fn {label, value} -> "#{label}: #{value}" end)
+  def text_details(rows),
+    do: Enum.map_join(rows, "\n", fn {label, value} -> "#{label}: #{value}" end)
 
   # -- helpers -----------------------------------------------------------------
 
