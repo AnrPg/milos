@@ -169,6 +169,17 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "garmin-public")
   end
 
+  # ADR-212: Brevo's transactional webhook (bursts after a big send) and the
+  # one-click unsubscribe link of transactional email (mail apps POST it).
+  pipeline :email_provider_webhook do
+    plug(PaleeWeb.Plugs.RateLimit, max: 1200, interval: 60_000, bucket: "brevo-webhook")
+    plug(PaleeWeb.Plugs.WebhookSecret, config_key: :brevo_webhook_secret)
+  end
+
+  pipeline :email_unsubscribe do
+    plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "email-unsubscribe")
+  end
+
   # ADR-161: connecting, syncing and confirming device imports.
   pipeline :device_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit,
@@ -323,6 +334,20 @@ defmodule PaleeWeb.Router do
     post("/deregistration", GarminIntegrationController, :deregistration)
   end
 
+  # ADR-212: mail provider events and the unsubscribe link (no app session).
+  scope "/api/webhooks", PaleeWeb do
+    pipe_through([:email_provider_webhook])
+
+    post("/brevo", BrevoWebhookController, :create)
+  end
+
+  scope "/api/email/unsubscribe", PaleeWeb do
+    pipe_through([:email_unsubscribe])
+
+    get("/:token", EmailUnsubscribeController, :show)
+    post("/:token", EmailUnsubscribeController, :create)
+  end
+
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
   scope "/api" do
     pipe_through([:api, :slug_alias_rate_limited])
@@ -348,10 +373,22 @@ defmodule PaleeWeb.Router do
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
-    # ADR-187: password recovery without a mail service.
+    # ADR-187, ADR-206: password recovery (emailed link, handlers, codes).
     post("/password-reset-requests", PasswordRecoveryController, :request)
+    post("/password-reset/inspect", PasswordRecoveryController, :inspect_link)
     post("/password-reset", PasswordRecoveryController, :complete)
     post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
+    # ADR-213: the emailed link's page posts its token here.
+    post("/verify-email", EmailVerificationController, :verify)
+    # ADR-208: a security notice's emailed "sign out everywhere" link.
+    post("/sign-out-everywhere", SecurityLinkController, :sign_out_everywhere)
+    # ADR-207: the links of an email change (new address, then old address).
+    post("/email-change/confirm", EmailChangeController, :confirm)
+    post("/email-change/revert", EmailChangeController, :revert)
+    # ADR-211: the emailed deletion links, and "undo" from the sign-in form.
+    post("/account-deletion/confirm", AccountDeletionController, :confirm)
+    post("/account-deletion/undo", AccountDeletionController, :undo)
+    post("/account-deletion/undo-sign-in", AccountDeletionController, :undo_sign_in)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -365,6 +402,18 @@ defmodule PaleeWeb.Router do
     post("/switch-profile", AccountProfilesController, :switch)
     get("/recovery-codes", PasswordRecoveryController, :codes_status)
     post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+    # ADR-211: self-service deletion of the profile or the whole login.
+    get("/account-deletion", AccountDeletionController, :show)
+    delete("/account-deletion", AccountDeletionController, :delete)
+    # ADR-213: a new verification link for the signed-in login.
+    post("/verification-email", EmailVerificationController, :resend)
+  end
+
+  # ADR-211: asking takes the password, so a session gets few tries.
+  scope "/api/auth", PaleeWeb do
+    pipe_through([:api, :authenticated, :auth_rate_limited])
+
+    post("/account-deletion", AccountDeletionController, :create)
   end
 
   # ADR-187: the password reset requests the signed-in person can handle
@@ -413,6 +462,9 @@ defmodule PaleeWeb.Router do
 
     get("/invitations", OrganizationAccessController, :list_invitations)
     post("/invitations", OrganizationAccessController, :issue)
+    # ADR-209: invitations sent by email.
+    post("/invitations/bulk", OrganizationAccessController, :bulk_invite)
+    post("/invitations/:id/resend", OrganizationAccessController, :resend)
     get("/join-link", OrganizationAccessController, :show_join_link)
     put("/join-link", OrganizationAccessController, :update_join_link)
     delete("/invitations/:id", OrganizationAccessController, :revoke)
@@ -1303,6 +1355,12 @@ defmodule PaleeWeb.Router do
       :invitation_email
     )
 
+    get(
+      "/organizations/:id/invitations/:invitation_id/email",
+      PlatformOrganizationController,
+      :invitation_deliveries
+    )
+
     patch(
       "/organizations/:id/memberships/:membership_id/role",
       PlatformOrganizationController,
@@ -1400,6 +1458,11 @@ defmodule PaleeWeb.Router do
     ])
 
     patch("/profile", MeController, :update_profile)
+    # ADR-207: the login's pending email change.
+    get("/email-change", EmailChangeController, :show)
+    post("/email-change", EmailChangeController, :create)
+    post("/email-change/resend", EmailChangeController, :resend)
+    delete("/email-change", EmailChangeController, :delete)
     post("/tours/:audience/complete", MeController, :complete_tour)
     put("/time-zone", MeController, :update_time_zone)
     post("/avatar/upload-url", MeController, :avatar_upload_url)
@@ -1647,6 +1710,8 @@ defmodule PaleeWeb.Router do
     put("/me/buddies/settings", MyBuddiesController, :update_settings)
     post("/me/buddies", MyBuddiesController, :invite)
     post("/me/buddies/invite-links", MyBuddiesController, :create_invite_link)
+    # ADR-210: "Send by email" of a guest pass, buddy invite link or «Φέρε φίλο».
+    post("/me/share-links/email", ShareLinkEmailController, :create)
     post("/me/buddies/:id/accept", MyBuddiesController, :accept)
     post("/me/buddies/:id/decline", MyBuddiesController, :decline)
     post("/me/buddies/:id/leave", MyBuddiesController, :leave)

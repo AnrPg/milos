@@ -14,6 +14,10 @@ describe("parseJoinInput", () => {
     expect(parseJoinInput("  abc123  ")).toEqual({ kind: "invite", token: "abc123" });
   });
 
+  it("reads an emailed invitation link, whose token is in the fragment (ADR-209)", () => {
+    expect(parseJoinInput("https://palee.app/invite#token=abc123")).toEqual({ kind: "invite", token: "abc123" });
+  });
+
   it("rejects anything else", () => {
     expect(parseJoinInput("")).toBeNull();
     expect(parseJoinInput("two words")).toBeNull();

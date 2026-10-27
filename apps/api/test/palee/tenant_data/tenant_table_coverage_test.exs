@@ -10,8 +10,10 @@ defmodule Palee.TenantData.TenantTableCoverageTest do
   alias Palee.Application.TenantDataContexts
   alias Palee.Organizations
 
-  # Platform-level records that must survive a purge by design.
-  @not_tenant_data ~w(organization_purges)
+  # Platform-level records that must survive a purge by design. ADR-203: the
+  # email outbox is the platform's send log; a purge nils its organization_id
+  # (the foreign key) and the bodies are cleared once sent.
+  @not_tenant_data ~w(organization_purges email_messages)
 
   test "every organization_id table is owned by exactly one context policy" do
     declared =

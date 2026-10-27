@@ -32,6 +32,33 @@ defmodule Palee.Mailer do
 
   defp put_reply_to(email), do: email
 
+  @doc """
+  The TLS options for STARTTLS to `relay` (ADR-212): TLS 1.2+, the peer
+  verified against the system CA store (CAStore's bundle when the image
+  has none), SNI with the relay's name and an https-style hostname check,
+  so a man in the middle cannot read the mail or the SMTP credentials.
+  """
+  def tls_options(relay) when is_binary(relay) and relay != "" do
+    [
+      versions: [:"tlsv1.2", :"tlsv1.3"],
+      verify: :verify_peer,
+      server_name_indication: String.to_charlist(relay),
+      depth: 99,
+      customize_hostname_check: [
+        match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+      ]
+    ] ++ ca_options()
+  end
+
+  defp ca_options do
+    case :public_key.cacerts_get() do
+      [_ | _] = cacerts -> [cacerts: cacerts]
+      _none -> [cacertfile: CAStore.file_path()]
+    end
+  rescue
+    _no_system_store -> [cacertfile: CAStore.file_path()]
+  end
+
   def message_id(domain), do: "<#{Ecto.UUID.generate()}@#{domain}>"
 
   @doc """

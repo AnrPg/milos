@@ -107,7 +107,8 @@ defmodule Palee.Notifications.Notification do
     :class_workout_missing,
     :password_reset_requested,
     :password_reset_completed,
-    :business_demo_idle
+    :business_demo_idle,
+    :email_key_expiring
   ]
 
   schema "notifications" do

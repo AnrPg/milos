@@ -1,6 +1,10 @@
 defmodule Palee.Application.PasswordRecovery do
   @moduledoc """
-  ADR-187: password recovery without a mail service.
+  ADR-187 and ADR-206: password recovery.
+
+  ADR-206: a login whose email is verified gets a one-hour reset link by
+  email, automatically. Everyone else, and anyone who says they can't open
+  their inbox, falls back to the ADR-187 handlers below.
 
   A person who forgot their password asks for a reset by email or @handle;
   the answer never says whether the account exists. The request reaches the
@@ -16,59 +20,125 @@ defmodule Palee.Application.PasswordRecovery do
 
   require Logger
 
-  alias Palee.Application.PasswordVerifier
+  alias Palee.Application.{PasswordVerifier, PublicURL, SecurityNotices}
+  alias Palee.Email
+  alias Palee.Email.LinkTokens
   alias Palee.Identity
-  alias Palee.Identity.Domain.{PasswordResetPolicy, RecoveryCodes}
+  alias Palee.Identity.Domain.{Locale, PasswordResetPolicy, RecoveryCodes}
   alias Palee.Identity.PasswordResetStore, as: Store
   alias Palee.Identity.RegistrationPolicy
   alias Palee.Notifications
 
   @log_limit 500
+  @email_key "password_reset"
 
   # -- the person ----------------------------------------------------------
 
   @doc """
-  Files a request for the account named by `identifier` (an email or an
-  @handle). Always `:ok`: whether the account exists, or already has an open
-  request, is not revealed.
-  """
-  def request(identifier, now \\ DateTime.utc_now())
+  ADR-206: takes a "forgot password" request from the public form and hands
+  it to a background job (`request/2` does the work there). Every request
+  takes the same short path and gets the same answer, so neither the
+  answer nor its timing says whether the account exists, has a verified
+  email or already asked.
 
-  def request(identifier, now) when is_binary(identifier) do
-    with %{} = person <- find(identifier),
-         nil <- Store.get_request_for_login(person.login_id),
-         {:ok, request} <- Store.create_request(%{login_id: person.login_id, user_id: person.id}) do
-      log(:requested, person, nil)
-      notify_handlers(request, person, now)
+  Options: `:cant_access_email` (the person says they can't open their
+  inbox: go straight to the handlers), `:locale` (the page's language, for
+  an account that never chose one), `:requester_key` (an HMAC of the
+  client's IP, which caps handler requests a day).
+  """
+  def submit_request(identifier, opts \\ []) when is_binary(identifier) do
+    args = %{
+      identifier: identifier,
+      cant_access_email: Keyword.get(opts, :cant_access_email, false) == true,
+      locale: Keyword.get(opts, :locale),
+      requester_key:
+        case Keyword.get(opts, :requester_key) do
+          key when is_binary(key) -> Base.url_encode64(key, padding: false)
+          _none -> nil
+        end
+    }
+
+    case queue().submit(args) do
+      :ok -> :ok
+      {:error, reason} -> Logger.error("password_reset_submit_failed #{inspect(reason)}")
     end
 
     :ok
   end
 
-  def request(_identifier, _now), do: :ok
+  @doc """
+  Works out a request for the account named by `identifier` (an email or an
+  @handle). Always `:ok`: whether the account exists, or already has an open
+  request, is not revealed.
 
-  @doc "Sets a new password with a reset link's token."
+  ADR-206: a login whose email is verified gets a one-hour reset link by
+  email (at most one every 10 minutes and five a day). An unverified email,
+  a person who says they can't open their inbox (`cant_access_email: true`)
+  or an email that cannot go out (suppressed address, provider budget) files
+  the ADR-187 handler request instead. A request over the limits sends
+  nothing and is reported as an auth anomaly.
+  """
+  def request(identifier, opts \\ [])
+
+  def request(identifier, opts) when is_binary(identifier) and is_list(opts) do
+    now = Keyword.get_lazy(opts, :now, &DateTime.utc_now/0)
+
+    case find(identifier) do
+      %{} = person ->
+        if Keyword.get(opts, :cant_access_email, false) or not Identity.email_verified?(person),
+          do: file_handler_request(person, opts, now),
+          else: email_link(person, opts, now)
+
+      nil ->
+        :ok
+    end
+
+    :ok
+  end
+
+  def request(_identifier, _opts), do: :ok
+
+  @doc """
+  What a reset link's page may show before the password is typed (ADR-206):
+  `{:ok, %{expires_at: ...}}`, or `{:error, :invalid_reset_link |
+  :expired_reset_link | :used_reset_link}`. Never spends the link, so a
+  mail scanner or a reload cannot use it up.
+  """
+  def inspect_link(token, now \\ DateTime.utc_now())
+
+  def inspect_link(token, now) when is_binary(token) do
+    case LinkTokens.peek(:password_reset, token, now) do
+      {:ok, link} -> {:ok, %{expires_at: link.expires_at}}
+      {:error, :used} -> {:error, :used_reset_link}
+      {:error, :expired} -> {:error, :expired_reset_link}
+      {:error, :invalid} -> inspect_handler_link(token, now)
+    end
+  end
+
+  def inspect_link(_token, _now), do: {:error, :invalid_reset_link}
+
+  @doc """
+  Sets a new password with a reset link's token: an emailed link (ADR-206)
+  or one a handler mailed (ADR-187). The link is spent and the password set
+  in one transaction, so neither happens without the other. The new
+  password signs every profile of the login out; an emailed link also
+  proves the login reads its email, and closes any open handler request.
+  """
   def complete(token, password, now \\ DateTime.utc_now())
 
   def complete(token, password, now) when is_binary(token) and is_binary(password) do
     with {:password, true} <- {:password, RegistrationPolicy.valid_password?(password)},
-         %{} = request <-
-           Store.get_request_by_token_hash(PasswordResetPolicy.hash_token(token)) ||
-             {:error, :invalid_reset_link},
-         false <- PasswordResetPolicy.expired?(request, now),
-         :ok <- Identity.reset_login_password(request.login_id, password) do
-      :ok = Store.delete_request(request.id)
-      person = Identity.find_by_id(request.user_id)
+         {:ok, done} <- Store.transaction(fn -> spend(token, password, now) end) do
+      person =
+        Identity.find_by_id(done.user_id) || %{id: done.user_id, login_id: done.login_id}
 
-      handler =
-        request.link_issued_by_user_id && Identity.find_by_id(request.link_issued_by_user_id)
-
-      log(:completed, person || %{id: request.user_id, login_id: request.login_id}, handler)
-      notify_completed(request.user_id)
+      handler = done.handler_id && Identity.find_by_id(done.handler_id)
+      log(:completed, person, handler)
+      notify_completed(done.user_id)
+      if match?(%Identity.Account{}, person), do: notify_security(person)
       :ok
     else
       {:password, false} -> {:error, :weak_password}
-      true -> {:error, :expired_reset_link}
       {:error, _reason} = error -> error
     end
   end
@@ -92,6 +162,7 @@ defmodule Palee.Application.PasswordRecovery do
 
       log(:recovery_code_used, person, nil)
       notify_completed(person.id)
+      :ok = Palee.Application.RecoveryCodeNotices.code_used(person, now)
       :ok
     else
       {:password, false} -> {:error, :weak_password}
@@ -105,10 +176,11 @@ defmodule Palee.Application.PasswordRecovery do
   New recovery codes for the account's login; the old ones stop working.
   Asks for the current password so a borrowed session cannot mint codes.
   """
-  def generate_codes(%{login_id: login_id, password_hash: hash}, current_password) do
+  def generate_codes(%{login_id: login_id, password_hash: hash} = account, current_password) do
     if is_binary(current_password) and PasswordVerifier.verify(current_password, hash) do
       codes = RecoveryCodes.generate()
       :ok = Store.replace_recovery_codes(login_id, Enum.map(codes, &RecoveryCodes.hash/1))
+      :ok = Palee.Application.RecoveryCodeNotices.regenerated(account)
       {:ok, codes}
     else
       {:error, :invalid_current_password}
@@ -224,6 +296,178 @@ defmodule Palee.Application.PasswordRecovery do
   def log_entries, do: Store.list_log(@log_limit)
 
   # -- helpers -------------------------------------------------------------
+
+  defp email_link(person, opts, now) do
+    if PasswordResetPolicy.email_allowed?(emails_sent(person.login_id), now) do
+      case Store.transaction(fn -> issue_and_enqueue(person, opts, now) end) do
+        {:ok, _message} -> log(:link_emailed, person, nil)
+        {:error, :throttled} -> throttled(person, "password_reset_throttled")
+        # The address bounced, the provider's budget is spent, ...: people
+        # who know the person can still help.
+        {:error, _reason} -> file_handler_request(person, opts, now)
+      end
+    else
+      throttled(person, "password_reset_throttled")
+    end
+  end
+
+  # Issuing the link replaces the login's older unused one, so it happens
+  # only together with the email that carries the new one.
+  defp issue_and_enqueue(person, opts, now) do
+    with {:ok, raw, link} <-
+           LinkTokens.issue(:password_reset, person.login_id,
+             user_id: person.id,
+             target_email: person.email,
+             ttl_seconds: PasswordResetPolicy.email_link_ttl_seconds(),
+             now: now
+           ) do
+      Email.enqueue(
+        :password_reset,
+        person.email,
+        %{url: reset_url(raw), name: person.nickname},
+        locale: email_locale(person, opts),
+        login_id: person.login_id,
+        user_id: person.id,
+        category: :security,
+        idempotency_key: "#{@email_key}:#{person.login_id}:#{link.id}",
+        now: now
+      )
+    end
+  end
+
+  defp emails_sent(login_id) do
+    "#{@email_key}:#{login_id}:"
+    |> Email.list_by_idempotency_prefix()
+    |> Enum.reject(&(&1.status in ["failed", "suppressed"]))
+    |> Enum.map(&to_utc(&1.inserted_at))
+  end
+
+  defp to_utc(%DateTime{} = at), do: at
+  defp to_utc(%NaiveDateTime{} = at), do: DateTime.from_naive!(at, "Etc/UTC")
+
+  defp reset_url(raw), do: PublicURL.base_url() <> "/reset-password#token=" <> raw
+
+  defp email_locale(person, opts) do
+    [person.preferred_locale, Keyword.get(opts, :locale)]
+    |> Enum.find_value(Locale.default(), fn locale ->
+      case Locale.normalize(locale) do
+        {:ok, supported} -> supported
+        {:error, _unsupported} -> nil
+      end
+    end)
+  end
+
+  defp file_handler_request(person, opts, now) do
+    key = Keyword.get(opts, :requester_key)
+
+    cond do
+      Store.get_request_for_login(person.login_id) ->
+        :ok
+
+      is_binary(key) and
+          not PasswordResetPolicy.handler_request_allowed?(
+            Store.count_requests_from(key, PasswordResetPolicy.window_start(now))
+          ) ->
+        throttled(person, "password_reset_handler_cap")
+
+      true ->
+        with {:ok, request} <-
+               Store.create_request(%{
+                 login_id: person.login_id,
+                 user_id: person.id,
+                 requester_key: key
+               }) do
+          log(:requested, person, nil)
+          notify_handlers(request, person, now)
+        end
+    end
+  end
+
+  defp throttled(person, reason) do
+    :telemetry.execute([:palee, :auth, :anomaly], %{count: 1}, %{reason: reason})
+    log(:throttled, person, nil)
+  end
+
+  defp spend(token, password, now) do
+    case LinkTokens.consume(:password_reset, token, now) do
+      {:ok, link} ->
+        with :ok <- verify_address(link, now),
+             :ok <- Identity.reset_login_password(link.login_id, password) do
+          case Store.get_request_for_login(link.login_id) do
+            nil -> :ok
+            request -> Store.delete_request(request.id)
+          end
+
+          {:ok, %{login_id: link.login_id, user_id: link.user_id, handler_id: nil}}
+        end
+
+      {:error, :used} ->
+        {:error, :used_reset_link}
+
+      {:error, :expired} ->
+        {:error, :expired_reset_link}
+
+      {:error, :invalid} ->
+        spend_handler_link(token, password, now)
+    end
+  end
+
+  # The link went to the login's address when it was sent; after an email
+  # change it no longer proves anything and stops working.
+  defp verify_address(%{target_email: email} = link, now) when is_binary(email) do
+    case Identity.mark_email_verified(link.login_id, email, now) do
+      :ok -> :ok
+      {:error, _mismatch} -> {:error, :invalid_reset_link}
+    end
+  end
+
+  defp verify_address(_link, _now), do: {:error, :invalid_reset_link}
+
+  defp spend_handler_link(token, password, now) do
+    case Store.lock_request_by_token_hash(PasswordResetPolicy.hash_token(token)) do
+      nil ->
+        {:error, :invalid_reset_link}
+
+      request ->
+        cond do
+          PasswordResetPolicy.expired?(request, now) ->
+            {:error, :expired_reset_link}
+
+          (result = Identity.reset_login_password(request.login_id, password)) != :ok ->
+            result
+
+          true ->
+            :ok = Store.delete_request(request.id)
+
+            {:ok,
+             %{
+               login_id: request.login_id,
+               user_id: request.user_id,
+               handler_id: request.link_issued_by_user_id
+             }}
+        end
+    end
+  end
+
+  defp inspect_handler_link(token, now) do
+    case Store.get_request_by_token_hash(PasswordResetPolicy.hash_token(token)) do
+      nil ->
+        {:error, :invalid_reset_link}
+
+      request ->
+        if PasswordResetPolicy.expired?(request, now),
+          do: {:error, :expired_reset_link},
+          else: {:ok, %{expires_at: request.link_expires_at}}
+    end
+  end
+
+  defp notify_security(account) do
+    SecurityNotices.notify(:password_reset_completed, account, %{})
+  rescue
+    error -> Logger.error("password reset notice failed: #{Exception.message(error)}")
+  end
+
+  defp queue, do: Application.fetch_env!(:palee, :password_reset_queue)
 
   defp find(identifier) do
     identifier = String.trim(identifier)

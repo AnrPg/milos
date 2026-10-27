@@ -68,6 +68,7 @@ function personaFor(id: string, nickname: string, role: "member" | "admin", slug
     nickname,
     role,
     email: `${id}@example.com`,
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,
@@ -194,6 +195,18 @@ test.describe("referrals", () => {
     await page.getByRole("button", { name: "Share link" }).click();
     await expect(page.getByRole("button", { name: "Link copied" })).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`/r/${CODE}$`));
+
+    // ADR-210: the same link, sent by email from the address the member types.
+    const emailed: unknown[] = [];
+    await page.route("**/api/me/share-links/email", (route) => {
+      emailed.push(route.request().postDataJSON());
+      return route.fulfill(json({ delivery: { id: "message-1", status: "queued" } }, 202));
+    });
+    await page.getByRole("button", { name: "Send by email" }).click();
+    await page.getByLabel("Their email address").fill("friend@example.com");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByText("Sent to friend@example.com")).toBeVisible();
+    expect(emailed).toEqual([{ link: "referral", token: CODE, to: "friend@example.com" }]);
 
     await list.filter({ hasText: "Open WOD" }).getByRole("button", { name: "Invite" }).click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`/r/${CODE}\\?event=${EVENT_ID}$`));

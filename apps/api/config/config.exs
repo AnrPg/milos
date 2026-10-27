@@ -59,7 +59,12 @@ config :palee, Oban,
        {"10 1 * * *", Palee.Workers.SeasonSweepJob},
        {"40 2 * * *", Palee.Workers.NightlyInsightsJob},
        {"27 * * * *", Palee.Workers.ScalingSuggestionScanJob},
-       {"47 * * * *", Palee.Workers.WorldGazetteerJob}
+       {"47 * * * *", Palee.Workers.WorldGazetteerJob},
+       # ADR-212: email retention and the SMTP key's expiry check.
+       {"15 3 * * *", Palee.Workers.EmailRetentionJob},
+       {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob},
+       # ADR-211: self-service account deletions whose grace is over.
+       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob}
      ]}
   ],
   queues: [
@@ -68,7 +73,10 @@ config :palee, Oban,
     gamification: 5,
     analytics: 3,
     # ADR-157: photo and video processing is CPU-bound.
-    media: 2
+    media: 2,
+    # ADR-203: outbox delivery. Two at a time keeps the daily budget close
+    # to exact (each job counts today's sent mail before it sends).
+    email: 2
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -100,6 +108,9 @@ config :palee, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :palee, :readiness_checker, Palee.Infrastructure.Readiness.Live
 config :palee, :identity_user_store, Palee.Infrastructure.Identity.EctoUserStore
 config :palee, :password_reset_store, Palee.Infrastructure.Identity.EctoPasswordResetStore
+config :palee, :login_device_store, Palee.Infrastructure.Identity.EctoLoginDeviceStore
+# ADR-206: "forgot password" requests are worked out in a background job.
+config :palee, :password_reset_queue, Palee.Infrastructure.Identity.ObanPasswordResetQueue
 
 config :palee,
        :organization_store,
@@ -457,6 +468,15 @@ config :palee, Palee.Mailer, adapter: Swoosh.Adapters.Local
 # Overridden for prod in runtime.exs (MAIL_FROM_NAME/MAIL_FROM_ADDRESS); this
 # default is fine for dev/test, where mail never actually leaves the box.
 config :palee, :mail_from, name: "Palee", address: "no-reply@example.com"
+
+# ADR-203: the transactional email outbox, its links and the sender.
+config :palee, :email_message_store, Palee.Infrastructure.Email.EctoMessageStore
+config :palee, :email_link_token_store, Palee.Infrastructure.Email.EctoLinkTokenStore
+config :palee, :email_sender, Palee.Infrastructure.Email.SwooshSender
+config :palee, :email_budget, daily_budget: 280, hard_cap: 295
+# ADR-212: Brevo's webhook secret and the SMTP key's expiry (runtime env).
+config :palee, :brevo_webhook_secret, nil
+config :palee, :smtp_key_expires_on, nil
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,

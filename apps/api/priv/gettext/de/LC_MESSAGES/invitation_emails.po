@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Owner"
+msgstr "Inhaber"
+
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Coach"
+msgstr "Coach"
+
+msgid "Front desk"
+msgstr "Empfang"
+
+msgid "Accountant"
+msgstr "Buchhaltung"
+
+msgid "Cleaning staff"
+msgstr "Reinigungspersonal"
+
+msgid "Box member"
+msgstr "Box-Mitglied"
+
+msgid "Athlete"
+msgstr "Athlet"
+
+msgid "Your invitation to %{business}"
+msgstr "Ihre Einladung zu „%{business}“"
+
+msgid "You're invited to %{business}"
+msgstr "Sie sind zu „%{business}“ eingeladen"
+
+msgid "%{inviter} invited you to join %{business} on %{product}."
+msgstr "%{inviter} hat Sie eingeladen, „%{business}“ auf %{product} beizutreten."
+
+msgid "%{business} invited you to join on %{product}."
+msgstr "„%{business}“ hat Sie eingeladen, auf %{product} beizutreten."
+
+msgid "Accept the invitation"
+msgstr "Einladung annehmen"
+
+msgid "Joins as"
+msgstr "Beitritt als"
+
+msgid "Branches"
+msgstr "Standorte"
+
+msgid "All branches"
+msgstr "Alle Standorte"
+
+msgid "The link works once and expires on %{date}."
+msgstr "Der Link funktioniert einmal und läuft am %{date} ab."
+
+msgid "Create your account or sign in with this email address to accept."
+msgstr "Erstellen Sie ein Konto oder melden Sie sich mit dieser E-Mail-Adresse an, um anzunehmen."
+
+msgid "If you weren't expecting this invitation, you can ignore this email."
+msgstr "Wenn Sie diese Einladung nicht erwartet haben, können Sie diese E-Mail ignorieren."

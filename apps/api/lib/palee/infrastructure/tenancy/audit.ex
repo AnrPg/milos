@@ -77,12 +77,17 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
   # functions (`palee_activate_business`, `palee_touch_demo_activity`,
   # `palee_claim_demo_reminder`, `palee_mark_demo_archived`,
   # `palee_reopen_demo_business`), never by a tenant session directly.
+  #
+  # `email_messages` (ADR-203) is the platform's email outbox: written by
+  # `Palee.Email` and its worker (no session scope), never read by a tenant
+  # session; its `organization_id` only records which business sent it.
   @platform_administered_tables ~w(
     organizations organization_memberships organization_settings
     organization_domains organization_slug_aliases registration_invitations vendors users
     organization_provisioning_events organization_purges
     platform_plans organization_platform_subscriptions
     business_activation_links business_requests
+    email_messages
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS

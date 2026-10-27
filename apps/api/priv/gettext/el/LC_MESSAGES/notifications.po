@@ -696,3 +696,15 @@ msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε: %{reason}. Η �
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε. Η θέση σου αποδεσμεύτηκε."
+
+msgid "The email key expires soon"
+msgstr "Το κλειδί email λήγει σύντομα"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "Το κλειδί SMTP του Palee λήγει σε %{days} ημέρες (%{date}). Δημιούργησε νέο κλειδί στο Brevo και ενημέρωσε το μυστικό του διακομιστή πριν από τότε, αλλιώς το Palee θα σταματήσει να στέλνει email."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "Το κλειδί SMTP του Palee έληξε στις %{date}, οπότε το Palee δεν μπορεί να στείλει email. Δημιούργησε νέο κλειδί στο Brevo και ενημέρωσε το μυστικό του διακομιστή."
+
+msgid "The email key has expired"
+msgstr "Το κλειδί email έληξε"

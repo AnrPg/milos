@@ -369,6 +369,8 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.OrganizationAccessController, :show_join_link} => [:invite_clients],
     {W.OrganizationAccessController, :update_join_link} => [:invite_clients],
     {W.OrganizationAccessController, :revoke} => [:invite_clients],
+    {W.OrganizationAccessController, :bulk_invite} => [:invite_clients],
+    {W.OrganizationAccessController, :resend} => [:invite_clients],
     # ADR-104: the whole team reports; front desk, admins and owners manage.
     {W.InventoryController, :machines} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :machine_events} => [:manage_inventory, :report_inventory],

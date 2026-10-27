@@ -33,6 +33,10 @@ defmodule PaleeWeb.AuthController do
       display_name: %Schema{type: :string},
       handle: %Schema{type: :string, description: "ADR-187: the unique @handle"},
       email: %Schema{type: :string, description: "The login's email, shared by its profiles"},
+      email_verified: %Schema{
+        type: :boolean,
+        description: "ADR-213: whether the login opened an emailed link to its current email"
+      },
       profile_count: %Schema{type: :integer},
       profile_limit: %Schema{type: :integer},
       role: %Schema{type: :string},
@@ -59,14 +63,15 @@ defmodule PaleeWeb.AuthController do
       }
     },
     required: [
+      :completed_tours,
+      :display_name,
+      :email_verified,
+      :handle,
       :id,
       :nickname,
-      :display_name,
-      :handle,
-      :role,
-      :vendor,
       :preferred_locale,
-      :completed_tours
+      :role,
+      :vendor
     ]
   }
 
@@ -142,13 +147,18 @@ defmodule PaleeWeb.AuthController do
     },
     responses: [
       created:
-        {"Access session", "application/json",
+        {"Signed up; a link was sent to the email", "application/json",
          %Schema{
            type: :object,
-           properties: %{access_token: %Schema{type: :string}},
-           required: [:access_token]
+           description:
+             "ADR-211: an email that already has a login, with another password, gets this same answer without access_token (nothing is created)",
+           properties: %{
+             access_token: %Schema{type: :string},
+             confirmation: %Schema{type: :string, enum: ["email_sent"]},
+             email: %Schema{type: :string}
+           },
+           required: [:confirmation, :email]
          }},
-      conflict: {"Email already has accounts", "application/json", @email_in_use_schema},
       unprocessable_entity:
         {"Validation errors", "application/json",
          %Schema{
@@ -564,13 +574,22 @@ defmodule PaleeWeb.AuthController do
     json(conn, %{handle: AccountProfiles.suggest_handle(display_name)})
   end
 
+  # ADR-211: a new sign-up and one with an email that already has a login
+  # (wrong password) answer alike: 201, "a link was sent to <email>". Only a
+  # real new account also gets its session.
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user} = result} ->
         conn
+        |> remember_device(result, :signed_up)
         |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
-        |> json(%{access_token: access_token})
+        |> json(%{access_token: access_token, confirmation: "email_sent", email: user.email})
+
+      {:confirmation_sent, email} ->
+        conn
+        |> put_status(:created)
+        |> json(%{confirmation: "email_sent", email: email})
 
       error ->
         error
@@ -587,8 +606,9 @@ defmodule PaleeWeb.AuthController do
 
   defp register_invited(conn, allowed_roles) do
     case RegisterInvitedUser.call(conn.body_params, allowed_roles) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token} = result} ->
         conn
+        |> remember_device(result, :signed_up)
         |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
         |> json(%{access_token: access_token})
@@ -628,8 +648,9 @@ defmodule PaleeWeb.AuthController do
 
   def login(conn, _params) do
     case LoginUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user} = result} ->
         conn
+        |> remember_device(result, :signed_in)
         |> put_refresh_cookie(refresh_token)
         |> json(%{access_token: access_token, user: current_user_json(user)})
 
@@ -637,6 +658,21 @@ defmodule PaleeWeb.AuthController do
         error
     end
   end
+
+  # ADR-208: remember the device; a password sign-in from a new one alerts.
+  defp remember_device(conn, %{user: user}, step) do
+    {conn, context} = PaleeWeb.SignInDevice.context(conn)
+
+    :ok =
+      case step do
+        :signed_in -> Palee.Application.SignInDevices.signed_in(user, context)
+        :signed_up -> Palee.Application.SignInDevices.signed_up(user, context)
+      end
+
+    conn
+  end
+
+  defp remember_device(conn, _result, _step), do: conn
 
   def refresh(conn, _params) do
     conn = fetch_cookies(conn)
@@ -698,6 +734,7 @@ defmodule PaleeWeb.AuthController do
       display_name: user.nickname,
       handle: Map.get(user, :handle) || Map.get(user, :normalized_nickname),
       email: Map.get(user, :email),
+      email_verified: Palee.Identity.email_verified?(user),
       profile_count: profile_count,
       profile_limit: Palee.Identity.max_profiles(),
       role: to_string(user.role),

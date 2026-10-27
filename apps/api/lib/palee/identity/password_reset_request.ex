@@ -14,6 +14,8 @@ defmodule Palee.Identity.PasswordResetRequest do
     field :link_token_hash, :binary, redact: true
     field :link_expires_at, :utc_datetime_usec
     field :link_issued_at, :utc_datetime_usec
+    # ADR-206: HMAC of the requesting client's IP (caps handler requests a day).
+    field :requester_key, :binary, redact: true
 
     belongs_to :login, Palee.Identity.Login
     belongs_to :user, Palee.Identity.User
@@ -25,7 +27,7 @@ defmodule Palee.Identity.PasswordResetRequest do
 
   def create_changeset(params) do
     %__MODULE__{}
-    |> cast(params, [:login_id, :user_id])
+    |> cast(params, [:login_id, :user_id, :requester_key])
     |> validate_required([:login_id, :user_id])
     |> unique_constraint(:login_id)
   end

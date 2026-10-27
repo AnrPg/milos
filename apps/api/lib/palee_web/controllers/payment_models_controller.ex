@@ -361,8 +361,16 @@ defmodule PaleeWeb.PaymentModelsController do
              offer: %Schema{
                type: :object,
                nullable: true,
-               properties: %{company_name: %Schema{type: :string}},
-               required: [:company_name]
+               properties: %{
+                 company_name: %Schema{type: :string},
+                 needs_verification: %Schema{
+                   type: :boolean,
+                   description:
+                     "ADR-205: the account email matches but is not verified yet; " <>
+                       "joining waits for the confirmation"
+                 }
+               },
+               required: [:company_name, :needs_verification]
              }
            },
            required: [:offer]
@@ -385,6 +393,7 @@ defmodule PaleeWeb.PaymentModelsController do
     responses: [
       created: {"Seat", "application/json", @seat_response},
       not_found: {"No matching plan", "application/json", @error},
+      forbidden: {"The matching email is not verified yet", "application/json", @error},
       conflict: {"No seats left or already enrolled", "application/json", @error}
     ]
   )

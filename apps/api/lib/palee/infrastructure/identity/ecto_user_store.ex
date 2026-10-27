@@ -13,6 +13,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     Identity.Domain.ProfilePolicy,
     Identity.Login,
     Identity.PasswordHasher,
+    Identity.PendingEmailChange,
     Identity.User,
     Repo
   }
@@ -22,6 +23,21 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   # ADR-187: a new email creates a login and its first profile together.
   @impl true
   def create_login_with_profile(params), do: create_login(params, nil)
+
+  # ADR-211: the same checks, in the same order, as `create_login/2` runs
+  # before it writes, so a sign-up that only pretends (an email that already
+  # has a login) refuses exactly what a real one would.
+  @impl true
+  def validate_new_login(params) do
+    profile_changeset = User.profile_create_changeset(%User{}, nil, params)
+
+    with {:ok, _profile} <- Ecto.Changeset.apply_action(profile_changeset, :insert),
+         :ok <- ensure_handle_free(Ecto.Changeset.get_field(profile_changeset, :handle), nil),
+         {:ok, _login} <-
+           params |> Login.create_changeset() |> Ecto.Changeset.apply_action(:insert) do
+      :ok
+    end
+  end
 
   # ADR-184: a mock person of a demo business, marked for good at insert.
   @impl true
@@ -99,6 +115,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         %{
           id: login.id,
           email: login.email,
+          email_verified_at: login.email_verified_at,
           password_hash: login.password_hash,
           last_used_user_id: login.last_used_user_id,
           profile_count: count_profiles(login.id)
@@ -171,20 +188,49 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   @doc "ADR-187: sets a new password on a login and revokes every profile's sessions."
   @impl true
+  def mark_email_verified(login_id, email, now) do
+    normalized = InvitationEmail.normalize(email)
+
+    {count, _rows} =
+      Login
+      |> where([l], l.id == ^login_id and fragment("lower(?)", l.email) == ^normalized)
+      |> where([l], is_nil(l.email_verified_at))
+      |> Repo.update_all(set: [email_verified_at: now, updated_at: now])
+
+    if count == 1 or email_verified_as?(login_id, normalized),
+      do: :ok,
+      else: {:error, :email_mismatch}
+  end
+
+  defp email_verified_as?(login_id, normalized) do
+    Login
+    |> where([l], l.id == ^login_id and fragment("lower(?)", l.email) == ^normalized)
+    |> where([l], not is_nil(l.email_verified_at))
+    |> Repo.exists?()
+  end
+
+  @impl true
   def reset_login_password(login_id, password) do
     case Repo.get(Login, login_id) do
       nil ->
         {:error, :not_found}
 
       login ->
+        # ADR-207: a reset proves the inbox, so it lifts the "this wasn't me"
+        # lock and drops a pending email change.
         login
         |> Login.credentials_changeset(%{password: password})
         |> maybe_put_password_hash()
         |> maybe_bump_login_security()
+        |> Ecto.Changeset.put_change(:email_change_locked_until, nil)
         |> Repo.update()
         |> case do
-          {:ok, _login} -> :ok
-          {:error, changeset} -> {:error, changeset}
+          {:ok, _login} ->
+            Repo.delete_all(from(p in PendingEmailChange, where: p.login_id == ^login_id))
+            :ok
+
+          {:error, changeset} ->
+            {:error, changeset}
         end
     end
   end
@@ -418,10 +464,11 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end
   end
 
-  # Profile fields change on the profile; email and password on its login.
-  # One transaction so a bad password never leaves a half-applied edit.
+  # Profile fields change on the profile; the password on its login (the
+  # email only through ADR-207's confirmed change). One transaction so a bad
+  # password never leaves a half-applied edit.
   defp update_profile_and_credentials(user, params) do
-    credential_params = Map.take(stringify(params), ["email", "password"])
+    credential_params = Map.take(stringify(params), ["password"])
     now = DateTime.utc_now()
 
     Repo.transaction(fn ->
@@ -764,6 +811,20 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end
   end
 
+  @doc "ADR-208: one more on the login's version, which every profile's tokens carry."
+  @impl true
+  def bump_login_security_version(login_id) do
+    case Login
+         |> where([l], l.id == ^login_id)
+         |> update([l],
+           set: [security_version: fragment("COALESCE(?, 0) + 1", l.security_version)]
+         )
+         |> Repo.update_all([]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
   defp to_account(nil), do: nil
 
   defp to_account(%User{login: %Login{} = login} = user) do
@@ -787,6 +848,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       preferred_theme_slug: user.preferred_theme_slug,
       time_zone: user.time_zone,
       email: login.email,
+      email_verified_at: login.email_verified_at,
       inserted_at: user.inserted_at,
       demo_organization_id: user.demo_organization_id,
       completed_tours: user.completed_tours || []

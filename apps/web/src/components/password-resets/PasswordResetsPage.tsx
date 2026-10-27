@@ -31,6 +31,7 @@ const POLL_MS = 30_000;
  */
 export function PasswordResetsPage() {
   const t = useTranslations("passwordResets");
+  const pr = useTranslations("passwordReset");
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const searchParams = useSearchParams();
@@ -63,6 +64,7 @@ export function PasswordResetsPage() {
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-4">
         <h1 className="text-2xl font-semibold text-[var(--text)]">{t("title")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("subtitle")}</p>
+        <p className="mt-1 text-sm text-[var(--dim)]">{pr("handlerNote")}</p>
       </header>
 
       {inbox.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}

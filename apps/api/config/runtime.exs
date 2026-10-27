@@ -334,11 +334,42 @@ if config_env() == :prod do
     address: mail_from_address,
     reply_to: System.get_env("MAIL_REPLY_TO")
 
+  # ADR-203: the outbox's daily budget. The provider's free plan sends 300 a
+  # day; non-security mail stops at the budget (deferred to the next UTC
+  # day), security mail at the hard cap.
+  config :palee, :email_budget,
+    daily_budget: String.to_integer(System.get_env("EMAIL_DAILY_BUDGET") || "280"),
+    hard_cap: String.to_integer(System.get_env("EMAIL_DAILY_HARD_CAP") || "295")
+
+  # ADR-212: the shared secret Brevo's transactional webhook presents
+  # (bearer token, basic-auth password or x-webhook-secret header). Unset,
+  # the webhook refuses every call.
+  config :palee, :brevo_webhook_secret, System.get_env("BREVO_WEBHOOK_SECRET")
+
+  # ADR-212: the SMTP key's expiry date (YYYY-MM-DD). A daily check alerts
+  # vendors from 30 days before; mail stops when the key expires.
+  smtp_key_expires_on =
+    case System.get_env("SMTP_KEY_EXPIRES_ON") do
+      blank when blank in [nil, ""] ->
+        nil
+
+      value ->
+        case Date.from_iso8601(String.trim(value)) do
+          {:ok, date} ->
+            date
+
+          {:error, _} ->
+            raise "SMTP_KEY_EXPIRES_ON must be a date like 2027-10-26, got #{inspect(value)}"
+        end
+    end
+
+  config :palee, :smtp_key_expires_on, smtp_key_expires_on
+
   # Optional on purpose: absent SMTP_RELAY must not crash boot over a
   # feature (owner-invitation email) the app worked without until now.
   # Falls back to config.exs's Local adapter - dev-mailbox-only, and every
   # caller already treats a delivery failure as a clean {:error, _} rather
-  # than crashing (see SendOwnerInvitationEmail.safe_deliver/1) - so this
+  # than crashing (see SwooshSender.safe_deliver/1) - so this
   # stays a degraded feature, not an outage, until these are set.
   if smtp_relay do
     config :palee, Palee.Mailer,
@@ -351,17 +382,10 @@ if config_env() == :prod do
       password: System.get_env("SMTP_PASSWORD"),
       tls: :always,
       # OTP 26+ verifies TLS peers by default; without CA certificates and the
-      # relay's name to check against, STARTTLS failed (:tls_failed).
-      tls_options: [
-        versions: [:"tlsv1.2", :"tlsv1.3"],
-        verify: :verify_peer,
-        cacerts: :public_key.cacerts_get(),
-        server_name_indication: String.to_charlist(smtp_relay),
-        depth: 99,
-        customize_hostname_check: [
-          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-        ]
-      ],
+      # relay's name to check against, STARTTLS failed (:tls_failed). ADR-212:
+      # verify_peer against the system CA store (CAStore's bundle if the image
+      # has none), SNI and an https-style hostname check on the relay's name.
+      tls_options: Palee.Mailer.tls_options(smtp_relay),
       auth: :always,
       ssl: System.get_env("SMTP_SSL") in ~w(true 1)
   end

@@ -1,0 +1,50 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Alguien intentó registrarse con su correo electrónico"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Alguien intentó crear una cuenta de %{product} con esta dirección de correo electrónico."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Si fue usted, inicie sesión para añadir un perfil o restablezca su contraseña si la ha olvidado."
+
+msgid "Sign in"
+msgstr "Iniciar sesión"
+
+msgid "Reset password"
+msgstr "Restablecer contraseña"
+
+msgid "Forgot your password?"
+msgstr "¿Ha olvidado su contraseña?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Si no fue usted, puede ignorar este correo. No se ha creado ninguna cuenta y no ha cambiado nada."
+
+msgid "Confirm deleting your account"
+msgstr "Confirme la eliminación de su cuenta"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "Ha solicitado eliminar su perfil @%{handle}."
+
+msgid "You asked to delete your account with all its profiles."
+msgstr "Ha solicitado eliminar su cuenta con todos sus perfiles."
+
+msgid "Confirm deleting your profile"
+msgstr "Confirme la eliminación de su perfil"
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "Cuando lo confirme, la eliminación se realizará en %{days} días. Hasta entonces puede deshacerla."
+
+msgid "Confirm deletion"
+msgstr "Confirmar eliminación"
+
+msgid "The link expires in 24 hours."
+msgstr "El enlace caduca en 24 horas."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Si no lo ha solicitado usted, no abra el enlace y cambie su contraseña: otra persona la conoce."

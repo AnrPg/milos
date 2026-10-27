@@ -5,16 +5,21 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
   body; the PDF is downloaded from the admin screen.
   """
 
-  alias Palee.BrandPalette
+  alias Palee.Email.Layout
+  alias Palee.Localization
 
   import Swoosh.Email
 
   @doc """
-  `localize` translates a message with bindings (the gym's default locale);
-  `kind` is `:issued` or `:reminder`.
+  The subject and both bodies, in `locale` (the gym's default locale):
+  the invoice strings from the `corporate_invoices` domain, wrapped in the
+  shared email layout (ADR-203). `kind` is `:issued` or `:reminder`.
   """
-  def build(kind, %{invoice: invoice, client: client, gym_name: gym_name, from: from}, localize)
-      when kind in [:issued, :reminder] do
+  def render(kind, assigns, locale) when kind in [:issued, :reminder] do
+    render(kind, assigns, &Localization.translate(locale, &1, &2, "corporate_invoices"), locale)
+  end
+
+  defp render(kind, %{invoice: invoice, client: client, gym_name: gym_name}, localize, locale) do
     bindings = %{
       number: invoice.invoice_number || "",
       gym: gym_name,
@@ -40,12 +45,51 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
     greeting = localize.("Hello %{name},", %{name: client.contact_name || client.company_name})
     thanks = localize.("Thank you.", %{})
 
+    reason =
+      Layout.t(
+        locale,
+        "You're receiving this email because you are the billing contact of %{company} at %{business}.",
+        %{company: client.company_name, business: gym_name}
+      )
+
+    %{
+      subject: subject,
+      text:
+        Layout.text(locale, [greeting, intro, Layout.text_details(rows), outro, thanks, gym_name],
+          reason: reason
+        ),
+      html:
+        Layout.html(
+          locale,
+          [
+            Layout.paragraph(greeting),
+            Layout.paragraph(intro),
+            Layout.details(rows),
+            Layout.paragraph(outro),
+            Layout.paragraph(thanks),
+            Layout.paragraph(gym_name)
+          ],
+          reason: reason,
+          preheader: intro
+        )
+    }
+  end
+
+  @doc """
+  The same as a `Swoosh.Email` (the mailer tests use it). `localize`
+  translates a message with bindings; `assigns.locale` (default `"en"`)
+  picks the layout's language.
+  """
+  def build(kind, %{client: client, from: from} = assigns, localize)
+      when kind in [:issued, :reminder] do
+    rendered = render(kind, assigns, localize, Map.get(assigns, :locale, "en"))
+
     new()
     |> to(client.billing_email)
     |> from(from)
-    |> subject(subject)
-    |> text_body(text_body([greeting, intro], rows, [outro, thanks, gym_name]))
-    |> html_body(html_body([greeting, intro], rows, [outro, thanks, gym_name]))
+    |> subject(rendered.subject)
+    |> text_body(rendered.text)
+    |> html_body(rendered.html)
   end
 
   defp copy(:issued, bindings, localize) do
@@ -64,29 +108,6 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
      ), localize.("If you have already paid, please ignore this reminder.", bindings)}
   end
 
-  defp text_body(intro, rows, outro) do
-    table = Enum.map_join(rows, "\n", fn {label, value} -> "#{label}: #{value}" end)
-    Enum.join(intro ++ [table] ++ outro, "\n\n") <> "\n"
-  end
-
-  defp html_body(intro, rows, outro) do
-    paragraphs = &Enum.map_join(&1, "", fn line -> "<p>#{escape(line)}</p>" end)
-
-    table =
-      Enum.map_join(rows, "", fn {label, value} ->
-        ~s(<tr><td style="padding:4px 12px 4px 0;color:#{BrandPalette.colour(:muted)};">#{escape(label)}</td>) <>
-          ~s(<td style="padding:4px 0;font-weight:600;">#{escape(value)}</td></tr>)
-      end)
-
-    """
-    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 520px; margin: 0 auto; color: #{BrandPalette.colour(:text)};">
-      #{paragraphs.(intro)}
-      <table style="border-collapse: collapse; margin: 16px 0;">#{table}</table>
-      #{paragraphs.(outro)}
-    </div>
-    """
-  end
-
   defp date(%Date{} = date), do: Calendar.strftime(date, "%d/%m/%Y")
   defp date(_other), do: ""
 
@@ -94,13 +115,4 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
     do: "€" <> :erlang.float_to_binary(cents / 100, decimals: 2)
 
   defp money(_cents), do: "€0.00"
-
-  defp escape(value) do
-    value
-    |> to_string()
-    |> String.replace("&", "&amp;")
-    |> String.replace("<", "&lt;")
-    |> String.replace(">", "&gt;")
-    |> String.replace("\"", "&quot;")
-  end
 end

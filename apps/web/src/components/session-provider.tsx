@@ -52,7 +52,8 @@ type SessionContextValue = {
   tokens: AuthTokens | null;
   currentUser: CurrentUser | null;
   signIn: (payload: LoginRequest) => Promise<CurrentUser>;
-  signUp: (payload: RegisterRequest) => Promise<CurrentUser>;
+  /** ADR-211: `user` is null when the email already had an account (nothing was created). */
+  signUp: (payload: RegisterRequest) => Promise<SignUpResult>;
   signUpAdmin: (payload: AdminRegisterRequest) => Promise<CurrentUser>;
   signUpInvited: (payload: InvitedRegisterRequest) => Promise<CurrentUser>;
   /** ADR-204: the signed-in profile accepts an invitation, keeping the session alive if its role changes. */
@@ -62,6 +63,9 @@ type SessionContextValue = {
   switchSession: (issuedTokens: AuthTokens) => Promise<CurrentUser>;
   signOut: () => void;
 };
+
+/** ADR-211: what a sign-up answered: always "a link was sent to `email`"; a session only for a new account. */
+export type SignUpResult = { email: string; user: CurrentUser | null };
 
 type SessionExpiredState = {
   title: string;
@@ -160,9 +164,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return establishSession(issuedTokens);
   }
 
-  async function signUp(payload: RegisterRequest) {
-    const issuedTokens = await registerUser(withPageLocale(payload));
-    return establishSession(issuedTokens);
+  async function signUp(payload: RegisterRequest): Promise<SignUpResult> {
+    const response = await registerUser(withPageLocale(payload));
+    if (!response.access_token) return { email: response.email, user: null };
+    const user = await establishSession({ access_token: response.access_token });
+    return { email: response.email, user };
   }
 
   async function signUpAdmin(payload: AdminRegisterRequest) {

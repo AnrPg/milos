@@ -14,6 +14,7 @@ import {
   listPlatformOrganizations,
   provisionPlatformOrganization,
   renamePlatformOrganization,
+  fetchOwnerInvitationDeliveries,
   sendOwnerInvitationEmail,
   updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
@@ -61,6 +62,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
     changePlatformOrganizationSettings: vi.fn(),
     renamePlatformOrganization: vi.fn(),
     sendOwnerInvitationEmail: vi.fn(),
+    fetchOwnerInvitationDeliveries: vi.fn(),
   };
 });
 
@@ -99,6 +101,15 @@ function renderPage() {
   );
 }
 
+const queuedDelivery = {
+  id: "delivery-1",
+  status: "queued" as const,
+  attempts: 0,
+  inserted_at: "2026-08-04T10:00:00Z",
+  scheduled_at: null,
+  sent_at: null,
+};
+
 describe("PlatformOrganizationsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -108,7 +119,8 @@ describe("PlatformOrganizationsPage", () => {
     vi.mocked(changePlatformOrganizationLifecycle).mockResolvedValue({
       organization: { ...organization.organization, status: "archived" },
     });
-    vi.mocked(sendOwnerInvitationEmail).mockResolvedValue(undefined);
+    vi.mocked(sendOwnerInvitationEmail).mockResolvedValue({ delivery: queuedDelivery });
+    vi.mocked(fetchOwnerInvitationDeliveries).mockResolvedValue({ deliveries: [queuedDelivery] });
     vi.mocked(renamePlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, name: "North Harbor Strength" },
     });
@@ -135,6 +147,7 @@ describe("PlatformOrganizationsPage", () => {
     });
     vi.mocked(issuePlatformOrganizationInvitation).mockResolvedValue({
       invitation: {
+        id: "invitation-coach",
         token: "coach-invite-token",
         expires_at: "2026-08-11T00:00:00Z",
         role: "coach",
@@ -154,8 +167,9 @@ describe("PlatformOrganizationsPage", () => {
     });
     vi.mocked(provisionPlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, id: "org-2", name: "Atlas Gym", slug: "atlas" },
-      settings: { ...organization.settings, organization_id: "org-2", brand_name: "Atlas Gym" },
+      settings: { ...organization.settings, organization_id: "org-2", brand_name: "Atlas Gym", default_locale: "de" },
       initial_owner_invitation: {
+        id: "invitation-1",
         token: "invite-token",
         expires_at: "2026-08-11T00:00:00Z",
         role: "admin",
@@ -229,13 +243,60 @@ describe("PlatformOrganizationsPage", () => {
     fireEvent.click(sendButton);
 
     await waitFor(() => {
+      // ADR-210: in the business's default language unless the vendor picks another.
       expect(sendOwnerInvitationEmail).toHaveBeenCalledWith("token", "org-2", {
         email: "owner@atlas.test",
         token: "invite-token",
+        locale: "de",
+        resend: false,
       });
     });
 
-    expect(await screen.findByRole("button", { name: "Email sent" })).toBeInTheDocument();
+    expect(await screen.findByTestId("owner-invitation-delivery")).toHaveTextContent("Queued");
+    await waitFor(() => {
+      expect(fetchOwnerInvitationDeliveries).toHaveBeenCalledWith("token", "org-2", "invitation-1");
+    });
+
+    // The setup code stays on the console as the manual fallback; the email has the link only.
+    expect(screen.getAllByText("invite-token").length).toBeGreaterThan(0);
+
+    vi.mocked(fetchOwnerInvitationDeliveries).mockResolvedValue({
+      deliveries: [{ ...queuedDelivery, status: "sent", sent_at: "2026-08-04T10:01:00Z" }],
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    await waitFor(() => {
+      expect(screen.getByTestId("owner-invitation-delivery")).toHaveTextContent("Sent");
+    });
+
+    chooseValue(screen.getByLabelText("Email language"), "el");
+    fireEvent.click(screen.getByRole("button", { name: "Send again" }));
+
+    await waitFor(() => {
+      expect(sendOwnerInvitationEmail).toHaveBeenLastCalledWith("token", "org-2", {
+        email: "owner@atlas.test",
+        token: "invite-token",
+        locale: "el",
+        resend: true,
+      });
+    });
+  });
+
+  it("explains a throttled resend", async () => {
+    vi.mocked(sendOwnerInvitationEmail).mockRejectedValueOnce(
+      new ApiError(429, "throttled", { code: "throttled" }),
+    );
+    renderPage();
+
+    await screen.findByText("North Harbor Strength");
+    fireEvent.click(screen.getByRole("button", { name: "Create organization" }));
+    const dialog = screen.getByRole("dialog", { name: "Create organization" });
+    fireEvent.change(within(dialog).getByLabelText("Organization name"), { target: { value: "Atlas Gym" } });
+    fireEvent.change(within(dialog).getByLabelText("Initial admin email"), { target: { value: "owner@atlas.test" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Provision organization" }));
+
+    fireEvent.click(await screen.findByRole("button", { name: /owner@atlas\.test/ }));
+
+    expect(await screen.findByText("An email just went to this address. Try again in a minute.")).toBeInTheDocument();
   });
 
   it("archives an organization only after explicit confirmation", async () => {
@@ -414,6 +475,7 @@ describe("PlatformOrganizationsPage", () => {
   it("keeps generated organization invitation links and tokens in collapsible access history", async () => {
     vi.mocked(issuePlatformOrganizationInvitation).mockResolvedValueOnce({
       invitation: {
+        id: "invitation-admin",
         token: "admin-invite-token",
         expires_at: "2026-08-11T00:00:00Z",
         role: "admin",

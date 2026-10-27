@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { completePasswordReset } from "@/api/auth";
+import { completePasswordReset, inspectPasswordReset } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
 import {
   passwordLongEnough,
   resetFailure,
-  resetTokenFromHash,
+  resetTokenFromLocation,
   type FieldErrors,
   type ResetFailure,
 } from "@/components/auth/auth-errors";
@@ -22,11 +22,14 @@ import { useUiTranslations } from "@/i18n/ui";
 type LinkState = "reading" | "ready" | "missing";
 
 /**
- * ADR-187: the page a one-time reset link opens (`/reset-password#token=...`).
- * Setting the password signs every device out.
+ * ADR-187, ADR-206: the page a one-time reset link opens
+ * (`/reset-password#token=...`; older handler links used `?token=`). Opening
+ * the page only checks the link; it is spent when the new password is saved,
+ * which signs every device out.
  */
 export function ResetPassword() {
   const t = useTranslations("authRecovery");
+  const pr = useTranslations("passwordReset");
   const ui = useUiTranslations();
   const { status, signOut } = useSession();
 
@@ -40,13 +43,30 @@ export function ResetPassword() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  // The fragment only exists in the browser.
+  // The fragment only exists in the browser. The token is kept in memory and
+  // taken out of the address bar, so it stays out of history and referrers.
+  // Read and checked once: a second run of the effect (React's development
+  // double mount) would find the address bar already cleared.
+  const readRef = useRef(false);
   useEffect(() => {
-    const found = resetTokenFromHash(window.location.hash);
+    if (readRef.current) return;
+    readRef.current = true;
+    const found = resetTokenFromLocation(window.location.hash, window.location.search);
+    if (found) window.history.replaceState(window.history.state, "", window.location.pathname);
     queueMicrotask(() => {
       setToken(found);
-      setLinkState(found ? "ready" : "missing");
+      if (!found) setLinkState("missing");
     });
+    if (found) {
+      inspectPasswordReset(found)
+        .then(() => setLinkState("ready"))
+        .catch((caught: unknown) => {
+          const kind = resetFailure(caught);
+          // Offline or a server hiccup: let the person try; submitting tells.
+          if (kind === "other" || kind === "weak_password") setLinkState("ready");
+          else setFailure(kind);
+        });
+    }
   }, []);
 
   // Every session ended with the reset, this one included.
@@ -96,12 +116,12 @@ export function ResetPassword() {
   }
 
   if (linkState === "missing" || failure) {
+    const problem =
+      failure === "expired" ? pr("linkExpired") : failure === "used" ? pr("linkUsed") : pr("linkInvalid");
     return (
-      <AuthShell title={t("resetLinkProblemTitle")}>
+      <AuthShell title={failure === "used" ? pr("linkUsedTitle") : t("resetLinkProblemTitle")}>
         <div className="space-y-5 text-center">
-          <ErrorNotice className="text-start">
-            {failure === "expired" ? t("resetLinkExpired") : t("resetLinkInvalid")}
-          </ErrorNotice>
+          <ErrorNotice className="text-start">{problem}</ErrorNotice>
           <Link className={`block ${primaryButtonClass}`} style={primaryButtonStyle} href="/forgot-password">
             {t("askForNewLink")}
           </Link>
@@ -109,6 +129,16 @@ export function ResetPassword() {
             {t("backToSignIn")}
           </Link>
         </div>
+      </AuthShell>
+    );
+  }
+
+  if (linkState === "reading") {
+    return (
+      <AuthShell title={t("resetTitle")}>
+        <p className="text-center text-sm" style={{ color: "var(--dim)" }} role="status">
+          {pr("checkingLink")}
+        </p>
       </AuthShell>
     );
   }

@@ -2,11 +2,16 @@
 
 import { useId, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
-import { enrollCorporateSeat, fetchCorporateEnrollmentOffer } from "@/api/my-finance";
+import {
+  enrollCorporateSeat,
+  fetchCorporateEnrollmentOffer,
+  requestCorporateVerificationEmail,
+} from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
 import { clientErrorMessage } from "@/components/client/errors";
-import { companyCodeFromSearch } from "@/components/client/corporate-enrollment";
+import { companyCodeFromSearch, needsEmailConfirmation } from "@/components/client/corporate-enrollment";
 import { CLIENT_ENTITLEMENT_QUERY_KEY } from "@/components/client/use-client-entitlement";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -15,10 +20,13 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
  * Company plan enrollment (ADR-098). Company-paid plans are rare, so the card
  * stays hidden unless it applies: the member opened the enrollment link their
  * employer shared (`?company_code=`), or their account email matches an
- * email-domain plan they have not joined yet.
+ * email-domain plan they have not joined yet. ADR-205: an email-domain match
+ * joins only once the email is confirmed; until then the card says so and
+ * offers to send the confirmation link again.
  */
 export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => void }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("VerifiedGates");
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const queryClient = useQueryClient();
@@ -48,8 +56,11 @@ export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => voi
     },
   });
 
+  const resend = useMutation({ mutationFn: () => requestCorporateVerificationEmail(token!) });
+
   const companyName = offer.data?.company_name ?? null;
   if (!joined && !linkCode && !companyName) return null;
+  const confirmFirst = !joined && needsEmailConfirmation(linkCode, offer.data ?? null, enroll.error);
 
   return (
     <section
@@ -65,6 +76,29 @@ export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => voi
         <p role="status" className="text-sm font-semibold" style={{ color: "var(--success)" }}>
           {i18n("clCorporateJoined")}
         </p>
+      ) : confirmFirst ? (
+        <>
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>
+            {t("corporate.confirmToJoin", { company: companyName ?? "" })}
+          </p>
+          <div>
+            <button
+              type="button"
+              disabled={resend.isPending || resend.isSuccess || !token}
+              onClick={() => resend.mutate()}
+              className="rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              {resend.isPending ? t("corporate.sending") : t("corporate.resend")}
+            </button>
+          </div>
+          {resend.isSuccess ? (
+            <p role="status" className="text-sm" style={{ color: "var(--success)" }}>
+              {t("corporate.sent")}
+            </p>
+          ) : null}
+          {resend.isError ? <ErrorNotice>{clientErrorMessage(resend.error, i18n)}</ErrorNotice> : null}
+        </>
       ) : (
         <>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>

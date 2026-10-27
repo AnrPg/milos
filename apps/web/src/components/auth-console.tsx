@@ -9,14 +9,18 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
+import { useFragmentInvitationToken } from "@/lib/invitation-fragment";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   inspectInvitation,
   type InvitationInspection,
 } from "@/api/auth";
+import { ApiError } from "@/api/client";
+import { undoAccountDeletionAndSignIn } from "@/api/account-deletion";
 import { AuthField } from "@/components/auth/AuthField";
+import { CheckInboxNotice } from "@/components/auth/CheckInboxNotice";
 import { AuthNotice } from "@/components/auth/AuthShell";
 import { LanguagePicker } from "@/components/auth/LanguagePicker";
 import { BusinessSignUpLink } from "@/components/business/BusinessSignUp";
@@ -71,12 +75,21 @@ function invalidLoginFields(form: LoginForm, t: (key: string) => string): FieldE
   return errors;
 }
 
+/** ADR-211: when a sign-in answered "scheduled for deletion", the date it runs. */
+function scheduledDeletionOf(error: unknown): string | null {
+  if (!(error instanceof ApiError) || error.payload.code !== "account_deletion_scheduled") return null;
+  const at = (error.payload as Record<string, unknown>).scheduled_for;
+  return typeof at === "string" ? at : null;
+}
+
 export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const i18n = useUiTranslations();
   const t = useTranslations("authRecovery");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signIn, signUp, signUpInvited, status, tokens } = useSession();
+  const tDeletion = useTranslations("accountDeletion");
+  const format = useFormatter();
+  const { signIn, signUp, signUpInvited, switchSession, status, tokens } = useSession();
 
   const [mode, setMode] = useState<Mode>(() =>
     searchParams.get("token") ? "register" : initialMode,
@@ -93,14 +106,22 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const [handleEdited, setHandleEdited] = useState(false);
   // After sign-up, recovery codes are offered once before moving on.
   const [offerRecoveryCodes, setOfferRecoveryCodes] = useState(false);
+  // ADR-211: every sign-up first shows "we sent a link to <email>"; only a
+  // new account has a session to continue into.
+  const [inbox, setInbox] = useState<{ email: string; signedIn: boolean } | null>(null);
+  // ADR-211: the right password for an account scheduled for deletion.
+  const [scheduledDeletion, setScheduledDeletion] = useState<string | null>(null);
   const registeringRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [invitationToken, setInvitationToken] = useState(
-    () => searchParams.get("token") ?? "",
+  // ADR-209: an emailed invitation's link carries its token in the fragment.
+  const fragmentToken = useFragmentInvitationToken();
+  const [typedToken, setInvitationToken] = useState<string | null>(
+    () => searchParams.get("token"),
   );
+  const invitationToken = typedToken ?? fragmentToken;
   const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
 
   useEffect(() => {
@@ -219,7 +240,21 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           className="rounded-[2rem] p-7"
           style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
-          {offerRecoveryCodes ? <RecoveryCodesOffer onSkip={continueAfterAuth} /> : <>
+          {offerRecoveryCodes ? <RecoveryCodesOffer onSkip={continueAfterAuth} /> : inbox ? (
+            <CheckInboxNotice
+              email={inbox.email}
+              onContinue={() => {
+                if (inbox.signedIn) {
+                  setOfferRecoveryCodes(true);
+                  return;
+                }
+                // Nothing was created: the person signs in to the account the email has.
+                setLoginForm({ identifier: inbox.email, password: "" });
+                setInbox(null);
+                switchMode("login");
+              }}
+            />
+          ) : <>
           <div className="mb-4 flex justify-end">
             <LanguagePicker />
           </div>
@@ -396,12 +431,19 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                         } else {
                           // ADR-156: an invite kept on this device brought a new account.
                           markReferralNewAccount();
+                          let result;
                           try {
-                            await signUp({ ...profile, role: registerForm.role });
+                            result = await signUp({ ...profile, role: registerForm.role });
                           } catch (caught) {
                             markReferralNewAccount(false);
                             throw caught;
                           }
+                          if (!result.user) {
+                            markReferralNewAccount(false);
+                            registeringRef.current = false;
+                          }
+                          setInbox({ email: result.email, signedIn: result.user !== null });
+                          return;
                         }
                         setOfferRecoveryCodes(true);
                       } catch (caught) {
@@ -455,14 +497,56 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   disabled={busyAction === "login"}
                   onClick={() => {
                     if (!validate(invalidLoginFields(loginForm, t))) return;
+                    setScheduledDeletion(null);
                     void runAction("login", async () => {
-                      await signIn({ identifier: loginForm.identifier.trim(), password: loginForm.password });
+                      try {
+                        await signIn({ identifier: loginForm.identifier.trim(), password: loginForm.password });
+                      } catch (caught) {
+                        const scheduledFor = scheduledDeletionOf(caught);
+                        if (scheduledFor === null) throw caught;
+                        setScheduledDeletion(scheduledFor);
+                      }
                     });
                   }}
                   type="button"
                 >
                   {busyAction === "login" ? i18n("signingInc66b2ad") : i18n("signInada2e9e")}
                 </button>
+
+                {scheduledDeletion ? (
+                  <div className="space-y-3" role="status">
+                    <p
+                      className="rounded-2xl px-4 py-3 text-sm"
+                      style={{
+                        border: "1px solid color-mix(in srgb, var(--warning) 35%, transparent)",
+                        background: "color-mix(in srgb, var(--warning) 10%, transparent)",
+                        color: "var(--text)",
+                      }}
+                    >
+                      {tDeletion("signInScheduled", {
+                        date: format.dateTime(new Date(scheduledDeletion), { dateStyle: "long" }),
+                      })}
+                    </p>
+                    <button
+                      type="button"
+                      className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
+                      style={{ border: "1px solid var(--border-strong)", color: "var(--text)" }}
+                      disabled={busyAction === "undo"}
+                      onClick={() =>
+                        void runAction("undo", async () => {
+                          const issued = await undoAccountDeletionAndSignIn({
+                            identifier: loginForm.identifier.trim(),
+                            password: loginForm.password,
+                          });
+                          setScheduledDeletion(null);
+                          await switchSession(issued);
+                        })
+                      }
+                    >
+                      {tDeletion("signInUndo")}
+                    </button>
+                  </div>
+                ) : null}
               </>
             )}
           </div>

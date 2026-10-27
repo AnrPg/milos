@@ -28,6 +28,9 @@ defmodule Palee.Identity.Account do
     # Carried on the domain struct so invitation email binding can be checked
     # without reaching for the Ecto schema.
     :email,
+    # When the login proved it can read `email` (an emailed link was opened);
+    # nil while unverified. Features that trust the address check this.
+    :email_verified_at,
     :inserted_at,
     # ADR-184: the demo business a mock person belongs to; nil for real people.
     :demo_organization_id,
@@ -50,6 +53,7 @@ defmodule Palee.Identity.Account do
           preferred_theme_slug: String.t() | nil,
           time_zone: String.t() | nil,
           email: String.t() | nil,
+          email_verified_at: DateTime.t() | nil,
           inserted_at: DateTime.t() | NaiveDateTime.t() | nil,
           demo_organization_id: Ecto.UUID.t() | nil
         }

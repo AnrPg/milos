@@ -696,3 +696,15 @@ msgstr "%{class} (%{time}) is geannuleerd: %{reason}. Je plek is vrijgegeven."
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
 msgstr "%{class} (%{time}) is geannuleerd. Je plek is vrijgegeven."
+
+msgid "The email key expires soon"
+msgstr "De e-mailsleutel verloopt binnenkort"
+
+msgid "Palee's SMTP key expires in %{days} days (%{date}). Create a new key in Brevo and update the server's secret before then, or Palee stops sending email."
+msgstr "De SMTP-sleutel van Palee verloopt over %{days} dagen (%{date}). Maak vóór die tijd een nieuwe sleutel in Brevo en werk het secret op de server bij, anders verstuurt Palee geen e-mail meer."
+
+msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a new key in Brevo and update the server's secret."
+msgstr "De SMTP-sleutel van Palee is op %{date} verlopen, dus Palee kan geen e-mail versturen. Maak een nieuwe sleutel in Brevo en werk het secret op de server bij."
+
+msgid "The email key has expired"
+msgstr "De e-mailsleutel is verlopen"
