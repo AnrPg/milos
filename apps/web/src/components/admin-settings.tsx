@@ -39,6 +39,7 @@ import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerS
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 import { IntegerInput } from "@/components/integer-input";
+import { DurationLimitField } from "@/components/schedule/BookingRuleFields";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
@@ -943,33 +944,41 @@ function formatCleanupAmount(record: FinanceCleanupRecord) {
   return new Intl.NumberFormat("el-GR", { style: "currency", currency }).format(cents / 100);
 }
 
-// A number setting where null means "no limit" (ADR-097 booking window and cancellation cutoff).
+// A number setting where null means "no limit" (ADR-097 booking window).
 function OptionalLimitField({
   label,
   hint,
+  unit,
+  noLimitLabel,
   value,
   min,
   max,
   fallback,
   onChange,
+  testId,
 }: {
   label: string;
   hint: string;
+  unit: string;
+  noLimitLabel: string;
   value: number | null;
   min: number;
   max: number;
   fallback: number;
   onChange: (value: number | null) => void;
+  testId?: string;
 }) {
-  const i18n = useUiTranslations();
   return (
-    <div className="text-sm font-semibold">
+    <div className="text-sm font-semibold" data-testid={testId}>
       <span>{label}</span>
-      <div className="mt-2 flex items-center gap-3">
-        <IntegerInput aria-label={label} disabled={value === null} min={min} max={max} emptyValue={min} className="w-28 rounded-xl px-4 py-3 disabled:opacity-40" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={value} onValueChange={(next) => onChange(next ?? min)} />
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm font-normal" style={{ color: "var(--muted)" }}>
-          <input type="checkbox" checked={value === null} onChange={(event) => onChange(event.target.checked ? null : fallback)} />
-          {i18n("admNoLimit")}
+          <IntegerInput aria-label={label} data-testid={testId ? `${testId}-value` : undefined} disabled={value === null} min={min} max={max} emptyValue={min} className="w-24 rounded-xl px-3 py-3 disabled:opacity-40" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={value} onValueChange={(next) => onChange(next ?? min)} />
+          {unit}
+        </label>
+        <label className="flex items-center gap-2 text-sm font-normal" style={{ color: "var(--muted)" }}>
+          <input type="checkbox" data-testid={testId ? `${testId}-no-limit` : undefined} checked={value === null} onChange={(event) => onChange(event.target.checked ? null : fallback)} />
+          {noLimitLabel}
         </label>
       </div>
       <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{hint}</p>
@@ -979,27 +988,29 @@ function OptionalLimitField({
 
 type SchedulingForm = {
   capacity: number;
-  timeout: number;
+  /** ADR-226: null = a request waits for approval until the class starts. */
+  timeout: number | null;
   autoApprove: boolean;
   windowDays: number | null;
-  cutoffHours: number | null;
+  /** ADR-226: minutes before the class; null = cancelling is always free. */
+  cutoffMinutes: number | null;
 };
 
 function schedulingFormFromSettings(value: SchedulingSettings): SchedulingForm {
   return {
     capacity: value.default_capacity,
-    timeout: value.default_booking_timeout_minutes,
+    timeout: value.default_booking_timeout_minutes ?? null,
     autoApprove: value.default_auto_approve,
     windowDays: value.default_booking_window_days ?? null,
-    cutoffHours: value.default_cancellation_cutoff_hours ?? null,
+    cutoffMinutes: value.default_cancellation_cutoff_minutes ?? null,
   };
 }
 
 function SchedulingDefaultsSection({ token }: { token: string }) {
-  const i18n = useUiTranslations();
+  const rules = useTranslations("BookingRules");
   const queryClient = useQueryClient();
   const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
-  const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffHours: null });
+  const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffMinutes: null });
 
   useEffect(() => {
     const value = settingsQuery.data?.scheduling;
@@ -1014,7 +1025,7 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
       default_booking_timeout_minutes: form.timeout,
       default_auto_approve: form.autoApprove,
       default_booking_window_days: form.windowDays,
-      default_cancellation_cutoff_hours: form.cutoffHours,
+      default_cancellation_cutoff_minutes: form.cutoffMinutes,
     } }),
     onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
   });
@@ -1022,12 +1033,20 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
   const saved = current ? schedulingFormFromSettings(current) : null;
   const dirty = Boolean(saved) && (Object.keys(form) as Array<keyof SchedulingForm>).some((key) => form[key] !== saved![key]);
 
-  return <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-    <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<IntegerInput min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} /></label>
-    <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<IntegerInput min={1} max={10080} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onValueChange={(timeout) => setForm({ ...form, timeout: timeout ?? 1 })} /></label>
-    <OptionalLimitField label={i18n("admBookingWindowDays")} hint={i18n("admBookingWindowHint")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
-    <OptionalLimitField label={i18n("admCancellationCutoffHours")} hint={i18n("admCancellationCutoffHint")} value={form.cutoffHours} min={0} max={168} fallback={12} onChange={(cutoffHours) => setForm({ ...form, cutoffHours })} />
-    <label className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{i18n("featureAutoApproveClassBookings")}</label>
+  // ADR-226: every rule says what it does, for whom, and what "no limit" means.
+  return <div className="grid max-w-3xl gap-5 sm:grid-cols-2" data-testid="class-booking-defaults">
+    <div className="text-sm font-semibold">
+      <label htmlFor="class-default-capacity">{rules("capacityLabel")}</label>
+      <IntegerInput id="class-default-capacity" data-testid="class-default-capacity" min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} />
+      <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("capacityHelp")}</p>
+    </div>
+    <div className="text-sm font-semibold">
+      <label className="flex items-center gap-3"><input type="checkbox" data-testid="class-default-auto-approve" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{rules("autoApproveLabel")}</label>
+      <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("autoApproveHelp")}</p>
+    </div>
+    <DurationLimitField testId="class-default-approval-wait" label={rules("approvalWaitLabel")} help={rules("approvalWaitHelp")} noLimitLabel={rules("approvalWaitNoLimit")} value={form.timeout} min={1} max={10080} fallback={60} onChange={(timeout) => setForm({ ...form, timeout })} />
+    <OptionalLimitField testId="class-default-booking-window" label={rules("bookingWindowLabel")} hint={rules("bookingWindowHelp")} unit={rules("days")} noLimitLabel={rules("noLimit")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
+    <DurationLimitField testId="class-default-late-cancellation" label={rules("lateCancellationLabel")} help={rules("lateCancellationHelp")} noLimitLabel={rules("noLimit")} value={form.cutoffMinutes} min={0} max={10080} fallback={720} onChange={(cutoffMinutes) => setForm({ ...form, cutoffMinutes })} />
     <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => saved && setForm(saved)} /></div>
   </div>;
 }

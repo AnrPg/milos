@@ -75466,7 +75466,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75518,7 +75518,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75595,7 +75595,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -76773,9 +76773,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -76834,11 +76836,12 @@ export interface operations {
                     };
                     scheduling?: {
                         default_auto_approve?: boolean;
-                        default_booking_timeout_minutes?: number;
+                        /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                        default_booking_timeout_minutes?: number | null;
                         /** @description How many days ahead members may book when their package sets no window */
                         default_booking_window_days?: number | null;
-                        /** @description Withdrawals closer to the class than this use the visit */
-                        default_cancellation_cutoff_hours?: number | null;
+                        /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                        default_cancellation_cutoff_minutes?: number | null;
                         default_capacity?: number;
                     };
                     workouts?: {
@@ -76893,9 +76896,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;

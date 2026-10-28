@@ -177215,6 +177215,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
+                    "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -177337,7 +177340,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
                     "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -177524,6 +177529,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
+                    "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -180648,8 +180656,10 @@
                           "type": "boolean"
                         },
                         "default_booking_timeout_minutes": {
+                          "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                           "maximum": 10080,
                           "minimum": 1,
+                          "nullable": true,
                           "type": "integer"
                         },
                         "default_booking_window_days": {
@@ -180658,8 +180668,9 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "default_cancellation_cutoff_hours": {
-                          "maximum": 168,
+                        "default_cancellation_cutoff_minutes": {
+                          "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                          "maximum": 10080,
                           "minimum": 0,
                           "nullable": true,
                           "type": "integer"
@@ -180849,8 +180860,10 @@
                         "type": "boolean"
                       },
                       "default_booking_timeout_minutes": {
+                        "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                         "maximum": 10080,
                         "minimum": 1,
+                        "nullable": true,
                         "type": "integer"
                       },
                       "default_booking_window_days": {
@@ -180860,9 +180873,9 @@
                         "nullable": true,
                         "type": "integer"
                       },
-                      "default_cancellation_cutoff_hours": {
-                        "description": "Withdrawals closer to the class than this use the visit",
-                        "maximum": 168,
+                      "default_cancellation_cutoff_minutes": {
+                        "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                        "maximum": 10080,
                         "minimum": 0,
                         "nullable": true,
                         "type": "integer"
@@ -181020,8 +181033,10 @@
                           "type": "boolean"
                         },
                         "default_booking_timeout_minutes": {
+                          "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                           "maximum": 10080,
                           "minimum": 1,
+                          "nullable": true,
                           "type": "integer"
                         },
                         "default_booking_window_days": {
@@ -181030,8 +181045,9 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "default_cancellation_cutoff_hours": {
-                          "maximum": 168,
+                        "default_cancellation_cutoff_minutes": {
+                          "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                          "maximum": 10080,
                           "minimum": 0,
                           "nullable": true,
                           "type": "integer"
