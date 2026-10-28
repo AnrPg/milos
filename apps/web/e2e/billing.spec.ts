@@ -328,7 +328,7 @@ test.describe("billing", () => {
     await page.goto("/me/payments");
     const renewal = page.getByRole("switch", { name: /Automatic renewal/ });
     await expect(renewal).toBeChecked();
-    await expect(page.getByText("Your package renews every period.", { exact: false })).toBeVisible();
+    await expect(page.getByText("Your subscription package renews every period.", { exact: false })).toBeVisible();
 
     await renewal.click();
     await expect(renewal).not.toBeChecked();
