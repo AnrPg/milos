@@ -55,6 +55,8 @@ async function stub(page: Page, user: ReturnType<typeof person>, writes: Array<{
     if (path === "/api/memberships") return json(route, [ownerMembership]);
     if (path.startsWith("/api/notifications")) return json(route, { notifications: [], unread_count: 0 });
     if (path === "/api/admin/settings") return json(route, { gamification: {}, finance: {}, scheduling: {} });
+    // Settings › Invitations shows the two join links (ADR-216).
+    if (path === "/api/join-link") return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     if (path === "/api/admin/community/groups") {
       return json(route, { settings: { member_groups: "none", partners_enabled: false }, pending: [], groups: [] });
     }

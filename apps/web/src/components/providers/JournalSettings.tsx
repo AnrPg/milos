@@ -92,7 +92,7 @@ export function JournalExportSetting() {
   const queryClient = useQueryClient();
   const [conflict, setConflict] = useState(false);
   const exports = useQuery({
-    queryKey: [...JOURNAL_EXPORTS_KEY, token],
+    queryKey: JOURNAL_EXPORTS_KEY,
     enabled: Boolean(token),
     queryFn: () => fetchJournalExports(token!),
     refetchInterval: (query) => (query.state.data?.some?.((item) => item.status === "pending") ? 3000 : false),

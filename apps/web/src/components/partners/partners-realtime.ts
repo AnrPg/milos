@@ -3,6 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { PARTNERS_KEY, PARTNER_MATCHES_KEY, partnerMessagesKey } from "@/api/partners";
 
 import type { CacheRefresh } from "@/components/buddy/buddy-realtime";
+import { REALTIME_FALLBACK_REFETCH_MS } from "@/lib/query-policy";
 
 /**
  * Live Partners updates (ADR-169 §7): one `partners:changed` event on the
@@ -10,7 +11,8 @@ import type { CacheRefresh } from "@/components/buddy/buddy-realtime";
  * and the match id only. This turns an event into the caches to refresh.
  */
 export const PARTNERS_EVENT = "partners:changed";
-export const PARTNERS_FALLBACK_REFETCH_MS = 2 * 60_000;
+/** The safety net behind the events, polled only while the live connection is down; a rejoin also resyncs. */
+export const PARTNERS_FALLBACK_REFETCH_MS = REALTIME_FALLBACK_REFETCH_MS;
 
 export type PartnersEventKind = "partner_match_changed" | "partner_message_created" | "partner_messages_read";
 export type PartnersEvent = { kind: PartnersEventKind; match_id?: string };
