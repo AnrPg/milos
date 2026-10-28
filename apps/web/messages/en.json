@@ -237,6 +237,7 @@
     "classAction_cancel": "Cancel class",
     "classAction_restore": "Restore class",
     "classAction_delete": "Delete",
+    "classMoreActions": "More actions for this class",
     "classActionTitle_pause": "Pause bookings?",
     "classActionTitle_resume": "Resume bookings?",
     "classActionTitle_cancel": "Cancel this class?",

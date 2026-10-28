@@ -357,7 +357,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button type="button" className="rounded-full px-3 py-2 text-sm" style={{ background: "var(--panel-muted)" }} onClick={() => {
             const date = new Date(`${startDate}T12:00:00`); date.setDate(date.getDate() - 7); setStartDate(isoDate(date));
           }}>{i18n("featurePreviousWeek")}</button>

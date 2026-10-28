@@ -237,6 +237,7 @@
     "classAction_cancel": "Отмени занятието",
     "classAction_restore": "Възстанови занятието",
     "classAction_delete": "Изтрий",
+    "classMoreActions": "Още действия за занятието",
     "classActionTitle_pause": "Да спрем ли записването?",
     "classActionTitle_resume": "Да подновим ли записването?",
     "classActionTitle_cancel": "Да отмениш ли това занятие?",

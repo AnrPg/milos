@@ -237,6 +237,7 @@
     "classAction_cancel": "ביטול שיעור",
     "classAction_restore": "שחזור שיעור",
     "classAction_delete": "מחיקה",
+    "classMoreActions": "פעולות נוספות לשיעור",
     "classActionTitle_pause": "להשהות את ההרשמה?",
     "classActionTitle_resume": "להמשיך את ההרשמה?",
     "classActionTitle_cancel": "לבטל את השיעור הזה?",
