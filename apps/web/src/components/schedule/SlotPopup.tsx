@@ -50,6 +50,7 @@ import { zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 
 // ADR-179: on the gym's clock (`zone`), its city added when the viewer's differs.
 function formatDateTime(locale: string, isoString: string, zone: string | null) {
@@ -135,6 +136,8 @@ export function SlotPopup({
   const memberState = memberSlotState(slot);
   const canBook = !isAdmin && memberState.kind === "bookable";
   const canJoinWaitlist = !isAdmin && memberState.kind === "waitlist_open";
+  // ADR-200: pause/resume, cancel/restore and delete apply to upcoming classes only.
+  const stateActions = isAdmin && onClassAction && !isPast ? classActionsFor(slot) : [];
   const locationName = slotLocationName(slot, locations);
   const creditCost = slotCreditCost(slot);
   const [waitlistBusy, setWaitlistBusy] = useState(false);
@@ -323,7 +326,7 @@ export function SlotPopup({
         </div>
 
         <div className="p-6">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <h2 className="text-3xl font-semibold" style={{ color: "var(--text)" }}>
                 {slot.workout?.title ?? i18n("scheduledClass571cba0")}
@@ -356,25 +359,53 @@ export function SlotPopup({
 
           <ClassStateNotice slot={slot} className="mt-4" />
 
-          {isAdmin && onClassAction && !isPast ? (
-            <div className="mt-4 flex flex-wrap gap-2" data-testid="class-actions">
-              {classActionsFor(slot)
-                .filter((action) => action !== "delete")
-                .map((action) => (
-                  <button
-                    key={action}
-                    className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                    style={
-                      action === "cancel"
-                        ? { background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }
-                        : { background: "var(--card)", color: "var(--text-soft)" }
-                    }
-                    onClick={() => onClassAction(action)}
-                    type="button"
-                  >
-                    {t(`classAction_${action}`)}
-                  </button>
-                ))}
+          {/* Class actions: Edit (and Restore on a cancelled class) stay in
+              view; the rest sit behind ⋯ so the row never overflows the card
+              on a phone or in a long language. Destructive ones come last. */}
+          {isAdmin ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="class-actions">
+              <button
+                className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                style={{ background: "var(--text)", color: "var(--bg)" }}
+                onClick={onEdit}
+                type="button"
+              >
+                {i18n("editSlot4754d1f")}
+              </button>
+              {stateActions.includes("restore") ? (
+                <button
+                  className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                  style={{ background: "var(--card)", color: "var(--text-soft)" }}
+                  onClick={() => onClassAction?.("restore")}
+                  type="button"
+                >
+                  {t("classAction_restore")}
+                </button>
+              ) : null}
+              <MoreMenu
+                variant="pill"
+                label={t("classMoreActions")}
+                testId="class-more-actions"
+                items={[
+                  ...(onDuplicate ? [{ label: t("duplicateClass"), onSelect: onDuplicate }] : []),
+                  ...stateActions
+                    .filter((action) => action !== "restore" && action !== "delete")
+                    .map((action) => ({
+                      label: t(`classAction_${action}`),
+                      onSelect: () => onClassAction?.(action),
+                      tone: action === "cancel" ? ("danger" as const) : undefined,
+                    })),
+                  ...(onDelete || onClassAction
+                    ? [
+                        {
+                          label: i18n("deletef6fdbe4"),
+                          onSelect: () => (onClassAction ? onClassAction("delete") : onDelete?.()),
+                          tone: "danger" as const,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
             </div>
           ) : null}
 
@@ -647,43 +678,16 @@ export function SlotPopup({
             className="mt-8 rounded-[1.8rem] p-5"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="min-w-0 text-lg font-semibold" style={{ color: "var(--text)" }}>
                 {i18n("workout39463a5")}
               </h3>
-              {isAdmin ? (
-                <div className="flex gap-2">
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                    style={{ background: "var(--card)", color: "var(--text-soft)" }}
-                    onClick={onEdit}
-                    type="button"
-                  >
-                      {i18n("editSlot4754d1f")}
-                    </button>
-                  {onDuplicate ? (
-                    <button
-                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
-                      onClick={onDuplicate}
-                      type="button"
-                    >
-                      {t("duplicateClass")}
-                    </button>
-                  ) : null}
-                  {onDelete || onClassAction ? (
-                    <button
-                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                      style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }}
-                      onClick={() => (onClassAction ? onClassAction("delete") : onDelete?.())}
-                      type="button"
-                    >
-                      {i18n("deletef6fdbe4")}
-                    </button>
-                  ) : null}
+              {/* Only the workout's own actions here; the class's are at the top. */}
+              {isAdmin && (slot.workout || canProgramVariations) ? (
+                <div className="flex flex-wrap gap-2" data-testid="workout-actions">
                   {slot.workout ? (
                     <button
-                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                       style={{ background: "var(--card)", color: "var(--text-soft)" }}
                       onClick={() => setEditWorkoutOpen(true)}
                       type="button"
@@ -693,7 +697,7 @@ export function SlotPopup({
                   ) : null}
                   {canProgramVariations ? (
                     <button
-                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                       style={{ background: "var(--card)", color: "var(--text-soft)" }}
                       onClick={() => setVariationOpen(true)}
                       type="button"

@@ -64,7 +64,10 @@ defmodule PaleeWeb.OrganizationJoinLinkControllerTest do
   end
 
   test "the join link is disabled by default and hidden from the public", context do
-    assert %{"enabled" => false, "role" => "member"} =
+    assert %{
+             "member" => %{"enabled" => false},
+             "athlete" => %{"enabled" => false, "key" => nil}
+           } =
              context
              |> admin_conn()
              |> get("/api/org/#{context.organization.slug}/join-link")
@@ -88,52 +91,111 @@ defmodule PaleeWeb.OrganizationJoinLinkControllerTest do
              |> put_req_header("content-type", "application/json")
              |> put(
                "/api/org/#{context.organization.slug}/join-link",
-               Jason.encode!(%{role: "admin"})
+               Jason.encode!(%{role: "admin", enabled: true})
              )
              |> json_response(422)
   end
 
-  test "a client account joins with the configured role, idempotently", context do
-    assert %{"enabled" => true, "role" => "athlete"} =
-             enable_link(context, %{enabled: true, role: "athlete"})
-
-    assert %{"organization" => %{"name" => "Join Gym"}, "role" => "athlete"} =
-             context.conn
-             |> get("/api/auth/join/#{context.organization.slug}")
-             |> json_response(200)
-
+  defp visitor do
     {:ok, visitor} =
       Identity.register(%{
-        nickname: "join_visitor",
+        nickname: "join_visitor#{System.unique_integer([:positive])}",
         password: "S3cur3P@ss!42",
         role: :member,
         email: "visitor#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
+    visitor
+  end
+
+  defp join(context, user, path) do
+    context.conn |> recycle() |> put_bearer_token(user) |> post(path)
+  end
+
+  test "the athlete link joins with the athlete role, idempotently", context do
+    assert %{"athlete" => %{"enabled" => true, "key" => key}, "member" => %{"enabled" => false}} =
+             enable_link(context, %{role: "athlete", enabled: true})
+
+    assert is_binary(key)
+    slug = context.organization.slug
+
+    assert %{"organization" => %{"name" => "Join Gym"}, "role" => "athlete"} =
+             context.conn
+             |> get("/api/auth/join/#{slug}/athlete/#{key}")
+             |> json_response(200)
+
+    visitor = visitor()
+
     joined =
-      context.conn
-      |> recycle()
-      |> put_bearer_token(visitor)
-      |> post("/api/memberships/join/#{context.organization.slug}")
+      context
+      |> join(visitor, "/api/memberships/join/#{slug}/athlete/#{key}")
       |> json_response(201)
 
     assert joined["role"] == "athlete"
-    assert joined["organization"]["slug"] == context.organization.slug
+    assert joined["organization"]["slug"] == slug
     # The account role changed, so earlier access tokens are stale; the web
     # client refreshes its session after joining.
     visitor = Identity.find_by_id(visitor.id)
     assert visitor.role == :athlete
 
     assert %{"role" => "athlete"} =
-             context.conn
-             |> recycle()
-             |> put_bearer_token(visitor)
-             |> post("/api/memberships/join/#{context.organization.slug}")
+             context
+             |> join(visitor, "/api/memberships/join/#{slug}/athlete/#{key}")
              |> json_response(200)
   end
 
+  test "both links work at once, each with its own role", context do
+    enable_link(context, %{role: "member", enabled: true})
+    %{"athlete" => %{"key" => key}} = enable_link(context, %{role: "athlete", enabled: true})
+    slug = context.organization.slug
+
+    assert %{"role" => "member"} =
+             context.conn |> get("/api/auth/join/#{slug}") |> json_response(200)
+
+    assert %{"role" => "member"} =
+             context |> join(visitor(), "/api/memberships/join/#{slug}") |> json_response(201)
+
+    assert %{"role" => "athlete"} =
+             context
+             |> join(visitor(), "/api/memberships/join/#{slug}/athlete/#{key}")
+             |> json_response(201)
+  end
+
+  test "the member link never grants the athlete role, and a wrong key is unavailable", context do
+    enable_link(context, %{role: "athlete", enabled: true})
+    slug = context.organization.slug
+
+    # Only the athlete link is on: the box address alone does not let anyone in.
+    assert %{"code" => "join_link_unavailable"} =
+             context.conn |> get("/api/auth/join/#{slug}") |> json_response(404)
+
+    assert %{"code" => "join_link_unavailable"} =
+             context |> join(visitor(), "/api/memberships/join/#{slug}") |> json_response(404)
+
+    assert %{"code" => "join_link_unavailable"} =
+             context.conn |> get("/api/auth/join/#{slug}/athlete/guess") |> json_response(404)
+
+    assert %{"code" => "join_link_unavailable"} =
+             context
+             |> join(visitor(), "/api/memberships/join/#{slug}/athlete/guess")
+             |> json_response(404)
+  end
+
+  test "a new athlete key retires the old address", context do
+    %{"athlete" => %{"key" => old}} = enable_link(context, %{role: "athlete", enabled: true})
+
+    %{"athlete" => %{"enabled" => true, "key" => new}} =
+      enable_link(context, %{role: "athlete", rotate_key: true})
+
+    refute old == new
+    slug = context.organization.slug
+
+    context.conn |> get("/api/auth/join/#{slug}/athlete/#{old}") |> json_response(404)
+    context.conn |> get("/api/auth/join/#{slug}/athlete/#{new}") |> json_response(200)
+  end
+
   test "joining never changes an existing staff membership", context do
-    enable_link(context, %{enabled: true})
+    enable_link(context, %{role: "member", enabled: true})
 
     assert %{"role" => "owner"} =
              context

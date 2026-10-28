@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -13,6 +12,7 @@ import { useBodySettings, useBodySnapshots, useBodyToken, useUpdateBodySettings 
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { POSES, defaultComparePair, formatDelta, sharedPoses, toDeltaRows, unitOf } from "@/lib/body";
 import { Select } from "@/components/ui/Select";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * Two photos of one pose on top of each other with a divider to drag
@@ -149,7 +149,7 @@ export function ComparePage() {
     return (
       <Card label={t("compareTitle")}>
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("compareNeedTwo")}</p>
-        <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
+        <BackLink href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("title")}</BackLink>
       </Card>
     );
   }
@@ -186,7 +186,7 @@ export function ComparePage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
+        <BackLink href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("title")}</BackLink>
         <h2 className="mt-1 text-xl font-extrabold" style={{ color: "var(--text)" }}>{t("compareTitle")}</h2>
       </div>
       <div className="flex gap-2">

@@ -62,20 +62,6 @@ defmodule PaleeWeb.AdminSettingsController do
     ]
   }
 
-  @notification_push_settings_schema %Schema{
-    type: :object,
-    properties: %{
-      id: %Schema{type: :string, format: :uuid, nullable: true},
-      enabled: %Schema{type: :boolean},
-      vapid_public_key: %Schema{type: :string, nullable: true},
-      vapid_private_key_configured: %Schema{type: :boolean},
-      vapid_subject: %Schema{type: :string, nullable: true},
-      inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
-      updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
-    },
-    required: [:enabled, :vapid_private_key_configured]
-  }
-
   @scheduling_settings_schema %Schema{
     type: :object,
     properties: %{
@@ -153,12 +139,11 @@ defmodule PaleeWeb.AdminSettingsController do
       time_zone: @time_zone_schema,
       gamification: @gamification_settings_schema,
       finance: @finance_settings_schema,
-      notifications: @notification_push_settings_schema,
       scheduling: @scheduling_settings_schema,
       workouts: @workout_settings_schema,
       provider: @provider_settings_schema
     },
-    required: [:gamification, :finance, :notifications, :scheduling, :workouts, :provider]
+    required: [:gamification, :finance, :scheduling, :workouts, :provider]
   }
 
   @admin_settings_update_schema %Schema{
@@ -190,15 +175,6 @@ defmodule PaleeWeb.AdminSettingsController do
             uniqueItems: true,
             items: %Schema{type: :string, enum: Finance.package_module_keys()}
           }
-        },
-        required: []
-      },
-      notifications: %Schema{
-        type: :object,
-        properties: %{
-          vapid_public_key: %Schema{type: :string, nullable: true},
-          vapid_private_key: %Schema{type: :string, nullable: true},
-          vapid_subject: %Schema{type: :string, nullable: true}
         },
         required: []
       },

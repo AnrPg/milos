@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
@@ -26,6 +25,7 @@ import { relativeTime } from "@/components/password-resets/reset-email";
 import { canTakeOver, claimerName, sourceLabels } from "@/components/password-resets/request-labels";
 import { useNow } from "@/components/password-resets/use-now";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 const primaryButton =
   "rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-40";
@@ -117,9 +117,7 @@ export function RequestView({ id, request, loading }: { id: string; request: Pas
   }, [state, token, claim]);
 
   const back = (
-    <Link href="/password-resets" className="text-sm text-[var(--text-soft)]">
-      ‹ {t("back")}
-    </Link>
+    <BackLink href="/password-resets" className="text-sm text-[var(--text-soft)]">{t("back")}</BackLink>
   );
 
   if (!request) {

@@ -46,6 +46,17 @@ function chipStyle(variant: Variant, selected: boolean): CSSProperties {
     : { background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" };
 }
 
+// ANR 2026-10-28: on a phone the tabs fold into this dropdown, and it is the
+// page's main switch, so it must not read as a grey form field. It takes the
+// Dojo action fill (light and dark have their own Dojo) with a matching chevron.
+const DROPDOWN_STYLE = {
+  background: "var(--primary)",
+  border: "1px solid var(--primary)",
+  color: "var(--primary-contrast)",
+  boxShadow: "var(--shadow-sm)",
+  "--select-chevron": "var(--primary-contrast)",
+} as CSSProperties;
+
 function Badge({ selected, children }: { selected: boolean; children: ReactNode }) {
   return (
     <span
@@ -180,8 +191,9 @@ export function SegmentPicker<T extends string>({
           value={value}
           onValueChange={(value) => onChange(value as T)}
           aria-controls={panelId}
-          className="min-h-10 w-full rounded-xl px-3 text-sm font-semibold"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+          data-segment-dropdown=""
+          className="min-h-11 w-full rounded-xl px-3.5 text-sm font-bold"
+          style={DROPDOWN_STYLE}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value} disabled={option.disabled}>

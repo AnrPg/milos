@@ -6,21 +6,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
-import { inspectJoinLink, joinOrganization } from "@/api/organizations";
+import { inspectJoinLink, joinOrganization, joinPath } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
-export function JoinOrganizationPage({ slug }: { slug: string }) {
+export function JoinOrganizationPage({ slug, athleteKey }: { slug: string; athleteKey?: string }) {
   const t = useTranslations("Invites");
   const uiT = useTranslations("Ui");
   const router = useRouter();
   const queryClient = useQueryClient();
   const { status, tokens, rotate } = useSession();
-  const link = useQuery({ queryKey: ["public-join-link", slug], queryFn: () => inspectJoinLink(slug), retry: false });
+  const target = { slug, athleteKey };
+  const link = useQuery({
+    queryKey: ["public-join-link", slug, athleteKey ?? null],
+    queryFn: () => inspectJoinLink(target),
+    retry: false,
+  });
   const join = useMutation({
-    mutationFn: () => joinOrganization(tokens!.access_token, slug),
+    mutationFn: () => joinOrganization(tokens!.access_token, target),
     onSuccess: async (membership) => {
       rememberSelectedOrganization(membership.organization.slug);
       // Joining can change the account role, which invalidates the old token.
@@ -30,7 +35,7 @@ export function JoinOrganizationPage({ slug }: { slug: string }) {
     },
   });
 
-  const next = `/join/${encodeURIComponent(slug)}`;
+  const next = joinPath(target);
   const name = link.data?.settings?.brand_name || link.data?.organization.name;
   const role = link.data?.role === "athlete" ? "athlete" : "member";
 

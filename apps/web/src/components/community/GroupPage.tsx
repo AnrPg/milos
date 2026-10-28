@@ -35,11 +35,12 @@ import { useUiTranslations } from "@/i18n/ui";
 import { ComposeButton } from "./ComposeSheet";
 import { FeedList } from "./FeedList";
 import { Badge } from "./MembersTab";
-import { MoreMenu } from "./PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { Field, inputStyle, JoinPolicyPicker } from "./ProposeGroupSheet";
 import { ReportSheet } from "./ReportSheet";
 import { ErrorLine, Sheet, SheetButton } from "./Sheet";
 import { useClubRealtime, useMyClubs } from "./use-community";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * A member group (board 7 Q2): its posts and events (ADR-153) for members, who is in it, and for
@@ -92,9 +93,7 @@ function GroupView({ club, clubs, group }: { club: CommunityClub; clubs: Communi
       title={group.name}
       actions={canPost ? <ComposeButton clubs={clubs} clubId={club.id} channelId={group.id} /> : <GroupMenu club={club} group={group} />}
     >
-      <Link href={`/clubs/${club.id}`} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
-        ‹ {club.name}
-      </Link>
+      <BackLink href={`/clubs/${club.id}`} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{club.name}</BackLink>
       <HubCard>
         <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
           {t("groupLabel")} · {t("groupMembers", { count: group.member_count })}

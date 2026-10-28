@@ -665,7 +665,10 @@ defmodule PaleeWeb.FallbackController do
   def call(conn, {:error, :invalid_join_link}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> json(%{code: "invalid_join_link", error: "Choose member or athlete and on or off"})
+    |> json(%{
+      code: "invalid_join_link",
+      error: "Choose the member or athlete link and turn it on or off"
+    })
   end
 
   def call(conn, {:error, :stale_dsl_revision}) do
@@ -1624,7 +1627,7 @@ defmodule PaleeWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "role_ceiling_exceeded",
-      error: "You cannot invite someone to a role more privileged than your own"
+      error: "You can only grant roles below your own, to people ranked below you"
     })
   end
 
@@ -2580,6 +2583,9 @@ defmodule PaleeWeb.FallbackController do
     invalid_location_scope: {:unprocessable_entity, "Choose every branch or at least one branch"},
     owner_location_scope: {:unprocessable_entity, "Owners work at every branch"},
     cannot_change_own_membership: {:forbidden, "Someone else changes your own access"},
+    # ADR-219: only roles below one's top role move on oneself.
+    own_top_role_locked:
+      {:forbidden, "Your top role stays; you may add or drop only roles below it"},
     promotion_location_not_included:
       {:unprocessable_entity, "This promotion is not valid at the branches of this package"},
     # ADR-191: partner perks.

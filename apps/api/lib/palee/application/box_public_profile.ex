@@ -9,7 +9,7 @@ defmodule Palee.Application.BoxPublicProfile do
   """
 
   alias Palee.Application.MediaUrls
-  alias Palee.{Identity, Media, Organizations}
+  alias Palee.{Facility, Identity, Media, Organizations}
 
   @snapshot_fields ~w(about disciplines audiences amenities services languages cover_photo_id photo_ids coach_ids)a
 
@@ -63,8 +63,17 @@ defmodule Palee.Application.BoxPublicProfile do
       coach_candidates: candidates,
       published: published,
       unpublished_changes: published and snapshot(profile) != published_view(profile),
-      missing: Organizations.box_profile_missing(profile)
+      missing: Organizations.box_profile_missing(profile),
+      on_map: on_map?(context)
     })
+  end
+
+  # ADR-221: Γύρω μου places a business by an open location with a map point;
+  # the page publishes without one, but then only the name search finds it.
+  defp on_map?(context) do
+    context
+    |> Facility.list_locations()
+    |> Enum.any?(&(is_nil(Map.get(&1, :archived_at)) and is_number(Map.get(&1, :latitude))))
   end
 
   @doc """
