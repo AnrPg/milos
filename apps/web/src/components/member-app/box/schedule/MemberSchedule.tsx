@@ -89,13 +89,13 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const reload = useCallback(() => void refetch(), [refetch]);
 
   const placesQuery = useQuery({
-    queryKey: ["bookable-places", token],
+    queryKey: ["bookable-places"],
     enabled: Boolean(token),
     queryFn: () => fetchBookablePlaces(token!),
     staleTime: 5 * 60_000,
   });
   const entitlementQuery = useQuery({
-    queryKey: ["my-entitlement", token, organizationId],
+    queryKey: ["my-entitlement", organizationId],
     enabled: Boolean(token && organizationId),
     queryFn: () => fetchMyEntitlement(token!),
   });

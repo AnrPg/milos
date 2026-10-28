@@ -212,6 +212,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-212 | Email deliverability: Brevo webhook, suppression state, one-click unsubscribe, budget and key-expiry alarms, retention | Accepted |
 | ADR-213 | Email verification at sign-up: emailed link, resend, banner, `email_verified` | Accepted |
 | ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |
+| ADR-215 | Client data freshness by kind, and one shared realtime connection | Accepted |
 | ADR-216 | One join link per client role: box-member link and athlete link (with a secret key), each on or off | Accepted |
 | ADR-217 | People are shown by their roles in the business, never `users.role`; only clients have a finance profile | Accepted |
 | ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted |

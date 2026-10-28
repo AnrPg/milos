@@ -40,7 +40,7 @@ export function useCoachAudience() {
   const providers = useMyProviders();
   const any = (providers.data?.providers?.length ?? 0) > 0;
   const query = useQuery({
-    queryKey: [...COACH_AUDIENCE_KEY, token],
+    queryKey: COACH_AUDIENCE_KEY,
     enabled: Boolean(token) && any,
     queryFn: () => fetchCoachAudience(token!),
     staleTime: 60_000,

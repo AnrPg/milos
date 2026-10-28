@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 
 import { msUntilNudge } from "./buddy-model";
 import { BUDDY_FALLBACK_REFETCH_MS } from "./buddy-realtime";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
 
 export function useBuddyToken() {
   const { tokens } = useSession();
@@ -26,12 +27,13 @@ export function useBuddyToken() {
 /** My buddies, the people I support, invitations and settings. */
 export function useBuddies(enabled = true) {
   const token = useBuddyToken();
+  const fallback = useRealtimeFallbackInterval(BUDDY_FALLBACK_REFETCH_MS);
   return useQuery({
     queryKey: BUDDIES_KEY,
     enabled: Boolean(token) && enabled,
     queryFn: () => fetchBuddies(token!),
     staleTime: 30_000,
-    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
+    refetchInterval: fallback,
   });
 }
 
@@ -41,11 +43,12 @@ export function useBuddies(enabled = true) {
  */
 export function useSupportRequests(role: "sent" | "received", enabled = true) {
   const token = useBuddyToken();
+  const fallback = useRealtimeFallbackInterval(BUDDY_FALLBACK_REFETCH_MS);
   return useQuery({
     queryKey: [...SUPPORT_REQUESTS_KEY, role],
     enabled: Boolean(token) && enabled,
     queryFn: () => fetchSupportRequests(token!, role),
-    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
+    refetchInterval: fallback,
   });
 }
 
@@ -57,6 +60,7 @@ export function useSupportRequests(role: "sent" | "received", enabled = true) {
  */
 export function useSupportRequest(requestId: string | null, initial?: SupportRequest | null) {
   const token = useBuddyToken();
+  const fallback = useRealtimeFallbackInterval(BUDDY_FALLBACK_REFETCH_MS);
   const query = useQuery({
     queryKey: [...SUPPORT_REQUESTS_KEY, "one", requestId],
     enabled: Boolean(token && requestId),
@@ -65,7 +69,7 @@ export function useSupportRequest(requestId: string | null, initial?: SupportReq
     refetchInterval: (current) => {
       const data = current.state.data;
       if (!data || data.status === "undone" || (data.replies?.length ?? 0) > 0) return false;
-      return BUDDY_FALLBACK_REFETCH_MS;
+      return fallback;
     },
   });
   const data = query.data;

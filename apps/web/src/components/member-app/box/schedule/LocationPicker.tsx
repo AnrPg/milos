@@ -62,7 +62,7 @@ export function LocationPicker() {
   const [error, setError] = useState<string | null>(null);
 
   const placesQuery = useQuery({
-    queryKey: ["bookable-places", token, position],
+    queryKey: ["bookable-places", position],
     enabled: Boolean(token),
     queryFn: () => fetchBookablePlaces(token!, position),
   });

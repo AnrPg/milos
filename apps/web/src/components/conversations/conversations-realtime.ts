@@ -8,6 +8,7 @@ import {
   conversationMessagesKey,
 } from "@/api/conversations";
 import type { CacheRefresh } from "@/components/buddy/buddy-realtime";
+import { REALTIME_FALLBACK_REFETCH_MS } from "@/lib/query-policy";
 
 /**
  * Live person-conversation updates (ADR-193 §3): one `conversation:changed`
@@ -16,8 +17,8 @@ import type { CacheRefresh } from "@/components/buddy/buddy-realtime";
  * event into the caches to refresh.
  */
 export const CONVERSATION_EVENT = "conversation:changed";
-/** The slow safety net behind the events; focus and reconnect also refetch. */
-export const CONVERSATIONS_FALLBACK_REFETCH_MS = 2 * 60_000;
+/** The safety net behind the events, polled only while the live connection is down; a rejoin also resyncs. */
+export const CONVERSATIONS_FALLBACK_REFETCH_MS = REALTIME_FALLBACK_REFETCH_MS;
 
 export type ConversationEventKind = "message_created" | "read" | "folder_changed";
 export type ConversationEvent = { kind: ConversationEventKind; conversation_id: string; message_id?: string };
