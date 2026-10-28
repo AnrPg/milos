@@ -235,12 +235,12 @@ test.describe("member schedule", () => {
     await page.goto("/box/schedule");
     await page.getByRole("button", { name: /δείξε τον μήνα/ }).click();
     const grid = page.getByRole("grid", { name: "Μήνας" });
-    await expect(grid.getByRole("gridcell", { name: /4 μαθήματα/ })).toBeVisible();
+    await expect(grid.getByRole("gridcell", { name: /4 τμήματα/ })).toBeVisible();
     await shot(page, "month");
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     await grid.getByRole("gridcell", { name: new RegExp(`^\\S+ ${tomorrow.getDate()} `) }).first().click();
-    await expect(page.getByText("Δεν υπάρχουν μαθήματα")).toBeVisible();
+    await expect(page.getByText("Δεν υπάρχουν τμήματα")).toBeVisible();
   });
 
   test("opens a class as a sheet with its facts, the WOD names and Κράτηση at the bottom", async ({ page }) => {
