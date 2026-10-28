@@ -11797,6 +11797,8 @@
     "setByCoach": "Lo fijó tu coach {name}. Puedes cambiarlo cuando quieras.",
     "setByStaff": "Lo fijó {name}, de tu box. Puedes cambiarlo cuando quieras.",
     "saveFailed": "No se pudo guardar tu objetivo. Inténtalo de nuevo.",
+    "loadFailed": "No se pudo cargar tu objetivo.",
+    "retry": "Reintentar",
     "staffHint": "El objetivo propio de {name}: cuántos entrenamientos hacen que su semana cuente para la racha. Como su coach puedes fijarlo; {name} recibe un aviso y puede cambiarlo.",
     "staffDefault": "Aún sin fijar. Se aplica el valor por defecto de {count, plural, one {# entrenamiento} other {# entrenamientos}} a la semana.",
     "staffSetBy": "Fijado por última vez por {name}.",

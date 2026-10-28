@@ -13,8 +13,9 @@ defmodule Palee.Repo.Migrations.PersonalTrainingGoals do
      the staff who may coach them. `palee_training_goal_reachable` is the
      database's coarse bound: the acting person themselves, or inside the
      session's box an owner/admin of that box (the goal's person an active
-     member there) or a coach with an active coaching relationship with the
-     person there. The application narrows staff further (ADR-099/100
+     member there), a head coach of that box (`coach_scope = 'all'`, the
+     person an active member there), or a coach with an active coaching
+     relationship with the person there. The application narrows staff further (ADR-099/100
      capability scopes).
 
   2. `gamification_settings` keeps only box-wide streak rules: the new
@@ -90,7 +91,10 @@ defmodule Palee.Repo.Migrations.PersonalTrainingGoals do
                 WHERE staff.organization_id = acting.organization_id
                   AND staff.user_id = acting.user_id
                   AND staff.status = 'active'
-                  AND staff.roles && ARRAY['owner', 'admin']::varchar[]
+                  AND (
+                    staff.roles && ARRAY['owner', 'admin']::varchar[]
+                    OR ('coach' = ANY (staff.roles) AND staff.coach_scope = 'all')
+                  )
               )
               AND EXISTS (
                 SELECT 1

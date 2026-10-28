@@ -11797,6 +11797,8 @@
     "setByCoach": "Fixé par ton coach {name}. Tu peux le modifier à tout moment.",
     "setByStaff": "Fixé par {name}, de ta box. Tu peux le modifier à tout moment.",
     "saveFailed": "Impossible d'enregistrer ton objectif. Réessaie.",
+    "loadFailed": "Impossible de charger ton objectif.",
+    "retry": "Réessayer",
     "staffHint": "L'objectif personnel de {name} : combien de séances font compter sa semaine pour sa série. En tant que coach, tu peux le fixer ; {name} est prévenu·e et peut le modifier.",
     "staffDefault": "Pas encore fixé. La valeur par défaut de {count, plural, one {# séance} other {# séances}} par semaine s'applique.",
     "staffSetBy": "Fixé en dernier par {name}.",

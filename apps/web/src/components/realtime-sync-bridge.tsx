@@ -4,6 +4,7 @@
 import { useEffect, useEffectEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { TRAINING_GOAL_KEY } from "@/api/gamification";
 import { JOURNAL_FEED_KEY } from "@/api/journal";
 import { MY_REVIEWS_KEY } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
@@ -27,6 +28,11 @@ export function RealtimeSyncBridge() {
     if (detail.scopes.includes("landing")) {
       void queryClient.invalidateQueries({ queryKey: ["landing"] });
       void queryClient.invalidateQueries({ queryKey: ["execution"] });
+    }
+
+    // ADR-221: a coach changed my weekly goal.
+    if (detail.scopes.includes("training_goal")) {
+      void queryClient.invalidateQueries({ queryKey: TRAINING_GOAL_KEY });
     }
 
     if (detail.scopes.includes("admin_challenges")) {

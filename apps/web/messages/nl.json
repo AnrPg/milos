@@ -11797,6 +11797,8 @@
     "setByCoach": "Ingesteld door je coach {name}. Je kunt het altijd aanpassen.",
     "setByStaff": "Ingesteld door {name} van je box. Je kunt het altijd aanpassen.",
     "saveFailed": "Je doel kon niet worden opgeslagen. Probeer het opnieuw.",
+    "loadFailed": "Je doel kon niet worden geladen.",
+    "retry": "Opnieuw proberen",
     "staffHint": "Het eigen doel van {name}: hoeveel trainingen de week laten tellen voor de reeks. Als coach kun je het instellen; {name} krijgt een melding en kan het aanpassen.",
     "staffDefault": "Nog niet ingesteld. De standaard van {count, plural, one {# training} other {# trainingen}} per week geldt.",
     "staffSetBy": "Laatst ingesteld door {name}.",

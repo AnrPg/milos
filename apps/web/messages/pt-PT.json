@@ -11797,6 +11797,8 @@
     "setByCoach": "Definido pelo teu coach {name}. Podes alterá-lo quando quiseres.",
     "setByStaff": "Definido por {name}, da tua box. Podes alterá-lo quando quiseres.",
     "saveFailed": "Não foi possível guardar o teu objetivo. Tenta novamente.",
+    "loadFailed": "Não foi possível carregar o teu objetivo.",
+    "retry": "Tentar novamente",
     "staffHint": "O objetivo pessoal de {name}: quantos treinos fazem a semana contar para a sequência. Como coach podes defini-lo; {name} é avisado e pode alterá-lo.",
     "staffDefault": "Ainda não definido. Aplica-se o valor predefinido de {count, plural, one {# treino} other {# treinos}} por semana.",
     "staffSetBy": "Definido pela última vez por {name}.",

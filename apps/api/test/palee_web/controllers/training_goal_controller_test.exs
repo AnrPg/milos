@@ -139,6 +139,37 @@ defmodule PaleeWeb.TrainingGoalControllerTest do
            |> json_response(403)
   end
 
+  test "a head coach (full coaching scope) sets the goal of a client they do not coach", %{
+    conn: conn,
+    base: base
+  } do
+    head = user_fixture()
+    {:ok, membership} = Organizations.ensure_legacy_membership_for_migration(head, :coach)
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    {:ok, _} =
+      Palee.Organizations.OrganizationStore.update_membership_settings(
+        organization.id,
+        membership.id,
+        %{coach_scope: :all}
+      )
+
+    client = person(:member)
+    path = "#{base}/staff/clients/#{client.id}/training-goal"
+
+    assert %{"goal" => %{"is_default" => true}} =
+             conn |> as(head) |> get(path) |> json_response(200)
+
+    assert %{"goal" => %{"weekly_workout_target" => 4, "set_by_role" => "staff"}} =
+             conn
+             |> as(head)
+             |> send_json(:put, path, %{weekly_workout_target: 4})
+             |> json_response(200)
+
+    assert %{"goal" => %{"weekly_workout_target" => 4}} =
+             conn |> as(client) |> get("/api/gamification/goal") |> json_response(200)
+  end
+
   test "an owner sets any client's goal; front desk, members and other gyms cannot", %{
     conn: conn,
     owner: owner,

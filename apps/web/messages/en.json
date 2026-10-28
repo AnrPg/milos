@@ -11797,6 +11797,8 @@
     "setByCoach": "Set by your coach {name}. You can change it at any time.",
     "setByStaff": "Set by {name} from your box. You can change it at any time.",
     "saveFailed": "Could not save your goal. Please try again.",
+    "loadFailed": "Could not load your goal.",
+    "retry": "Try again",
     "staffHint": "{name}'s own goal: how many workouts make their week count for their streak. As their coach you can set it; {name} is notified and can change it.",
     "staffDefault": "Not set yet. The default of {count, plural, one {# workout} other {# workouts}} a week applies.",
     "staffSetBy": "Last set by {name}.",

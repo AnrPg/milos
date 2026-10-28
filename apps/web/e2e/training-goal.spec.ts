@@ -96,6 +96,28 @@ test.describe("personal weekly goal (ADR-221)", () => {
     await expect(setting.getByRole("button", { name: "One workout more" })).toBeEnabled();
   });
 
+  test("a goal that failed to load is never edited on a guess", async ({ page }) => {
+    await common(page, "member");
+    let fail = true;
+    const puts: unknown[] = [];
+    await page.route("**/api/gamification/goal", (route) => {
+      if (route.request().method() === "PUT") puts.push(route.request().postDataJSON());
+      if (fail) return route.fulfill(json({ error: "boom" }, 500));
+      return route.fulfill(json({ goal: { weekly_workout_target: 5, is_default: false, set_by_role: "self", set_by_nickname: "Maria", min: 1, max: 14 } }));
+    });
+
+    await page.goto("/me/settings#training-schedule");
+    const setting = page.getByTestId("weekly-goal-setting");
+    await expect(setting).toContainText("Could not load your goal.", { timeout: 60_000 });
+    await expect(setting.getByRole("button", { name: "One workout more" })).toHaveCount(0);
+    await expect(setting).not.toContainText("This is the starting suggestion.");
+
+    fail = false;
+    await setting.getByRole("button", { name: "Try again" }).click();
+    await expect(setting.getByTestId("training-goal-value")).toHaveText("5 workouts a week");
+    expect(puts).toEqual([]);
+  });
+
   test("a coach sets a client's goal on the client's profile", async ({ page }) => {
     await common(page, "coach");
     const puts: unknown[] = [];

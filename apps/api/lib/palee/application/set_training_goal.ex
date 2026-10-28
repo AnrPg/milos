@@ -7,7 +7,7 @@ defmodule Palee.Application.SetTrainingGoal do
   person is told who and to what, and can always change it back.
   """
 
-  alias Palee.Application.{GetTrainingGoal, InvalidateLandingPages}
+  alias Palee.Application.{BroadcastUserSync, GetTrainingGoal, InvalidateLandingPages}
   alias Palee.{Coaching, Gamification, Notifications}
   alias Palee.Gamification.Domain.WeeklyGoal
 
@@ -31,6 +31,8 @@ defmodule Palee.Application.SetTrainingGoal do
              Gamification.put_training_goal(attrs)
            end) do
       InvalidateLandingPages.for_users([member_id])
+      # Open settings and Πρόοδος tabs refetch the goal itself too.
+      BroadcastUserSync.for_user(member_id, ["training_goal"], reason: "training_goal_updated")
       notify(role, member_id, goal, actor)
       {:ok, WeeklyGoal.present(goal)}
     end

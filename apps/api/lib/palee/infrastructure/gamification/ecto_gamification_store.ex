@@ -599,19 +599,19 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
     |> present_goal()
   end
 
-  # One row per person and kind: the upsert keeps the row (and its
-  # inserted_at) and replaces the target and who set it.
+  # One row per person and kind, written in one statement so a member and
+  # their coach saving at once both land on it: the conflict keeps the row
+  # (and its inserted_at) and replaces the target and who set it.
   @impl true
   def put_training_goal(params) do
-    user_id = params[:user_id] || params["user_id"]
-    kind = params[:kind] || params["kind"]
-
-    TrainingGoal
-    |> where([goal], goal.user_id == ^user_id and goal.kind == ^kind)
-    |> Repo.one()
-    |> Kernel.||(%TrainingGoal{})
+    %TrainingGoal{}
     |> TrainingGoal.changeset(params)
-    |> Repo.insert_or_update()
+    |> Repo.insert(
+      on_conflict:
+        {:replace, [:target, :set_by_id, :set_by_role, :set_in_organization_id, :updated_at]},
+      conflict_target: [:user_id, :kind],
+      returning: true
+    )
     |> case do
       {:ok, goal} -> {:ok, present_goal(goal)}
       {:error, changeset} -> {:error, changeset}

@@ -11797,6 +11797,8 @@
     "setByCoach": "Impostato dal tuo coach {name}. Puoi cambiarlo quando vuoi.",
     "setByStaff": "Impostato da {name} del tuo box. Puoi cambiarlo quando vuoi.",
     "saveFailed": "Impossibile salvare l'obiettivo. Riprova.",
+    "loadFailed": "Impossibile caricare il tuo obiettivo.",
+    "retry": "Riprova",
     "staffHint": "L'obiettivo personale di {name}: quanti allenamenti fanno contare la settimana per la serie. Come coach puoi impostarlo; {name} riceve un avviso e può cambiarlo.",
     "staffDefault": "Non ancora impostato. Vale il predefinito di {count, plural, one {# allenamento} other {# allenamenti}} a settimana.",
     "staffSetBy": "Ultima modifica di {name}.",

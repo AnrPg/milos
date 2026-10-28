@@ -11797,6 +11797,8 @@
     "setByCoach": "Von deinem Coach {name} festgelegt. Du kannst es jederzeit ändern.",
     "setByStaff": "Von {name} aus deiner Box festgelegt. Du kannst es jederzeit ändern.",
     "saveFailed": "Dein Ziel konnte nicht gespeichert werden. Bitte versuch es erneut.",
+    "loadFailed": "Dein Ziel konnte nicht geladen werden.",
+    "retry": "Erneut versuchen",
     "staffHint": "Das eigene Ziel von {name}: wie viele Trainings eine Woche für die Serie zählen lassen. Als Coach kannst du es festlegen; {name} wird benachrichtigt und kann es ändern.",
     "staffDefault": "Noch nicht festgelegt. Es gilt der Standard von {count, plural, one {# Training} other {# Trainings}} pro Woche.",
     "staffSetBy": "Zuletzt festgelegt von {name}.",
