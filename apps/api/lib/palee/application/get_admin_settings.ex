@@ -1,5 +1,5 @@
 defmodule Palee.Application.GetAdminSettings do
-  alias Palee.{Finance, Gamification, Notifications, Organizations, Scheduling}
+  alias Palee.{Finance, Gamification, Organizations, Scheduling}
 
   def call, do: {:error, :organization_context_required}
 
@@ -9,7 +9,6 @@ defmodule Palee.Application.GetAdminSettings do
        # TD-092: gamification settings are a tenant row (defaults otherwise).
        gamification: Gamification.with_tenant_context(context, &Gamification.get_settings/0),
        finance: Finance.get_finance_settings(context),
-       notifications: Notifications.get_push_settings(),
        scheduling: Scheduling.get_settings(context),
        # ADR-163: workout-authoring defaults (the WOD-goals toggle).
        workouts: Organizations.get_workout_settings(context),

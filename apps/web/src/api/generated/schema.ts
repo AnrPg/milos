@@ -12670,6 +12670,24 @@ export interface paths {
         patch: operations["PaleeWeb.PlatformPlanController.update"];
         trace?: never;
     };
+    "/api/platform/push-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The installation's Web Push settings (never the private key) */
+        get: operations["PaleeWeb.PlatformPushSettingsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Save or replace the installation's Web Push keys and contact */
+        patch: operations["PaleeWeb.PlatformPushSettingsController.update"];
+        trace?: never;
+    };
     "/api/platform/subscriptions": {
         parameters: {
             query?: never;
@@ -76388,18 +76406,6 @@ export interface operations {
                             updated_at?: string | null;
                             weekly_workout_target: number;
                         };
-                        notifications: {
-                            enabled: boolean;
-                            /** Format: uuid */
-                            id?: string | null;
-                            /** Format: date-time */
-                            inserted_at?: string | null;
-                            /** Format: date-time */
-                            updated_at?: string | null;
-                            vapid_private_key_configured: boolean;
-                            vapid_public_key?: string | null;
-                            vapid_subject?: string | null;
-                        };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
                             editable: boolean;
@@ -76463,11 +76469,6 @@ export interface operations {
                         streak_shield_reset_day?: number | null;
                         weekly_workout_target?: number;
                     };
-                    notifications?: {
-                        vapid_private_key?: string | null;
-                        vapid_public_key?: string | null;
-                        vapid_subject?: string | null;
-                    };
                     provider?: {
                         /** @enum {string} */
                         kind?: "gym" | "coach";
@@ -76524,18 +76525,6 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
-                        };
-                        notifications: {
-                            enabled: boolean;
-                            /** Format: uuid */
-                            id?: string | null;
-                            /** Format: date-time */
-                            inserted_at?: string | null;
-                            /** Format: date-time */
-                            updated_at?: string | null;
-                            vapid_private_key_configured: boolean;
-                            vapid_public_key?: string | null;
-                            vapid_subject?: string | null;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -103158,6 +103147,76 @@ export interface operations {
                         price_status: "placeholder" | "confirmed";
                         public: boolean;
                         trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPushSettingsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Push settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** Format: date-time */
+                        inserted_at?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string | null;
+                        vapid_private_key_configured: boolean;
+                        vapid_public_key?: string | null;
+                        vapid_subject?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPushSettingsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    vapid_private_key?: string | null;
+                    vapid_public_key?: string | null;
+                    vapid_subject?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Push settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** Format: date-time */
+                        inserted_at?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string | null;
+                        vapid_private_key_configured: boolean;
+                        vapid_public_key?: string | null;
+                        vapid_subject?: string | null;
                     };
                 };
             };

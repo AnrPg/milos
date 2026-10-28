@@ -214,4 +214,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |
 | ADR-216 | One join link per client role: box-member link and athlete link (with a secret key), each on or off | Accepted |
 | ADR-217 | People are shown by their roles in the business, never `users.role`; only clients have a finance profile | Accepted |
+| ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted |
 | ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
