@@ -72,12 +72,28 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
       else: :ok
   end
 
-  @doc "Withdrawing an approved booking inside the cutoff is a late cancellation."
+  @doc """
+  When a pending request (manual approval) is cancelled if staff have not
+  answered (ADR-222): `timeout_minutes` from `now`, never after the class
+  starts; nil (no limit) waits until the class starts.
+  """
+  def approval_deadline(_now, nil, %DateTime{} = starts_at), do: starts_at
+
+  def approval_deadline(%DateTime{} = now, timeout_minutes, %DateTime{} = starts_at)
+      when is_integer(timeout_minutes) do
+    deadline = DateTime.add(now, timeout_minutes * 60, :second)
+    if DateTime.compare(deadline, starts_at) == :gt, do: starts_at, else: deadline
+  end
+
+  @doc """
+  Withdrawing an approved booking inside the cutoff is a late cancellation.
+  The cutoff is in minutes before the class (ADR-222).
+  """
   def late_cancellation?(_status, _scheduled_at, _now, nil), do: false
 
-  def late_cancellation?(:approved, %DateTime{} = scheduled_at, %DateTime{} = now, hours)
-      when is_integer(hours) do
-    DateTime.compare(now, DateTime.add(scheduled_at, -hours * 3600, :second)) != :lt
+  def late_cancellation?(:approved, %DateTime{} = scheduled_at, %DateTime{} = now, minutes)
+      when is_integer(minutes) do
+    DateTime.compare(now, DateTime.add(scheduled_at, -minutes * 60, :second)) != :lt
   end
 
   def late_cancellation?(_status, _scheduled_at, _now, _hours), do: false

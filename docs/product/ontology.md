@@ -261,6 +261,15 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Training partner chat | Συνομιλία συναθλητών | partner match thread | Opens when a training-partner match happens. |
 | Check-in buddy chat | Συνομιλία στήριξης | buddy support thread | Opens when a check-in buddy answers a support request. |
 
+### 4.6a Class booking rules (ADR-222)
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Time to answer a booking request | Χρόνος για απάντηση σε αίτηση κράτησης | `booking_timeout_minutes` | Without automatic confirmation, how long a request waits for staff before it is cancelled; «Χωρίς όριο» = until the class starts. | Bookings open; a booking deadline. |
+| Bookings open | Άνοιγμα κρατήσεων | `booking_window_days` | The earliest a member can book, in days before the class. Bookings stay open until the start. | Time to answer a request. |
+| Late cancellation | Καθυστερημένη ακύρωση | `default_cancellation_cutoff_minutes` | Cancelling later than this before the class still uses the visit. Entered as hours + minutes. | Cancelling a class (staff). |
+| Automatic confirmation | Αυτόματη επιβεβαίωση κρατήσεων | `auto_approve` | A booking is confirmed at once instead of waiting for staff. | Booking request. |
+
 ### 4.7 Outside parties
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |

@@ -159,7 +159,8 @@ export type ScheduleSlot = {
   class_type: ClassTypeRecord;
   capacity: number;
   auto_approve: boolean;
-  booking_timeout_minutes: number;
+  /** ADR-222: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
   approved_booking_count: number;
   spots_remaining: number;
   workout: WorkoutPreview | null;
@@ -230,7 +231,8 @@ export type ScheduleSlotPayload = {
   scheduled_at: string;
   capacity: number;
   auto_approve: boolean;
-  booking_timeout_minutes: number;
+  /** ADR-222: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
   /** Optional gym location (ADR-097); null for single-site gyms. */
   location_id?: string | null;
   /** Optional space of the branch (ADR-202). */
@@ -398,7 +400,8 @@ export async function createScheduleSeries(
     excluded_dates: string[];
     capacity: number;
     auto_approve: boolean;
-    booking_timeout_minutes: number;
+    /** ADR-222: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
     location_id?: string | null;
     /** ADR-202: the space every class of the series is held in. */
     space_id?: string | null;

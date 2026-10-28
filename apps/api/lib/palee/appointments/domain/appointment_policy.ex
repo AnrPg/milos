@@ -64,8 +64,9 @@ defmodule Palee.Appointments.Domain.AppointmentPolicy do
 
   def late_cancellation?(_starts_at, _now, cutoff) when cutoff in [nil, 0], do: false
 
-  def late_cancellation?(%DateTime{} = starts_at, %DateTime{} = now, cutoff_hours),
-    do: DateTime.diff(starts_at, now, :second) < cutoff_hours * 3600
+  # ADR-222: the cutoff is in minutes before the appointment.
+  def late_cancellation?(%DateTime{} = starts_at, %DateTime{} = now, cutoff_minutes),
+    do: DateTime.diff(starts_at, now, :second) < cutoff_minutes * 60
 
   def can_cancel?(%{status: "booked"}), do: :ok
   def can_cancel?(_booking), do: {:error, :appointment_not_active}

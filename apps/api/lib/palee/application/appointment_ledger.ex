@@ -22,16 +22,19 @@ defmodule Palee.Application.AppointmentLedger do
     :ok
   end
 
-  @doc "Cancellation cutoff for the client: the paying package's, else the gym default."
-  def cutoff_hours(context, terms) do
+  @doc """
+  Cancellation cutoff for the client in minutes (ADR-222): the paying
+  package's, else the gym default.
+  """
+  def cutoff_minutes(context, terms) do
     case terms && terms[:cancellation_cutoff_hours] do
       hours when is_integer(hours) ->
-        hours
+        hours * 60
 
       _none ->
         context
         |> Scheduling.get_settings()
-        |> Map.get(:default_cancellation_cutoff_hours)
+        |> Map.get(:default_cancellation_cutoff_minutes)
     end
   end
 end

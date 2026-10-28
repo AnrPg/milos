@@ -72,7 +72,6 @@ defmodule Palee.Scheduling.ClassSeries do
       :materialized_through,
       :capacity,
       :auto_approve,
-      :booking_timeout_minutes,
       :status
     ])
     |> update_change(:name, &String.trim/1)
@@ -80,7 +79,8 @@ defmodule Palee.Scheduling.ClassSeries do
     |> validate_length(:timezone, min: 1, max: 100)
     |> validate_number(:duration_minutes, greater_than: 0, less_than_or_equal_to: 1440)
     |> validate_number(:capacity, greater_than: 0)
-    |> validate_number(:booking_timeout_minutes, greater_than: 0)
+    # ADR-222: nil = a request waits for approval until the class starts.
+    |> validate_number(:booking_timeout_minutes, greater_than: 0, less_than_or_equal_to: 10_080)
     |> validate_length(:weekdays, min: 1, max: 7)
     |> validate_subset(:weekdays, Enum.to_list(1..7))
     |> validate_inclusion(:status, ["active", "ended", "cancelled"])
