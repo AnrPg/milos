@@ -161,7 +161,7 @@ test.describe("Schedule › variation for several people", () => {
     const outcome = dialog.getByTestId("group-outcome");
     await expect(outcome).toContainText("Done for 1 of 2.");
     await expect(outcome.locator('[data-outcome="ok"]')).toContainText("Anna");
-    await expect(outcome.locator('[data-outcome="error"]')).toContainText("Zoe's package does not include personal programming");
+    await expect(outcome.locator('[data-outcome="error"]')).toContainText("Zoe's subscription package does not include personal programming");
   });
 
   test("select all picks every attendee", async ({ page }) => {

@@ -42,10 +42,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     InvoiceNumber,
     MembershipLifecycle,
     MembershipLinks,
+    MemberRenewal,
     PackageCode,
     PackageContract,
     PaymentModelPolicy,
     PromotionRedemptionPolicy,
+    ReceivedPayment,
     ReferralLifecycle,
     RevenueBreakdown,
     ReferralPolicy,
@@ -353,6 +355,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
              ),
            {:ok, params} <- payment_model_params(membership, package, string_key_map(params)) do
         subscription = insert_subscription!(membership, package, params)
+        rejoin!(membership)
         refresh_entitlement_snapshot(membership.id)
         normalize_subscription(subscription)
       else
@@ -451,33 +454,147 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
-  def create_receipt(membership_id, params) do
+  def create_receipt(membership_id, params),
+    do: create_paid_document(membership_id, :receipt, params)
+
+  # ADR-222: money received at the desk. The box's billing setup picks the
+  # document; one idempotency key records the money once, however often the
+  # request is retried (the membership row lock serialises retries).
+  @impl true
+  def receive_payment(membership_id, params) do
+    params = string_key_map(params)
+
+    with :ok <- ReceivedPayment.validate(params) do
+      document =
+        ReceivedPayment.document(
+          get_finance_settings().document_mode,
+          params["finance_invoice_id"]
+        )
+
+      Repo.transaction(fn ->
+        with %Membership{} = membership <- locked_membership(membership_id),
+             nil <- payment_by_idempotency_key(membership.id, params["idempotency_key"]),
+             :ok <- ReceivedPayment.validate_purpose(document, params),
+             {:ok, result} <- receive_into(document, membership.id, params) do
+          Map.put(result, :replayed, false)
+        else
+          %MembershipPayment{} = payment ->
+            payment |> received_payment_result() |> Map.put(:replayed, true)
+
+          nil ->
+            Repo.rollback(:not_found)
+
+          {:error, reason} ->
+            Repo.rollback(reason)
+        end
+      end)
+    end
+  end
+
+  defp receive_into(:settle_invoice, membership_id, params) do
+    with {:ok, payment} <-
+           record_payment(membership_id, %{
+             "finance_invoice_id" => params["finance_invoice_id"],
+             "amount_cents" => params["amount_cents"],
+             "currency" => params["currency"] || "EUR",
+             "paid_on" => params["paid_on"],
+             "payment_method" => params["payment_method"],
+             "payment_status" => "paid",
+             "notes" => params["notes"],
+             "params" => %{
+               "idempotency_key" => params["idempotency_key"],
+               "created_by_id" => params["created_by_id"]
+             }
+           }) do
+      {:ok, received_payment_result(Repo.get!(MembershipPayment, payment.id))}
+    end
+  end
+
+  defp receive_into(document, membership_id, params) do
+    create_paid_document(membership_id, document, params)
+  end
+
+  defp payment_by_idempotency_key(membership_id, key) do
+    MembershipPayment
+    |> tenant_scope()
+    |> where([payment], payment.membership_id == ^membership_id and is_nil(payment.deleted_at))
+    |> where([payment], fragment("?->>'idempotency_key' = ?", payment.params, ^key))
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp received_payment_result(%MembershipPayment{finance_invoice_id: invoice_id} = payment) do
+    invoice = FinanceInvoice |> Repo.get!(invoice_id) |> normalize_invoice_with_balance()
+    subscription = invoice_subscription(invoice.membership_package_subscription_id)
+
+    %{
+      document_type: (invoice.params || %{})["document_kind"] || "invoice",
+      reference: invoice.invoice_number,
+      issued_on: payment.paid_on,
+      amount_cents: payment.amount_cents,
+      currency: payment.currency,
+      description: invoice_description(invoice),
+      membership_package_subscription_id: invoice.membership_package_subscription_id,
+      package_name: subscription && subscription.package_name,
+      package_code_snapshot: subscription && subscription.package_code_snapshot,
+      package_family_snapshot: subscription && subscription.package_family_snapshot,
+      invoice: invoice,
+      payment: normalize_payment(payment)
+    }
+  end
+
+  # What the money was for: the invoice's first line, else its notes.
+  defp invoice_description(invoice) do
+    FinanceInvoiceLine
+    |> where([line], line.finance_invoice_id == ^invoice.id)
+    |> order_by([line], asc: line.inserted_at, asc: line.id)
+    |> select([line], line.description)
+    |> limit(1)
+    |> Repo.one()
+    |> Kernel.||(invoice.notes)
+  end
+
+  defp invoice_subscription(nil), do: nil
+
+  defp invoice_subscription(subscription_id) do
+    case Repo.get(MembershipPackageSubscription, subscription_id) do
+      nil -> nil
+      subscription -> normalize_subscription(subscription)
+    end
+  end
+
+  # A document issued already paid: a receipt (ADR-189 receipt mode) or, in
+  # invoice mode, a paid invoice (ADR-222).
+  defp create_paid_document(membership_id, document, params) do
     params = string_key_map(params)
     amount_cents = parse_integer(params["amount_cents"], 0)
     paid_on = parse_date(params["paid_on"], GymClock.today())
     description = params["description"] || params["notes"] || "Payment received"
     currency = params["currency"] || "EUR"
+    kind = ReceivedPayment.document_kind(document)
 
     Repo.transaction(fn ->
-      invoice_params = %{
-        "invoice_type" => "manual",
-        "issue_date" => paid_on,
-        "due_date" => nil,
-        "currency" => currency,
-        "amount_cents" => amount_cents,
-        "description" => description,
-        "membership_package_subscription_id" => params["membership_package_subscription_id"],
-        "notes" => params["notes"],
-        "params" => %{
-          "document_kind" => "receipt",
-          "idempotency_key" => params["idempotency_key"]
+      invoice_params =
+        %{
+          "invoice_type" => "manual",
+          "issue_date" => paid_on,
+          "due_date" => if(document == :invoice, do: paid_on),
+          "currency" => currency,
+          "amount_cents" => amount_cents,
+          "description" => description,
+          "membership_package_subscription_id" => params["membership_package_subscription_id"],
+          "notes" => params["notes"],
+          "params" => %{
+            "document_kind" => kind,
+            "idempotency_key" => params["idempotency_key"]
+          }
         }
-      }
+        |> maybe_put_charge_line(params["charge_category"])
 
       with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
            {:ok, invoice} <- create_invoice(membership_id, invoice_params),
            {:ok, _issued_invoice} <-
-             issue_invoice(invoice.id, %{"issue_date" => paid_on}),
+             issue_invoice(invoice.id, %{"issue_date" => paid_on, "due_date" => paid_on}),
            {:ok, payment} <-
              record_payment(membership_id, %{
                "finance_invoice_id" => invoice.id,
@@ -490,51 +607,37 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "payment_status" => "paid",
                "notes" => params["notes"],
                "params" => %{
-                 "document_kind" => "receipt",
+                 "document_kind" => kind,
                  "idempotency_key" => params["idempotency_key"],
                  "created_by_id" => params["created_by_id"]
                }
              }) do
-        paid_invoice =
-          FinanceInvoice
-          |> Repo.get!(invoice.id)
-          |> normalize_invoice_with_balance()
-
-        package_subscription =
-          case paid_invoice.membership_package_subscription_id do
-            nil ->
-              nil
-
-            subscription_id ->
-              MembershipPackageSubscription
-              |> Repo.get(subscription_id)
-              |> case do
-                nil -> nil
-                subscription -> normalize_subscription(subscription)
-              end
-          end
-
-        %{
-          document_type: "receipt",
-          reference: paid_invoice.invoice_number,
-          issued_on: paid_on,
-          amount_cents: amount_cents,
-          currency: currency,
-          description: description,
-          membership_package_subscription_id: paid_invoice.membership_package_subscription_id,
-          package_name: package_subscription && package_subscription.package_name,
-          package_code_snapshot:
-            package_subscription && package_subscription.package_code_snapshot,
-          package_family_snapshot:
-            package_subscription && package_subscription.package_family_snapshot,
-          invoice: paid_invoice,
-          payment: payment
-        }
+        received_payment_result(Repo.get!(MembershipPayment, payment.id))
       else
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
   end
+
+  # A payment for something other than a πακέτο συνδρομής keeps its charge
+  # category (product, personal training, event, other) on its line.
+  defp maybe_put_charge_line(%{"membership_package_subscription_id" => id} = params, _category)
+       when is_binary(id) and id != "",
+       do: params
+
+  defp maybe_put_charge_line(params, category) when is_binary(category) and category != "" do
+    Map.put(params, "lines", [
+      %{
+        "line_type" => "manual_charge",
+        "charge_category" => category,
+        "description" => params["description"],
+        "quantity" => 1,
+        "unit_amount_cents" => params["amount_cents"]
+      }
+    ])
+  end
+
+  defp maybe_put_charge_line(params, _category), do: params
 
   @impl true
   def create_manual_credit(membership_id, params) do
@@ -923,7 +1026,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
            renewal_subscription(membership.id, params["membership_package_subscription_id"]),
          :ok <- not_corporate_seat(subscription),
          :ok <- add_on_base_active(subscription),
-         :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) do
+         :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}),
+         :ok <- MemberRenewal.renewal_allowed(subscription, membership) do
       period_start = parse_date(params["service_period_start"], GymClock.today())
 
       with {:ok, {period_start, period_end}} <-
@@ -984,6 +1088,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   # both take the same one.
   defp renewal_with_referral_discounts(%Membership{} = membership, subscription, invoice_params) do
     Repo.transaction(fn ->
+      renewal_still_allowed!(membership, subscription)
+
       rewards =
         ReferralReward
         |> tenant_scope()
@@ -1013,6 +1119,25 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
+  end
+
+  # ADR-220: the member may turn renewal off (or leave) while this invoice is
+  # being made; both rows are locked in the same order as those changes and
+  # the choice is checked again, so no renewal slips past it.
+  defp renewal_still_allowed!(membership, subscription) do
+    locked_membership =
+      Membership |> tenant_scope() |> lock("FOR UPDATE") |> Repo.get(membership.id)
+
+    locked_subscription = locked_subscription(membership.id, subscription.id)
+
+    with %Membership{} <- locked_membership,
+         %MembershipPackageSubscription{} <- locked_subscription,
+         :ok <- MemberRenewal.renewal_allowed(locked_subscription, locked_membership) do
+      :ok
+    else
+      nil -> Repo.rollback(:not_found)
+      {:error, reason} -> Repo.rollback(reason)
+    end
   end
 
   # Voiding a renewal frees the discount rewards it took for the next one.
@@ -2259,6 +2384,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> join(:inner, [subscription], membership in Membership,
       on: membership.id == subscription.membership_id
     )
+    # ADR-220: someone leaving the box is not asked to renew.
+    |> where([_subscription, membership], is_nil(membership.left_at))
     |> select([subscription, membership], {subscription, membership.user_id})
     |> Repo.all()
     |> Enum.flat_map(fn {subscription, user_id} ->
@@ -5727,6 +5854,10 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       entitlement_source: membership.entitlement_source,
       entitlement_expires_on: membership.entitlement_expires_on,
       entitlement_updated_at: membership.entitlement_updated_at,
+      leaving_on: membership.leaving_on,
+      left_at: membership.left_at,
+      left_by: membership.left_by,
+      leave_reason: membership.leave_reason,
       params: membership.params || %{},
       inserted_at: membership.inserted_at,
       updated_at: membership.updated_at
@@ -5761,6 +5892,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       corporate_client_id: subscription.corporate_client_id,
       corporate_enrolled_via: subscription.corporate_enrolled_via,
       referral_reward_applied: subscription.referral_reward_applied,
+      auto_renew: MemberRenewal.auto_renew(subscription),
+      renewal_changed_at: subscription.renewal_changed_at,
+      renewal_changed_by: subscription.renewal_changed_by,
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at
     }
@@ -6587,6 +6721,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       [_subscription, membership],
       membership.status in ["active", "expiring", "trial", "comped"]
     )
+    # ADR-220: a member who is leaving chose this end; no reminders about it.
+    |> where([_subscription, membership], is_nil(membership.left_at))
     |> where(
       [subscription],
       not exists(
@@ -6620,6 +6756,481 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
     :ok
   end
+
+  # ── Renewal choice and leaving the box (ADR-220) ───────────────────────────
+
+  @impl true
+  def set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)
+      when is_boolean(auto_renew) and by in ["member", "staff"] do
+    today = GymClock.today()
+
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership_for_user(user_id),
+           %MembershipPackageSubscription{} = subscription <-
+             locked_subscription(membership.id, subscription_id),
+           :ok <- renewal_choice_open(subscription, membership, auto_renew, today) do
+        if subscription.auto_renew == auto_renew do
+          normalize_subscription(subscription)
+        else
+          now = DateTime.utc_now()
+          updated = change_renewal!(subscription, auto_renew, by, now, today)
+
+          unless auto_renew,
+            do:
+              void_invoices!(
+                membership.id,
+                &(&1.subscription_ids == [subscription.id] and
+                    MemberRenewal.void_after_leaving?(&1, updated.ends_on || today)),
+                "Renewal turned off"
+              )
+
+          refresh_entitlement_snapshot(membership.id)
+          normalize_subscription(updated)
+        end
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def membership_leave_preview(user_id) do
+    today = GymClock.today()
+
+    case membership_for_user(user_id) do
+      nil ->
+        nil
+
+      %Membership{} = membership ->
+        membership.id
+        |> running_subscriptions(today)
+        |> natural_leaving_day(today)
+    end
+  end
+
+  @impl true
+  def leave_membership(user_id, params) do
+    params = string_key_map(params)
+    by = params["by"]
+    today = GymClock.today()
+
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership_for_user(user_id),
+           :ok <- not_leaving(membership),
+           subscriptions = running_subscriptions(membership.id, today),
+           {:ok, leaving_on} <- leaving_day(by, params, subscriptions, today) do
+        now = DateTime.utc_now()
+
+        not_begun =
+          subscriptions
+          |> Enum.map(&end_for_leaving!(&1, leaving_on, by, now))
+          |> Enum.reject(&is_nil/1)
+
+        # Only what lies after the last day goes: periods that have not begun
+        # and packages that never started. Money owed for anything already
+        # used stays owed (and reminded) until it is paid.
+        voided =
+          void_invoices!(
+            membership.id,
+            &(MemberRenewal.void_after_leaving?(&1, leaving_on) or
+                (&1.subscription_ids != [] and
+                   Enum.all?(&1.subscription_ids, fn id -> id in not_begun end) and
+                   MemberRenewal.unpaid_untouched?(&1))),
+            "Member left the box"
+          )
+
+        updated =
+          membership
+          |> Membership.leave_changeset(%{
+            leaving_on: leaving_on,
+            left_at: now,
+            left_by: by,
+            leave_reason: blank_to_nil(params["reason"]),
+            expires_on: earliest_date(membership.expires_on, leaving_on),
+            # Staff marking someone as gone today ends access now.
+            status:
+              if(by == "staff" and Date.compare(leaving_on, today) != :gt,
+                do: "cancelled",
+                else: membership.status
+              )
+          })
+          |> Repo.update()
+          |> case do
+            {:ok, updated} -> updated
+            {:error, reason} -> Repo.rollback(reason)
+          end
+
+        refresh_entitlement_snapshot(updated.id)
+
+        %{
+          membership: normalize_membership(Repo.get!(Membership, updated.id)),
+          leaving_on: leaving_on,
+          voided_invoice_count: voided,
+          outstanding_cents:
+            Map.get(outstanding_balance_per_membership([updated.id]), updated.id, 0)
+        }
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def undo_leave_membership(user_id, by) when by in ["member", "staff"] do
+    today = GymClock.today()
+
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership_for_user(user_id),
+           :ok <- undo_open(membership, by, today) do
+        now = DateTime.utc_now()
+
+        MembershipPackageSubscription
+        |> tenant_scope()
+        |> where([subscription], subscription.membership_id == ^membership.id)
+        |> where([subscription], subscription.status == "active")
+        |> where([subscription], subscription.renewal_changed_at == ^membership.left_at)
+        |> lock("FOR UPDATE")
+        |> Repo.all()
+        |> Enum.each(&resume_after_leave!(&1, by, now))
+
+        rejoin!(membership)
+        refresh_entitlement_snapshot(membership.id)
+        normalize_membership(Repo.get!(Membership, membership.id))
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  defp membership_for_user(user_id) do
+    Membership
+    |> tenant_scope()
+    |> where([membership], membership.user_id == ^user_id)
+    |> Repo.one()
+  end
+
+  defp locked_membership_for_user(user_id) do
+    Membership
+    |> tenant_scope()
+    |> where([membership], membership.user_id == ^user_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  defp locked_subscription(membership_id, subscription_id) do
+    with {:ok, subscription_id} <- Ecto.UUID.cast(subscription_id) do
+      MembershipPackageSubscription
+      |> tenant_scope()
+      |> where([subscription], subscription.id == ^subscription_id)
+      |> where([subscription], subscription.membership_id == ^membership_id)
+      |> lock("FOR UPDATE")
+      |> Repo.one()
+    else
+      :error -> nil
+    end
+  end
+
+  defp renewal_choice_open(subscription, membership, auto_renew, today) do
+    cond do
+      not MemberRenewal.choice_allowed?(subscription) -> {:error, :renewal_choice_not_allowed}
+      not MemberRenewal.running?(subscription, today) -> {:error, :subscription_ended}
+      auto_renew and not is_nil(membership.left_at) -> {:error, :member_leaving}
+      true -> :ok
+    end
+  end
+
+  # Turning renewal off gives an open-ended subscription its last day;
+  # turning it back on takes that day away again (and the reminders it got).
+  defp change_renewal!(subscription, false, by, now, today) do
+    open_ended? = is_nil(subscription.ends_on) or subscription.ends_on_from_renewal_stop
+
+    attrs = %{
+      auto_renew: false,
+      renewal_changed_at: now,
+      renewal_changed_by: by,
+      ends_on:
+        if(open_ended?,
+          do: MemberRenewal.last_day(subscription, paid_periods(subscription.id), today),
+          else: subscription.ends_on
+        ),
+      ends_on_from_renewal_stop: open_ended?
+    }
+
+    update_renewal!(subscription, attrs)
+  end
+
+  defp change_renewal!(subscription, true, by, now, _today) do
+    from_stop? = subscription.ends_on_from_renewal_stop
+
+    attrs = %{
+      auto_renew: true,
+      renewal_changed_at: now,
+      renewal_changed_by: by,
+      ends_on: if(from_stop?, do: nil, else: subscription.ends_on),
+      ends_on_from_renewal_stop: false,
+      expiry_reminder_sent_at:
+        if(from_stop?, do: nil, else: subscription.expiry_reminder_sent_at),
+      grace_notice_sent_at: if(from_stop?, do: nil, else: subscription.grace_notice_sent_at)
+    }
+
+    update_renewal!(subscription, attrs)
+  end
+
+  defp update_renewal!(subscription, attrs) do
+    subscription
+    |> MembershipPackageSubscription.renewal_changeset(attrs)
+    |> Repo.update()
+    |> case do
+      {:ok, updated} -> updated
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
+  defp running_subscriptions(membership_id, today) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.membership_id == ^membership_id)
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^today)
+    |> Repo.all()
+  end
+
+  # Periods of the subscription's invoices that were paid, or partly paid
+  # (also once such an invoice falls overdue). An invoice belongs to the
+  # subscription through its header or any of its lines.
+  defp paid_periods(subscription_id) do
+    FinanceInvoice
+    |> tenant_scope()
+    |> where([invoice], invoice.id in subquery(invoice_ids_for_subscription(subscription_id)))
+    |> where([invoice], invoice.status not in ["draft", "void"])
+    |> where([invoice], is_nil(invoice.deleted_at))
+    |> where([invoice], not is_nil(invoice.service_period_end))
+    |> Repo.all()
+    |> Enum.filter(
+      &(&1.status in MemberRenewal.paid_statuses() or invoice_paid_cents(&1.id) > 0 or
+          invoice_credit_applied_cents(&1.id) > 0)
+    )
+    |> Enum.map(&{&1.service_period_start, &1.service_period_end})
+  end
+
+  defp invoice_ids_for_subscription(subscription_id) do
+    header =
+      FinanceInvoice
+      |> where([invoice], invoice.membership_package_subscription_id == ^subscription_id)
+      |> select([invoice], invoice.id)
+
+    FinanceInvoiceLine
+    |> where([line], line.membership_package_subscription_id == ^subscription_id)
+    |> select([line], line.finance_invoice_id)
+    |> union(^header)
+  end
+
+  defp not_leaving(%Membership{left_at: nil}), do: :ok
+  defp not_leaving(_membership), do: {:error, :member_leaving}
+
+  defp undo_open(%Membership{left_at: nil}, _by, _today), do: {:error, :not_leaving}
+  defp undo_open(_membership, "staff", _today), do: :ok
+  defp undo_open(%Membership{left_by: "staff"}, "member", _today), do: {:error, :left_by_staff}
+  defp undo_open(membership, "member", today), do: MemberRenewal.undo_allowed(membership, today)
+
+  # Members keep everything they paid for; staff may name the day, today at
+  # the earliest (what was already used stays owed either way).
+  defp leaving_day("member", _params, subscriptions, today),
+    do: {:ok, natural_leaving_day(subscriptions, today)}
+
+  defp leaving_day("staff", params, subscriptions, today) do
+    case params["leaving_on"] do
+      value when value in [nil, ""] ->
+        {:ok, natural_leaving_day(subscriptions, today)}
+
+      value ->
+        with %Date{} = leaving_on <- parse_date(value, {:error, :invalid_leaving_on}),
+             :ok <- not_in_past(leaving_on, today),
+             :ok <-
+               MemberRenewal.staff_leaving_allowed(
+                 leaving_on,
+                 subscriptions |> Enum.map(& &1.commitment_ends_on) |> latest_date(),
+                 params["commitment_override_reason"]
+               ) do
+          {:ok, leaving_on}
+        end
+    end
+  end
+
+  defp leaving_day(_by, _params, _subscriptions, _today), do: {:error, :invalid_leave_actor}
+
+  defp not_in_past(leaving_on, today) do
+    if Date.compare(leaving_on, today) == :lt, do: {:error, :invalid_leaving_on}, else: :ok
+  end
+
+  # Packages that have not begun yet do not keep the member: they are
+  # cancelled with the leave.
+  defp natural_leaving_day(subscriptions, today) do
+    subscriptions
+    |> Enum.filter(&(is_nil(&1.starts_on) or Date.compare(&1.starts_on, today) != :gt))
+    |> Enum.map(&MemberRenewal.last_day(&1, paid_periods(&1.id), today))
+    |> MemberRenewal.leaving_on(today)
+  end
+
+  # Every running subscription stops renewing and ends by the last day; one
+  # that would only start after it is cancelled (its id is returned).
+  defp end_for_leaving!(subscription, leaving_on, by, now) do
+    if subscription.starts_on && Date.compare(subscription.starts_on, leaving_on) == :gt do
+      subscription
+      |> MembershipPackageSubscription.changeset(%{"status" => "cancelled"})
+      |> Repo.update()
+      |> case do
+        {:ok, cancelled} -> cancelled.id
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    else
+      stop_for_leaving!(subscription, leaving_on, by, now)
+      nil
+    end
+  end
+
+  # Renewal the member had already turned off keeps who turned it off and
+  # when, so undoing the leave leaves it off; only its last day may move in.
+  defp stop_for_leaving!(%{auto_renew: false} = subscription, leaving_on, _by, _now) do
+    ends_on = earliest_date(subscription.ends_on, leaving_on)
+
+    if ends_on != subscription.ends_on,
+      do:
+        update_renewal!(subscription, %{
+          auto_renew: false,
+          renewal_changed_at: subscription.renewal_changed_at,
+          renewal_changed_by: subscription.renewal_changed_by,
+          ends_on: ends_on
+        })
+  end
+
+  defp stop_for_leaving!(subscription, leaving_on, by, now) do
+    open_ended? = is_nil(subscription.ends_on) or subscription.ends_on_from_renewal_stop
+
+    update_renewal!(subscription, %{
+      auto_renew: false,
+      renewal_changed_at: now,
+      renewal_changed_by: by,
+      ends_on: earliest_date(subscription.ends_on, leaving_on),
+      ends_on_from_renewal_stop: open_ended?
+    })
+  end
+
+  defp resume_after_leave!(subscription, by, now) do
+    attrs = %{
+      auto_renew: MemberRenewal.choice_allowed?(subscription),
+      renewal_changed_at: now,
+      renewal_changed_by: by,
+      ends_on: if(subscription.ends_on_from_renewal_stop, do: nil, else: subscription.ends_on),
+      ends_on_from_renewal_stop: false,
+      expiry_reminder_sent_at: nil,
+      grace_notice_sent_at: nil
+    }
+
+    update_renewal!(subscription, attrs)
+  end
+
+  # Coming back (staff undo the leave or assign a new package) clears it;
+  # a membership staff had cancelled for the leave is active again.
+  defp rejoin!(%Membership{left_at: nil}), do: :ok
+
+  defp rejoin!(%Membership{} = membership) do
+    status =
+      if membership.status == "cancelled" and membership.left_by == "staff",
+        do: "active",
+        else: membership.status
+
+    membership
+    |> Membership.leave_changeset(%{
+      leaving_on: nil,
+      left_at: nil,
+      left_by: nil,
+      leave_reason: nil,
+      expires_on:
+        if(membership.expires_on == membership.leaving_on, do: nil, else: membership.expires_on),
+      status: status
+    })
+    |> Repo.update()
+    |> case do
+      {:ok, _membership} -> :ok
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
+  # The subscriptions an invoice is for: its header's and its lines'.
+  defp invoice_subscription_ids(invoice) do
+    FinanceInvoiceLine
+    |> where([line], line.finance_invoice_id == ^invoice.id)
+    |> where([line], not is_nil(line.membership_package_subscription_id))
+    |> select([line], line.membership_package_subscription_id)
+    |> Repo.all()
+    |> then(
+      &Enum.uniq(
+        Enum.reject([invoice.membership_package_subscription_id | &1], fn id -> is_nil(id) end)
+      )
+    )
+  end
+
+  # Voids the membership's open invoices `void?` picks (it gets each invoice
+  # with what was paid and credited on it and the subscriptions it is for);
+  # returns how many.
+  defp void_invoices!(membership_id, void?, note) do
+    FinanceInvoice
+    |> tenant_scope()
+    |> where([invoice], invoice.membership_id == ^membership_id)
+    |> where([invoice], invoice.status in ["draft", "issued", "overdue"])
+    |> where([invoice], is_nil(invoice.deleted_at))
+    |> lock("FOR UPDATE")
+    |> Repo.all()
+    |> Enum.map(fn invoice ->
+      invoice
+      |> Map.from_struct()
+      |> Map.merge(%{
+        paid_cents: invoice_paid_cents(invoice.id),
+        credit_applied_cents: invoice_credit_applied_cents(invoice.id),
+        subscription_ids: invoice_subscription_ids(invoice),
+        invoice: invoice
+      })
+    end)
+    |> Enum.filter(void?)
+    |> Enum.map(fn %{invoice: invoice} ->
+      invoice
+      |> FinanceInvoice.changeset(%{
+        status: "void",
+        voided_at: utc_now(),
+        notes: Enum.join(Enum.reject([invoice.notes, note], &(&1 in [nil, ""])), "\n")
+      })
+      |> Repo.update()
+      |> case do
+        {:ok, voided} -> release_referral_discounts(voided.id)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+    |> length()
+  end
+
+  defp earliest_date(nil, date), do: date
+  defp earliest_date(date, nil), do: date
+  defp earliest_date(left, right), do: Enum.min([left, right], Date)
+
+  defp latest_date(dates) do
+    case Enum.reject(dates, &is_nil/1) do
+      [] -> nil
+      dates -> Enum.max(dates, Date)
+    end
+  end
+
+  defp blank_to_nil(value) when is_binary(value) do
+    case String.trim(value) do
+      "" -> nil
+      trimmed -> trimmed
+    end
+  end
+
+  defp blank_to_nil(_value), do: nil
 
   @impl true
   def refresh_entitlement_snapshots do

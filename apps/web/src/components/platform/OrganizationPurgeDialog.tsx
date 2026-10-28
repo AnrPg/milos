@@ -72,7 +72,7 @@ export function OrganizationPurgeDialog({
 
   // Status is refreshed on demand (and after every action) rather than polled.
   const purgeQuery = useQuery({
-    queryKey: ["platform-organization-purge", accessToken, organizationId],
+    queryKey: ["platform-organization-purge", organizationId],
     enabled: Boolean(accessToken),
     retry: false,
     queryFn: async () => {

@@ -45,7 +45,7 @@ export function OrganizationSlugRenameDialog({
   const [result, setResult] = useState<OrganizationSlugRenameResult | null>(null);
 
   const impactQuery = useQuery({
-    queryKey: ["platform-organization-slug-impact", accessToken, organizationId],
+    queryKey: ["platform-organization-slug-impact", organizationId],
     enabled: Boolean(accessToken),
     retry: false,
     queryFn: () => fetchOrganizationSlugImpact(accessToken!, organizationId),

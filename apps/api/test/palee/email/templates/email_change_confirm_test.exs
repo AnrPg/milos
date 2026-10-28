@@ -16,7 +16,7 @@ defmodule Palee.Email.Templates.EmailChangeConfirmTest do
 
   test "reads natively in Greek" do
     assert EmailChangeConfirm.subject(%{url: @url}, "el") ==
-             "Επιβεβαιώστε τη νέα σας διεύθυνση email"
+             "Επιβεβαίωσε τη νέα σου διεύθυνση email"
 
     assert EmailChangeConfirm.text(%{url: @url}, "el") =~ "Ο σύνδεσμος ισχύει για 24 ώρες."
   end

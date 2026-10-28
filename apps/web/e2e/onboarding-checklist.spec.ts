@@ -54,6 +54,10 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
   await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ gamification: null, finance: null, scheduling: null })));
   await page.route("**/api/org/*/admin/onboarding", (route) => route.fulfill(json(checklist)));
+  // Settings › Invitations shows the two join links (ADR-216).
+  await page.route("**/api/org/*/join-link", (route) =>
+    route.fulfill(json({ member: { enabled: false }, athlete: { enabled: false, key: null } })),
+  );
 }
 
 async function openChecklist(page: Page, start: string) {
@@ -74,7 +78,7 @@ test.describe("admin setup checklist", () => {
     const expected: Record<string, string> = {
       "Open settings": "/org/kypseli/admin/settings",
       "Set up classes": "/org/kypseli/admin/class-schedule",
-      "Create a package": "/org/kypseli/admin/finance?tab=packages",
+      "Create a subscription package": "/org/kypseli/admin/finance?tab=packages",
       "Write a workout": "/org/kypseli/admin/workouts/new",
       // ADR-221: until the page is published nobody finds the box.
       "Open the public page": "/org/kypseli/admin/public-page",

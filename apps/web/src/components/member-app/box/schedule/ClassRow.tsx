@@ -11,7 +11,7 @@ import { zonedText } from "@/lib/zoned-time";
  * One class in the day view (plan §5a decision 8): time with a subtle
  * duration, name, coach, and the member's state or the spots left. The
  * location shows only when several locations are listed together. Classes
- * outside the package are dimmed with «Εκτός πακέτου» (decision 4).
+ * outside the package are dimmed with «Εκτός πακέτου συνδρομής» (decision 4).
  */
 export function ClassRow({
   slot,

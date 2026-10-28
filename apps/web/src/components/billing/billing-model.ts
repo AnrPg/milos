@@ -46,3 +46,35 @@ export function validityProgress(startsOn: string | null | undefined, endsOn: st
   if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return null;
   return Math.min(1, Math.max(0, (now.getTime() - start) / (end - start)));
 }
+
+type LeaveFacts = {
+  actions: { self_service_leave?: boolean };
+  membership?: { leaving_on?: string | null; left_by?: string | null; leave_preview_on?: string | null } | null;
+};
+
+export type LeaveState =
+  | { kind: "none" }
+  | { kind: "leaving"; leavingOn: string; byStaff: boolean }
+  | { kind: "can_leave"; previewOn: string | null };
+
+/**
+ * ADR-220: where the member stands with leaving this provider: already
+ * leaving (on their own or marked by staff), free to leave (with the last
+ * day they would keep), or neither (no membership there).
+ */
+export function leaveState(provider: LeaveFacts): LeaveState {
+  const membership = provider.membership;
+  if (membership?.leaving_on) {
+    return { kind: "leaving", leavingOn: membership.leaving_on, byStaff: membership.left_by === "staff" };
+  }
+  if (provider.actions.self_service_leave && membership) {
+    return { kind: "can_leave", previewOn: membership.leave_preview_on ?? null };
+  }
+  return { kind: "none" };
+}
+
+/** A member can change their mind until their last day has passed (local calendar day). */
+export function canStay(leavingOn: string, now: Date): boolean {
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  return leavingOn.slice(0, 10) >= today;
+}

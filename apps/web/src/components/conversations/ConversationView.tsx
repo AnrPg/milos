@@ -29,6 +29,7 @@ import { personLabel, settledPending, shownMessages, type PendingMessage } from 
 import { CONVERSATIONS_FALLBACK_REFETCH_MS } from "./conversations-realtime";
 import { REQUESTS_HREF, useConversationsToken, useRequestActions } from "./use-conversations";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
 
 /** The API's limit on one message (ADR-193 §3). */
 export const MESSAGE_MAX_LENGTH = 2000;
@@ -77,13 +78,14 @@ export function ConversationView({ conversationId, onDeclined }: { conversationI
     queryFn: () => fetchConversation(token!, conversationId),
     retry: (count, error) => !(error instanceof ApiError && error.status === 404) && count < 2,
   });
+  const fallback = useRealtimeFallbackInterval(CONVERSATIONS_FALLBACK_REFETCH_MS);
   const pages = useInfiniteQuery({
     queryKey: messagesKey,
     enabled: Boolean(token) && conversation.isSuccess,
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => fetchConversationMessages(token!, conversationId, pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
-    refetchInterval: CONVERSATIONS_FALLBACK_REFETCH_MS,
+    refetchInterval: fallback,
   });
 
   const loaded = pages.data?.pages;

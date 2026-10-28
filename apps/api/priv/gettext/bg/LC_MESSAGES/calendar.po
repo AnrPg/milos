@@ -17,7 +17,7 @@ msgid "Downloading the .ics file imports a one-off snapshot and will not stay sy
 msgstr "Изтеглянето на .ics файла импортира еднократна моментна снимка и няма да остане синхронизирано."
 
 msgid "Class: %{name}"
-msgstr "Клас: %{name}"
+msgstr "Занятие: %{name}"
 
 msgid "Assigned workout"
 msgstr "Назначена тренировка"
@@ -29,7 +29,7 @@ msgid "Assigned workout in Palee."
 msgstr "Назначена тренировка в Palee."
 
 msgid "Scheduled %{name} class in Palee."
-msgstr "Планиран %{name} клас в Palee."
+msgstr "Планирано занятие %{name} в Palee."
 
 msgid "Pending"
 msgstr "В очакване"
@@ -41,7 +41,7 @@ msgid "Scheduled"
 msgstr "Планирано"
 
 msgid "Palee class booking status: %{status}."
-msgstr "Състояние на резервацията за курс на Palee: %{status}."
+msgstr "Състояние на записването за занятие в Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Пробна тренировка в %{box}: %{name}"

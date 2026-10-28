@@ -38,8 +38,8 @@ defmodule Palee.Application.EmailVerificationTest do
 
       assert message.category == "account"
       assert message.locale == "el"
-      assert message.subject == "Επιβεβαιώστε τη διεύθυνση email σας"
-      assert message.text =~ "Γεια σας Ελένη,"
+      assert message.subject == "Επιβεβαίωσε τη διεύθυνση email σου"
+      assert message.text =~ "Γεια σου Ελένη,"
       assert message.html =~ "/verify-email#token="
       assert message.idempotency_key == "verify_email:#{user.login_id}:sign_up"
       refute Identity.email_verified?(Identity.find_by_id(user.id))

@@ -24,7 +24,7 @@ const REMEMBER_DELAY_MS = 800;
  */
 export function useSchedulePreferences(token: string | null, organizationId: string | null) {
   const queryClient = useQueryClient();
-  const queryKey = ["saved-filters", "box_schedule", token];
+  const queryKey = ["saved-filters", "box_schedule"];
   const saved = useQuery({
     queryKey,
     queryFn: () => fetchSavedFilters(token!, "box_schedule"),
@@ -57,7 +57,7 @@ export function useSchedulePreferences(token: string | null, organizationId: str
         });
         setLastParams(params);
         void rememberFilters(token, "box_schedule", params)
-          .then((next) => queryClient.setQueryData(["saved-filters", "box_schedule", token], next))
+          .then((next) => queryClient.setQueryData(["saved-filters", "box_schedule"], next))
           .catch(() => undefined);
       }, REMEMBER_DELAY_MS);
     },
@@ -99,7 +99,7 @@ export function useRememberScheduleLocation(token: string | null) {
   return useCallback(
     async (organizationId: string, locationId: string | null) => {
       if (!token) return;
-      const key = ["saved-filters", "box_schedule", token];
+      const key = ["saved-filters", "box_schedule"];
       const current =
         queryClient.getQueryData<SavedFilters>(key) ??
         (await fetchSavedFilters(token, "box_schedule").catch(() => null));

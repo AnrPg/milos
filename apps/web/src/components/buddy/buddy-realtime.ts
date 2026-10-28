@@ -1,6 +1,7 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 import { BUDDIES_KEY, SUPPORT_REQUESTS_KEY } from "@/api/buddies";
+import { REALTIME_FALLBACK_REFETCH_MS } from "@/lib/query-policy";
 
 /**
  * Live Buddy updates (ADR-160): the API sends one `buddy:changed` event on
@@ -11,8 +12,8 @@ import { BUDDIES_KEY, SUPPORT_REQUESTS_KEY } from "@/api/buddies";
 
 export const BUDDY_TOPIC_PREFIX = "user:";
 export const BUDDY_EVENT = "buddy:changed";
-/** The slow safety net that replaced the 10–60 s polls; focus and reconnect also refetch. */
-export const BUDDY_FALLBACK_REFETCH_MS = 2 * 60_000;
+/** The safety net behind the events, polled only while the live connection is down; a rejoin also resyncs. */
+export const BUDDY_FALLBACK_REFETCH_MS = REALTIME_FALLBACK_REFETCH_MS;
 
 export type BuddyEventKind =
   | "support_request_sent"

@@ -75,7 +75,7 @@ defmodule Palee.Email.Templates.LinkEmailsTest do
 
         html = ShareLink.html(assigns, "el")
         assert html =~ "Maria &lt;b&gt;"
-        assert html =~ "Αν δεν γνωρίζετε αυτό το άτομο"
+        assert html =~ "Αν δεν γνωρίζεις αυτό το άτομο"
       end
     end
 

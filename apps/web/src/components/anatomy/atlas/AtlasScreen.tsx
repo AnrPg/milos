@@ -61,7 +61,7 @@ export function AtlasScreen() {
   const [range, setRange] = useState<AtlasRange>(DEFAULT_ATLAS_RANGE);
 
   const atlas = useQuery({
-    queryKey: [...myAtlasKey(range), token],
+    queryKey: myAtlasKey(range),
     enabled: Boolean(token),
     queryFn: () => fetchMyAtlas(token!, range),
     placeholderData: (previous) => previous,
@@ -353,7 +353,7 @@ function NodeExercises({ nodeId, token }: { nodeId: MuscleNodeId; token: string 
   const t = useTranslations("Atlas");
   const [expanded, setExpanded] = useState(false);
   const query = useQuery({
-    queryKey: [...atlasNodeExercisesKey(nodeId), token],
+    queryKey: atlasNodeExercisesKey(nodeId),
     enabled: Boolean(token),
     queryFn: () => fetchAtlasNodeExercises(token!, nodeId),
     staleTime: 5 * 60_000,

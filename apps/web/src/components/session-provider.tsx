@@ -6,6 +6,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { reportMyTimeZone } from "@/api/profile";
 import { deviceTimeZone } from "@/lib/zoned-time";
@@ -99,6 +100,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [sessionExpired, setSessionExpired] = useState<SessionExpiredState>(null);
   const accessTokenRef = useRef<string | undefined>(undefined);
+  // Query keys name the data, not the person: the cache is emptied whenever
+  // the signed-in person changes, so nothing of one person reaches another.
+  const queryCache = useRef(useQueryClient());
+  const cachedUserId = useRef<string | null>(null);
 
   useEffect(() => {
     accessTokenRef.current = tokens?.access_token;
@@ -122,6 +127,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     nextTokens: AuthTokens,
     user: CurrentUser,
   ) {
+    if (cachedUserId.current !== null && cachedUserId.current !== user.id) queryCache.current.clear();
+    cachedUserId.current = user.id;
     void setWorkoutCacheUser(user.id);
     setTokens(nextTokens);
     setCurrentUser(user);
@@ -139,6 +146,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   function resetSession(accessTokenForCleanup?: string | null) {
     endLoginSession();
     resetRealtimeSocket();
+    queryCache.current.clear();
+    cachedUserId.current = null;
     void setWorkoutCacheUser(null);
     try {
       window.localStorage.removeItem(SELECTED_ORGANIZATION_SLUG_KEY);

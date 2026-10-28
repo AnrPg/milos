@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/components/session-provider";
 
 import { PARTNERS_FALLBACK_REFETCH_MS } from "./partners-realtime";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
 
 export function usePartnersToken() {
   const { tokens } = useSession();
@@ -48,12 +49,13 @@ export function usePartnerDeck(clubId: string, filters: PartnerFilters, enabled:
 /** My matches across clubs; live updates refresh them, the slow refetch is a safety net. */
 export function usePartnerMatches(enabled = true) {
   const token = usePartnersToken();
+  const fallback = useRealtimeFallbackInterval(PARTNERS_FALLBACK_REFETCH_MS);
   return useQuery({
     queryKey: PARTNER_MATCHES_KEY,
     enabled: Boolean(token) && enabled,
     queryFn: () => fetchPartnerMatches(token!),
     staleTime: 30_000,
-    refetchInterval: PARTNERS_FALLBACK_REFETCH_MS,
+    refetchInterval: fallback,
   });
 }
 
