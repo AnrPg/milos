@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "ستظهر معاينة WOD للنص الحر هنا.",
     "freeTextPreviewNoText": "لا يحتوي هذا الـ WOD على نص بعد.",
     "textSectionsPreviewLabel": "الأقسام",
-    "textSectionNumber": "القسم {number}",
     "textSectionScoredBy": "يُقيَّم حسب: {metrics}",
     "workoutPreviewLoading": "جارٍ تحميل الـ WOD…",
     "timerFormatLabel": "تنسيق الموقت",

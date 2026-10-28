@@ -2699,7 +2699,6 @@
     "timerFormatLabel": "Είδος χρονομέτρου",
     "freeTextPreviewNoText": "Αυτό το WOD δεν έχει ακόμα κείμενο.",
     "textSectionsPreviewLabel": "Ενότητες",
-    "textSectionNumber": "Ενότητα {number}",
     "textSectionScoredBy": "Βαθμολογείται με: {metrics}",
     "workoutPreviewLoading": "Φόρτωση του WOD…",
     "durationMinutesLabel": "Διάρκεια (λεπτά)",

@@ -2699,7 +2699,6 @@
     "timerFormatLabel": "Format du chrono",
     "freeTextPreviewNoText": "Ce WOD n'a pas encore de texte.",
     "textSectionsPreviewLabel": "Sections",
-    "textSectionNumber": "Section {number}",
     "textSectionScoredBy": "Noté par : {metrics}",
     "workoutPreviewLoading": "Chargement du WOD…",
     "durationMinutesLabel": "Durée (minutes)",

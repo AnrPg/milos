@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "Het vrije-tekst WOD-voorbeeld verschijnt hier.",
     "freeTextPreviewNoText": "Deze WOD heeft nog geen tekst.",
     "textSectionsPreviewLabel": "Onderdelen",
-    "textSectionNumber": "Onderdeel {number}",
     "textSectionScoredBy": "Gescoord op: {metrics}",
     "workoutPreviewLoading": "WOD laden…",
     "timerFormatLabel": "Timer-formaat",

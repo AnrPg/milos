@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "WOD визуализацията в свободен текст ще се появи тук.",
     "freeTextPreviewNoText": "Този WOD все още няма текст.",
     "textSectionsPreviewLabel": "Секции",
-    "textSectionNumber": "Секция {number}",
     "textSectionScoredBy": "Оценява се по: {metrics}",
     "workoutPreviewLoading": "Зареждане на WOD…",
     "timerFormatLabel": "Формат на таймера",

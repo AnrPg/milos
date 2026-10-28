@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "The free-text WOD preview will appear here.",
     "freeTextPreviewNoText": "This WOD has no text yet.",
     "textSectionsPreviewLabel": "Sections",
-    "textSectionNumber": "Section {number}",
     "textSectionScoredBy": "Scored by: {metrics}",
     "workoutPreviewLoading": "Loading the WOD…",
     "timerFormatLabel": "Timer format",

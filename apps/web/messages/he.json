@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "התצוגה המקדימה של WOD בטקסט חופשי תופיע כאן.",
     "freeTextPreviewNoText": "ל-WOD הזה עדיין אין טקסט.",
     "textSectionsPreviewLabel": "חלקים",
-    "textSectionNumber": "חלק {number}",
     "textSectionScoredBy": "ניקוד לפי: {metrics}",
     "workoutPreviewLoading": "טוען את ה-WOD…",
     "timerFormatLabel": "פורמט טיימר",

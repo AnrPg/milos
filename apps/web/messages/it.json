@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "L'anteprima del WOD a testo libero apparirà qui.",
     "freeTextPreviewNoText": "Questo WOD non ha ancora testo.",
     "textSectionsPreviewLabel": "Sezioni",
-    "textSectionNumber": "Sezione {number}",
     "textSectionScoredBy": "Punteggio: {metrics}",
     "workoutPreviewLoading": "Caricamento del WOD…",
     "timerFormatLabel": "Formato del timer",

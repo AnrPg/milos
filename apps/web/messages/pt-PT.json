@@ -2698,7 +2698,6 @@
     "freeTextPreviewEmpty": "A visualização do WOD em texto livre aparecerá aqui.",
     "freeTextPreviewNoText": "Este WOD ainda não tem texto.",
     "textSectionsPreviewLabel": "Secções",
-    "textSectionNumber": "Secção {number}",
     "textSectionScoredBy": "Pontuado por: {metrics}",
     "workoutPreviewLoading": "A carregar o WOD…",
     "timerFormatLabel": "Formato do temporizador",
