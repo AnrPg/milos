@@ -173,7 +173,7 @@ export function PlatformOrganizationsPage() {
   // ADR-210: the email is queued, not sent in the request; while it waits,
   // the console reads its delivery status again.
   const deliveriesQuery = useQuery({
-    queryKey: ["owner-invitation-deliveries", invitation?.initial_owner_invitation.id, accessToken],
+    queryKey: ["owner-invitation-deliveries", invitation?.initial_owner_invitation.id],
     queryFn: () =>
       fetchOwnerInvitationDeliveries(
         accessToken!,
