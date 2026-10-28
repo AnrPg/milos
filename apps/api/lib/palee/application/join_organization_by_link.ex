@@ -10,8 +10,8 @@ defmodule Palee.Application.JoinOrganizationByLink do
 
   alias Palee.{Identity, Organizations}
 
-  def call(%{id: user_id} = user, slug) do
-    with {:ok, result} <- Organizations.join_by_link(slug, user_id),
+  def call(%{id: user_id} = user, link) do
+    with {:ok, result} <- Organizations.join_by_link(link, user_id),
          {:ok, _user} <- maybe_align_role(user, result) do
       {:ok, result}
     end

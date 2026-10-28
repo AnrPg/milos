@@ -23,6 +23,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
       "Audience picker per post: a club channel, followers or public",
       "Clubs with channels: announcements, today's WOD with leaderboard, challenges, time-slot groups, seasons, PT squads, member-created groups and open clubs that non-members can join",
       "Follows and follow requests, profile with posts, shared PRs and clubs",
+      "One search for clubs, people, boxes and independent coaches by name, forgiving accents, Latin spelling and typos",
       "Around me: nearby events, open clubs, gyms offering trials and public posts, as a list or a map, with radius, discipline, time, cost, level, language and audience filters and saved filter combinations",
       "Direct messages and threads, notifications and web push",
       "Moderation: report queue, block, auto-archive of inactive member groups",

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../../../messages/en.json";
 
 import { ApiError } from "@/api/client";
-import { bulkInvite, issueClientInvitation, listPendingInvitations, resendInvitation } from "@/api/organizations";
+import { bulkInvite, fetchJoinLink, issueClientInvitation, listPendingInvitations, resendInvitation, updateJoinLink } from "@/api/organizations";
 import { InviteClientsDialog } from "./InviteClients";
 
 const state = vi.hoisted(() => ({
@@ -30,11 +30,12 @@ vi.mock("@/api/organizations", async (importOriginal) => {
     bulkInvite: vi.fn(),
     resendInvitation: vi.fn(),
     revokeInvitation: vi.fn(),
-    fetchJoinLink: vi.fn().mockResolvedValue({ enabled: false, role: "member" }),
+    fetchJoinLink: vi.fn(),
+    updateJoinLink: vi.fn(),
   };
 });
 
-function renderDialog(initialTab?: "link" | "bulk" | "pending") {
+function renderDialog(initialTab?: "link" | "bulk" | "public" | "pending") {
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <NextIntlClientProvider locale="en" messages={en}>
@@ -56,6 +57,41 @@ beforeEach(() => {
     settings: { brand_name: null, brand_logo_url: null, brand_primary_color: null, default_locale: "el" },
   };
   vi.mocked(listPendingInvitations).mockResolvedValue([]);
+  vi.mocked(fetchJoinLink).mockResolvedValue({ member: { enabled: false }, athlete: { enabled: false, key: null } });
+});
+
+describe("Join links, one per role (ADR-216)", () => {
+  it("switches each link on its own and both can be on", async () => {
+    vi.mocked(fetchJoinLink).mockResolvedValue({ member: { enabled: true }, athlete: { enabled: false, key: null } });
+    vi.mocked(updateJoinLink).mockResolvedValue({ member: { enabled: true }, athlete: { enabled: true, key: "Kq9_x-2" } });
+    renderDialog("public");
+
+    const member = await screen.findByRole("region", { name: "Link for box members" });
+    expect(member).toHaveTextContent("Whoever uses it becomes a box member");
+    expect(screen.getByDisplayValue(/\/join\/kypseli$/)).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Link for athletes" })).toHaveTextContent("Off.");
+    expect(screen.queryByRole("radio", { name: /Athlete/ })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("switch", { name: "Link for athletes" }));
+    await waitFor(() => expect(updateJoinLink).toHaveBeenCalledWith("access", "kypseli", { role: "athlete", enabled: true }));
+    expect(await screen.findByDisplayValue(/\/join\/kypseli\/athlete\/Kq9_x-2$/)).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Link for box members" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("switch", { name: "Link for athletes" })).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("gives the athletes' link a new key only after confirming", async () => {
+    vi.mocked(fetchJoinLink).mockResolvedValue({ member: { enabled: false }, athlete: { enabled: true, key: "old-key" } });
+    vi.mocked(updateJoinLink).mockResolvedValue({ member: { enabled: false }, athlete: { enabled: true, key: "new-key" } });
+    renderDialog("public");
+
+    fireEvent.click(await screen.findByRole("button", { name: "New athletes’ link" }));
+    expect(updateJoinLink).not.toHaveBeenCalled();
+    expect(screen.getByText(/The current link stops working right away/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Yes, make a new one" }));
+
+    await waitFor(() => expect(updateJoinLink).toHaveBeenCalledWith("access", "kypseli", { role: "athlete", rotate_key: true }));
+    expect(await screen.findByDisplayValue(/\/athlete\/new-key$/)).toBeInTheDocument();
+  });
 });
 
 describe("Send by email (ADR-209)", () => {

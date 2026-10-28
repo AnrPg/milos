@@ -280,7 +280,7 @@ defmodule Palee.Finance.PackageTypesTest do
     test "coaching packages authorize programming delivery" do
       {:ok, package} =
         Finance.create_package(%{
-          name: "Online coaching",
+          name: "Online programming",
           package_type: "membership",
           fields: %{"group_classes.included" => false, "online_coaching.included" => true}
         })

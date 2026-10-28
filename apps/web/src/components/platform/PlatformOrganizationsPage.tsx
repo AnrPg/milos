@@ -17,7 +17,7 @@ import {
   fetchOwnerInvitationDeliveries,
   sendOwnerInvitationEmail,
   type OwnerInvitationDelivery,
-  updatePlatformOrganizationMembershipRole,
+  updatePlatformOrganizationMembershipRoles,
   type OrganizationMembershipRole,
   type OrganizationSettings,
   type OrganizationStatus,
@@ -43,6 +43,8 @@ import { FieldError } from "@/components/ui/ErrorNotice";
 import { useUiTranslations } from "@/i18n/ui";
 import { fieldBorder, formErrorsFrom, invalidFieldProps, type FormErrors } from "@/lib/form-errors";
 import { Select } from "@/components/ui/Select";
+import { ALL_ROLES } from "@/api/roles";
+import { RoleChipsEditor } from "@/components/roles/RoleChipsEditor";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { LOCALE_NAMES, SUPPORTED_LOCALES, isAppLocale } from "@/i18n/locales";
 
@@ -87,6 +89,7 @@ export function PlatformOrganizationsPage() {
   const purgeCopy = platformOrganizationPurgeCopy(locale);
   const slugCopy = platformOrganizationSlugCopy(locale);
   const tResets = useTranslations("passwordResets");
+  const tPush = useTranslations("PlatformPush");
   const tBusiness = useTranslations("Business");
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
@@ -296,6 +299,12 @@ export function PlatformOrganizationsPage() {
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {copy.plans}
+          </Link>
+          <Link
+            href="/platform/push"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tPush("title")}
           </Link>
           <Link
             href="/platform/password-resets"
@@ -782,21 +791,22 @@ function AccessDialog({
     }
   }
 
-  async function changeRole(membershipId: string, nextRole: OrganizationMembershipRole) {
+  async function changeRoles(membershipId: string, nextRoles: OrganizationMembershipRole[]) {
     if (!accessToken) return;
     setRolePending(membershipId);
     setError(null);
 
     try {
-      await updatePlatformOrganizationMembershipRole(
+      await updatePlatformOrganizationMembershipRoles(
         accessToken,
         organization.organization.id,
         membershipId,
-        nextRole,
+        nextRoles,
       );
       await accessQuery.refetch();
-    } catch {
-      setError(copy.roleError);
+    } catch (caught) {
+      // A gym keeps an owner (ADR-219); say so instead of a generic failure.
+      setError(caught instanceof ApiError && caught.payload.code === "last_owner" ? copy.lastOwner : copy.roleError);
     } finally {
       setRolePending(null);
     }
@@ -857,23 +867,24 @@ function AccessDialog({
         <div className="mt-5 divide-y divide-[var(--border)] border-y border-[var(--border)]">
           {accessQuery.isLoading ? <p className="py-5 text-sm text-[var(--text-soft)]">{copy.loading}</p> : null}
           {(accessQuery.data?.memberships ?? []).map((membership) => (
-            <div key={membership.id} className="grid gap-3 py-4 sm:grid-cols-[1fr_10rem_12rem] sm:items-center">
+            <div key={membership.id} className="grid gap-3 py-4 sm:grid-cols-[1fr_10rem] sm:items-center">
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-[var(--text)]">{membership.user?.nickname ?? membership.user_id}</p>
                 <p className="mt-1 text-xs text-[var(--text-soft)]">{copy.globalAccountType}: {membership.user?.role ?? "-"}</p>
               </div>
               <p className="text-sm text-[var(--text-soft)]">{membership.status}</p>
-              <label className="text-xs font-semibold text-[var(--text-soft)]">
+              {/* The vendor ranks above every gym role and sets any role set (ADR-219). */}
+              <div className="text-xs font-semibold text-[var(--text-soft)] sm:col-span-2">
                 <span className="mb-1 block">{copy.membershipRole}</span>
-                <Select
-                  className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm"
-                  disabled={rolePending === membership.id}
-                  value={membership.role}
-                  onValueChange={(value) => void changeRole(membership.id, value as OrganizationMembershipRole)}
-                >
-                  {membershipRoles.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
-                </Select>
-              </label>
+                <RoleChipsEditor
+                  key={(membership.roles ?? [membership.role]).join()}
+                  label={`${copy.membershipRole}: ${membership.user?.nickname ?? membership.user_id}`}
+                  current={membership.roles ?? [membership.role]}
+                  editable={ALL_ROLES}
+                  pending={rolePending === membership.id}
+                  onSave={(roles) => void changeRoles(membership.id, roles)}
+                />
+              </div>
             </div>
           ))}
         </div>

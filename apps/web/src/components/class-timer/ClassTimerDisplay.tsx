@@ -75,7 +75,7 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
       style={{ background: `color-mix(in srgb, ${tint} 16%, var(--bg))`, color: "var(--text)" }}
       onPointerDown={soundReady ? undefined : enableSound}
     >
-      <header className="flex items-start justify-between gap-4 p-[2.5vmin]">
+      <header className="flex flex-wrap items-start justify-between gap-4 p-[2.5vmin]">
         <div className="min-w-0">
           <div className="truncate font-black" style={{ fontSize: "clamp(1rem, 3.4vmin, 2.75rem)" }}>
             {payload.workout?.title ?? payload.class.name}
@@ -84,7 +84,7 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
             {payload.class.name}
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <span
             role="status"
             aria-label={timer.connected ? i18n("classTimerLive") : i18n("classTimerReconnecting")}

@@ -15,7 +15,6 @@ import {
   updateAdminSettings,
   type FinanceSettings,
   type GamificationSettings,
-  type NotificationPushSettings,
   type SchedulingSettings,
 } from "@/api/settings";
 import {
@@ -24,6 +23,7 @@ import {
   type FinanceCleanupRecord,
 } from "@/api/finance";
 import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/workouts";
+import { newLevelCode } from "@/lib/scale-level-code";
 import { adminLogoApi, fetchAdminBranding } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { useSession } from "@/components/session-provider";
@@ -383,6 +383,22 @@ function GamificationSection({ token }: { token: string }) {
 
 // ── Level Taxonomy section ───────────────────────────────────────────────────
 
+function isDraftLevel(level: ScaleLevel) {
+  return !level.id || level.id.startsWith("draft-");
+}
+
+// A saved level keeps its code: WOD text (`[scale: rx]`) and workout history
+// point at it. A new level's code is derived from its name on save.
+function levelCodes(levels: ScaleLevel[]) {
+  const taken = levels.filter((level) => !isDraftLevel(level)).map((level) => level.slug);
+  return levels.map((level, index) => {
+    if (!isDraftLevel(level)) return level.slug;
+    const code = newLevelCode(level.label, taken, index + 1);
+    taken.push(code);
+    return code;
+  });
+}
+
 function LevelTaxonomySection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
@@ -400,10 +416,12 @@ function LevelTaxonomySection({ token }: { token: string }) {
     queueMicrotask(() => { setLevels(data); setInitialized(true); });
   }, [levelsQuery.data]);
 
+  const codes = levelCodes(levels);
+
   const saveMutation = useMutation({
     mutationFn: () =>
       replaceScaleLevels(token, {
-        scale_levels: levels.map((l, i) => ({ slug: l.slug, label: l.label, sort_order: i + 1 })),
+        scale_levels: levels.map((l, i) => ({ slug: codes[i], label: l.label.trim(), sort_order: i + 1 })),
       }),
     onSuccess: (updated) => {
       setLevels(updated);
@@ -413,44 +431,51 @@ function LevelTaxonomySection({ token }: { token: string }) {
 
   const serverLevels = levelsQuery.data ?? [];
   const dirty = initialized && JSON.stringify(levels) !== JSON.stringify(serverLevels);
+  const missingName = levels.some((level) => level.label.trim() === "");
 
   return (
     <div className="space-y-4">
+      <p className="max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
+        {i18n("lvlHelpIntro")}
+      </p>
+
       {levelsQuery.isLoading && (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
       )}
 
-      <div className="space-y-3">
+      <ol className="space-y-3" data-testid="level-taxonomy-list">
         {levels.map((level, index) => (
-          <div
+          <li
             key={level.id ?? level.slug ?? index}
-            className="grid gap-3 rounded-[1.4rem] p-4 md:grid-cols-[0.8fr_1fr_auto]"
+            className="grid gap-3 rounded-[1.4rem] p-4 md:grid-cols-[2rem_1fr_auto] md:items-start"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
-            <input
-              className="rounded-2xl px-4 py-3 text-sm outline-none"
-              placeholder={i18n("slug6300777")}
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={level.slug}
-              onChange={(e) =>
-                setLevels((cur) =>
-                  cur.map((item, i) => (i === index ? { ...item, slug: e.target.value } : item)),
-                )
-              }
-            />
-            <input
-              className="rounded-2xl px-4 py-3 text-sm outline-none"
-              placeholder={i18n("displayLabeld747868")}
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={level.label}
-              onChange={(e) =>
-                setLevels((cur) =>
-                  cur.map((item, i) => (i === index ? { ...item, label: e.target.value } : item)),
-                )
-              }
-            />
+            <span className="pt-3 text-sm font-semibold tabular-nums" style={{ color: "var(--dim)" }}>{index + 1}</span>
+            <label className="block space-y-1.5">
+              <input
+                aria-label={i18n("lvlNameLabel")}
+                className="w-full rounded-2xl px-4 py-3 text-sm outline-none"
+                placeholder={i18n("lvlNamePlaceholder")}
+                style={{ background: "var(--bg)", border: `1px solid ${level.label.trim() === "" && !isDraftLevel(level) ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
+                value={level.label}
+                onChange={(e) =>
+                  setLevels((cur) =>
+                    cur.map((item, i) => (i === index ? { ...item, label: e.target.value } : item)),
+                  )
+                }
+              />
+              <span className="block text-xs leading-5" style={{ color: "var(--dim)" }}>
+                {i18n("lvlCodeLine")}{" "}
+                <code className="rounded px-1.5 py-0.5 font-mono" style={{ background: "var(--bg)", color: "var(--text)" }} data-testid="level-code">
+                  {codes[index]}
+                </code>
+                {" · "}
+                {isDraftLevel(level) ? i18n("lvlCodeNew") : i18n("lvlCodeFixed")}
+              </span>
+            </label>
             <button
-              className="rounded-full px-4 py-2 text-sm transition-colors"
+              className="rounded-full px-4 py-2 text-sm transition-colors disabled:opacity-50"
+              disabled={levels.length === 1}
               style={{ background: "var(--panel)", color: "var(--muted)" }}
               type="button"
               onClick={() =>
@@ -459,9 +484,9 @@ function LevelTaxonomySection({ token }: { token: string }) {
             >
               {i18n("removee963907")}
             </button>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
 
       <button
         className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
@@ -477,8 +502,16 @@ function LevelTaxonomySection({ token }: { token: string }) {
         {i18n("addLeveld2d215f")}
       </button>
 
+      <ul className="max-w-3xl list-disc space-y-1 pl-5 text-xs leading-5" style={{ color: "var(--dim)" }}>
+        <li>{i18n("lvlHelpOrder")}</li>
+        <li>{i18n("lvlHelpCode")}</li>
+        <li>{i18n("lvlHelpRemove")}</li>
+      </ul>
+
+      {missingName ? <p className="text-sm" style={{ color: "var(--danger)" }}>{i18n("lvlNameRequired")}</p> : null}
+
       <SaveBar
-        dirty={dirty}
+        dirty={dirty && !missingName}
         pending={saveMutation.isPending}
         success={saveMutation.isSuccess}
         error={saveMutation.error}
@@ -999,219 +1032,6 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
   </div>;
 }
 
-// ── Notifications section ────────────────────────────────────────────────────
-
-type NotificationPushFormState = {
-  publicKey: string;
-  privateKey: string;
-  subject: string;
-  clearPrivateKey: boolean;
-};
-
-function notificationPushFormFromSettings(s: NotificationPushSettings): NotificationPushFormState {
-  return {
-    publicKey: s.vapid_public_key ?? "",
-    privateKey: "",
-    subject: s.vapid_subject ?? "",
-    clearPrivateKey: false,
-  };
-}
-
-function bytesToBase64Url(bytes: ArrayBuffer) {
-  const raw = String.fromCharCode(...new Uint8Array(bytes));
-  return window.btoa(raw).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-async function generateVapidKeyPair() {
-  const pair = await window.crypto.subtle.generateKey(
-    { name: "ECDH", namedCurve: String.fromCharCode(80, 45, 50, 53, 54) },
-    true,
-    ["deriveBits"],
-  );
-
-  const publicKey = await window.crypto.subtle.exportKey("raw", pair.publicKey);
-  const privateKey = await window.crypto.subtle.exportKey("jwk", pair.privateKey);
-
-  if (typeof privateKey.d !== "string") {
-    throw new Error("vapid_key_export_failed");
-  }
-
-  return {
-    publicKey: bytesToBase64Url(publicKey),
-    privateKey: privateKey.d,
-  };
-}
-
-function NotificationsSection({ token }: { token: string }) {
-  const i18n = useUiTranslations();
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<NotificationPushFormState>({
-    publicKey: "",
-    privateKey: "",
-    subject: "",
-    clearPrivateKey: false,
-  });
-  const [initialized, setInitialized] = useState(false);
-  const [generateError, setGenerateError] = useState<string | null>(null);
-
-  const settingsQuery = useQuery({
-    queryKey: ["admin", "settings"],
-    queryFn: () => fetchAdminSettings(token),
-  });
-
-  useEffect(() => {
-    if (!settingsQuery.data?.notifications) return;
-    const next = notificationPushFormFromSettings(settingsQuery.data.notifications);
-    queueMicrotask(() => { setForm(next); setInitialized(true); });
-  }, [settingsQuery.data]);
-
-  const saveMutation = useMutation({
-    mutationFn: () => {
-      const privateKey = form.privateKey.trim();
-      const payload: {
-        vapid_public_key: string | null;
-        vapid_subject: string | null;
-        vapid_private_key?: string | null;
-      } = {
-        vapid_public_key: form.publicKey.trim() || null,
-        vapid_subject: form.subject.trim() || null,
-      };
-
-      if (privateKey || form.clearPrivateKey) {
-        payload.vapid_private_key = privateKey || null;
-      }
-
-      return updateAdminSettings(token, {
-        notifications: payload,
-      });
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["admin", "settings"], data);
-      setForm(notificationPushFormFromSettings(data.notifications));
-    },
-  });
-
-  const serverForm = settingsQuery.data?.notifications
-    ? notificationPushFormFromSettings(settingsQuery.data.notifications)
-    : null;
-  const dirty =
-    initialized &&
-    serverForm !== null &&
-    (form.publicKey !== serverForm.publicKey ||
-      form.subject !== serverForm.subject ||
-      form.privateKey.trim() !== "" ||
-      form.clearPrivateKey);
-  const configured = Boolean(settingsQuery.data?.notifications.enabled);
-  const privateKeyConfigured = Boolean(settingsQuery.data?.notifications.vapid_private_key_configured);
-
-  async function handleGenerate() {
-    setGenerateError(null);
-
-    try {
-      const keyPair = await generateVapidKeyPair();
-      setForm((current) => ({
-        ...current,
-        publicKey: keyPair.publicKey,
-        privateKey: keyPair.privateKey,
-        clearPrivateKey: false,
-      }));
-    } catch {
-      setGenerateError(i18n("browserCouldNotGeneratePushKeys6c91b0a"));
-    }
-  }
-
-  return (
-    <div className="max-w-3xl space-y-5">
-      <div
-        className="rounded-[1.4rem] p-4 text-sm"
-        style={{
-          background: configured
-            ? "color-mix(in srgb, var(--success) 10%, var(--panel-muted))"
-            : "var(--panel-muted)",
-          border: "1px solid var(--border)",
-          color: configured ? "var(--success)" : "var(--muted)",
-        }}
-      >
-        {configured ? i18n("browserAlertsAreAvailableForUserOptIn9f7f20d") : i18n("browserAlertsAreNotAvailableYetc3c13bb")}
-      </div>
-
-      <div className="flex flex-wrap gap-3">
-        <button
-          className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          type="button"
-          onClick={() => void handleGenerate()}
-        >
-          {i18n("generateBrowserAlertKeys3f8d1bf")}
-        </button>
-        {privateKeyConfigured ? (
-          <button
-            className="rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
-            type="button"
-            onClick={() => setForm((current) => ({ ...current, publicKey: "", privateKey: "", subject: "", clearPrivateKey: true }))}
-          >
-            {i18n("turnOffBrowserAlerts17b2048")}
-          </button>
-        ) : null}
-      </div>
-      {generateError ? <ErrorNotice>{generateError}</ErrorNotice> : null}
-
-      <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-          {i18n("contactForBrowserAlertsfc50ab0")}
-        </span>
-        <input
-          className="w-full rounded-2xl border px-4 py-3 text-sm"
-          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-          value={form.subject}
-          onChange={(e) => setForm((current) => ({ ...current, subject: e.target.value, clearPrivateKey: false }))}
-        />
-      </label>
-
-      <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-          {i18n("publicBrowserAlertKeyacbc22f")}
-        </span>
-        <textarea
-          className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
-          spellCheck={false}
-          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-          value={form.publicKey}
-          onChange={(e) => setForm((current) => ({ ...current, publicKey: e.target.value, clearPrivateKey: false }))}
-        />
-      </label>
-
-      <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-          {privateKeyConfigured ? i18n("replacePrivateBrowserAlertKey2d09431") : i18n("privateBrowserAlertKey09f05b1")}
-        </span>
-        <textarea
-          className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
-          placeholder={privateKeyConfigured ? i18n("leaveBlankToKeepCurrentKeyea85d22") : ""}
-          spellCheck={false}
-          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-          value={form.privateKey}
-          onChange={(e) => setForm((current) => ({ ...current, privateKey: e.target.value, clearPrivateKey: false }))}
-        />
-      </label>
-
-      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
-        {i18n("adminsManageTheSharedBrowserAlertServiceHerec33b6e5")}
-      </p>
-
-      <SaveBar
-        dirty={dirty}
-        pending={saveMutation.isPending}
-        success={saveMutation.isSuccess}
-        error={saveMutation.error}
-        onSave={() => saveMutation.mutate()}
-        onReset={() => serverForm && setForm(serverForm)}
-      />
-    </div>
-  );
-}
-
 function ProviderKindSection({ token }: { token: string }) {
   const t = useTranslations("Providers");
   return (
@@ -1326,14 +1146,6 @@ export function AdminSettingsHub() {
               description={i18n("paymentReminders64c6e44")}
             >
               <FinanceSection token={token} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              id="notifications"
-              title={i18n("notificationseee2ef2")}
-              description={i18n("browserAlertsAndInAppInboxDeliveryc83f515")}
-            >
-              <NotificationsSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection

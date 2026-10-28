@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { listAdminLocations } from "@/api/facility";
 import type { RoleName } from "@/api/roles";
 import { BranchScopePicker } from "@/components/admin/users/BranchScopePicker";
-import { grantableRoles } from "@/components/admin/users/MemberRolesEditor";
+import { grantableRoles } from "@/lib/role-hierarchy";
 import { RoleLabel } from "@/components/semantic-label";
 import { hasSeveralBranches, membershipLocationScope, type LocationScope } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";

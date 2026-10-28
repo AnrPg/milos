@@ -178,7 +178,7 @@ defmodule Palee.Finance.Domain.PackageCatalog do
       min: 0,
       max: 20
     },
-    # Online coaching
+    # Online programming (code key stays online_coaching)
     %{key: "online_coaching.included", section: "online_coaching", kind: :boolean, phase: :a},
     %{
       key: "online_coaching.assigned_programming",

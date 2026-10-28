@@ -11,6 +11,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 import { QrCode } from "./QrCode";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * The printed poster (ADR-155 §5, board 10 Q1 extra) for a box without a
@@ -31,9 +32,7 @@ export function PosterPage({ locationId }: { locationId: string }) {
   return (
     <main className="checkin-print-root flex min-h-dvh flex-col items-center gap-6 px-6 py-8" style={{ background: "var(--bg)" }}>
       <nav className="checkin-print-hide flex w-full max-w-2xl items-center justify-between gap-3">
-        <Link href={back} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
-          ‹ {t("backToLocation")}
-        </Link>
+        <BackLink href={back} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{t("backToLocation")}</BackLink>
         {poster.data?.enabled ? (
           <button
             type="button"

@@ -176,6 +176,8 @@ test.describe("Πρόοδος depth (ADR-165)", () => {
     await page.goto("/admin/users/u-1?tab=training");
     const panel = page.getByTestId("coach-training-depth");
     await expect(panel.getByText("1.4 : 1")).toBeVisible({ timeout: 60_000 });
+    // The back link draws one arrow; the translation brings none of its own.
+    await expect(page.getByRole("main").getByRole("link", { name: "Users", exact: true })).toHaveText(/^\s*←\s*Users\s*$/);
     await expect(panel).toContainText("Only from entries the client shares with the box's coaches.");
     await expect(panel.getByRole("region", { name: "Muscle coverage" }).getByRole("link")).toHaveCount(0);
     await expect(panel.getByRole("region", { name: "Training load" })).toContainText("not medical advice");

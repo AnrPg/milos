@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -17,6 +16,7 @@ import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey, errorCode } from "./errors";
 import { QrCode } from "./QrCode";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * Box › Check-in (ADR-155 §6, vision §7.5): the member's own QR for the desk
@@ -83,7 +83,7 @@ export function MemberCheckIn() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
       <header className="flex flex-col gap-1">
-        <Link href="/box" className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>‹ {t("backToBox")}</Link>
+        <BackLink href="/box" className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{t("backToBox")}</BackLink>
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("memberTitle")}</h1>
         {boxName ? <p className="text-sm" style={{ color: "var(--dim)" }}>{boxName}</p> : null}
       </header>
