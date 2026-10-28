@@ -237,6 +237,7 @@
     "classAction_cancel": "Cancelar clase",
     "classAction_restore": "Restaurar clase",
     "classAction_delete": "Eliminar",
+    "classMoreActions": "Más acciones para esta clase",
     "classActionTitle_pause": "¿Pausar las reservas?",
     "classActionTitle_resume": "¿Reanudar las reservas?",
     "classActionTitle_cancel": "¿Cancelar esta clase?",

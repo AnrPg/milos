@@ -22,7 +22,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { Badge } from "@/components/community/MembersTab";
-import { MoreMenu } from "@/components/community/PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { Field, inputStyle } from "@/components/community/ProposeGroupSheet";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";

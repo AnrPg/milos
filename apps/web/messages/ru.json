@@ -237,6 +237,7 @@
     "classAction_cancel": "Отменить занятие",
     "classAction_restore": "Восстановить занятие",
     "classAction_delete": "Удалить",
+    "classMoreActions": "Другие действия с занятием",
     "classActionTitle_pause": "Приостановить запись?",
     "classActionTitle_resume": "Возобновить запись?",
     "classActionTitle_cancel": "Отменить это занятие?",

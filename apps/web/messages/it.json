@@ -237,6 +237,7 @@
     "classAction_cancel": "Annulla lezione",
     "classAction_restore": "Ripristina lezione",
     "classAction_delete": "Elimina",
+    "classMoreActions": "Altre azioni per questa lezione",
     "classActionTitle_pause": "Mettere in pausa le prenotazioni?",
     "classActionTitle_resume": "Riprendere le prenotazioni?",
     "classActionTitle_cancel": "Annullare questa lezione?",

@@ -35,7 +35,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { ComposeButton } from "./ComposeSheet";
 import { FeedList } from "./FeedList";
 import { Badge } from "./MembersTab";
-import { MoreMenu } from "./PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { Field, inputStyle, JoinPolicyPicker } from "./ProposeGroupSheet";
 import { ReportSheet } from "./ReportSheet";
 import { ErrorLine, Sheet, SheetButton } from "./Sheet";
