@@ -70,6 +70,17 @@ async function signedInOwner(page: Page) {
   );
 }
 
+// The role filter is a segmented radio group on wide screens, a picker on phones.
+async function pickRole(page: Page, name: RegExp) {
+  const picker = page.getByRole("combobox", { name: "Filter by role" });
+  if (await picker.isVisible()) {
+    await picker.click();
+    await page.getByRole("option", { name }).click();
+  } else {
+    await page.getByRole("radio", { name }).click();
+  }
+}
+
 test.describe("box roles in Users (ADR-217)", () => {
   test("the list shows every role, tints staff and gives staff no membership status", async ({ page }) => {
     await signedInOwner(page);
@@ -87,9 +98,10 @@ test.describe("box roles in Users (ADR-217)", () => {
     await expect(coach).toHaveAttribute("data-staff", "true");
     await expect(member).not.toHaveAttribute("data-staff", "true");
 
-    await page.getByRole("radio", { name: /Staff/ }).click();
+    await page.getByRole("button", { name: "Filters" }).click();
+    await pickRole(page, /Staff/);
     await expect(list.getByRole("listitem")).toHaveCount(2);
-    await page.getByRole("radio", { name: /Box members/ }).click();
+    await pickRole(page, /Box members/);
     await expect(list.getByRole("listitem")).toHaveCount(2);
   });
 
@@ -102,7 +114,7 @@ test.describe("box roles in Users (ADR-217)", () => {
             identity: { id: "owner-1", nickname: "Xristoforos", avatar_url: null, role: "owner", joined_at: "2026-10-27T10:00:00Z" },
             account_status: "active",
             membership: { roles: ["owner"], coach_scope: "own", location_scope: { all_locations: true, location_ids: [] } },
-            available_sections: ["overview", "training_history", "prs", "scores", "class_participation", "messages", "admin_actions"],
+            available_sections: ["overview", "admin_actions"],
             attention: [],
             operational_links: { messages: "/messages", user_id: "owner-1" },
           },
