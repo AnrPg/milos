@@ -113,7 +113,6 @@ async function stubOwner(page: Page, puts: Array<Record<string, unknown>>, appro
       queue = [];
       return json(route, { suggestion: { ...suggestion, status: "approved" } });
     }
-    if (path.endsWith("/join-link")) return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     return json(route, {});
   });
 }
@@ -229,7 +228,6 @@ async function stubMember(page: Page, scaling: unknown) {
     if (path === "/api/executions") return json(route, { executions: [] });
     if (/\/injury-warnings$/.test(path)) return json(route, { level: "none", warnings: [], warning_count: 0 });
     if (path === "/api/me/workouts/wod-1/scaling") return json(route, { scaling });
-    if (path.endsWith("/join-link")) return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     return json(route, {});
   });
 }
