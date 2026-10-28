@@ -123,7 +123,7 @@ test("the Find bubble is a magnifying glass and the current tab has no fill", as
   await stub(page);
   await page.goto("/clubs/find");
 
-  await expect(page.getByRole("heading", { name: "Find clubs and people" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Find clubs, boxes and people" })).toBeVisible();
   const find = page.getByRole("link", { name: "Find" });
   await expect(find.locator("svg")).toHaveCount(1);
   await expect(find).not.toContainText("+");
