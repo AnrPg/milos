@@ -12,7 +12,16 @@ export type AdminUserDirectoryEntry = {
   id: string;
   nickname: string;
   avatar_url: string | null;
-  role: "member" | "athlete" | "admin";
+  /** ADR-217: the primary role in this box (owner, coach, member...). */
+  role: string;
+  /** ADR-217: every role held in this box, in privilege order. */
+  roles?: string[];
+  /** "all" marks a head coach. */
+  coach_scope?: string | null;
+  /** Holds a staff role (owner and admin included). */
+  staff?: boolean;
+  /** Holds a member or athlete role; only clients have a finance status. */
+  client?: boolean;
   account_status: string;
   joined_at: string | null;
   finance_status: string | null;

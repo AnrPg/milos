@@ -2102,6 +2102,7 @@
     "roleOwner": "Ιδιοκτήτης",
     "roleAdmin": "Διαχειριστής",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Head coach",
     "roleFrontDesk": "Υπάλληλος υποδοχής",
     "roleAccountant": "Λογιστής",
     "roleJanitor": "Προσωπικό καθαριότητας",
@@ -4961,7 +4962,7 @@
       "all": "Όλοι",
       "member": "Μέλη box",
       "athlete": "Αθλητές (προσωπικό πρόγραμμα)",
-      "admin": "Προσωπικό"
+      "staff": "Προσωπικό"
     },
     "showing": "Εμφανίζονται {shown} από {total}",
     "clearFilters": "Καθαρισμός φίλτρων",
@@ -4974,6 +4975,7 @@
     "listLabel": "Άτομα",
     "columns": {
       "person": "Άτομο",
+      "roles": "Ρόλοι",
       "finance": "Συνδρομή",
       "joined": "Εγγραφή",
       "open": "Άνοιγμα προφίλ"

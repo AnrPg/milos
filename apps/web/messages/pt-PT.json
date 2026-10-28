@@ -2102,6 +2102,7 @@
     "roleOwner": "Proprietário",
     "roleAdmin": "Administrador",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Treinador principal",
     "roleFrontDesk": "Rececionista",
     "roleAccountant": "Contabilista",
     "roleJanitor": "Pessoal de limpeza",
@@ -4961,7 +4962,7 @@
       "all": "Todos",
       "member": "Sócios",
       "athlete": "Atletas",
-      "admin": "Equipa"
+      "staff": "Equipa"
     },
     "showing": "A mostrar {shown} de {total}",
     "clearFilters": "Limpar filtros",
@@ -4974,6 +4975,7 @@
     "listLabel": "Pessoas",
     "columns": {
       "person": "Pessoa",
+      "roles": "Funções",
       "finance": "Adesão",
       "joined": "Data de adesão",
       "open": "Abrir perfil"
