@@ -1,7 +1,38 @@
 import type { AdminUserDirectoryEntry } from "@/api/admin-users";
 import { SERIES_TOKENS, tokenVar } from "@/lib/theme";
 
-export type DirectoryRole = "all" | "member" | "athlete" | "admin";
+export type DirectoryRole = "all" | "member" | "athlete" | "staff";
+
+/** Roles in privilege order (ADR-099); the list shows them in this order. */
+const ROLE_ORDER = ["owner", "admin", "coach", "front_desk", "accountant", "janitor", "member", "athlete"];
+const STAFF_ROLES = new Set(["owner", "admin", "coach", "front_desk", "accountant", "janitor"]);
+
+/**
+ * ADR-217: a person's roles in this box, never the account-wide role. Falls
+ * back to the primary `role` when the API sent no role set.
+ */
+export function rolesOf(user: Pick<AdminUserDirectoryEntry, "role" | "roles">): string[] {
+  const roles = user.roles?.length ? user.roles : [user.role];
+  return ROLE_ORDER.filter((role) => roles.includes(role));
+}
+
+export function isStaff(user: Pick<AdminUserDirectoryEntry, "role" | "roles" | "staff">) {
+  return user.staff ?? rolesOf(user).some((role) => STAFF_ROLES.has(role));
+}
+
+/**
+ * The role words a person is shown with, in privilege order. A coach who sees
+ * every client reads as head coach (`coach_scope: all`, ontology §4.3).
+ */
+export function displayRoles(user: Pick<AdminUserDirectoryEntry, "role" | "roles" | "coach_scope">): string[] {
+  return rolesOf(user).map((role) => (role === "coach" && user.coach_scope === "all" ? "head_coach" : role));
+}
+
+function matchesRole(user: AdminUserDirectoryEntry, role: DirectoryRole) {
+  if (role === "all") return true;
+  if (role === "staff") return isStaff(user);
+  return rolesOf(user).includes(role);
+}
 export type DirectorySort = "name" | "newest" | "oldest";
 export type DirectoryFilters = { query: string; role: DirectoryRole; finance: string; sort: DirectorySort };
 
@@ -16,11 +47,12 @@ function matchesQuery(user: AdminUserDirectoryEntry, query: string) {
 }
 
 export function roleCounts(users: AdminUserDirectoryEntry[], query: string): Record<DirectoryRole, number> {
-  const counts: Record<DirectoryRole, number> = { all: 0, member: 0, athlete: 0, admin: 0 };
+  const counts: Record<DirectoryRole, number> = { all: 0, member: 0, athlete: 0, staff: 0 };
   for (const user of users) {
     if (!matchesQuery(user, query)) continue;
-    counts.all += 1;
-    counts[user.role] += 1;
+    for (const role of ["all", "member", "athlete", "staff"] as const) {
+      if (matchesRole(user, role)) counts[role] += 1;
+    }
   }
   return counts;
 }
@@ -29,7 +61,7 @@ export function filterDirectory(users: AdminUserDirectoryEntry[], filters: Direc
   const filtered = users.filter(
     (user) =>
       matchesQuery(user, filters.query) &&
-      (filters.role === "all" || user.role === filters.role) &&
+      matchesRole(user, filters.role) &&
       (filters.finance === "all" || (user.finance_status ?? "none") === filters.finance),
   );
 

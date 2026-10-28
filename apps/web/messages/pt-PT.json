@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# aula ficou como estava (já começou ou foi cancelada).} other {# aulas ficaram como estavam (já começaram ou foram canceladas).}}",
     "seriesEveryLabel": "Quais",
     "seriesEveryAll": "Todas as aulas",
-    "seriesEveryNth": "Uma aula em cada {n}"
+    "seriesEveryNth": "Uma aula em cada {n}",
+    "dayView": "Vista diária",
+    "dayViewShort": "Dia",
+    "openDayView": "Vista diária: {date}",
+    "classMoreActions": "Mais ações para esta aula"
   },
   "Ui": {
     "exercise1091b7f": "Exercício",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Escolheu demasiados: no máximo {count}.",
     "formErrTooFewItems": "Escolha pelo menos {count}.",
     "formErrInvalid": "Este valor não é aceite. Verifique-o e tente novamente.",
-    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}"
+    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}",
+    "roleHeadCoach": "Treinador principal",
+    "programmingDialogEyebrowFor": "Programação para {name}",
+    "programmingDialogWhat": "O que queres fazer?",
+    "programmingModeVariant": "Mudar só para este membro",
+    "programmingModePersonal": "Treino à parte",
+    "programmingModeClass": "Mudar para toda a aula",
+    "programmingDialogClass": "Aula",
+    "programmingDialogChooseClass": "Escolhe uma aula…",
+    "programmingDialogNoClass": "Não tem aula reservada neste dia. Escolhe «Treino à parte» ou reserva-lhe primeiro uma aula.",
+    "programmingDialogWorkout": "Treino",
+    "programmingSourceAdapt": "Adaptar o WOD da aula",
+    "programmingSourceAsIs": "O WOD da aula tal como está",
+    "programmingSourceLibrary": "Da biblioteca",
+    "programmingSourceNew": "Novo WOD",
+    "programmingDialogChooseWod": "Escolhe um WOD…",
+    "programmingMoreOptions": "Mais opções",
+    "programmingMoreSummary": "Pasta: {folder} · {count, plural, =0 {só esta pessoa} one {+# pessoa} other {+# pessoas}}",
+    "programmingFolderAuto": "Automática",
+    "programmingFolder": "Pasta da biblioteca",
+    "programmingSubmitAssign": "{count, plural, one {Atribuir} other {Atribuir a # pessoas}}",
+    "programmingSubmitReplaceClass": "Mudar o WOD da aula",
+    "programmingSubmitEditor": "Continuar para o editor",
+    "programmingMissingClass": "Escolhe uma aula para continuar.",
+    "programmingMissingWod": "Escolhe um WOD da biblioteca.",
+    "programmingEditorHint": "É atribuído assim que o publicares."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -4933,7 +4962,7 @@
       "all": "Todos",
       "member": "Sócios",
       "athlete": "Atletas",
-      "admin": "Equipa"
+      "staff": "Equipa"
     },
     "showing": "A mostrar {shown} de {total}",
     "clearFilters": "Limpar filtros",
@@ -4948,7 +4977,8 @@
       "person": "Pessoa",
       "finance": "Adesão",
       "joined": "Data de adesão",
-      "open": "Abrir perfil"
+      "open": "Abrir perfil",
+      "roles": "Funções"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Define o fuso horário",
         "body": "Os dias das aulas, os lembretes de WOD e os dias de check-in seguem-no. Deduzimo-lo do teu dispositivo: confirma ou escolhe outro.",
         "cta": "Definir fuso horário"
+      },
+      "page": {
+        "title": "Publica a tua página pública",
+        "body": "Até ser publicada, ninguém encontra a tua box: nem pelo nome nem em Perto de mim.",
+        "cta": "Abrir a página pública"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Check-ins"
       },
       "saveError": "Não foi guardado. Tenta novamente."
-    }
+    },
+    "boxFindByName": "Ou procura pelo nome"
   },
   "Community": {
     "all": "Tudo",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Adicionar fotografias",
     "step_coaches": "Coaches",
     "coachesHint": "Escolhe que coaches aparecem na página. Ao lado aparecem as aulas que dão.",
-    "coachesNone": "Ainda não há coaches na equipa."
+    "coachesNone": "Ainda não há coaches na equipa.",
+    "checkOnMap": "Morada no mapa (para apareceres em Perto de mim)",
+    "checkOnMapAction": "Adiciona-a",
+    "findableHint": "Enquanto a página for um rascunho, ninguém encontra a box pelo nome nem em Perto de mim."
   },
   "PlatformTagSuggestions": {
     "title": "Sugestões de etiquetas",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Perto de ti",
     "relationYouFollow": "Segues",
     "findPeople": "Encontrar pessoas",
-    "findClubsAndPeople": "Procurar clubes e pessoas",
     "peopleTitle": "Pessoas",
     "peopleNoMatch": "Não encontrámos ninguém. As contas privadas só aparecem a quem já as conhece.",
     "peopleSearchFailed": "A pesquisa falhou. Tenta outra vez.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Pedido para seguir",
     "notifFollowRequestedBody": "{name} quer seguir-te.",
     "notifFollowAcceptedTitle": "Pedido aceite",
-    "notifFollowAcceptedBody": "{name} aceitou o teu pedido para seguir."
+    "notifFollowAcceptedBody": "{name} aceitou o teu pedido para seguir.",
+    "findClubsBoxesPeople": "Procurar clubes, boxes e pessoas",
+    "boxesTitle": "Boxes e treinadores",
+    "boxNoMatch": "Nenhuma box ou treinador com esse nome. Só aparecem os negócios que publicaram a sua página.",
+    "boxSearchFailed": "A pesquisa não funcionou. Tenta novamente."
   },
   "BoxPage": {
     "allWeek": "Semana toda",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Sair deste club?",
     "clubLeaveBody": "As publicações saem do teu feed. Podes voltar a entrar em Encontrar.",
     "find": "Encontrar",
-    "findTitle": "Encontrar clubs e pessoas",
+    "findTitle": "Encontrar clubs, boxes e pessoas",
     "findOpenClubs": "Clubs abertos",
     "findGroups": "Grupos nas tuas boxes",
     "findNoClubs": "As boxes de que és membro ou que segues ainda não têm clubs abertos.",
@@ -9861,7 +9903,9 @@
       "confirm": "Ativar",
       "working": "A ativar…",
       "doneTitle": "Já estás ativo",
-      "done": "{name} está ativo. Os dados de demonstração foram removidos e tudo o que configuraste está à tua espera."
+      "done": "{name} está ativo. Os dados de demonstração foram removidos e tudo o que configuraste está à tua espera.",
+      "publishNext": "Mais um passo para te encontrarem: publica a tua página pública. Até lá a tua box não aparece nem na pesquisa nem em Perto de mim.",
+      "openPublicPage": "Publicar a página"
     },
     "settings": {
       "title": "Conta empresarial",

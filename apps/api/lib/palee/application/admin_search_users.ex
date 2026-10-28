@@ -1,6 +1,7 @@
 defmodule Palee.Application.AdminSearchUsers do
   alias Palee.Application.AdminMemberSearchIndex
   alias Palee.{Finance, Identity, Identity.RegistrationPolicy, Organizations}
+  alias Palee.Organizations.Domain.MembershipPolicy
 
   def call(params) do
     call(params, nil)
@@ -34,16 +35,18 @@ defmodule Palee.Application.AdminSearchUsers do
         }
         |> maybe_put_organization_id(tenant_context)
         |> maybe_put_allowed_user_ids(allowed_user_ids)
+        |> tenant_role_filter(tenant_context)
 
       case search_with_index(search_params) do
         {:ok, payload} ->
           {:ok,
            payload
            |> filter_index_payload(Map.get(search_params, :allowed_user_ids))
+           |> with_tenant_roles(tenant_context, role)
            |> put_in([:meta, :empty_search], false)}
 
         {:error, _reason} ->
-          {:ok, fallback_search(search_params)}
+          {:ok, search_params |> fallback_search() |> with_tenant_roles(tenant_context, role)}
       end
     end
   end
@@ -101,10 +104,36 @@ defmodule Palee.Application.AdminSearchUsers do
 
   defp allowed_user_ids(nil), do: nil
 
+  # ADR-217: this is the finance desk's people picker, so in a gym it finds
+  # clients only (member or athlete role); staff never get a package.
   defp allowed_user_ids(tenant_context) do
     tenant_context
-    |> Organizations.list_active_membership_user_ids()
+    |> Organizations.list_client_user_ids()
     |> MapSet.new()
+  end
+
+  # In a gym the role filter and `identity_role` follow the person's client
+  # role there, not the account-wide `users.role` the index stores.
+  defp tenant_role_filter(search_params, nil), do: search_params
+  defp tenant_role_filter(search_params, _tenant_context), do: %{search_params | role: "all"}
+
+  defp with_tenant_roles(payload, nil, _role), do: payload
+
+  defp with_tenant_roles(payload, tenant_context, role) do
+    roles_by_user = Organizations.member_roles_by_user(tenant_context)
+
+    Map.update(payload, :users, [], fn users ->
+      users
+      |> Enum.map(fn user ->
+        client_role =
+          roles_by_user
+          |> get_in([user.id, :roles])
+          |> MembershipPolicy.client_role()
+
+        Map.put(user, :identity_role, client_role && to_string(client_role))
+      end)
+      |> Enum.filter(&(role == "all" or &1.identity_role == role))
+    end)
   end
 
   defp maybe_put_organization_id(search_params, %Organizations.TenantContext{

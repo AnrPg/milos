@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# clase se dejó como estaba (ya empezó o está cancelada).} other {# clases se dejaron como estaban (ya empezaron o están canceladas).}}",
     "seriesEveryLabel": "Cuáles",
     "seriesEveryAll": "Todas las clases",
-    "seriesEveryNth": "Una de cada {n} clases"
+    "seriesEveryNth": "Una de cada {n} clases",
+    "dayView": "Vista diaria",
+    "dayViewShort": "Día",
+    "openDayView": "Vista diaria: {date}",
+    "classMoreActions": "Más acciones para esta clase"
   },
   "Ui": {
     "exercise1091b7f": "Ejercicio",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Demasiados elegidos: como máximo {count}.",
     "formErrTooFewItems": "Elige al menos {count}.",
     "formErrInvalid": "Este valor no se acepta. Revísalo e inténtalo de nuevo.",
-    "apiErrorValidationFailedDetail": "Algunos datos no se aceptaron: {details}"
+    "apiErrorValidationFailedDetail": "Algunos datos no se aceptaron: {details}",
+    "roleHeadCoach": "Entrenador jefe",
+    "programmingDialogEyebrowFor": "Programación para {name}",
+    "programmingDialogWhat": "¿Qué quieres hacer?",
+    "programmingModeVariant": "Cambiarlo solo para este miembro",
+    "programmingModePersonal": "Entrenamiento aparte",
+    "programmingModeClass": "Cambiarlo para toda la clase",
+    "programmingDialogClass": "Clase",
+    "programmingDialogChooseClass": "Elige una clase…",
+    "programmingDialogNoClass": "No tiene clase reservada este día. Elige «Entrenamiento aparte» o resérvale una clase primero.",
+    "programmingDialogWorkout": "Entrenamiento",
+    "programmingSourceAdapt": "Adaptar el WOD de la clase",
+    "programmingSourceAsIs": "El WOD de la clase tal cual",
+    "programmingSourceLibrary": "De la biblioteca",
+    "programmingSourceNew": "WOD nuevo",
+    "programmingDialogChooseWod": "Elige un WOD…",
+    "programmingMoreOptions": "Más opciones",
+    "programmingMoreSummary": "Carpeta: {folder} · {count, plural, =0 {solo esta persona} one {+# persona} other {+# personas}}",
+    "programmingFolderAuto": "Automática",
+    "programmingFolder": "Carpeta de la biblioteca",
+    "programmingSubmitAssign": "{count, plural, one {Asignar} other {Asignar a # personas}}",
+    "programmingSubmitReplaceClass": "Cambiar el WOD de la clase",
+    "programmingSubmitEditor": "Continuar al editor",
+    "programmingMissingClass": "Elige una clase para continuar.",
+    "programmingMissingWod": "Elige un WOD de la biblioteca.",
+    "programmingEditorHint": "Se asigna en cuanto lo publiques."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -4933,7 +4962,7 @@
       "all": "Todos",
       "member": "Socios",
       "athlete": "Atletas (programación personal)",
-      "admin": "Equipo"
+      "staff": "Personal"
     },
     "showing": "Mostrando {shown} de {total}",
     "clearFilters": "Borrar filtros",
@@ -4948,7 +4977,8 @@
       "person": "Persona",
       "finance": "Membresía",
       "joined": "Alta",
-      "open": "Abrir perfil"
+      "open": "Abrir perfil",
+      "roles": "Roles"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Define tu zona horaria",
         "body": "Los días de clase, los recordatorios de WOD y los días de check-in la siguen. La hemos supuesto por tu dispositivo: confírmala o elige otra.",
         "cta": "Definir zona horaria"
+      },
+      "page": {
+        "title": "Publica tu página pública",
+        "body": "Hasta que se publique, nadie encuentra tu box: ni por nombre ni en Cerca de mí.",
+        "cta": "Abrir la página pública"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Cómo me siento"
       },
       "saveError": "No se ha guardado. Inténtalo de nuevo."
-    }
+    },
+    "boxFindByName": "O busca por nombre"
   },
   "Community": {
     "all": "Todo",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Añadir fotos",
     "step_coaches": "Coaches",
     "coachesHint": "Elige qué coaches aparecen en la página. A su lado se ven las clases que imparten.",
-    "coachesNone": "Aún no hay coaches en el equipo."
+    "coachesNone": "Aún no hay coaches en el equipo.",
+    "checkOnMap": "Dirección en el mapa (para aparecer en Cerca de mí)",
+    "checkOnMapAction": "Añádela",
+    "findableHint": "Mientras la página sea un borrador, nadie encuentra el box por nombre ni en Cerca de mí."
   },
   "PlatformTagSuggestions": {
     "title": "Propuestas de etiquetas",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Cerca",
     "relationYouFollow": "Siguiendo",
     "findPeople": "Buscar gente",
-    "findClubsAndPeople": "Buscar clubs y personas",
     "peopleTitle": "Personas",
     "peopleNoMatch": "No hemos encontrado a nadie. Las cuentas privadas solo aparecen para quien ya las conoce.",
     "peopleSearchFailed": "La búsqueda no ha funcionado. Inténtalo de nuevo.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Solicitud de seguimiento",
     "notifFollowRequestedBody": "{name} quiere seguirte.",
     "notifFollowAcceptedTitle": "Solicitud aceptada",
-    "notifFollowAcceptedBody": "{name} ha aceptado tu solicitud de seguimiento."
+    "notifFollowAcceptedBody": "{name} ha aceptado tu solicitud de seguimiento.",
+    "findClubsBoxesPeople": "Buscar clubs, boxes y personas",
+    "boxesTitle": "Boxes y entrenadores",
+    "boxNoMatch": "No hay ningún box ni entrenador con ese nombre. Solo aparecen los negocios que han publicado su página.",
+    "boxSearchFailed": "La búsqueda no funcionó. Inténtalo de nuevo."
   },
   "BoxPage": {
     "allWeek": "Toda la semana",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "¿Salir de este club?",
     "clubLeaveBody": "Sus publicaciones salen de tu feed. Puedes volver a unirte desde Buscar.",
     "find": "Buscar",
-    "findTitle": "Buscar clubs y personas",
+    "findTitle": "Buscar clubs, boxes y personas",
     "findOpenClubs": "Clubs abiertos",
     "findGroups": "Grupos en tus boxes",
     "findNoClubs": "Los boxes de los que eres socio o que sigues aún no tienen clubs abiertos.",
@@ -9861,7 +9903,9 @@
       "confirm": "Activar",
       "working": "Activando…",
       "doneTitle": "Ya estás activo",
-      "done": "{name} está activo. Los datos de prueba se han ido y todo lo que configuraste te espera."
+      "done": "{name} está activo. Los datos de prueba se han ido y todo lo que configuraste te espera.",
+      "publishNext": "Un paso más para que te encuentren: publica tu página pública. Hasta entonces tu box no aparece ni en la búsqueda ni en Cerca de mí.",
+      "openPublicPage": "Publicar la página"
     },
     "settings": {
       "title": "Cuenta de empresa",

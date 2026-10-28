@@ -65,6 +65,10 @@ describe("SegmentPicker", () => {
     render(<Picker options={ROLES.slice(0, 3)} />);
     expect(screen.queryByRole("tablist")).toBeNull();
     const select = screen.getByRole("combobox", { name: "Role" });
+    // The folded tabs stand out: a Dojo fill and a chevron in its contrast colour.
+    expect(select.style.background).toBe("var(--primary)");
+    expect(select.style.color).toBe("var(--primary-contrast)");
+    expect(select.style.getPropertyValue("--select-chevron")).toBe("var(--primary-contrast)");
     fireEvent.click(select);
     expect(screen.getByRole("option", { name: "Members (2)" })).toBeTruthy();
     fireEvent.click(select);

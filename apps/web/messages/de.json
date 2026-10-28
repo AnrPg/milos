@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# Kurs blieb unverändert (bereits gestartet oder abgesagt).} other {# Kurse blieben unverändert (bereits gestartet oder abgesagt).}}",
     "seriesEveryLabel": "Welche davon",
     "seriesEveryAll": "Jeder Kurs",
-    "seriesEveryNth": "{n, selectordinal, other {Jeder #. Kurs}}"
+    "seriesEveryNth": "{n, selectordinal, other {Jeder #. Kurs}}",
+    "dayView": "Tagesansicht",
+    "dayViewShort": "Tag",
+    "openDayView": "Tagesansicht: {date}",
+    "classMoreActions": "Weitere Aktionen für diesen Kurs"
   },
   "Ui": {
     "exercise1091b7f": "Übung",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Zu viele ausgewählt: höchstens {count}.",
     "formErrTooFewItems": "Wähle mindestens {count}.",
     "formErrInvalid": "Dieser Wert wird nicht akzeptiert. Prüfe ihn und versuch es erneut.",
-    "apiErrorValidationFailedDetail": "Einige Angaben wurden nicht akzeptiert: {details}"
+    "apiErrorValidationFailedDetail": "Einige Angaben wurden nicht akzeptiert: {details}",
+    "roleHeadCoach": "Cheftrainer",
+    "programmingDialogEyebrowFor": "Programmierung für {name}",
+    "programmingDialogWhat": "Was möchtest du tun?",
+    "programmingModeVariant": "Nur für dieses Mitglied ändern",
+    "programmingModePersonal": "Eigenes Training",
+    "programmingModeClass": "Für die ganze Stunde ändern",
+    "programmingDialogClass": "Stunde",
+    "programmingDialogChooseClass": "Stunde wählen…",
+    "programmingDialogNoClass": "An diesem Tag ist keine Stunde gebucht. Wähle „Eigenes Training“ oder buche zuerst eine Stunde.",
+    "programmingDialogWorkout": "Training",
+    "programmingSourceAdapt": "Das WOD der Stunde anpassen",
+    "programmingSourceAsIs": "Das WOD der Stunde unverändert",
+    "programmingSourceLibrary": "Aus der Bibliothek",
+    "programmingSourceNew": "Neues WOD",
+    "programmingDialogChooseWod": "WOD wählen…",
+    "programmingMoreOptions": "Weitere Optionen",
+    "programmingMoreSummary": "Ordner: {folder} · {count, plural, =0 {nur diese Person} one {+# Person} other {+# Personen}}",
+    "programmingFolderAuto": "Automatisch",
+    "programmingFolder": "Bibliotheksordner",
+    "programmingSubmitAssign": "{count, plural, one {Zuweisen} other {# Personen zuweisen}}",
+    "programmingSubmitReplaceClass": "WOD der Stunde ändern",
+    "programmingSubmitEditor": "Weiter zum Editor",
+    "programmingMissingClass": "Wähle eine Stunde, um fortzufahren.",
+    "programmingMissingWod": "Wähle ein WOD aus der Bibliothek.",
+    "programmingEditorHint": "Es wird zugewiesen, sobald du es veröffentlichst."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4933,7 +4962,7 @@
       "all": "Alle",
       "member": "Mitglieder",
       "athlete": "Athleten (persönliches Programming)",
-      "admin": "Team"
+      "staff": "Team"
     },
     "showing": "{shown} von {total} angezeigt",
     "clearFilters": "Filter zurücksetzen",
@@ -4948,7 +4977,8 @@
       "person": "Person",
       "finance": "Mitgliedschaft",
       "joined": "Beigetreten",
-      "open": "Profil öffnen"
+      "open": "Profil öffnen",
+      "roles": "Rollen"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Zeitzone festlegen",
         "body": "Kurstage, WOD-Erinnerungen und Check-in-Tage richten sich danach. Wir haben sie von deinem Gerät übernommen: Bestätige sie oder wähle eine andere.",
         "cta": "Zeitzone festlegen"
+      },
+      "page": {
+        "title": "Veröffentliche deine öffentliche Seite",
+        "body": "Bis sie veröffentlicht ist, findet niemand deine Box: weder über den Namen noch unter „In der Nähe“.",
+        "cta": "Öffentliche Seite öffnen"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Check-ins"
       },
       "saveError": "Das wurde nicht gespeichert. Versuch es noch einmal."
-    }
+    },
+    "boxFindByName": "Oder nach Namen suchen"
   },
   "Community": {
     "all": "Alle",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Fotos hinzufügen",
     "step_coaches": "Coaches",
     "coachesHint": "Wähle, welche Coaches auf der Seite erscheinen. Daneben stehen die Kurse, die sie leiten.",
-    "coachesNone": "Noch keine Coaches im Team."
+    "coachesNone": "Noch keine Coaches im Team.",
+    "checkOnMap": "Adresse auf der Karte (um unter „In der Nähe“ zu erscheinen)",
+    "checkOnMapAction": "Hinzufügen",
+    "findableHint": "Solange die Seite ein Entwurf ist, findet niemand die Box über den Namen oder unter „In der Nähe“."
   },
   "PlatformTagSuggestions": {
     "title": "Tag-Vorschläge",
@@ -6177,7 +6216,6 @@
     "relationNearby": "In der Nähe",
     "relationYouFollow": "Du folgst",
     "findPeople": "Personen finden",
-    "findClubsAndPeople": "Clubs und Personen suchen",
     "peopleTitle": "Personen",
     "peopleNoMatch": "Niemanden gefunden. Private Konten erscheinen nur für Leute, die sie schon kennen.",
     "peopleSearchFailed": "Die Suche hat nicht geklappt. Versuch es noch einmal.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Folgeanfrage",
     "notifFollowRequestedBody": "{name} möchte dir folgen.",
     "notifFollowAcceptedTitle": "Anfrage angenommen",
-    "notifFollowAcceptedBody": "{name} hat deine Folgeanfrage angenommen."
+    "notifFollowAcceptedBody": "{name} hat deine Folgeanfrage angenommen.",
+    "findClubsBoxesPeople": "Clubs, Boxen und Personen suchen",
+    "boxesTitle": "Boxen und Coaches",
+    "boxNoMatch": "Keine Box und kein Coach mit diesem Namen. Es erscheinen nur Betriebe, die ihre Seite veröffentlicht haben.",
+    "boxSearchFailed": "Die Suche hat nicht funktioniert. Versuch es noch einmal."
   },
   "BoxPage": {
     "allWeek": "Ganze Woche",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Diesen Club verlassen?",
     "clubLeaveBody": "Seine Beiträge verschwinden aus deinem Feed. Über Entdecken kannst du wieder beitreten.",
     "find": "Entdecken",
-    "findTitle": "Clubs und Personen finden",
+    "findTitle": "Clubs, Boxen und Personen finden",
     "findOpenClubs": "Offene Clubs",
     "findGroups": "Gruppen in deinen Boxen",
     "findNoClubs": "Die Boxen, in denen du Mitglied bist oder denen du folgst, haben noch keine offenen Clubs.",
@@ -9861,7 +9903,9 @@
       "confirm": "Aktivieren",
       "working": "Wird aktiviert …",
       "doneTitle": "Du bist live",
-      "done": "{name} ist aktiv. Die Demodaten sind weg, und alles, was du eingerichtet hast, wartet auf dich."
+      "done": "{name} ist aktiv. Die Demodaten sind weg, und alles, was du eingerichtet hast, wartet auf dich.",
+      "publishNext": "Noch ein Schritt, damit man dich findet: Veröffentliche deine öffentliche Seite. Bis dahin erscheint deine Box weder in der Suche noch unter „In der Nähe“.",
+      "openPublicPage": "Seite veröffentlichen"
     },
     "settings": {
       "title": "Unternehmenskonto",

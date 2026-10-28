@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# занятие осталось как было (уже началось или отменено).} few {# занятия остались как были (уже начались или отменены).} many {# занятий осталось как было (уже начались или отменены).} other {# занятий осталось как было (уже начались или отменены).}}",
     "seriesEveryLabel": "Какие именно",
     "seriesEveryAll": "Каждое занятие",
-    "seriesEveryNth": "Каждое {n}-е занятие"
+    "seriesEveryNth": "Каждое {n}-е занятие",
+    "dayView": "Просмотр дня",
+    "dayViewShort": "День",
+    "openDayView": "Просмотр дня: {date}",
+    "classMoreActions": "Другие действия с занятием"
   },
   "Ui": {
     "exercise1091b7f": "Упражнение",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Выбрано слишком много: не более {count}.",
     "formErrTooFewItems": "Выбери не менее {count}.",
     "formErrInvalid": "Это значение не принимается. Проверь его и попробуй снова.",
-    "apiErrorValidationFailedDetail": "Некоторые данные не приняты: {details}"
+    "apiErrorValidationFailedDetail": "Некоторые данные не приняты: {details}",
+    "roleHeadCoach": "Главный тренер",
+    "programmingDialogEyebrowFor": "Программа для {name}",
+    "programmingDialogWhat": "Что вы хотите сделать?",
+    "programmingModeVariant": "Изменить только для этого участника",
+    "programmingModePersonal": "Отдельная тренировка",
+    "programmingModeClass": "Изменить для всего занятия",
+    "programmingDialogClass": "Занятие",
+    "programmingDialogChooseClass": "Выберите занятие…",
+    "programmingDialogNoClass": "В этот день нет записи на занятие. Выберите «Отдельная тренировка» или сначала запишите на занятие.",
+    "programmingDialogWorkout": "Тренировка",
+    "programmingSourceAdapt": "Адаптировать WOD занятия",
+    "programmingSourceAsIs": "WOD занятия как есть",
+    "programmingSourceLibrary": "Из библиотеки",
+    "programmingSourceNew": "Новый WOD",
+    "programmingDialogChooseWod": "Выберите WOD…",
+    "programmingMoreOptions": "Другие параметры",
+    "programmingMoreSummary": "Папка: {folder} · {count, plural, =0 {только этот человек} one {+# человек} few {+# человека} many {+# человек} other {+# человека}}",
+    "programmingFolderAuto": "Автоматически",
+    "programmingFolder": "Папка библиотеки",
+    "programmingSubmitAssign": "{count, plural, one {Назначить} other {Назначить # людям}}",
+    "programmingSubmitReplaceClass": "Изменить WOD занятия",
+    "programmingSubmitEditor": "Перейти в редактор",
+    "programmingMissingClass": "Выберите занятие, чтобы продолжить.",
+    "programmingMissingWod": "Выберите WOD из библиотеки.",
+    "programmingEditorHint": "Назначается сразу после публикации."
   },
   "PrSharing": {
     "gymLabel": "Где ты установил этот PR?",
@@ -4933,7 +4962,7 @@
       "all": "Все",
       "member": "Участники бокса",
       "athlete": "Спортсмены (персональное программирование)",
-      "admin": "Команда"
+      "staff": "Сотрудники"
     },
     "showing": "Показано {shown} из {total}",
     "clearFilters": "Сбросить фильтры",
@@ -4948,7 +4977,8 @@
       "person": "Человек",
       "finance": "Абонемент",
       "joined": "Вступил(а)",
-      "open": "Открыть профиль"
+      "open": "Открыть профиль",
+      "roles": "Роли"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Задай часовой пояс",
         "body": "По нему считаются дни занятий, напоминания о WOD и дни чек-инов. Мы определили его по твоему устройству: подтверди или выбери другой.",
         "cta": "Задать часовой пояс"
+      },
+      "page": {
+        "title": "Опубликуйте публичную страницу",
+        "body": "Пока она не опубликована, ваш зал никто не найдёт: ни по названию, ни в разделе «Рядом».",
+        "cta": "Открыть публичную страницу"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Самочувствие"
       },
       "saveError": "Не сохранилось. Попробуй ещё раз."
-    }
+    },
+    "boxFindByName": "Или найдите по названию"
   },
   "Community": {
     "all": "Все",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Добавить фото",
     "step_coaches": "Тренеры",
     "coachesHint": "Выбери, каких тренеров показать на странице. Рядом будут занятия, которые они ведут.",
-    "coachesNone": "В команде пока нет тренеров."
+    "coachesNone": "В команде пока нет тренеров.",
+    "checkOnMap": "Адрес на карте (чтобы появляться в разделе «Рядом»)",
+    "checkOnMapAction": "Добавить",
+    "findableHint": "Пока страница — черновик, зал не найти ни по названию, ни в разделе «Рядом»."
   },
   "PlatformTagSuggestions": {
     "title": "Предложения тегов",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Рядом",
     "relationYouFollow": "Ты подписан",
     "findPeople": "Найти людей",
-    "findClubsAndPeople": "Поиск клубов и людей",
     "peopleTitle": "Люди",
     "peopleNoMatch": "Никого не нашли. Закрытые аккаунты видны только тем, кто их уже знает.",
     "peopleSearchFailed": "Поиск не удался. Попробуй ещё раз.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Запрос на подписку",
     "notifFollowRequestedBody": "{name} хочет подписаться на тебя.",
     "notifFollowAcceptedTitle": "Запрос принят",
-    "notifFollowAcceptedBody": "{name} принял(а) твой запрос на подписку."
+    "notifFollowAcceptedBody": "{name} принял(а) твой запрос на подписку.",
+    "findClubsBoxesPeople": "Поиск клубов, залов и людей",
+    "boxesTitle": "Залы и тренеры",
+    "boxNoMatch": "Нет зала или тренера с таким названием. Показываются только те, кто опубликовал свою страницу.",
+    "boxSearchFailed": "Поиск не сработал. Попробуйте ещё раз."
   },
   "BoxPage": {
     "allWeek": "Вся неделя",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Выйти из этого клуба?",
     "clubLeaveBody": "Его публикации исчезнут из твоей ленты. Вступить снова можно в разделе «Найти».",
     "find": "Найти",
-    "findTitle": "Найти клубы и людей",
+    "findTitle": "Найти клубы, залы и людей",
     "findOpenClubs": "Открытые клубы",
     "findGroups": "Группы в твоих боксах",
     "findNoClubs": "В боксах, где ты участник или на которые подписан, пока нет открытых клубов.",
@@ -9861,7 +9903,9 @@
       "confirm": "Активировать",
       "working": "Активируем…",
       "doneTitle": "Ты в работе",
-      "done": "{name} активирован. Демо-данные удалены, а всё, что ты настроил(а), ждёт тебя."
+      "done": "{name} активирован. Демо-данные удалены, а всё, что ты настроил(а), ждёт тебя.",
+      "publishNext": "Ещё один шаг, чтобы вас находили: опубликуйте публичную страницу. До этого ваш зал не появляется ни в поиске, ни в разделе «Рядом».",
+      "openPublicPage": "Опубликовать страницу"
     },
     "settings": {
       "title": "Бизнес-аккаунт",

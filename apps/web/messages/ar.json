@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, zero {لم تُترك أي حصة كما هي.} one {تُركت حصة واحدة كما هي (بدأت أو أُلغيت بالفعل).} two {تُركت حصتان كما هما (بدأتا أو أُلغيتا بالفعل).} few {تُركت # حصص كما هي (بدأت أو أُلغيت بالفعل).} many {تُركت # حصة كما هي (بدأت أو أُلغيت بالفعل).} other {تُركت # حصة كما هي (بدأت أو أُلغيت بالفعل).}}",
     "seriesEveryLabel": "أيّ منها",
     "seriesEveryAll": "كل حصة",
-    "seriesEveryNth": "حصة واحدة من كل {n}"
+    "seriesEveryNth": "حصة واحدة من كل {n}",
+    "dayView": "عرض اليوم",
+    "dayViewShort": "يوم",
+    "openDayView": "عرض اليوم: {date}",
+    "classMoreActions": "إجراءات أخرى لهذا الصف"
   },
   "Ui": {
     "exercise1091b7f": "تمرين",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "اخترت عددًا كبيرًا: {count} كحد أقصى.",
     "formErrTooFewItems": "اختر {count} على الأقل.",
     "formErrInvalid": "هذه القيمة غير مقبولة. تحقّق منها وحاول مرة أخرى.",
-    "apiErrorValidationFailedDetail": "لم تُقبل بعض البيانات: {details}"
+    "apiErrorValidationFailedDetail": "لم تُقبل بعض البيانات: {details}",
+    "roleHeadCoach": "المدرب الرئيسي",
+    "programmingDialogEyebrowFor": "البرمجة لـ {name}",
+    "programmingDialogWhat": "ماذا تريد أن تفعل؟",
+    "programmingModeVariant": "التغيير لهذا العضو فقط",
+    "programmingModePersonal": "تمرين منفصل",
+    "programmingModeClass": "التغيير للحصة كلها",
+    "programmingDialogClass": "الحصة",
+    "programmingDialogChooseClass": "اختر حصة…",
+    "programmingDialogNoClass": "لا توجد حصة محجوزة في هذا اليوم. اختر «تمرين منفصل» أو احجز له حصة أولاً.",
+    "programmingDialogWorkout": "التمرين",
+    "programmingSourceAdapt": "تكييف WOD الحصة",
+    "programmingSourceAsIs": "WOD الحصة كما هو",
+    "programmingSourceLibrary": "من المكتبة",
+    "programmingSourceNew": "WOD جديد",
+    "programmingDialogChooseWod": "اختر WOD…",
+    "programmingMoreOptions": "خيارات إضافية",
+    "programmingMoreSummary": "المجلد: {folder} · {count, plural, =0 {هذا الشخص فقط} one {+# شخص} other {+# أشخاص}}",
+    "programmingFolderAuto": "تلقائي",
+    "programmingFolder": "مجلد المكتبة",
+    "programmingSubmitAssign": "{count, plural, one {تعيين} other {تعيين لـ # أشخاص}}",
+    "programmingSubmitReplaceClass": "تغيير WOD الحصة",
+    "programmingSubmitEditor": "المتابعة إلى المحرر",
+    "programmingMissingClass": "اختر حصة للمتابعة.",
+    "programmingMissingWod": "اختر WOD من المكتبة.",
+    "programmingEditorHint": "يُعيَّن فور نشره."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4933,7 +4962,7 @@
       "all": "الجميع",
       "member": "الأعضاء",
       "athlete": "الرياضيون",
-      "admin": "الطاقم"
+      "staff": "الطاقم"
     },
     "showing": "عرض {shown} من {total}",
     "clearFilters": "مسح عوامل التصفية",
@@ -4948,7 +4977,8 @@
       "person": "الشخص",
       "finance": "الاشتراك",
       "joined": "تاريخ الانضمام",
-      "open": "فتح الملف"
+      "open": "فتح الملف",
+      "roles": "الأدوار"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "حدّد المنطقة الزمنية",
         "body": "تتبعها أيام الحصص وتذكيرات WOD وأيام تسجيل الحضور. استنتجناها من جهازك: أكّدها أو اختر غيرها.",
         "cta": "تحديد المنطقة الزمنية"
+      },
+      "page": {
+        "title": "انشر صفحتك العامة",
+        "body": "إلى أن تُنشر، لا يجد أحد صالتك: لا بالاسم ولا في «حولي».",
+        "cta": "افتح الصفحة العامة"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "تسجيلات الحضور"
       },
       "saveError": "لم يُحفظ ذلك. حاول مرة أخرى."
-    }
+    },
+    "boxFindByName": "أو ابحث بالاسم"
   },
   "Community": {
     "all": "الكل",
@@ -6081,7 +6117,10 @@
     "addPhotos": "إضافة صور",
     "step_coaches": "المدربون",
     "coachesHint": "اختر المدربين الظاهرين في الصفحة. تظهر بجانبهم الحصص التي يدرّبونها.",
-    "coachesNone": "لا يوجد مدربون في الفريق بعد."
+    "coachesNone": "لا يوجد مدربون في الفريق بعد.",
+    "checkOnMap": "العنوان على الخريطة (لتظهر في «حولي»)",
+    "checkOnMapAction": "أضفه",
+    "findableHint": "ما دامت الصفحة مسودة، لا يجد أحد الصالة بالاسم أو في «حولي»."
   },
   "PlatformTagSuggestions": {
     "title": "اقتراحات الوسوم",
@@ -6177,7 +6216,6 @@
     "relationNearby": "بالقرب منك",
     "relationYouFollow": "تتابعه",
     "findPeople": "ابحث عن أشخاص",
-    "findClubsAndPeople": "ابحث عن أندية وأشخاص",
     "peopleTitle": "أشخاص",
     "peopleNoMatch": "لم نجد أحدًا. الحسابات الخاصة تظهر فقط لمن يعرفها مسبقًا.",
     "peopleSearchFailed": "تعذّر البحث. حاول مرة أخرى.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "طلب متابعة",
     "notifFollowRequestedBody": "يريد {name} متابعتك.",
     "notifFollowAcceptedTitle": "تم قبول الطلب",
-    "notifFollowAcceptedBody": "قبل {name} طلب متابعتك."
+    "notifFollowAcceptedBody": "قبل {name} طلب متابعتك.",
+    "findClubsBoxesPeople": "ابحث عن أندية وصالات وأشخاص",
+    "boxesTitle": "الصالات والمدربون",
+    "boxNoMatch": "لا توجد صالة أو مدرب بهذا الاسم. تظهر فقط الأعمال التي نشرت صفحتها.",
+    "boxSearchFailed": "لم ينجح البحث. حاول مرة أخرى."
   },
   "BoxPage": {
     "allWeek": "الأسبوع كاملًا",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "مغادرة هذا النادي؟",
     "clubLeaveBody": "ستختفي منشوراته من موجزك. يمكنك الانضمام مجددًا من «اكتشف».",
     "find": "اكتشف",
-    "findTitle": "اكتشف الأندية والأشخاص",
+    "findTitle": "اكتشف الأندية والصالات والأشخاص",
     "findOpenClubs": "الأندية المفتوحة",
     "findGroups": "مجموعات في صالاتك",
     "findNoClubs": "لا توجد أندية مفتوحة بعد في الصالات التي تنتمي إليها أو تتابعها.",
@@ -9861,7 +9903,9 @@
       "confirm": "تفعيل",
       "working": "جارٍ التفعيل…",
       "doneTitle": "أصبحت متاحًا الآن",
-      "done": "{name} مفعّل. أُزيلت البيانات التجريبية وكل ما أعددته بانتظارك."
+      "done": "{name} مفعّل. أُزيلت البيانات التجريبية وكل ما أعددته بانتظارك.",
+      "publishNext": "خطوة أخرى ليجدك الناس: انشر صفحتك العامة. حتى ذلك الحين لا تظهر صالتك في البحث ولا في «حولي».",
+      "openPublicPage": "انشر الصفحة"
     },
     "settings": {
       "title": "حساب أعمال",

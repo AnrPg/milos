@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# τμήμα έμεινε ως είχε (ξεκίνησε ή ακυρώθηκε ήδη).} other {# τμήματα έμειναν ως είχαν (ξεκίνησαν ή ακυρώθηκαν ήδη).}}",
     "seriesEveryLabel": "Ποια από αυτά",
     "seriesEveryAll": "Κάθε τμήμα",
-    "seriesEveryNth": "Κάθε {n}ο τμήμα"
+    "seriesEveryNth": "Κάθε {n}ο τμήμα",
+    "dayView": "Προβολή ημέρας",
+    "dayViewShort": "Ημέρα",
+    "openDayView": "Προβολή ημέρας: {date}",
+    "classMoreActions": "Περισσότερες ενέργειες για το τμήμα"
   },
   "Ui": {
     "exercise1091b7f": "Άσκηση",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Διάλεξες πάρα πολλά: έως {count}.",
     "formErrTooFewItems": "Διάλεξε τουλάχιστον {count}.",
     "formErrInvalid": "Αυτή η τιμή δεν γίνεται δεκτή. Έλεγξέ την και δοκίμασε ξανά.",
-    "apiErrorValidationFailedDetail": "Κάποια στοιχεία δεν έγιναν δεκτά: {details}"
+    "apiErrorValidationFailedDetail": "Κάποια στοιχεία δεν έγιναν δεκτά: {details}",
+    "roleHeadCoach": "Head coach",
+    "programmingDialogEyebrowFor": "Προγραμματισμός για {name}",
+    "programmingDialogWhat": "Τι θέλεις να κάνεις;",
+    "programmingModeVariant": "Αλλαγή μόνο για αυτό το μέλος",
+    "programmingModePersonal": "Ξεχωριστή προπόνηση",
+    "programmingModeClass": "Αλλαγή για όλο το τμήμα",
+    "programmingDialogClass": "Τμήμα",
+    "programmingDialogChooseClass": "Διάλεξε τμήμα…",
+    "programmingDialogNoClass": "Δεν έχει κλείσει τμήμα αυτή τη μέρα. Διάλεξε «Ξεχωριστή προπόνηση» ή κλείσε του πρώτα θέση.",
+    "programmingDialogWorkout": "Προπόνηση",
+    "programmingSourceAdapt": "Προσαρμογή του WOD του τμήματος",
+    "programmingSourceAsIs": "Το WOD του τμήματος ως έχει",
+    "programmingSourceLibrary": "Από τη βιβλιοθήκη",
+    "programmingSourceNew": "Νέο WOD",
+    "programmingDialogChooseWod": "Διάλεξε WOD…",
+    "programmingMoreOptions": "Περισσότερες επιλογές",
+    "programmingMoreSummary": "Φάκελος: {folder} · {count, plural, =0 {μόνο αυτό το άτομο} one {+# άτομο} other {+# άτομα}}",
+    "programmingFolderAuto": "Αυτόματα",
+    "programmingFolder": "Φάκελος βιβλιοθήκης",
+    "programmingSubmitAssign": "{count, plural, one {Ανάθεση} other {Ανάθεση σε # άτομα}}",
+    "programmingSubmitReplaceClass": "Αλλαγή του WOD του τμήματος",
+    "programmingSubmitEditor": "Συνέχεια στον επεξεργαστή",
+    "programmingMissingClass": "Διάλεξε τμήμα για να συνεχίσεις.",
+    "programmingMissingWod": "Διάλεξε WOD από τη βιβλιοθήκη.",
+    "programmingEditorHint": "Ανατίθεται μόλις το δημοσιεύσεις."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -4933,7 +4962,7 @@
       "all": "Όλοι",
       "member": "Μέλη box",
       "athlete": "Αθλητές (προσωπικό πρόγραμμα)",
-      "admin": "Προσωπικό"
+      "staff": "Προσωπικό"
     },
     "showing": "Εμφανίζονται {shown} από {total}",
     "clearFilters": "Καθαρισμός φίλτρων",
@@ -4948,7 +4977,8 @@
       "person": "Άτομο",
       "finance": "Συνδρομή",
       "joined": "Εγγραφή",
-      "open": "Άνοιγμα προφίλ"
+      "open": "Άνοιγμα προφίλ",
+      "roles": "Ρόλοι"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Όρισε τη ζώνη ώρας",
         "body": "Οι ημέρες τμημάτων, οι υπενθυμίσεις WOD και οι ημέρες check-in την ακολουθούν. Την υποθέσαμε από τη συσκευή σου: επιβεβαίωσέ την ή διάλεξε άλλη.",
         "cta": "Ορισμός ζώνης ώρας"
+      },
+      "page": {
+        "title": "Δημοσίευσε τη δημόσια σελίδα σου",
+        "body": "Μέχρι να δημοσιευτεί, κανείς δεν βρίσκει το box σου: ούτε με το όνομα ούτε στο «Γύρω μου».",
+        "cta": "Άνοιγμα δημόσιας σελίδας"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Check-in"
       },
       "saveError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά."
-    }
+    },
+    "boxFindByName": "Ή ψάξε με το όνομα"
   },
   "Community": {
     "all": "Όλα",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Προσθήκη φωτογραφιών",
     "step_coaches": "Coaches",
     "coachesHint": "Διάλεξε ποιοι coaches φαίνονται στη σελίδα. Δίπλα τους εμφανίζονται τα τμήματα που κάνουν.",
-    "coachesNone": "Δεν υπάρχουν coaches στο προσωπικό ακόμα."
+    "coachesNone": "Δεν υπάρχουν coaches στο προσωπικό ακόμα.",
+    "checkOnMap": "Διεύθυνση στον χάρτη (για να εμφανίζεσαι στο «Γύρω μου»)",
+    "checkOnMapAction": "Πρόσθεσέ τη",
+    "findableHint": "Όσο η σελίδα είναι πρόχειρη, κανείς δεν βρίσκει το box με το όνομα ή στο «Γύρω μου»."
   },
   "PlatformTagSuggestions": {
     "title": "Προτάσεις ετικετών",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Κοντά σου",
     "relationYouFollow": "Ακολουθείς",
     "findPeople": "Βρες άτομα",
-    "findClubsAndPeople": "Αναζήτηση clubs και ατόμων",
     "peopleTitle": "Άτομα",
     "peopleNoMatch": "Δεν βρέθηκε κανείς. Οι ιδιωτικοί λογαριασμοί εμφανίζονται μόνο σε όσους ήδη τους γνωρίζουν.",
     "peopleSearchFailed": "Η αναζήτηση δεν έγινε. Δοκίμασε ξανά.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Αίτημα ακολούθησης",
     "notifFollowRequestedBody": "{name} θέλει να σε ακολουθήσει.",
     "notifFollowAcceptedTitle": "Το αίτημα έγινε δεκτό",
-    "notifFollowAcceptedBody": "{name} αποδέχτηκε το αίτημα ακολούθησής σου."
+    "notifFollowAcceptedBody": "{name} αποδέχτηκε το αίτημα ακολούθησής σου.",
+    "findClubsBoxesPeople": "Αναζήτηση clubs, box και ατόμων",
+    "boxesTitle": "Box και coaches",
+    "boxNoMatch": "Δεν βρέθηκε box ή coach με αυτό το όνομα. Εμφανίζονται μόνο όσοι έχουν δημοσιεύσει τη σελίδα τους.",
+    "boxSearchFailed": "Η αναζήτηση δεν έγινε. Δοκίμασε ξανά."
   },
   "BoxPage": {
     "allWeek": "Όλη η εβδομάδα",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Αποχώρηση από αυτό το club;",
     "clubLeaveBody": "Οι αναρτήσεις του φεύγουν από τη ροή σου. Μπορείς να ξαναμπείς από το Βρες.",
     "find": "Βρες",
-    "findTitle": "Βρες clubs και άτομα",
+    "findTitle": "Βρες clubs, box και άτομα",
     "findOpenClubs": "Ανοιχτά clubs",
     "findGroups": "Ομάδες στα box σου",
     "findNoClubs": "Τα box όπου είσαι μέλος ή που ακολουθείς δεν έχουν ακόμα ανοιχτά clubs.",
@@ -9861,7 +9903,9 @@
       "confirm": "Ενεργοποίηση",
       "working": "Ενεργοποιείται…",
       "doneTitle": "Είσαι πλέον ζωντανά",
-      "done": "Η επιχείρηση {name} είναι ενεργή. Τα δεδομένα επίδειξης αφαιρέθηκαν και ό,τι έστησες σε περιμένει."
+      "done": "Η επιχείρηση {name} είναι ενεργή. Τα δεδομένα επίδειξης αφαιρέθηκαν και ό,τι έστησες σε περιμένει.",
+      "publishNext": "Ένα βήμα ακόμη για να σε βρίσκει ο κόσμος: δημοσίευσε τη δημόσια σελίδα σου. Μέχρι τότε το box σου δεν εμφανίζεται ούτε στην αναζήτηση ούτε στο «Γύρω μου».",
+      "openPublicPage": "Δημοσίευση της σελίδας"
     },
     "settings": {
       "title": "Επαγγελματικός λογαριασμός",

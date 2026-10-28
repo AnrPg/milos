@@ -19,6 +19,7 @@ export function AdditionalPeoplePicker({
   picked,
   onChange,
   needsBooking,
+  collapsible = true,
 }: {
   token: string;
   /** The person whose profile this is (always programmed). */
@@ -27,9 +28,12 @@ export function AdditionalPeoplePicker({
   onChange: (people: PickedPerson[]) => void;
   /** A class mode: each person must have booked the chosen class. */
   needsBooking: boolean;
+  /** False when a parent disclosure already hides it until asked for. */
+  collapsible?: boolean;
 }) {
   const i18n = useUiTranslations();
-  const [open, setOpen] = useState(picked.length > 0);
+  const [expanded, setOpen] = useState(picked.length > 0);
+  const open = expanded || !collapsible;
   const [query, setQuery] = useState("");
   const [options, setOptions] = useState<AthleteOption[]>([]);
 
@@ -39,7 +43,7 @@ export function AdditionalPeoplePicker({
     const timer = window.setTimeout(() => {
       listAthletes(token, query, { includeMembers: true })
         .then((people) => {
-          if (active) setOptions(people);
+          if (active) setOptions(Array.isArray(people) ? people : []);
         })
         .catch(() => {
           if (active) setOptions([]);
@@ -122,9 +126,9 @@ export function AdditionalPeoplePicker({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : query.trim() ? (
         <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{i18n("groupProgrammingNoMatches")}</p>
-      )}
+      ) : null}
     </div>
   );
 }

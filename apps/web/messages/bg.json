@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# занятие беше оставено както е (вече е започнало или е отменено).} other {# занятия бяха оставени както са (вече са започнали или са отменени).}}",
     "seriesEveryLabel": "Кои от тях",
     "seriesEveryAll": "Всяко занятие",
-    "seriesEveryNth": "Всяко {n}-о занятие"
+    "seriesEveryNth": "Всяко {n}-о занятие",
+    "dayView": "Дневен изглед",
+    "dayViewShort": "Ден",
+    "openDayView": "Дневен изглед: {date}",
+    "classMoreActions": "Още действия за занятието"
   },
   "Ui": {
     "exercise1091b7f": "Упражнение",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Избрани са твърде много: най-много {count}.",
     "formErrTooFewItems": "Изберете поне {count}.",
     "formErrInvalid": "Тази стойност не се приема. Проверете я и опитайте отново.",
-    "apiErrorValidationFailedDetail": "Някои данни не бяха приети: {details}"
+    "apiErrorValidationFailedDetail": "Някои данни не бяха приети: {details}",
+    "roleHeadCoach": "Главен треньор",
+    "programmingDialogEyebrowFor": "Програмиране за {name}",
+    "programmingDialogWhat": "Какво искаш да направиш?",
+    "programmingModeVariant": "Промяна само за този член",
+    "programmingModePersonal": "Отделна тренировка",
+    "programmingModeClass": "Промяна за целия час",
+    "programmingDialogClass": "Час",
+    "programmingDialogChooseClass": "Избери час…",
+    "programmingDialogNoClass": "Няма записан час за този ден. Избери „Отделна тренировка“ или първо го запиши за час.",
+    "programmingDialogWorkout": "Тренировка",
+    "programmingSourceAdapt": "Адаптирай WOD на часа",
+    "programmingSourceAsIs": "WOD на часа без промени",
+    "programmingSourceLibrary": "От библиотеката",
+    "programmingSourceNew": "Нов WOD",
+    "programmingDialogChooseWod": "Избери WOD…",
+    "programmingMoreOptions": "Още опции",
+    "programmingMoreSummary": "Папка: {folder} · {count, plural, =0 {само този човек} one {+# човек} other {+# души}}",
+    "programmingFolderAuto": "Автоматично",
+    "programmingFolder": "Папка в библиотеката",
+    "programmingSubmitAssign": "{count, plural, one {Възложи} other {Възложи на # души}}",
+    "programmingSubmitReplaceClass": "Промени WOD на часа",
+    "programmingSubmitEditor": "Продължи към редактора",
+    "programmingMissingClass": "Избери час, за да продължиш.",
+    "programmingMissingWod": "Избери WOD от библиотеката.",
+    "programmingEditorHint": "Възлага се веднага щом го публикуваш."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -4933,7 +4962,7 @@
       "all": "Всички",
       "member": "Членове",
       "athlete": "Атлети",
-      "admin": "Служители"
+      "staff": "Служители"
     },
     "showing": "Показани {shown} от {total}",
     "clearFilters": "Изчисти филтрите",
@@ -4948,7 +4977,8 @@
       "person": "Човек",
       "finance": "Членство",
       "joined": "Присъединен",
-      "open": "Отвори профила"
+      "open": "Отвори профила",
+      "roles": "Роли"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Задай часовата зона",
         "body": "Дните на занятията, напомнянията за WOD и дните за check-in я следват. Предположихме я от устройството ти: потвърди или избери друга.",
         "cta": "Задай часова зона"
+      },
+      "page": {
+        "title": "Публикувай публичната си страница",
+        "body": "Докато не е публикувана, никой не намира залата ти: нито по име, нито в „Около мен“.",
+        "cta": "Отвори публичната страница"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Чекиране"
       },
       "saveError": "Не се запази. Опитайте отново."
-    }
+    },
+    "boxFindByName": "Или търси по име"
   },
   "Community": {
     "all": "Всички",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Добави снимки",
     "step_coaches": "Треньори",
     "coachesHint": "Избери кои треньори да се виждат на страницата. До тях се показват занятията, които водят.",
-    "coachesNone": "Още няма треньори в екипа."
+    "coachesNone": "Още няма треньори в екипа.",
+    "checkOnMap": "Адрес на картата (за да се показваш в „Около мен“)",
+    "checkOnMapAction": "Добави го",
+    "findableHint": "Докато страницата е чернова, никой не намира залата по име или в „Около мен“."
   },
   "PlatformTagSuggestions": {
     "title": "Предложения за етикети",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Наблизо",
     "relationYouFollow": "Следваш",
     "findPeople": "Намери хора",
-    "findClubsAndPeople": "Търсене на клубове и хора",
     "peopleTitle": "Хора",
     "peopleNoMatch": "Няма намерени хора. Частните профили се показват само на хора, които вече ги познават.",
     "peopleSearchFailed": "Търсенето не успя. Опитай пак.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Заявка за следване",
     "notifFollowRequestedBody": "{name} иска да те следва.",
     "notifFollowAcceptedTitle": "Заявката е приета",
-    "notifFollowAcceptedBody": "{name} прие заявката ти за следване."
+    "notifFollowAcceptedBody": "{name} прие заявката ти за следване.",
+    "findClubsBoxesPeople": "Търсене на клубове, зали и хора",
+    "boxesTitle": "Зали и треньори",
+    "boxNoMatch": "Няма зала или треньор с това име. Показват се само бизнеси, които са публикували страницата си.",
+    "boxSearchFailed": "Търсенето не сработи. Опитай отново."
   },
   "BoxPage": {
     "allWeek": "Цялата седмица",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Да напуснеш ли този клуб?",
     "clubLeaveBody": "Публикациите му изчезват от лентата ти. Можеш да влезеш отново от Търси.",
     "find": "Търси",
-    "findTitle": "Търси клубове и хора",
+    "findTitle": "Търси клубове, зали и хора",
     "findOpenClubs": "Отворени клубове",
     "findGroups": "Групи в твоите зали",
     "findNoClubs": "Боксовете, в които членуваш или които следваш, все още нямат отворени клубове.",
@@ -9861,7 +9903,9 @@
       "confirm": "Активирай",
       "working": "Активира се…",
       "doneTitle": "Вече си активен",
-      "done": "{name} е активен. Демо данните са премахнати и всичко, което си настроил, те чака."
+      "done": "{name} е активен. Демо данните са премахнати и всичко, което си настроил, те чака.",
+      "publishNext": "Още една стъпка, за да те намират: публикувай публичната си страница. Дотогава залата ти не се показва нито в търсенето, нито в „Около мен“.",
+      "openPublicPage": "Публикувай страницата"
     },
     "settings": {
       "title": "Бизнес акаунт",

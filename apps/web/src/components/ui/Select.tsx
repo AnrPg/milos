@@ -263,7 +263,7 @@ export function Select({
         <span className="min-w-0 flex-1 truncate" style={shown ? undefined : { color: "var(--placeholder)" }}>
           {shown ? shown.label : placeholder}
         </span>
-        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0" style={{ color: "var(--muted)", transform: open ? "rotate(180deg)" : undefined, transition: "transform 120ms" }}>
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0" style={{ color: "var(--select-chevron, var(--muted))", transform: open ? "rotate(180deg)" : undefined, transition: "transform 120ms" }}>
           <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>

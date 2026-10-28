@@ -259,7 +259,11 @@
     "classActionSkipped": "{count, plural, one {# class was left as it was (already started or cancelled).} other {# classes were left as they were (already started or cancelled).}}",
     "seriesEveryLabel": "Which of them",
     "seriesEveryAll": "Every class",
-    "seriesEveryNth": "{n, selectordinal, one {Every #st class} two {Every #nd class} few {Every #rd class} other {Every #th class}}"
+    "seriesEveryNth": "{n, selectordinal, one {Every #st class} two {Every #nd class} few {Every #rd class} other {Every #th class}}",
+    "dayView": "Day view",
+    "dayViewShort": "Day",
+    "openDayView": "Day view: {date}",
+    "classMoreActions": "More actions for this class"
   },
   "Ui": {
     "exercise1091b7f": "Exercise",
@@ -4602,7 +4606,32 @@
     "formErrTooManyItems": "Too many chosen: pick at most {count}.",
     "formErrTooFewItems": "Pick at least {count}.",
     "formErrInvalid": "This value isn't accepted. Check it and try again.",
-    "apiErrorValidationFailedDetail": "Some details weren't accepted: {details}"
+    "apiErrorValidationFailedDetail": "Some details weren't accepted: {details}",
+    "roleHeadCoach": "Head coach",
+    "programmingDialogEyebrowFor": "Programming for {name}",
+    "programmingDialogWhat": "What do you want to do?",
+    "programmingModeVariant": "Change it for this member only",
+    "programmingModePersonal": "Separate workout",
+    "programmingModeClass": "Change it for the whole class",
+    "programmingDialogClass": "Class",
+    "programmingDialogChooseClass": "Choose a class…",
+    "programmingDialogNoClass": "No class booked this day. Choose “Separate workout”, or book them a class first.",
+    "programmingDialogWorkout": "Workout",
+    "programmingSourceAdapt": "Adapt the class WOD",
+    "programmingSourceAsIs": "The class WOD as it is",
+    "programmingSourceLibrary": "From the library",
+    "programmingSourceNew": "New WOD",
+    "programmingDialogChooseWod": "Choose a WOD…",
+    "programmingMoreOptions": "More options",
+    "programmingMoreSummary": "Folder: {folder} · {count, plural, =0 {just this person} one {+# person} other {+# people}}",
+    "programmingFolderAuto": "Automatic",
+    "programmingFolder": "Library folder",
+    "programmingSubmitAssign": "{count, plural, one {Assign} other {Assign to # people}}",
+    "programmingSubmitReplaceClass": "Change the class WOD",
+    "programmingSubmitEditor": "Continue to the editor",
+    "programmingMissingClass": "Choose a class to continue.",
+    "programmingMissingWod": "Choose a WOD from the library.",
+    "programmingEditorHint": "It's assigned as soon as you publish it."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4933,7 +4962,7 @@
       "all": "Everyone",
       "member": "Box members",
       "athlete": "Athletes (personal programming)",
-      "admin": "Staff"
+      "staff": "Staff"
     },
     "showing": "Showing {shown} of {total}",
     "clearFilters": "Clear filters",
@@ -4948,7 +4977,8 @@
       "person": "Person",
       "finance": "Membership",
       "joined": "Joined",
-      "open": "Open profile"
+      "open": "Open profile",
+      "roles": "Roles"
     }
   },
   "Onboarding": {
@@ -5026,6 +5056,11 @@
         "title": "Set your time zone",
         "body": "Class days, WOD reminders and check-in days follow it. We guessed it from your device: confirm it or pick another.",
         "cta": "Set time zone"
+      },
+      "page": {
+        "title": "Publish your public page",
+        "body": "Until it is published, nobody finds your box: not by name, not in Around me.",
+        "cta": "Open the public page"
       }
     },
     "tour": {
@@ -5633,7 +5668,8 @@
         "check_in": "Check-ins"
       },
       "saveError": "That didn't save. Try again."
-    }
+    },
+    "boxFindByName": "Or search by name"
   },
   "Community": {
     "all": "All",
@@ -6081,7 +6117,10 @@
     "addPhotos": "Add photos",
     "step_coaches": "Coaches",
     "coachesHint": "Pick which coaches show on the page. The classes they teach appear next to them.",
-    "coachesNone": "There are no coaches on staff yet."
+    "coachesNone": "There are no coaches on staff yet.",
+    "checkOnMap": "Address on the map (to show up in Around me)",
+    "checkOnMapAction": "Add it",
+    "findableHint": "While the page is a draft, nobody finds the box by name or in Around me."
   },
   "PlatformTagSuggestions": {
     "title": "Tag suggestions",
@@ -6177,7 +6216,6 @@
     "relationNearby": "Nearby",
     "relationYouFollow": "You follow",
     "findPeople": "Find people",
-    "findClubsAndPeople": "Search clubs and people",
     "peopleTitle": "People",
     "peopleNoMatch": "No one found. Private accounts show up only for people who already know them.",
     "peopleSearchFailed": "The search didn't work. Try again.",
@@ -6204,7 +6242,11 @@
     "notifFollowRequestedTitle": "Follow request",
     "notifFollowRequestedBody": "{name} wants to follow you.",
     "notifFollowAcceptedTitle": "Request accepted",
-    "notifFollowAcceptedBody": "{name} accepted your follow request."
+    "notifFollowAcceptedBody": "{name} accepted your follow request.",
+    "findClubsBoxesPeople": "Search clubs, boxes and people",
+    "boxesTitle": "Boxes and coaches",
+    "boxNoMatch": "No box or coach by that name. Only businesses that have published their page show up.",
+    "boxSearchFailed": "The search didn't work. Try again."
   },
   "BoxPage": {
     "allWeek": "Whole week",
@@ -6524,7 +6566,7 @@
     "clubLeaveTitle": "Leave this club?",
     "clubLeaveBody": "Its posts leave your feed. You can join again from Find.",
     "find": "Find",
-    "findTitle": "Find clubs and people",
+    "findTitle": "Find clubs, boxes and people",
     "findOpenClubs": "Open clubs",
     "findGroups": "Groups in your boxes",
     "findNoClubs": "The boxes you belong to or follow have no open clubs yet.",
@@ -9861,7 +9903,9 @@
       "confirm": "Activate",
       "working": "Activating…",
       "doneTitle": "You are live",
-      "done": "{name} is active. The demo data is gone and everything you set up is waiting for you."
+      "done": "{name} is active. The demo data is gone and everything you set up is waiting for you.",
+      "publishNext": "One more step so people find you: publish your public page. Until then your box shows up neither in search nor in Around me.",
+      "openPublicPage": "Publish the public page"
     },
     "settings": {
       "title": "Business account",
