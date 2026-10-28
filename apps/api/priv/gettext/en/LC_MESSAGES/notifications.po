@@ -709,6 +709,12 @@ msgstr "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a
 msgid "The email key has expired"
 msgstr "The email key has expired"
 
+msgid "Your weekly goal changed"
+msgstr "Your weekly goal changed"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} set your goal to %{target} workouts a week. You can change it."
+
 msgid "A box member is leaving"
 msgstr "A box member is leaving"
 

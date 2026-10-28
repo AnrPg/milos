@@ -133,7 +133,8 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
         role: currentUser?.role ?? "member",
         admin_metrics: { member_count: 0, total_outstanding_cents: 0, pending_referral_approvals: 0, classes_today: 0 },
         gamification: {
-          settings: { weekly_workout_target: 3, streak_shield_reset_day: null, leaderboard_enabled: true },
+          settings: { streak_shields: 1, streak_shield_reset_day: null, leaderboard_enabled: true },
+          goal: { weekly_workout_target: 3, is_default: false, set_by_role: "self", min: 1, max: 14 },
           stats: {
             current_streak: 0,
             longest_streak: 0,

@@ -14,11 +14,11 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       |> put_bearer_token(admin)
       |> patch(
         "/api/org/#{organization.slug}/admin/settings",
-        %{gamification: %{weekly_workout_target: 4}}
+        %{gamification: %{streak_shields: 4}}
       )
       |> json_response(200)
 
-    assert get_in(payload, ["gamification", "weekly_workout_target"]) == 4
+    assert get_in(payload, ["gamification", "streak_shields"]) == 4
     refute Map.has_key?(payload["gamification"], "theme_slug")
     assert get_in(payload, ["gamification", "leaderboard_enabled"]) == true
     # ADR-218: the installation's push keys are not a gym setting.
@@ -33,7 +33,7 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       |> get("/api/org/#{organization.slug}/admin/settings")
       |> json_response(200)
 
-    assert get_in(fetched, ["gamification", "weekly_workout_target"]) == 4
+    assert get_in(fetched, ["gamification", "streak_shields"]) == 4
 
     untouched =
       conn
@@ -44,7 +44,7 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       })
       |> json_response(200)
 
-    assert get_in(untouched, ["gamification", "weekly_workout_target"]) == 4
+    assert get_in(untouched, ["gamification", "streak_shields"]) == 4
   end
 
   test "a gym admin cannot change the installation's push keys (ADR-218)", %{conn: conn} do
@@ -120,13 +120,13 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
              as.(admin) |> get(path) |> json_response(200) |> Map.fetch!("provider")
 
     assert as.(admin)
-           |> patch(path, %{provider: %{kind: "gym"}, gamification: %{weekly_workout_target: 4}})
+           |> patch(path, %{provider: %{kind: "gym"}, gamification: %{streak_shields: 4}})
            |> json_response(403)
 
     assert as.(owner)
            |> get(path)
            |> json_response(200)
-           |> get_in(["gamification", "weekly_workout_target"]) !=
+           |> get_in(["gamification", "streak_shields"]) !=
              4
 
     assert as.(owner) |> patch(path, %{provider: %{kind: "studio"}}) |> json_response(422)

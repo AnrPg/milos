@@ -767,6 +767,9 @@ defmodule PaleeWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    # ADR-229: a client's weekly goal, set by their coach or full-scope staff.
+    get("/clients/:user_id/training-goal", TrainingGoalController, :client_show)
+    put("/clients/:user_id/training-goal", TrainingGoalController, :client_update)
     get("/clients/:user_id/journal", JournalController, :client_journal)
     # ADR-158: shared body snapshots (audited in the client's access log).
     get("/clients/:user_id/body", ClientBodyController, :index)
@@ -1966,6 +1969,9 @@ defmodule PaleeWeb.Router do
 
     get("/preferences", GamificationPreferencesController, :show)
     put("/preferences", GamificationPreferencesController, :update)
+    # ADR-229: the weekly workout goal is the person's own.
+    get("/goal", TrainingGoalController, :show)
+    put("/goal", TrainingGoalController, :update)
   end
 
   scope "/api/prs", PaleeWeb do

@@ -319,6 +319,10 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.CoachNotesController, :reads} => [:write_coach_notes],
     {W.CoachNotesController, :visibility} => [:write_coach_notes],
 
+    # A client's weekly goal (ADR-229); the scope check narrows to own clients.
+    {W.TrainingGoalController, :client_show} => [:manage_coaching],
+    {W.TrainingGoalController, :client_update} => [:manage_coaching],
+
     # Cleaning log (ADR-102)
     {W.CleaningController, :areas} => [:record_cleaning, :review_cleaning, :manage_cleaning_areas],
     {W.CleaningController, :create_area} => [:manage_cleaning_areas],
