@@ -143,7 +143,7 @@ test.describe("admin public page editor", () => {
     await expect(page.getByText("Πρόχειρο", { exact: true })).toBeVisible();
     const publish = page.getByRole("button", { name: "Δημοσίευση", exact: true });
     await expect(publish).toBeDisabled();
-    // ADR-216: a draft is not findable, and Γύρω μου needs a map point.
+    // ADR-221: a draft is not findable, and Γύρω μου needs a map point.
     const findable = page.getByText("Όσο η σελίδα είναι πρόχειρη, κανείς δεν βρίσκει το box", { exact: false });
     await expect(findable).toBeVisible();
     await expect(page.getByText("Διεύθυνση στον χάρτη", { exact: false })).toBeVisible();

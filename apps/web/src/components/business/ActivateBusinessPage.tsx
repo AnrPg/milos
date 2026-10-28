@@ -53,7 +53,7 @@ export function ActivateBusinessPage({ token: queryToken }: { token: string }) {
       <AuthShell title={t("activate.doneTitle")}>
         <div className="space-y-5">
           <AuthNotice tone="success">{t("activate.done", { name: redeem.data.organization.name })}</AuthNotice>
-          {/* ADR-216: live is not findable; the page has to be published too. */}
+          {/* ADR-221: live is not findable; the page has to be published too. */}
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("activate.publishNext")}</p>
           <button
             type="button"

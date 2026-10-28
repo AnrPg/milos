@@ -84,7 +84,7 @@ defmodule PaleeWeb.AdminOnboardingControllerTest do
              Enum.find(checklist["steps"], &(&1["id"] == "invite"))
   end
 
-  # ADR-216: until the page is published nobody finds the box, so publishing
+  # ADR-221: until the page is published nobody finds the box, so publishing
   # it is a step of its own, done by the publication itself.
   test "publishing the public page completes the page step automatically", context do
     page = fn ->

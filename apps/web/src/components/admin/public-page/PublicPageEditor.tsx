@@ -295,7 +295,7 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
               <li style={{ color: draft.cover || draft.photos.length ? "var(--success)" : "var(--dim)" }}>
                 {draft.cover || draft.photos.length ? "✓" : "○"} {t("checkPhotos")}
               </li>
-              {/* ADR-216: Γύρω μου places the box by a location with a map point. */}
+              {/* ADR-221: Γύρω μου places the box by a location with a map point. */}
               <li style={{ color: server.on_map ? "var(--success)" : "var(--dim)" }}>
                 {server.on_map ? "✓" : "○"} {t("checkOnMap")}
                 {server.on_map ? null : (

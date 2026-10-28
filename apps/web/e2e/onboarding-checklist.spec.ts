@@ -76,7 +76,7 @@ test.describe("admin setup checklist", () => {
       "Set up classes": "/org/kypseli/admin/class-schedule",
       "Create a package": "/org/kypseli/admin/finance?tab=packages",
       "Write a workout": "/org/kypseli/admin/workouts/new",
-      // ADR-216: until the page is published nobody finds the box.
+      // ADR-221: until the page is published nobody finds the box.
       "Open the public page": "/org/kypseli/admin/public-page",
     };
     for (const [name, href] of Object.entries(expected)) {

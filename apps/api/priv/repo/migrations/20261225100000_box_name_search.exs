@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.BoxNameSearch do
   @moduledoc """
-  ADR-216: find a box (or an independent coach) by name.
+  ADR-221: find a box (or an independent coach) by name.
 
   `palee_fold_name/1` folds a name the way `Palee.Identity.Domain.NameSearch`
   folds a query (NFKD, combining marks stripped, lower-case, spaces

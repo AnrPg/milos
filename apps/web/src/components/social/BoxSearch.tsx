@@ -13,7 +13,7 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { isPeopleSearch } from "./social-model";
 
 /**
- * Boxes and independent coaches by name (ADR-216): only businesses that are
+ * Boxes and independent coaches by name (ADR-221): only businesses that are
  * live and published their page answer, from two characters on, accents and
  * case ignored. Γύρω μου finds them by place; this finds them by name.
  */

@@ -1974,7 +1974,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/people-search", PeopleController, :search)
-    # ADR-216: boxes and independent coaches by name.
+    # ADR-221: boxes and independent coaches by name.
     get("/box-search", BoxSearchController, :index)
   end
 

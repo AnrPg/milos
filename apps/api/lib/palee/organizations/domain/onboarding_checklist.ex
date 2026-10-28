@@ -15,7 +15,7 @@ defmodule Palee.Organizations.Domain.OnboardingChecklist do
   # page, bookable sessions, session packages, the «Team» club, an open
   # bootcamp, then clients.
   # ADR-176: both start with the time zone every gym-local rule reads.
-  # ADR-216: a gym publishes its page before it invites: until then nobody
+  # ADR-221: a gym publishes its page before it invites: until then nobody
   # finds it by name or in Γύρω μου, even once it is live.
   @steps_by_audience %{
     "gym" => ~w(timezone settings classes packages workout page invite tour),

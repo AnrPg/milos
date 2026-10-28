@@ -58,7 +58,7 @@ defmodule PaleeWeb.Schemas.PublicProfile do
         on_map: %Schema{
           type: :boolean,
           description:
-            "ADR-216: an open location has a map point, so Γύρω μου can show the business once published."
+            "ADR-221: an open location has a map point, so Γύρω μου can show the business once published."
         },
         published_at: %Schema{type: :string, format: :"date-time", nullable: true},
         lock_version: %Schema{type: :integer},

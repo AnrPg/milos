@@ -26,7 +26,7 @@ export type SocialPrivacyRequest = components["schemas"]["SocialPrivacyRequest"]
 export type PeopleSearchResponse = components["schemas"]["PeopleSearchResponse"];
 export type PeopleSearchPerson = components["schemas"]["PeopleSearchPerson"];
 export type PeopleRelation = PeopleSearchPerson["relation"];
-/** ADR-216: published, live boxes and independent coaches found by name. */
+/** ADR-221: published, live boxes and independent coaches found by name. */
 export type BoxSearchResponse = components["schemas"]["BoxSearchResponse"];
 export type BoxSearchResult = components["schemas"]["BoxSearchResult"];
 
@@ -109,7 +109,7 @@ export function searchPeople(token: string, q: string) {
   return apiRequest<PeopleSearchResponse>(`/people-search?${new URLSearchParams({ q })}`, { token });
 }
 
-/** ADR-216: boxes and coaches by name, from two characters on like people. */
+/** ADR-221: boxes and coaches by name, from two characters on like people. */
 export function searchBoxes(token: string, q: string) {
   return apiRequest<BoxSearchResponse>(`/box-search?${new URLSearchParams({ q })}`, { token });
 }

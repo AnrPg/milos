@@ -364,7 +364,7 @@ defmodule PaleeWeb.Schemas.Social do
     box = %Schema{
       title: "BoxSearchResult",
       type: :object,
-      description: "ADR-216: a published, live box or independent coach found by name",
+      description: "ADR-221: a published, live box or independent coach found by name",
       properties: %{
         organization_id: @uuid,
         slug: %Schema{type: :string},

@@ -38,7 +38,7 @@ defmodule Palee.Application.BoxPublicProfileTest do
             }} = BoxPublicProfile.get(a.context)
   end
 
-  # ADR-216: Γύρω μου needs an open location with a map point.
+  # ADR-221: Γύρω μου needs an open location with a map point.
   test "on_map says whether an open location has a map point", %{a: a} do
     {:ok, _unplaced} =
       Facility.create_location(a.context, %{"name" => "Χωρίς χάρτη", "address" => "Οδός 1"})

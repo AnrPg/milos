@@ -1,4 +1,4 @@
-# ADR-216: Find a box or coach by name; publishing the public page is a setup step
+# ADR-221: Find a box or coach by name; publishing the public page is a setup step
 Date: 2026-10-28
 Status: Accepted
 

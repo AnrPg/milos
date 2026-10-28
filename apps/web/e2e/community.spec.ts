@@ -346,7 +346,7 @@ test.describe("community", () => {
     expect(calls.joins).toEqual(["open-1"]);
   });
 
-  // ADR-216: the same field finds a live, published box or coach by name.
+  // ADR-221: the same field finds a live, published box or coach by name.
   test("«Find» finds a box by name and opens its public page", async ({ page }) => {
     await member(page);
     const queries: string[] = [];

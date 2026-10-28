@@ -1,5 +1,5 @@
 defmodule PaleeWeb.BoxSearchController do
-  @moduledoc "ADR-216: find a published box or independent coach by name."
+  @moduledoc "ADR-221: find a published box or independent coach by name."
 
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -17,7 +17,7 @@ defmodule PaleeWeb.BoxSearchController do
 
   operation(:index,
     summary:
-      "ADR-216: published, live boxes and independent coaches whose name holds the query (accents and case ignored)",
+      "ADR-221: published, live boxes and independent coaches whose name holds the query (accents and case ignored)",
     parameters: [
       %Parameter{
         name: :q,

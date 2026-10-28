@@ -1,6 +1,6 @@
 defmodule Palee.Application.BoxSearch do
   @moduledoc """
-  ADR-216: find a box or an independent coach by name, in the member's
+  ADR-221: find a box or an independent coach by name, in the member's
   personal session (the «Βρες» search, next to clubs and people).
 
   Only businesses a visitor may see answer: active, live (not in demo,

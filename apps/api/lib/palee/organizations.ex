@@ -875,7 +875,7 @@ defmodule Palee.Organizations do
   def public_boxes(ids), do: Palee.Organizations.PublicProfileStore.public_boxes(ids)
 
   @doc """
-  ADR-216: published, live businesses (boxes and independent coaches) whose
+  ADR-221: published, live businesses (boxes and independent coaches) whose
   name, brand name or slug holds one of the already folded `terms`.
   """
   def search_public_boxes(terms, limit),

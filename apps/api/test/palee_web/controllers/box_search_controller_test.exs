@@ -1,6 +1,6 @@
 defmodule PaleeWeb.BoxSearchControllerTest do
   @moduledoc """
-  ADR-216: «Βρες» finds a box or an independent coach by name, as the RLS
+  ADR-221: «Βρες» finds a box or an independent coach by name, as the RLS
   runtime role: only live businesses with a published page, accents and
   case ignored, the Latin spelling too, no map point needed, word starts
   first, with the viewer's follow status.

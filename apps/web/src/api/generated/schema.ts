@@ -605,7 +605,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ADR-216: published, live boxes and independent coaches whose name holds the query (accents and case ignored) */
+        /** ADR-221: published, live boxes and independent coaches whose name holds the query (accents and case ignored) */
         get: operations["PaleeWeb.BoxSearchController.index"];
         put?: never;
         post?: never;
@@ -18353,7 +18353,7 @@ export interface components {
             lock_version: number;
             /** @description What the draft still needs before it can be published. */
             missing: ("about" | "disciplines")[];
-            /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
             on_map?: boolean;
             photos: {
                 alt_text?: string | null;
@@ -18457,7 +18457,7 @@ export interface components {
                 lock_version: number;
                 /** @description What the draft still needs before it can be published. */
                 missing: ("about" | "disciplines")[];
-                /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+                /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
                 on_map?: boolean;
                 photos: {
                     alt_text?: string | null;
@@ -18532,7 +18532,7 @@ export interface components {
         };
         /**
          * BoxSearchResult
-         * @description ADR-216: a published, live box or independent coach found by name
+         * @description ADR-221: a published, live box or independent coach found by name
          */
         BoxSearchResult: {
             city?: string | null;
@@ -73165,7 +73165,7 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
-                            /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
                             on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
@@ -73295,7 +73295,7 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
-                            /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
                             on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
@@ -73522,7 +73522,7 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
-                            /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
                             on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
@@ -73701,7 +73701,7 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
-                            /** @description ADR-216: an open location has a map point, so Γύρω μου can show the business once published. */
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
                             on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;

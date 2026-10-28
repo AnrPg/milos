@@ -10,7 +10,7 @@ defmodule PaleeWeb.AdminOnboardingController do
   tags(["Admin Onboarding"])
   security([%{"bearerAuth" => []}])
 
-  # Gym steps (ADR-216 adds `page`) and an independent coach's (ADR-170).
+  # Gym steps (ADR-221 adds `page`) and an independent coach's (ADR-170).
   @steps ~w(timezone settings classes packages workout page invite tour profile sessions team bootcamp)
 
   @checklist_schema %Schema{

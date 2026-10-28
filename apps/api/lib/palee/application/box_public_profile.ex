@@ -68,7 +68,7 @@ defmodule Palee.Application.BoxPublicProfile do
     })
   end
 
-  # ADR-216: Γύρω μου places a business by an open location with a map point;
+  # ADR-221: Γύρω μου places a business by an open location with a map point;
   # the page publishes without one, but then only the name search finds it.
   defp on_map?(context) do
     context

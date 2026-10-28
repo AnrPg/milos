@@ -423,7 +423,7 @@ test.describe("member app shell", () => {
 
     await expect(page.getByRole("heading", { name: "You're not in a box yet" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around?kind=boxes");
-    // ADR-216: or by name, when they already know which box.
+    // ADR-221: or by name, when they already know which box.
     await page.route("**/api/box-search**", (route) =>
       route.fulfill(
         json({

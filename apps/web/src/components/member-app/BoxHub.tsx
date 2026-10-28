@@ -102,7 +102,7 @@ export function BoxHub() {
 
 /**
  * Box for someone who is not in any box or with any coach yet: near me in
- * Γύρω μου, or by name (ADR-216) when they already know which one.
+ * Γύρω μου, or by name (ADR-221) when they already know which one.
  */
 function FindABox() {
   const t = useTranslations("MemberApp");

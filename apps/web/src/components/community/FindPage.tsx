@@ -43,7 +43,7 @@ const FIND_SHAPE = { kind: "one", box: "many" } as const;
  * «+ Βρες» (board 7 Q7): open clubs of the boxes you belong to or follow, and
  * member groups of your gyms you're not in, with a search, and «Κοντά μου»:
  * open clubs near you from Γύρω μου (ADR-154). The search finds people on
- * Palee too (ADR-193 §4), and boxes and coaches by name (ADR-216), each in
+ * Palee too (ADR-193 §4), and boxes and coaches by name (ADR-221), each in
  * a card shown only when something matches.
  */
 export function FindPage() {

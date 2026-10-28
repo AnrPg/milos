@@ -347,7 +347,7 @@ test.describe("activation link", () => {
       await page.getByRole("button", { name: "Activate", exact: true }).click();
       await expect(page.getByText("Box Kypseli is active.", { exact: false })).toBeVisible();
       expect(sent.redeemed).toEqual([{ token: "act-token" }]);
-      // ADR-216: live is not findable yet; the next step is the public page.
+      // ADR-221: live is not findable yet; the next step is the public page.
       await expect(page.getByText("One more step so people find you", { exact: false })).toBeVisible();
       await expect(page.getByRole("button", { name: "Publish the public page" })).toBeVisible();
 
