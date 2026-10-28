@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { TrainingGoal } from "@/api/gamification";
 import type { operations, paths } from "@/api/generated/schema";
 
 // ADR-098 staff work under /staff: form reviews, the reply queue, nutrition
@@ -73,6 +74,21 @@ export async function saveClientNutritionPlan(token: string, userId: string, bod
     body,
   });
   return response.nutrition_plan ?? null;
+}
+
+/** ADR-216: a client's weekly goal, for their coach or full-scope staff. */
+export async function fetchClientTrainingGoal(token: string, userId: string): Promise<TrainingGoal> {
+  const response = await apiRequest<{ goal: TrainingGoal }>(`/staff/clients/${userId}/training-goal`, { token });
+  return response.goal;
+}
+
+export async function saveClientTrainingGoal(token: string, userId: string, weeklyWorkoutTarget: number): Promise<TrainingGoal> {
+  const response = await apiRequest<{ goal: TrainingGoal }>(`/staff/clients/${userId}/training-goal`, {
+    method: "PUT",
+    token,
+    body: { weekly_workout_target: weeklyWorkoutTarget },
+  });
+  return response.goal;
 }
 
 export async function fetchAppointmentSlots(

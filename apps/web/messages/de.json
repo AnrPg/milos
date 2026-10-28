@@ -717,13 +717,8 @@
     "markReviewed277c924": "Mark überprüft",
     "needsFollowUp067fefc": "Muss weiterverfolgt werden",
     "triageTags6d6b330": "Triage-Tags",
-    "weeklyWorkoutTarget8106ea7": "Wöchentliches Trainingsziel",
-    "weeklyWorkoutTargetInfo19b03c8": "Wöchentliche Trainingszielinformationen",
-    "howManyCompletedWorkoutsAUserNeedsPere99943b": "Wie viele abgeschlossene Trainingseinheiten ein Benutzer pro Woche benötigt, damit diese Woche für seinen Streak angerechnet wird.",
-    "validValuesInteger1Default281502ef": "Gültige Werte: Ganzzahl ≥ 1. Standard: 2.",
     "streakShieldResetDayd22b9ea": "Tag des Streak-Shield-Resets",
     "streakShieldResetDayInfo10555c2": "Informationen zum Tag des Zurücksetzens des Streak-Schildes",
-    "dayOfMonthWhenEachUserGetsTheir605b967": "Tag des Monats, an dem jeder Benutzer seinen monatlichen Streak-Schutz wiederhergestellt erhält. Gültig: 1–28 oder leer für anmeldungsbezogenes Zurücksetzen.",
     "useSignupRelativeMonthlyReseta55c3a9": "Verwenden Sie die anmeldungsbezogene monatliche Zurücksetzung",
     "enableLeaderboardGloballyc5e326f": "Aktivieren Sie die Bestenliste global",
     "enableLeaderboardGloballyInfo62095ee": "Aktivieren Sie globale Bestenlisteninformationen",
@@ -1366,7 +1361,6 @@
     "signOutAllDevicesf14a071": "Melden Sie alle Geräte ab",
     "nicknameAndPassword3e84316": "Spitzname und Passwort",
     "saving56a2285": "Sparen…",
-    "markYourWeeklyRestDaysUpTo5ee5b72a": "Markieren Sie Ihre wöchentlichen Ruhetage (bis zu 5)",
     "profilePictureaeb8371": "Profilbild",
     "uploadingd921a79": "Hochladen…",
     "changeAvatar60f2e98": "Avatar ändern",
@@ -4602,7 +4596,9 @@
     "formErrTooManyItems": "Zu viele ausgewählt: höchstens {count}.",
     "formErrTooFewItems": "Wählen Sie mindestens {count}.",
     "formErrInvalid": "Dieser Wert wird nicht akzeptiert. Prüfen Sie ihn und versuchen Sie es erneut.",
-    "apiErrorValidationFailedDetail": "Einige Angaben wurden nicht akzeptiert: {details}"
+    "apiErrorValidationFailedDetail": "Einige Angaben wurden nicht akzeptiert: {details}",
+    "ntfTrainingGoalTitle": "Dein Wochenziel wurde geändert",
+    "ntfTrainingGoalBody": "{name} hat dein Wochenziel auf {count, plural, one {# Training} other {# Trainings}} gesetzt. Du kannst es in deinen Einstellungen ändern."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -11787,5 +11783,34 @@
     "working": "Einen Moment…",
     "failed": "Das hat nicht geklappt. Prüfe deine Verbindung und versuche es erneut.",
     "status": "Nicht gespeichert: woanders geändert"
+  },
+  "TrainingGoal": {
+    "title": "Wochenziel",
+    "hint": "Wie viele Trainings eine Woche zählen lassen. Jede Woche, in der du es erreichst, hält deine Serie am Laufen und hebt deine Beständigkeit und Motivation. Ein Serienschild rettet eine verpasste Woche.",
+    "perWeek": "{count, plural, one {# Training pro Woche} other {# Trainings pro Woche}}",
+    "decrease": "Ein Training weniger",
+    "increase": "Ein Training mehr",
+    "defaultNote": "Das ist der Startvorschlag. Stell die Zahl ein, die zu deiner Woche passt.",
+    "setByCoach": "Von deinem Coach {name} festgelegt. Du kannst es jederzeit ändern.",
+    "setByStaff": "Von {name} aus deiner Box festgelegt. Du kannst es jederzeit ändern.",
+    "saveFailed": "Dein Ziel konnte nicht gespeichert werden. Bitte versuch es erneut.",
+    "staffHint": "Das eigene Ziel von {name}: wie viele Trainings eine Woche für die Serie zählen lassen. Als Coach kannst du es festlegen; {name} wird benachrichtigt und kann es ändern.",
+    "staffDefault": "Noch nicht festgelegt. Es gilt der Standard von {count, plural, one {# Training} other {# Trainings}} pro Woche.",
+    "staffSetBy": "Zuletzt festgelegt von {name}.",
+    "staffSetBySelf": "Zuletzt von {name} selbst festgelegt.",
+    "staffSave": "Ziel speichern",
+    "staffSaved": "Gespeichert. {name} wurde benachrichtigt.",
+    "box": {
+      "goalIsPersonal": "Das wöchentliche Trainingsziel ist persönlich: Jeder Kunde legt es selbst unter Ich › Einstellungen › Trainingsplan fest, und sein Coach kann es im Kundenprofil festlegen. Hier stellst du nur die Serienschilde und ihre Erneuerung ein.",
+      "shieldsLabel": "Serienschilde pro Erneuerung",
+      "shieldsInfo": "Über Serienschilde",
+      "shieldsHelp": "Ein Schild rettet die Serie eines Kunden in einer Woche, in der er sein Wochenziel nicht erreicht hat. Jeder Kunde erhält bei jeder Erneuerung so viele Schilde. Nicht genutzte Schilde verfallen.",
+      "shieldsValues": "Erlaubt: 0 bis 5. 0 schaltet Schilde ab. Standard: 1.",
+      "shieldsHint": "Wie viele verpasste Wochen jedem Kunden zwischen zwei Erneuerungen verziehen werden.",
+      "renewalHelp": "Wann die Schilde wieder aufgefüllt werden. Gib einen Tag des Monats (1 bis 28) ein, um sie für alle an diesem Tag zu erneuern, oder lass das Feld leer, damit sie für jeden Kunden monatlich am Tag seiner Anmeldung erneuert werden.",
+      "renewalOnDay": "Die Schilde werden für alle am {day}. jedes Monats erneuert.",
+      "renewalOnSignup": "Leer: Die Schilde jedes Kunden werden monatlich am Tag seiner Anmeldung erneuert."
+    },
+    "sectionDescription": "Dein wöchentliches Trainingsziel und deine Ruhetage."
   }
 }

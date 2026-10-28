@@ -708,3 +708,9 @@ msgstr "A chave SMTP do Palee expirou a %{date}, por isso o Palee não consegue 
 
 msgid "The email key has expired"
 msgstr "A chave de email expirou"
+
+msgid "Your weekly goal changed"
+msgstr "O teu objetivo semanal mudou"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} definiu o teu objetivo em %{target} treinos por semana. Podes alterá-lo."

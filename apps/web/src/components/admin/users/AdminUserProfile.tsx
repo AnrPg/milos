@@ -49,6 +49,7 @@ import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
+import { ClientTrainingGoalPanel } from "@/components/training-goal/ClientTrainingGoalPanel";
 import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
 import { CoachWellnessPanel } from "@/components/buddy/CoachWellnessPanel";
 import { CoachTrainingDepthPanel } from "@/components/member-app/progress/CoachTrainingDepthPanel";
@@ -531,6 +532,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const tPrSharing = useTranslations("PrSharing");
   const tDepth = useTranslations("Depth");
+  const tGoal = useTranslations("TrainingGoal");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const organizationSlug = useOrganizationSlug();
@@ -640,6 +642,8 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const tabSections = new Set(sections);
   if (trains) tabSections.add("training_history");
   if (showCoaches) tabSections.add("coaching_relationships");
+  // ADR-216: a coach (or full-scope staff) may set the client's weekly goal.
+  if (isClient && can(actor, "manage_coaching")) tabSections.add("training_goal");
   if (showCoachNotes) tabSections.add("coach_notes");
   if (showBoxMessage) tabSections.add("box_message");
   // ADR-158: a client's coach sees the body snapshots the member shared.
@@ -780,6 +784,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
               defaultKind={defaultHistoryKind(profile.identity.role)}
             />
+          ) : null}
+
+          {token && inTab("training_goal") ? (
+            <Panel id="training_goal" title={tGoal("title")}>
+              <ClientTrainingGoalPanel userId={userId} nickname={profile.identity.nickname} />
+            </Panel>
           ) : null}
 
           {token && inTab("training_depth") ? (

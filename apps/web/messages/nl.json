@@ -717,13 +717,8 @@
     "markReviewed277c924": "Mark beoordeeld",
     "needsFollowUp067fefc": "Heeft opvolging nodig",
     "triageTags6d6b330": "triage-tags",
-    "weeklyWorkoutTarget8106ea7": "Wekelijks trainingsdoel",
-    "weeklyWorkoutTargetInfo19b03c8": "Informatie over wekelijkse trainingsdoelen",
-    "howManyCompletedWorkoutsAUserNeedsPere99943b": "Hoeveel voltooide trainingen een gebruiker die week per week nodig heeft om mee te tellen voor zijn streak.",
-    "validValuesInteger1Default281502ef": "Geldige waarden: geheel getal ≥ 1. Standaard: 2.",
     "streakShieldResetDayd22b9ea": "Resetdag van het Streak Shield",
     "streakShieldResetDayInfo10555c2": "Streak Shield reset daginformatie",
-    "dayOfMonthWhenEachUserGetsTheir605b967": "Dag van de maand waarop elke gebruiker zijn maandelijkse streak-schild herstelt. Geldig: 1-28, of leeg voor het opnieuw instellen van de aanmeldingsrelatie.",
     "useSignupRelativeMonthlyReseta55c3a9": "Gebruik aanmeldings-relatieve maandelijkse reset",
     "enableLeaderboardGloballyc5e326f": "Schakel het leaderboard wereldwijd in",
     "enableLeaderboardGloballyInfo62095ee": "Schakel leaderboard-informatie wereldwijd in",
@@ -1366,7 +1361,6 @@
     "signOutAllDevicesf14a071": "Meld alle apparaten af",
     "nicknameAndPassword3e84316": "Bijnaam en wachtwoord",
     "saving56a2285": "Opslaan…",
-    "markYourWeeklyRestDaysUpTo5ee5b72a": "Markeer uw wekelijkse rustdagen (maximaal 5)",
     "profilePictureaeb8371": "Profielfoto",
     "uploadingd921a79": "Uploaden…",
     "changeAvatar60f2e98": "Wijzig avatar",
@@ -4602,7 +4596,9 @@
     "formErrTooManyItems": "Te veel gekozen: maximaal {count}.",
     "formErrTooFewItems": "Kies er minstens {count}.",
     "formErrInvalid": "Deze waarde wordt niet geaccepteerd. Controleer hem en probeer het opnieuw.",
-    "apiErrorValidationFailedDetail": "Sommige gegevens zijn niet geaccepteerd: {details}"
+    "apiErrorValidationFailedDetail": "Sommige gegevens zijn niet geaccepteerd: {details}",
+    "ntfTrainingGoalTitle": "Je weekdoel is gewijzigd",
+    "ntfTrainingGoalBody": "{name} heeft je weekdoel op {count, plural, one {# training} other {# trainingen}} gezet. Je kunt het aanpassen in je instellingen."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -11787,5 +11783,34 @@
     "working": "Een moment…",
     "failed": "Dat lukte niet. Controleer je verbinding en probeer het opnieuw.",
     "status": "Niet opgeslagen: ergens anders gewijzigd"
+  },
+  "TrainingGoal": {
+    "title": "Weekdoel",
+    "hint": "Hoeveel trainingen een week laten tellen. Elke week dat je het haalt houdt je reeks in stand en verhoogt je consistentie en motivatie. Een reeksschild redt een gemiste week.",
+    "perWeek": "{count, plural, one {# training per week} other {# trainingen per week}}",
+    "decrease": "Eén training minder",
+    "increase": "Eén training meer",
+    "defaultNote": "Dit is de startsuggestie. Kies het aantal dat bij jouw week past.",
+    "setByCoach": "Ingesteld door je coach {name}. Je kunt het altijd aanpassen.",
+    "setByStaff": "Ingesteld door {name} van je box. Je kunt het altijd aanpassen.",
+    "saveFailed": "Je doel kon niet worden opgeslagen. Probeer het opnieuw.",
+    "staffHint": "Het eigen doel van {name}: hoeveel trainingen de week laten tellen voor de reeks. Als coach kun je het instellen; {name} krijgt een melding en kan het aanpassen.",
+    "staffDefault": "Nog niet ingesteld. De standaard van {count, plural, one {# training} other {# trainingen}} per week geldt.",
+    "staffSetBy": "Laatst ingesteld door {name}.",
+    "staffSetBySelf": "Door {name} zelf ingesteld.",
+    "staffSave": "Doel opslaan",
+    "staffSaved": "Opgeslagen. {name} heeft een melding gekregen.",
+    "box": {
+      "goalIsPersonal": "Het wekelijkse trainingsdoel is persoonlijk: elke klant stelt het zelf in via Ik › Instellingen › Trainingsschema, en de coach kan het instellen vanuit het klantprofiel. Hier stel je alleen de reeksschilden in en wanneer ze vernieuwen.",
+      "shieldsLabel": "Reeksschilden per vernieuwing",
+      "shieldsInfo": "Over reeksschilden",
+      "shieldsHelp": "Een schild redt de reeks van een klant in een week waarin het weekdoel niet is gehaald. Elke klant krijgt bij elke vernieuwing zoveel schilden. Ongebruikte schilden schuiven niet door.",
+      "shieldsValues": "Toegestaan: 0 tot 5. 0 schakelt schilden uit. Standaard: 1.",
+      "shieldsHint": "Hoeveel gemiste weken elke klant tussen twee vernieuwingen worden vergeven.",
+      "renewalHelp": "Wanneer de schilden weer worden aangevuld. Vul een dag van de maand in (1 tot 28) om ze voor iedereen op die dag te vernieuwen, of laat het leeg zodat ze voor elke klant maandelijks vernieuwen op de dag van inschrijving.",
+      "renewalOnDay": "Schilden vernieuwen voor iedereen op dag {day} van elke maand.",
+      "renewalOnSignup": "Leeg: de schilden van elke klant vernieuwen maandelijks op de dag van inschrijving."
+    },
+    "sectionDescription": "Je wekelijkse trainingsdoel en je rustdagen."
   }
 }

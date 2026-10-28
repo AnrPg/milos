@@ -58,11 +58,25 @@ defmodule PaleeWeb.LandingController do
   @gamification_settings_schema %Schema{
     type: :object,
     properties: %{
-      weekly_workout_target: %Schema{type: :integer, minimum: 1},
+      streak_shields: %Schema{type: :integer, minimum: 0, maximum: 5},
       streak_shield_reset_day: %Schema{type: :integer, minimum: 1, maximum: 28, nullable: true},
       leaderboard_enabled: %Schema{type: :boolean}
     },
-    required: [:weekly_workout_target, :leaderboard_enabled]
+    required: [:leaderboard_enabled, :streak_shields]
+  }
+
+  # ADR-216: the person's own weekly workout goal.
+  @goal_schema %Schema{
+    type: :object,
+    nullable: true,
+    properties: %{
+      weekly_workout_target: %Schema{type: :integer, minimum: 1},
+      is_default: %Schema{type: :boolean},
+      set_by_role: %Schema{type: :string, enum: ["self", "coach", "staff"], nullable: true},
+      set_by_nickname: %Schema{type: :string, nullable: true}
+    },
+    required: [:is_default, :weekly_workout_target],
+    additionalProperties: true
   }
 
   operation(:show,
@@ -76,7 +90,8 @@ defmodule PaleeWeb.LandingController do
              gamification: %Schema{
                type: :object,
                properties: %{
-                 settings: @gamification_settings_schema
+                 settings: @gamification_settings_schema,
+                 goal: @goal_schema
                },
                required: [:settings],
                additionalProperties: true

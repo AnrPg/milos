@@ -70,6 +70,38 @@ export type PRHistoryEntry = {
   inserted_at: string;
 };
 
+/**
+ * ADR-216: a person's weekly workout goal. Theirs to set; their coach, or an
+ * owner/admin who may coach every client, may set it for them.
+ */
+export type TrainingGoal = {
+  weekly_workout_target: number;
+  /** Nobody set one yet: the platform default applies. */
+  is_default: boolean;
+  set_by_role: "self" | "coach" | "staff" | null;
+  set_by_id?: string | null;
+  set_by_nickname?: string | null;
+  updated_at?: string | null;
+  min?: number;
+  max?: number;
+};
+
+export const TRAINING_GOAL_KEY = ["gamification", "goal"] as const;
+
+export async function fetchTrainingGoal(token: string): Promise<TrainingGoal | null> {
+  const data = await apiRequest<{ goal?: TrainingGoal }>("/gamification/goal", { token });
+  return data.goal ?? null;
+}
+
+export async function updateTrainingGoal(token: string, weeklyWorkoutTarget: number): Promise<TrainingGoal> {
+  const data = await apiRequest<{ goal: TrainingGoal }>("/gamification/goal", {
+    method: "PUT",
+    token,
+    body: { weekly_workout_target: weeklyWorkoutTarget },
+  });
+  return data.goal;
+}
+
 export async function fetchGamificationPreferences(
   token: string,
 ): Promise<GamificationPreferences> {

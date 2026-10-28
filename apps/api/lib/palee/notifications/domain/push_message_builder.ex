@@ -1062,6 +1062,18 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("training_goal_updated", payload, localize) do
+    %{
+      title: localize.("Your weekly goal changed", %{}),
+      body:
+        localize.("%{person} set your goal to %{target} workouts a week. You can change it.", %{
+          person: payload["set_by_nickname"] || "",
+          target: payload["target"] || ""
+        }),
+      url: payload["url"] || "/me/settings#training-schedule"
+    }
+  end
+
   def build("appointment_booked", payload, localize) do
     %{
       title: localize.("New appointment booked", %{}),

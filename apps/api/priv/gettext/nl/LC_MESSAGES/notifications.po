@@ -708,3 +708,9 @@ msgstr "De SMTP-sleutel van Palee is op %{date} verlopen, dus Palee kan geen e-m
 
 msgid "The email key has expired"
 msgstr "De e-mailsleutel is verlopen"
+
+msgid "Your weekly goal changed"
+msgstr "Je weekdoel is gewijzigd"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} heeft je doel op %{target} trainingen per week gezet. Je kunt het aanpassen."

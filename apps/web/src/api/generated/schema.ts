@@ -1031,6 +1031,24 @@ export interface paths {
         patch: operations["PaleeWeb.ExecutionController.update_progress"];
         trace?: never;
     };
+    "/api/gamification/goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.show"];
+        /** Set my weekly workout goal */
+        put: operations["PaleeWeb.TrainingGoalController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gamification/preferences": {
         parameters: {
             query?: never;
@@ -10792,6 +10810,24 @@ export interface paths {
         /** A client's muscle coverage, qualities radar and training load, from shared entries */
         get: operations["PaleeWeb.TrainingDepthController.client"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/training-goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.client_show"];
+        /** Set a client's weekly workout goal; the client is notified */
+        put: operations["PaleeWeb.TrainingGoalController.client_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -37007,6 +37043,21 @@ export interface components {
                 undo_until?: string;
             };
         };
+        /** TrainingGoal */
+        TrainingGoal: {
+            /** @description No one set a goal yet; the platform default applies */
+            is_default: boolean;
+            max: number;
+            min: number;
+            /** Format: uuid */
+            set_by_id?: string | null;
+            set_by_nickname?: string | null;
+            /** @enum {string|null} */
+            set_by_role?: "self" | "coach" | "staff" | null;
+            /** Format: date-time */
+            updated_at?: string | null;
+            weekly_workout_target: number;
+        };
         /** TrainingHistoryPage */
         TrainingHistoryPage: {
             entries: {
@@ -43825,6 +43876,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -76072,10 +76213,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         notifications: {
                             enabled: boolean;
@@ -76149,8 +76292,10 @@ export interface operations {
                     };
                     gamification?: {
                         leaderboard_enabled?: boolean;
+                        /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                         streak_shield_reset_day?: number | null;
-                        weekly_workout_target?: number;
+                        /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                        streak_shields?: number;
                     };
                     notifications?: {
                         vapid_private_key?: string | null;
@@ -76209,10 +76354,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         notifications: {
                             enabled: boolean;
@@ -87171,10 +87318,19 @@ export interface operations {
                             thread_id: string;
                         }[];
                         gamification: {
+                            goal?: ({
+                                is_default: boolean;
+                                set_by_nickname?: string | null;
+                                /** @enum {string|null} */
+                                set_by_role?: "self" | "coach" | "staff" | null;
+                                weekly_workout_target: number;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
                             settings: {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
-                                weekly_workout_target: number;
+                                streak_shields: number;
                             };
                         } & {
                             [key: string]: unknown;
@@ -93100,6 +93256,122 @@ export interface operations {
                 content: {
                     "application/json": {
                         error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

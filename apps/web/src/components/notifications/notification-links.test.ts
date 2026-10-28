@@ -174,6 +174,10 @@ describe("notificationTargetUrl", () => {
     expect(
       notificationTargetUrl({ type: "nutrition_plan_updated", payload: { title: "Cut" } }, "athlete"),
     ).toBe("/box/coach");
+    // ADR-216: a goal a coach set opens my own settings, where I can change it.
+    expect(
+      notificationTargetUrl({ type: "training_goal_updated", payload: { target: 4, set_by_nickname: "Nikos" } }, "member"),
+    ).toBe("/me/settings#training-schedule");
   });
 
   it("opens appointments on the side of the reader", () => {

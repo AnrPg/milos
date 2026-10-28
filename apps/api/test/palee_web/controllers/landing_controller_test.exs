@@ -37,7 +37,7 @@ defmodule PaleeWeb.LandingControllerTest do
 
     {:ok, _settings} =
       Gamification.update_settings(%{
-        weekly_workout_target: 3,
+        streak_shields: 3,
         streak_shield_reset_day: 7,
         leaderboard_enabled: true
       })
@@ -120,7 +120,12 @@ defmodule PaleeWeb.LandingControllerTest do
       |> json_response(200)
 
     assert get_in(landing, ["gamification", "stats", "current_streak"]) == 1
-    assert get_in(landing, ["gamification", "settings", "weekly_workout_target"]) == 3
+    assert get_in(landing, ["gamification", "settings", "streak_shields"]) == 3
+    refute Map.has_key?(get_in(landing, ["gamification", "settings"]), "weekly_workout_target")
+    # ADR-216: the weekly goal is the person's own, the default until set.
+    assert %{"weekly_workout_target" => 2, "is_default" => true} =
+             get_in(landing, ["gamification", "goal"])
+
     assert get_in(landing, ["gamification", "settings", "streak_shield_reset_day"]) == 7
     assert get_in(landing, ["gamification", "settings", "leaderboard_enabled"]) == true
     refute Map.has_key?(get_in(landing, ["gamification", "settings"]), "theme_slug")

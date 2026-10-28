@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { TrainingGoal } from "@/api/gamification";
 import type { WorkoutExecution } from "@/api/executions";
 
 export type BadgeRecord = {
@@ -68,10 +69,12 @@ export type LandingPayload = {
   admin_metrics?: AdminMetrics;
   gamification: {
     settings: {
-      weekly_workout_target: number;
+      streak_shields: number;
       streak_shield_reset_day: number | null;
       leaderboard_enabled: boolean;
     };
+    /** ADR-216: the person's own weekly goal (absent for staff landings). */
+    goal?: TrainingGoal | null;
     stats: {
       current_streak: number;
       longest_streak: number;

@@ -86,6 +86,9 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
     case "form_review_completed":
     case "nutrition_plan_updated":
       return "/box/coach";
+    // ADR-216: my weekly goal lives in Εγώ › Ρυθμίσεις.
+    case "training_goal_updated":
+      return "/me/settings#training-schedule";
     case "appointment_booked":
     case "appointment_cancelled":
       return isStaffRole(role) ? "/admin/appointments" : "/box/appointments";

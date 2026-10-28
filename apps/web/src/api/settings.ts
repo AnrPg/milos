@@ -2,7 +2,9 @@ import { apiRequest } from "@/api/client";
 
 export type GamificationSettings = {
   id?: string | null;
-  weekly_workout_target: number;
+  /** ADR-216: streak shields each member gets at every renewal (0–5, 0 = off). */
+  streak_shields: number;
+  /** Day of the month the shields renew; null = each member's sign-up day. */
   streak_shield_reset_day: number | null;
   leaderboard_enabled: boolean;
   inserted_at?: string | null;
@@ -79,7 +81,7 @@ export type WorkoutAuthoringSettings = {
 };
 
 export type GamificationUpdate = Partial<
-  Pick<GamificationSettings, "weekly_workout_target" | "streak_shield_reset_day" | "leaderboard_enabled">
+  Pick<GamificationSettings, "streak_shields" | "streak_shield_reset_day" | "leaderboard_enabled">
 >;
 
 export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days" | "subscription_expiry_reminder_days" | "subscription_grace_days" | "document_mode" | "package_modules">>;

@@ -6,10 +6,11 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
     MotivationCalculator,
     PerseveranceCalculator,
     PRDetector,
-    StreakCalculator
+    StreakCalculator,
+    WeeklyGoal
   }
 
-  alias Palee.Gamification.GamificationStore
+  alias Palee.Gamification.{GamificationSetting, GamificationStore}
   alias Palee.TimeZones.ZonedTime
 
   def call(
@@ -49,8 +50,14 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
 
     day_streaks = DayStreakCalculator.calculate(completed_dates, off_days, today)
 
+    # ADR-216: the week's target is the person's own goal, the shields the box's.
+    weekly_target =
+      user_id
+      |> GamificationStore.get_training_goal(WeeklyGoal.kind())
+      |> WeeklyGoal.effective_target()
+
     motivation_score =
-      MotivationCalculator.calculate(completed_dates, settings.weekly_workout_target, today)
+      MotivationCalculator.calculate(completed_dates, weekly_target, today)
 
     perseverance_score =
       PerseveranceCalculator.calculate(
@@ -72,8 +79,10 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
           completed_dates: completed_dates,
           current_date: today,
           anchor_date: signup_anchor_date(account, completed_dates),
-          target: settings.weekly_workout_target,
-          shield_reset_day: settings.streak_shield_reset_day
+          target: weekly_target,
+          shield_reset_day: settings.streak_shield_reset_day,
+          shields:
+            Map.get(settings, :streak_shields, GamificationSetting.default_streak_shields())
         )
 
       completion_facts = %{

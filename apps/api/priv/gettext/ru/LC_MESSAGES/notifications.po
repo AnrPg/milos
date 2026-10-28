@@ -708,3 +708,9 @@ msgstr "SMTP-ключ Palee истёк %{date}, поэтому Palee не мож
 
 msgid "The email key has expired"
 msgstr "Ключ для email истёк"
+
+msgid "Your weekly goal changed"
+msgstr "Ваша недельная цель изменена"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} установил(а) вашу цель: %{target} тренировок в неделю. Вы можете её изменить."

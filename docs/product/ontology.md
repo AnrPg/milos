@@ -272,6 +272,15 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Trial visitor | Δοκιμαστικό | `trials` | A newcomer trying one class. | Guest, mock person. |
 | Referral | Φέρε φίλο | `referrals` | A member invites a friend; rewards on trial or join. | Guest. |
 
+### 4.8 Goals and streaks
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Weekly goal | Εβδομαδιαίος στόχος | `training_goals` kind `weekly_workouts` | How many workouts make a person's week count. Theirs to set; their coach (or staff who coach every client) may set it, and the person is told. (ADR-216) | WOD goals (the muscles and qualities a workout trains). |
+| Streak | Σερί | `user_stats.current_streak` | Days or weeks in a row of training. One streak only (ADR-194). | |
+| Streak shield | Ασπίδα σερί | `gamification_settings.streak_shields` | Saves a streak in a week that missed the weekly goal. The box sets how many each client gets (0–5) and when they renew. (ADR-216) | |
+| Shield renewal | Ανανέωση ασπίδων | `streak_shield_reset_day` | When shields are topped up: a day of the month for everyone, or each client's sign-up day. | |
+
 ## 5. Name clashes found, and proposals
 
 Each needs ANR's choice before the UI changes. The recommended option is first.

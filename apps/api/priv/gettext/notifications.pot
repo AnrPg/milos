@@ -703,3 +703,9 @@ msgstr ""
 
 msgid "The email key has expired"
 msgstr ""
+
+msgid "Your weekly goal changed"
+msgstr ""
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr ""

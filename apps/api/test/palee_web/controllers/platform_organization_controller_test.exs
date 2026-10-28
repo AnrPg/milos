@@ -663,7 +663,7 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
       %GamificationSetting{}
       |> GamificationSetting.changeset(%{
         organization_id: organization.id,
-        weekly_workout_target: 3,
+        streak_shields: 3,
         leaderboard_enabled: true
       })
       |> Repo.insert()

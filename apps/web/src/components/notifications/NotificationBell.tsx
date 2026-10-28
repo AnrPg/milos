@@ -473,6 +473,12 @@ function NotificationCard({
         });
       case "nutrition_plan_updated":
         return text("title") || i18n("stfNotifNutritionPlanBody");
+      // ADR-216: a coach or the box changed my weekly goal.
+      case "training_goal_updated":
+        return i18n("ntfTrainingGoalBody", {
+          name: text("set_by_nickname") || "—",
+          count: Number(notification.payload.target ?? 0),
+        });
       case "appointment_booked":
         return i18n("stfNotifAppointmentBookedBody", { client: client(), kind: kind(), time: when("starts_at") || "—" });
       case "appointment_cancelled":
@@ -612,6 +618,8 @@ function NotificationCard({
         return i18n("ntfBusinessDemoIdleTitle");
       case "nutrition_plan_updated":
         return i18n("stfNotifNutritionPlanTitle");
+      case "training_goal_updated":
+        return i18n("ntfTrainingGoalTitle");
       case "appointment_booked":
         return i18n("stfNotifAppointmentBookedTitle");
       case "appointment_cancelled":
@@ -737,6 +745,7 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
     "form_review_completed",
     "coaching_reply_overdue",
     "nutrition_plan_updated",
+    "training_goal_updated",
   ],
   bookings: [
     "booking_pending",

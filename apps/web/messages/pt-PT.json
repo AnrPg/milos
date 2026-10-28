@@ -717,13 +717,8 @@
     "markReviewed277c924": "Marcar revisado",
     "needsFollowUp067fefc": "Precisa de acompanhamento",
     "triageTags6d6b330": "etiquetas de triagem",
-    "weeklyWorkoutTarget8106ea7": "Meta de treino semanal",
-    "weeklyWorkoutTargetInfo19b03c8": "Informações sobre meta de treino semanal",
-    "howManyCompletedWorkoutsAUserNeedsPere99943b": "Quantos treinos concluídos um usuário precisa por semana naquela semana para contar para sua sequência.",
-    "validValuesInteger1Default281502ef": "Valores válidos: número inteiro ≥ 1. Padrão: 2.",
     "streakShieldResetDayd22b9ea": "Dia de redefinição do escudo de raia",
     "streakShieldResetDayInfo10555c2": "Informações do dia de redefinição do escudo de raia",
-    "dayOfMonthWhenEachUserGetsTheir605b967": "Dia do mês em que cada usuário recupera seu escudo de sequência mensal. Válido: 1–28 ou em branco para redefinição relativa à inscrição.",
     "useSignupRelativeMonthlyReseta55c3a9": "Use a redefinição mensal relativa à inscrição",
     "enableLeaderboardGloballyc5e326f": "Habilite o placar globalmente",
     "enableLeaderboardGloballyInfo62095ee": "Ativar informações globais da tabela de classificação",
@@ -1366,7 +1361,6 @@
     "signOutAllDevicesf14a071": "Desconectar todos os dispositivos",
     "nicknameAndPassword3e84316": "Apelido e senha",
     "saving56a2285": "Salvando…",
-    "markYourWeeklyRestDaysUpTo5ee5b72a": "Marque seus dias de descanso semanal (até 5)",
     "profilePictureaeb8371": "Foto do perfil",
     "uploadingd921a79": "Fazendo upload…",
     "changeAvatar60f2e98": "Alterar avatar",
@@ -4602,7 +4596,9 @@
     "formErrTooManyItems": "Escolheu demasiados: no máximo {count}.",
     "formErrTooFewItems": "Escolha pelo menos {count}.",
     "formErrInvalid": "Este valor não é aceite. Verifique-o e tente novamente.",
-    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}"
+    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}",
+    "ntfTrainingGoalTitle": "O teu objetivo semanal mudou",
+    "ntfTrainingGoalBody": "{name} definiu o teu objetivo semanal em {count, plural, one {# treino} other {# treinos}}. Podes alterá-lo nas tuas definições."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -11787,5 +11783,34 @@
     "working": "Um momento…",
     "failed": "Não resultou. Verifica a ligação e tenta novamente.",
     "status": "Não guardado: alterado noutro sítio"
+  },
+  "TrainingGoal": {
+    "title": "Objetivo semanal",
+    "hint": "Quantos treinos fazem uma semana contar. Cada semana em que o atinges mantém a tua sequência e aumenta a tua consistência e motivação. Um escudo de sequência salva uma semana falhada.",
+    "perWeek": "{count, plural, one {# treino por semana} other {# treinos por semana}}",
+    "decrease": "Menos um treino",
+    "increase": "Mais um treino",
+    "defaultNote": "Esta é a sugestão inicial. Escolhe o número que se ajusta à tua semana.",
+    "setByCoach": "Definido pelo teu coach {name}. Podes alterá-lo quando quiseres.",
+    "setByStaff": "Definido por {name}, da tua box. Podes alterá-lo quando quiseres.",
+    "saveFailed": "Não foi possível guardar o teu objetivo. Tenta novamente.",
+    "staffHint": "O objetivo pessoal de {name}: quantos treinos fazem a semana contar para a sequência. Como coach podes defini-lo; {name} é avisado e pode alterá-lo.",
+    "staffDefault": "Ainda não definido. Aplica-se o valor predefinido de {count, plural, one {# treino} other {# treinos}} por semana.",
+    "staffSetBy": "Definido pela última vez por {name}.",
+    "staffSetBySelf": "Definido pelo próprio ({name}).",
+    "staffSave": "Guardar objetivo",
+    "staffSaved": "Guardado. {name} foi avisado.",
+    "box": {
+      "goalIsPersonal": "O objetivo semanal de treinos é pessoal: cada cliente define o seu em Eu › Definições › Plano de treino, e o seu coach pode defini-lo a partir do perfil do cliente. Aqui defines apenas os escudos de sequência e quando se renovam.",
+      "shieldsLabel": "Escudos de sequência por renovação",
+      "shieldsInfo": "Sobre os escudos de sequência",
+      "shieldsHelp": "Um escudo salva a sequência de um cliente numa semana em que não atingiu o objetivo semanal. Cada cliente recebe estes escudos em cada renovação. Os escudos não usados não transitam.",
+      "shieldsValues": "Permitido: de 0 a 5. 0 desativa os escudos. Predefinição: 1.",
+      "shieldsHint": "Quantas semanas falhadas são perdoadas a cada cliente entre duas renovações.",
+      "renewalHelp": "Quando os escudos são repostos. Escreve um dia do mês (de 1 a 28) para os renovar para todos nesse dia, ou deixa vazio para que os de cada cliente se renovem todos os meses no dia em que se inscreveu.",
+      "renewalOnDay": "Os escudos renovam-se para todos no dia {day} de cada mês.",
+      "renewalOnSignup": "Vazio: os escudos de cada cliente renovam-se todos os meses no dia em que se inscreveu."
+    },
+    "sectionDescription": "O teu objetivo semanal de treinos e os teus dias de descanso."
   }
 }
