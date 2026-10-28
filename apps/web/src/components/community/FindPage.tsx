@@ -23,6 +23,7 @@ import { distinctOptions, picked } from "@/components/filters/list-filter";
 import { useListFilter } from "@/components/filters/use-remembered-filter";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
+import { BoxResultRow, useBoxSearch } from "@/components/social/BoxSearch";
 import { PersonResultRow, usePeopleSearch } from "@/components/social/PeopleSearch";
 import { isPeopleSearch } from "@/components/social/social-model";
 import { useDebounced } from "@/hooks/useDebounced";
@@ -42,7 +43,8 @@ const FIND_SHAPE = { kind: "one", box: "many" } as const;
  * «+ Βρες» (board 7 Q7): open clubs of the boxes you belong to or follow, and
  * member groups of your gyms you're not in, with a search, and «Κοντά μου»:
  * open clubs near you from Γύρω μου (ADR-154). The search finds people on
- * Palee too (ADR-193 §4), in a card shown only when someone matches.
+ * Palee too (ADR-193 §4), and boxes and coaches by name (ADR-221), each in
+ * a card shown only when something matches.
  */
 export function FindPage() {
   const t = useTranslations("Clubs");
@@ -78,17 +80,19 @@ export function FindPage() {
   const peopleTerm = useDebounced(q, 250);
   const people = usePeopleSearch(peopleTerm);
   const peopleFound = isPeopleSearch(q) && isPeopleSearch(peopleTerm) ? (people.data?.people ?? []) : [];
+  const boxSearch = useBoxSearch(peopleTerm);
+  const boxesFound = isPeopleSearch(q) && isPeopleSearch(peopleTerm) ? (boxSearch.data?.boxes ?? []) : [];
 
   return (
     <HubPage title={t("findTitle")}>
       <ClubBar clubs={clubs.data ?? []} findActive />
-      <label className="sr-only" htmlFor="find-clubs">{tSocial("findClubsAndPeople")}</label>
+      <label className="sr-only" htmlFor="find-clubs">{tSocial("findClubsBoxesPeople")}</label>
       <input
         id="find-clubs"
         type="search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder={tSocial("findClubsAndPeople")}
+        placeholder={tSocial("findClubsBoxesPeople")}
         className="min-h-11 w-full rounded-2xl px-3 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
       />
@@ -133,7 +137,16 @@ export function FindPage() {
               </ul>
             </HubCard>
           ) : null}
-          {/* Only while a search finds someone: no empty card (vision §4 principle 2). */}
+          {/* Only while a search finds something: no empty card (vision §4 principle 2). */}
+          {boxesFound.length > 0 ? (
+            <HubCard eyebrow={tSocial("boxesTitle")}>
+              <ul className="flex flex-col gap-2">
+                {boxesFound.map((box) => (
+                  <BoxResultRow key={box.organization_id} box={box} />
+                ))}
+              </ul>
+            </HubCard>
+          ) : null}
           {peopleFound.length > 0 ? (
             <HubCard eyebrow={tSocial("peopleTitle")}>
               <ul className="flex flex-col gap-2">

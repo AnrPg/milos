@@ -5019,6 +5019,11 @@
         "body": "Escríbelo como en la pizarra. El asistente hace el resto.",
         "cta": "Escribir entrenamiento"
       },
+      "page": {
+        "title": "Publica tu página pública",
+        "body": "Hasta que se publique, nadie encuentra tu box: ni por nombre ni en Cerca de mí.",
+        "cta": "Abrir la página pública"
+      },
       "invite": {
         "title": "Invita a tus clientes",
         "body": "Envía un enlace personal o activa el enlace de alta del gimnasio.",
@@ -5255,6 +5260,7 @@
     "boxFindTitle": "Aún no estás en ningún box",
     "boxFindBody": "Encuentra un box o un coach cerca de ti para reservar clases, seguir el WOD y ver tu membresía aquí.",
     "boxFindAction": "Buscar un box",
+    "boxFindByName": "O busca por nombre",
     "membershipOpen": "Suscripción y pagos",
     "newEntry": "Nueva entrada",
     "meSharing": "Compartir y visibilidad",
@@ -6045,6 +6051,9 @@
     "checkAbout": "Unas palabras sobre el gimnasio",
     "checkDisciplines": "Al menos una disciplina",
     "checkPhotos": "Fotos (opcionales, pero ayudan)",
+    "checkOnMap": "Dirección en el mapa (para aparecer en Cerca de mí)",
+    "checkOnMapAction": "Añádela",
+    "findableHint": "Mientras la página sea un borrador, nadie encuentra el box por nombre ni en Cerca de mí.",
     "publish": "Publicar",
     "unpublish": "Retirar",
     "publishedNotice": "Publicada. Ya se puede ver la página.",
@@ -6204,10 +6213,13 @@
     "relationNearby": "Cerca",
     "relationYouFollow": "Siguiendo",
     "findPeople": "Buscar gente",
-    "findClubsAndPeople": "Buscar clubs y personas",
+    "findClubsBoxesPeople": "Buscar clubs, boxes y personas",
     "peopleTitle": "Personas",
     "peopleNoMatch": "No hemos encontrado a nadie. Las cuentas privadas solo aparecen para quien ya las conoce.",
     "peopleSearchFailed": "La búsqueda no ha funcionado. Inténtalo de nuevo.",
+    "boxesTitle": "Boxes y entrenadores",
+    "boxNoMatch": "No hay ningún box ni entrenador con ese nombre. Solo aparecen los negocios que han publicado su página.",
+    "boxSearchFailed": "La búsqueda no funcionó. Inténtalo de nuevo.",
     "searchBuddies": "Buscar colegas",
     "buddiesEmpty": "Aún no tienes colegas. Cuando alguien a quien sigues te siga también, seréis colegas.",
     "followYouEmpty": "Nadie por aquí. Aquí aparece quien te sigue sin que tú lo sigas.",
@@ -6551,7 +6563,7 @@
     "clubLeaveTitle": "¿Salir de este club?",
     "clubLeaveBody": "Sus publicaciones salen de tu feed. Puedes volver a unirte desde Buscar.",
     "find": "Buscar",
-    "findTitle": "Buscar clubs y personas",
+    "findTitle": "Buscar clubs, boxes y personas",
     "findOpenClubs": "Clubs abiertos",
     "findGroups": "Grupos en tus boxes",
     "findNoClubs": "Los boxes de los que eres miembro o que sigues aún no tienen clubs abiertos.",
@@ -9888,7 +9900,9 @@
       "confirm": "Activar",
       "working": "Activando…",
       "doneTitle": "Ya estás activo",
-      "done": "{name} está activo. Los datos de prueba se han ido y todo lo que configuraste te espera."
+      "done": "{name} está activo. Los datos de prueba se han ido y todo lo que configuraste te espera.",
+      "publishNext": "Un paso más para que te encuentren: publica tu página pública. Hasta entonces tu box no aparece ni en la búsqueda ni en Cerca de mí.",
+      "openPublicPage": "Publicar la página"
     },
     "settings": {
       "title": "Cuenta de empresa",

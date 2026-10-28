@@ -5019,6 +5019,11 @@
         "body": "Escreve-o como no quadro. O assistente trata do resto.",
         "cta": "Escrever treino"
       },
+      "page": {
+        "title": "Publica a tua página pública",
+        "body": "Até ser publicada, ninguém encontra a tua box: nem pelo nome nem em Perto de mim.",
+        "cta": "Abrir a página pública"
+      },
       "invite": {
         "title": "Convida os teus clientes",
         "body": "Envia um link pessoal ou ativa o link de adesão do ginásio.",
@@ -5255,6 +5260,7 @@
     "boxFindTitle": "Ainda não estás em nenhuma box",
     "boxFindBody": "Encontra uma box ou um coach perto de ti para reservar aulas, acompanhar o WOD e ver aqui a tua inscrição.",
     "boxFindAction": "Encontrar uma box",
+    "boxFindByName": "Ou procura pelo nome",
     "membershipOpen": "Subscrição e pagamentos",
     "newEntry": "Nova entrada",
     "meSharing": "Partilha e visibilidade",
@@ -6045,6 +6051,9 @@
     "checkAbout": "Algumas palavras sobre o ginásio",
     "checkDisciplines": "Pelo menos uma modalidade",
     "checkPhotos": "Fotografias (opcionais, mas ajudam)",
+    "checkOnMap": "Morada no mapa (para apareceres em Perto de mim)",
+    "checkOnMapAction": "Adiciona-a",
+    "findableHint": "Enquanto a página for um rascunho, ninguém encontra a box pelo nome nem em Perto de mim.",
     "publish": "Publicar",
     "unpublish": "Retirar",
     "publishedNotice": "Publicada. A página já está visível.",
@@ -6204,10 +6213,13 @@
     "relationNearby": "Perto de ti",
     "relationYouFollow": "Segues",
     "findPeople": "Encontrar pessoas",
-    "findClubsAndPeople": "Procurar clubes e pessoas",
+    "findClubsBoxesPeople": "Procurar clubes, boxes e pessoas",
     "peopleTitle": "Pessoas",
     "peopleNoMatch": "Não encontrámos ninguém. As contas privadas só aparecem a quem já as conhece.",
     "peopleSearchFailed": "A pesquisa falhou. Tenta outra vez.",
+    "boxesTitle": "Boxes e treinadores",
+    "boxNoMatch": "Nenhuma box ou treinador com esse nome. Só aparecem os negócios que publicaram a sua página.",
+    "boxSearchFailed": "A pesquisa não funcionou. Tenta novamente.",
     "searchBuddies": "Procurar amigalhaços",
     "buddiesEmpty": "Ainda não tens amigalhaços. Quando alguém que segues te seguir também, ficam amigalhaços.",
     "followYouEmpty": "Ninguém aqui. Aqui aparece quem te segue sem que o sigas.",
@@ -6551,7 +6563,7 @@
     "clubLeaveTitle": "Sair deste club?",
     "clubLeaveBody": "As publicações saem do teu feed. Podes voltar a entrar em Encontrar.",
     "find": "Encontrar",
-    "findTitle": "Encontrar clubs e pessoas",
+    "findTitle": "Encontrar clubs, boxes e pessoas",
     "findOpenClubs": "Clubs abertos",
     "findGroups": "Grupos nas tuas boxes",
     "findNoClubs": "As boxes de que és membro ou que segues ainda não têm clubs abertos.",
@@ -9888,7 +9900,9 @@
       "confirm": "Ativar",
       "working": "A ativar…",
       "doneTitle": "Já estás ativo",
-      "done": "{name} está ativo. Os dados de demonstração foram removidos e tudo o que configuraste está à tua espera."
+      "done": "{name} está ativo. Os dados de demonstração foram removidos e tudo o que configuraste está à tua espera.",
+      "publishNext": "Mais um passo para te encontrarem: publica a tua página pública. Até lá a tua box não aparece nem na pesquisa nem em Perto de mim.",
+      "openPublicPage": "Publicar a página"
     },
     "settings": {
       "title": "Conta empresarial",

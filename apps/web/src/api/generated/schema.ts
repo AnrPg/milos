@@ -598,6 +598,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-221: published, live boxes and independent coaches whose name holds the query (accents and case ignored) */
+        get: operations["PaleeWeb.BoxSearchController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-vocabulary": {
         parameters: {
             query?: never;
@@ -13603,7 +13620,7 @@ export interface components {
                 auto: boolean;
                 done: boolean;
                 /** @enum {string} */
-                id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 skipped: boolean;
             }[];
             total: number;
@@ -18336,6 +18353,8 @@ export interface components {
             lock_version: number;
             /** @description What the draft still needs before it can be published. */
             missing: ("about" | "disciplines")[];
+            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+            on_map?: boolean;
             photos: {
                 alt_text?: string | null;
                 content_type: string;
@@ -18438,6 +18457,8 @@ export interface components {
                 lock_version: number;
                 /** @description What the draft still needs before it can be published. */
                 missing: ("about" | "disciplines")[];
+                /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                on_map?: boolean;
                 photos: {
                     alt_text?: string | null;
                     content_type: string;
@@ -18491,6 +18512,41 @@ export interface components {
             /** @description Ready box_photo media of the gallery, in display order. */
             photo_ids?: string[];
             services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** BoxSearchResponse */
+        BoxSearchResponse: {
+            boxes: {
+                city?: string | null;
+                logo_url?: string | null;
+                /** @enum {string} */
+                my_status: "none" | "requested" | "active";
+                name: string;
+                neighbourhood?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @enum {string} */
+                provider_kind: "gym" | "coach";
+                slug: string;
+            }[];
+        };
+        /**
+         * BoxSearchResult
+         * @description ADR-221: a published, live box or independent coach found by name
+         */
+        BoxSearchResult: {
+            city?: string | null;
+            logo_url?: string | null;
+            /** @enum {string} */
+            my_status: "none" | "requested" | "active";
+            name: string;
+            neighbourhood?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            /** @enum {string} */
+            provider_kind: "gym" | "coach";
+            slug: string;
         };
         /** BoxTagSuggestion */
         BoxTagSuggestion: {
@@ -41776,6 +41832,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxSearchController.index": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Boxes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        boxes: {
+                            city?: string | null;
+                            logo_url?: string | null;
+                            /** @enum {string} */
+                            my_status: "none" | "requested" | "active";
+                            name: string;
+                            neighbourhood?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            /** @enum {string} */
+                            provider_kind: "gym" | "coach";
+                            slug: string;
+                        }[];
+                    };
                 };
             };
         };
@@ -71620,7 +71713,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -71643,7 +71736,7 @@ export interface operations {
                     /** @enum {string} */
                     action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
                     /** @enum {string} */
-                    step?: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                    step?: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 };
             };
         };
@@ -71664,7 +71757,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -73072,6 +73165,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73200,6 +73295,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73425,6 +73522,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73602,6 +73701,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
