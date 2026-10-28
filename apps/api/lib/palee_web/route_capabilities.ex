@@ -66,6 +66,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminUserController, :program_workout} => [:manage_coaching],
     {W.AdminUserController, :program_workout_for_users} => [:manage_coaching],
     {W.AdminUserController, :place_in_class} => [:book_for_clients, :manage_schedule],
+    {W.AdminUserController, :class_placement_options} => [:book_for_clients, :manage_schedule],
     {W.AdminUserController, :prs} => [:view_client_training],
     {W.AdminUserController, :pr_members} => [:view_client_training],
     {W.AdminUserController, :incidents} => [:view_health],

@@ -2434,6 +2434,42 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp reserve_for_membership!(membership, request) do
+    case authorize_reservation(membership, request) do
+      {:ok, %{decision: decision, subscription: subscription} = evaluation}
+      when not is_nil(subscription) ->
+        if allowance = Map.get(evaluation.request, :allowance) do
+          entry =
+            insert_usage_entry!(%{
+              membership_id: membership.id,
+              membership_package_subscription_id: subscription.id,
+              allowance_key: to_string(allowance),
+              event_type: "reserve",
+              quantity_delta: Map.get(evaluation.request, :quantity, 1),
+              period_start: evaluation.period_start,
+              period_end: evaluation.period_end,
+              source_context: to_string(Map.get(request, :source_context, "application")),
+              source_id: Map.get(request, :source_id),
+              idempotency_key: Map.fetch!(request, :idempotency_key),
+              metadata: Map.get(request, :metadata, %{})
+            })
+
+          activate_on_first_use!(subscription, evaluation.occurred_on)
+          Map.put(entry, :decision, decision)
+        else
+          %{id: nil, decision: decision, observed?: true}
+        end
+
+      {:ok, %{decision: decision}} ->
+        %{id: nil, decision: decision, observed?: true}
+
+      {:error, reason} ->
+        Repo.rollback(reason)
+    end
+  end
+
+  # The decision `reserve_entitlement/2` takes, without writing anything:
+  # `{:ok, evaluation}` or `{:error, reason | {reason, details}}`.
+  defp authorize_reservation(membership, request) do
     occurred_on = request_date(request)
     base_entitlement = entitlement_for_membership(membership)
     mode = entitlement_enforcement_mode()
@@ -2443,64 +2479,95 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       select_subscription(membership.id, base_entitlement, request, occurred_on)
 
     if is_nil(subscription) and mode != :observe and Map.get(request, :actor_role) != :admin and
-         frozen_subscriptions(membership.id, occurred_on) != [],
-       do: Repo.rollback(:finance_membership_frozen)
+         frozen_subscriptions(membership.id, occurred_on) != [] do
+      {:error, :finance_membership_frozen}
+    else
+      entitlement =
+        if subscription do
+          Map.put(base_entitlement, :plan, subscription.params_snapshot || %{})
+        else
+          base_entitlement
+        end
 
-    entitlement =
-      if subscription do
-        Map.put(base_entitlement, :plan, subscription.params_snapshot || %{})
-      else
-        base_entitlement
+      allowance = Map.get(request, :allowance)
+
+      {period_start, period_end, committed, extensions, limit} =
+        allowance_state(subscription, allowance, occurred_on, membership.id)
+
+      policy_request =
+        request
+        |> Map.put(:committed, committed)
+        |> Map.put(:limit, effective_limit(limit, extensions))
+
+      evaluation = %{
+        request: request,
+        subscription: subscription,
+        occurred_on: occurred_on,
+        period_start: period_start,
+        period_end: period_end
+      }
+
+      case EntitlementPolicy.authorize(entitlement, policy_request,
+             mode: mode,
+             actor_role: Map.get(request, :actor_role)
+           ) do
+        {:ok, decision} ->
+          {:ok, Map.put(evaluation, :decision, decision)}
+
+        :ok ->
+          {:ok,
+           %{evaluation | subscription: nil} |> Map.put(:decision, %{remaining: :not_metered})}
+
+        {:error, reason} ->
+          case entitlement_denial_details(reason, policy_request) do
+            nil -> {:error, reason}
+            details -> {:error, {reason, details}}
+          end
+
+        {:error, reason, details} ->
+          {:error, {reason, details}}
       end
+    end
+  end
 
-    allowance = Map.get(request, :allowance)
+  @impl true
+  def check_entitlements(_user_id, []), do: []
 
-    {period_start, period_end, committed, extensions, limit} =
-      allowance_state(subscription, allowance, occurred_on, membership.id)
+  def check_entitlements(user_id, requests) do
+    membership = tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one()
 
-    policy_request =
-      request
-      |> Map.put(:committed, committed)
-      |> Map.put(:limit, effective_limit(limit, extensions))
+    requests
+    |> Enum.map(&atom_key_map/1)
+    |> Enum.map_reduce(%{}, fn request, seen ->
+      key = request |> Map.drop([:starts_at]) |> Map.put(:on, request_date(request))
 
-    case EntitlementPolicy.authorize(entitlement, policy_request,
-           mode: mode,
+      case seen do
+        %{^key => result} ->
+          {result, seen}
+
+        _new ->
+          result = check_entitlement(membership, request)
+          {result, Map.put(seen, key, result)}
+      end
+    end)
+    |> elem(0)
+  end
+
+  defp check_entitlement(nil, request) do
+    case EntitlementPolicy.authorize(nil, request,
+           mode: entitlement_enforcement_mode(),
            actor_role: Map.get(request, :actor_role)
          ) do
-      {:ok, decision} ->
-        if allowance && subscription do
-          entry =
-            insert_usage_entry!(%{
-              membership_id: membership.id,
-              membership_package_subscription_id: subscription.id,
-              allowance_key: to_string(allowance),
-              event_type: "reserve",
-              quantity_delta: Map.get(request, :quantity, 1),
-              period_start: period_start,
-              period_end: period_end,
-              source_context: to_string(Map.get(request, :source_context, "application")),
-              source_id: Map.get(request, :source_id),
-              idempotency_key: Map.fetch!(request, :idempotency_key),
-              metadata: Map.get(request, :metadata, %{})
-            })
+      {:error, reason} -> {:error, reason}
+      _allowed -> :ok
+    end
+  end
 
-          activate_on_first_use!(subscription, occurred_on)
-          Map.put(entry, :decision, decision)
-        else
-          %{id: nil, decision: decision, observed?: true}
-        end
-
-      :ok ->
-        %{id: nil, decision: %{remaining: :not_metered}, observed?: true}
-
-      {:error, reason} ->
-        case entitlement_denial_details(reason, policy_request) do
-          nil -> Repo.rollback(reason)
-          details -> Repo.rollback({reason, details})
-        end
-
-      {:error, reason, details} ->
-        Repo.rollback({reason, details})
+  defp check_entitlement(membership, request) do
+    case authorize_reservation(membership, request) do
+      {:ok, _evaluation} -> :ok
+      {:error, {reason, _details}} -> {:error, reason}
+      {:error, reason} -> {:error, reason}
     end
   end
 

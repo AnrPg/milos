@@ -11,6 +11,7 @@ defmodule PaleeWeb.AdminUserController do
     GetAdminUserPRs,
     GetAdminUserSchedule,
     GetAdminUserTrainingHistory,
+    GetClassPlacementOptions,
     GrantUserAllowance,
     DeleteAdminUser,
     ListAdminUsers,
@@ -351,6 +352,7 @@ defmodule PaleeWeb.AdminUserController do
     schedule: [:view_client_training, :run_classes],
     program_workout: [:manage_coaching],
     place_in_class: [:book_for_clients, :manage_schedule],
+    class_placement_options: [:book_for_clients, :manage_schedule],
     incidents: [:view_health],
     messages: [:message_clients],
     coaching_context: [:view_client_training]
@@ -363,6 +365,7 @@ defmodule PaleeWeb.AdminUserController do
               :schedule,
               :program_workout,
               :place_in_class,
+              :class_placement_options,
               :incidents,
               :messages,
               :coaching_context
@@ -502,10 +505,68 @@ defmodule PaleeWeb.AdminUserController do
   )
 
   operation(:place_in_class,
-    summary: "Book a member into a class, optionally moving them out of an existing booking",
+    summary:
+      "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-225)",
     parameters: [@id_parameter],
     request_body: @class_placement_body,
     responses: [created: {"Class placement result", "application/json", @summary_object}]
+  )
+
+  @placement_class %Schema{
+    type: :object,
+    additionalProperties: false,
+    required: [
+      :blocked_reason,
+      :capacity,
+      :duration_minutes,
+      :name,
+      :scheduled_at,
+      :slot_id,
+      :spots_remaining
+    ],
+    properties: %{
+      slot_id: @user_id,
+      name: %Schema{type: :string},
+      scheduled_at: %Schema{type: :string, format: :"date-time"},
+      duration_minutes: %Schema{type: :integer, nullable: true},
+      capacity: %Schema{type: :integer, nullable: true},
+      spots_remaining: %Schema{type: :integer},
+      blocked_reason: %Schema{
+        type: :string,
+        nullable: true,
+        description:
+          "Why the class cannot take the member now, as the booking error code (slot_full, class_paused, class_not_published, already_booked, finance_*), or null."
+      }
+    }
+  }
+  @placement_booking %Schema{
+    type: :object,
+    additionalProperties: false,
+    required: [:booking_id, :name, :scheduled_at, :slot_id, :status],
+    properties: %{
+      booking_id: @user_id,
+      slot_id: @user_id,
+      name: %Schema{type: :string},
+      scheduled_at: %Schema{type: :string, format: :"date-time"},
+      status: %Schema{type: :string, enum: ["pending", "approved"]}
+    }
+  }
+  @placement_options %Schema{
+    type: :object,
+    additionalProperties: false,
+    required: [:bookings, :classes, :lookahead_days, :timezone],
+    properties: %{
+      timezone: %Schema{type: :string, description: "The box's IANA time zone (ADR-179)."},
+      lookahead_days: %Schema{type: :integer},
+      bookings: %Schema{type: :array, items: @placement_booking},
+      classes: %Schema{type: :array, items: @placement_class}
+    }
+  }
+
+  operation(:class_placement_options,
+    summary: "What staff can choose when booking a member into a class or moving them (ADR-225)",
+    parameters: [@id_parameter],
+    responses: [ok: {"Class placement options", "application/json", @placement_options}]
   )
 
   operation(:prs,
@@ -1130,6 +1191,16 @@ defmodule PaleeWeb.AdminUserController do
              conn.body_params
            ) do
       conn |> put_status(:created) |> json(payload)
+    end
+  end
+
+  def class_placement_options(conn, params) do
+    with {:ok, payload} <-
+           GetClassPlacementOptions.call(
+             conn.assigns.tenant_context,
+             params["id"] || params[:id]
+           ) do
+      json(conn, payload)
     end
   end
 

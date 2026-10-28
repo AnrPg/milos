@@ -886,6 +886,7 @@ defmodule PaleeWeb.Router do
     get("/users/:id/history", TrainingHistoryController, :for_user)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
+    get("/users/:id/class-placement", AdminUserController, :class_placement_options)
     post("/users/:id/class-placement", AdminUserController, :place_in_class)
     get("/users/:id/incidents", AdminUserController, :incidents)
     get("/users/:id/messages", AdminUserController, :messages)

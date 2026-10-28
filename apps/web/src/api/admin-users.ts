@@ -222,6 +222,16 @@ export type AdminUserPRs = {
   prs: AdminUserPR[];
 };
 
+/** ADR-225: the member's movable bookings and the classes staff may place them in. */
+export type ClassPlacementOptions =
+  paths["/api/org/{organization_slug}/admin/users/{id}/class-placement"]["get"]["responses"][200]["content"]["application/json"];
+export type ClassPlacementBooking = ClassPlacementOptions["bookings"][number];
+export type ClassPlacementClass = ClassPlacementOptions["classes"][number];
+
+export function fetchClassPlacementOptions(token: string, userId: string) {
+  return apiRequest<ClassPlacementOptions>(`/admin/users/${userId}/class-placement`, { token });
+}
+
 export function placeAdminUserInClass(
   token: string,
   userId: string,
