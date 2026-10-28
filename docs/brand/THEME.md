@@ -100,7 +100,8 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Placeholder | `--placeholder` |
 | Invalid field border / message | `--danger` / `ui/ErrorNotice variant="field"` |
 | Autofilled field (WebKit) | `--control-bg` fill, `--text` text |
-| Dropdown (`ui/Select`, ADR-182; native `<select>` is banned by a guard test): trigger / chevron | `--control-bg`, `--control-border`, `--text` / `--muted` |
+| Dropdown (`ui/Select`, ADR-182; native `<select>` is banned by a guard test): trigger / chevron | `--control-bg`, `--control-border`, `--text` / `--muted` (or `--select-chevron` when the trigger sets it) |
+| Tabs folded into a dropdown on small screens (`filters/SegmentPicker`): trigger / chevron | `--primary` fill and border, `--primary-contrast` text, `--shadow-sm` / `--primary-contrast` |
 | Dropdown: open list / group header / hovered or keyboard-active option / chosen option and its ✓ | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--text` at 7% with a `--focus-ring` outline / `--primary` at 14% and `--primary` |
 | Date and time pickers (`ui/DateInput`, `TimeInput`, `DateTimeInput`, ADR-182): field / icon / placeholder | `--control-bg`, `--control-border`, `--text` / `--muted` / `--placeholder` |
 | Calendar: panel / weekday header / other-month days / today ring / chosen day / Today button / Clear | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--dim` / `--spark` / `--primary` with `--primary-contrast` / `--spark` with `--spark-contrast` / `--muted` |
