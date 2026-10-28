@@ -221,3 +221,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-222 | Record money received at the desk; the billing setup picks the receipt, paid invoice or invoice it settles | Accepted |
 | ADR-223 | A new WOD written in context comes back to its form and is assigned to it; programming copies keep how they were written | Accepted |
 | ADR-224 | A workout's `body` has its own shape per way of writing (free text, text sections, structured) | Accepted |
+| ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |

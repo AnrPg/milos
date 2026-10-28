@@ -515,13 +515,14 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
   if (joinLink.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("loading")}</p>;
   if (joinLink.error) return <ErrorNotice>{localizeError(joinLink.error, uiT)}</ErrorNotice>;
 
-  const data = joinLink.data!;
+  // A partial answer must not take the whole settings hub down: a missing link reads as off.
+  const data = joinLink.data;
 
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{t("publicIntro")}</p>
-      <JoinLinkCard t={t} slug={slug} role="member" enabled={data.member.enabled} save={save} />
-      <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data.athlete.enabled} athleteKey={data.athlete.key} save={save} />
+      <JoinLinkCard t={t} slug={slug} role="member" enabled={data?.member?.enabled ?? false} save={save} />
+      <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data?.athlete?.enabled ?? false} athleteKey={data?.athlete?.key} save={save} />
       <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicStaffNote")}</p>
       {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
     </div>

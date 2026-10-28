@@ -58,14 +58,14 @@ defmodule Palee.Scheduling.ScheduledClass do
       :duration_minutes,
       :scheduled_at,
       :capacity,
-      :auto_approve,
-      :booking_timeout_minutes
+      :auto_approve
     ])
     # ADR-176: the WOD is optional; a standalone class without one is a draft.
     |> validate_number(:capacity, greater_than: 0)
     |> validate_length(:name, min: 1, max: 120)
     |> validate_number(:duration_minutes, greater_than: 0, less_than_or_equal_to: 1440)
-    |> validate_number(:booking_timeout_minutes, greater_than: 0)
+    # ADR-226: nil = a request waits for approval until the class starts.
+    |> validate_number(:booking_timeout_minutes, greater_than: 0, less_than_or_equal_to: 10_080)
     |> validate_future_schedule()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)

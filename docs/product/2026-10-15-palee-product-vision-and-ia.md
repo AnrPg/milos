@@ -255,6 +255,8 @@ Why swipe works for people and not for clubs: swipe makes sense when **both side
 - Injury warning (existing `InjuryWarnings`, acknowledge flow) shows above the buttons when relevant.
 - **Στόχοι** row → goals screen (§7.6).
 
+*Decision (ADR-226, 2026-10-28):* a class without automatic confirmation shows members «Απαιτεί έγκριση · απάντηση μέσα σε …» (or «έως την έναρξη» when the box set no limit). It never shows a booking deadline: bookings stay open until the class starts. Late cancellation is set in hours and minutes.
+
 ### 7.5 Check-in with QR (fewest taps) [PARTIAL]
 | Method | Taps | Web? | Notes |
 |---|---|---|---|

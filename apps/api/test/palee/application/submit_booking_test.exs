@@ -72,6 +72,47 @@ defmodule Palee.Application.SubmitBookingTest do
     end)
   end
 
+  test "a pending request times out after its limit, never after the class starts (ADR-226)" do
+    Testing.with_testing_mode(:manual, fn ->
+      admin = admin_fixture()
+      member = user_fixture()
+      other_member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      context = legacy_tenant_context(member)
+      other_context = legacy_tenant_context(other_member)
+      workout = workout_fixture(admin)
+      starts_at = DateTime.add(DateTime.utc_now() |> DateTime.truncate(:second), 3 * 3600)
+
+      limited =
+        slot_fixture(workout, %{
+          auto_approve: false,
+          booking_timeout_minutes: 30,
+          scheduled_at: starts_at
+        })
+
+      unlimited =
+        slot_fixture(workout, %{
+          auto_approve: false,
+          booking_timeout_minutes: nil,
+          scheduled_at: DateTime.add(starts_at, 3600)
+        })
+
+      assert unlimited.booking_timeout_minutes == nil
+
+      assert {:ok, limited_booking} = SubmitBooking.call(context, member, limited.id)
+      assert {:ok, open_booking} = SubmitBooking.call(other_context, other_member, unlimited.id)
+
+      [limited_job] =
+        all_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => limited_booking.id})
+
+      [open_job] =
+        all_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => open_booking.id})
+
+      assert_in_delta DateTime.diff(limited_job.scheduled_at, DateTime.utc_now()), 30 * 60, 60
+      assert DateTime.compare(open_job.scheduled_at, unlimited.scheduled_at) == :eq
+    end)
+  end
+
   test "submitting an auto-approved booking resolves immediately" do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture()
