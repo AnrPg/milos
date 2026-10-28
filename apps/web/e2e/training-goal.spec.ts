@@ -167,7 +167,7 @@ test.describe("personal weekly goal (ADR-222)", () => {
     await common(page, "owner");
     const patches: Record<string, unknown>[] = [];
     let gamification = { streak_shields: 1, streak_shield_reset_day: null as number | null, leaderboard_enabled: true };
-    const settings = () => ({ notifications: { enabled: false }, gamification, finance: null, scheduling: null, workouts: null, provider: null });
+    const settings = () => ({ notifications: { enabled: false }, gamification, finance: {}, scheduling: {}, workouts: {}, provider: {} });
     await page.route("**/api/org/*/admin/settings", (route) => {
       if (route.request().method() === "PATCH") {
         const body = route.request().postDataJSON() as { gamification?: typeof gamification };
@@ -177,6 +177,10 @@ test.describe("personal weekly goal (ADR-222)", () => {
       return route.fulfill(json(settings()));
     });
 
+    // The settings hub also shows the join links (ADR-216).
+    await page.route("**/api/org/kypseli/join-link", (route) =>
+      route.fulfill(json({ member: { enabled: false }, athlete: { enabled: false, key: null } })),
+    );
     await page.goto("/org/kypseli/admin/settings#gamification");
     const section = page.locator("section#gamification");
     await expect(section.getByTestId("weekly-goal-is-personal")).toContainText("The weekly workout goal is personal", { timeout: 60_000 });
