@@ -825,6 +825,17 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-220.
+  def build("member_leaving", payload, localize) do
+    bindings = %{nickname: payload["person_nickname"], date: payload["leaving_on"]}
+
+    %{
+      title: localize.("A box member is leaving", %{}),
+      body: localize.("%{nickname} is leaving the box. Last day: %{date}.", bindings),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
   # ADR-155 (board 10, Q3).
   def build("check_in_visitor", payload, localize) do
     bindings = %{

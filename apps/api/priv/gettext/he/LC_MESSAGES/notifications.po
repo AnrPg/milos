@@ -708,3 +708,9 @@ msgstr "מפתח ה-SMTP של Palee פג ב-%{date}, ולכן Palee לא יכו�
 
 msgid "The email key has expired"
 msgstr "מפתח המייל פג"
+
+msgid "A box member is leaving"
+msgstr "חבר בבוקס עוזב"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} עוזב/ת את הבוקס. יום אחרון: %{date}."

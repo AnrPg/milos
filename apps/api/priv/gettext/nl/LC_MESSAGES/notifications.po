@@ -708,3 +708,9 @@ msgstr "De SMTP-sleutel van Palee is op %{date} verlopen, dus Palee kan geen e-m
 
 msgid "The email key has expired"
 msgstr "De e-mailsleutel is verlopen"
+
+msgid "A box member is leaving"
+msgstr "Een boxlid vertrekt"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} verlaat de box. Laatste dag: %{date}."

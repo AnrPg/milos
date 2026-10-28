@@ -594,6 +594,30 @@ defmodule Palee.Notifications do
     end)
   end
 
+  # ADR-220: a member is leaving the box. The staff who manage billing hear
+  # the last day and the reason, once per leave.
+  def process_event("member_leaving", payload) do
+    organization_id = field(payload, :organization_id)
+    member_id = field(payload, :member_user_id)
+
+    organization_id
+    |> Organizations.list_user_ids_with_capability(:manage_billing)
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(:member_leaving, %{user_id: staff_id}, %{
+             organization_id: organization_id,
+             member_user_id: member_id,
+             person_nickname: field(payload, :person_nickname),
+             leaving_on: field(payload, :leaving_on),
+             reason: field(payload, :reason),
+             dedupe_key: "member_leaving:#{field(payload, :left_at)}:#{member_id}:#{staff_id}",
+             url: "/admin/users/#{member_id}"
+           }) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)
