@@ -79,7 +79,7 @@ defmodule PaleeWeb.ShareLinkEmailControllerTest do
     assert message.locale == "el"
     assert message.subject =~ "Μαρία Π."
     assert message.text =~ "/r/#{code}"
-    assert message.text =~ "Αν δεν γνωρίζετε αυτό το άτομο"
+    assert message.text =~ "Αν δεν γνωρίζεις αυτό το άτομο"
 
     assert String.starts_with?(
              message.idempotency_key,
