@@ -348,7 +348,7 @@ test.describe("QR check-in", () => {
       await emit(page, "S1membercode");
       const result = page.getByTestId("desk-result");
       await expect(result).toContainText("Eleni Papadopoulou");
-      await expect(result).toContainText("Package expired");
+      await expect(result).toContainText("Subscription package expired");
       await expect(result).toContainText("Payment due");
       await expect(page.getByTestId("desk-check-in")).toBeHidden();
       expect(calls.scans).toEqual([{ code: "S1membercode", auto: false }]);

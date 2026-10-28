@@ -10,7 +10,7 @@ export type MyInsights = components["schemas"]["MyInsights"];
 export type Insight = MyInsights["insights"][number];
 export type InsightParams = components["schemas"]["InsightParams"];
 
-export const myInsightsKey = (token: string | null) => ["me", "insights", token] as const;
+export const myInsightsKey = () => ["me", "insights"] as const;
 
 export function fetchMyInsights(token: string) {
   return apiRequest<MyInsights>("/me/insights", { token, scope: "account" });

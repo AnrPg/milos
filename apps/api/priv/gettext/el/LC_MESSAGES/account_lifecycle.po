@@ -5,13 +5,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Someone tried to sign up with your email"
-msgstr "Κάποιος προσπάθησε να εγγραφεί με το email σας"
+msgstr "Κάποιος προσπάθησε να εγγραφεί με το email σου"
 
 msgid "Someone tried to create a %{product} account with this email address."
 msgstr "Κάποιος προσπάθησε να δημιουργήσει λογαριασμό στο %{product} με αυτή τη διεύθυνση email."
 
 msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
-msgstr "Αν ήσασταν εσείς, συνδεθείτε για να προσθέσετε προφίλ ή επαναφέρετε τον κωδικό σας, αν τον ξεχάσατε."
+msgstr "Αν ήσουν εσύ, συνδέσου για να προσθέσεις προφίλ ή κάνε επαναφορά του κωδικού σου, αν τον ξέχασες."
 
 msgid "Sign in"
 msgstr "Σύνδεση"
@@ -20,25 +20,25 @@ msgid "Reset password"
 msgstr "Επαναφορά κωδικού"
 
 msgid "Forgot your password?"
-msgstr "Ξεχάσατε τον κωδικό σας;"
+msgstr "Ξέχασες τον κωδικό σου;"
 
 msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
-msgstr "Αν δεν ήσασταν εσείς, αγνοήστε αυτό το email. Δεν δημιουργήθηκε λογαριασμός και δεν άλλαξε τίποτα."
+msgstr "Αν δεν ήσουν εσύ, αγνόησε αυτό το email. Δεν δημιουργήθηκε λογαριασμός και δεν άλλαξε τίποτα."
 
 msgid "Confirm deleting your account"
-msgstr "Επιβεβαιώστε τη διαγραφή του λογαριασμού σας"
+msgstr "Επιβεβαίωσε τη διαγραφή του λογαριασμού σου"
 
 msgid "You asked to delete your profile @%{handle}."
-msgstr "Ζητήσατε να διαγραφεί το προφίλ σας @%{handle}."
+msgstr "Ζήτησες να διαγραφεί το προφίλ σου @%{handle}."
 
 msgid "You asked to delete your account with all its profiles."
-msgstr "Ζητήσατε να διαγραφεί ο λογαριασμός σας μαζί με όλα τα προφίλ του."
+msgstr "Ζήτησες να διαγραφεί ο λογαριασμός σου μαζί με όλα τα προφίλ του."
 
 msgid "Confirm deleting your profile"
-msgstr "Επιβεβαιώστε τη διαγραφή του προφίλ σας"
+msgstr "Επιβεβαίωσε τη διαγραφή του προφίλ σου"
 
 msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
-msgstr "Μόλις επιβεβαιώσετε, η διαγραφή θα γίνει σε %{days} ημέρες. Μέχρι τότε μπορείτε να την αναιρέσετε."
+msgstr "Μόλις επιβεβαιώσεις, η διαγραφή θα γίνει σε %{days} ημέρες. Μέχρι τότε μπορείς να την αναιρέσεις."
 
 msgid "Confirm deletion"
 msgstr "Επιβεβαίωση διαγραφής"
@@ -47,4 +47,4 @@ msgid "The link expires in 24 hours."
 msgstr "Ο σύνδεσμος λήγει σε 24 ώρες."
 
 msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
-msgstr "Αν δεν το ζητήσατε εσείς, μην ανοίξετε τον σύνδεσμο και αλλάξτε τον κωδικό σας: κάποιος άλλος τον γνωρίζει."
+msgstr "Αν δεν το ζήτησες εσύ, μην ανοίξεις τον σύνδεσμο και άλλαξε τον κωδικό σου: κάποιος άλλος τον γνωρίζει."

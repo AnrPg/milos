@@ -22,7 +22,7 @@ defmodule Palee.EmailTest do
 
     found = assert_email_enqueued(kind: :sample_notice, to: "jo@box.test")
     assert found.text =~ "Open:\nhttps://palee.app/x"
-    assert found.html =~ "Λαμβάνετε αυτό το email"
+    assert found.html =~ "Λαμβάνεις αυτό το email"
 
     assert {:ok, %{status: "queued", attempts: 0}} = Email.status(message.id)
     assert {:error, :not_found} = Email.status(Ecto.UUID.generate())

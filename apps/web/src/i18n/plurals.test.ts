@@ -20,6 +20,6 @@ describe("package-count translations", () => {
       fs.readFileSync(path.resolve("messages/el.json"), "utf8"),
     ) as { Ui: Record<string, string> };
 
-    expect(catalog.Ui.activePackagesCount02af29c).toContain("# ενεργά πακέτα");
+    expect(catalog.Ui.activePackagesCount02af29c).toContain("# ενεργά πακέτα συνδρομής");
   });
 });

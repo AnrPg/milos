@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Abriu um lugar em %{class}. A tua reserva está confirmada ou a aguardar aprovação."
 
 msgid "Your package ends soon"
-msgstr "O teu pacote termina em breve"
+msgstr "O teu pacote de subscrição termina em breve"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} termina a %{date}."
@@ -708,3 +708,9 @@ msgstr "A chave SMTP do Palee expirou a %{date}, por isso o Palee não consegue 
 
 msgid "The email key has expired"
 msgstr "A chave de email expirou"
+
+msgid "A box member is leaving"
+msgstr "Um membro da box vai sair"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} vai sair da box. Último dia: %{date}."

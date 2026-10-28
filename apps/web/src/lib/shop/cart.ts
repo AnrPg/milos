@@ -113,7 +113,7 @@ export function cartTotals(
   return { lines, missing, currency, subtotalCents, discountCents, totalCents: subtotalCents - discountCents };
 }
 
-/** The member's price for one unit, for «Με το πακέτο σου: 22,50 €». */
+/** The member's price for one unit, for «Με το πακέτο συνδρομής σου: 22,50 €». */
 export function memberUnitPriceCents(unitPriceCents: number, applies: boolean, percent: number | null | undefined) {
   return unitPriceCents - lineDiscountCents(unitPriceCents, applies, percent);
 }

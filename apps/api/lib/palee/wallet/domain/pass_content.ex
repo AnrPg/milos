@@ -37,7 +37,7 @@ defmodule Palee.Wallet.Domain.PassContent do
     "el" => %{
       member: "Μέλος",
       next: "Επόμενη κράτηση",
-      class: "Μάθημα",
+      class: "Τμήμα",
       none: "Καμία κράτηση",
       description: "Κάρτα check-in",
       how: "Δείξε τον κωδικό στην είσοδο. Η κάρτα ενημερώνεται όταν κλείνεις ή ακυρώνεις θέση.",

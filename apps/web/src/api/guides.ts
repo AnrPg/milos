@@ -11,7 +11,7 @@ export type GuideProgressList = components["schemas"]["GuideProgressList"];
 export type GuideProgressUpdate = components["schemas"]["GuideProgressUpdate"];
 export type GuideStatus = GuideProgress["status"];
 
-export const guideProgressKey = (token: string | null) => ["me", "guides", token] as const;
+export const guideProgressKey = () => ["me", "guides"] as const;
 
 export function fetchGuideProgress(token: string) {
   return apiRequest<GuideProgressList>("/me/guides", { token, scope: "account" });

@@ -17,7 +17,7 @@ export function ProgressDepthSections({ filter }: { filter: ProgressQuery }) {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const query = useQuery({
-    queryKey: myTrainingDepthKey(token, filter.range, filter.sources),
+    queryKey: myTrainingDepthKey(filter.range, filter.sources),
     enabled: Boolean(token),
     queryFn: () => fetchMyTrainingDepth(token!, filter.range, filter.sources),
     placeholderData: (previous) => previous,

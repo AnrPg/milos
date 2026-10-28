@@ -53,7 +53,7 @@ defmodule Palee.Email.Templates.OrganizationInvitationTest do
 
     assert OrganizationInvitation.subject(assigns, "el") =~ "«Box <Kypseli> & Co»"
     assert text =~ "Μέλος box"
-    assert text =~ "σας προσκαλεί"
+    assert text =~ "σε προσκαλεί"
     refute text =~ "Παραρτήματα"
   end
 

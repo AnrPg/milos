@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
-import { fetchOrganizationMemberships } from "@/api/organizations";
 import { selectProvider } from "@/api/providers";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { useOrganizationMemberships } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
 
 type OrganizationSelectorProps = {
@@ -39,12 +39,7 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
     }
   });
 
-  const memberships = useQuery({
-    queryKey: ["organization-memberships"],
-    enabled: Boolean(tokens?.access_token),
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-    staleTime: 60_000,
-  });
+  const memberships = useOrganizationMemberships();
 
   const pathSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? "";
   const membershipList = useMemo(

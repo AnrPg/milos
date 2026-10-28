@@ -60,7 +60,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
   const t = useTranslations("Schedule");
   const locale = useLocale();
   const todayKey = dateKeyInZone(new Date(), timeZone);
-  // ADR-214: a class cannot start in the past, so past days offer no "+ Slot".
+  // ADR-214: a class cannot start in the past, so past days offer no "+ Class".
   const canAddOn = (date: string) => isAdmin && date >= todayKey;
   const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days, timeZone);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {

@@ -22,7 +22,7 @@ export function InsightsCard() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const client = useQueryClient();
-  const key = myInsightsKey(token);
+  const key = myInsightsKey();
 
   const query = useQuery({
     queryKey: key,

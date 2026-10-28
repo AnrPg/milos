@@ -703,3 +703,9 @@ msgstr ""
 
 msgid "The email key has expired"
 msgstr ""
+
+msgid "A box member is leaving"
+msgstr ""
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr ""

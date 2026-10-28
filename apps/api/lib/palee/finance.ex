@@ -432,6 +432,22 @@ defmodule Palee.Finance do
   def subscriptions_needing_expiry_notice(context, kind, days),
     do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
 
+  # ADR-220: renewal choice and leaving the box.
+  def set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, by),
+    do:
+      scoped(context, fn ->
+        FinanceStore.set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)
+      end)
+
+  def membership_leave_preview(context, user_id),
+    do: scoped(context, fn -> FinanceStore.membership_leave_preview(user_id) end)
+
+  def leave_membership(context, user_id, params),
+    do: scoped(context, fn -> FinanceStore.leave_membership(user_id, params) end)
+
+  def undo_leave_membership(context, user_id, by),
+    do: scoped(context, fn -> FinanceStore.undo_leave_membership(user_id, by) end)
+
   def mark_subscription_notice_sent(context, subscription_id, kind),
     do:
       scoped(context, fn -> FinanceStore.mark_subscription_notice_sent(subscription_id, kind) end)
