@@ -370,6 +370,7 @@ defmodule PaleeWeb.Router do
     post("/register-admin", AuthController, :register_admin)
     post("/invitations/inspect", OrganizationAccessController, :inspect)
     get("/join/:slug", OrganizationAccessController, :inspect_join_link)
+    get("/join/:slug/athlete/:key", OrganizationAccessController, :inspect_athlete_join_link)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -446,6 +447,7 @@ defmodule PaleeWeb.Router do
 
     post("/memberships/redeem", OrganizationAccessController, :redeem)
     post("/memberships/join/:slug", OrganizationAccessController, :join)
+    post("/memberships/join/:slug/athlete/:key", OrganizationAccessController, :join_as_athlete)
     # ADR-204: same as redeem, plus the staff surface role and a new session.
     post("/auth/accept-invitation", AuthController, :accept_invitation)
   end
@@ -516,6 +518,8 @@ defmodule PaleeWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-219: roles below my top role (an owner who also coaches).
+    put("/roles", MyRolesController, :update)
     # ADR-167: Box › Συνδρομή › seasons.
     get("/seasons", SeasonController, :index)
     post("/seasons/:id/request", SeasonController, :request)
@@ -1352,6 +1356,9 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    # ADR-218: the installation's Web Push keys (formerly in each gym's settings).
+    get("/push-settings", PlatformPushSettingsController, :show)
+    patch("/push-settings", PlatformPushSettingsController, :update)
     # ADR-187: the password reset security log.
     get("/password-reset-log", PasswordRecoveryController, :log)
     # ADR-170: platform plans, prices and each organization's plan.
@@ -1992,6 +1999,8 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/people-search", PeopleController, :search)
+    # ADR-221: boxes and independent coaches by name.
+    get("/box-search", BoxSearchController, :index)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).

@@ -27,6 +27,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackArrow } from "@/components/ui/BackLink";
 
 const LocationPinMap = dynamic(() => import("@/components/admin/location/LocationPinMap"), { ssr: false });
 
@@ -208,7 +209,7 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
             className="grid h-10 w-10 place-items-center rounded-full text-xl"
             style={{ color: "var(--text)", border: "1px solid var(--border)" }}
           >
-            <span aria-hidden="true">‹</span>
+            <BackArrow />
           </Link>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>
             {form.name.trim() || location.name}

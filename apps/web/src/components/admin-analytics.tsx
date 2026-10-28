@@ -22,6 +22,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -202,9 +203,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
           actions={
             <>
               <BranchFilterControl filter={branchFilter} />
-              <Link href={adminHref("/admin/metrics", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+              <BackLink href={adminHref("/admin/metrics", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
                 {i18n("analyticsMarketing0ecf7f0")}
-              </Link>
+              </BackLink>
             </>
           }
         />

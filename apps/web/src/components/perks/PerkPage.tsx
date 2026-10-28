@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -15,6 +14,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { PerkLogo, useBenefitConditions, useBenefitText } from "./PerkRows";
 import { useClaimPerk, useMemberPerks, useRefreshPerkLink } from "./use-perks";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 const REASONS = new Set([
   "perk_sold_out",
@@ -45,9 +45,7 @@ export function PerkPage({ perkId }: { perkId: string }) {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
-      <Link href={backHref} className="inline-flex min-h-9 items-center self-start text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
-        ‹ {t("back")}
-      </Link>
+      <BackLink href={backHref} className="inline-flex min-h-9 items-center self-start text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{t("back")}</BackLink>
       {perk ? (
         <PerkBody perk={perk} />
       ) : perks.isLoading ? (

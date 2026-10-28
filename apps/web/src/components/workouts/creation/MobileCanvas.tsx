@@ -10,6 +10,7 @@ import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { LeftPanel } from "./LeftPanel";
 import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
+import { BackButton } from "@/components/ui/BackLink";
 
 type Props = {
   scaleLevels: ScaleLevel[];
@@ -22,13 +23,7 @@ export function MobileCanvas({ scaleLevels }: Props) {
   return (
     <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden overflow-x-clip">
       {mobileView === "exercises" ? (
-        <button
-          onClick={() => setMobileView("sections")}
-          className="px-4 py-2 text-start text-sm"
-          style={{ color: "var(--accent)" }}
-        >
-          {i18n("sectionsfcb5b85")}
-        </button>
+        <BackButton onClick={() => setMobileView("sections")} className="px-4 py-2 text-start text-sm" style={{ color: "var(--accent)" }} >{i18n("sectionsfcb5b85")}</BackButton>
       ) : null}
 
       <div className="min-w-0 flex-1 overflow-hidden overflow-x-clip">

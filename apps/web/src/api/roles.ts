@@ -47,6 +47,14 @@ export async function updateMemberRoles(token: string, userId: string, roles: Ro
   return response.membership;
 }
 
+type MyRolesResponse = Json<Op["PaleeWeb.MyRolesController.update"]["responses"][200]>;
+
+/** Settings › My roles: roles below my top role in this box (ADR-219). */
+export async function updateMyRoles(token: string, roles: RoleName[]) {
+  const response = await apiRequest<MyRolesResponse>("/me/roles", { method: "PUT", token, body: { roles } });
+  return response.membership;
+}
+
 export async function updateCoachScope(token: string, userId: string, coachScope: "own" | "all") {
   const response = await apiRequest<MembershipRolesResponse>(`/admin/users/${userId}/coach-scope`, {
     method: "PATCH",

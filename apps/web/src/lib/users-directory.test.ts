@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { AdminUserDirectoryEntry } from "@/api/admin-users";
-import { avatarTone, filterDirectory, initialsOf, roleCounts } from "./users-directory";
+import { avatarTone, displayRoles, filterDirectory, initialsOf, isStaff, roleCounts } from "./users-directory";
 
 const user = (overrides: Partial<AdminUserDirectoryEntry>): AdminUserDirectoryEntry => ({
   id: "id",
@@ -18,13 +18,13 @@ const user = (overrides: Partial<AdminUserDirectoryEntry>): AdminUserDirectoryEn
 const users = [
   user({ id: "1", nickname: "Ελένη", role: "athlete", joined_at: "2026-03-01T00:00:00Z", finance_status: "active" }),
   user({ id: "2", nickname: "bob", role: "member", joined_at: "2026-05-01T00:00:00Z" }),
-  user({ id: "3", nickname: "Alice", role: "admin", joined_at: "2026-01-01T00:00:00Z" }),
+  user({ id: "3", nickname: "Alice", role: "owner", roles: ["owner"], staff: true, joined_at: "2026-01-01T00:00:00Z" }),
 ];
 
 describe("users directory", () => {
   it("counts roles for the current search", () => {
-    expect(roleCounts(users, "")).toEqual({ all: 3, member: 1, athlete: 1, admin: 1 });
-    expect(roleCounts(users, "ελενη")).toEqual({ all: 1, member: 0, athlete: 1, admin: 0 });
+    expect(roleCounts(users, "")).toEqual({ all: 3, member: 1, athlete: 1, staff: 1 });
+    expect(roleCounts(users, "ελενη")).toEqual({ all: 1, member: 0, athlete: 1, staff: 0 });
   });
 
   it("filters by role and finance status and sorts", () => {
@@ -33,6 +33,18 @@ describe("users directory", () => {
     expect(filterDirectory(users, { ...base, sort: "newest" }).map((entry) => entry.id)).toEqual(["2", "1", "3"]);
     expect(filterDirectory(users, { ...base, finance: "none" }).map((entry) => entry.id)).toEqual(["3", "2"]);
     expect(filterDirectory(users, { ...base, role: "athlete" }).map((entry) => entry.id)).toEqual(["1"]);
+    expect(filterDirectory(users, { ...base, role: "staff" }).map((entry) => entry.id)).toEqual(["3"]);
+  });
+
+  // ADR-217: people are shown by their roles in the box, never the account role.
+  it("reads the box roles, marks staff and names head coaches", () => {
+    const coachMember = user({ role: "coach", roles: ["member", "coach"], coach_scope: "all", staff: true });
+    expect(displayRoles(coachMember)).toEqual(["head_coach", "member"]);
+    expect(displayRoles(user({ role: "coach", roles: ["coach"], coach_scope: "own" }))).toEqual(["coach"]);
+    expect(isStaff(coachMember)).toBe(true);
+    expect(isStaff(user({ role: "member", roles: ["member"] }))).toBe(false);
+    expect(isStaff(user({ role: "front_desk", roles: ["front_desk"] }))).toBe(true);
+    expect(filterDirectory([coachMember], { query: "", role: "member", finance: "all", sort: "name" })).toHaveLength(1);
   });
 
   it("builds initials and stable avatar tones", () => {

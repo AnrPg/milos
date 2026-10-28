@@ -408,6 +408,52 @@ defmodule Palee.Organizations do
     |> Enum.map(&Map.take(&1, [:user_id, :role, :roles]))
   end
 
+  @doc """
+  ADR-217: the role facts (`roles`, primary `role`, `coach_scope`) of every
+  active person in a gym, keyed by user id. Someone's standing in a business
+  comes from these tenant roles, never from the account-wide `users.role`.
+  """
+  def member_roles_by_user(%{organization_id: organization_id}) when is_binary(organization_id),
+    do: member_roles_by_user(organization_id)
+
+  def member_roles_by_user(organization_id) when is_binary(organization_id) do
+    organization_id
+    |> ListMemberRoles.call()
+    |> Map.new(&{&1.user_id, Map.take(&1, [:role, :roles, :coach_scope])})
+  end
+
+  def member_roles_by_user(_context), do: %{}
+
+  @doc """
+  ADR-217: active clients of a gym, the people holding a member or athlete
+  role. Only they have a finance profile, packages and a place in the finance
+  ledger and analytics; staff-only people never do.
+  """
+  def list_client_user_ids(%{organization_id: organization_id}) when is_binary(organization_id),
+    do: list_client_user_ids(organization_id)
+
+  def list_client_user_ids(organization_id) when is_binary(organization_id) do
+    organization_id
+    |> ListMemberRoles.call(roles: Palee.Organizations.Domain.MembershipPolicy.client_roles())
+    |> Enum.map(& &1.user_id)
+  end
+
+  def list_client_user_ids(_context), do: []
+
+  @doc "ADR-217: the client role (`:athlete` before `:member`) a person holds in a gym, or nil."
+  def client_role(%{organization_id: organization_id}, user_id) when is_binary(organization_id),
+    do: client_role(organization_id, user_id)
+
+  def client_role(organization_id, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    case member(organization_id, user_id) do
+      %{roles: roles} -> Palee.Organizations.Domain.MembershipPolicy.client_role(roles)
+      nil -> nil
+    end
+  end
+
+  def client_role(_context, _user_id), do: nil
+
   defp member(organization_id, user_id) do
     organization_id
     |> ListMemberRoles.call(user_id: user_id)
@@ -488,11 +534,16 @@ defmodule Palee.Organizations do
 
   def onboarding_audience(_context), do: "gym"
 
-  def inspect_join_link(slug), do: Palee.Organizations.Queries.InspectJoinLink.call(slug)
+  @doc """
+  ADR-216: describes the organization behind one of its join links. `link` is
+  `%{slug: slug, role: "member" | "athlete", key: key | nil}`.
+  """
+  def inspect_join_link(%{slug: slug, role: role} = link),
+    do: Palee.Organizations.Queries.InspectJoinLink.call(slug, role, Map.get(link, :key))
 
-  def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
+  def join_by_link(link, user_id, joined_at \\ DateTime.utc_now()),
     do:
-      slug
+      link
       |> Palee.Organizations.Commands.JoinByLink.call(user_id, joined_at)
       |> announce_activation()
 
@@ -873,6 +924,13 @@ defmodule Palee.Organizations do
 
   @doc "Name, slug, logo and colour of the published gyms among `ids`."
   def public_boxes(ids), do: Palee.Organizations.PublicProfileStore.public_boxes(ids)
+
+  @doc """
+  ADR-221: published, live businesses (boxes and independent coaches) whose
+  name, brand name or slug holds one of the already folded `terms`.
+  """
+  def search_public_boxes(terms, limit),
+    do: Palee.Organizations.PublicProfileStore.search_public_boxes(terms, limit)
 
   def resolve_tag_suggestion(id, status),
     do: Palee.Organizations.PublicProfileStore.resolve_suggestion(id, status)

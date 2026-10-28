@@ -11,7 +11,7 @@ defmodule Palee.Application.EnrollCorporateSeat do
   since the code is the employer's own proof.
   """
 
-  alias Palee.{Finance, Identity}
+  alias Palee.{Finance, Identity, Organizations}
 
   def call(context, %{id: user_id} = actor, params) do
     with {:ok, client, via} <- find_client(context, actor, params) do
@@ -40,6 +40,22 @@ defmodule Palee.Application.EnrollCorporateSeat do
       _no_offer -> nil
     end
   end
+
+  @doc """
+  A gym's staff gives a client a seat (ADR-098). ADR-217: seats carry a
+  finance profile, so only clients (member or athlete role) can hold one.
+  """
+  def by_staff(context, corporate_client_id, user_id) do
+    with :ok <- ensure_client(context, user_id) do
+      Finance.enroll_corporate_seat(context, corporate_client_id, user_id, %{})
+    end
+  end
+
+  defp ensure_client(context, user_id) when is_binary(user_id) do
+    if Organizations.client_role(context, user_id), do: :ok, else: {:error, :not_a_client}
+  end
+
+  defp ensure_client(_context, _user_id), do: {:error, :not_found}
 
   defp find_client(context, actor, params) do
     case Map.get(params, :code) || Map.get(params, "code") do

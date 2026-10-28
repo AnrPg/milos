@@ -1,8 +1,9 @@
+import type { RoleName } from "@/api/roles";
 import type { paths } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
 
 export type OrganizationStatus = "active" | "suspended" | "archived";
-export type OrganizationMembershipRole = "owner" | "admin" | "coach" | "member" | "athlete";
+export type OrganizationMembershipRole = RoleName;
 
 export type PlatformOrganization = {
   organization: {
@@ -61,6 +62,7 @@ export type PlatformOrganizationMembership = {
   id: string;
   user_id: string;
   role: OrganizationMembershipRole;
+  roles?: OrganizationMembershipRole[];
   status: string;
   joined_at: string | null;
   inserted_at: string;
@@ -202,15 +204,16 @@ export function fetchOwnerInvitationDeliveries(token: string, organizationId: st
   );
 }
 
-export function updatePlatformOrganizationMembershipRole(
+/** The vendor sets any role set, down to owner; a gym keeps an owner (ADR-219). */
+export function updatePlatformOrganizationMembershipRoles(
   token: string,
   organizationId: string,
   membershipId: string,
-  role: OrganizationMembershipRole,
+  roles: OrganizationMembershipRole[],
 ) {
   return apiRequest<{ membership: PlatformOrganizationMembership }>(
     `/platform/organizations/${organizationId}/memberships/${membershipId}/role`,
-    { method: "PATCH", token, body: { role } },
+    { method: "PATCH", token, body: { roles } },
   );
 }
 
