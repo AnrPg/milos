@@ -428,5 +428,4 @@ defmodule Palee.Application.MyBilling do
 
       {nil, false}
   end
-
 end

@@ -27,7 +27,8 @@ defmodule Palee.Finance.Domain.MemberRenewal do
   themselves (an add-on follows its base; a company pays for a corporate seat).
   """
   def choice_allowed?(subscription) do
-    field(subscription, :status) == "active" and is_nil(field(subscription, :base_subscription_id)) and
+    field(subscription, :status) == "active" and
+      is_nil(field(subscription, :base_subscription_id)) and
       is_nil(field(subscription, :corporate_client_id)) and
       SubscriptionSelection.renewable?(field(subscription, :params_snapshot) || %{}) == :ok
   end
@@ -120,7 +121,9 @@ defmodule Palee.Finance.Domain.MemberRenewal do
     do: field(invoice, :status) in @unpaid_statuses and untouched?(invoice)
 
   defp untouched?(invoice),
-    do: (field(invoice, :paid_cents) || 0) == 0 and (field(invoice, :credit_applied_cents) || 0) == 0
+    do:
+      (field(invoice, :paid_cents) || 0) == 0 and
+        (field(invoice, :credit_applied_cents) || 0) == 0
 
   @doc """
   The day a member leaving `today` keeps access until: the latest last day
@@ -145,8 +148,11 @@ defmodule Palee.Finance.Domain.MemberRenewal do
   @doc "Whether the leave can still be undone: the last day has not passed."
   def undo_allowed(membership, %Date{} = today) do
     case field(membership, :leaving_on) do
-      nil -> {:error, :not_leaving}
-      leaving_on -> if Date.compare(leaving_on, today) == :lt, do: {:error, :already_left}, else: :ok
+      nil ->
+        {:error, :not_leaving}
+
+      leaving_on ->
+        if Date.compare(leaving_on, today) == :lt, do: {:error, :already_left}, else: :ok
     end
   end
 

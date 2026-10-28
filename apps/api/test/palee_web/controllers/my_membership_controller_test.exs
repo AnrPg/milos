@@ -22,7 +22,10 @@ defmodule PaleeWeb.MyMembershipControllerTest do
 
     owner = user_fixture()
     member = user_fixture()
-    {:ok, box} = Organizations.create_organization(%{name: "Box #{System.unique_integer([:positive])}"})
+
+    {:ok, box} =
+      Organizations.create_organization(%{name: "Box #{System.unique_integer([:positive])}"})
+
     add!(box, owner, [:owner, :coach])
     add!(box, member, [:member])
 
@@ -93,7 +96,9 @@ defmodule PaleeWeb.MyMembershipControllerTest do
       |> put("#{me(ctx)}/subscriptions/#{ctx.subscription.id}/auto-renew", %{auto_renew: false})
       |> json_response(200)
 
-    assert %{"auto_renew" => false, "renewal_changed_by" => "member"} = body["package_subscription"]
+    assert %{"auto_renew" => false, "renewal_changed_by" => "member"} =
+             body["package_subscription"]
+
     assert body["package_subscription"]["ends_on"] == Date.to_iso8601(ctx.period_end)
 
     # The unpaid invoice for after the last day is no longer owed.
@@ -223,6 +228,20 @@ defmodule PaleeWeb.MyMembershipControllerTest do
 
     assert body["membership"]["status"] == "cancelled"
     assert body["membership"]["left_by"] == "staff"
+
+    # The box member's profile shows the leave and the stopped renewal.
+    finance =
+      ctx.conn
+      |> authed(ctx.owner)
+      |> get("/api/org/#{ctx.box.slug}/admin/users/#{ctx.member.id}/finance")
+      |> json_response(200)
+
+    assert %{"leaving_on" => _, "left_by" => "staff", "leave_reason" => "Stopped coming"} =
+             finance["details"]["membership"]
+
+    assert [%{"auto_renew" => false, "renewal_changed_by" => "staff"} | _] =
+             finance["details"]["package_subscriptions"]
+
     # The next period never began: cancelled. This month was used: still owed.
     assert body["voided_invoice_count"] == 1
     assert invoice_status(ctx, future.id) == "void"
@@ -237,9 +256,14 @@ defmodule PaleeWeb.MyMembershipControllerTest do
 
   test "a package that has not started yet is cancelled with its invoice", ctx do
     {:ok, later} =
-      Finance.assign_package(ctx.staff, ctx.membership.id, ctx.subscription.membership_package_id, %{
-        starts_on: Date.add(ctx.period_end, 10)
-      })
+      Finance.assign_package(
+        ctx.staff,
+        ctx.membership.id,
+        ctx.subscription.membership_package_id,
+        %{
+          starts_on: Date.add(ctx.period_end, 10)
+        }
+      )
 
     {:ok, invoice} =
       Finance.create_invoice(ctx.staff, ctx.membership.id, %{

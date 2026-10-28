@@ -5,7 +5,9 @@ defmodule Palee.Finance.Domain.MemberRenewalTest do
   alias Palee.Finance.Domain.{MemberRenewal, PackageContract}
 
   defp params(fields \\ %{}) do
-    {:ok, contract} = PackageContract.normalize(%{"package_type" => "membership", "fields" => fields})
+    {:ok, contract} =
+      PackageContract.normalize(%{"package_type" => "membership", "fields" => fields})
+
     PackageContract.to_params(contract)
   end
 
@@ -113,7 +115,9 @@ defmodule Palee.Finance.Domain.MemberRenewalTest do
     end
 
     test "a leave can be undone until the last day passes" do
-      assert {:error, :not_leaving} = MemberRenewal.undo_allowed(%{leaving_on: nil}, ~D[2026-03-10])
+      assert {:error, :not_leaving} =
+               MemberRenewal.undo_allowed(%{leaving_on: nil}, ~D[2026-03-10])
+
       assert :ok = MemberRenewal.undo_allowed(%{leaving_on: ~D[2026-03-10]}, ~D[2026-03-10])
 
       assert {:error, :already_left} =

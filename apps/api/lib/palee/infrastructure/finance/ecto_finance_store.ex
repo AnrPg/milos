@@ -6742,7 +6742,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           membership: normalize_membership(Repo.get!(Membership, updated.id)),
           leaving_on: leaving_on,
           voided_invoice_count: voided,
-          outstanding_cents: Map.get(outstanding_balance_per_membership([updated.id]), updated.id, 0)
+          outstanding_cents:
+            Map.get(outstanding_balance_per_membership([updated.id]), updated.id, 0)
         }
       else
         nil -> Repo.rollback(:not_found)
@@ -6845,7 +6846,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       renewal_changed_by: by,
       ends_on: if(from_stop?, do: nil, else: subscription.ends_on),
       ends_on_from_renewal_stop: false,
-      expiry_reminder_sent_at: if(from_stop?, do: nil, else: subscription.expiry_reminder_sent_at),
+      expiry_reminder_sent_at:
+        if(from_stop?, do: nil, else: subscription.expiry_reminder_sent_at),
       grace_notice_sent_at: if(from_stop?, do: nil, else: subscription.grace_notice_sent_at)
     }
 

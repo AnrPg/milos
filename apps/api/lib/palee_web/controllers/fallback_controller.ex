@@ -1237,31 +1237,94 @@ defmodule PaleeWeb.FallbackController do
 
   # ADR-220: renewal choice and leaving the box.
   def call(conn, {:error, :renewal_turned_off}),
-    do: package_contract_error(conn, :conflict, "renewal_turned_off", "The member turned renewal off", %{})
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "renewal_turned_off",
+        "The member turned renewal off",
+        %{}
+      )
 
   def call(conn, {:error, :member_leaving}),
-    do: package_contract_error(conn, :conflict, "member_leaving", "The member is leaving the box", %{})
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "member_leaving",
+        "The member is leaving the box",
+        %{}
+      )
 
   def call(conn, {:error, :renewal_choice_not_allowed}),
-    do: package_contract_error(conn, :unprocessable_entity, "renewal_choice_not_allowed", "This subscription has no renewal choice", %{})
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "renewal_choice_not_allowed",
+        "This subscription has no renewal choice",
+        %{}
+      )
 
   def call(conn, {:error, :subscription_ended}),
-    do: package_contract_error(conn, :conflict, "subscription_ended", "The subscription has already ended", %{})
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "subscription_ended",
+        "The subscription has already ended",
+        %{}
+      )
 
   def call(conn, {:error, :not_leaving}),
-    do: package_contract_error(conn, :conflict, "not_leaving", "The member is not leaving the box", %{})
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "not_leaving",
+        "The member is not leaving the box",
+        %{}
+      )
 
   def call(conn, {:error, :already_left}),
-    do: package_contract_error(conn, :conflict, "already_left", "The member's last day has passed", %{})
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "already_left",
+        "The member's last day has passed",
+        %{}
+      )
 
   def call(conn, {:error, :invalid_leaving_on}),
-    do: package_contract_error(conn, :unprocessable_entity, "invalid_leaving_on", "The last day is not a valid date", %{})
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_leaving_on",
+        "The last day is not a valid date",
+        %{}
+      )
 
   def call(conn, {:error, :invalid_leave_actor}),
-    do: package_contract_error(conn, :unprocessable_entity, "invalid_leave_actor", "Unknown leave actor", %{})
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_leave_actor",
+        "Unknown leave actor",
+        %{}
+      )
 
   def call(conn, {:error, :invalid_auto_renew}),
-    do: package_contract_error(conn, :unprocessable_entity, "invalid_auto_renew", "auto_renew must be true or false", %{})
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_auto_renew",
+        "auto_renew must be true or false",
+        %{}
+      )
 
   def call(conn, {:error, :package_not_renewable}) do
     package_contract_error(

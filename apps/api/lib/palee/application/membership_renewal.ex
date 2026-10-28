@@ -16,7 +16,14 @@ defmodule Palee.Application.MembershipRenewal do
   @doc "The member turns renewal of one of their subscriptions on or off."
   def member_set_auto_renew(%{user_id: user_id} = context, subscription_id, auto_renew)
       when is_boolean(auto_renew),
-      do: Finance.set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, "member")
+      do:
+        Finance.set_subscription_auto_renew(
+          context,
+          user_id,
+          subscription_id,
+          auto_renew,
+          "member"
+        )
 
   def member_set_auto_renew(_context, _subscription_id, _auto_renew),
     do: {:error, :invalid_auto_renew}
@@ -40,7 +47,14 @@ defmodule Palee.Application.MembershipRenewal do
   @doc "Staff turn a member's renewal on or off (for example, asked at the desk)."
   def staff_set_auto_renew(context, user_id, subscription_id, auto_renew)
       when is_boolean(auto_renew),
-      do: Finance.set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, "staff")
+      do:
+        Finance.set_subscription_auto_renew(
+          context,
+          user_id,
+          subscription_id,
+          auto_renew,
+          "staff"
+        )
 
   def staff_set_auto_renew(_context, _user_id, _subscription_id, _auto_renew),
     do: {:error, :invalid_auto_renew}

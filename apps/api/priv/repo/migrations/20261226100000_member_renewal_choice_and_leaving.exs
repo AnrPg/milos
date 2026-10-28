@@ -43,7 +43,8 @@ defmodule Palee.Repo.Migrations.MemberRenewalChoiceAndLeaving do
            )
 
     create constraint(:memberships, :leaving_consistency_check,
-             check: "(left_at IS NULL) = (leaving_on IS NULL) AND (left_at IS NULL) = (left_by IS NULL)"
+             check:
+               "(left_at IS NULL) = (leaving_on IS NULL) AND (left_at IS NULL) = (left_by IS NULL)"
            )
 
     add_notification_types(@notification_types)
