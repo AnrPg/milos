@@ -52,7 +52,7 @@ type Props = {
   onAssignRequestHandled?: () => void;
 };
 
-// Outcome-first labels: each says who gets the change, its hint says how.
+// Outcome-first labels: each says who gets the change; the full explanation sits under it.
 const MODE_LABEL_KEYS: Record<MemberProgrammingMode, string> = {
   class_variant: "programmingModeVariant",
   personal: "programmingModePersonal",
@@ -60,9 +60,9 @@ const MODE_LABEL_KEYS: Record<MemberProgrammingMode, string> = {
 };
 
 const MODE_HINT_KEYS: Record<MemberProgrammingMode, string> = {
-  class_variant: "programmingModeVariantHint",
-  personal: "programmingModePersonalHint",
-  class_workout: "programmingModeClassHint",
+  class_variant: "memberProgrammingModeClassVariantHint",
+  personal: "memberProgrammingModePersonalHint",
+  class_workout: "memberProgrammingModeClassWorkoutHint",
 };
 
 const SOURCE_LABEL_KEYS: Record<ProgrammingSource, string> = {
