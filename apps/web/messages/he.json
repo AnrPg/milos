@@ -237,6 +237,7 @@
     "classAction_cancel": "ביטול שיעור",
     "classAction_restore": "שחזור שיעור",
     "classAction_delete": "מחיקה",
+    "classMoreActions": "פעולות נוספות לשיעור",
     "classActionTitle_pause": "להשהות את ההרשמה?",
     "classActionTitle_resume": "להמשיך את ההרשמה?",
     "classActionTitle_cancel": "לבטל את השיעור הזה?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "בעלים",
     "roleAdmin": "מנהל",
     "roleCoach": "מאמן",
+    "roleHeadCoach": "מאמן ראשי",
     "roleFrontDesk": "פקיד קבלה",
     "roleAccountant": "מנהל חשבונות",
     "roleJanitor": "צוות ניקיון",
@@ -4974,7 +4976,7 @@
       "all": "כולם",
       "member": "מנויים",
       "athlete": "ספורטאים",
-      "admin": "צוות"
+      "staff": "צוות"
     },
     "showing": "מוצגים {shown} מתוך {total}",
     "clearFilters": "ניקוי מסננים",
@@ -4987,6 +4989,7 @@
     "listLabel": "אנשים",
     "columns": {
       "person": "אדם",
+      "roles": "תפקידים",
       "finance": "מנוי",
       "joined": "הצטרפות",
       "open": "פתיחת פרופיל"

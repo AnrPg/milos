@@ -292,14 +292,18 @@ export function InlineToggle({
   value,
   options,
   onSave,
+  placeholder,
 }: {
   value: string;
   options: Array<{ value: string; label: string; accent?: boolean }>;
   onSave: (value: string) => void;
+  /** Shown when `value` is none of the options (e.g. no status yet); a click sets the first option. */
+  placeholder?: string;
 }) {
   const i18n = useUiTranslations();
-  const current = options.find((o) => o.value === value) ?? options[0];
-  const next = options[(options.indexOf(current) + 1) % options.length];
+  const matched = options.find((o) => o.value === value);
+  const current = matched ?? (placeholder ? { value: "", label: placeholder, accent: false } : options[0]);
+  const next = matched || !placeholder ? options[(options.indexOf(current) + 1) % options.length] : options[0];
 
   return (
     <button

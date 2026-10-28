@@ -24,7 +24,7 @@ import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { blockPerson } from "@/api/partners";
-import { MoreMenu } from "@/components/community/PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 import { can } from "@/lib/role-navigation";
