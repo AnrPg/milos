@@ -69,6 +69,9 @@ import { dateTimeLocalInZone, dateTimeLocalToIso, formatInZone, zoneLabel, zoned
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { ContextualWorkoutCreator } from "@/components/workouts/creation/ContextualWorkoutCreator";
 import { WodPicker } from "@/components/schedule/WodPicker";
+import { DayWorkoutDialog } from "@/components/schedule/DayWorkoutDialog";
+import { coveringDayWorkout } from "@/components/schedule/day-workouts";
+import type { DayWorkout } from "@/api/day-workouts";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
@@ -198,6 +201,9 @@ export function ScheduleConsole({
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  // ADR-224: the WOD of each day in the window (staff), and the day being edited.
+  const [dayWorkouts, setDayWorkouts] = useState<DayWorkout[]>([]);
+  const [dayWodDate, setDayWodDate] = useState<string | null>(null);
   const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null | undefined>(undefined);
   const [notice, setNotice] = useState<string | null>(null);
   // ADR-186 §8: «Ισχύει για» on a new class or series, and what it created.
@@ -275,6 +281,7 @@ export function ScheduleConsole({
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
       setLocations(Array.isArray(window.locations) ? window.locations : []);
+      setDayWorkouts(Array.isArray(window.day_workouts) ? window.day_workouts : []);
       return nextSlots;
     } catch (loadError) {
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
@@ -867,6 +874,9 @@ export function ScheduleConsole({
             slots={schedule}
             startDate={startDate}
             timeZone={gymZone}
+            dayWorkouts={dayWorkouts}
+            classTypes={classTypes}
+            onOpenDayWorkout={isAdmin && canManageSchedule ? setDayWodDate : undefined}
           />
         )}
       </div>
@@ -876,6 +886,20 @@ export function ScheduleConsole({
           target={newWodTargetLabel(newWodFor)}
           onPublished={(workoutId) => assignNewWod(newWodFor, workoutId)}
           onClose={() => setNewWodFor(null)}
+        />
+      ) : null}
+
+      {dayWodDate && tokens?.access_token ? (
+        <DayWorkoutDialog
+          token={tokens.access_token}
+          date={dayWodDate}
+          timeZone={gymZone}
+          dayWorkouts={dayWorkouts}
+          slots={schedule}
+          classTypes={classTypes}
+          locations={manyBranches ? adminLocations : []}
+          onClose={() => setDayWodDate(null)}
+          onChanged={() => void loadSchedule()}
         />
       ) : null}
 
@@ -898,6 +922,7 @@ export function ScheduleConsole({
             void loadSchedule();
           }}
           onSlotChanged={() => void refreshSelectedSlot()}
+          dayWorkout={isAdmin ? coveringDayWorkout(dayWorkouts, selectedSlot, gymZone) : null}
           onClose={() => setSelectedSlot(null)}
           onClassAction={(action) => setClassAction({ slot: selectedSlot, action })}
           onEdit={() => openUpdateEditor(selectedSlot)}

@@ -64,4 +64,77 @@ describe("CalendarView", () => {
     expect(within(day).getAllByText("CrossFit")).toHaveLength(5);
     expect(screen.queryByText("Yoga")).not.toBeInTheDocument();
   });
+
+  describe("day WOD (ADR-224)", () => {
+    const rule = {
+      id: "r1",
+      local_date: "2026-10-14",
+      class_type_id: null,
+      location_id: null,
+      master_workout_id: "w1",
+      workout: { id: "w1", title: "Fran" },
+    };
+
+    it("shows the day's WOD under the day header and opens it for staff", () => {
+      vi.useFakeTimers({ now: new Date("2026-10-13T08:00:00Z"), toFake: ["Date"] });
+      const onOpenDayWorkout = vi.fn();
+      render(
+        <CalendarView
+          {...base}
+          isAdmin
+          days={7}
+          startDate="2026-10-12"
+          slots={[...busyDay, otherDay]}
+          dayWorkouts={[rule]}
+          onOpenDayWorkout={onOpenDayWorkout}
+        />,
+      );
+
+      const strip = screen.getByTestId("day-wod-2026-10-14");
+      expect(strip).toHaveTextContent("Fran");
+      fireEvent.click(strip);
+      expect(onOpenDayWorkout).toHaveBeenCalledWith("2026-10-14");
+      vi.useRealTimers();
+    });
+
+    it("offers «+ Day WOD» only on days with classes, from today on", () => {
+      vi.useFakeTimers({ now: new Date("2026-10-13T08:00:00Z"), toFake: ["Date"] });
+      try {
+        const onOpenDayWorkout = vi.fn();
+        render(
+          <CalendarView
+            {...base}
+            isAdmin
+            days={7}
+            startDate="2026-10-12"
+            slots={[...busyDay, otherDay, slot("past", "2026-10-12T09:00:00Z")]}
+            onOpenDayWorkout={onOpenDayWorkout}
+          />,
+        );
+
+        expect(screen.getByTestId("day-wod-add-2026-10-15")).toBeInTheDocument();
+        // A past day, and a day without classes, offer nothing.
+        expect(screen.queryByTestId("day-wod-add-2026-10-12")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("day-wod-add-2026-10-16")).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId("day-wod-add-2026-10-14"));
+        expect(onOpenDayWorkout).toHaveBeenCalledWith("2026-10-14");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("in the month view, the day's WOD is one line that opens the day", () => {
+      const onOpenDay = vi.fn();
+      render(<CalendarView {...base} days={30} startDate="2026-10-01" slots={busyDay} dayWorkouts={[rule]} onOpenDay={onOpenDay} />);
+
+      fireEvent.click(screen.getByTestId("day-wod-2026-10-14"));
+      expect(onOpenDay).toHaveBeenCalledWith("2026-10-14");
+    });
+
+    it("members see no day WOD controls", () => {
+      render(<CalendarView {...base} days={7} startDate="2026-10-12" slots={busyDay} />);
+      expect(screen.queryByTestId(/^day-wod/)).not.toBeInTheDocument();
+    });
+  });
 });

@@ -7135,6 +7135,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Day WODs of a date range */
+        get: operations["PaleeWeb.AdminDayWorkoutController.index"];
+        /**
+         * Set the WOD of a day
+         * @description ADR-224: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.
+         */
+        put: operations["PaleeWeb.AdminDayWorkoutController.put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What setting a day WOD would change */
+        post: operations["PaleeWeb.AdminDayWorkoutController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a day WOD */
+        delete: operations["PaleeWeb.AdminDayWorkoutController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots": {
         parameters: {
             query?: never;
@@ -7185,6 +7240,23 @@ export interface paths {
         head?: never;
         /** Update a scheduled class slot */
         patch: operations["PaleeWeb.AdminScheduleController.update_slot"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/day-workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give a class the day's WOD in place of its own */
+        post: operations["PaleeWeb.AdminDayWorkoutController.follow_day"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
@@ -74767,6 +74839,247 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDayWorkoutController.index": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Day WODs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day_workouts: ({
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.put": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Empty or missing: every class of the day */
+                    class_type_ids?: string[];
+                    /**
+                     * Format: date
+                     * @description The gym's own date
+                     */
+                    date: string;
+                    /**
+                     * Format: uuid
+                     * @description Null: every branch
+                     */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    /** @description Also replace the WODs set on single classes in this scope */
+                    replace_own?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Day WODs set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed_count: number;
+                        day_workouts: ({
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Empty or missing: every class of the day */
+                    class_type_ids?: string[];
+                    /**
+                     * Format: date
+                     * @description The gym's own date
+                     */
+                    date: string;
+                    /**
+                     * Format: uuid
+                     * @description Null: every branch
+                     */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    /** @description Also replace the WODs set on single classes in this scope */
+                    replace_own?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Classes by outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        inherit: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        own: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        started: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed_count: number;
+                        day_workout: {
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminScheduleController.create_slot": {
         parameters: {
             query?: never;
@@ -74956,6 +75269,32 @@ export interface operations {
                         };
                         /** @description Classes the edit changed, the edited one included */
                         updated_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.follow_day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Slot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        slot: {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -91487,6 +91826,27 @@ export interface operations {
                             id: string;
                             nickname: string;
                         }[];
+                        /** @description ADR-224, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one. */
+                        day_workouts: ({
+                            /** Format: uuid */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /** Format: uuid */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
                         days: number;
                         /** Format: date */
                         end_date: string;
@@ -91524,6 +91884,11 @@ export interface operations {
                             cancel_free_until?: string | null;
                             /** @description Members only: whether the viewer's package includes this class, regardless of visits left. */
                             covered_by_package?: boolean;
+                            /**
+                             * Format: uuid
+                             * @description ADR-224: the day WOD the class's WOD comes from.
+                             */
+                            day_workout_id?: string | null;
                             /** @description Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip). */
                             friends_going?: {
                                 avatar_url?: string | null;
@@ -91549,6 +91914,11 @@ export interface operations {
                             } & {
                                 [key: string]: unknown;
                             }) | null;
+                            /**
+                             * @description ADR-224: day = inherited from the day's WOD, class = set on the class.
+                             * @enum {string|null}
+                             */
+                            workout_source?: "day" | "class" | null;
                         } & {
                             [key: string]: unknown;
                         })[];

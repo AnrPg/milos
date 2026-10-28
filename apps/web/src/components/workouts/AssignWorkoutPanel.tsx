@@ -11,7 +11,19 @@ import { useEffect, useState } from "react";
 
 import { ApiError } from "@/api/client";
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
-import { fetchSchedule, updateScheduleSlot, type ScheduleSlot } from "@/api/schedule";
+import { fetchSchedule, listAdminClassTypes, updateScheduleSlot, type ClassTypeRecord, type ScheduleSlot } from "@/api/schedule";
+import { setDayWorkout } from "@/api/day-workouts";
+import {
+  ALL_CLASSES,
+  DayWorkoutPreviewNote,
+  DayWorkoutScopeFields,
+  scopeIsComplete,
+  scopeRequest,
+  type DayWorkoutScopeValue,
+} from "@/components/schedule/DayWorkoutFields";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { dateKeyInZone } from "@/lib/zoned-time";
+import { useTranslations } from "next-intl";
 import { fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
@@ -33,7 +45,14 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
   const { tokens, signOut } = useSession();
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
-  const [mode, setMode] = useState<"athletes" | "class">("athletes");
+  const scheduleT = useTranslations("Schedule");
+  // ADR-224: «Ημέρα» sets the WOD of a whole day (all classes or some types).
+  const [mode, setMode] = useState<"athletes" | "class" | "day">("athletes");
+  const gymZone = useOrganizationTimeZone();
+  const [dayDate, setDayDate] = useState(() => dateKeyInZone(new Date(), gymZone));
+  const [dayScope, setDayScope] = useState<DayWorkoutScopeValue>(ALL_CLASSES);
+  const [dayReplaceOwn, setDayReplaceOwn] = useState(false);
+  const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
@@ -122,6 +141,39 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
       cancelled = true;
     };
   }, [mode, tokens?.access_token]);
+
+  useEffect(() => {
+    if (!tokens?.access_token || mode !== "day") return;
+    let cancelled = false;
+    void listAdminClassTypes(tokens.access_token)
+      .then((types) => {
+        if (!cancelled) setClassTypes(types);
+      })
+      .catch(() => {
+        if (!cancelled) setClassTypes([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, tokens?.access_token]);
+
+  const dayRequest =
+    dayDate && scopeIsComplete(dayScope) ? { date: dayDate, master_workout_id: workoutId, ...scopeRequest(dayScope) } : null;
+
+  async function submitDayAssignment() {
+    if (!tokens?.access_token || !dayRequest) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await setDayWorkout(tokens.access_token, { ...dayRequest, replace_own: dayReplaceOwn });
+      onAssigned();
+      onClose();
+    } catch (requestError) {
+      setError(localizeError(requestError, i18n));
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function submitAssignment() {
     if (!tokens?.access_token) return;
@@ -246,6 +298,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
             {([
               ["athletes", i18n("athletesda22204")],
               ["class", i18n("featureScheduledClass")],
+              ["day", scheduleT("dayWodAssignMode")],
             ] as const).map(([nextMode, label]) => (
               <button
                 key={nextMode}
@@ -323,6 +376,28 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 </div>
               </div>
             </>
+          ) : mode === "day" ? (
+            <div className="space-y-4" data-testid="assign-day">
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
+                  {i18n("dateeb9a4bc")}
+                </span>
+                <DateInput
+                  className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                  onValueChange={(value) => setDayDate(value)}
+                  value={dayDate}
+                />
+              </label>
+              <DayWorkoutScopeFields value={dayScope} onChange={setDayScope} classTypes={classTypes} disabled={saving} />
+              <DayWorkoutPreviewNote
+                token={tokens?.access_token ?? ""}
+                request={dayRequest}
+                replaceOwn={dayReplaceOwn}
+                onReplaceOwnChange={setDayReplaceOwn}
+                timeZone={gymZone}
+              />
+            </div>
           ) : (
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
@@ -345,6 +420,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           )}
 
           {/* Admin notes */}
+          {mode === "day" ? null : (
           <label className="block">
             <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
               {i18n("instructionsdff73a2")}
@@ -363,6 +439,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               value={instructions}
             />
           </label>
+          )}
         </div>
 
         {/* Bottom CTA */}
@@ -373,14 +450,23 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           <button
             className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            disabled={saving || loading || isUnassignable || (mode === "class" ? !selectedSlotId : selectedIds.length === 0)}
-            onClick={() => void (mode === "class" ? submitClassAssignment() : submitAssignment())}
+            disabled={
+              saving ||
+              loading ||
+              isUnassignable ||
+              (mode === "class" ? !selectedSlotId : mode === "day" ? !dayRequest : selectedIds.length === 0)
+            }
+            onClick={() =>
+              void (mode === "class" ? submitClassAssignment() : mode === "day" ? submitDayAssignment() : submitAssignment())
+            }
             type="button"
           >
             {saving
                 ? i18n("assigning4d16a1a")
                 : mode === "class"
                 ? i18n("featureAssignToClass")
+                : mode === "day"
+                ? scheduleT("dayWodSave")
                 : selectedIds.length === 0
                   ? i18n("selectAthletesToAssign1666500")
                   : i18n("assignToAthletes", {count: selectedIds.length})}

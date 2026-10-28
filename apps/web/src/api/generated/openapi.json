@@ -176041,6 +176041,523 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.index",
+        "parameters": [
+          {
+            "description": "",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "day_workouts": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "description": "Null: every class (events only by type)",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "Null: every branch",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "day_workouts"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Day WODs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Day WODs of a date range",
+        "tags": [
+          "Admin Schedule"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "ADR-224: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.",
+        "operationId": "PaleeWeb.AdminDayWorkoutController.put",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "class_type_ids": {
+                    "description": "Empty or missing: every class of the day",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "date": {
+                    "description": "The gym's own date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "description": "Null: every branch",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "replace_own": {
+                    "description": "Also replace the WODs set on single classes in this scope",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "date",
+                  "master_workout_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "changed_count": {
+                      "type": "integer"
+                    },
+                    "day_workouts": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "description": "Null: every class (events only by type)",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "Null: every branch",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "day_workouts",
+                    "changed_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Day WODs set"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set the WOD of a day",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/preview": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.preview",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "class_type_ids": {
+                    "description": "Empty or missing: every class of the day",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "date": {
+                    "description": "The gym's own date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "description": "Null: every branch",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "replace_own": {
+                    "description": "Also replace the WODs set on single classes in this scope",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "date",
+                  "master_workout_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "inherit": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "own": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "started": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "inherit",
+                    "own",
+                    "started"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Classes by outcome"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What setting a day WOD would change",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "changed_count": {
+                      "type": "integer"
+                    },
+                    "day_workout": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "class_type_id": {
+                          "description": "Null: every class (events only by type)",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "local_date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "Null: every branch",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "master_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "workout": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "local_date",
+                        "class_type_id",
+                        "location_id",
+                        "master_workout_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "day_workout",
+                    "changed_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a day WOD",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/schedule/slots": {
       "post": {
         "callbacks": {},
@@ -176478,6 +176995,53 @@
           }
         ],
         "summary": "Update a scheduled class slot",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/day-workout": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.follow_day",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slot": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "slot"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slot"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give a class the day's WOD in place of its own",
         "tags": [
           "Admin Schedule"
         ]
@@ -221205,6 +221769,7 @@
             "required": false,
             "schema": {
               "enum": [
+                1,
                 3,
                 7,
                 30
@@ -221261,6 +221826,62 @@
                           "id",
                           "nickname",
                           "avatar_url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "day_workouts": {
+                      "description": "ADR-224, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one.",
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
                         ],
                         "type": "object"
                       },
@@ -221399,6 +222020,12 @@
                             "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
                             "type": "boolean"
                           },
+                          "day_workout_id": {
+                            "description": "ADR-224: the day WOD the class's WOD comes from.",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "friends_going": {
                             "description": "Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip).",
                             "items": {
@@ -221477,6 +222104,15 @@
                               }
                             },
                             "type": "object"
+                          },
+                          "workout_source": {
+                            "description": "ADR-224: day = inherited from the day's WOD, class = set on the class.",
+                            "enum": [
+                              "day",
+                              "class"
+                            ],
+                            "nullable": true,
+                            "type": "string"
                           }
                         },
                         "type": "object"
@@ -221493,6 +222129,7 @@
                     "end_date",
                     "days",
                     "class_types",
+                    "day_workouts",
                     "slots"
                   ],
                   "type": "object"

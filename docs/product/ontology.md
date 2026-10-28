@@ -237,6 +237,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Personal training | Προσωπική προπόνηση | `pt_pack`, appointments | One-to-one sessions with a coach, sold as personal training packages («Πακέτο προσωπικών προπονήσεων»). "PT" is never written in Greek. | Class. |
 | Event | Εκδήλωση | `community_events` | A one-off or weekly happening with places, price and attendees. Run by a club or an organiser. | Class (on the schedule). |
 | Class | Μάθημα | `class_slots` | A scheduled session on the box's timetable, booked with a package. | Event. |
+| Day WOD | WOD ημέρας | `day_workouts` | The WOD set for a whole date: every class of that day, or only chosen class types (and, with branches, one branch), takes it unless the class has its own WOD. (ADR-224) | A class's own WOD (an override); «WOD σήμερα» (the club channel). |
 
 ### 4.5 Relations between people
 

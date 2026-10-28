@@ -1,6 +1,7 @@
 import type { AssignedWorkoutPreview } from "@/api/assigned-workouts";
 import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import { apiRequest } from "@/api/client";
+import type { DayWorkout } from "@/api/day-workouts";
 import type { operations, paths } from "@/api/generated/schema";
 
 type CreateBookingRequest = NonNullable<
@@ -151,6 +152,10 @@ export type ScheduleSlot = {
   /** False for a draft: no WOD and not in a series, so members can't see it. */
   published?: boolean;
   workout_status?: ClassWorkoutStatus;
+  /** ADR-224: "day" = inherited from the day's WOD, "class" = set on the class. */
+  workout_source?: "day" | "class" | null;
+  /** ADR-224: the day WOD the class's WOD comes from. */
+  day_workout_id?: string | null;
   class_series_id?: string | null;
   name: string;
   duration_minutes: number;
@@ -219,6 +224,8 @@ export type ScheduleWindow = {
   slots: ScheduleSlot[];
   locations?: ScheduleLocation[];
   coaches?: ScheduleCoach[];
+  /** ADR-224, staff only: the WOD of each day in the window. */
+  day_workouts?: DayWorkout[];
 };
 
 export type ScheduleSlotPayload = {

@@ -386,6 +386,10 @@ const API_ERROR_KEYS: Record<string, string> = {
   slot_not_full: "mbErrSlotNotFull",
   // ADR-176
   class_not_published: "apiErrorClassNotPublished",
+  // ADR-224: day WODs.
+  day_in_the_past: "apiErrorDayInThePast",
+  no_day_workout: "apiErrorNoDayWorkout",
+  day_class_started: "apiErrorDayClassStarted",
   invalid_time_zone: "apiErrorInvalidTimeZone",
   time_zone_required: "apiErrorTimeZoneRequired",
   already_booked: "mbErrAlreadyBooked",
