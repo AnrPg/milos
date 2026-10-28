@@ -16,7 +16,7 @@ defmodule Palee.Application.BoxPublicProfileTest do
     UpdateBoxPublicProfile
   }
 
-  alias Palee.{Media, Organizations}
+  alias Palee.{Facility, Media, Organizations}
   alias Palee.TestSupport.MemoryObjectStore
 
   setup do
@@ -32,9 +32,31 @@ defmodule Palee.Application.BoxPublicProfileTest do
               photos: [],
               published: false,
               missing: ["about", "disciplines"],
+              on_map: false,
               languages: ["el", "en"],
               lock_version: 0
             }} = BoxPublicProfile.get(a.context)
+  end
+
+  # ADR-221: Γύρω μου needs an open location with a map point.
+  test "on_map says whether an open location has a map point", %{a: a} do
+    {:ok, _unplaced} =
+      Facility.create_location(a.context, %{"name" => "Χωρίς χάρτη", "address" => "Οδός 1"})
+
+    assert {:ok, %{on_map: false}} = BoxPublicProfile.get(a.context)
+
+    {:ok, placed} =
+      Facility.create_location(a.context, %{
+        "name" => "Κυψέλη",
+        "address" => "Φωκίωνος Νέγρη 1",
+        "latitude" => 38.004,
+        "longitude" => 23.738
+      })
+
+    assert {:ok, %{on_map: true}} = BoxPublicProfile.get(a.context)
+
+    {:ok, _archived} = Facility.archive_location(a.context, placed.id)
+    assert {:ok, %{on_map: false}} = BoxPublicProfile.get(a.context)
   end
 
   test "the first save keeps Greek and English unless languages are sent", %{a: a, b: b} do

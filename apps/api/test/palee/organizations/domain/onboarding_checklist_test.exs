@@ -9,12 +9,12 @@ defmodule Palee.Organizations.Domain.OnboardingChecklistTest do
     view = OnboardingChecklist.build(OnboardingChecklist.from_settings(%{}), %{})
 
     assert view["completed_count"] == 0
-    assert view["total"] == 7
+    assert view["total"] == 8
     refute view["finished"]
     refute view["dismissed"]
 
     assert Enum.map(view["steps"], & &1["id"]) ==
-             ~w(timezone settings classes packages workout invite tour)
+             ~w(timezone settings classes packages workout page invite tour)
   end
 
   test "real data completes steps automatically" do
@@ -32,7 +32,8 @@ defmodule Palee.Organizations.Domain.OnboardingChecklistTest do
     state = OnboardingChecklist.default_state()
 
     state =
-      Enum.reduce(~w(timezone settings classes packages workout invite), state, fn step, acc ->
+      Enum.reduce(~w(timezone settings classes packages workout page invite), state, fn step,
+                                                                                        acc ->
         {:ok, next} =
           OnboardingChecklist.apply_action(acc, %{"action" => "complete", "step" => step}, @now)
 
