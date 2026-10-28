@@ -396,7 +396,7 @@ defmodule PaleeWeb.BusinessAccountControllerTest do
         )
 
       assert email.locale == "el"
-      assert email.subject =~ "Ενεργοποιήστε"
+      assert email.subject =~ "Ενεργοποίησε"
       assert email.text =~ "/activate-business#token=" <> token
       assert email.html =~ "/activate-business#token=" <> token
 

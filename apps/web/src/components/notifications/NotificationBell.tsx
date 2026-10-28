@@ -10,7 +10,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { emailKeyNotificationText } from "@/components/email/email-key-notifications";
@@ -18,11 +18,13 @@ import { useTranslations } from "next-intl";
 
 import {
   fetchNotifications,
+  fetchUnreadNotificationCount,
   markNotificationClicked,
   markAllNotificationsRead,
   type NotificationsResponse,
   type NotificationRecord,
 } from "@/api/notifications";
+import { FRESHNESS } from "@/lib/query-policy";
 import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
@@ -866,9 +868,19 @@ export function NotificationBell({
   const [open, setOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const push = usePushNotifications(tokens?.access_token);
+  const signedIn = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser?.id);
+  // The badge shows on every screen, so it reads the count alone; the list
+  // loads only while the panel is open. Both stay current through the
+  // `notifications:changed` event (invalidating ["notifications", user]).
+  const unreadQuery = useQuery({
+    queryKey: ["notifications", currentUser?.id, "unread-count"],
+    enabled: signedIn,
+    queryFn: () => fetchUnreadNotificationCount(tokens!.access_token),
+    staleTime: FRESHNESS.pushed,
+  });
   const notificationQuery = useInfiniteQuery({
     queryKey: ["notifications", currentUser?.id],
-    enabled: status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser?.id),
+    enabled: signedIn && open,
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
       if (!tokens?.access_token) {
@@ -940,16 +952,13 @@ export function NotificationBell({
   useEffect(() => {
     if (status !== "authenticated" || !tokens?.access_token || !currentUser?.id) return;
 
-    return subscribeToTopic(tokens.access_token, "notifications:" + (currentUser.id), {
-      "notifications:changed": () => {
-        void queryClient.invalidateQueries({ queryKey: ["notifications", currentUser.id] });
-      },
-    });
+    const refresh = () => void queryClient.invalidateQueries({ queryKey: ["notifications", currentUser.id] });
+    return subscribeToTopic(tokens.access_token, "notifications:" + (currentUser.id), { "notifications:changed": refresh }, { onRejoin: refresh });
   }, [currentUser?.id, queryClient, status, tokens?.access_token]);
 
   const [readSectionOpen, setReadSectionOpen] = useState(false);
 
-  const unreadCount = notificationQuery.data?.pages[0]?.unread_count;
+  const unreadCount = notificationQuery.data?.pages[0]?.unread_count ?? unreadQuery.data?.unread_count;
   const allNotifications =
     notificationQuery.data?.pages.flatMap((page: NotificationsResponse) => page.notifications) ?? [];
   const filterTypes = FILTER_TYPES[activeFilter];
@@ -976,19 +985,16 @@ export function NotificationBell({
   }, [onUnreadChange, unreadCount]);
 
   useEffect(() => {
-    const handler = () => {
-      setOpen(true);
-      void notificationQuery.refetch();
-    };
+    // Opening enables the list query, which loads it when it is not fresh.
+    const handler = () => setOpen(true);
     window.addEventListener(OPEN_EVENT, handler);
     return () => window.removeEventListener(OPEN_EVENT, handler);
-  }, [notificationQuery]);
+  }, []);
 
   if (status !== "authenticated" || !tokens?.access_token) return null;
 
   function openPanel() {
     setOpen(true);
-    void notificationQuery.refetch();
     void push.refreshCapability();
   }
 

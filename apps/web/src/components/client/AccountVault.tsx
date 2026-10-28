@@ -54,7 +54,7 @@ export function AccountVault() {
   const token = tokens?.access_token ?? null;
   const { filter, setFilter } = useRememberedFilter("vault", parseVaultFilter, DEFAULT_VAULT_FILTER);
   const vault = useQuery({
-    queryKey: [...ACCOUNT_VAULT_KEY, token, filter],
+    queryKey: [...ACCOUNT_VAULT_KEY, filter],
     enabled: Boolean(token) && filter !== null,
     queryFn: () => fetchAccountVault(token!, filter!),
     placeholderData: (previous) => previous,

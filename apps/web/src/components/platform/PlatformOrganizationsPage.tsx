@@ -116,7 +116,7 @@ export function PlatformOrganizationsPage() {
 
   const accessToken = tokens?.access_token;
   const organizationsQuery = useQuery({
-    queryKey: ["platform-organizations", accessToken],
+    queryKey: ["platform-organizations"],
     queryFn: () => listPlatformOrganizations(accessToken!),
     enabled: Boolean(accessToken),
   });
@@ -176,7 +176,7 @@ export function PlatformOrganizationsPage() {
   // ADR-210: the email is queued, not sent in the request; while it waits,
   // the console reads its delivery status again.
   const deliveriesQuery = useQuery({
-    queryKey: ["owner-invitation-deliveries", invitation?.initial_owner_invitation.id, accessToken],
+    queryKey: ["owner-invitation-deliveries", invitation?.initial_owner_invitation.id],
     queryFn: () =>
       fetchOwnerInvitationDeliveries(
         accessToken!,
@@ -758,7 +758,7 @@ function AccessDialog({
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
   const accessQuery = useQuery({
-    queryKey: ["platform-organization-access", accessToken, organization.organization.id],
+    queryKey: ["platform-organization-access", organization.organization.id],
     enabled: Boolean(accessToken),
     queryFn: () => fetchPlatformOrganizationAccess(accessToken!, organization.organization.id),
   });

@@ -23,6 +23,7 @@ defmodule PaleeWeb.AdminFinanceController do
     GetFinancePackageCatalog,
     GetFinanceMemberProfile,
     GenerateFinanceRenewalInvoice,
+    MembershipRenewal,
     IssueFinanceInvoice,
     ListFinanceCleanupRecords,
     ListFinanceMembers,
@@ -815,6 +816,78 @@ defmodule PaleeWeb.AdminFinanceController do
              param_id(params),
              body_params(conn, params)
            ) do
+      json(conn, %{membership: membership})
+    end
+  end
+
+  @subscription_id_parameter %Parameter{
+    name: :subscription_id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
+  }
+
+  operation(:set_member_auto_renew,
+    summary: "Turn a member's subscription renewal on or off (ADR-220)",
+    parameters: [@id_parameter, @subscription_id_parameter],
+    request_body:
+      {"Renewal choice", "application/json",
+       %Schema{
+         type: :object,
+         properties: %{auto_renew: %Schema{type: :boolean}},
+         required: [:auto_renew]
+       }},
+    responses: [ok: {"Package subscription", "application/json", @open_object}]
+  )
+
+  def set_member_auto_renew(conn, params) do
+    with {:ok, subscription} <-
+           MembershipRenewal.staff_set_auto_renew(
+             conn.assigns.tenant_context,
+             param_id(params),
+             params["subscription_id"],
+             (conn.body_params || %{})["auto_renew"]
+           ) do
+      json(conn, %{package_subscription: subscription})
+    end
+  end
+
+  operation(:mark_member_left,
+    summary: "Mark a member as left the box (ADR-220)",
+    parameters: [@id_parameter],
+    request_body:
+      {"Leave", "application/json",
+       %Schema{
+         type: :object,
+         properties: %{
+           leaving_on: %Schema{type: :string, format: :date, nullable: true},
+           reason: %Schema{type: :string, maxLength: 500, nullable: true},
+           commitment_override_reason: %Schema{type: :string, nullable: true}
+         }
+       }},
+    responses: [ok: {"Leave result", "application/json", @open_object}]
+  )
+
+  def mark_member_left(conn, params) do
+    with {:ok, result} <-
+           MembershipRenewal.staff_mark_left(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
+      json(conn, result)
+    end
+  end
+
+  operation(:undo_member_left,
+    summary: "Undo a member's leave (ADR-220)",
+    parameters: [@id_parameter],
+    responses: [ok: {"Membership", "application/json", @open_object}]
+  )
+
+  def undo_member_left(conn, params) do
+    with {:ok, membership} <-
+           MembershipRenewal.staff_undo_leave(conn.assigns.tenant_context, param_id(params)) do
       json(conn, %{membership: membership})
     end
   end

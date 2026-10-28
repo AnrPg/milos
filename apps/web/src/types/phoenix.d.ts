@@ -11,8 +11,12 @@ declare module "phoenix" {
   }
 
   export class Socket {
-    constructor(endpoint: string, options?: { params?: Record<string, unknown> });
+    /** `params` may be a function: it is read at every (re)connect. */
+    constructor(endpoint: string, options?: { params?: Record<string, unknown> | (() => Record<string, unknown>) });
     connect(): void;
+    onOpen(callback: () => void): string;
+    onClose(callback: (event?: unknown) => void): string;
+    onError(callback: (error?: unknown) => void): string;
     disconnect(): void;
     channel(topic: string, params?: Record<string, unknown>): Channel;
   }

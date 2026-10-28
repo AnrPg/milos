@@ -191,7 +191,7 @@ export function WorkoutAdminConsole() {
     if (!tokens?.access_token) return;
 
     const confirmed = window.confirm(
-      i18n("delete63346e8") + (workout.title || i18n("thisWorkoutd8375a8")) + i18n("permanentlyThisHardDeleteRemovesTheWorkoutDefinitionbb6e054"),
+      i18n("deleteWorkoutPermanentlyConfirm", { title: workout.title || i18n("thisWorkoutd8375a8") }),
     );
 
     if (!confirmed) return;
@@ -199,7 +199,7 @@ export function WorkoutAdminConsole() {
     await runAction("delete-" + (workout.id), async () => {
       await deleteWorkout(tokens.access_token, workout.id);
       setWorkouts((current) => current.filter((item) => item.id !== workout.id));
-      setMessage(i18n("deleted98c055d") + (workout.title || "workout") + "\".");
+      setMessage(i18n("workoutDeletedNamed", { title: workout.title || i18n("thisWorkoutd8375a8") }));
     });
   }
 

@@ -24,6 +24,7 @@ import { inboxHref } from "@/components/chat/inbox/inbox-model";
 
 import { billingTab, sessionsLeft, validityProgress, type BillingTab } from "./billing-model";
 import { OffersSegment } from "./OffersSegment";
+import { LeaveProviderCard, RenewalSwitch } from "./RenewalAndLeaving";
 import { Detail, Empty, Row } from "./parts";
 import { TransactionsSegment } from "./TransactionsSegment";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -34,8 +35,9 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
  * reach the box), then three segments in `?tab=`: «Συνδρομή» (package,
  * allowances, history, corporate plan), «Συναλλαγές» (the complete money
  * history, events at any host included) and «Προσφορές» (codes to use,
- * offers claimed, seasons, referral rewards, trials). Members cannot buy or cancel here (staff assign
- * packages), so those needs go to «Επικοινωνία με το box». Several providers
+ * offers claimed, seasons, referral rewards, trials). Members cannot buy here (staff assign
+ * packages), so that goes to «Επικοινωνία με το box»; they do decide whether
+ * their package renews and can leave the box (ADR-220). Several providers
  * get a dropdown (`?box=`). People without a provider never see the entry,
  * and the route sends them back to Εγώ.
  */
@@ -284,7 +286,10 @@ function MembershipSegment({
       {current ? (
         <HubCard>
           <SubscriptionDetails subscription={current} />
-          {provider.actions.self_service_purchase ? null : (
+          {/* ADR-220: the member's own choice; otherwise the box arranges it. */}
+          {current.can_change_auto_renew ? (
+            <RenewalSwitch provider={provider} subscription={current} />
+          ) : provider.actions.self_service_purchase || provider.membership?.leaving_on ? null : (
             <p className="mt-3 text-xs" style={{ color: "var(--dim)" }}>{t("renewWithBox")}</p>
           )}
         </HubCard>
@@ -308,6 +313,7 @@ function MembershipSegment({
         </HubCard>
       ) : null}
       <CorporateEnrollmentCard onEnrolled={onEnrolled} />
+      <LeaveProviderCard provider={provider} />
     </>
   );
 }
@@ -321,7 +327,7 @@ function SubscriptionDetails({ subscription }: { subscription: BillingSubscripti
       <Detail label={t("period")} value={`${formatDate(locale, subscription.starts_on)} – ${subscription.ends_on ? formatDate(locale, subscription.ends_on) : t("openEnded")}`} />
       {subscription.billing_period ? <Detail label={t("billing")} value={<SemanticLabel value={subscription.billing_period} />} /> : null}
       {typeof subscription.price_cents === "number" ? <Detail label={t("price")} value={formatMinorUnits(locale, subscription.price_cents)} /> : null}
-      {subscription.auto_renew !== null && subscription.auto_renew !== undefined ? (
+      {subscription.auto_renew !== null && subscription.auto_renew !== undefined && !subscription.can_change_auto_renew ? (
         <Detail label={t("autoRenew")} value={subscription.auto_renew ? t("yes") : t("no")} />
       ) : null}
       {subscription.commitment_ends_on ? <Detail label={t("commitment")} value={formatDate(locale, subscription.commitment_ends_on)} /> : null}

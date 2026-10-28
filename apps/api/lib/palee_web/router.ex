@@ -483,6 +483,15 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-220: the member's renewal choice and leaving the box.
+    put(
+      "/membership/subscriptions/:id/auto-renew",
+      MyMembershipController,
+      :set_auto_renew
+    )
+
+    post("/membership/leave", MyMembershipController, :leave)
+    delete("/membership/leave", MyMembershipController, :stay)
     # ADR-155: Box › Check-in.
     get("/check-in/code", MyCheckInController, :code)
     post("/check-in/code/reset", MyCheckInController, :reset_code)
@@ -1197,6 +1206,15 @@ defmodule PaleeWeb.Router do
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
+    # ADR-220: renewal choice and leaving the box.
+    put(
+      "/finance/members/:id/subscriptions/:subscription_id/auto-renew",
+      AdminFinanceController,
+      :set_member_auto_renew
+    )
+
+    post("/finance/members/:id/leave", AdminFinanceController, :mark_member_left)
+    delete("/finance/members/:id/leave", AdminFinanceController, :undo_member_left)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
     post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
@@ -1491,6 +1509,7 @@ defmodule PaleeWeb.Router do
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
     get("/notifications", NotificationController, :index)
+    get("/notifications/unread-count", NotificationController, :unread_count)
     post("/notifications/read-all", NotificationController, :mark_all_read)
     post("/notifications/:id/read", NotificationController, :mark_read)
     post("/notifications/:id/click", NotificationController, :mark_clicked)

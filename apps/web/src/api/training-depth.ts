@@ -18,8 +18,8 @@ export type DepthLoad = TrainingDepth["load"];
 export const COACH_DEPTH_RANGES = ["4w", "12w", "6m"] as const satisfies readonly ProgressRange[];
 export type CoachDepthRange = (typeof COACH_DEPTH_RANGES)[number];
 
-export const myTrainingDepthKey = (token: string | null, range: ProgressRange, sources: readonly SourceToken[]) =>
-  ["me", "progress-depth", token, range, [...sources].sort().join(",")] as const;
+export const myTrainingDepthKey = (range: ProgressRange, sources: readonly SourceToken[]) =>
+  ["me", "progress-depth", range, [...sources].sort().join(",")] as const;
 
 export const clientTrainingDepthKey = (userId: string, range: CoachDepthRange) =>
   ["staff", "clients", userId, "progress-depth", range] as const;
