@@ -708,3 +708,9 @@ msgstr "Το κλειδί SMTP του Palee έληξε στις %{date}, οπό�
 
 msgid "The email key has expired"
 msgstr "Το κλειδί email έληξε"
+
+msgid "A box member is leaving"
+msgstr "Ένα μέλος του box αποχωρεί"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "Ο/Η %{nickname} αποχωρεί από το box. Τελευταία ημέρα: %{date}."

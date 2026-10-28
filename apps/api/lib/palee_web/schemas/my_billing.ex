@@ -32,7 +32,21 @@ defmodule PaleeWeb.Schemas.MyBilling do
         status: @string,
         entitlement_status: @nullable_string,
         starts_on: @date,
-        expires_on: @date
+        expires_on: @date,
+        leaving_on: %Schema{
+          type: :string,
+          format: :date,
+          nullable: true,
+          description: "ADR-220: the member is leaving (or left) the box; their last day."
+        },
+        left_by: %Schema{type: :string, enum: ["member", "staff"], nullable: true},
+        leave_reason: @nullable_string,
+        leave_preview_on: %Schema{
+          type: :string,
+          format: :date,
+          nullable: true,
+          description: "ADR-220: the last day the member would keep if they left today."
+        }
       }
     }
   end
@@ -49,7 +63,16 @@ defmodule PaleeWeb.Schemas.MyBilling do
       starts_on: @date,
       ends_on: @date,
       commitment_ends_on: @date,
-      auto_renew: %Schema{type: :boolean, nullable: true},
+      auto_renew: %Schema{
+        type: :boolean,
+        nullable: true,
+        description:
+          "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs."
+      },
+      can_change_auto_renew: %Schema{
+        type: :boolean,
+        description: "The member can turn renewal of this subscription on or off."
+      },
       corporate: @boolean
     })
   end
@@ -228,10 +251,16 @@ defmodule PaleeWeb.Schemas.MyBilling do
         actions:
           object(
             "BillingActions",
-            [:self_service_purchase, :self_service_cancel_auto_renew, :download_invoices],
+            [
+              :self_service_purchase,
+              :self_service_cancel_auto_renew,
+              :self_service_leave,
+              :download_invoices
+            ],
             %{
               self_service_purchase: @boolean,
               self_service_cancel_auto_renew: @boolean,
+              self_service_leave: @boolean,
               download_invoices: @boolean
             }
           ),

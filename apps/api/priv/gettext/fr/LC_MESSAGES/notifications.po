@@ -708,3 +708,9 @@ msgstr "La clé SMTP de Palee a expiré le %{date} : Palee ne peut plus envoyer 
 
 msgid "The email key has expired"
 msgstr "La clé e-mail a expiré"
+
+msgid "A box member is leaving"
+msgstr "Un membre de la box s'en va"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} quitte la box. Dernier jour : %{date}."

@@ -21,6 +21,11 @@ defmodule Palee.Finance.Membership do
     field :entitlement_expires_on, :date
     field :entitlement_updated_at, :utc_datetime_usec
     field :last_payment_reminder_sent_at, :utc_datetime_usec
+    # ADR-220: the member is leaving (or left) the box on `leaving_on`.
+    field :leaving_on, :date
+    field :left_at, :utc_datetime_usec
+    field :left_by, :string
+    field :leave_reason, :string
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -66,5 +71,17 @@ defmodule Palee.Finance.Membership do
     |> unique_constraint([:organization_id, :user_id], name: :memberships_organization_user_index)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:referred_by_user_id)
+  end
+
+  @doc """
+  ADR-220: records (or, with every field nil, clears) the member leaving the
+  box. Kept out of `changeset/2` so a plain membership update cannot set it.
+  """
+  def leave_changeset(%__MODULE__{} = membership, params) do
+    membership
+    |> cast(params, [:leaving_on, :left_at, :left_by, :leave_reason, :expires_on, :status])
+    |> validate_inclusion(:left_by, ["member", "staff"])
+    |> validate_length(:leave_reason, max: 500)
+    |> check_constraint(:leaving_on, name: :leaving_consistency_check)
   end
 end

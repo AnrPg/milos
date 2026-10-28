@@ -6003,6 +6003,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a member as left the box (ADR-220) */
+        post: operations["PaleeWeb.AdminFinanceController.mark_member_left"];
+        /** Undo a member's leave (ADR-220) */
+        delete: operations["PaleeWeb.AdminFinanceController.undo_member_left"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
         parameters: {
             query?: never;
@@ -6099,6 +6117,23 @@ export interface paths {
         put?: never;
         /** Record received money and immediately issue its receipt */
         post: operations["PaleeWeb.AdminFinanceController.create_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/subscriptions/{subscription_id}/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Turn a member's subscription renewal on or off (ADR-220) */
+        put: operations["PaleeWeb.AdminFinanceController.set_member_auto_renew"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9730,6 +9765,41 @@ export interface paths {
         /** Get a presigned download URL for one of the current member's invoices */
         get: operations["PaleeWeb.MyFinanceController.invoice_download_url"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/membership/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Leave the box: renewal stops and access ends with what I paid for */
+        post: operations["PaleeWeb.MyMembershipController.leave"];
+        /** Change my mind before my last day at the box */
+        delete: operations["PaleeWeb.MyMembershipController.stay"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/membership/subscriptions/{id}/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Turn renewal of one of my subscriptions on or off */
+        put: operations["PaleeWeb.MyMembershipController.set_auto_renew"];
         post?: never;
         delete?: never;
         options?: never;
@@ -17134,6 +17204,7 @@ export interface components {
         BillingActions: {
             download_invoices: boolean;
             self_service_cancel_auto_renew: boolean;
+            self_service_leave: boolean;
             self_service_purchase: boolean;
         };
         /** BillingAvailableOffer */
@@ -17185,6 +17256,19 @@ export interface components {
             entitlement_status?: string | null;
             /** Format: date */
             expires_on?: string | null;
+            /**
+             * Format: date
+             * @description ADR-220: the last day the member would keep if they left today.
+             */
+            leave_preview_on?: string | null;
+            leave_reason?: string | null;
+            /**
+             * Format: date
+             * @description ADR-220: the member is leaving (or left) the box; their last day.
+             */
+            leaving_on?: string | null;
+            /** @enum {string|null} */
+            left_by?: "member" | "staff" | null;
             /** Format: date */
             starts_on?: string | null;
             status: string;
@@ -17234,6 +17318,7 @@ export interface components {
             actions: {
                 download_invoices: boolean;
                 self_service_cancel_auto_renew: boolean;
+                self_service_leave: boolean;
                 self_service_purchase: boolean;
             };
             /** @description Codes of running campaigns the box shows to members. */
@@ -17283,6 +17368,19 @@ export interface components {
                 entitlement_status?: string | null;
                 /** Format: date */
                 expires_on?: string | null;
+                /**
+                 * Format: date
+                 * @description ADR-220: the last day the member would keep if they left today.
+                 */
+                leave_preview_on?: string | null;
+                leave_reason?: string | null;
+                /**
+                 * Format: date
+                 * @description ADR-220: the member is leaving (or left) the box; their last day.
+                 */
+                leaving_on?: string | null;
+                /** @enum {string|null} */
+                left_by?: "member" | "staff" | null;
                 /** Format: date */
                 starts_on?: string | null;
                 status: string;
@@ -17371,8 +17469,11 @@ export interface components {
             }[];
             slug: string;
             subscriptions: {
+                /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                 auto_renew?: boolean | null;
                 billing_period?: string | null;
+                /** @description The member can turn renewal of this subscription on or off. */
+                can_change_auto_renew?: boolean;
                 /** Format: date */
                 commitment_ends_on?: string | null;
                 corporate?: boolean;
@@ -17454,8 +17555,11 @@ export interface components {
         };
         /** BillingSubscription */
         BillingSubscription: {
+            /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
             auto_renew?: boolean | null;
             billing_period?: string | null;
+            /** @description The member can turn renewal of this subscription on or off. */
+            can_change_auto_renew?: boolean;
             /** Format: date */
             commitment_ends_on?: string | null;
             corporate?: boolean;
@@ -27823,6 +27927,7 @@ export interface components {
                 actions: {
                     download_invoices: boolean;
                     self_service_cancel_auto_renew: boolean;
+                    self_service_leave: boolean;
                     self_service_purchase: boolean;
                 };
                 /** @description Codes of running campaigns the box shows to members. */
@@ -27872,6 +27977,19 @@ export interface components {
                     entitlement_status?: string | null;
                     /** Format: date */
                     expires_on?: string | null;
+                    /**
+                     * Format: date
+                     * @description ADR-220: the last day the member would keep if they left today.
+                     */
+                    leave_preview_on?: string | null;
+                    leave_reason?: string | null;
+                    /**
+                     * Format: date
+                     * @description ADR-220: the member is leaving (or left) the box; their last day.
+                     */
+                    leaving_on?: string | null;
+                    /** @enum {string|null} */
+                    left_by?: "member" | "staff" | null;
                     /** Format: date */
                     starts_on?: string | null;
                     status: string;
@@ -27960,8 +28078,11 @@ export interface components {
                 }[];
                 slug: string;
                 subscriptions: {
+                    /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                     auto_renew?: boolean | null;
                     billing_period?: string | null;
+                    /** @description The member can turn renewal of this subscription on or off. */
+                    can_change_auto_renew?: boolean;
                     /** Format: date */
                     commitment_ends_on?: string | null;
                     corporate?: boolean;
@@ -44739,6 +44860,7 @@ export interface operations {
                             actions: {
                                 download_invoices: boolean;
                                 self_service_cancel_auto_renew: boolean;
+                                self_service_leave: boolean;
                                 self_service_purchase: boolean;
                             };
                             /** @description Codes of running campaigns the box shows to members. */
@@ -44788,6 +44910,19 @@ export interface operations {
                                 entitlement_status?: string | null;
                                 /** Format: date */
                                 expires_on?: string | null;
+                                /**
+                                 * Format: date
+                                 * @description ADR-220: the last day the member would keep if they left today.
+                                 */
+                                leave_preview_on?: string | null;
+                                leave_reason?: string | null;
+                                /**
+                                 * Format: date
+                                 * @description ADR-220: the member is leaving (or left) the box; their last day.
+                                 */
+                                leaving_on?: string | null;
+                                /** @enum {string|null} */
+                                left_by?: "member" | "staff" | null;
                                 /** Format: date */
                                 starts_on?: string | null;
                                 status: string;
@@ -44876,8 +45011,11 @@ export interface operations {
                             }[];
                             slug: string;
                             subscriptions: {
+                                /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                                 auto_renew?: boolean | null;
                                 billing_period?: string | null;
+                                /** @description The member can turn renewal of this subscription on or off. */
+                                can_change_auto_renew?: boolean;
                                 /** Format: date */
                                 commitment_ends_on?: string | null;
                                 corporate?: boolean;
@@ -69701,6 +69839,64 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFinanceController.mark_member_left": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Leave */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    commitment_override_reason?: string | null;
+                    /** Format: date */
+                    leaving_on?: string | null;
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Leave result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.undo_member_left": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceController.assign_package": {
         parameters: {
             query?: never;
@@ -69894,6 +70090,38 @@ export interface operations {
         responses: {
             /** @description Paid receipt */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.set_member_auto_renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Renewal choice */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    auto_renew: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Package subscription */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -88577,6 +88805,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Leave */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Leave result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Already leaving */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.stay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not leaving, or the last day has passed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.set_auto_renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Renewal choice */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    auto_renew: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Package subscription */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Ended, or leaving the box */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description No renewal choice here */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
