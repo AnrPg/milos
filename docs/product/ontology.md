@@ -222,6 +222,8 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Client | Πελάτης | member or athlete role | Someone who trains with the business. Umbrella word for the two below. |
 | Box member | Μέλος box | `member` | Client of a box with a membership or package. Where the box is known, name it: "Member of Box Kypseli" / «Μέλος στο Box Kypseli». Never a bare "Member" / «Μέλος». |
 | Athlete | Αθλητής | `athlete` | Client who gets **personal programming** from a coach. |
+| Personal link | Προσωπικός σύνδεσμος | `registration_invitations` | One-time invitation for one person, any role including staff. |
+| Join links | Σύνδεσμοι εγγραφής | `organization_settings.join_link` | Public links, one per client role, each on or off on its own: «Σύνδεσμος για μέλη box» (`/join/<slug>`) and «Σύνδεσμος για αθλητές» (`/join/<slug>/athlete/<key>`). The link sets the role, never the visitor. (ADR-216) |
 
 ### 4.4 Community spaces
 

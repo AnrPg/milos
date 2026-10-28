@@ -4885,12 +4885,26 @@
     "createAnother": "Crea un altro link",
     "inviteSubject": "Il tuo invito a {organization}",
     "inviteMessage": "Sei invitato a unirti a {organization}. Crea il tuo account qui: {url}",
-    "publicTitle": "Link di iscrizione pubblico",
-    "publicHint": "Chiunque abbia l’indirizzo della tua palestra può iscriversi. Disattivabile in qualsiasi momento.",
-    "publicOff": "Il link di iscrizione è disattivato. Attivalo per avere un indirizzo da mettere sul sito, sui social o in un QR code alla reception.",
+    "publicOff": "Disattivato. Attivalo quando vuoi un indirizzo per il tuo sito, i social o un codice QR alla reception.",
     "publicWarning": "Chi usa questo indirizzo entra come {role}. Lo staff ha comunque bisogno di un link personale.",
+    "publicIntro": "Ogni ruolo ha il suo link. È il link che condividi a decidere il ruolo, non chi si iscrive. Possono essere attivi entrambi.",
+    "publicLinks": {
+      "member": {
+        "title": "Link per gli iscritti al box",
+        "hint": "L’indirizzo del tuo box. Chi lo usa diventa iscritto al box e prenota posti nelle lezioni. Gli iscritti possono anche scriverlo da soli in «I miei box e club».",
+        "message": "Iscriviti al nostro box nell’app: {url}"
+      },
+      "athlete": {
+        "title": "Link per gli atleti",
+        "hint": "Chi lo usa diventa atleta e riceve una programmazione personale. Ha una sua chiave segreta, quindi nessuno può ricavarlo dal link degli iscritti.",
+        "message": "Iscriviti al nostro box come atleta per la tua programmazione personale: {url}"
+      }
+    },
+    "publicStaffNote": "I link di iscrizione danno solo ruoli da cliente. Per lo staff usa un link personale. Chi è già nel tuo box mantiene il suo ruolo.",
+    "rotateKey": "Nuovo link per gli atleti",
+    "rotateKeyHint": "Il link attuale smette subito di funzionare, insieme a ogni QR o post che lo contiene. Chi si è già iscritto resta com’è.",
+    "confirmRotate": "Sì, creane uno nuovo",
     "joinSubject": "Unisciti a noi",
-    "joinMessage": "Iscriviti alla nostra palestra nell’app: {url}",
     "noPending": "Nessun invito in sospeso. I link che crei compaiono qui finché non vengono usati o scadono.",
     "emailBound": "legato a un’email",
     "expires": "Scade il {date}",

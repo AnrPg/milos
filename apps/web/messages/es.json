@@ -4863,7 +4863,7 @@
     "clientAccess": "Acceso de clientes",
     "clientAccessIntro": "Elige cómo entran los nuevos clientes en tu app: con un enlace personal de un solo uso o con el enlace público de alta.",
     "tabPersonal": "Enlace personal",
-    "tabPublic": "Enlace de alta",
+    "tabPublic": "Enlaces de alta",
     "tabPending": "Pendientes ({count})",
     "joinsAs": "Se une como",
     "roles": {
@@ -4885,12 +4885,26 @@
     "createAnother": "Crear otro enlace",
     "inviteSubject": "Tu invitación a {organization}",
     "inviteMessage": "Te invitamos a unirte a {organization}. Crea tu cuenta aquí: {url}",
-    "publicTitle": "Enlace público de alta",
-    "publicHint": "Cualquiera con la dirección de tu gimnasio puede registrarse. Desactívalo cuando quieras.",
-    "publicOff": "El enlace de alta está desactivado. Actívalo para tener una dirección para tu web, redes sociales o un código QR en recepción.",
+    "publicOff": "Desactivado. Actívalo cuando quieras una dirección para tu web, tus redes o un código QR en recepción.",
     "publicWarning": "Quien use esta dirección se une como {role}. El personal sigue necesitando un enlace personal.",
+    "publicIntro": "Cada rol tiene su propio enlace. El rol lo decide el enlace que compartes, no quien se registra. Pueden estar los dos activados a la vez.",
+    "publicLinks": {
+      "member": {
+        "title": "Enlace para socios del box",
+        "hint": "La dirección de tu box. Quien la usa se hace socio del box y reserva plazas en las clases. Los socios también pueden escribirla en «Mis boxes y clubs».",
+        "message": "Únete a nuestro box en la app: {url}"
+      },
+      "athlete": {
+        "title": "Enlace para atletas",
+        "hint": "Quien lo usa se hace atleta y recibe programación personal. Tiene su propia clave secreta, así que nadie puede sacarlo del enlace de socios.",
+        "message": "Únete a nuestro box como atleta para tu programación personal: {url}"
+      }
+    },
+    "publicStaffNote": "Los enlaces de alta solo dan roles de cliente. Para el personal, usa un enlace personal. Quien ya está en tu box mantiene su rol.",
+    "rotateKey": "Nuevo enlace para atletas",
+    "rotateKeyHint": "El enlace actual deja de funcionar al momento, junto con cada QR o publicación que lo tenga. Quien ya se unió sigue igual.",
+    "confirmRotate": "Sí, crear uno nuevo",
     "joinSubject": "Únete a nosotros",
-    "joinMessage": "Únete a nuestro gimnasio en la app: {url}",
     "noPending": "No hay invitaciones pendientes. Los enlaces que crees aparecerán aquí hasta que se usen o caduquen.",
     "emailBound": "ligado a un correo",
     "expires": "Caduca el {date}",

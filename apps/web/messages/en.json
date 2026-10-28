@@ -4863,7 +4863,7 @@
     "clientAccess": "Client access",
     "clientAccessIntro": "Choose how new clients get into your app: a personal one-time link, or your box’s public join link.",
     "tabPersonal": "Personal link",
-    "tabPublic": "Join link",
+    "tabPublic": "Join links",
     "tabPending": "Pending ({count})",
     "joinsAs": "Joins as",
     "roles": {
@@ -4885,12 +4885,26 @@
     "createAnother": "Create another link",
     "inviteSubject": "Your invitation to {organization}",
     "inviteMessage": "You’re invited to join {organization}. Create your account here: {url}",
-    "publicTitle": "Public join link",
-    "publicHint": "Anyone with your box’s address can sign up. Turn it off anytime.",
-    "publicOff": "The join link is off. Turn it on to get a shareable address for your website, social media or a QR code at reception.",
+    "publicOff": "Off. Turn it on when you want an address for your website, social media or a QR code at the front desk.",
     "publicWarning": "Everyone who uses this address joins as {role}. Staff still need a personal link.",
+    "publicIntro": "Each role has its own link. The link you hand out sets the role, not the person signing up. Both can be on at the same time.",
+    "publicLinks": {
+      "member": {
+        "title": "Link for box members",
+        "hint": "Your box’s address. Whoever uses it becomes a box member and books spots in classes. Members can also type it themselves in “My boxes and clubs”.",
+        "message": "Join our box in the app: {url}"
+      },
+      "athlete": {
+        "title": "Link for athletes",
+        "hint": "Whoever uses it becomes an athlete and gets personal programming. It has its own secret key, so nobody can work it out from the members’ link.",
+        "message": "Join our box as an athlete for your personal programming: {url}"
+      }
+    },
+    "publicStaffNote": "Join links only give client roles. For staff, use a personal link. Someone already in your box keeps their role.",
+    "rotateKey": "New athletes’ link",
+    "rotateKeyHint": "The current link stops working right away, along with every QR code or post that has it. People who already joined stay as they are.",
+    "confirmRotate": "Yes, make a new one",
     "joinSubject": "Join us",
-    "joinMessage": "Join our box in the app: {url}",
     "noPending": "No pending invitations. Links you create appear here until they’re used or expire.",
     "emailBound": "email-bound",
     "expires": "Expires {date}",
