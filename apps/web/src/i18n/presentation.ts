@@ -424,6 +424,8 @@ const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
   finance_class_type_not_included: "apiErrorFinanceClassTypeNotIncluded",
 };
 
+const WORKOUT_PROBLEMS = new Set(["no_content", "incomplete_sections", "invalid_details"]);
+
 const PACKAGE_RULES = new Set([
   "validity_required",
   "limited_quota_required",
@@ -504,6 +506,13 @@ export function localizeError(error: unknown, translate: UiTranslator): string {
   const rule = error.payload.params?.rule;
   if (error.payload.code === "package_rule_violated" && typeof rule === "string" && PACKAGE_RULES.has(rule)) {
     return translate(`apiErrorPackageRule_${rule}`);
+  }
+
+  // A WOD that cannot be given to anyone: name it and what it lacks.
+  const problem = error.payload.params?.problem;
+  if (error.payload.code === "workout_not_assignable" && typeof problem === "string" && WORKOUT_PROBLEMS.has(problem)) {
+    const title = error.payload.params?.title;
+    return translate(`apiErrorWorkoutNotAssignable_${problem}`, { title: typeof title === "string" && title ? title : "WOD" });
   }
 
   const key = error.payload.code ? API_ERROR_KEYS[error.payload.code] : undefined;

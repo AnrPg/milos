@@ -8,6 +8,7 @@ import { fetchAdminWorkout, fetchWorkoutAuthoringSettings, WOD_ASSISTANT_AVAILAB
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { workoutPublishedHref } from "@/lib/workout-return";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
 import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
@@ -24,15 +25,32 @@ type AuthoringMode = "structured" | "quick-text" | "free-text" | "sectioned";
  */
 const SHOW_AUTHORING_MODE_SWITCHER = false;
 
-export function WorkoutAuthoringModes() {
+type Props = {
+  /**
+   * Opened from inside another screen (a class form, a member's programming):
+   * the editor keeps its draft and mode in its own state instead of the
+   * address, so the screen underneath stays exactly as the coach left it.
+   */
+  embedded?: boolean;
+  /** Embedded only: open this draft (e.g. a member's copy of a class WOD) instead of a new one. */
+  initialDraftId?: string | null;
+  /** Embedded only: the new workout was published. */
+  onPublished?: (workoutId: string) => void;
+  /** Embedded only: the legacy structured canvas's cancel button. */
+  onCancel?: () => void;
+};
+
+export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null, onPublished, onCancel }: Props = {}) {
   const i18n = useUiTranslations();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
   const storeDraftId = useWorkoutCreationStore((state) => state.draftId);
-  const requestedMode = searchParams.get("mode");
-  const draftId = searchParams.get("draft") ?? storeDraftId;
+  // Embedded: the draft lives here, never in the address of the screen below.
+  const [embeddedDraftId, setEmbeddedDraftId] = useState<string | null>(initialDraftId);
+  const requestedMode = embedded ? null : searchParams.get("mode");
+  const draftId = embedded ? embeddedDraftId : (searchParams.get("draft") ?? storeDraftId);
   const switcherMode: AuthoringMode =
     requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
 
@@ -73,7 +91,7 @@ export function WorkoutAuthoringModes() {
     (!SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending) || availability.isLoading;
 
   // New workouts started from inside a library folder are created in that folder.
-  const folderId = searchParams.get("folder");
+  const folderId = embedded ? null : searchParams.get("folder");
   const [modeBarVisible, setModeBarVisible] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
 
@@ -117,6 +135,10 @@ export function WorkoutAuthoringModes() {
   }
 
   function selectMode(nextMode: AuthoringMode, selectedDraftId = draftId) {
+    if (embedded) {
+      setEmbeddedDraftId(selectedDraftId);
+      return;
+    }
     const params = new URLSearchParams(searchParams.toString());
     params.set("mode", nextMode);
 
@@ -125,6 +147,16 @@ export function WorkoutAuthoringModes() {
     }
 
     router.replace(adminHref(`/admin/workouts/new?${params.toString()}`, organizationSlug));
+  }
+
+  // Published: back to whoever opened the editor. A page visit goes to the
+  // form it came from (`?return_to=`, ADR-176) or to the library.
+  function published(workoutId: string) {
+    if (embedded) {
+      onPublished?.(workoutId);
+      return;
+    }
+    router.push(workoutPublishedHref(new URLSearchParams(window.location.search), workoutId, adminHref("/admin/workouts", organizationSlug)));
   }
 
   if (resolvingDraft) {
@@ -188,6 +220,7 @@ export function WorkoutAuthoringModes() {
             draftId={draftId}
             folderId={folderId}
             onDraftReady={(id) => selectMode("quick-text", id)}
+            onPublished={published}
             onSwitchToStructured={(id) => selectMode("structured", id)}
           />
         ) : mode === "free-text" ? (
@@ -196,6 +229,7 @@ export function WorkoutAuthoringModes() {
             draftId={draftId}
             folderId={folderId}
             onDraftReady={(id) => selectMode("free-text", id)}
+            onPublished={published}
             onUseSections={() => setAssistantChoice({ draftId, useAssistant: false })}
           />
         ) : mode === "sectioned" ? (
@@ -207,11 +241,16 @@ export function WorkoutAuthoringModes() {
               setAssistantChoice((current) => (current && current.draftId === null ? { ...current, draftId: id } : current));
               selectMode("free-text", id);
             }}
+            onPublished={published}
             assistantAvailable={assistantAvailable}
             onUseAssistant={() => setAssistantChoice({ draftId, useAssistant: true })}
           />
         ) : (
-          <WorkoutCreationCanvas />
+          embedded ? (
+            <WorkoutCreationCanvas embedded initialDraftId={draftId} onCancel={onCancel} onPublished={(workout) => published(workout.id)} />
+          ) : (
+            <WorkoutCreationCanvas />
+          )
         )}
       </div>
     </div>

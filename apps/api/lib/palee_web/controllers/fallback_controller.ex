@@ -1898,6 +1898,18 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # A WOD whose programming copy cannot be published: the WOD itself has to
+  # be fixed in its editor, so the reply names it and what it lacks.
+  def call(conn, {:error, :workout_not_assignable, details}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "workout_not_assignable",
+      error: "The workout cannot be assigned until it is complete (#{details.problem})",
+      params: details
+    })
+  end
+
   # ADR-201: programming for several people.
   def call(conn, {:error, reason}) when reason in [:invalid_user_ids, :too_many_users] do
     conn

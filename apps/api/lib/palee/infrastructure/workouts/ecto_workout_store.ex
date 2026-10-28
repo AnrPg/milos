@@ -1981,6 +1981,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       "workout_metadata" => workout.workout_metadata,
       "sections" => draft_sections_from_db(workout.sections)
     }
+    |> Map.merge(authoring_draft_fields(workout))
   end
 
   defp draft_sections_from_db(sections) do
@@ -2241,15 +2242,22 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         title = String.trim("#{source.title || "Untitled"} #{title_suffix}")
         draft_data = build_duplicate_draft_data(source, title)
 
-        params = %{
-          created_by_id: source.created_by_id,
-          status: :draft,
-          title: title,
-          type: source.type,
-          folder_id: Map.get(attrs, :folder_id) || Map.get(attrs, "folder_id"),
-          source_workout_id: source.id,
-          draft_data: draft_data
-        }
+        # The copy is written the same way as its original (free text, text
+        # sections, structured): without the authoring mode and its body a
+        # copy of a text WOD publishes as an empty structured one and fails
+        # with `no_sections` when it is assigned to a class or a member.
+        params =
+          draft_data
+          |> authoring_columns()
+          |> Map.merge(%{
+            created_by_id: source.created_by_id,
+            status: :draft,
+            title: title,
+            type: source.type,
+            folder_id: Map.get(attrs, :folder_id) || Map.get(attrs, "folder_id"),
+            source_workout_id: source.id,
+            draft_data: draft_data
+          })
 
         # Copies keep the original's icon, whoever chose it, and its WOD
         # goals (ADR-163), in one transaction. Programming copies (class
@@ -2336,11 +2344,14 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   defp build_duplicate_draft_data(source, title) do
-    base = source.draft_data || %{}
-    existing_sections = Map.get(base, "sections", Map.get(base, :sections))
+    base = stringify_keys_deep(source.draft_data || %{})
+    existing_sections = Map.get(base, "sections")
 
     if is_list(existing_sections) && existing_sections != [] do
-      base
+      # Pending edits win; the saved authoring state fills what they lack.
+      source
+      |> authoring_draft_fields()
+      |> Map.merge(base)
       |> Map.put("title", title)
       |> Map.put("type", source.type && to_string(source.type))
     else
@@ -2350,6 +2361,24 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       |> Map.put("title", title)
     end
   end
+
+  # The authoring state (mode, DSL, free text) as draft_data keys, so a
+  # reopened or copied workout publishes in the mode it was written in.
+  defp authoring_draft_fields(%MasterWorkout{} = workout) do
+    %{
+      "authoring_mode" => workout.authoring_mode,
+      "dsl_version" => workout.dsl_version,
+      "dsl_source" => workout.dsl_source,
+      "dsl_document" => workout.dsl_document,
+      "last_dsl_diagnostics" => workout.last_dsl_diagnostics,
+      "free_text_body" => workout.free_text_body,
+      "free_text_document" => workout.free_text_document
+    }
+    |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+    |> Map.new()
+  end
+
+  defp authoring_columns(draft_data), do: extract_dsl_authoring_fields(draft_data)
 
   defp prepare_workout_structure(params) do
     case WorkoutAuthoring.prepare_structure(params) do

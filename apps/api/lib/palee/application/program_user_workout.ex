@@ -153,7 +153,10 @@ defmodule Palee.Application.ProgramUserWorkout do
                title_suffix: suffix,
                copy_goals: false
              ) do
-        Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0})
+        FileWorkoutCopy.publish_copy(context, draft, %{
+          id: source_id,
+          title: workout_title(context, source_id)
+        })
       end
     else
       file_original(context, folder_id, params)
@@ -168,6 +171,13 @@ defmodule Palee.Application.ProgramUserWorkout do
       )
     else
       file_original(context, folder_id, params)
+    end
+  end
+
+  defp workout_title(context, workout_id) do
+    case Workouts.get_workout_for_admin(context, workout_id) do
+      %{title: title} -> title
+      _missing -> nil
     end
   end
 
