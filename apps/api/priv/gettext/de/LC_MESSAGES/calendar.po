@@ -17,7 +17,7 @@ msgid "Downloading the .ics file imports a one-off snapshot and will not stay sy
 msgstr "Durch das Herunterladen der ICS-Datei wird ein einmaliger Snapshot importiert und die Synchronisierung bleibt nicht erhalten."
 
 msgid "Class: %{name}"
-msgstr "Klasse: %{name}"
+msgstr "Kurs: %{name}"
 
 msgid "Assigned workout"
 msgstr "Zugewiesenes Training"

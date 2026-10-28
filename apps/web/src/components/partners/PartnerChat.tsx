@@ -29,6 +29,8 @@ import { PARTNERS_FALLBACK_REFETCH_MS } from "./partners-realtime";
 import { usePartnerMatches, usePartnersToken } from "./use-partners";
 import { Popover } from "@/components/ui/Popover";
 import { inboxHref } from "@/components/chat/inbox/inbox-model";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
+import { BackLink } from "@/components/ui/BackLink";
 
 type Confirm = "end" | "block" | null;
 
@@ -55,13 +57,14 @@ export function PartnerChat({ matchId }: { matchId: string }) {
   const bottom = useRef<HTMLDivElement | null>(null);
   const messagesKey = useMemo(() => partnerMessagesKey(matchId), [matchId]);
 
+  const fallback = useRealtimeFallbackInterval(PARTNERS_FALLBACK_REFETCH_MS);
   const pages = useInfiniteQuery({
     queryKey: messagesKey,
     enabled: Boolean(token),
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => fetchPartnerMessages(token!, matchId, pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
-    refetchInterval: PARTNERS_FALLBACK_REFETCH_MS,
+    refetchInterval: fallback,
   });
 
   const match = matches.data?.find((item) => item.id === matchId) ?? null;
@@ -124,9 +127,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href={inboxHref({ filter: "partners" })} className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>
-            ← {t("messagesBack")}
-          </Link>
+          <BackLink href={inboxHref({ filter: "partners" })} className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("messagesBack")}</BackLink>
           <div className="flex items-center gap-3">
             <PersonAvatar name={name} url={match?.person.avatar_url} size={40} />
             <div className="min-w-0">

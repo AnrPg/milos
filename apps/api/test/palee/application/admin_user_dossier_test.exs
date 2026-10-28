@@ -18,7 +18,8 @@ defmodule Palee.Application.AdminUserDossierTest do
 
   test "member dossier services share a stable user key and safe empty collections" do
     member = user_fixture(%{role: :member})
-    tenant_context = legacy_tenant_context(member)
+    # ADR-217: finance is a client's section, so the person holds a member role.
+    tenant_context = legacy_tenant_context(member, [:owner, :member])
 
     assert {:ok, %{user_id: id, available: true}} =
              GetAdminUserFinance.call(
@@ -45,7 +46,7 @@ defmodule Palee.Application.AdminUserDossierTest do
   test "finance dossier includes package, referral, and referred-member context" do
     member = user_fixture(%{role: :member})
     referred = user_fixture(%{role: :member})
-    tenant_context = legacy_tenant_context(member)
+    tenant_context = legacy_tenant_context(member, [:owner, :member])
 
     Finance.with_tenant_context(tenant_context, fn ->
       referral =
@@ -161,7 +162,7 @@ defmodule Palee.Application.AdminUserDossierTest do
       Organizations.add_membership(%{
         organization_id: organization.id,
         user_id: user.id,
-        role: role,
+        roles: List.wrap(role),
         status: :active,
         joined_at: DateTime.utc_now()
       })

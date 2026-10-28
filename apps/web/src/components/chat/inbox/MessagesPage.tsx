@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -8,6 +7,7 @@ import { ConversationList } from "@/components/conversations/ConversationList";
 
 import { INBOX_PATH, inboxHref, parseInboxSegment, type InboxSegment } from "./inbox-model";
 import { InboxView } from "./InboxView";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * `/messages` (vision §6.1–6.3, mockup «inbox»): Feed Μηνύματα and `Box › Coach`
@@ -30,10 +30,9 @@ export function MessagesPage() {
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-4 pb-6 pt-4">
       {requests ? (
         <div className="flex flex-col gap-3">
-          <Link href={INBOX_PATH} className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-semibold" style={{ color: "var(--primary)" }}>
-            <span aria-hidden="true" className="rtl:rotate-180">←</span>
+          <BackLink href={INBOX_PATH} className="min-h-11 self-start text-sm font-semibold">
             {t("title")}
-          </Link>
+          </BackLink>
           <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>
             {tConversations("requests")}
           </h1>

@@ -57,3 +57,29 @@ export function fetchProviderRefundReceiptDocument(token: string, slug: string, 
     responseType: "text",
   });
 }
+
+// ── ADR-220: the member's renewal choice and leaving the box ────────────────
+
+/** Turns renewal of one of the member's subscriptions at a provider on or off. */
+export function setMyAutoRenew(token: string, slug: string, subscriptionId: string, autoRenew: boolean) {
+  return apiRequest<{ package_subscription: Record<string, unknown> }>(
+    orgPath(slug, `/me/membership/subscriptions/${encodeURIComponent(subscriptionId)}/auto-renew`),
+    { token, method: "PUT", body: { auto_renew: autoRenew } },
+  );
+}
+
+/** The member leaves the provider: renewals stop, access lasts to the paid end. */
+export function leaveProvider(token: string, slug: string, reason: string | null) {
+  return apiRequest<{ leaving_on: string; voided_invoice_count: number; outstanding_cents: number }>(
+    orgPath(slug, "/me/membership/leave"),
+    { token, method: "POST", body: { reason } },
+  );
+}
+
+/** The member changes their mind before their last day. */
+export function stayWithProvider(token: string, slug: string) {
+  return apiRequest<{ membership: Record<string, unknown> }>(orgPath(slug, "/me/membership/leave"), {
+    token,
+    method: "DELETE",
+  });
+}

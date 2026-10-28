@@ -9,6 +9,15 @@ describe("parseJoinInput", () => {
     expect(parseJoinInput("/join/box-kypseli")).toEqual({ kind: "join", slug: "box-kypseli" });
   });
 
+  it("reads a gym's athlete join link with its key (ADR-216)", () => {
+    expect(parseJoinInput("https://palee.app/join/box-kypseli/athlete/Ab_9-x")).toEqual({
+      kind: "join",
+      slug: "box-kypseli",
+      athleteKey: "Ab_9-x",
+    });
+    expect(parseJoinInput("/join/box-kypseli/athlete/Ab_9-x/")).toEqual({ kind: "join", slug: "box-kypseli", athleteKey: "Ab_9-x" });
+  });
+
   it("reads an invitation link or a bare code", () => {
     expect(parseJoinInput("https://palee.app/register?token=abc123")).toEqual({ kind: "invite", token: "abc123" });
     expect(parseJoinInput("  abc123  ")).toEqual({ kind: "invite", token: "abc123" });

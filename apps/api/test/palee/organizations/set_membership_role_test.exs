@@ -121,9 +121,102 @@ defmodule Palee.Organizations.SetMembershipRoleTest do
              Organizations.set_membership_role(coach_context, member.id, :athlete)
   end
 
-  test "an account cannot change its own role", %{owner: owner, context_a: context_a} do
-    assert {:error, :cannot_change_own_membership} =
+  test "an account never changes its own top role", %{owner: owner, context_a: context_a} do
+    assert {:error, :own_top_role_locked} =
              Organizations.set_membership_role(context_a, owner.id, :member)
+
+    assert {:error, :own_top_role_locked} =
+             Organizations.set_membership_roles(context_a, owner.id, ["coach"])
+  end
+
+  describe "the hierarchy (ADR-219)" do
+    defp join_as(org, user, roles) do
+      {:ok, _} =
+        Organizations.add_membership(%{
+          organization_id: org.id,
+          user_id: user.id,
+          role: hd(roles),
+          roles: roles,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+
+      {:ok, context} = Organizations.resolve_tenant_context(user, org.slug)
+      context
+    end
+
+    test "an owner adds and drops lower roles on themselves and stays owner",
+         %{owner: owner, org_a: org_a, context_a: context_a} do
+      assert {:ok, membership} =
+               Organizations.set_membership_roles(context_a, owner.id, ["owner", "coach"])
+
+      assert membership.roles == [:owner, :coach]
+      assert membership.role == :owner
+
+      assert {:ok, %{roles: [:owner]}} =
+               Organizations.set_membership_roles(context_a, owner.id, ["owner"])
+
+      assert OrganizationStore.get_membership(org_a.id, owner.id).roles == [:owner]
+    end
+
+    test "an admin adds a staff role to themselves but never an owner role",
+         %{org_a: org_a} do
+      admin = TestFixtures.admin_fixture()
+      context = join_as(org_a, admin, [:admin])
+
+      assert {:ok, %{roles: [:admin, :coach, :member]}} =
+               Organizations.set_membership_roles(context, admin.id, ["admin", "coach", "member"])
+
+      assert {:error, :own_top_role_locked} =
+               Organizations.set_membership_roles(context, admin.id, ["owner", "admin"])
+
+      assert {:error, :own_top_role_locked} =
+               Organizations.set_membership_roles(context, admin.id, ["coach"])
+    end
+
+    test "a coach adds a client role to themselves without the right to grant staff roles",
+         %{org_a: org_a} do
+      coach = TestFixtures.user_fixture(%{role: :member})
+      context = join_as(org_a, coach, [:coach])
+
+      assert {:ok, %{roles: [:coach, :member]}} =
+               Organizations.set_membership_roles(context, coach.id, ["coach", "member"])
+
+      assert {:error, :own_top_role_locked} =
+               Organizations.set_membership_roles(context, coach.id, ["coach", "front_desk"])
+    end
+
+    test "an admin cannot touch a fellow admin or an owner, even their lower roles",
+         %{owner: owner, org_a: org_a} do
+      admin = TestFixtures.admin_fixture()
+      context = join_as(org_a, admin, [:admin])
+      other_admin = TestFixtures.admin_fixture()
+      join_as(org_a, other_admin, [:admin])
+
+      assert {:error, :role_ceiling_exceeded} =
+               Organizations.set_membership_roles(context, other_admin.id, ["admin", "coach"])
+
+      assert {:error, :role_ceiling_exceeded} =
+               Organizations.set_membership_roles(context, owner.id, ["owner", "member"])
+
+      assert OrganizationStore.get_membership(org_a.id, owner.id).roles == [:owner]
+    end
+
+    test "head coach is set only on coaches ranked below, or on oneself",
+         %{owner: owner, org_a: org_a, context_a: context_a} do
+      admin = TestFixtures.admin_fixture()
+      context = join_as(org_a, admin, [:admin, :coach])
+
+      {:ok, _} = Organizations.set_membership_roles(context_a, owner.id, ["owner", "coach"])
+
+      assert {:error, :role_ceiling_exceeded} =
+               Organizations.set_coach_scope(context, owner.id, :all)
+
+      assert {:ok, %{coach_scope: :all}} = Organizations.set_coach_scope(context, admin.id, :all)
+
+      assert {:ok, %{coach_scope: :own}} =
+               Organizations.set_coach_scope(context_a, admin.id, :own)
+    end
   end
 
   describe "state owned by the previous role" do

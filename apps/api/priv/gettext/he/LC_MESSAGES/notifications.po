@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "התפנה מקום ב-%{class}. ההזמנה אושרה או ממתינה לאישור."
 
 msgid "Your package ends soon"
-msgstr "החבילה מסתיימת בקרוב"
+msgstr "חבילת המנוי שלך מסתיימת בקרוב"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} מסתיימת ב-%{date}."
@@ -708,3 +708,9 @@ msgstr "מפתח ה-SMTP של Palee פג ב-%{date}, ולכן Palee לא יכו�
 
 msgid "The email key has expired"
 msgstr "מפתח המייל פג"
+
+msgid "A box member is leaving"
+msgstr "חבר בבוקס עוזב"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} עוזב/ת את הבוקס. יום אחרון: %{date}."

@@ -16,6 +16,7 @@ import type { MapBounds } from "./PlacesMap";
 import { useRememberScheduleLocation } from "./use-schedule-preferences";
 import { Layer } from "@/components/ui/Layer";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackArrow } from "@/components/ui/BackLink";
 
 const PlacesMap = dynamic(() => import("./PlacesMap"), {
   ssr: false,
@@ -61,7 +62,7 @@ export function LocationPicker() {
   const [error, setError] = useState<string | null>(null);
 
   const placesQuery = useQuery({
-    queryKey: ["bookable-places", token, position],
+    queryKey: ["bookable-places", position],
     enabled: Boolean(token),
     queryFn: () => fetchBookablePlaces(token!, position),
   });
@@ -182,7 +183,7 @@ export function LocationPicker() {
           className="grid h-10 w-10 place-items-center rounded-full text-xl"
           style={{ color: "var(--text)" }}
         >
-          <span aria-hidden="true">‹</span>
+          <BackArrow />
         </button>
         <h1 className="flex-1 text-xl font-extrabold" style={{ color: "var(--text)" }}>
           {t("title")}

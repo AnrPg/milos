@@ -9,7 +9,8 @@ defmodule Palee.Organizations.Commands.UpdateJoinLink do
         settings = OrganizationStore.get_organization_settings(context.organization_id)
         current = JoinLinkPolicy.from_settings(settings && settings.settings)
 
-        with {:ok, join_link} <- JoinLinkPolicy.update(current, params),
+        with {:ok, join_link} <-
+               JoinLinkPolicy.update(current, params, JoinLinkPolicy.new_key()),
              :ok <- live_link(context, join_link),
              {:ok, _settings} <-
                OrganizationStore.put_organization_settings_entry(
@@ -23,9 +24,10 @@ defmodule Palee.Organizations.Commands.UpdateJoinLink do
     end
   end
 
-  # ADR-184: a business in demo mode may set its link up but not open it.
-  defp live_link(context, %{"enabled" => true}),
-    do: GoLivePolicy.check(Map.get(context, :organization), :invite_people)
-
-  defp live_link(_context, _join_link), do: :ok
+  # ADR-184: a business in demo mode may set its links up but not open them.
+  defp live_link(context, join_links) do
+    if Enum.any?(join_links, fn {_role, link} -> link["enabled"] end),
+      do: GoLivePolicy.check(Map.get(context, :organization), :invite_people),
+      else: :ok
+  end
 end

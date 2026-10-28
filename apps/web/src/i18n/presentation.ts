@@ -362,6 +362,15 @@ const API_ERROR_KEYS: Record<string, string> = {
   package_already_used: "apiErrorPackageAlreadyUsed",
   package_new_members_only: "apiErrorPackageNewMembersOnly",
   package_not_renewable: "apiErrorPackageNotRenewable",
+  // ADR-220: renewal choice and leaving the box.
+  renewal_turned_off: "apiErrorRenewalTurnedOff",
+  member_leaving: "apiErrorMemberLeaving",
+  renewal_choice_not_allowed: "apiErrorRenewalChoiceNotAllowed",
+  subscription_ended: "apiErrorSubscriptionEnded",
+  not_leaving: "apiErrorNotLeaving",
+  already_left: "apiErrorAlreadyLeft",
+  left_by_staff: "apiErrorLeftByStaff",
+  invalid_leaving_on: "apiErrorInvalidLeavingOn",
   invalid_athletes: "apiErrorInvalidAthletes",
   member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",
@@ -404,6 +413,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   owner_location_scope: "apiErrorOwnerLocationScope",
   cannot_change_own_membership: "apiErrorCannotChangeOwnMembership",
   role_ceiling_exceeded: "apiErrorRoleCeilingExceeded",
+  own_top_role_locked: "apiErrorOwnTopRoleLocked",
   promotion_location_not_included: "apiErrorPromotionLocationNotIncluded",
   location_not_found: "mbErrLocationNotFound",
   // ADR-097 admin codes
@@ -476,6 +486,8 @@ const ROLE_KEYS: Record<string, string> = {
   owner: "roleOwner",
   admin: "roleAdmin",
   coach: "roleCoach",
+  // A coach with `coach_scope: all` (ontology §4.3).
+  head_coach: "roleHeadCoach",
   front_desk: "roleFrontDesk",
   accountant: "roleAccountant",
   janitor: "roleJanitor",

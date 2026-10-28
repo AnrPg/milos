@@ -10,6 +10,7 @@ defmodule PaleeWeb.NotificationController do
     GetNotifications,
     GetPushNotificationConfig,
     GetPushSubscriptionStatus,
+    GetUnreadNotificationCount,
     MarkNotificationClicked,
     MarkNotificationRead,
     MarkNotificationsRead,
@@ -158,6 +159,21 @@ defmodule PaleeWeb.NotificationController do
              next_cursor: %Schema{type: :string, nullable: true}
            },
            required: [:notifications, :unread_count, :next_cursor]
+         }}
+    ]
+  )
+
+  operation(:unread_count,
+    summary: "Count the current user's unread notifications",
+    description:
+      "The bell's badge on every screen; the list itself loads only when the panel opens.",
+    responses: [
+      ok:
+        {"Unread count", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{unread_count: %Schema{type: :integer, minimum: 0}},
+           required: [:unread_count]
          }}
     ]
   )
@@ -378,6 +394,11 @@ defmodule PaleeWeb.NotificationController do
     with {:ok, payload} <- GetNotifications.call(actor.id, params) do
       json(conn, payload)
     end
+  end
+
+  def unread_count(conn, _params) do
+    actor = GuardianPlug.current_resource(conn)
+    json(conn, %{unread_count: GetUnreadNotificationCount.call(actor.id)})
   end
 
   def mark_all_read(conn, _params) do

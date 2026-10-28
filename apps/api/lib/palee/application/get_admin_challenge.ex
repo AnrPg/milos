@@ -17,10 +17,11 @@ defmodule Palee.Application.GetAdminChallenge do
         |> Map.new(&{&1.user_id, &1})
 
       users = tracked_users(context)
+      roles_by_user = Organizations.member_roles_by_user(context)
 
       participants =
         users
-        |> Enum.map(&normalize_participant(&1, progress_rows, challenge))
+        |> Enum.map(&normalize_participant(&1, progress_rows, challenge, roles_by_user))
         |> Enum.sort_by(fn participant ->
           {
             participant.completed_at == nil,
@@ -46,7 +47,7 @@ defmodule Palee.Application.GetAdminChallenge do
     |> Identity.list_by_ids()
   end
 
-  defp normalize_participant(user, progress_rows, challenge) do
+  defp normalize_participant(user, progress_rows, challenge, roles_by_user) do
     progress_row = Map.get(progress_rows, user.id, %{})
     target = ChallengeProgress.target(challenge)
     progress = Map.get(progress_row, :progress, 0)
@@ -66,7 +67,8 @@ defmodule Palee.Application.GetAdminChallenge do
     %{
       user_id: user.id,
       nickname: user.nickname,
-      role: to_string(user.role),
+      # ADR-217: the person's primary role in this gym.
+      role: to_string(get_in(roles_by_user, [user.id, :role]) || user.role),
       progress: progress,
       target: target,
       completion_ratio: completion_ratio(progress, target),

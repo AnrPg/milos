@@ -52,8 +52,8 @@ import {
   type OriginChoice,
 } from "./around";
 
-const SAVED_KEY = (token: string | null) => ["saved-filters", "around_me", token] as const;
-const FEED_PREFS_KEY = (token: string | null) => ["saved-filters", "feed", token] as const;
+const SAVED_KEY = ["saved-filters", "around_me"] as const;
+const FEED_PREFS_KEY = ["saved-filters", "feed"] as const;
 
 /** 422 `origin_required`: no area, no box, no place: ask «Πού να ψάξουμε;». */
 export function needsOrigin(error: unknown) {
@@ -274,7 +274,7 @@ export function useSavedAroundFilters() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   return useQuery({
-    queryKey: SAVED_KEY(token),
+    queryKey: SAVED_KEY,
     enabled: Boolean(token),
     staleTime: 60_000,
     retry,
@@ -287,7 +287,7 @@ export function useSavedFilterActions() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const queryClient = useQueryClient();
-  const put = (next: SavedFilters) => queryClient.setQueryData(SAVED_KEY(token), next);
+  const put = (next: SavedFilters) => queryClient.setQueryData(SAVED_KEY, next);
 
   const save = useMutation({
     mutationFn: ({ name, filter }: { name: string; filter: AroundFilter }) => saveNamedFilter(token!, "around_me", name, filter),
@@ -300,7 +300,7 @@ export function useSavedFilterActions() {
   const alert = useMutation({
     mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => setSavedFilterAlert(token!, "around_me", id, enabled),
     onMutate: async ({ id, enabled }) => {
-      const previous = queryClient.getQueryData<SavedFilters>(SAVED_KEY(token));
+      const previous = queryClient.getQueryData<SavedFilters>(SAVED_KEY);
       if (previous) put({ ...previous, saved: previous.saved.map((entry) => (entry.id === id ? { ...entry, alert: enabled } : entry)) });
       return { previous };
     },
@@ -350,7 +350,7 @@ export function useHomeScope() {
     () => null,
   );
   const prefs = useQuery({
-    queryKey: FEED_PREFS_KEY(token),
+    queryKey: FEED_PREFS_KEY,
     enabled: Boolean(token),
     staleTime: Infinity,
     retry,
@@ -363,10 +363,10 @@ export function useHomeScope() {
       writeStored(SCOPE_STORAGE_KEY, scope);
       window.dispatchEvent(new Event("palee:home-scope"));
       if (!token) return;
-      const current = queryClient.getQueryData<SavedFilters>(FEED_PREFS_KEY(token));
+      const current = queryClient.getQueryData<SavedFilters>(FEED_PREFS_KEY);
       const params = { ...(current?.last_used ?? {}), scope };
       void rememberFilters(token, "feed", params)
-        .then((next) => queryClient.setQueryData(FEED_PREFS_KEY(token), next))
+        .then((next) => queryClient.setQueryData(FEED_PREFS_KEY, next))
         .catch(() => undefined);
     },
     [queryClient, token],

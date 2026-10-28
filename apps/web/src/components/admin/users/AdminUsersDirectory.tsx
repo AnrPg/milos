@@ -18,8 +18,10 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
   avatarTone,
+  displayRoles,
   filterDirectory,
   initialsOf,
+  isStaff,
   roleCounts,
   type DirectoryFilters,
   type DirectoryRole,
@@ -29,7 +31,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
-const ROLES: DirectoryRole[] = ["all", "member", "athlete", "admin"];
+const ROLES: DirectoryRole[] = ["all", "member", "athlete", "staff"];
 const SORTS: DirectorySort[] = ["name", "newest", "oldest"];
 const PAGE_SIZE = 50;
 const MAX_USERS = 1_000;
@@ -226,33 +228,55 @@ export function AdminUsersDirectory() {
 
         {usersQuery.isSuccess && users.length > 0 && !(allUsers.length <= 1 && !filtersActive) ? (
           <section aria-label={t("listLabel")} className="overflow-hidden rounded-[1.6rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] md:grid" style={{ color: "var(--dim)", borderBottom: "1px solid var(--border)" }}>
+            <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] md:grid" style={{ color: "var(--dim)", borderBottom: "1px solid var(--border)" }}>
               <span>{t("columns.person")}</span>
+              <span>{t("columns.roles")}</span>
               <span>{t("columns.finance")}</span>
               <span>{t("columns.joined")}</span>
               <span className="sr-only">{t("columns.open")}</span>
             </div>
             <ul>
-              {users.map((user) => (
-                <li key={user.id} style={{ borderBottom: "1px solid var(--border)" }} className="last:border-b-0">
+              {users.map((user) => {
+                // ADR-217: staff rows are tinted so the team stands apart from clients.
+                const staff = isStaff(user);
+                // Only clients have a membership status; staff never get a package.
+                const client = user.client ?? !staff;
+                return (
+                <li
+                  key={user.id}
+                  data-staff={staff ? "true" : undefined}
+                  style={{
+                    borderBottom: "1px solid var(--border)",
+                    background: staff ? "color-mix(in srgb, var(--primary) 7%, transparent)" : undefined,
+                    boxShadow: staff ? "inset 3px 0 0 var(--primary)" : undefined,
+                  }}
+                  className="last:border-b-0"
+                >
                   <Link
                     href={adminHref(`/admin/users/${user.id}`, organizationSlug)}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--panel-muted)] focus-visible:bg-[var(--panel-muted)] md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:gap-4 md:px-5"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--panel-muted)] focus-visible:bg-[var(--panel-muted)] md:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:gap-4 md:px-5"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       <Avatar user={user} />
                       <span className="min-w-0">
                         <span className="block truncate font-semibold" style={{ color: "var(--text)" }}>{user.nickname}</span>
-                        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs" style={{ color: "var(--muted)" }}>
-                          <RoleBadge role={user.role} />
-                          <span className="md:hidden">
-                            {user.finance_status ? <SemanticLabel value={user.finance_status} /> : i18n("noFinanceProfilef804f44")}
-                          </span>
+                        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs md:hidden" style={{ color: "var(--muted)" }}>
+                          <RoleBadges user={user} />
+                          {client ? (
+                            <span>{user.finance_status ? <SemanticLabel value={user.finance_status} /> : i18n("noFinanceProfilef804f44")}</span>
+                          ) : null}
                         </span>
                       </span>
                     </span>
+                    <span className="hidden min-w-0 text-xs md:flex md:flex-wrap md:items-center md:gap-x-3 md:gap-y-1">
+                      <RoleBadges user={user} />
+                    </span>
                     <span className="hidden text-sm md:block" style={{ color: "var(--muted)" }}>
-                      {user.finance_status ? <FinanceBadge status={user.finance_status} /> : <span style={{ color: "var(--dim)" }}>{i18n("noFinanceProfilef804f44")}</span>}
+                      {client ? (
+                        user.finance_status ? <FinanceBadge status={user.finance_status} /> : <span style={{ color: "var(--dim)" }}>{i18n("noFinanceProfilef804f44")}</span>
+                      ) : (
+                        <span style={{ color: "var(--dim)" }}>—</span>
+                      )}
                     </span>
                     <span className="hidden text-sm md:block" style={{ color: "var(--muted)" }}>
                       {user.joined_at ? dateFormat.format(new Date(user.joined_at)) : "—"}
@@ -260,7 +284,8 @@ export function AdminUsersDirectory() {
                     <span aria-hidden="true" className="text-lg" style={{ color: "var(--dim)" }}>›</span>
                   </Link>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </section>
         ) : null}
@@ -287,13 +312,20 @@ function Avatar({ user }: { user: AdminUserDirectoryEntry }) {
   );
 }
 
-function RoleBadge({ role }: { role: AdminUserDirectoryEntry["role"] }) {
-  const color = role === "admin" ? "var(--primary)" : role === "athlete" ? "var(--success)" : "var(--muted)";
+/** ADR-217: every role the person holds in this box, staff roles first. */
+function RoleBadges({ user }: { user: AdminUserDirectoryEntry }) {
   return (
-    <span className="inline-flex items-center gap-1 font-semibold uppercase tracking-[0.12em]" style={{ color }}>
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-      <RoleLabel role={role} />
-    </span>
+    <>
+      {displayRoles(user).map((role) => {
+        const color = role === "athlete" ? "var(--success)" : role === "member" ? "var(--muted)" : "var(--primary)";
+        return (
+          <span key={role} className="inline-flex items-center gap-1 font-semibold uppercase tracking-[0.12em]" style={{ color }}>
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+            <RoleLabel role={role} />
+          </span>
+        );
+      })}
+    </>
   );
 }
 

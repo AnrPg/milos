@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { TOUR_STEPS, checklistLaterKey } from "./onboarding";
 
 const locales = ["en", "el", "ar", "ru", "de", "es", "pt-PT", "he", "it", "bg", "nl", "fr"];
-const CHECKLIST_STEPS = ["settings", "classes", "packages", "workout", "invite", "tour"];
+const CHECKLIST_STEPS = ["settings", "classes", "packages", "workout", "page", "invite", "tour"];
 
 function catalog(locale: string) {
   return JSON.parse(fs.readFileSync(path.resolve("messages", `${locale}.json`), "utf8")).Onboarding;

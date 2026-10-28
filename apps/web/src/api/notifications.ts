@@ -24,6 +24,11 @@ export type DeletePushSubscriptionPayload = {
   endpoint: string;
 };
 
+/** The bell's badge: the unread count alone, without a page of the inbox. */
+export function fetchUnreadNotificationCount(token: string) {
+  return apiRequest<{ unread_count: number }>("/notifications/unread-count", { token });
+}
+
 export async function fetchNotifications(
   token: string,
   params: {

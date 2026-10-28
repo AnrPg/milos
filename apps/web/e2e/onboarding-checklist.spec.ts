@@ -23,7 +23,7 @@ function tokenFor() {
 
 const json = (body: unknown, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });
 
-const STEPS = ["settings", "classes", "packages", "workout", "invite", "tour"];
+const STEPS = ["settings", "classes", "packages", "workout", "page", "invite", "tour"];
 const checklist = {
   audience: "gym",
   steps: STEPS.map((id) => ({ id, done: false, auto: false, skipped: false })),
@@ -52,8 +52,12 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
     ),
   );
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
-  await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ notifications: { enabled: false }, gamification: null, finance: null, scheduling: null })));
+  await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ gamification: null, finance: null, scheduling: null })));
   await page.route("**/api/org/*/admin/onboarding", (route) => route.fulfill(json(checklist)));
+  // Settings › Invitations shows the two join links (ADR-216).
+  await page.route("**/api/org/*/join-link", (route) =>
+    route.fulfill(json({ member: { enabled: false }, athlete: { enabled: false, key: null } })),
+  );
 }
 
 async function openChecklist(page: Page, start: string) {
@@ -74,8 +78,10 @@ test.describe("admin setup checklist", () => {
     const expected: Record<string, string> = {
       "Open settings": "/org/kypseli/admin/settings",
       "Set up classes": "/org/kypseli/admin/class-schedule",
-      "Create a package": "/org/kypseli/admin/finance?tab=packages",
+      "Create a subscription package": "/org/kypseli/admin/finance?tab=packages",
       "Write a workout": "/org/kypseli/admin/workouts/new",
+      // ADR-221: until the page is published nobody finds the box.
+      "Open the public page": "/org/kypseli/admin/public-page",
     };
     for (const [name, href] of Object.entries(expected)) {
       await expect(dialog.getByRole("link", { name })).toHaveAttribute("href", href);
@@ -114,7 +120,7 @@ test.describe("admin setup checklist", () => {
     const panel = page.locator("#setup-checklist");
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("data-pending", "true");
-    await expect(panel).toContainText("0 of 6 done");
+    await expect(panel).toContainText("0 of 7 done");
     await expect(panel.getByRole("link", { name: "Set up classes" })).toHaveCount(0);
     const toggle = panel.getByRole("button", { name: "Show steps" });
     await expect(toggle).toHaveAttribute("aria-expanded", "false");

@@ -33,7 +33,26 @@ defmodule PaleeWeb.AdminUserDirectoryControllerTest do
       |> json_response(200)
 
     assert all["meta"]["total"] >= 3
-    assert Enum.any?(all["users"], &(&1["id"] == admin.id and &1["role"] == "admin"))
+    # ADR-217: people read as their roles in the box, not users.role.
+    owner_row = Enum.find(all["users"], &(&1["id"] == admin.id))
+    assert owner_row["role"] == "owner"
+    assert owner_row["roles"] == ["owner"]
+    assert owner_row["staff"] == true
+    assert owner_row["client"] == false
+    assert owner_row["finance_status"] == nil
+
+    athlete_row = Enum.find(all["users"], &(&1["id"] == athlete.id))
+    assert athlete_row["roles"] == ["athlete"]
+    assert athlete_row["staff"] == false
+    assert athlete_row["client"] == true
+
+    staff_only =
+      build_conn()
+      |> put_bearer_token(admin)
+      |> get("/api/org/#{context.organization.slug}/admin/users?role=staff")
+      |> json_response(200)
+
+    assert Enum.map(staff_only["users"], & &1["id"]) == [admin.id]
 
     filtered =
       build_conn()

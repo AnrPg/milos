@@ -17,7 +17,7 @@ msgid "Downloading the .ics file imports a one-off snapshot and will not stay sy
 msgstr "يؤدي تنزيل ملف ‎.ics إلى استيراد لقطة لمرة واحدة ولن يظل متزامنًا."
 
 msgid "Class: %{name}"
-msgstr "الفئة: %{name}"
+msgstr "الحصة: %{name}"
 
 msgid "Assigned workout"
 msgstr "التمرين المخصص"
@@ -29,7 +29,7 @@ msgid "Assigned workout in Palee."
 msgstr "التمرين المخصص في Palee."
 
 msgid "Scheduled %{name} class in Palee."
-msgstr "تمت جدولة فصل %{name} في Palee."
+msgstr "حصة %{name} مجدولة في Palee."
 
 msgid "Pending"
 msgstr "قيد الانتظار"
@@ -41,7 +41,7 @@ msgid "Scheduled"
 msgstr "المقرر"
 
 msgid "Palee class booking status: %{status}."
-msgstr "حالة حجز فصل Palee: %{status}."
+msgstr "حالة حجز الحصة في Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "حصة تجريبية في %{box}: %{name}"

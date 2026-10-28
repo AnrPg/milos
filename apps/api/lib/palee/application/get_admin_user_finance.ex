@@ -10,7 +10,9 @@ defmodule Palee.Application.GetAdminUserFinance do
 
   def call(user_id, tenant_context, organization_slug \\ nil) do
     with {:ok, user} <- TenantUserAccess.fetch_active_user(tenant_context, user_id) do
-      if AdminProfilePolicy.finance_available?(user.role) do
+      if AdminProfilePolicy.finance_available?(
+           TenantUserAccess.tenant_roles(tenant_context, user.id)
+         ) do
         with {:ok, profile} <- GetFinanceMemberProfile.call(user_id, tenant_context) do
           entitlement =
             EntitlementClassTypeNames.put(
@@ -98,7 +100,11 @@ defmodule Palee.Application.GetAdminUserFinance do
       :expires_on,
       :entitlement_status,
       :entitlement_source,
-      :notes
+      :notes,
+      # ADR-220: leaving the box.
+      :leaving_on,
+      :left_by,
+      :leave_reason
     ])
   end
 
@@ -112,7 +118,12 @@ defmodule Palee.Application.GetAdminUserFinance do
       :price_cents_snapshot,
       :status,
       :starts_on,
-      :ends_on
+      :ends_on,
+      :package_name,
+      # ADR-220: the member's renewal choice (nil: not theirs to make).
+      :auto_renew,
+      :renewal_changed_by,
+      :renewal_changed_at
     ])
   end
 

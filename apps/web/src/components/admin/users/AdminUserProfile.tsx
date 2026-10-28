@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -29,6 +28,7 @@ import { updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
 import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
+import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
@@ -73,6 +73,8 @@ import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
+import { displayRoles, rolesOf } from "@/lib/users-directory";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -311,6 +313,15 @@ function FinanceDetails({
     signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
     notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
   }));
+  // ADR-220: leaving (or undoing it) changes status and expiry on the server;
+  // the cards show what the refreshed profile says, not the earlier edit.
+  const serverStatus = valueText(membership?.status) === "—" ? "active" : valueText(membership?.status);
+  const serverExpiresOn = typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "";
+  const [synced, setSynced] = useState({ status: serverStatus, expires_on: serverExpiresOn });
+  if (synced.status !== serverStatus || synced.expires_on !== serverExpiresOn) {
+    setSynced({ status: serverStatus, expires_on: serverExpiresOn });
+    setDraft((current) => ({ ...current, status: serverStatus, expires_on: serverExpiresOn }));
+  }
   const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
@@ -344,7 +355,7 @@ function FinanceDetails({
           <div className="space-y-2">
             <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
               <Select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onValueChange={(value) => { const status = value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
-                {['active', 'inactive', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
+                {['active', 'paused', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
               </Select>
             </EditableFinanceCard>
             {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
@@ -368,6 +379,7 @@ function FinanceDetails({
               />
             ) : null}
             <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
+            <MembershipLeaving token={token} userId={userId} membership={membership} subscriptions={subscriptions} onRefresh={onRefresh} />
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
@@ -508,7 +520,7 @@ function PRDossier({ member, prs }: { member: AdminUserPRMember; prs: AdminUserP
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {tPrSharing("dossierBack")}</Link>
+        <BackLink href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{tPrSharing("dossierBack")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={{ nickname: member.nickname, avatar_url: member.avatar_url ?? null }} />
           <div className="min-w-0 flex-1">
@@ -626,15 +638,18 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     messages: messages.data?.threads.length ?? 0,
   });
   const sections = new Set(visibleSections);
-  if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
+  // ADR-217: the person's roles in this box, never the account-wide role
+  // (which reads "member" for every account, owners included).
+  const boxRoles = rolesOf({ role: profile.identity.role, roles: profile.membership?.roles });
+  const shownRoles = displayRoles({ role: profile.identity.role, roles: profile.membership?.roles, coach_scope: profile.membership?.coach_scope });
+  const clientRole = boxRoles.includes("athlete") ? "athlete" : boxRoles.includes("member") ? "member" : null;
   // ADR-100/101: coaches and private coach notes belong to client profiles.
-  const isClient = profile.membership?.roles?.length
-    ? profile.membership.roles.some((role) => role === "member" || role === "athlete")
-    : profile.identity.role === "member" || profile.identity.role === "athlete";
+  const isClient = clientRole !== null;
+  if (isClient) sections.add("schedule");
   const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
   const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
   const showBoxMessage = isClient && can(actor, "message_from_box");
-  const trains = profile.identity.role === "member" || profile.identity.role === "athlete";
+  const trains = isClient;
 
   // ADR-140 §8: six tabs, each shown when one of its sections is.
   const tabSections = new Set(sections);
@@ -677,7 +692,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     label: `${semanticLabel(incident.body_area, i18n)} · ${date(incident.started_on)}`,
   }));
   const overviewItems: Array<[string, React.ReactNode]> = [
-    [i18n("rolec3f104d"), <RoleLabel key="role" role={profile.identity.role} />],
+    [i18n("rolec3f104d"), <RoleList key="role" roles={shownRoles} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
     [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
     [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
@@ -694,15 +709,15 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {i18n("users206fc04")}</Link>
+        <BackLink href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("users206fc04")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={profile.identity} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><RoleLabel role={profile.identity.role} /></p>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><RoleList roles={shownRoles} /></p>
             <h1 className="mt-4 truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
             <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
           </div>
-          {token && profile.identity.role === "athlete" ? (
+          {token && clientRole === "athlete" ? (
             <HoverHint hint={i18n("featureAssignWorkoutHint")} align="end">
               <button
                 type="button"
@@ -718,7 +733,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               </button>
             </HoverHint>
           ) : null}
-          {token && profile.identity.role === "member" ? (
+          {token && boxRoles.includes("member") ? (
             <HoverHint hint={i18n("featureMoveToClassHint")} align="end">
               <button
                 type="button"
@@ -768,7 +783,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
 
-          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={profile.identity.role} nickname={profile.identity.nickname} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
+          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={clientRole ?? "member"} nickname={profile.identity.nickname} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
 
           {inTab("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
@@ -778,7 +793,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               id="training_history"
               queryKey={["admin", "users", userId]}
               fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
-              defaultKind={defaultHistoryKind(profile.identity.role)}
+              defaultKind={defaultHistoryKind(clientRole)}
             />
           ) : null}
 
@@ -861,7 +876,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                     type="button"
                     disabled={!canDelete || deleteMutation.isPending}
                     onClick={() => {
-                      if (window.confirm(i18n("delete63346e8") + profile.identity.nickname + "\"?")) deleteMutation.mutate();
+                      if (window.confirm(i18n("deleteNamedConfirm", { name: profile.identity.nickname }))) deleteMutation.mutate();
                     }}
                     className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
                     style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
@@ -880,5 +895,19 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
       </div>
     </main>
+  );
+}
+
+/** ADR-217: every role held in the box, e.g. «Ιδιοκτήτης · Head coach». */
+function RoleList({ roles }: { roles: string[] }) {
+  return (
+    <>
+      {roles.map((role, index) => (
+        <span key={role}>
+          {index > 0 ? " · " : null}
+          <RoleLabel role={role} />
+        </span>
+      ))}
+    </>
   );
 }

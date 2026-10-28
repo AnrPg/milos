@@ -228,7 +228,7 @@ test.describe("Schedule › the space of a class", () => {
 
     await page.goto("/admin/schedule");
     await page.getByRole("button", { name: /CrossFit/ }).first().click();
-    await page.getByRole("button", { name: "Edit slot" }).click();
+    await page.getByRole("button", { name: "Edit class" }).click();
     const dialog = page.getByRole("dialog", { name: "Edit scheduled class" });
     const select = dialog.getByTestId("class-space-select");
     await select.click();

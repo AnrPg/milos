@@ -24,6 +24,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { BoxPhotoUploadError, uploadBoxPhoto } from "@/lib/box-photo-upload";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 type Draft = {
   about: string;
@@ -94,6 +95,7 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
   const tags = useTranslations("BoxTags");
   const i18n = useUiTranslations();
   const locale = useLocale();
+  const slug = useOrganizationSlug();
   const queryClient = useQueryClient();
   const [server, setServer] = useState(profile);
   const saved = useMemo(() => toDraft(server), [server]);
@@ -293,6 +295,23 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
               <li style={{ color: draft.cover || draft.photos.length ? "var(--success)" : "var(--dim)" }}>
                 {draft.cover || draft.photos.length ? "✓" : "○"} {t("checkPhotos")}
               </li>
+              {/* ADR-221: Γύρω μου places the box by a location with a map point. */}
+              <li style={{ color: server.on_map ? "var(--success)" : "var(--dim)" }}>
+                {server.on_map ? "✓" : "○"} {t("checkOnMap")}
+                {server.on_map ? null : (
+                  <>
+                    {" "}
+                    <a href={adminHref("/admin/settings#locations", slug)} className="font-semibold underline" style={{ color: "var(--text)" }}>
+                      {t("checkOnMapAction")}
+                    </a>
+                  </>
+                )}
+              </li>
+              {server.published ? null : (
+                <li className="pt-1 text-xs" style={{ color: "var(--text-soft)" }}>
+                  {t("findableHint")}
+                </li>
+              )}
             </ul>
             <div className="flex flex-wrap gap-2">
               {server.published ? (

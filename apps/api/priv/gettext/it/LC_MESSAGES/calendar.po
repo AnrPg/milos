@@ -17,7 +17,7 @@ msgid "Downloading the .ics file imports a one-off snapshot and will not stay sy
 msgstr "Il download del file .ics importa uno snapshot una tantum e non rimarrà sincronizzato."
 
 msgid "Class: %{name}"
-msgstr "Classe: %{name}"
+msgstr "Lezione: %{name}"
 
 msgid "Assigned workout"
 msgstr "Allenamento assegnato"
@@ -29,7 +29,7 @@ msgid "Assigned workout in Palee."
 msgstr "Allenamento assegnato in Palee."
 
 msgid "Scheduled %{name} class in Palee."
-msgstr "Classe %{name} programmata a Palee."
+msgstr "Lezione %{name} programmata su Palee."
 
 msgid "Pending"
 msgstr "In attesa di"
@@ -41,7 +41,7 @@ msgid "Scheduled"
 msgstr "Programmato"
 
 msgid "Palee class booking status: %{status}."
-msgstr "Stato della prenotazione del corso di formazione Palee: %{status}."
+msgstr "Stato della prenotazione della lezione su Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Lezione di prova da %{box}: %{name}"

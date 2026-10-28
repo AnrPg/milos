@@ -34,6 +34,8 @@ export type BoxPublicProfile = {
   unpublished_changes: boolean;
   /** What the draft still needs before «Δημοσίευση». */
   missing: Array<"about" | "disciplines">;
+  /** ADR-221: an open location has a map point, so Γύρω μου can show the box once published. */
+  on_map?: boolean;
   lock_version: number;
 };
 
