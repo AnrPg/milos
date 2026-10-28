@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
@@ -34,6 +33,7 @@ import { HostedEventSheet, useEventHosts } from "./HostedEventSheet";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { guideAnchor } from "@/lib/guides/anchors";
 import { GuideButton } from "@/components/guides/GuideButton";
+import { BackButton, BackLink } from "@/components/ui/BackLink";
 
 type Tab = "manage" | "finances" | "analytics";
 const TABS: Tab[] = ["manage", "finances", "analytics"];
@@ -70,7 +70,7 @@ export function HostingConsole({ org = null, tab = null, event = null }: { org?:
         </div>
       }
     >
-      <Link href="/events" className="text-sm font-semibold" style={{ color: "var(--dim)" }}>‹ {t("backToEvents")}</Link>
+      <BackLink href="/events" className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{t("backToEvents")}</BackLink>
       {hosts.isPending ? (
         <p className="text-sm" style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
       ) : !host ? (
@@ -122,9 +122,7 @@ function ManageTab({ host, initialEvent }: { host: EventHostChoice; initialEvent
   if (selected) {
     return (
       <>
-        <button type="button" onClick={() => setSelected(null)} className="self-start text-sm font-semibold" style={{ color: "var(--dim)" }}>
-          ‹ {t("allEvents")}
-        </button>
+        <BackButton type="button" onClick={() => setSelected(null)} className="self-start text-sm font-semibold" style={{ color: "var(--dim)" }}>{t("allEvents")}</BackButton>
         <HostedEventPanel eventId={selected} scope={consoleScope(host)} />
       </>
     );

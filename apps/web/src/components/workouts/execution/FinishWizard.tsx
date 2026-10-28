@@ -20,6 +20,7 @@ import { FeltStep } from "@/components/wod-goals/FeltStep";
 import { buildSegmentStepDefinitions } from "./progress";
 import { TextSectionScoreStep, type TextSectionScoreView } from "./TextSectionScoreStep";
 import type { TextSection, TextSectionResult } from "@/lib/text-sections";
+import { BackButton } from "@/components/ui/BackLink";
 
 type SectionScore = {
   section_id: string;
@@ -125,14 +126,7 @@ function ScoreEntryStep({
           {i18n("next2f04eb1")}
         </button>
         {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-full max-w-xs rounded-2xl py-3 text-sm font-semibold"
-            style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
-          >
-            {backLabel ?? i18n("backc32ae9f")}
-          </button>
+          <BackButton type="button" onClick={onBack} className="w-full max-w-xs rounded-2xl py-3 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }} >{backLabel ?? i18n("backc32ae9f")}</BackButton>
         ) : null}
       </div>
     );
@@ -143,9 +137,7 @@ function ScoreEntryStep({
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <div>
           {onBack && (
-            <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-              {backLabel ?? i18n("backc32ae9f")}
-            </button>
+            <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{backLabel ?? i18n("backc32ae9f")}</BackButton>
           )}
         </div>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
@@ -470,9 +462,7 @@ function ModificationsEditorStep({
   return (
     <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
-        <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-          {i18n("backc32ae9f")}
-        </button>
+        <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{i18n("backc32ae9f")}</BackButton>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
           {i18n("skip10b7bbe")}
         </button>
@@ -714,9 +704,7 @@ function FreeTextCommentsStep({
   return (
     <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
-        <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-          {i18n("backc32ae9f")}
-        </button>
+        <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{i18n("backc32ae9f")}</BackButton>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
           {i18n("skip10b7bbe")}
         </button>
@@ -794,9 +782,7 @@ function ConfirmStep({
       style={{ background: "var(--bg)", color: "var(--text)" }}
     >
       <div className="flex items-center px-5 pt-8 pb-2">
-        <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-          {i18n("backc32ae9f")}
-        </button>
+        <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{i18n("backc32ae9f")}</BackButton>
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-4 pb-6 px-6">

@@ -12,6 +12,7 @@ import {
 } from "@/lib/text-sections";
 
 import { formatClock } from "./TimerDisplay";
+import { BackButton } from "@/components/ui/BackLink";
 
 /** A result as the review shows it (a section score, keyed per metric). */
 export type TextSectionScoreView = {
@@ -96,9 +97,7 @@ export function TextSectionScoreStep({
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <div>
           {onBack ? (
-            <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-              {backLabel ?? i18n("backc32ae9f")}
-            </button>
+            <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{backLabel ?? i18n("backc32ae9f")}</BackButton>
           ) : null}
         </div>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>

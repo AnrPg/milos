@@ -33,6 +33,7 @@ import { useUiTranslations } from "@/i18n/ui";
 
 import { InviteClientsSheet, SmallAction, useSquadRefresh, useSquads } from "./SquadParts";
 import { seatsLeft } from "./squads";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * A PT squad (ADR-168): its posts and people for the coach and its members;
@@ -80,9 +81,7 @@ function SquadView({ club, clubs, squad }: { club: CommunityClub; clubs: Communi
 
   return (
     <HubPage title={squad.name} actions={canPost ? <ComposeButton clubs={clubs} clubId={club.id} channelId={squad.id} /> : null}>
-      <Link href={`/clubs/${club.id}`} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
-        ‹ {club.name}
-      </Link>
+      <BackLink href={`/clubs/${club.id}`} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{club.name}</BackLink>
       <HubCard>
         <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
           {t("label")} · {t("members", { count: squad.member_count })}

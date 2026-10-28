@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -26,6 +25,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 const STATUSES: SubscriptionStatus[] = ["trialing", "active", "past_due", "cancelled", "comped"];
 const inputClass = "min-h-10 w-full border-[1px] border-[var(--border)] bg-[var(--panel)] px-3 text-sm text-[var(--text)]";
@@ -45,7 +45,7 @@ export function PlatformPlansPage() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-5">
-        <Link href="/platform/organizations" className="text-sm text-[var(--text-soft)]">‹ {t("console.back")}</Link>
+        <BackLink href="/platform/organizations" className="text-sm text-[var(--text-soft)]">{t("console.back")}</BackLink>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("console.title")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("console.subtitle")}</p>
       </header>

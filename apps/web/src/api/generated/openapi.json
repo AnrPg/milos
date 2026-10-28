@@ -86931,7 +86931,127 @@
             "description": "Join link"
           }
         },
-        "summary": "Public: describe the organization behind a join link",
+        "summary": "Public: describe the organization behind its member join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/auth/join/{slug}/athlete/{key}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.inspect_athlete_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization": {
+                      "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach",
+                            "organiser"
+                          ],
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "summary": "Public: describe the organization behind its athlete join link",
         "tags": [
           "Organizations"
         ]
@@ -137115,7 +137235,328 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Join an organization through its public join link",
+        "summary": "Join an organization as a box member through its member join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/memberships/join/{slug}/athlete/{key}": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.join_as_athlete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "capabilities": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "capability => scope (all, own, status), ADR-099",
+                      "type": "object"
+                    },
+                    "coach_scope": {
+                      "enum": [
+                        "own",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "home_location_id": {
+                      "description": "The location this gym opens on for the person (Phase 2)",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
+                    "notes_visible_to_admins": {
+                      "description": "ADR-101",
+                      "type": "boolean"
+                    },
+                    "organization": {
+                      "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach",
+                            "organiser"
+                          ],
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "roles",
+                    "capabilities",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already a member"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "capabilities": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "capability => scope (all, own, status), ADR-099",
+                      "type": "object"
+                    },
+                    "coach_scope": {
+                      "enum": [
+                        "own",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "home_location_id": {
+                      "description": "The location this gym opens on for the person (Phase 2)",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "location_scope": {
+                      "description": "ADR-186: the branches a staff member works at; all_locations means every branch",
+                      "properties": {
+                        "all_locations": {
+                          "type": "boolean"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "all_locations",
+                        "location_ids"
+                      ],
+                      "type": "object"
+                    },
+                    "notes_visible_to_admins": {
+                      "description": "ADR-101",
+                      "type": "boolean"
+                    },
+                    "organization": {
+                      "properties": {
+                        "activation": {
+                          "description": "ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it",
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach",
+                            "organiser"
+                          ],
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "default_locale": {
+                          "description": "ADR-209: the box's language (its emails default to it)",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "roles",
+                    "capabilities",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join an organization as an athlete through its athlete join link",
         "tags": [
           "Organizations"
         ]
@@ -179714,44 +180155,6 @@
                       ],
                       "type": "object"
                     },
-                    "notifications": {
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_private_key_configured": {
-                          "type": "boolean"
-                        },
-                        "vapid_public_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_subject": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "enabled",
-                        "vapid_private_key_configured"
-                      ],
-                      "type": "object"
-                    },
                     "provider": {
                       "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
                       "properties": {
@@ -179870,7 +180273,6 @@
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications",
                     "scheduling",
                     "workouts",
                     "provider"
@@ -179959,23 +180361,6 @@
                       "weekly_workout_target": {
                         "minimum": 1,
                         "type": "integer"
-                      }
-                    },
-                    "type": "object"
-                  },
-                  "notifications": {
-                    "properties": {
-                      "vapid_private_key": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "vapid_public_key": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "vapid_subject": {
-                        "nullable": true,
-                        "type": "string"
                       }
                     },
                     "type": "object"
@@ -180142,44 +180527,6 @@
                       ],
                       "type": "object"
                     },
-                    "notifications": {
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_private_key_configured": {
-                          "type": "boolean"
-                        },
-                        "vapid_public_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_subject": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "enabled",
-                        "vapid_private_key_configured"
-                      ],
-                      "type": "object"
-                    },
                     "provider": {
                       "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
                       "properties": {
@@ -180298,7 +180645,6 @@
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications",
                     "scheduling",
                     "workouts",
                     "provider"
@@ -210483,20 +210829,38 @@
               "application/json": {
                 "schema": {
                   "properties": {
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "role": {
-                      "enum": [
-                        "member",
-                        "athlete"
+                    "athlete": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "key": {
+                          "description": "Secret part of /join/<slug>/athlete/<key>; null until first enabled",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "key"
                       ],
-                      "type": "string"
+                      "type": "object"
+                    },
+                    "member": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "enabled"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
-                    "enabled",
-                    "role"
+                    "athlete",
+                    "member"
                   ],
                   "type": "object"
                 }
@@ -210542,8 +210906,15 @@
                       "athlete"
                     ],
                     "type": "string"
+                  },
+                  "rotate_key": {
+                    "description": "Athlete link only: retire the old address",
+                    "type": "boolean"
                   }
                 },
+                "required": [
+                  "role"
+                ],
                 "type": "object"
               }
             }
@@ -210556,20 +210927,38 @@
               "application/json": {
                 "schema": {
                   "properties": {
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "role": {
-                      "enum": [
-                        "member",
-                        "athlete"
+                    "athlete": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "key": {
+                          "description": "Secret part of /join/<slug>/athlete/<key>; null until first enabled",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "key"
                       ],
-                      "type": "string"
+                      "type": "object"
+                    },
+                    "member": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "enabled"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
-                    "enabled",
-                    "role"
+                    "athlete",
+                    "member"
                   ],
                   "type": "object"
                 }
@@ -210583,7 +210972,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Enable, disable or change the role of the public join link",
+        "summary": "Turn one join link on or off, or give the athlete link a new key",
         "tags": [
           "Organizations"
         ]
@@ -254862,6 +255251,154 @@
         "summary": "Change a plan's name, limits, prices, trial or visibility (vendors)",
         "tags": [
           "Platform plans"
+        ]
+      }
+    },
+    "/api/platform/push-settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPushSettingsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_private_key_configured": {
+                      "type": "boolean"
+                    },
+                    "vapid_public_key": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_subject": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "vapid_private_key_configured"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Push settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The installation's Web Push settings (never the private key)",
+        "tags": [
+          "Platform"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPushSettingsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "vapid_private_key": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vapid_public_key": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vapid_subject": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_private_key_configured": {
+                      "type": "boolean"
+                    },
+                    "vapid_public_key": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_subject": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "vapid_private_key_configured"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Push settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save or replace the installation's Web Push keys and contact",
+        "tags": [
+          "Platform"
         ]
       }
     },

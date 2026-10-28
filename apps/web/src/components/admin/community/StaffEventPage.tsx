@@ -41,6 +41,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { BackLink } from "@/components/ui/BackLink";
 
 type ListTab = "going" | "waitlisted" | "cancelled" | "came";
 const LIST_TABS: ListTab[] = ["going", "waitlisted", "cancelled", "came"];
@@ -119,7 +120,7 @@ export function StaffEventPage({ eventId }: { eventId: string }) {
   return (
     <main className="min-h-screen px-4 py-8 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex max-w-3xl flex-col gap-5 pb-28">
-        <Link href={back} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>‹ {t("backToEvents")}</Link>
+        <BackLink href={back} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{t("backToEvents")}</BackLink>
         {event.isPending ? (
           <p style={{ color: "var(--dim)" }}>{tEvents("loading")}</p>
         ) : event.data ? (

@@ -101,7 +101,7 @@ async function stubOwner(page: Page, puts: Array<Record<string, unknown>>, appro
       return json(route, { ai_settings: settings });
     }
     // The settings hub's other sections need their own shapes to render.
-    if (path === "/api/admin/settings") return json(route, { notifications: { enabled: false }, gamification: {}, finance: {}, scheduling: {} });
+    if (path === "/api/admin/settings") return json(route, { gamification: {}, finance: {}, scheduling: {} });
     if (path === "/api/admin/community/groups") {
       return json(route, { settings: { member_groups: "none", partners_enabled: false }, pending: [], groups: [] });
     }
