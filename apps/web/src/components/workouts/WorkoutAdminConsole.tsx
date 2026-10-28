@@ -999,7 +999,7 @@ export function WorkoutAdminConsole() {
 }
 
 /**
- * ADR-223: the library lists workouts in summary form (no text, no rich
+ * ADR-224: the library lists workouts in summary form (no text, no rich
  * documents), so opening one loads the whole workout: its text sections with
  * timers and scoring, or its exercises with every parameter.
  */

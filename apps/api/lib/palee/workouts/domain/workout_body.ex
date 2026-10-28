@@ -1,6 +1,6 @@
 defmodule Palee.Workouts.Domain.WorkoutBody do
   @moduledoc """
-  What a workout says, in the shape of the way it was written, pure (ADR-223).
+  What a workout says, in the shape of the way it was written, pure (ADR-224).
 
   A workout is written in one of three ways, and each has its own data. The
   flat workout fields (`free_text_body`, `sections[].exercises`, ...) are a

@@ -1,4 +1,4 @@
-# ADR-223: A workout's body has its own shape for each way of writing it
+# ADR-224: A workout's body has its own shape for each way of writing it
 Date: 2026-10-28
 Status: Accepted
 

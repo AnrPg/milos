@@ -554,7 +554,7 @@ export function WorkoutPreviewDetail({
   // Free text is how coaches write; everyone reads the structured workout. The
   // text is shown only for free-text workouts that have no structure, and for
   // workouts written in text sections (ADR-180: their text holds every section).
-  // ADR-223: text sections are shown one by one, each with its timer and
+  // ADR-224: text sections are shown one by one, each with its timer and
   // what it is scored by, in the coach's own formatting.
   const textSections = authoringMode === "sectioned_text" ? readTextSections({ authoring_mode: authoringMode, sections }) : [];
   if (textSections.length > 0) {

@@ -149,7 +149,7 @@ export type WorkoutSectionRecord = {
   exercises: WorkoutExerciseRecord[];
 };
 
-/** ADR-223: one text section of a workout written without the assistant. */
+/** ADR-224: one text section of a workout written without the assistant. */
 export type TextSectionBody = {
   id: string | null;
   /** Null when the coach left the section untitled. */
@@ -163,7 +163,7 @@ export type TextSectionBody = {
 };
 
 /**
- * ADR-223: what a workout says, in the shape of how it was written. Full
+ * ADR-224: what a workout says, in the shape of how it was written. Full
  * responses carry `WorkoutBody`; lists carry `WorkoutBodySummary`.
  */
 export type WorkoutBody =
@@ -225,7 +225,7 @@ export type WorkoutRecord = {
   workout_metadata?: Record<string, unknown> | null;
   /** Οδηγίες and the rest of the workout's content; staff also get the coach-brief (ADR-140 §4). */
   content?: WorkoutContentEntry[];
-  /** ADR-223: the full body in single-workout responses, a summary in lists. */
+  /** ADR-224: the full body in single-workout responses, a summary in lists. */
   body?: WorkoutBody | WorkoutBodySummary;
 };
 

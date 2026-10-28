@@ -1216,6 +1216,7 @@ defmodule PaleeWeb.Router do
     post("/finance/members/:id/leave", AdminFinanceController, :mark_member_left)
     delete("/finance/members/:id/leave", AdminFinanceController, :undo_member_left)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
+    post("/finance/members/:id/payments/receive", AdminFinanceController, :receive_payment)
     post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
 

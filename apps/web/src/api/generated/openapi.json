@@ -163312,6 +163312,132 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/payments/receive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.receive_payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_cents": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "charge_category": {
+                    "enum": [
+                      "product",
+                      "personal_training",
+                      "event",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "currency": {
+                    "maxLength": 3,
+                    "minLength": 3,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "finance_invoice_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "membership_package_subscription_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "paid_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "payment_method": {
+                    "enum": [
+                      "cash",
+                      "card_manual",
+                      "bank_transfer",
+                      "other"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount_cents",
+                  "idempotency_key",
+                  "payment_method"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The same request, already recorded"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Received payment and its document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record money received from a client and issue the document the billing setup calls for",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/payments/{payment_id}/credits": {
       "post": {
         "callbacks": {},

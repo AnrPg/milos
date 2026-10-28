@@ -338,7 +338,7 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
                }
              ] = workout["sections"]
 
-      # ADR-223: the body carries only what text sections have.
+      # ADR-224: the body carries only what text sections have.
       assert %{
                "kind" => "text_sections",
                "sections" => [

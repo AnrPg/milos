@@ -293,7 +293,7 @@ defmodule PaleeWeb.Schemas.Workout do
   }
 
   @doc """
-  ADR-223: what a workout says, as a union keyed by `kind`, carrying only the
+  ADR-224: what a workout says, as a union keyed by `kind`, carrying only the
   data of the way it was written.
   """
   def body_schema do
@@ -393,7 +393,7 @@ defmodule PaleeWeb.Schemas.Workout do
     }
   end
 
-  @doc "ADR-223: the body in workout lists: excerpts and counts, no documents."
+  @doc "ADR-224: the body in workout lists: excerpts and counts, no documents."
   def body_summary_schema do
     %Schema{
       title: "WorkoutBodySummary",

@@ -47,6 +47,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     PackageContract,
     PaymentModelPolicy,
     PromotionRedemptionPolicy,
+    ReceivedPayment,
     ReferralLifecycle,
     RevenueBreakdown,
     ReferralPolicy,
@@ -453,33 +454,147 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
-  def create_receipt(membership_id, params) do
+  def create_receipt(membership_id, params),
+    do: create_paid_document(membership_id, :receipt, params)
+
+  # ADR-222: money received at the desk. The box's billing setup picks the
+  # document; one idempotency key records the money once, however often the
+  # request is retried (the membership row lock serialises retries).
+  @impl true
+  def receive_payment(membership_id, params) do
+    params = string_key_map(params)
+
+    with :ok <- ReceivedPayment.validate(params) do
+      document =
+        ReceivedPayment.document(
+          get_finance_settings().document_mode,
+          params["finance_invoice_id"]
+        )
+
+      Repo.transaction(fn ->
+        with %Membership{} = membership <- locked_membership(membership_id),
+             nil <- payment_by_idempotency_key(membership.id, params["idempotency_key"]),
+             :ok <- ReceivedPayment.validate_purpose(document, params),
+             {:ok, result} <- receive_into(document, membership.id, params) do
+          Map.put(result, :replayed, false)
+        else
+          %MembershipPayment{} = payment ->
+            payment |> received_payment_result() |> Map.put(:replayed, true)
+
+          nil ->
+            Repo.rollback(:not_found)
+
+          {:error, reason} ->
+            Repo.rollback(reason)
+        end
+      end)
+    end
+  end
+
+  defp receive_into(:settle_invoice, membership_id, params) do
+    with {:ok, payment} <-
+           record_payment(membership_id, %{
+             "finance_invoice_id" => params["finance_invoice_id"],
+             "amount_cents" => params["amount_cents"],
+             "currency" => params["currency"] || "EUR",
+             "paid_on" => params["paid_on"],
+             "payment_method" => params["payment_method"],
+             "payment_status" => "paid",
+             "notes" => params["notes"],
+             "params" => %{
+               "idempotency_key" => params["idempotency_key"],
+               "created_by_id" => params["created_by_id"]
+             }
+           }) do
+      {:ok, received_payment_result(Repo.get!(MembershipPayment, payment.id))}
+    end
+  end
+
+  defp receive_into(document, membership_id, params) do
+    create_paid_document(membership_id, document, params)
+  end
+
+  defp payment_by_idempotency_key(membership_id, key) do
+    MembershipPayment
+    |> tenant_scope()
+    |> where([payment], payment.membership_id == ^membership_id and is_nil(payment.deleted_at))
+    |> where([payment], fragment("?->>'idempotency_key' = ?", payment.params, ^key))
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp received_payment_result(%MembershipPayment{finance_invoice_id: invoice_id} = payment) do
+    invoice = FinanceInvoice |> Repo.get!(invoice_id) |> normalize_invoice_with_balance()
+    subscription = invoice_subscription(invoice.membership_package_subscription_id)
+
+    %{
+      document_type: (invoice.params || %{})["document_kind"] || "invoice",
+      reference: invoice.invoice_number,
+      issued_on: payment.paid_on,
+      amount_cents: payment.amount_cents,
+      currency: payment.currency,
+      description: invoice_description(invoice),
+      membership_package_subscription_id: invoice.membership_package_subscription_id,
+      package_name: subscription && subscription.package_name,
+      package_code_snapshot: subscription && subscription.package_code_snapshot,
+      package_family_snapshot: subscription && subscription.package_family_snapshot,
+      invoice: invoice,
+      payment: normalize_payment(payment)
+    }
+  end
+
+  # What the money was for: the invoice's first line, else its notes.
+  defp invoice_description(invoice) do
+    FinanceInvoiceLine
+    |> where([line], line.finance_invoice_id == ^invoice.id)
+    |> order_by([line], asc: line.inserted_at, asc: line.id)
+    |> select([line], line.description)
+    |> limit(1)
+    |> Repo.one()
+    |> Kernel.||(invoice.notes)
+  end
+
+  defp invoice_subscription(nil), do: nil
+
+  defp invoice_subscription(subscription_id) do
+    case Repo.get(MembershipPackageSubscription, subscription_id) do
+      nil -> nil
+      subscription -> normalize_subscription(subscription)
+    end
+  end
+
+  # A document issued already paid: a receipt (ADR-189 receipt mode) or, in
+  # invoice mode, a paid invoice (ADR-222).
+  defp create_paid_document(membership_id, document, params) do
     params = string_key_map(params)
     amount_cents = parse_integer(params["amount_cents"], 0)
     paid_on = parse_date(params["paid_on"], GymClock.today())
     description = params["description"] || params["notes"] || "Payment received"
     currency = params["currency"] || "EUR"
+    kind = ReceivedPayment.document_kind(document)
 
     Repo.transaction(fn ->
-      invoice_params = %{
-        "invoice_type" => "manual",
-        "issue_date" => paid_on,
-        "due_date" => nil,
-        "currency" => currency,
-        "amount_cents" => amount_cents,
-        "description" => description,
-        "membership_package_subscription_id" => params["membership_package_subscription_id"],
-        "notes" => params["notes"],
-        "params" => %{
-          "document_kind" => "receipt",
-          "idempotency_key" => params["idempotency_key"]
+      invoice_params =
+        %{
+          "invoice_type" => "manual",
+          "issue_date" => paid_on,
+          "due_date" => if(document == :invoice, do: paid_on),
+          "currency" => currency,
+          "amount_cents" => amount_cents,
+          "description" => description,
+          "membership_package_subscription_id" => params["membership_package_subscription_id"],
+          "notes" => params["notes"],
+          "params" => %{
+            "document_kind" => kind,
+            "idempotency_key" => params["idempotency_key"]
+          }
         }
-      }
+        |> maybe_put_charge_line(params["charge_category"])
 
       with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
            {:ok, invoice} <- create_invoice(membership_id, invoice_params),
            {:ok, _issued_invoice} <-
-             issue_invoice(invoice.id, %{"issue_date" => paid_on}),
+             issue_invoice(invoice.id, %{"issue_date" => paid_on, "due_date" => paid_on}),
            {:ok, payment} <-
              record_payment(membership_id, %{
                "finance_invoice_id" => invoice.id,
@@ -492,51 +607,37 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "payment_status" => "paid",
                "notes" => params["notes"],
                "params" => %{
-                 "document_kind" => "receipt",
+                 "document_kind" => kind,
                  "idempotency_key" => params["idempotency_key"],
                  "created_by_id" => params["created_by_id"]
                }
              }) do
-        paid_invoice =
-          FinanceInvoice
-          |> Repo.get!(invoice.id)
-          |> normalize_invoice_with_balance()
-
-        package_subscription =
-          case paid_invoice.membership_package_subscription_id do
-            nil ->
-              nil
-
-            subscription_id ->
-              MembershipPackageSubscription
-              |> Repo.get(subscription_id)
-              |> case do
-                nil -> nil
-                subscription -> normalize_subscription(subscription)
-              end
-          end
-
-        %{
-          document_type: "receipt",
-          reference: paid_invoice.invoice_number,
-          issued_on: paid_on,
-          amount_cents: amount_cents,
-          currency: currency,
-          description: description,
-          membership_package_subscription_id: paid_invoice.membership_package_subscription_id,
-          package_name: package_subscription && package_subscription.package_name,
-          package_code_snapshot:
-            package_subscription && package_subscription.package_code_snapshot,
-          package_family_snapshot:
-            package_subscription && package_subscription.package_family_snapshot,
-          invoice: paid_invoice,
-          payment: payment
-        }
+        received_payment_result(Repo.get!(MembershipPayment, payment.id))
       else
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
   end
+
+  # A payment for something other than a πακέτο συνδρομής keeps its charge
+  # category (product, personal training, event, other) on its line.
+  defp maybe_put_charge_line(%{"membership_package_subscription_id" => id} = params, _category)
+       when is_binary(id) and id != "",
+       do: params
+
+  defp maybe_put_charge_line(params, category) when is_binary(category) and category != "" do
+    Map.put(params, "lines", [
+      %{
+        "line_type" => "manual_charge",
+        "charge_category" => category,
+        "description" => params["description"],
+        "quantity" => 1,
+        "unit_amount_cents" => params["amount_cents"]
+      }
+    ])
+  end
+
+  defp maybe_put_charge_line(params, _category), do: params
 
   @impl true
   def create_manual_credit(membership_id, params) do

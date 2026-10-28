@@ -1199,7 +1199,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
 
     normalized
     |> Map.put(:available_scale_levels, WorkoutMaterializer.available_scales(normalized))
-    # ADR-223: what the workout says, in the shape of how it was written.
+    # ADR-224: what the workout says, in the shape of how it was written.
     |> Map.put(
       :body,
       WorkoutBody.build(

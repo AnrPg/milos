@@ -1,4 +1,4 @@
-# ADR-222: A new WOD written in context comes back to its form; copies keep how they were written
+# ADR-223: A new WOD written in context comes back to its form; copies keep how they were written
 Date: 2026-10-28
 Status: Accepted
 
