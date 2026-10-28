@@ -179714,44 +179714,6 @@
                       ],
                       "type": "object"
                     },
-                    "notifications": {
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_private_key_configured": {
-                          "type": "boolean"
-                        },
-                        "vapid_public_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_subject": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "enabled",
-                        "vapid_private_key_configured"
-                      ],
-                      "type": "object"
-                    },
                     "provider": {
                       "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
                       "properties": {
@@ -179870,7 +179832,6 @@
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications",
                     "scheduling",
                     "workouts",
                     "provider"
@@ -179959,23 +179920,6 @@
                       "weekly_workout_target": {
                         "minimum": 1,
                         "type": "integer"
-                      }
-                    },
-                    "type": "object"
-                  },
-                  "notifications": {
-                    "properties": {
-                      "vapid_private_key": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "vapid_public_key": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "vapid_subject": {
-                        "nullable": true,
-                        "type": "string"
                       }
                     },
                     "type": "object"
@@ -180142,44 +180086,6 @@
                       ],
                       "type": "object"
                     },
-                    "notifications": {
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_private_key_configured": {
-                          "type": "boolean"
-                        },
-                        "vapid_public_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "vapid_subject": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "enabled",
-                        "vapid_private_key_configured"
-                      ],
-                      "type": "object"
-                    },
                     "provider": {
                       "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
                       "properties": {
@@ -180298,7 +180204,6 @@
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications",
                     "scheduling",
                     "workouts",
                     "provider"
@@ -254746,6 +254651,154 @@
         "summary": "Change a plan's name, limits, prices, trial or visibility (vendors)",
         "tags": [
           "Platform plans"
+        ]
+      }
+    },
+    "/api/platform/push-settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPushSettingsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_private_key_configured": {
+                      "type": "boolean"
+                    },
+                    "vapid_public_key": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_subject": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "vapid_private_key_configured"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Push settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The installation's Web Push settings (never the private key)",
+        "tags": [
+          "Platform"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPushSettingsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "vapid_private_key": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vapid_public_key": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vapid_subject": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_private_key_configured": {
+                      "type": "boolean"
+                    },
+                    "vapid_public_key": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "vapid_subject": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "vapid_private_key_configured"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Push settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save or replace the installation's Web Push keys and contact",
+        "tags": [
+          "Platform"
         ]
       }
     },
