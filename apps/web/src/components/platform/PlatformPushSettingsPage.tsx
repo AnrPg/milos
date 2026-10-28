@@ -1,6 +1,5 @@
 "use client";
 
-import { BackLink } from "@/components/ui/BackLink";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -15,6 +14,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { generateVapidKeyPair, normalizePushContact } from "@/lib/web-push-keys";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * ADR-218: browser alerts are signed with one key pair for the whole Palee
@@ -115,9 +115,7 @@ export function PlatformPushSettingsPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6">
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-5">
-        <BackLink href="/platform/organizations" className="self-start text-sm" style={{ color: "var(--text-soft)" }}>
-          {t("back")}
-        </BackLink>
+        <BackLink href="/platform/organizations" className="text-sm text-[var(--text-soft)]">{t("back")}</BackLink>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("title")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("subtitle")}</p>
       </header>

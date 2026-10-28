@@ -30,13 +30,15 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
   def call(_context, _user_id, _role), do: {:error, :not_found}
 
   @doc """
-  Sets the full role set of an account in the context's gym (ADR-099). The
-  actor needs to be allowed to grant every role added or removed, so an admin
-  can neither promote anyone to admin or owner nor demote an owner, and a gym
+  Sets the full role set of an account in the context's gym (ADR-099,
+  ADR-219). On someone else the actor must outrank them and be allowed to
+  grant every role added or removed, so an admin can neither promote anyone
+  to admin or owner nor touch an owner or a fellow admin. On oneself anyone
+  adds or drops roles below their own top role, which never changes. A gym
   always keeps an owner.
   """
   def set_roles(context, user_id, roles) when is_binary(user_id) do
-    case TenantAuthorization.authorize_capability(context, :grant_staff_roles) do
+    case authorize_actor(context, user_id) do
       # organization_memberships is a root tenant table: lookups, the update and
       # the staff broadcast run in the acting member's tenant scope (TD-046).
       :ok -> RepoContext.run(context, fn -> change_roles(context, user_id, roles) end)
@@ -49,11 +51,15 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
   defp change_roles(context, user_id, roles) do
     with {:ok, roles} <- MembershipPolicy.normalize_roles(roles),
          {:ok, membership} <- fetch_membership(context, user_id),
-         :ok <- refuse_self_change(context, membership),
-         changed = symmetric_difference(roles, membership.roles),
-         :ok <- authorize_role_ceiling(TenantAuthorization.roles(context), changed),
-         # ADR-186: a branch manager changes only staff of their own branches.
-         :ok <- SetMembershipLocationScope.authorize_manage(context, membership, roles),
+         who = if(self?(context, user_id), do: :self, else: :other),
+         :ok <-
+           MembershipPolicy.authorize_role_change(
+             TenantAuthorization.roles(context),
+             membership.roles,
+             roles,
+             who
+           ),
+         :ok <- authorize_branches(context, membership, roles, who),
          :ok <- keep_an_owner(context, membership, roles) do
       OrganizationStore.transaction(fn ->
         with :ok <- reconcile_role_owned_state(context, membership, roles) do
@@ -68,7 +74,21 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
     end
   end
 
-  defp symmetric_difference(a, b), do: Enum.uniq((a -- b) ++ (b -- a))
+  # Changing one's own lower roles needs no right to grant roles to others.
+  defp authorize_actor(context, user_id) do
+    if self?(context, user_id),
+      do: :ok,
+      else: TenantAuthorization.authorize_capability(context, :grant_staff_roles)
+  end
+
+  defp self?(context, user_id), do: Map.get(context, :user_id) == user_id
+
+  # ADR-186: a branch manager changes only staff of their own branches. New
+  # roles on oneself work where one already works.
+  defp authorize_branches(_context, _membership, _roles, :self), do: :ok
+
+  defp authorize_branches(context, membership, roles, :other),
+    do: SetMembershipLocationScope.authorize_manage(context, membership, roles)
 
   defp keep_an_owner(context, membership, roles) do
     losing_owner? = :owner in membership.roles and :owner not in roles
@@ -176,24 +196,6 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
         {:error, reason} -> {:halt, {:error, reason}}
       end
     end)
-  end
-
-  defp refuse_self_change(context, membership) do
-    if membership.user_id == context.user_id do
-      {:error, :cannot_change_own_membership}
-    else
-      :ok
-    end
-  end
-
-  # Every added or removed role must be one the actor may grant: an admin may
-  # neither promote someone to admin or owner nor demote an owner.
-  defp authorize_role_ceiling(actor_roles, changed_roles) do
-    if Enum.all?(changed_roles, &MembershipPolicy.can_grant_role?(actor_roles, &1)) do
-      :ok
-    else
-      {:error, :role_ceiling_exceeded}
-    end
   end
 
   defp normalize_role(role) when is_atom(role), do: validate_role(role)

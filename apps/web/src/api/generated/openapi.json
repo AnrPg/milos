@@ -215199,6 +215199,104 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/roles": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyRolesController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "roles": {
+                    "items": {
+                      "enum": [
+                        "owner",
+                        "admin",
+                        "coach",
+                        "front_desk",
+                        "accountant",
+                        "janitor",
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "roles"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership": {
+                      "properties": {
+                        "role": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "role",
+                        "roles",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A role at or above my top role (own_top_role_locked)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set my roles in this gym; only roles below my top role may change (ADR-219)",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/search/users": {
       "get": {
         "callbacks": {},
@@ -252908,21 +253006,39 @@
           "content": {
             "application/json": {
               "schema": {
+                "description": "`roles` (a set) wins over `role`, which replaces the set (ADR-219).",
                 "properties": {
                   "role": {
                     "enum": [
                       "owner",
                       "admin",
                       "coach",
+                      "front_desk",
+                      "accountant",
+                      "janitor",
                       "member",
                       "athlete"
                     ],
                     "type": "string"
+                  },
+                  "roles": {
+                    "items": {
+                      "enum": [
+                        "owner",
+                        "admin",
+                        "coach",
+                        "front_desk",
+                        "accountant",
+                        "janitor",
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
                   }
                 },
-                "required": [
-                  "role"
-                ],
                 "type": "object"
               }
             }
@@ -252947,7 +253063,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Update a tenant membership role from the platform console",
+        "summary": "Set a tenant membership's roles from the platform console (vendor, ADR-219)",
         "tags": [
           "Platform Organizations"
         ]
