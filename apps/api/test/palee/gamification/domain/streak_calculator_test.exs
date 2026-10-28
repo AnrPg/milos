@@ -31,7 +31,7 @@ defmodule Palee.Gamification.Domain.StreakCalculatorTest do
     assert result.current_streak_shields == 0
   end
 
-  # ADR-226: the box chooses how many shields each renewal hands out.
+  # ADR-229: the box chooses how many shields each renewal hands out.
   test "the box's shield count decides how many missed weeks a streak survives" do
     completed_dates = [~D[2026-05-26], ~D[2026-05-28], ~D[2026-06-16], ~D[2026-06-17]]
     opts = [current_date: ~D[2026-06-17], target: 2, shield_reset_day: 1]

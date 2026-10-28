@@ -58,7 +58,7 @@ defmodule Palee.Application.WithdrawBooking do
       booking.status,
       scheduled_at,
       DateTime.utc_now(),
-      terms.cancellation_cutoff_hours
+      terms.cancellation_cutoff_minutes
     )
   end
 

@@ -2,7 +2,7 @@ import { apiRequest } from "@/api/client";
 
 export type GamificationSettings = {
   id?: string | null;
-  /** ADR-226: streak shields each member gets at every renewal (0–5, 0 = off). */
+  /** ADR-229: streak shields each member gets at every renewal (0–5, 0 = off). */
   streak_shields: number;
   /** Day of the month the shields renew; null = each member's sign-up day. */
   streak_shield_reset_day: number | null;
@@ -39,11 +39,12 @@ export type SchedulingSettings = {
   id?: string | null;
   default_capacity: number;
   default_auto_approve: boolean;
-  default_booking_timeout_minutes: number;
+  /** ADR-226: minutes a pending request waits for staff; null waits until the class starts. */
+  default_booking_timeout_minutes: number | null;
   /** How many days ahead members may book; null means no limit. Packages can override it. */
   default_booking_window_days?: number | null;
-  /** Hours before a class after which cancelling still uses the visit; null means no cutoff. */
-  default_cancellation_cutoff_hours?: number | null;
+  /** ADR-226: minutes before a class after which cancelling still uses the visit; null means no cutoff. */
+  default_cancellation_cutoff_minutes?: number | null;
   inserted_at?: string | null;
   updated_at?: string | null;
 };
@@ -104,7 +105,7 @@ export type AdminSettingsUpdate = {
       | "default_auto_approve"
       | "default_booking_timeout_minutes"
       | "default_booking_window_days"
-      | "default_cancellation_cutoff_hours"
+      | "default_cancellation_cutoff_minutes"
     >
   >;
 };

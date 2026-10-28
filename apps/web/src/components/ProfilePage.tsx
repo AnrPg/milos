@@ -265,7 +265,7 @@ export function ProfilePage() {
             description={tGoal("sectionDescription")}
           >
             <div className="space-y-6">
-              {/* ADR-226: the weekly goal is mine; my coach may set it too. */}
+              {/* ADR-229: the weekly goal is mine; my coach may set it too. */}
               <WeeklyGoalSetting />
               <RestDaysSettings />
             </div>

@@ -51,6 +51,7 @@ import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
+import { DurationLimitField } from "@/components/schedule/BookingRuleFields";
 import { fetchGymStaff } from "@/api/staff";
 import { coachOptions } from "@/components/admin/staff-home";
 import { can } from "@/lib/role-navigation";
@@ -185,7 +186,7 @@ function defaultSlotValues(
     scheduled_at: date.toISOString(),
     capacity: defaults?.default_capacity ?? 12,
     auto_approve: defaults?.default_auto_approve ?? false,
-    booking_timeout_minutes: defaults?.default_booking_timeout_minutes ?? 60,
+    booking_timeout_minutes: defaults ? defaults.default_booking_timeout_minutes ?? null : 60,
   };
 }
 
@@ -200,6 +201,7 @@ export function ScheduleConsole({
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const branchT = useTranslations("BranchScope");
+  const rulesT = useTranslations("BookingRules");
   const locale = useLocale();
   const { tokens } = useSession();
   const { days, setDays, openDay, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
@@ -1044,9 +1046,31 @@ export function ScheduleConsole({
                 { label: t("scheduledAt"), type: "datetime" as const, field: "scheduled_at" as const },
                 { label: i18n("featureDurationMinutes"), type: "number-duration" as const, field: "duration_minutes" as const },
                 { label: t("capacity"), type: "number-cap" as const, field: "capacity" as const },
-                { label: t("timeoutMinutes"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
+                { label: rulesT("approvalWaitLabel"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
               ].map(({ label, type, field }) =>
-                type === "select" ? (
+                type === "number-timeout" ? (
+                  // ADR-226: how long a request waits for staff; only without auto-approval.
+                  <div key={label} className="md:col-span-2" style={{ color: "var(--muted)" }}>
+                    <DurationLimitField
+                      testId="slot-approval-wait"
+                      label={label}
+                      help={rulesT("approvalWaitClassHelp")}
+                      noLimitLabel={rulesT("approvalWaitNoLimit")}
+                      value={editor.values.booking_timeout_minutes}
+                      min={1}
+                      max={10080}
+                      fallback={60}
+                      inputStyle={slotInputStyle(field)}
+                      inputProps={invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
+                      onChange={(timeoutMinutes) =>
+                        setEditor((current) =>
+                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes } } : current,
+                        )
+                      }
+                    />
+                    <FieldError id={`slot-error-${field}`}>{editorFieldErrors[field]}</FieldError>
+                  </div>
+                ) : type === "select" ? (
                   <div key={label} className="md:col-span-2">
                     <WodPicker
                       label={label}
@@ -1143,21 +1167,7 @@ export function ScheduleConsole({
                       }
                       value={editor.values.capacity}
                     />
-                  ) : (
-                    <IntegerInput
-                      className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={slotInputStyle(field)}
-                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
-                      min={1}
-                      emptyValue={1}
-                      onValueChange={(timeoutMinutes) =>
-                        setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes ?? 1 } } : current,
-                        )
-                      }
-                      value={editor.values.booking_timeout_minutes}
-                    />
-                  )}
+                  ) : null}
                   <FieldError id={`slot-error-${field}`}>{editorFieldErrors[field]}</FieldError>
                 </label>
                 ),
@@ -1307,7 +1317,7 @@ export function ScheduleConsole({
               <FieldError id="series-error-coach_user_id">{seriesFieldErrors.coach_user_id}</FieldError>
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /><FieldError id="series-error-timezone">{seriesFieldErrors.timezone}</FieldError></label>
             </div>
-            <details className="mt-5 rounded-2xl p-4" open={seriesFieldErrors.capacity || seriesFieldErrors.booking_timeout_minutes ? true : undefined} style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("capacity")} {...invalidFieldProps(seriesFieldErrors.capacity, "series-error-capacity")} min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /><FieldError id="series-error-capacity">{seriesFieldErrors.capacity}</FieldError></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("booking_timeout_minutes")} {...invalidFieldProps(seriesFieldErrors.booking_timeout_minutes, "series-error-booking_timeout_minutes")} min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /><FieldError id="series-error-booking_timeout_minutes">{seriesFieldErrors.booking_timeout_minutes}</FieldError></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
+            <details className="mt-5 rounded-2xl p-4" open={seriesFieldErrors.capacity || seriesFieldErrors.booking_timeout_minutes ? true : undefined} style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("capacity")} {...invalidFieldProps(seriesFieldErrors.capacity, "series-error-capacity")} min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /><FieldError id="series-error-capacity">{seriesFieldErrors.capacity}</FieldError></label><div className="text-xs sm:col-span-3"><DurationLimitField testId="series-approval-wait" label={rulesT("approvalWaitLabel")} help={rulesT("approvalWaitClassHelp")} noLimitLabel={rulesT("approvalWaitNoLimit")} value={seriesEditor.values.booking_timeout_minutes} min={1} max={10080} fallback={60} inputStyle={seriesInputStyle("booking_timeout_minutes")} inputProps={invalidFieldProps(seriesFieldErrors.booking_timeout_minutes, "series-error-booking_timeout_minutes")} onChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes } })} /><FieldError id="series-error-booking_timeout_minutes">{seriesFieldErrors.booking_timeout_minutes}</FieldError></div><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
         </Dialog>
       ) : null}
     </main>

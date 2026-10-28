@@ -55,7 +55,7 @@ defmodule Palee.Application.CancelAppointment do
     AppointmentPolicy.late_cancellation?(
       slot.starts_at,
       DateTime.utc_now(),
-      AppointmentLedger.cutoff_hours(context, terms)
+      AppointmentLedger.cutoff_minutes(context, terms)
     )
   end
 end

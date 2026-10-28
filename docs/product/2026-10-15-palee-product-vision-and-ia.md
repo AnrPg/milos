@@ -255,6 +255,8 @@ Why swipe works for people and not for clubs: swipe makes sense when **both side
 - Injury warning (existing `InjuryWarnings`, acknowledge flow) shows above the buttons when relevant.
 - **Στόχοι** row → goals screen (§7.6).
 
+*Decision (ADR-226, 2026-10-28):* a class without automatic confirmation shows members «Απαιτεί έγκριση · απάντηση μέσα σε …» (or «έως την έναρξη» when the box set no limit). It never shows a booking deadline: bookings stay open until the class starts. Late cancellation is set in hours and minutes.
+
 ### 7.5 Check-in with QR (fewest taps) [PARTIAL]
 | Method | Taps | Web? | Notes |
 |---|---|---|---|
@@ -313,7 +315,7 @@ Show correlations only after enough data (e.g. ≥4 weeks), and always as **indi
 **ADR-194 (Πρόοδος / Ευεξία polish):**
 - Πρόοδος has no page title. The range chips come first and drive every card, including resting HR, which has no chips of its own.
 - Consistency is a single card holding the heatmap, the target and weeks on target. There is one streak only (a gym day streak, otherwise weeks).
-- **ADR-226 (ANR 2026-10-28):** the weekly target is the person's own «Εβδομαδιαίος στόχος», set in `Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης`. Their coach (or staff who coach every client) may set it from the client's profile; the person is notified and keeps the last word. Front desk and other roles never. Box settings keep only the streak shields per renewal (0–5) and when they renew.
+- **ADR-229 (ANR 2026-10-28):** the weekly target is the person's own «Εβδομαδιαίος στόχος», set in `Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης`. Their coach (or staff who coach every client) may set it from the client's profile; the person is notified and keeps the last word. Front desk and other roles never. Box settings keep only the streak shields per renewal (0–5) and when they renew.
 - Cards with no data are hidden, never shown as placeholders.
 - PR trends show estimated 1RM (Epley, ≤12 reps) and a retest hint after 84 days. Both come from one pure lib.
 - The member can hide the macros of the coach's plan. This is stored server-side (`hide_macros`). With no plan, no card is shown.

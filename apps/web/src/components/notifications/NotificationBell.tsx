@@ -475,7 +475,7 @@ function NotificationCard({
         });
       case "nutrition_plan_updated":
         return text("title") || i18n("stfNotifNutritionPlanBody");
-      // ADR-226: a coach or the box changed my weekly goal.
+      // ADR-229: a coach or the box changed my weekly goal.
       case "training_goal_updated":
         return i18n("ntfTrainingGoalBody", {
           name: text("set_by_nickname") || "—",

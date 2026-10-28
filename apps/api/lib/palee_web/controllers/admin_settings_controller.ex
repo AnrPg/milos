@@ -14,7 +14,7 @@ defmodule PaleeWeb.AdminSettingsController do
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true] when action in [:update]
 
-  # ADR-226: the box sets only the streak shields; the weekly goal is personal.
+  # ADR-229: the box sets only the streak shields; the weekly goal is personal.
   @streak_shields_schema %Schema{
     type: :integer,
     minimum: 0,
@@ -79,25 +79,40 @@ defmodule PaleeWeb.AdminSettingsController do
     ]
   }
 
+  # ADR-226: how long a request for a class without auto-approval waits for
+  # staff; null = until the class starts.
+  @booking_timeout_schema %Schema{
+    type: :integer,
+    minimum: 1,
+    maximum: 10_080,
+    nullable: true,
+    description:
+      "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts"
+  }
+
+  @cancellation_cutoff_schema %Schema{
+    type: :integer,
+    minimum: 0,
+    maximum: 10_080,
+    nullable: true,
+    description:
+      "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff"
+  }
+
   @scheduling_settings_schema %Schema{
     type: :object,
     properties: %{
       id: %Schema{type: :string, format: :uuid, nullable: true},
       default_capacity: %Schema{type: :integer, minimum: 1, maximum: 500},
       default_auto_approve: %Schema{type: :boolean},
-      default_booking_timeout_minutes: %Schema{type: :integer, minimum: 1, maximum: 10_080},
+      default_booking_timeout_minutes: @booking_timeout_schema,
       default_booking_window_days: %Schema{
         type: :integer,
         minimum: 1,
         maximum: 365,
         nullable: true
       },
-      default_cancellation_cutoff_hours: %Schema{
-        type: :integer,
-        minimum: 0,
-        maximum: 168,
-        nullable: true
-      },
+      default_cancellation_cutoff_minutes: @cancellation_cutoff_schema,
       inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
     },
@@ -195,11 +210,7 @@ defmodule PaleeWeb.AdminSettingsController do
         properties: %{
           default_capacity: %Schema{type: :integer, minimum: 1, maximum: 500},
           default_auto_approve: %Schema{type: :boolean},
-          default_booking_timeout_minutes: %Schema{
-            type: :integer,
-            minimum: 1,
-            maximum: 10_080
-          },
+          default_booking_timeout_minutes: @booking_timeout_schema,
           default_booking_window_days: %Schema{
             type: :integer,
             minimum: 1,
@@ -207,13 +218,7 @@ defmodule PaleeWeb.AdminSettingsController do
             nullable: true,
             description: "How many days ahead members may book when their package sets no window"
           },
-          default_cancellation_cutoff_hours: %Schema{
-            type: :integer,
-            minimum: 0,
-            maximum: 168,
-            nullable: true,
-            description: "Withdrawals closer to the class than this use the visit"
-          }
+          default_cancellation_cutoff_minutes: @cancellation_cutoff_schema
         },
         required: []
       },

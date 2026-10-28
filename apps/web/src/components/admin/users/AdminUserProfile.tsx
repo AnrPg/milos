@@ -657,7 +657,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const tabSections = new Set(sections);
   if (trains) tabSections.add("training_history");
   if (showCoaches) tabSections.add("coaching_relationships");
-  // ADR-226: a coach (or full-scope staff) may set the client's weekly goal.
+  // ADR-229: a coach (or full-scope staff) may set the client's weekly goal.
   if (isClient && can(actor, "manage_coaching")) tabSections.add("training_goal");
   if (showCoachNotes) tabSections.add("coach_notes");
   if (showBoxMessage) tabSections.add("box_message");

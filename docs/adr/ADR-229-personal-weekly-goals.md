@@ -1,4 +1,4 @@
-# ADR-226: The weekly workout goal is personal; the box sets only the streak shields
+# ADR-229: The weekly workout goal is personal; the box sets only the streak shields
 Date: 2026-10-28
 Status: Accepted
 

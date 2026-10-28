@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { stepGoal } from "@/components/training-goal/training-goal";
 
-/** − N + for the weekly workout goal (ADR-226); every press is one change. */
+/** − N + for the weekly workout goal (ADR-229); every press is one change. */
 export function GoalStepper({
   value,
   min,

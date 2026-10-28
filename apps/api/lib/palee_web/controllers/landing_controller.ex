@@ -65,7 +65,7 @@ defmodule PaleeWeb.LandingController do
     required: [:leaderboard_enabled, :streak_shields]
   }
 
-  # ADR-226: the person's own weekly workout goal.
+  # ADR-229: the person's own weekly workout goal.
   @goal_schema %Schema{
     type: :object,
     nullable: true,

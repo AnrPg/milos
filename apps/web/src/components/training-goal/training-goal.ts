@@ -1,6 +1,6 @@
 import type { TrainingGoal } from "@/api/gamification";
 
-/** ADR-226: the bounds the API accepts; the API sends them too. */
+/** ADR-229: the bounds the API accepts; the API sends them too. */
 export const GOAL_MIN = 1;
 export const GOAL_MAX = 14;
 export const GOAL_DEFAULT = 2;

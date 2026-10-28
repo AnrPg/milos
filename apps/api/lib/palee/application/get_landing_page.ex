@@ -133,7 +133,7 @@ defmodule Palee.Application.GetLandingPage do
       "role" => to_string(context.role),
       "gamification" => %{
         "settings" => Gamification.get_settings(),
-        # ADR-226: the person's own weekly goal (the default until set).
+        # ADR-229: the person's own weekly goal (the default until set).
         "goal" => user.id |> Gamification.get_training_goal() |> WeeklyGoal.present(),
         "stats" => stats,
         "preferences" => preferences,

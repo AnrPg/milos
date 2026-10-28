@@ -50,7 +50,7 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
 
     day_streaks = DayStreakCalculator.calculate(completed_dates, off_days, today)
 
-    # ADR-226: the week's target is the person's own goal, the shields the box's.
+    # ADR-229: the week's target is the person's own goal, the shields the box's.
     weekly_target =
       user_id
       |> GamificationStore.get_training_goal(WeeklyGoal.kind())

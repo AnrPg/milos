@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.PersonalTrainingGoals do
   @moduledoc """
-  ADR-226: the weekly workout goal belongs to the person, not the box.
+  ADR-229: the weekly workout goal belongs to the person, not the box.
 
   1. `training_goals`: one row per person and goal kind (today only
      `weekly_workouts`), kept only once someone set it, so no row means the
