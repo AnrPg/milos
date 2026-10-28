@@ -347,6 +347,16 @@ test.describe("member app shell", () => {
     // On a phone the two sources don't fit one row, so they are a dropdown (SegmentPicker).
     const sources = page.getByRole("combobox", { name: "Today's workouts by source" });
     await expect(sources).toContainText("Class");
+    // The folded tabs are the page's main switch: a Dojo fill, never a grey field (ANR 2026-10-28).
+    const dojo = await sources.evaluate((node) => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--primary)";
+      node.appendChild(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    await expect(sources).toHaveCSS("background-color", dojo);
     await expect(page.getByRole("button", { name: /Start/ })).toBeEnabled();
     await expect(page.getByRole("link", { name: "Videos" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Coach" })).toBeVisible();
@@ -423,6 +433,28 @@ test.describe("member app shell", () => {
 
     await expect(page.getByRole("heading", { name: "You're not in a box yet" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around?kind=boxes");
+    // ADR-221: or by name, when they already know which box.
+    await page.route("**/api/box-search**", (route) =>
+      route.fulfill(
+        json({
+          boxes: [
+            {
+              organization_id: "org-9",
+              slug: "tolaras-box",
+              name: "Τολάρας Box",
+              logo_url: null,
+              primary_color: null,
+              provider_kind: "gym",
+              neighbourhood: null,
+              city: "Αθήνα",
+              my_status: "none",
+            },
+          ],
+        }),
+      ),
+    );
+    await page.getByLabel("Or search by name").fill("tolaras");
+    await expect(page.getByRole("link", { name: /Τολάρας Box/ })).toHaveAttribute("href", "/b/tolaras-box");
     await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Membership", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Schedule" })).toHaveCount(0);

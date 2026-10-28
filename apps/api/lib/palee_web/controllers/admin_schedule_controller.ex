@@ -48,7 +48,7 @@ defmodule PaleeWeb.AdminScheduleController do
       scheduled_at: %Schema{type: :string, format: :"date-time"},
       capacity: %Schema{type: :integer},
       auto_approve: %Schema{type: :boolean},
-      # ADR-222: null = a request waits for approval until the class starts.
+      # ADR-226: null = a request waits for approval until the class starts.
       booking_timeout_minutes: %Schema{
         type: :integer,
         minimum: 1,

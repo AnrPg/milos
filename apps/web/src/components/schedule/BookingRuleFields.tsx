@@ -8,7 +8,7 @@ import { joinMinutes, splitMinutes } from "@/lib/duration-parts";
 const fieldStyle: CSSProperties = { background: "var(--panel-muted)", border: "1px solid var(--border)" };
 
 /**
- * ADR-222: a booking rule stored in minutes, entered as hours plus minutes.
+ * ADR-226: a booking rule stored in minutes, entered as hours plus minutes.
  * null means "no limit"; the checkbox is offered only with `noLimitLabel`.
  */
 export function DurationLimitField({

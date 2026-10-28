@@ -5,6 +5,8 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef } from "react";
+
+import { FloatingParent, useFloatingNode } from "@/components/ui/Popover";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -33,19 +35,22 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
 
   const panelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  // A Select in the section config opens its list in its own layer; the node
+  // counts a press on that list as inside the panel.
+  const panelNode = useFloatingNode(panelRef, false);
 
   useEffect(() => {
     if (mobile) return;
 
     function handleMouseDown(event: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+      if (panelRef.current && !panelNode.contains(event.target as Node)) {
         setSectionConfigOpen(false);
       }
     }
 
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [mobile, setSectionConfigOpen]);
+  }, [mobile, panelNode, setSectionConfigOpen]);
 
   // Scroll list to top when an exercise drag starts so the first section is reachable
   useEffect(() => {
@@ -144,7 +149,9 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
           className="scroll-area border-t"
           style={{ flex: "1 1 0", height: 0, minHeight: "8rem", borderColor: "var(--dim)" }}
         >
-          <SectionConfig section={selectedSection} />
+          <FloatingParent node={panelNode}>
+            <SectionConfig section={selectedSection} />
+          </FloatingParent>
         </div>
       ) : null}
     </div>

@@ -35,7 +35,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicyTest do
     assert {:error, :already_booked} = BookingPolicy.can_book?(slot, user_id: "u1", now: @now)
   end
 
-  describe "approval_deadline/3 (ADR-222)" do
+  describe "approval_deadline/3 (ADR-226)" do
     test "a limited request waits that long from now" do
       starts_at = DateTime.add(@now, 3 * 3600, :second)
 
@@ -54,7 +54,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicyTest do
     end
   end
 
-  describe "late_cancellation?/4 counts the cutoff in minutes (ADR-222)" do
+  describe "late_cancellation?/4 counts the cutoff in minutes (ADR-226)" do
     test "inside the cutoff is late" do
       starts_at = DateTime.add(@now, 89 * 60, :second)
       assert BookingPolicy.late_cancellation?(:approved, starts_at, @now, 90)

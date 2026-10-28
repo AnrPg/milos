@@ -1,5 +1,5 @@
 /**
- * ADR-222: booking rules (approval wait, late-cancellation cutoff) are stored
+ * ADR-226: booking rules (approval wait, late-cancellation cutoff) are stored
  * as whole minutes; staff enter them as hours plus minutes.
  */
 export type DurationParts = { hours: number; minutes: number };

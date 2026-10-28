@@ -72,7 +72,7 @@ defmodule Palee.Application.SubmitBookingTest do
     end)
   end
 
-  test "a pending request times out after its limit, never after the class starts (ADR-222)" do
+  test "a pending request times out after its limit, never after the class starts (ADR-226)" do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture()
       member = user_fixture()

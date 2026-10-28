@@ -26,6 +26,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 import { BranchFilterControl, BranchSplits, useBranchFilter, type BranchSplit } from "@/components/admin/BranchFilter";
 import { RevenueStreamsCard } from "@/components/admin/finance/RevenueStreamsCard";
+import { BackLink } from "@/components/ui/BackLink";
 
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -107,9 +108,9 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
               <Link href={adminHref("/admin/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {i18n("openFinanceOperationscffd9ab")}
               </Link>
-              <Link href={adminHref(analyticsMode ? "/admin/metrics" : "/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+              <BackLink href={adminHref(analyticsMode ? "/admin/metrics" : "/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
                 {analyticsMode ? i18n("analyticsMarketing0ecf7f0") : i18n("dashboard79e4071")}
-              </Link>
+              </BackLink>
             </>
           }
         />

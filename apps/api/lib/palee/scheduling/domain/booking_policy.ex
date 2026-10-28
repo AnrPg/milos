@@ -74,7 +74,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
 
   @doc """
   When a pending request (manual approval) is cancelled if staff have not
-  answered (ADR-222): `timeout_minutes` from `now`, never after the class
+  answered (ADR-226): `timeout_minutes` from `now`, never after the class
   starts; nil (no limit) waits until the class starts.
   """
   def approval_deadline(_now, nil, %DateTime{} = starts_at), do: starts_at
@@ -87,7 +87,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
 
   @doc """
   Withdrawing an approved booking inside the cutoff is a late cancellation.
-  The cutoff is in minutes before the class (ADR-222).
+  The cutoff is in minutes before the class (ADR-226).
   """
   def late_cancellation?(_status, _scheduled_at, _now, nil), do: false
 

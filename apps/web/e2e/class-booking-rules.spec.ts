@@ -1,6 +1,6 @@
 import { expect, test, type Page, type Request } from "./support/test";
 
-// ADR-222: the class booking rules say what they do. A request for a class
+// ADR-226: the class booking rules say what they do. A request for a class
 // without automatic confirmation waits a set time (or until the class starts)
 // for staff; late cancellation is entered as hours plus minutes and stored in
 // minutes. The API is stubbed; every route not listed answers an empty object.

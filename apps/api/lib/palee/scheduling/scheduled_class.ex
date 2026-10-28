@@ -64,7 +64,7 @@ defmodule Palee.Scheduling.ScheduledClass do
     |> validate_number(:capacity, greater_than: 0)
     |> validate_length(:name, min: 1, max: 120)
     |> validate_number(:duration_minutes, greater_than: 0, less_than_or_equal_to: 1440)
-    # ADR-222: nil = a request waits for approval until the class starts.
+    # ADR-226: nil = a request waits for approval until the class starts.
     |> validate_number(:booking_timeout_minutes, greater_than: 0, less_than_or_equal_to: 10_080)
     |> validate_future_schedule()
     |> foreign_key_constraint(:master_workout_id)

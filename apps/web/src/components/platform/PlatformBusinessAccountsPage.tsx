@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormatter, useTranslations } from "next-intl";
@@ -25,6 +24,7 @@ import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 type DemoBusiness = BusinessAccountsQueue["demo_businesses"][number];
 
@@ -49,7 +49,7 @@ export function PlatformBusinessAccountsPage() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-5">
-        <Link href="/platform/organizations" className="text-sm text-[var(--text-soft)]">‹ {t("console.back")}</Link>
+        <BackLink href="/platform/organizations" className="text-sm text-[var(--text-soft)]">{t("console.back")}</BackLink>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("console.title")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("console.subtitle")}</p>
       </header>

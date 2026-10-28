@@ -1482,7 +1482,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   defp normalize_attendance_result(record), do: {:ok, normalize_attendance(record)}
 
-  # ADR-222: counted from now, not `inserted_at`, so a promoted waitlist
+  # ADR-226: counted from now, not `inserted_at`, so a promoted waitlist
   # entry gets the full time to be answered.
   defp timeout_job_changeset(booking, timeout_minutes, class_starts_at) do
     BookingTimeoutJob.new(

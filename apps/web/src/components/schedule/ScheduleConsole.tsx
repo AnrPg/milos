@@ -1047,7 +1047,7 @@ export function ScheduleConsole({
                 { label: rulesT("approvalWaitLabel"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
               ].map(({ label, type, field }) =>
                 type === "number-timeout" ? (
-                  // ADR-222: how long a request waits for staff; only without auto-approval.
+                  // ADR-226: how long a request waits for staff; only without auto-approval.
                   <div key={label} className="md:col-span-2" style={{ color: "var(--muted)" }}>
                     <DurationLimitField
                       testId="slot-approval-wait"

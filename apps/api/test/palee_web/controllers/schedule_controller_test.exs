@@ -27,7 +27,7 @@ defmodule PaleeWeb.ScheduleControllerTest do
     :ok
   end
 
-  test "a class may let requests wait for approval without a limit (ADR-222)", %{conn: conn} do
+  test "a class may let requests wait for approval without a limit (ADR-226)", %{conn: conn} do
     admin = admin_fixture(%{nickname: "sched_nolimit_admin"})
     {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     workout = workout_fixture(admin, %{title: "No limit WOD"})

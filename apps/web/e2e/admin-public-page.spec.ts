@@ -143,6 +143,11 @@ test.describe("admin public page editor", () => {
     await expect(page.getByText("Πρόχειρο", { exact: true })).toBeVisible();
     const publish = page.getByRole("button", { name: "Δημοσίευση", exact: true });
     await expect(publish).toBeDisabled();
+    // ADR-221: a draft is not findable, and Γύρω μου needs a map point.
+    const findable = page.getByText("Όσο η σελίδα είναι πρόχειρη, κανείς δεν βρίσκει το box", { exact: false });
+    await expect(findable).toBeVisible();
+    await expect(page.getByText("Διεύθυνση στον χάρτη", { exact: false })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Πρόσθεσέ τη" })).toHaveAttribute("href", /\/admin\/settings#locations$/);
 
     await page.getByRole("textbox", { name: "Κείμενο" }).fill("Ένα μικρό box στην Κυψέλη, με προπονητές που σε ξέρουν με το όνομά σου.");
     await page.getByRole("button", { name: "Επόμενο" }).click();
@@ -179,6 +184,7 @@ test.describe("admin public page editor", () => {
     await expect(publish).toBeEnabled();
     await publish.click();
     await expect(page.getByText("Δημοσιευμένη", { exact: true })).toBeVisible();
+    await expect(findable).toHaveCount(0);
     expect(calls.published).toBe(1);
     expect(calls.saves.at(-1)).toMatchObject({
       disciplines: ["crossfit", "hyrox", "olympic_lifting"],

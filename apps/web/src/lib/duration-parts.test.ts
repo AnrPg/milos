@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatMinutes, joinMinutes, splitMinutes } from "./duration-parts";
 
-describe("duration parts (ADR-222)", () => {
+describe("duration parts (ADR-226)", () => {
   it("splits stored minutes into hours and minutes", () => {
     expect(splitMinutes(0)).toEqual({ hours: 0, minutes: 0 });
     expect(splitMinutes(90)).toEqual({ hours: 1, minutes: 30 });

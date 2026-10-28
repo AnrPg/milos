@@ -222,6 +222,8 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Client | Πελάτης | member or athlete role | Someone who trains with the business. Umbrella word for the two below. |
 | Box member | Μέλος box | `member` | Client of a box with a membership or package. Where the box is known, name it: "Member of Box Kypseli" / «Μέλος στο Box Kypseli». Never a bare "Member" / «Μέλος». |
 | Athlete | Αθλητής | `athlete` | Client who gets **personal programming** from a coach. |
+| Personal link | Προσωπικός σύνδεσμος | `registration_invitations` | One-time invitation for one person, any role including staff. |
+| Join links | Σύνδεσμοι εγγραφής | `organization_settings.join_link` | Public links, one per client role, each on or off on its own: «Σύνδεσμος για μέλη box» (`/join/<slug>`) and «Σύνδεσμος για αθλητές» (`/join/<slug>/athlete/<key>`). The link sets the role, never the visitor. (ADR-216) |
 
 ### 4.4 Community spaces
 
@@ -235,6 +237,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | PT squad | Ομάδα του coach | `channel kind: pt_squad` | A coach's private channel with up to 30 of their own clients. Greek formerly «PT squad». (ADR-168) | Member group, class. |
 | Class channel | Κανάλι μαθήματος | `channel kind: class_slot` | The channel of one class on the schedule. Formerly «ομάδα τάξης». | Member group. |
 | Personal training | Προσωπική προπόνηση | `pt_pack`, appointments | One-to-one sessions with a coach, sold as personal training packages («Πακέτο προσωπικών προπονήσεων»). "PT" is never written in Greek. | Class. |
+| Online programming | Online προγραμματισμός | `online_coaching` (package module) | A package service where a coach sends personal training plans and, optionally, messages, check-ins, technique video reviews and a nutrition plan, all remotely. Formerly "Online coaching" / «Online καθοδήγηση»; the code key stays `online_coaching` because saved packages store it. | Personal training (in person), Coaching (the coach ↔ client relation). |
 | Event | Εκδήλωση | `community_events` | A one-off or weekly happening with places, price and attendees. Run by a club or an organiser. | Class (on the schedule). |
 | Class | Μάθημα | `class_slots` | A scheduled session on the box's timetable, booked with a package. | Event. |
 
@@ -261,7 +264,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Training partner chat | Συνομιλία συναθλητών | partner match thread | Opens when a training-partner match happens. |
 | Check-in buddy chat | Συνομιλία στήριξης | buddy support thread | Opens when a check-in buddy answers a support request. |
 
-### 4.6a Class booking rules (ADR-222)
+### 4.6a Class booking rules (ADR-226)
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
 |---|---|---|---|---|

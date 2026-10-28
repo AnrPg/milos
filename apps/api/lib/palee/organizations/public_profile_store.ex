@@ -31,4 +31,7 @@ defmodule Palee.Organizations.PublicProfileStore do
 
   @impl true
   def public_boxes(organization_ids), do: adapter().public_boxes(organization_ids)
+
+  @impl true
+  def search_public_boxes(terms, limit), do: adapter().search_public_boxes(terms, limit)
 end

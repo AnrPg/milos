@@ -22,6 +22,7 @@ export type FinanceSettings = {
   updated_at?: string | null;
 };
 
+/** ADR-218: the installation's Web Push keys; only the platform team reads or edits them. */
 export type NotificationPushSettings = {
   id?: string | null;
   enabled: boolean;
@@ -36,11 +37,11 @@ export type SchedulingSettings = {
   id?: string | null;
   default_capacity: number;
   default_auto_approve: boolean;
-  /** ADR-222: minutes a pending request waits for staff; null waits until the class starts. */
+  /** ADR-226: minutes a pending request waits for staff; null waits until the class starts. */
   default_booking_timeout_minutes: number | null;
   /** How many days ahead members may book; null means no limit. Packages can override it. */
   default_booking_window_days?: number | null;
-  /** ADR-222: minutes before a class after which cancelling still uses the visit; null means no cutoff. */
+  /** ADR-226: minutes before a class after which cancelling still uses the visit; null means no cutoff. */
   default_cancellation_cutoff_minutes?: number | null;
   inserted_at?: string | null;
   updated_at?: string | null;
@@ -65,7 +66,6 @@ export type AdminSettingsPayload = {
   time_zone?: TimeZoneStatus;
   gamification: GamificationSettings;
   finance: FinanceSettings;
-  notifications: NotificationPushSettings;
   scheduling: SchedulingSettings;
   provider?: ProviderSettings;
   /** ADR-163: workout-authoring defaults. */
@@ -95,7 +95,6 @@ export type AdminSettingsUpdate = {
   provider?: { kind: ProviderKind };
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
-  notifications?: NotificationPushUpdate;
   workouts?: Partial<WorkoutAuthoringSettings>;
   scheduling?: Partial<
     Pick<
@@ -119,6 +118,14 @@ export async function updateAdminSettings(token: string, payload: AdminSettingsU
     token,
     body: payload,
   });
+}
+
+export async function fetchPlatformPushSettings(token: string) {
+  return apiRequest<NotificationPushSettings>("/platform/push-settings", { token, scope: "account" });
+}
+
+export async function updatePlatformPushSettings(token: string, payload: NotificationPushUpdate) {
+  return apiRequest<NotificationPushSettings>("/platform/push-settings", { method: "PATCH", token, body: payload, scope: "account" });
 }
 
 /** ADR-176: confirm the gym's zone, or report this device's zone as a guess. */

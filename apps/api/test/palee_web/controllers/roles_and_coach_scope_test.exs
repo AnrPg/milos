@@ -125,7 +125,8 @@ defmodule PaleeWeb.RolesAndCoachScopeTest do
     {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
     {:ok, owner_context} = Organizations.resolve_tenant_context(owner, organization.slug)
 
-    assert {:error, :cannot_change_own_membership} =
+    # ADR-219: on oneself only roles below the top role move.
+    assert {:error, :own_top_role_locked} =
              Organizations.set_membership_roles(owner_context, owner.id, ["member"])
 
     desk = client(:member)
@@ -158,5 +159,70 @@ defmodule PaleeWeb.RolesAndCoachScopeTest do
     assert membership["roles"] == ["front_desk"]
     assert membership["capabilities"]["manage_promotions"] == "all"
     refute Map.has_key?(membership["capabilities"], "grant_admin_roles")
+  end
+
+  test "anyone adds or drops roles below their top role on themselves (ADR-219)", %{
+    owner_conn: owner_conn,
+    coach_conn: coach_conn,
+    base: base
+  } do
+    assert %{"membership" => %{"role" => "owner", "roles" => ["owner", "coach"]}} =
+             owner_conn
+             |> send_json(:put, "#{base}/me/roles", %{roles: ["owner", "coach"]})
+             |> json_response(200)
+
+    assert %{"code" => "own_top_role_locked"} =
+             owner_conn
+             |> send_json(:put, "#{base}/me/roles", %{roles: ["coach"]})
+             |> json_response(403)
+
+    # A coach cannot grant roles to others, but may train as a member too.
+    assert %{"membership" => %{"roles" => ["coach", "member"]}} =
+             coach_conn
+             |> send_json(:put, "#{base}/me/roles", %{roles: ["coach", "member"]})
+             |> json_response(200)
+
+    assert %{"code" => "own_top_role_locked"} =
+             coach_conn
+             |> send_json(:put, "#{base}/me/roles", %{roles: ["admin", "coach"]})
+             |> json_response(403)
+
+    assert coach_conn
+           |> send_json(:put, "#{base}/admin/users/#{Ecto.UUID.generate()}/roles", %{
+             roles: ["member"]
+           })
+           |> json_response(403)
+  end
+
+  test "an admin cannot change a fellow admin or the owner (ADR-219)", %{
+    conn: conn,
+    owner: owner,
+    base: base
+  } do
+    admin = client(:admin)
+    other = client(:admin)
+    admin_conn = put_bearer_token(conn, admin)
+
+    assert %{"code" => "role_ceiling_exceeded"} =
+             admin_conn
+             |> send_json(:put, "#{base}/admin/users/#{other.id}/roles", %{
+               roles: ["admin", "coach"]
+             })
+             |> json_response(403)
+
+    assert %{"code" => "role_ceiling_exceeded"} =
+             admin_conn
+             |> send_json(:put, "#{base}/admin/users/#{owner.id}/roles", %{
+               roles: ["owner", "member"]
+             })
+             |> json_response(403)
+
+    # Their own profile works like Settings › My roles.
+    assert %{"membership" => %{"roles" => ["admin", "coach"]}} =
+             admin_conn
+             |> send_json(:put, "#{base}/admin/users/#{admin.id}/roles", %{
+               roles: ["admin", "coach"]
+             })
+             |> json_response(200)
   end
 end

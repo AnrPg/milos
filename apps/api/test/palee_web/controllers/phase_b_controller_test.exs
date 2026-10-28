@@ -64,7 +64,7 @@ defmodule PaleeWeb.PhaseBControllerTest do
              settings["scheduling"]
   end
 
-  test "booking requests may wait without a limit; the cutoff takes minutes up to 7 days (ADR-222)",
+  test "booking requests may wait without a limit; the cutoff takes minutes up to 7 days (ADR-226)",
        %{admin_conn: admin_conn, base: base} do
     settings =
       admin_conn

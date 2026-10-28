@@ -23,7 +23,7 @@ defmodule Palee.Application.AppointmentLedger do
   end
 
   @doc """
-  Cancellation cutoff for the client in minutes (ADR-222): the paying
+  Cancellation cutoff for the client in minutes (ADR-226): the paying
   package's, else the gym default.
   """
   def cutoff_minutes(context, terms) do

@@ -1,7 +1,7 @@
 defmodule Palee.Repo.Migrations.BookingRuleUnits do
   use Ecto.Migration
 
-  # ADR-222: a booking request may wait for approval without a limit (NULL =
+  # ADR-226: a booking request may wait for approval without a limit (NULL =
   # until the class starts), and the gym's late-cancellation cutoff is stored
   # in minutes so staff can set hours and minutes.
 

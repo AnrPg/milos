@@ -26,6 +26,9 @@ export type SocialPrivacyRequest = components["schemas"]["SocialPrivacyRequest"]
 export type PeopleSearchResponse = components["schemas"]["PeopleSearchResponse"];
 export type PeopleSearchPerson = components["schemas"]["PeopleSearchPerson"];
 export type PeopleRelation = PeopleSearchPerson["relation"];
+/** ADR-221: published, live boxes and independent coaches found by name. */
+export type BoxSearchResponse = components["schemas"]["BoxSearchResponse"];
+export type BoxSearchResult = components["schemas"]["BoxSearchResult"];
 
 export const SOCIAL_KEY = ["social"] as const;
 export const SUMMARY_KEY = ["social", "summary"] as const;
@@ -33,6 +36,7 @@ export const REQUESTS_KEY = ["social", "requests"] as const;
 export const followKey = (type: FollowTargetType, id: string) => ["social", "follow", type, id] as const;
 export const personKey = (id: string) => ["social", "person", id] as const;
 export const peopleSearchKey = (q: string) => ["social", "people-search", q] as const;
+export const boxSearchKey = (q: string) => ["social", "box-search", q] as const;
 
 /** ADR-193 §4: the search answers only from two characters on. */
 export const PEOPLE_SEARCH_MIN = 2;
@@ -103,6 +107,11 @@ export function fetchBuddies(token: string, cursor: string | null = null, q = ""
 /** ADR-193 §4: anyone on Palee who isn't private, plus the people you already know. */
 export function searchPeople(token: string, q: string) {
   return apiRequest<PeopleSearchResponse>(`/people-search?${new URLSearchParams({ q })}`, { token });
+}
+
+/** ADR-221: boxes and coaches by name, from two characters on like people. */
+export function searchBoxes(token: string, q: string) {
+  return apiRequest<BoxSearchResponse>(`/box-search?${new URLSearchParams({ q })}`, { token });
 }
 
 /** ADR-193 §2: going public also accepts the requests that are waiting. */

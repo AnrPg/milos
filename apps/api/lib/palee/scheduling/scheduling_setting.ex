@@ -30,7 +30,7 @@ defmodule Palee.Scheduling.SchedulingSetting do
       :default_auto_approve
     ])
     |> validate_number(:default_capacity, greater_than: 0, less_than_or_equal_to: 500)
-    # ADR-222: nil = a request waits for approval until the class starts.
+    # ADR-226: nil = a request waits for approval until the class starts.
     |> validate_number(:default_booking_timeout_minutes,
       greater_than: 0,
       less_than_or_equal_to: 10_080

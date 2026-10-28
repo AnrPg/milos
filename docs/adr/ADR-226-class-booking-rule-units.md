@@ -1,4 +1,4 @@
-# ADR-222: Class booking rules say what they do; no-limit approval wait; cancellation cutoff in minutes
+# ADR-226: Class booking rules say what they do; no-limit approval wait; cancellation cutoff in minutes
 Date: 2026-10-28
 Status: Accepted
 

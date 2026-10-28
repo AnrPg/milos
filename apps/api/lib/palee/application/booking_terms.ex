@@ -58,7 +58,7 @@ defmodule Palee.Application.BookingTerms do
     }
   end
 
-  # ADR-222: packages keep whole hours; the gym default is in minutes.
+  # ADR-226: packages keep whole hours; the gym default is in minutes.
   def hours_to_minutes(hours) when is_integer(hours), do: hours * 60
   def hours_to_minutes(_none), do: nil
 

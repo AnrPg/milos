@@ -8,6 +8,7 @@ import { ErrorNotice as SharedErrorNotice } from "@/components/ui/ErrorNotice";
 import type { ShopPhoto } from "@/api/shop";
 import { formatMinorUnits } from "@/lib/finance-accounting";
 import type { CardFlag } from "@/lib/shop/variants";
+import { BackLink } from "@/components/ui/BackLink";
 
 /** A square product photo; a product without one gets a quiet tile with its initial. */
 export function ProductPhoto({
@@ -76,9 +77,7 @@ export function ShopHeader({
 }) {
   return (
     <header className="flex flex-col gap-1">
-      <Link href={backHref} className="inline-flex min-h-9 items-center self-start text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
-        ‹ {backLabel}
-      </Link>
+      <BackLink href={backHref} className="inline-flex min-h-9 items-center self-start text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{backLabel}</BackLink>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>
