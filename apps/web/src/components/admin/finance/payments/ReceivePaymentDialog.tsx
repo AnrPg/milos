@@ -389,7 +389,8 @@ function ReceivedView({
               type="file"
               accept="image/*,.pdf"
               className="sr-only"
-              aria-label={t("attachInvoice")}
+              aria-hidden="true"
+              tabIndex={-1}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) void attachInvoice(file);
