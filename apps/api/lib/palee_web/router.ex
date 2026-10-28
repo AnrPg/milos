@@ -1974,6 +1974,8 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/people-search", PeopleController, :search)
+    # ADR-221: boxes and independent coaches by name.
+    get("/box-search", BoxSearchController, :index)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).
