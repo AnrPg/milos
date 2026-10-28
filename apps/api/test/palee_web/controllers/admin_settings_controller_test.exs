@@ -21,7 +21,8 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
     assert get_in(payload, ["gamification", "streak_shields"]) == 4
     refute Map.has_key?(payload["gamification"], "theme_slug")
     assert get_in(payload, ["gamification", "leaderboard_enabled"]) == true
-    assert get_in(payload, ["notifications", "enabled"]) == false
+    # ADR-218: the installation's push keys are not a gym setting.
+    refute Map.has_key?(payload, "notifications")
 
     # TD-092: reading the settings back (and a save that leaves gamification
     # untouched) sees the gym's stored values, not the defaults.
@@ -46,41 +47,23 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
     assert get_in(untouched, ["gamification", "streak_shields"]) == 4
   end
 
-  test "admin can configure browser push service settings", %{conn: conn} do
+  test "a gym admin cannot change the installation's push keys (ADR-218)", %{conn: conn} do
     admin = admin_fixture()
     organization = org_with_owner!(admin)
 
-    payload =
-      conn
-      |> put_bearer_token(admin)
-      |> patch(
-        "/api/org/#{organization.slug}/admin/settings",
-        %{
-          notifications: %{
-            vapid_public_key: "public-key",
-            vapid_private_key: "private-key",
-            vapid_subject: "mailto:gym@example.test"
-          }
-        }
-      )
-      |> json_response(200)
+    conn
+    |> put_bearer_token(admin)
+    |> patch("/api/org/#{organization.slug}/admin/settings", %{
+      notifications: %{
+        vapid_public_key: "public-key",
+        vapid_private_key: "private-key",
+        vapid_subject: "mailto:gym@example.test"
+      }
+    })
+    |> json_response(200)
 
-    assert get_in(payload, ["notifications", "enabled"]) == true
-    assert get_in(payload, ["notifications", "vapid_public_key"]) == "public-key"
-    assert get_in(payload, ["notifications", "vapid_private_key_configured"]) == true
-    refute Map.has_key?(payload["notifications"], "vapid_private_key")
-
-    push_config =
-      conn
-      |> put_bearer_token(admin)
-      |> get("/api/notifications/push-config")
-      |> json_response(200)
-
-    assert push_config == %{
-             "enabled" => true,
-             "vapid_public_key" => "public-key",
-             "native_providers" => []
-           }
+    assert Palee.Notifications.get_push_settings().vapid_private_key_configured == false
+    assert Palee.Notifications.get_push_settings().vapid_public_key == nil
   end
 
   test "a gym's first finance settings save is stored for that gym", %{conn: conn} do

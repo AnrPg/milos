@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -74,6 +73,7 @@ import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 import { displayRoles, rolesOf } from "@/lib/users-directory";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
@@ -510,7 +510,7 @@ function PRDossier({ member, prs }: { member: AdminUserPRMember; prs: AdminUserP
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {tPrSharing("dossierBack")}</Link>
+        <BackLink href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{tPrSharing("dossierBack")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={{ nickname: member.nickname, avatar_url: member.avatar_url ?? null }} />
           <div className="min-w-0 flex-1">
@@ -702,7 +702,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {i18n("users206fc04")}</Link>
+        <BackLink href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("users206fc04")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={profile.identity} />
           <div className="min-w-0 flex-1">

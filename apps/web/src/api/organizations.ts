@@ -107,16 +107,30 @@ export function fetchJoinLink(token: string, slug: string) {
   return apiRequest<JoinLinkSettings>(orgPath(slug, "/join-link"), { token });
 }
 
-export function updateJoinLink(token: string, slug: string, body: Partial<JoinLinkSettings>) {
+/** ADR-216: turn one join link on or off, or give the athlete link a new key. */
+export type JoinLinkChange = { role: ClientRole; enabled?: boolean; rotate_key?: boolean };
+
+export function updateJoinLink(token: string, slug: string, body: JoinLinkChange) {
   return apiRequest<JoinLinkSettings>(orgPath(slug, "/join-link"), { method: "PUT", token, body });
 }
 
-export function inspectJoinLink(slug: string) {
-  return apiRequest<PublicJoinLink>(`/auth/join/${encodeURIComponent(slug)}`);
+/**
+ * ADR-216: a box has one join link per client role. The member link is the box
+ * address; the athlete link adds a secret key, so the visitor never picks a role.
+ */
+export type JoinLinkTarget = { slug: string; athleteKey?: string | null };
+
+export function joinPath({ slug, athleteKey }: JoinLinkTarget) {
+  const base = `/join/${encodeURIComponent(slug)}`;
+  return athleteKey ? `${base}/athlete/${encodeURIComponent(athleteKey)}` : base;
 }
 
-export function joinOrganization(token: string, slug: string) {
-  return apiRequest<OrganizationMembership>(`/memberships/join/${encodeURIComponent(slug)}`, {
+export function inspectJoinLink(link: JoinLinkTarget) {
+  return apiRequest<PublicJoinLink>(`/auth${joinPath(link)}`);
+}
+
+export function joinOrganization(token: string, link: JoinLinkTarget) {
+  return apiRequest<OrganizationMembership>(`/memberships${joinPath(link)}`, {
     method: "POST",
     token,
   });
@@ -142,8 +156,8 @@ export function invitationTokenFromLocation(location: { hash: string; search: st
   return (fromHash ?? fromQuery ?? "").trim();
 }
 
-export function joinUrl(origin: string, slug: string) {
-  return `${origin}/join/${encodeURIComponent(slug)}`;
+export function joinUrl(origin: string, link: JoinLinkTarget) {
+  return `${origin}${joinPath(link)}`;
 }
 
 /** An existing account accepts an invitation code (`POST /memberships/redeem`). */

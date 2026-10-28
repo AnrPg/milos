@@ -24,6 +24,7 @@ export type FinanceSettings = {
   updated_at?: string | null;
 };
 
+/** ADR-218: the installation's Web Push keys; only the platform team reads or edits them. */
 export type NotificationPushSettings = {
   id?: string | null;
   enabled: boolean;
@@ -66,7 +67,6 @@ export type AdminSettingsPayload = {
   time_zone?: TimeZoneStatus;
   gamification: GamificationSettings;
   finance: FinanceSettings;
-  notifications: NotificationPushSettings;
   scheduling: SchedulingSettings;
   provider?: ProviderSettings;
   /** ADR-163: workout-authoring defaults. */
@@ -96,7 +96,6 @@ export type AdminSettingsUpdate = {
   provider?: { kind: ProviderKind };
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
-  notifications?: NotificationPushUpdate;
   workouts?: Partial<WorkoutAuthoringSettings>;
   scheduling?: Partial<
     Pick<
@@ -120,6 +119,14 @@ export async function updateAdminSettings(token: string, payload: AdminSettingsU
     token,
     body: payload,
   });
+}
+
+export async function fetchPlatformPushSettings(token: string) {
+  return apiRequest<NotificationPushSettings>("/platform/push-settings", { token, scope: "account" });
+}
+
+export async function updatePlatformPushSettings(token: string, payload: NotificationPushUpdate) {
+  return apiRequest<NotificationPushSettings>("/platform/push-settings", { method: "PATCH", token, body: payload, scope: "account" });
 }
 
 /** ADR-176: confirm the gym's zone, or report this device's zone as a guess. */

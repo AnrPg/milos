@@ -744,6 +744,31 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
     assert Repo.get!(OrganizationMembership, membership.id).role == :athlete
   end
 
+  test "the vendor sets any role set down to owner, but a gym keeps an owner (ADR-219)",
+       context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Vendor Roles Gym"})
+
+    {:ok, owner} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: context.ordinary_user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    path = "/api/platform/organizations/#{organization.id}/memberships/#{owner.id}/role"
+    conn = put_bearer_token(context.conn, context.platform_user)
+
+    assert %{"membership" => %{"role" => "owner", "roles" => ["owner", "coach"]}} =
+             conn |> patch(path, %{roles: ["coach", "owner"]}) |> json_response(200)
+
+    assert %{"code" => "last_owner"} =
+             conn |> recycle() |> patch(path, %{role: "admin"}) |> json_response(409)
+
+    assert Repo.get!(OrganizationMembership, owner.id).roles == [:owner, :coach]
+  end
+
   test "lifecycle and settings changes are audited and suspended tenants cannot resolve",
        context do
     {:ok, organization} = Organizations.create_organization(%{name: "Lifecycle Gym"})

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -13,6 +12,7 @@ import { trialErrorKey } from "@/components/trials/trial-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 type Draft = {
   enabled: boolean;
@@ -100,9 +100,7 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
         }}
       >
         <header className="flex flex-col gap-1">
-          <Link href={adminHref("/admin/trials", slug)} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
-            ‹ {t("queueTitle")}
-          </Link>
+          <BackLink href={adminHref("/admin/trials", slug)} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{t("queueTitle")}</BackLink>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("settingsTitle")}</h1>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("settingsIntro")}</p>
         </header>
