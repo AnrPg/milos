@@ -1,32 +1,30 @@
 defmodule Palee.Application.UpdateFinanceMember do
+  @moduledoc """
+  Creates or edits a person's finance profile in a gym. ADR-217: only clients
+  (a member or athlete role in the gym) have one. Staff never get a profile,
+  a package or a status, so they never reach the finance ledger or analytics;
+  someone who is both staff and a client (a role they were explicitly given)
+  is treated as the client they are.
+  """
+
   alias Palee.{Finance, Organizations}
 
-  def call(context, user_id, params) do
-    enriched = params |> string_key_map() |> maybe_put_user_type_snapshot(context, user_id)
-    Finance.upsert_membership(context, user_id, enriched)
+  def call(%{organization_id: _} = context, user_id, params) do
+    case Organizations.client_role(context, user_id) do
+      nil ->
+        {:error, :not_a_client}
+
+      client_role ->
+        enriched =
+          params
+          |> string_key_map()
+          |> Map.put_new("user_type_snapshot", Atom.to_string(client_role))
+
+        Finance.upsert_membership(context, user_id, enriched)
+    end
   end
 
   def call(_user_id, _params), do: {:error, :organization_context_required}
-
-  defp maybe_put_user_type_snapshot(params, context, user_id) do
-    if Map.has_key?(params, "user_type_snapshot") do
-      params
-    else
-      Map.put(params, "user_type_snapshot", derive_user_type(context, user_id))
-    end
-  end
-
-  defp derive_user_type(%{organization_id: organization_id}, user_id) do
-    case Enum.find(Organizations.list_memberships(user_id), fn %{
-                                                                 membership: membership,
-                                                                 organization: organization
-                                                               } ->
-           organization.id == organization_id and membership.status == :active
-         end) do
-      %{membership: %{role: :athlete}} -> "athlete"
-      _ -> "member"
-    end
-  end
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)

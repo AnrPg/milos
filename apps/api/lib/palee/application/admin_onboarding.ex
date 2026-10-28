@@ -5,7 +5,6 @@ defmodule Palee.Application.AdminOnboarding do
   independent coach (ADR-170) get different steps.
   """
 
-  alias Palee.Application.TenantUserAccess
   alias Palee.{Appointments, Community, Finance, Organizations, Scheduling, Workouts}
 
   def get(context) do
@@ -69,10 +68,12 @@ defmodule Palee.Application.AdminOnboarding do
   defp invited?(context),
     do: clients?(context) or present?(Organizations.list_active_invitations(context))
 
+  # ADR-217: a client is someone holding a member or athlete role in the box;
+  # the owner's own account (account-wide role "member") never counts.
   defp clients?(context) do
     context
-    |> TenantUserAccess.list_active_users()
-    |> Enum.any?(&(&1.role in [:member, :athlete]))
+    |> Organizations.list_client_user_ids()
+    |> Enum.any?(&(&1 != context.user_id))
   end
 
   defp published_profile?(context) do

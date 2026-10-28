@@ -237,6 +237,7 @@
     "classAction_cancel": "Отмени занятието",
     "classAction_restore": "Възстанови занятието",
     "classAction_delete": "Изтрий",
+    "classMoreActions": "Още действия за занятието",
     "classActionTitle_pause": "Да спрем ли записването?",
     "classActionTitle_resume": "Да подновим ли записването?",
     "classActionTitle_cancel": "Да отмениш ли това занятие?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Собственик",
     "roleAdmin": "Администратор",
     "roleCoach": "Треньор",
+    "roleHeadCoach": "Главен треньор",
     "roleFrontDesk": "Служител на рецепция",
     "roleAccountant": "Счетоводител",
     "roleJanitor": "Персонал по почистване",
@@ -4970,7 +4972,7 @@
       "all": "Всички",
       "member": "Членове",
       "athlete": "Атлети",
-      "admin": "Служители"
+      "staff": "Служители"
     },
     "showing": "Показани {shown} от {total}",
     "clearFilters": "Изчисти филтрите",
@@ -4983,6 +4985,7 @@
     "listLabel": "Хора",
     "columns": {
       "person": "Човек",
+      "roles": "Роли",
       "finance": "Членство",
       "joined": "Присъединен",
       "open": "Отвори профила"

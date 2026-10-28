@@ -237,6 +237,7 @@
     "classAction_cancel": "Отменить занятие",
     "classAction_restore": "Восстановить занятие",
     "classAction_delete": "Удалить",
+    "classMoreActions": "Другие действия с занятием",
     "classActionTitle_pause": "Приостановить запись?",
     "classActionTitle_resume": "Возобновить запись?",
     "classActionTitle_cancel": "Отменить это занятие?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Владелец",
     "roleAdmin": "Администратор",
     "roleCoach": "Тренер",
+    "roleHeadCoach": "Главный тренер",
     "roleFrontDesk": "Сотрудник ресепшн",
     "roleAccountant": "Бухгалтер",
     "roleJanitor": "Персонал по уборке",
@@ -4970,7 +4972,7 @@
       "all": "Все",
       "member": "Участники",
       "athlete": "Спортсмены",
-      "admin": "Сотрудники"
+      "staff": "Сотрудники"
     },
     "showing": "Показано {shown} из {total}",
     "clearFilters": "Сбросить фильтры",
@@ -4983,6 +4985,7 @@
     "listLabel": "Люди",
     "columns": {
       "person": "Человек",
+      "roles": "Роли",
       "finance": "Абонемент",
       "joined": "Вступил",
       "open": "Открыть профиль"
