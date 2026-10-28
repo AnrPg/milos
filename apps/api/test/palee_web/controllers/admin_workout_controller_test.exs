@@ -244,6 +244,14 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       assert workout["authoring_mode"] == "free_text"
       assert workout["free_text_body"] == "AMRAP 20\n10 pull-ups\n15 wall balls"
       assert workout["sections"] == []
+
+      assert %{
+               "kind" => "free_text",
+               "text" => "AMRAP 20\n10 pull-ups\n15 wall balls",
+               "document" => %{"type" => "doc"},
+               "structured" => false
+             } = workout["body"]
+
       assert workout["available_scale_levels"] == []
     end
 
@@ -329,6 +337,42 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
                  "exercises" => []
                }
              ] = workout["sections"]
+
+      # ADR-223: the body carries only what text sections have.
+      assert %{
+               "kind" => "text_sections",
+               "sections" => [
+                 %{
+                   "title" => "Strength",
+                   "text" => "Back squat 5x5 @ 75%",
+                   "timer" => %{"format" => "emom", "rounds" => 5},
+                   "scoring" => []
+                 },
+                 %{
+                   "title" => nil,
+                   "text" => "21-15-9\nThrusters\nPull-ups",
+                   "document" => %{"type" => "doc"}
+                 }
+               ]
+             } = workout["body"]
+
+      listed =
+        admin_conn
+        |> recycle()
+        |> get(base)
+        |> json_response(200)
+        |> Map.fetch!("workouts")
+        |> Enum.find(&(&1["id"] == draft_id))
+
+      assert %{
+               "kind" => "text_sections",
+               "sections" => [
+                 %{"title" => "Strength", "excerpt" => "Back squat 5x5 @ 75%", "scored" => false},
+                 %{"title" => nil, "excerpt" => "21-15-9\nThrusters\nPull-ups"}
+               ]
+             } = listed["body"]
+
+      refute Map.has_key?(hd(listed["body"]["sections"]), "document")
     end
 
     test "publishes a free-text workout with assistant-derived canonical sections", %{conn: conn} do

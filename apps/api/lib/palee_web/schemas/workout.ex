@@ -275,9 +275,136 @@ defmodule PaleeWeb.Schemas.Workout do
           items: PaleeWeb.Schemas.WorkoutDsl.diagnostic_schema()
         },
         free_text_body: %Schema{type: :string, nullable: true},
-        free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true}
+        free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        body: body_schema()
       },
       required: [:id, :title, :type, :sections],
+      additionalProperties: false
+    }
+  end
+
+  @rich_document %Schema{
+    type: :object,
+    nullable: true,
+    additionalProperties: true,
+    description:
+      "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, " <>
+        "underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes"
+  }
+
+  @doc """
+  ADR-223: what a workout says, as a union keyed by `kind`, carrying only the
+  data of the way it was written.
+  """
+  def body_schema do
+    %Schema{
+      title: "WorkoutBody",
+      oneOf: [free_text_body_schema(), text_sections_body_schema(), structured_body_schema()],
+      discriminator: %OpenApiSpex.Discriminator{propertyName: "kind"}
+    }
+  end
+
+  defp free_text_body_schema do
+    %Schema{
+      title: "FreeTextWorkoutBody",
+      description: "One text written with the WOD assistant",
+      type: :object,
+      properties: %{
+        kind: %Schema{type: :string, enum: ["free_text"]},
+        text: @nullable_string,
+        document: @rich_document,
+        timer: %Schema{type: :object, nullable: true, additionalProperties: true},
+        structured: %Schema{
+          type: :boolean,
+          description: "The assistant also derived exercises (see `sections`)"
+        }
+      },
+      required: [:kind, :text, :document, :timer, :structured],
+      additionalProperties: false
+    }
+  end
+
+  defp text_sections_body_schema do
+    %Schema{
+      title: "TextSectionsWorkoutBody",
+      description: "ADR-180: text sections written without the assistant, a timer each",
+      type: :object,
+      properties: %{
+        kind: %Schema{type: :string, enum: ["text_sections"]},
+        sections: %Schema{
+          type: :array,
+          items: %Schema{
+            title: "TextSection",
+            type: :object,
+            properties: %{
+              id: @nullable_uuid,
+              title: %Schema{type: :string, nullable: true, description: "Null when untitled"},
+              text: %Schema{type: :string},
+              document: @rich_document,
+              timer: section_timer_preset_schema(),
+              scoring: %Schema{
+                type: :array,
+                items: %Schema{type: :object, additionalProperties: true},
+                description:
+                  "What the section counts (SectionScoring metrics), empty when not scored"
+              }
+            },
+            required: [:id, :title, :text, :document, :timer, :scoring],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [:kind, :sections],
+      additionalProperties: false
+    }
+  end
+
+  defp structured_body_schema do
+    %Schema{
+      title: "StructuredWorkoutBody",
+      description: "Exercises with every parameter (structured editor, Quick Text)",
+      type: :object,
+      properties: %{
+        kind: %Schema{type: :string, enum: ["structured"]},
+        sections: %Schema{
+          type: :array,
+          items: %Schema{
+            title: "StructuredSection",
+            type: :object,
+            properties: %{
+              id: @nullable_uuid,
+              name: %Schema{type: :string},
+              subtitle: @nullable_string,
+              timer: %Schema{type: :object, nullable: true, additionalProperties: true},
+              scoreable: %Schema{type: :boolean},
+              exercises: %Schema{type: :array, items: workout_item_schema()}
+            },
+            required: [:id, :name, :timer, :scoreable, :exercises],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [:kind, :sections],
+      additionalProperties: false
+    }
+  end
+
+  @doc "ADR-223: the body in workout lists: excerpts and counts, no documents."
+  def body_summary_schema do
+    %Schema{
+      title: "WorkoutBodySummary",
+      type: :object,
+      properties: %{
+        kind: %Schema{type: :string, enum: Palee.Workouts.Domain.WorkoutBody.kinds()},
+        excerpt: @nullable_string,
+        timer: %Schema{type: :object, nullable: true, additionalProperties: true},
+        structured: %Schema{type: :boolean},
+        sections: %Schema{
+          type: :array,
+          items: %Schema{type: :object, additionalProperties: true}
+        }
+      },
+      required: [:kind],
       additionalProperties: false
     }
   end
