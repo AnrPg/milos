@@ -519,11 +519,11 @@ defmodule Palee.Application.GetScheduleCalendar do
   end
 
   defp parse_days(nil), do: {:ok, 7}
-  defp parse_days(value) when is_integer(value) and value in [3, 7, 30], do: {:ok, value}
+  defp parse_days(value) when is_integer(value) and value in [1, 3, 7, 30], do: {:ok, value}
 
   defp parse_days(value) when is_binary(value) do
     case Integer.parse(value) do
-      {days, ""} when days in [3, 7, 30] -> {:ok, days}
+      {days, ""} when days in [1, 3, 7, 30] -> {:ok, days}
       _ -> {:error, :bad_request}
     end
   end
