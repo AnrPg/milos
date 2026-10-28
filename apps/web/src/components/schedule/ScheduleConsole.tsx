@@ -202,7 +202,7 @@ export function ScheduleConsole({
   const branchT = useTranslations("BranchScope");
   const locale = useLocale();
   const { tokens } = useSession();
-  const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
+  const { days, setDays, openDay, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
@@ -780,6 +780,7 @@ export function ScheduleConsole({
                 ariaLabel={t("calendarView")}
                 onChange={setDays}
                 options={[
+                  { value: 1, label: t("dayViewShort"), accessibleLabel: t("dayView") },
                   { value: 3, label: i18n("message3d34f9efc"), accessibleLabel: t("threeDayView") },
                   { value: 7, label: i18n("message7dfd4a4c2"), accessibleLabel: t("weekView") },
                   { value: 30, label: i18n("mo91e885d"), accessibleLabel: t("monthView") },
@@ -891,6 +892,7 @@ export function ScheduleConsole({
             isAdmin={isAdmin}
             locations={locations}
             onCreateSlot={(isoDate) => openCreateEditor(isoDate)}
+            onOpenDay={openDay}
             onSelectSlot={setSelectedSlot}
             slots={schedule}
             startDate={startDate}

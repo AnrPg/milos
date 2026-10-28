@@ -98,12 +98,25 @@ export type CorporateSeat =
  * Join my company's corporate plan (ADR-098). With a code the matching client
  * is used; without one the API matches my account email's domain.
  */
-/** A company plan the account email qualifies for (ADR-098), or null. */
+/**
+ * A company plan the account email qualifies for (ADR-098), or null. ADR-205:
+ * `needs_verification` while the email is not confirmed yet; joining waits.
+ */
+export type CorporateEnrollmentOffer = { company_name: string; needs_verification?: boolean };
+
 export async function fetchCorporateEnrollmentOffer(token: string) {
-  const data = await apiRequest<{ offer: { company_name: string } | null }>("/me/corporate-enrollment", {
+  const data = await apiRequest<{ offer: CorporateEnrollmentOffer | null }>("/me/corporate-enrollment", {
     token,
   });
   return data.offer;
+}
+
+/** ADR-205: the code a domain match answers until the email is confirmed. */
+export const CORPORATE_EMAIL_UNVERIFIED_CODE = "corporate_email_unverified";
+
+/** Sends the account's email confirmation link again (the verify-email flow's endpoint). */
+export function requestCorporateVerificationEmail(token: string) {
+  return apiRequest<unknown>("/auth/verification-email", { method: "POST", token, scope: "account" });
 }
 
 export async function enrollCorporateSeat(token: string, code?: string | null) {

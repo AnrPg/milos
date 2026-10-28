@@ -21,6 +21,8 @@ defmodule PaleeWeb.FallbackController do
     invalid_activation_lifetime:
       {:unprocessable_entity, "A link lasts between one hour and 30 days"},
     account_not_found: {:not_found, "No account matches"},
+    activation_email_unverified:
+      {:unprocessable_entity, "The account has not confirmed its email address yet"},
     unknown_demo_section: {:unprocessable_entity, "There is no demo data for this screen"},
     demo_source_not_deletable:
       {:internal_server_error, "A demo seeder wrote a table it cannot remove"}
@@ -32,6 +34,31 @@ defmodule PaleeWeb.FallbackController do
     locked_category:
       {:unprocessable_entity, "Account and payment notifications cannot be switched off"},
     invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
+  }
+
+  # ADR-203: what `Palee.Email.enqueue/4` refuses. `:not_live` answers as
+  # ADR-184's `business_not_activated`.
+  @email_errors %{
+    invalid_address: {:unprocessable_entity, "Enter a valid email address"},
+    suppressed: {:unprocessable_entity, "Emails to this address bounce. Check it or use another"},
+    throttled: {:too_many_requests, "An email like this was sent just now. Try again later"},
+    over_budget: {:service_unavailable, "Email is busy today. Try again later"},
+    # ADR-210: "Send by email" of a share link.
+    share_link_invalid: {:not_found, "This link is no longer yours to share"},
+    share_link_sender_unverified:
+      {:forbidden, "Confirm your own email address before sending links by email"},
+    share_link_daily_limit:
+      {:too_many_requests,
+       "You've sent the most links by email for today. Share or copy it instead"}
+  }
+
+  @account_deletion_errors %{
+    invalid_scope: {:unprocessable_entity, "Choose the profile or the whole login"},
+    confirmation_mismatch:
+      {:unprocessable_entity, "Type your account's email address to confirm"},
+    already_scheduled: {:conflict, "A deletion is already scheduled"},
+    invalid_deletion_link: {:unprocessable_entity, "This link is not valid or was already used"},
+    expired_deletion_link: {:gone, "This link has expired"}
   }
 
   # ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
@@ -71,6 +98,16 @@ defmodule PaleeWeb.FallbackController do
       class_starts_at: Map.get(window, :class_starts_at)
     })
   end
+
+  def call(conn, {:error, reason}) when is_map_key(@email_errors, reason) do
+    {status, message} = Map.fetch!(@email_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, :not_live}), do: call(conn, {:error, :business_not_activated})
 
   def call(conn, {:error, reason}) when is_map_key(@notification_preference_errors, reason) do
     {status, message} = Map.fetch!(@notification_preference_errors, reason)
@@ -330,11 +367,42 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_password", error: "Password is incorrect"})
   end
 
+  # ADR-211: self-service account deletion.
+  def call(conn, {:error, reason}) when is_map_key(@account_deletion_errors, reason) do
+    {status, message} = Map.fetch!(@account_deletion_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:sole_owner, organizations}}) when is_list(organizations) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "sole_owner",
+      error: "Give the business another owner or close it first",
+      organizations: organizations
+    })
+  end
+
+  # Only after the right password: the person learns their own account's state.
+  def call(conn, {:error, {:account_deletion_scheduled, scheduled_for}}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "account_deletion_scheduled",
+      error: "This account is scheduled for deletion",
+      scheduled_for: scheduled_for
+    })
+  end
+
   # ADR-187: password recovery.
   def call(conn, {:error, reason})
       when reason in [
              :invalid_reset_link,
              :expired_reset_link,
+             :used_reset_link,
              :invalid_recovery_code,
              :weak_password,
              :claimed_by_other,
@@ -347,6 +415,10 @@ defmodule PaleeWeb.FallbackController do
 
         :expired_reset_link ->
           {:gone, "This reset link has expired"}
+
+        # ADR-206: an emailed link that was already used.
+        :used_reset_link ->
+          {:gone, "This reset link was already used"}
 
         :invalid_recovery_code ->
           {:unprocessable_entity, "The account or recovery code is wrong"}
@@ -389,6 +461,10 @@ defmodule PaleeWeb.FallbackController do
       profile_limit: limit
     })
   end
+
+  # ADR-211: an invitation to an address held for 7 days after an email
+  # change answers as a taken one.
+  def call(conn, {:error, :email_reserved}), do: call(conn, {:error, :email_taken})
 
   def call(conn, {:error, :email_taken}) do
     conn
@@ -529,6 +605,28 @@ defmodule PaleeWeb.FallbackController do
       code: "invitation_email_mismatch",
       error: "This invitation was issued to a different email address"
     })
+  end
+
+  # ADR-209: invitations sent by email.
+  @invitation_email_errors %{
+    invitation_email_unverified:
+      {:forbidden,
+       "This invitation is for a confirmed email address. Open the link in the invitation email, or confirm your email first"},
+    invitation_revoked: {:gone, "The box revoked this invitation"},
+    invitation_not_emailed: {:unprocessable_entity, "This invitation was not sent by email"},
+    invitation_email_required: {:unprocessable_entity, "Enter the email address to send it to"},
+    too_many_invitation_emails:
+      {:unprocessable_entity, "Send to at most 200 addresses at a time"},
+    invitation_email_cap_reached:
+      {:too_many_requests, "Your box sent its invitations for today. Try again tomorrow"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@invitation_email_errors, reason) do
+    {status, message} = Map.fetch!(@invitation_email_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
   end
 
   def call(conn, {:error, :invalid_invitation}) do
@@ -2533,6 +2631,8 @@ defmodule PaleeWeb.FallbackController do
     corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
     invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
     corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
+    corporate_email_unverified:
+      {:forbidden, "Confirm your email address to join your company's plan"},
     corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
     add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
     last_owner: {:conflict, "A gym needs at least one owner"},

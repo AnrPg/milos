@@ -118,6 +118,82 @@ defmodule Palee.Organizations.InvitationEmailBindingTest do
     assert {:ok, _redemption} = Organizations.redeem_invitation(token, unrelated.id)
   end
 
+  describe "ADR-209: proof of the inbox" do
+    test "an unverified matching account cannot redeem, and the invitation stays usable",
+         %{context: context} do
+      {:ok, %{token: token}} =
+        Organizations.issue_invitation(context, %{
+          role: "member",
+          intended_email: "invited@example.com"
+        })
+
+      unverified = register_with_email("invited@example.com", verified: false)
+
+      assert {:error, :invitation_email_unverified} =
+               Organizations.redeem_invitation(token, unverified.id)
+
+      :ok = Identity.mark_email_verified(unverified.login_id, "invited@example.com")
+      assert {:ok, _redemption} = Organizations.redeem_invitation(token, unverified.id)
+    end
+
+    test "an emailed invitation proves the inbox and marks the address verified",
+         %{context: context} do
+      {:ok, %{token: token}} =
+        Organizations.issue_invitation(context, %{
+          role: "member",
+          intended_email: "invited@example.com",
+          deliver_by_email: %{address: "invited@example.com", locale: "el"}
+        })
+
+      invitee = register_with_email("invited@example.com", verified: false)
+      refute Identity.email_verified?(invitee)
+
+      assert {:ok, redemption} = Organizations.redeem_invitation(token, invitee.id)
+      assert redemption.invitation.emailed_at
+      assert redemption.invitation.email_locale == "el"
+      assert Identity.email_verified?(Identity.find_by_id(invitee.id))
+    end
+
+    test "an emailed invitation still refuses another address", %{context: context} do
+      {:ok, %{token: token}} =
+        Organizations.issue_invitation(context, %{
+          role: "member",
+          intended_email: "invited@example.com",
+          deliver_by_email: %{address: "invited@example.com", locale: "en"}
+        })
+
+      other = register_with_email("other@example.com", verified: false)
+
+      assert {:error, :invitation_email_mismatch} =
+               Organizations.redeem_invitation(token, other.id)
+
+      refute Identity.email_verified?(Identity.find_by_id(other.id))
+    end
+
+    test "mark_invitation_emailed is idempotent and turns on the inbox proof",
+         %{context: context} do
+      {:ok, %{token: token, invitation: invitation}} =
+        Organizations.issue_invitation(context, %{
+          role: "member",
+          intended_email: "invited@example.com"
+        })
+
+      first = ~U[2026-12-24 10:00:00.000000Z]
+
+      run = fn fun -> Palee.Infrastructure.Tenancy.RepoContext.run(context, fun) end
+      assert :ok = run.(fn -> Organizations.mark_invitation_emailed(invitation.id, first) end)
+      assert :ok = run.(fn -> Organizations.mark_invitation_emailed(invitation.id) end)
+
+      assert {:error, :not_found} =
+               run.(fn -> Organizations.mark_invitation_emailed(Ecto.UUID.generate()) end)
+
+      invitee = register_with_email("invited@example.com", verified: false)
+      assert {:ok, redemption} = Organizations.redeem_invitation(token, invitee.id)
+      assert redemption.invitation.emailed_at == first
+      assert Identity.email_verified?(Identity.find_by_id(invitee.id))
+    end
+  end
+
   test "email addresses are unique across accounts, case-insensitively" do
     register_with_email("taken@example.com")
 
@@ -160,7 +236,9 @@ defmodule Palee.Organizations.InvitationEmailBindingTest do
     assert user.email == "mixed@example.com"
   end
 
-  defp register_with_email(email) do
+  # ADR-209: a business's bound invitation needs a verified address, so the
+  # accounts here prove their inbox unless a test says otherwise.
+  defp register_with_email(email, opts \\ []) do
     {:ok, user} =
       Identity.register(%{
         nickname: "invitee_#{System.unique_integer([:positive])}",
@@ -169,6 +247,9 @@ defmodule Palee.Organizations.InvitationEmailBindingTest do
         email: email
       })
 
-    user
+    if Keyword.get(opts, :verified, true),
+      do: :ok = Identity.mark_email_verified(user.login_id, user.email)
+
+    Identity.find_by_id(user.id)
   end
 end

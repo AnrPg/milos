@@ -36,6 +36,26 @@ defmodule PaleeWeb.PlatformOrganizationController do
     additionalProperties: true
   }
 
+  # ADR-210: one queued setup email, as the vendor console shows it.
+  @delivery_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      status: %Schema{type: :string, enum: ~w(queued deferred sent failed suppressed)},
+      attempts: %Schema{type: :integer, minimum: 0},
+      inserted_at: %Schema{type: :string, format: :"date-time"},
+      scheduled_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      sent_at: %Schema{type: :string, format: :"date-time", nullable: true}
+    },
+    required: [:id, :status, :attempts, :inserted_at]
+  }
+
+  @delivery_response %Schema{
+    type: :object,
+    properties: %{delivery: @delivery_schema},
+    required: [:delivery]
+  }
+
   operation(:index,
     summary: "List provisioned organizations",
     responses: [ok: {"Organizations", "application/json", %Schema{type: :object}}]
@@ -258,14 +278,38 @@ defmodule PaleeWeb.PlatformOrganizationController do
             type: :object,
             properties: %{
               email: %Schema{type: :string},
-              token: %Schema{type: :string}
+              token: %Schema{type: :string},
+              locale: %Schema{type: :string, description: "The email's language (ADR-210)"},
+              resend: %Schema{type: :boolean, description: "Queue another email"}
             },
             required: [:email, :token]
           }
         }
       }
     },
-    responses: [no_content: "Invitation email sent"]
+    responses: [accepted: {"Queued invitation email", "application/json", @delivery_response}]
+  )
+
+  operation(:invitation_deliveries,
+    summary: "The delivery status of an invitation's setup emails, newest first (ADR-210)",
+    parameters: [
+      @organization_id,
+      %Parameter{
+        name: :invitation_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Deliveries", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{deliveries: %Schema{type: :array, items: @delivery_schema}},
+           required: [:deliveries]
+         }}
+    ]
   )
 
   operation(:membership_role,
@@ -312,6 +356,7 @@ defmodule PaleeWeb.PlatformOrganizationController do
         organization: serialize_organization(result.organization),
         settings: serialize_settings(result.settings),
         initial_owner_invitation: %{
+          id: result.invitation.id,
           token: result.initial_owner_token,
           expires_at: result.invitation.expires_at,
           role: result.invitation.role
@@ -412,6 +457,7 @@ defmodule PaleeWeb.PlatformOrganizationController do
       |> put_status(:created)
       |> json(%{
         invitation: %{
+          id: result.invitation.id,
           token: result.token,
           expires_at: result.invitation.expires_at,
           role: result.invitation.role
@@ -421,15 +467,28 @@ defmodule PaleeWeb.PlatformOrganizationController do
   end
 
   def invitation_email(conn, %{"id" => organization_id}) do
-    with {:ok, _event} <-
+    with {:ok, delivery} <-
            SendOwnerInvitationEmail.call(
              conn.assigns.platform_context,
              organization_id,
              conn.body_params
            ) do
-      send_resp(conn, :no_content, "")
+      conn
+      |> put_status(:accepted)
+      |> json(%{delivery: serialize_delivery(delivery)})
     end
   end
+
+  def invitation_deliveries(conn, %{"invitation_id" => invitation_id}) do
+    with {:ok, deliveries} <-
+           SendOwnerInvitationEmail.deliveries(conn.assigns.platform_context, invitation_id) do
+      json(conn, %{deliveries: Enum.map(deliveries, &serialize_delivery/1)})
+    end
+  end
+
+  # No address, subject or provider error: the console only needs where it is.
+  defp serialize_delivery(delivery),
+    do: Map.take(delivery, [:id, :status, :attempts, :inserted_at, :scheduled_at, :sent_at])
 
   def membership_role(conn, %{"id" => organization_id, "membership_id" => membership_id}) do
     with {:ok, membership} <-

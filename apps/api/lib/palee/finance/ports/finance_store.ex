@@ -117,6 +117,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback enroll_corporate_seat(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback end_corporate_seat(binary(), binary()) :: {:ok, map()} | {:error, term()}
   @callback list_corporate_seats(binary()) :: [map()]
+  @callback end_email_domain_seats([binary()], String.t() | nil) ::
+              {:ok, [map()]} | {:error, term()}
   @callback generate_corporate_invoice(binary(), Date.t()) :: {:ok, map()} | {:error, term()}
   @callback list_corporate_invoices(binary()) :: [map()]
   @callback set_corporate_invoice_status(binary(), String.t()) :: {:ok, map()} | {:error, term()}

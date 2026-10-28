@@ -11,6 +11,14 @@ defmodule Palee.Identity.PasswordResetStore do
   @impl true
   def get_request_by_token_hash(hash), do: impl().get_request_by_token_hash(hash)
   @impl true
+  def lock_request_by_token_hash(hash), do: impl().lock_request_by_token_hash(hash)
+  @impl true
+  def count_requests_from(requester_key, since),
+    do: impl().count_requests_from(requester_key, since)
+
+  @impl true
+  def transaction(fun), do: impl().transaction(fun)
+  @impl true
   def create_request(params), do: impl().create_request(params)
   @impl true
   def update_request_locked(id, fun), do: impl().update_request_locked(id, fun)

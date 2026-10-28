@@ -12,6 +12,18 @@ defmodule Palee.Organizations.OrganizationStore do
     do: impl().revoke_invitation(organization_id, invitation_id, revoked_at)
 
   @impl true
+  def mark_invitation_emailed(invitation_id, emailed_at),
+    do: impl().mark_invitation_emailed(invitation_id, emailed_at)
+
+  @impl true
+  def get_invitation(organization_id, invitation_id),
+    do: impl().get_invitation(organization_id, invitation_id)
+
+  @impl true
+  def count_emailed_invitations(organization_id, user_id, since),
+    do: impl().count_emailed_invitations(organization_id, user_id, since)
+
+  @impl true
   def redeem_invitation(digest, user_id, redeemed_at),
     do: impl().redeem_invitation(digest, user_id, redeemed_at)
 
@@ -114,6 +126,9 @@ defmodule Palee.Organizations.OrganizationStore do
 
   @impl true
   def get_vendor(user_id), do: impl().get_vendor(user_id)
+
+  @impl true
+  def list_active_vendor_user_ids, do: impl().list_active_vendor_user_ids()
 
   @impl true
   def provision_organization(organization_params, invitation_params, platform_user_id, issued_at),

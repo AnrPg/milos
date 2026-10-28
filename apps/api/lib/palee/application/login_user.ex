@@ -15,6 +15,8 @@ defmodule Palee.Application.LoginUser do
     with true <- is_binary(identifier) and is_binary(password),
          %{} = user <- find(identifier),
          true <- PasswordVerifier.verify(password, user.password_hash),
+         # ADR-211: a profile scheduled for deletion opens only after an undo.
+         :ok <- Palee.Application.AccountDeletion.ensure_open(user),
          {:ok, tokens} <- TokenIssuer.issue_pair(user) do
       :ok = Identity.touch_last_used(user.login_id, user.id)
       # ADR-184 follow-up: signing in keeps the account's demo businesses alive.
@@ -30,6 +32,25 @@ defmodule Palee.Application.LoginUser do
 
       {:error, reason} ->
         {:error, reason}
+    end
+  end
+
+  @doc "ADR-211: the profile the credentials open, checked like a sign-in, without signing in."
+  def authenticate(params) when is_map(params) do
+    identifier = value(params, :identifier) || value(params, :nickname)
+    password = value(params, :password)
+
+    with true <- is_binary(identifier) and is_binary(password),
+         %{} = user <- find(identifier),
+         true <- PasswordVerifier.verify(password, user.password_hash) do
+      {:ok, user}
+    else
+      nil ->
+        PasswordVerifier.no_user_verify()
+        {:error, :invalid_credentials}
+
+      false ->
+        {:error, :invalid_credentials}
     end
   end
 

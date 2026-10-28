@@ -4,6 +4,9 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def create_login_with_profile(params), do: impl().create_login_with_profile(params)
   @impl true
+  def validate_new_login(params), do: impl().validate_new_login(params)
+
+  @impl true
   def create_demo_person(organization_id, params),
     do: impl().create_demo_person(organization_id, params)
 
@@ -27,6 +30,10 @@ defmodule Palee.Identity.UserStore do
 
   @impl true
   def update_credentials(user_id, params), do: impl().update_credentials(user_id, params)
+  @impl true
+  def mark_email_verified(login_id, email, now),
+    do: impl().mark_email_verified(login_id, email, now)
+
   @impl true
   def reset_login_password(login_id, password),
     do: impl().reset_login_password(login_id, password)
@@ -72,6 +79,9 @@ defmodule Palee.Identity.UserStore do
 
   @impl true
   def bump_security_version(user_id), do: impl().bump_security_version(user_id)
+
+  @impl true
+  def bump_login_security_version(login_id), do: impl().bump_login_security_version(login_id)
 
   defp impl do
     Application.fetch_env!(:palee, :identity_user_store)

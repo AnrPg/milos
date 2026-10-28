@@ -4,6 +4,8 @@ defmodule Palee.Identity.Ports.UserStore do
   # ADR-187: logins (one per email) hold up to three profiles.
   @callback create_login_with_profile(map()) ::
               {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  # ADR-211: the checks a new login would face, with nothing written.
+  @callback validate_new_login(map()) :: :ok | {:error, Ecto.Changeset.t()}
   @callback create_demo_person(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
   @callback demo_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
@@ -25,6 +27,8 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback handle_available?(String.t(), Ecto.UUID.t() | nil) :: boolean()
   @callback update_credentials(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback mark_email_verified(Ecto.UUID.t(), String.t(), DateTime.t()) ::
+              :ok | {:error, :email_mismatch}
   @callback reset_login_password(Ecto.UUID.t(), String.t()) ::
               :ok | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_user(Account.t()) :: :ok | {:error, term()}
@@ -51,4 +55,6 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback count_by_role(atom() | String.t()) :: non_neg_integer()
   @callback bump_security_version(Ecto.UUID.t()) ::
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  @doc "ADR-208: revokes the sessions of every profile of a login."
+  @callback bump_login_security_version(Ecto.UUID.t()) :: :ok | {:error, :not_found}
 end

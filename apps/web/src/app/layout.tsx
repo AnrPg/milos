@@ -14,6 +14,7 @@ import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { PersonalThemeBridge, ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
+import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { ScreenPreloader } from "@/components/nav/ScreenPreloader";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
@@ -147,6 +148,8 @@ export default async function RootLayout({
                 {/* ADR-193: in-app walkthroughs; the overlay survives page changes. */}
                 <GuideProvider>
                   <TopNav />
+                  {/* ADR-213: the quiet "confirm your email" line. */}
+                  <EmailVerificationBanner />
                   {children}
                   <BottomNav />
                   <ScreenPreloader />

@@ -92,6 +92,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/account-deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The login's open deletion request */
+        get: operations["PaleeWeb.AccountDeletionController.show"];
+        put?: never;
+        /**
+         * Ask to delete the current profile or the whole login
+         * @description Needs the password. A verified email gets a confirmation link; otherwise `confirm_email` (the login's email, typed) schedules it at once and the session ends.
+         */
+        post: operations["PaleeWeb.AccountDeletionController.create"];
+        /** Undo the login's deletion request from a signed-in profile */
+        delete: operations["PaleeWeb.AccountDeletionController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm a deletion with the emailed link */
+        post: operations["PaleeWeb.AccountDeletionController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo a scheduled deletion with the emailed link */
+        post: operations["PaleeWeb.AccountDeletionController.undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/account-deletion/undo-sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo a scheduled deletion and sign in */
+        post: operations["PaleeWeb.AccountDeletionController.undo_sign_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/email-change/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open the link mailed to the new address
+         * @description Every session of every profile ends. A browser holding a session of the same login gets a fresh one (access_token in the answer, refresh cookie).
+         */
+        post: operations["PaleeWeb.EmailChangeController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/email-change/revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** "This wasn't me": put the old address back and lock email changes */
+        post: operations["PaleeWeb.EmailChangeController.revert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/handle-available": {
         parameters: {
             query?: never;
@@ -254,8 +364,28 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Ask for a password reset (always answered the same way) */
+        /**
+         * Ask for a password reset (always answered the same way)
+         * @description A verified email gets a one-hour reset link; otherwise, or with `cant_access_email`, the request goes to the people who can vouch for the person. The answer never says which happened, or whether the account exists.
+         */
         post: operations["PaleeWeb.PasswordRecoveryController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password-reset/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a reset link before the new password is typed (never spends it) */
+        post: operations["PaleeWeb.PasswordRecoveryController.inspect_link"];
         delete?: never;
         options?: never;
         head?: never;
@@ -400,6 +530,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/sign-out-everywhere": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign every device of the login out with a security notice's emailed link */
+        post: operations["PaleeWeb.SecurityLinkController.sign_out_everywhere"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/switch-profile": {
         parameters: {
             query?: never;
@@ -411,6 +558,40 @@ export interface paths {
         put?: never;
         /** Open a session for another profile of the same login */
         post: operations["PaleeWeb.AccountProfilesController.switch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verification-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: email the signed-in person a new verification link */
+        post: operations["PaleeWeb.EmailVerificationController.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-213: confirm the login's email with the emailed link's token */
+        post: operations["PaleeWeb.EmailVerificationController.verify"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2351,6 +2532,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/email-change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The login's pending email change, if any */
+        get: operations["PaleeWeb.EmailChangeController.show"];
+        put?: never;
+        /**
+         * Ask to change the login's email (needs the current password)
+         * @description Mails a 24 h link to the new address; the login keeps its email until it is opened. The answer is the same whether or not the address already has an account.
+         */
+        post: operations["PaleeWeb.EmailChangeController.create"];
+        /** Cancel the pending email change */
+        delete: operations["PaleeWeb.EmailChangeController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/email-change/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mail the pending change's link again */
+        post: operations["PaleeWeb.EmailChangeController.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/event-hosts": {
         parameters: {
             query?: never;
@@ -3442,6 +3662,26 @@ export interface paths {
         get: operations["PaleeWeb.MeController.search_users (2)"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/share-links/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email one of your share links to an address (ADR-210)
+         * @description The link is rebuilt from `token` and must be yours and still usable. Needs a verified email; at most 10 a day. The same link to the same address is sent once.
+         */
+        post: operations["PaleeWeb.ShareLinkEmailController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9081,6 +9321,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/invitations/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-209: email one invitation to each of up to 200 addresses */
+        post: operations["PaleeWeb.OrganizationAccessController.bulk_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations/{id}": {
         parameters: {
             query?: never;
@@ -9093,6 +9350,23 @@ export interface paths {
         post?: never;
         /** Revoke an active organization invitation */
         delete: operations["PaleeWeb.OrganizationAccessController.revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/invitations/{id}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ADR-209: re-issue an emailed invitation and email the new link */
+        post: operations["PaleeWeb.OrganizationAccessController.resend"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -12099,6 +12373,23 @@ export interface paths {
         put?: never;
         /** Email an already-issued invitation's setup link to its recipient */
         post: operations["PaleeWeb.PlatformOrganizationController.invitation_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/invitations/{invitation_id}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The delivery status of an invitation's setup emails, newest first (ADR-210) */
+        get: operations["PaleeWeb.PlatformOrganizationController.invitation_deliveries"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -18623,6 +18914,17 @@ export interface components {
         BusinessAccountsQueue: {
             demo_businesses: {
                 link?: {
+                    /**
+                     * BusinessActivationLinkEmail
+                     * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                     */
+                    email_delivery?: {
+                        error?: string | null;
+                        /** Format: date_time */
+                        sent_at?: string | null;
+                        /** @enum {string} */
+                        status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                    } | null;
                     /** Format: date_time */
                     expires_at: string;
                     /** Format: uuid */
@@ -18658,6 +18960,8 @@ export interface components {
                     slug: string;
                 };
                 owners: {
+                    /** @description ADR-205: a link is only issued to a verified email */
+                    email_verified: boolean;
                     nickname?: string | null;
                     /** Format: uuid */
                     user_id: string;
@@ -18683,12 +18987,25 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             }[];
         };
         /** BusinessActivationLink */
         BusinessActivationLink: {
+            /**
+             * BusinessActivationLinkEmail
+             * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+             */
+            email_delivery?: {
+                error?: string | null;
+                /** Format: date_time */
+                sent_at?: string | null;
+                /** @enum {string} */
+                status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+            } | null;
             /** Format: date_time */
             expires_at: string;
             /** Format: uuid */
@@ -18709,6 +19026,17 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         };
+        /**
+         * BusinessActivationLinkEmail
+         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+         */
+        BusinessActivationLinkEmail: {
+            error?: string | null;
+            /** Format: date_time */
+            sent_at?: string | null;
+            /** @enum {string} */
+            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+        } | null;
         /** BusinessActivationPreview */
         BusinessActivationPreview: {
             demo: {
@@ -18805,6 +19133,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             } | null;
@@ -18867,6 +19197,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             };
@@ -18892,12 +19224,25 @@ export interface components {
             phone?: string | null;
             /** @description Vendors: nickname */
             requested_by?: string | null;
+            /** @description Vendors (ADR-205): whether the requester verified their email */
+            requester_email_verified?: boolean | null;
             /** @enum {string} */
             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
         };
         /** BusinessRequestDecision */
         BusinessRequestDecision: {
             activation_link?: {
+                /**
+                 * BusinessActivationLinkEmail
+                 * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                 */
+                email_delivery?: {
+                    error?: string | null;
+                    /** Format: date_time */
+                    sent_at?: string | null;
+                    /** @enum {string} */
+                    status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                } | null;
                 /** Format: date_time */
                 expires_at: string;
                 /** Format: uuid */
@@ -18952,6 +19297,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             };
@@ -18978,6 +19325,8 @@ export interface components {
                 phone?: string | null;
                 /** @description Vendors: nickname */
                 requested_by?: string | null;
+                /** @description Vendors (ADR-205): whether the requester verified their email */
+                requester_email_verified?: boolean | null;
                 /** @enum {string} */
                 status: "pending" | "approved" | "declined" | "cancelled" | "completed";
             }[];
@@ -39644,6 +39993,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -39686,6 +40037,469 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deletion state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    confirm_email?: string;
+                    password: string;
+                    /** @enum {string} */
+                    scope: "profile" | "login";
+                };
+            };
+        };
+        responses: {
+            /** @description Awaiting the emailed link, or scheduled */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Sole owner of a business, or already scheduled */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Wrong password or confirmation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description None open */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Scheduled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Invalid or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Where the confirmation link went (awaiting_confirmation only) */
+                        email?: string | null;
+                        /** Format: date-time */
+                        scheduled_for?: string | null;
+                        /** @enum {string|null} */
+                        scope?: "profile" | "login" | null;
+                        /** @enum {string} */
+                        status: "none" | "awaiting_confirmation" | "scheduled";
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+            /** @description Invalid or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AccountDeletionController.undo_sign_in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The login's email or a profile's @handle */
+                    identifier: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Access session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string;
+                        user?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Wrong credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                        organizations?: string[];
+                        /** Format: date-time */
+                        scheduled_for?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string | null;
+                        email: string;
+                        user?: Record<string, never> | null;
+                    };
+                };
+            };
+            /** @description Address no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Unknown or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reverted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: string;
+                    };
+                };
+            };
+            /** @description Address no longer available */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Expired link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Unknown or used link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
                 };
             };
         };
@@ -39772,8 +40586,22 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        /** @description ADR-209 (inspect): the invitation is for one email address, never shown */
+                        email_bound?: boolean;
                         /** Format: date_time */
                         expires_at: string;
+                        /**
+                         * Format: uuid
+                         * @description ADR-209: issue responses only
+                         */
+                        id?: string;
                         /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
                         location_scope?: {
                             all_locations: boolean;
@@ -39799,6 +40627,7 @@ export interface operations {
                         role: string;
                         /** @description ADR-186: the role set; `role` is its primary role */
                         roles?: string[];
+                        /** @description The link token; never returned for an invitation sent by email (ADR-209) */
                         token?: string | null;
                     };
                 };
@@ -39846,6 +40675,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -39886,6 +40717,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -40001,6 +40834,8 @@ export interface operations {
                         display_name: string;
                         /** @description The login's email, shared by its profiles */
                         email?: string;
+                        /** @description ADR-213: whether the login opened an emailed link to its current email */
+                        email_verified: boolean;
                         /** @description ADR-187: the unique @handle */
                         handle: string;
                         /** Format: uuid */
@@ -40083,7 +40918,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Expired link */
+            /** @description Expired or used link */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -40113,13 +40948,65 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    cant_access_email?: boolean;
                     identifier: string;
+                    locale?: string;
                 };
             };
         };
         responses: {
-            /** @description Request sent */
+            /** @description Request taken */
             202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "sent";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PasswordRecoveryController.inspect_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Usable link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                    };
+                };
+            };
+            /** @description Expired or used link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Unknown link */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -40329,6 +41216,8 @@ export interface operations {
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
+                            /** @description ADR-213: whether the login opened an emailed link to its current email */
+                            email_verified: boolean;
                             /** @description ADR-187: the unique @handle */
                             handle: string;
                             /** Format: uuid */
@@ -40429,28 +41318,17 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Access session */
+            /** @description Signed up; a link was sent to the email */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        access_token: string;
-                    };
-                };
-            };
-            /** @description Email already has accounts */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        code: string;
-                        error?: string;
-                        profile_count?: number;
-                        profile_limit?: number;
+                        access_token?: string;
+                        /** @enum {string} */
+                        confirmation: "email_sent";
+                        email: string;
                     };
                 };
             };
@@ -40700,6 +41578,56 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.SecurityLinkController.sign_out_everywhere": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Every session ended */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Expired or already used link */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        code: "invalid_link" | "expired_link" | "used_link";
+                        error: string;
+                    };
+                };
+            };
+            /** @description Unknown link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        code: "invalid_link" | "expired_link" | "used_link";
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AccountProfilesController.switch": {
         parameters: {
             query?: never;
@@ -40730,6 +41658,139 @@ export interface operations {
             };
             /** @description Not a profile of this login */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sent, or nothing to do */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "already_verified" | "sent";
+                    };
+                };
+            };
+            /** @description The address can't get email */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description A link was sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        retry_after_seconds: number;
+                    };
+                };
+            };
+            /** @description Email is busy today */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailVerificationController.verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Email verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email_verified: boolean;
+                    };
+                };
+            };
+            /** @description Link already used, or the email changed since */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Link expired */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Unknown link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -43216,6 +44277,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         };
@@ -46130,6 +47193,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         }[];
@@ -46184,6 +47249,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -46228,6 +47295,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -50725,6 +51794,203 @@ export interface operations {
                         seen_at?: string | null;
                         status?: string | null;
                         visible: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    current_password: string;
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pending */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Changes are locked for now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Wrong current password, or an invalid or unchanged address */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.EmailChangeController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        locked_until: string | null;
+                        pending: {
+                            email: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Nothing pending */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
+                    };
+                };
+            };
+            /** @description Sent just now */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                        /** Format: date-time */
+                        locked_until?: string;
                     };
                 };
             };
@@ -55533,7 +56799,10 @@ export interface operations {
                     /** @description Required to change the login's email or password */
                     current_password?: string;
                     display_name?: string;
-                    /** Format: email */
+                    /**
+                     * Format: email
+                     * @description ADR-207: only the current address; a new one goes through /api/me/email-change
+                     */
                     email?: string | null;
                     /** @description ADR-187: the unique @handle (once per 14 days) */
                     handle?: string;
@@ -55981,6 +57250,44 @@ export interface operations {
                             nickname?: string;
                             role?: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShareLinkEmailController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    link: "guest_pass" | "buddy_invite" | "referral";
+                    /** Format: email */
+                    to: string;
+                    /** @description The guest pass or buddy invite token, or the referral code */
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        delivery: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
                     };
                 };
             };
@@ -58444,6 +59751,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     }[];
                 };
@@ -58511,6 +59820,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -58565,6 +59876,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -58637,6 +59950,8 @@ export interface operations {
                             brand_logo_url?: string | null;
                             brand_name?: string | null;
                             brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
                         } | null;
                     };
                 };
@@ -59887,6 +61202,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -59945,6 +61262,8 @@ export interface operations {
                         phone?: string | null;
                         /** @description Vendors: nickname */
                         requested_by?: string | null;
+                        /** @description Vendors (ADR-205): whether the requester verified their email */
+                        requester_email_verified?: boolean | null;
                         /** @enum {string} */
                         status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                     };
@@ -59997,6 +61316,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -60050,6 +61371,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         } | null;
@@ -85571,7 +86894,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
                         email_bound: boolean;
+                        email_locale?: string | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */
@@ -85604,6 +86935,8 @@ export interface operations {
                 "application/json": {
                     /** @description ADR-186: staff work at every branch («Όλα τα καταστήματα») */
                     all_locations?: boolean;
+                    /** @description ADR-209: the email's language; defaults to the box's language */
+                    email_locale?: string;
                     intended_email?: string;
                     lifetime_seconds?: number;
                     /** @description ADR-186: the branches staff work at; defaults to the issuer's own scope */
@@ -85615,6 +86948,8 @@ export interface operations {
                     role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
                     /** @description ADR-186: the role set the invited person gets */
                     roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    /** @description ADR-209: email the invitation to `intended_email`; the token is then not returned */
+                    send_email?: boolean;
                 };
             };
         };
@@ -85626,8 +86961,22 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        /** @description ADR-209 (inspect): the invitation is for one email address, never shown */
+                        email_bound?: boolean;
                         /** Format: date_time */
                         expires_at: string;
+                        /**
+                         * Format: uuid
+                         * @description ADR-209: issue responses only
+                         */
+                        id?: string;
                         /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
                         location_scope?: {
                             all_locations: boolean;
@@ -85653,7 +87002,57 @@ export interface operations {
                         role: string;
                         /** @description ADR-186: the role set; `role` is its primary role */
                         roles?: string[];
+                        /** @description The link token; never returned for an invitation sent by email (ADR-209) */
                         token?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.OrganizationAccessController.bulk_invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    email_locale?: string;
+                    /** @description Addresses, or pasted text / CSV holding them */
+                    emails: string[] | string;
+                    lifetime_seconds?: number;
+                    location_ids?: string[];
+                    role?: string;
+                    roles?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-address results */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        failed: number;
+                        results: {
+                            email: string;
+                            /** @description Why this address got no invitation */
+                            error?: string;
+                            /** Format: uuid */
+                            invitation_id?: string;
+                            /** @enum {string} */
+                            status?: "queued";
+                        }[];
+                        sent: number;
+                        /** @description Pasted values that are not email addresses */
+                        skipped: string[];
                     };
                 };
             };
@@ -85677,6 +87076,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "PaleeWeb.OrganizationAccessController.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new invitation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description ADR-209: delivery of the invitation email (null when it was not emailed)
+                         * @enum {string|null}
+                         */
+                        delivery_status?: "queued" | "sent" | "failed" | "bounced" | "suppressed" | null;
+                        /** @description ADR-209: the address an invitation sent by email went to */
+                        email?: string | null;
+                        email_bound: boolean;
+                        email_locale?: string | null;
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        issued_at: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
+                        role: string;
+                        roles?: string[];
+                    };
+                };
             };
         };
     };
@@ -86207,6 +87652,8 @@ export interface operations {
                     "application/json": {
                         offer: {
                             company_name: string;
+                            /** @description ADR-205: the account email matches but is not verified yet; joining waits for the confirmation */
+                            needs_verification: boolean;
                         } | null;
                     };
                 };
@@ -86250,6 +87697,17 @@ export interface operations {
                         } & {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+            /** @description The matching email is not verified yet */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -90044,7 +91502,7 @@ export interface operations {
                 /** @description Explicit UTC window end datetime */
                 end_at?: string;
                 /** @description Window size in days */
-                days?: 3 | 7 | 30;
+                days?: 1 | 3 | 7 | 30;
                 /** @description Optional class type filters */
                 class_type_ids?: string[];
             };
@@ -99811,6 +101269,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * BusinessActivationLinkEmail
+                         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                         */
+                        email_delivery?: {
+                            error?: string | null;
+                            /** Format: date_time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                        } | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */
@@ -99853,6 +101322,17 @@ export interface operations {
                     "application/json": {
                         demo_businesses: {
                             link?: {
+                                /**
+                                 * BusinessActivationLinkEmail
+                                 * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                                 */
+                                email_delivery?: {
+                                    error?: string | null;
+                                    /** Format: date_time */
+                                    sent_at?: string | null;
+                                    /** @enum {string} */
+                                    status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                                } | null;
                                 /** Format: date_time */
                                 expires_at: string;
                                 /** Format: uuid */
@@ -99888,6 +101368,8 @@ export interface operations {
                                 slug: string;
                             };
                             owners: {
+                                /** @description ADR-205: a link is only issued to a verified email */
+                                email_verified: boolean;
                                 nickname?: string | null;
                                 /** Format: uuid */
                                 user_id: string;
@@ -99913,6 +101395,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         }[];
@@ -99953,6 +101437,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         activation_link?: {
+                            /**
+                             * BusinessActivationLinkEmail
+                             * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                             */
+                            email_delivery?: {
+                                error?: string | null;
+                                /** Format: date_time */
+                                sent_at?: string | null;
+                                /** @enum {string} */
+                                status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                            } | null;
                             /** Format: date_time */
                             expires_at: string;
                             /** Format: uuid */
@@ -100007,6 +101502,8 @@ export interface operations {
                             phone?: string | null;
                             /** @description Vendors: nickname */
                             requested_by?: string | null;
+                            /** @description Vendors (ADR-205): whether the requester verified their email */
+                            requester_email_verified?: boolean | null;
                             /** @enum {string} */
                             status: "pending" | "approved" | "declined" | "cancelled" | "completed";
                         };
@@ -100214,6 +101711,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * BusinessActivationLinkEmail
+                         * @description ADR-205: the link's email to the account. `not_sent` when the outbox refused it (`error` says why); the link still works and can be copied.
+                         */
+                        email_delivery?: {
+                            error?: string | null;
+                            /** Format: date_time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed" | "not_sent";
+                        } | null;
                         /** Format: date_time */
                         expires_at: string;
                         /** Format: uuid */
@@ -100394,17 +101902,74 @@ export interface operations {
             content: {
                 "application/json": {
                     email: string;
+                    /** @description The email's language (ADR-210) */
+                    locale?: string;
+                    /** @description Queue another email */
+                    resend?: boolean;
                     token: string;
                 };
             };
         };
         responses: {
-            /** @description Invitation email sent */
-            204: {
+            /** @description Queued invitation email */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        delivery: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformOrganizationController.invitation_deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deliveries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deliveries: {
+                            attempts: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            scheduled_at?: string | null;
+                            /** Format: date-time */
+                            sent_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "deferred" | "sent" | "failed" | "suppressed";
+                        }[];
+                    };
+                };
             };
         };
     };

@@ -33,9 +33,66 @@ export function issueClientInvitation(
     roles?: string[];
     all_locations?: boolean;
     location_ids?: string[];
+    /** ADR-209: email the invitation to `intended_email` (its token stays in the email). */
+    send_email?: boolean;
+    email_locale?: string;
   },
 ) {
   return apiRequest<IssuedInvitation>(orgPath(slug, "/invitations"), { method: "POST", token, body });
+}
+
+export type BulkInvitationResult = {
+  results: { email: string; status?: "queued"; invitation_id?: string; error?: string }[];
+  sent: number;
+  failed: number;
+  skipped: string[];
+};
+
+/** ADR-209: the most addresses one bulk request takes. */
+export const BULK_INVITE_MAX = 200;
+
+/** ADR-209: one invitation and email per address (`POST /invitations/bulk`). */
+export function bulkInvite(
+  token: string,
+  slug: string,
+  body: {
+    emails: string[];
+    role: string;
+    lifetime_seconds: number;
+    email_locale?: string;
+    roles?: string[];
+    all_locations?: boolean;
+    location_ids?: string[];
+  },
+) {
+  return apiRequest<BulkInvitationResult>(orgPath(slug, "/invitations/bulk"), { method: "POST", token, body });
+}
+
+/** ADR-209: re-issues an emailed invitation and emails the new link; the old one stops working. */
+export function resendInvitation(token: string, slug: string, id: string) {
+  return apiRequest<PendingInvitation>(orgPath(slug, `/invitations/${encodeURIComponent(id)}/resend`), {
+    method: "POST",
+    token,
+  });
+}
+
+/**
+ * ADR-209: the addresses in pasted text or a CSV file: split on commas,
+ * semicolons, quotes and whitespace, lower-cased, without repeats. Values that
+ * are not shaped like an address are returned separately.
+ */
+export function parseInviteAddresses(text: string): { emails: string[]; skipped: string[] } {
+  const seen = new Set<string>();
+  const emails: string[] = [];
+  const skipped: string[] = [];
+  for (const raw of text.split(/[\s,;"']+/u)) {
+    const value = raw.trim().toLowerCase();
+    if (!value || seen.has(value)) continue;
+    seen.add(value);
+    if (/^[^@\s<>()]+@[^@\s<>()]+\.[^@\s<>()]+$/u.test(value)) emails.push(value);
+    else skipped.push(value);
+  }
+  return { emails, skipped };
 }
 
 export function listPendingInvitations(token: string, slug: string) {
@@ -66,9 +123,23 @@ export function joinOrganization(token: string, slug: string) {
 }
 
 export function invitationUrl(origin: string, invitation: { role: string; roles?: string[] | null; token?: string | null }) {
+  return `${origin}${invitationSignUpPath(invitation)}?token=${encodeURIComponent(invitation.token ?? "")}`;
+}
+
+/** The sign-up page of an invitation: owners and admins register on `/set-admin`. */
+export function invitationSignUpPath(invitation: { role: string; roles?: string[] | null }) {
   const roles = invitation.roles?.length ? invitation.roles : [invitation.role];
-  const route = roles.includes("owner") || roles.includes("admin") ? "/set-admin" : "/register";
-  return `${origin}${route}?token=${encodeURIComponent(invitation.token ?? "")}`;
+  return roles.includes("owner") || roles.includes("admin") ? "/set-admin" : "/register";
+}
+
+/**
+ * ADR-209: the invitation token of the current page: `#token=` (emailed
+ * links keep it in the fragment, away from server logs) or `?token=`.
+ */
+export function invitationTokenFromLocation(location: { hash: string; search: string }): string {
+  const fromHash = new URLSearchParams(location.hash.replace(/^#/, "")).get("token");
+  const fromQuery = new URLSearchParams(location.search).get("token");
+  return (fromHash ?? fromQuery ?? "").trim();
 }
 
 export function joinUrl(origin: string, slug: string) {

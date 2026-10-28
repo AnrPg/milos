@@ -6,13 +6,17 @@ defmodule Palee.Application.RegisterProfile do
   person owns those accounts. Otherwise the caller learns only how many
   profiles the email holds (never which), so the form can say "this email
   already has 2 of 3 accounts" without exposing them.
+
+  ADR-211: an address a login changed away from in the last 7 days is held
+  for it (`Identity.email_reserved_for_other?/1`): `{:error, :email_reserved}`,
+  with nothing created.
   """
   alias Palee.Application.PasswordVerifier
   alias Palee.Identity
 
   def call(params) when is_map(params) do
     case Identity.find_login_by_email(value(params, :email)) do
-      nil -> create_login(params)
+      nil -> if_not_reserved(params, &create_login/1)
       login -> add_to_existing(login, params)
     end
   end
@@ -29,6 +33,12 @@ defmodule Palee.Application.RegisterProfile do
       result ->
         result
     end
+  end
+
+  defp if_not_reserved(params, fun) do
+    if Identity.email_reserved_for_other?(value(params, :email)),
+      do: {:error, :email_reserved},
+      else: fun.(params)
   end
 
   defp add_to_existing(login, params) do

@@ -37,6 +37,15 @@ describe("configuredMediaOrigins", () => {
     expect(response.headers.get("Permissions-Policy")).toContain("microphone=(self)");
   });
 
+  test("reset link pages send no referrer (ADR-206); other pages keep the default", async () => {
+    for (const path of ["/reset-password", "/forgot-password", "/org/box/reset-password"]) {
+      const response = await proxy(new NextRequest(`http://localhost${path}`));
+      expect(response.headers.get("Referrer-Policy")).toBe("no-referrer");
+    }
+    const other = await proxy(new NextRequest("http://localhost/login"));
+    expect(other.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
+  });
+
   test("rewrites tenant-prefixed RSC and prefetch requests too", () => {
     expect(config.matcher[0]).not.toHaveProperty("missing");
   });

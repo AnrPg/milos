@@ -1,0 +1,50 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Someone tried to sign up with your email"
+msgstr "Iemand probeerde zich aan te melden met uw e-mailadres"
+
+msgid "Someone tried to create a %{product} account with this email address."
+msgstr "Iemand probeerde een %{product}-account aan te maken met dit e-mailadres."
+
+msgid "If it was you, sign in to add a profile, or reset your password if you forgot it."
+msgstr "Was u dit, log dan in om een profiel toe te voegen, of stel uw wachtwoord opnieuw in als u het vergeten bent."
+
+msgid "Sign in"
+msgstr "Inloggen"
+
+msgid "Reset password"
+msgstr "Wachtwoord opnieuw instellen"
+
+msgid "Forgot your password?"
+msgstr "Wachtwoord vergeten?"
+
+msgid "If it wasn't you, you can ignore this email. No account was created and nothing changed."
+msgstr "Was u dit niet, dan kunt u deze e-mail negeren. Er is geen account aangemaakt en er is niets veranderd."
+
+msgid "Confirm deleting your account"
+msgstr "Bevestig het verwijderen van uw account"
+
+msgid "You asked to delete your profile @%{handle}."
+msgstr "U hebt gevraagd uw profiel @%{handle} te verwijderen."
+
+msgid "You asked to delete your account with all its profiles."
+msgstr "U hebt gevraagd uw account met al zijn profielen te verwijderen."
+
+msgid "Confirm deleting your profile"
+msgstr "Bevestig het verwijderen van uw profiel"
+
+msgid "After you confirm, the deletion takes place in %{days} days. Until then you can undo it."
+msgstr "Na uw bevestiging vindt de verwijdering over %{days} dagen plaats. Tot die tijd kunt u deze ongedaan maken."
+
+msgid "Confirm deletion"
+msgstr "Verwijdering bevestigen"
+
+msgid "The link expires in 24 hours."
+msgstr "De link verloopt over 24 uur."
+
+msgid "If you didn't ask for this, don't open the link and change your password: someone else knows it."
+msgstr "Hebt u dit niet gevraagd, open de link dan niet en wijzig uw wachtwoord: iemand anders kent het."

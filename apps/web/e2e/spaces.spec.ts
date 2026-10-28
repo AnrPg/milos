@@ -39,6 +39,7 @@ async function signIn(page: Page, role: string, capabilities: Record<string, str
     nickname: "Olga",
     role: "member",
     email: "staff@example.com",
+    email_verified: true,
     completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,

@@ -705,6 +705,17 @@ defmodule Palee.Notifications do
         url: "/admin"
       })
 
+  # ADR-212: the SMTP key expires soon (or has); to each vendor, once a day
+  # at most (the dedupe key carries the date).
+  def process_event("email_key_expiring", payload),
+    do:
+      enqueue_simple(:email_key_expiring, payload, %{
+        expires_on: field(payload, :expires_on),
+        days_left: field(payload, :days_left),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/platform"
+      })
+
   def process_event("coaching_reply_overdue", payload),
     do:
       enqueue_simple(:coaching_reply_overdue, payload, %{

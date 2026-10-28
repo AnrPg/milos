@@ -39,6 +39,13 @@ config :palee, PaleeWeb.Endpoint,
 # In test we don't send emails
 config :palee, Palee.Mailer, adapter: Swoosh.Adapters.Test
 
+# ADR-203: the outbox stores rows and their DeliverEmailJob in the sandbox
+# (Oban is not started, so nothing is sent until a test asks).
+# `Palee.EmailCase` asserts on what was enqueued and delivers it through
+# the Swoosh test adapter; no test trips the budget unless it lowers it.
+config :palee, :email_budget, daily_budget: 100_000, hard_cap: 100_000
+config :palee, :email_templates_extra, %{sample_notice: Palee.TestSupport.SampleEmail}
+
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 

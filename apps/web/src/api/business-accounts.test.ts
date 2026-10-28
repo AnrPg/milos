@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { demoSectionForPath, isAdminPath, isBusinessNotActivated } from "@/api/business-accounts";
+import {
+  activationEmailState,
+  activationTokenFrom,
+  demoSectionForPath,
+  isAdminPath,
+  isBusinessNotActivated,
+} from "@/api/business-accounts";
 import { ApiError, BUSINESS_NOT_ACTIVATED_EVENT, apiRequest } from "@/api/client";
 
 describe("demo sections (ADR-184)", () => {
@@ -52,5 +58,24 @@ describe("business_not_activated", () => {
     expect(isBusinessNotActivated(failure)).toBe(false);
     expect(listener).not.toHaveBeenCalled();
     window.removeEventListener(BUSINESS_NOT_ACTIVATED_EVENT, listener);
+  });
+});
+
+describe("ADR-205: the emailed activation link", () => {
+  it("reads the token from the fragment, else the older query form", () => {
+    expect(activationTokenFrom("", "#token=abc_DEF-123")).toBe("abc_DEF-123");
+    expect(activationTokenFrom("fromQuery", "#token=fromHash")).toBe("fromHash");
+    expect(activationTokenFrom("fromQuery", "")).toBe("fromQuery");
+    expect(activationTokenFrom(undefined, "#other=1")).toBe("");
+  });
+
+  it("words the email's delivery for the vendor console", () => {
+    expect(activationEmailState(null)).toBeNull();
+    expect(activationEmailState({ status: "sent" })).toBe("sent");
+    expect(activationEmailState({ status: "queued" })).toBe("pending");
+    expect(activationEmailState({ status: "deferred" })).toBe("pending");
+    expect(activationEmailState({ status: "failed" })).toBe("failed");
+    expect(activationEmailState({ status: "suppressed" })).toBe("failed");
+    expect(activationEmailState({ status: "not_sent", error: "throttled" })).toBe("failed");
   });
 });

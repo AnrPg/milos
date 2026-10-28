@@ -1,6 +1,6 @@
 defmodule Palee.Identity do
   alias Palee.Identity.Commands.{RegisterUser, UpdateRole}
-  alias Palee.Identity.Domain.Locale
+  alias Palee.Identity.Domain.{Locale, SignInDevice}
   alias Palee.Identity.Queries.FindUser
   alias Palee.Identity.UserStore
 
@@ -55,6 +55,38 @@ defmodule Palee.Identity do
   # ADR-187: logins (one per email) and their up to three profiles.
   defdelegate create_login_with_profile(params), to: UserStore
   defdelegate add_profile(login_id, params), to: UserStore
+
+  @doc """
+  ADR-211: the validation a new login and its first profile would get
+  (field rules, the handle being free), with nothing written.
+  """
+  defdelegate validate_new_login(params), to: UserStore
+
+  @doc """
+  ADR-211: an address a login changed away from stays held for it for
+  `reserved_email_seconds/0`, while its revert link works; nobody else may
+  sign up with it or change to it meanwhile. Only a digest is stored.
+  """
+  def reserve_released_email(email, login_id, now \\ DateTime.utc_now()),
+    do:
+      Palee.Identity.ReleasedEmailStore.reserve(
+        email,
+        login_id,
+        DateTime.add(now, reserved_email_seconds(), :second),
+        now
+      )
+
+  @doc "ADR-211: whether `email` is held for a login other than `login_id` (nil: any login)."
+  def email_reserved_for_other?(email, login_id \\ nil, now \\ DateTime.utc_now()),
+    do: Palee.Identity.ReleasedEmailStore.reserved_for_other?(email, login_id, now)
+
+  @doc "ADR-211: the login took its address back."
+  defdelegate release_reserved_email(email, login_id),
+    to: Palee.Identity.ReleasedEmailStore,
+    as: :release
+
+  @doc "How long a released address is held: the lifetime of ADR-207's revert link."
+  def reserved_email_seconds, do: 7 * 24 * 3_600
   defdelegate find_login_by_email(email), to: UserStore, as: :get_login_by_email
   defdelegate find_by_email(email), to: UserStore, as: :get_by_email
   defdelegate list_profiles(login_id), to: UserStore
@@ -62,6 +94,18 @@ defmodule Palee.Identity do
   defdelegate handle_available?(handle, except_user_id \\ nil), to: UserStore
   defdelegate update_credentials(user_id, params), to: UserStore
   defdelegate reset_login_password(login_id, password), to: UserStore
+
+  @doc """
+  Records that the login can read `email` (an emailed link to it was
+  opened). Only marks the login's current address; `{:error, :email_mismatch}`
+  when the login's email changed since the link was sent.
+  """
+  def mark_email_verified(login_id, email, now \\ DateTime.utc_now()),
+    do: UserStore.mark_email_verified(login_id, email, now)
+
+  @doc "Whether the account's login has proved it reads its email."
+  def email_verified?(%{email_verified_at: %DateTime{}}), do: true
+  def email_verified?(_account), do: false
   defdelegate max_profiles(), to: Palee.Identity.Domain.ProfilePolicy
   defdelegate find_by_id(id), to: FindUser, as: :by_id
   defdelegate list_by_ids(ids), to: FindUser, as: :list_by_ids
@@ -95,6 +139,23 @@ defmodule Palee.Identity do
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore
+  defdelegate bump_login_security_version(login_id), to: UserStore
+
+  @doc """
+  ADR-208: remembers the device a login signs in (`:sign_in`) or signs up
+  (`:sign_up`) from. Returns `{outcome, description}`: `:new` only when the
+  login has signed in before and never from this device.
+  """
+  def remember_sign_in_device(login_id, device_id, user_agent, source, now \\ DateTime.utc_now()) do
+    description = SignInDevice.describe(user_agent)
+    hash = SignInDevice.hash(device_id, description)
+
+    {Palee.Identity.LoginDeviceStore.remember(login_id, hash, description, source, now),
+     description}
+  end
+
+  defdelegate valid_device_id?(id), to: SignInDevice, as: :valid_id?
+  defdelegate generate_device_id(), to: SignInDevice, as: :generate_id
   defdelegate supported_locales(), to: Locale, as: :supported
 
   # Remembered filters of list surfaces (ADR-151).

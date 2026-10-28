@@ -1,5 +1,6 @@
 defmodule PaleeWeb.AuthControllerTest do
   use PaleeWeb.ConnCase, async: false
+  use Palee.EmailCase
 
   alias Palee.Identity
   alias Palee.Organizations
@@ -195,10 +196,12 @@ defmodule PaleeWeb.AuthControllerTest do
     } do
       {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
 
+      # ADR-209: sent by email, so signing up through it proves the inbox.
       {:ok, %{token: bound_token}} =
         Organizations.issue_invitation(context, %{
           role: :admin,
-          intended_email: "invited@example.com"
+          intended_email: "invited@example.com",
+          deliver_by_email: %{address: "invited@example.com", locale: "en"}
         })
 
       # Wrong address: rejected, and the invitation must survive for the
@@ -236,6 +239,37 @@ defmodule PaleeWeb.AuthControllerTest do
       account = Identity.find_by_nickname("right_person")
       assert account.email == "invited@example.com"
       assert account.role == :admin
+      assert Identity.email_verified?(Identity.find_by_id(account.id))
+    end
+
+    test "ADR-209: a bound link that was not emailed refuses a new, unverified account", %{
+      conn: conn,
+      owner: owner,
+      organization: organization
+    } do
+      {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+
+      {:ok, %{token: bound_token}} =
+        Organizations.issue_invitation(context, %{
+          role: :admin,
+          intended_email: "copied@example.com"
+        })
+
+      refused =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "copied_person",
+            password: "S3cur3P@ss!42",
+            invitation_token: bound_token,
+            email: "copied@example.com"
+          })
+        )
+
+      assert %{"code" => "invitation_email_unverified"} = json_response(refused, 403)
+      refute Identity.find_by_nickname("copied_person")
     end
 
     # ADR-187/204: an email that already has a login takes the owner profile
@@ -470,6 +504,66 @@ defmodule PaleeWeb.AuthControllerTest do
     end
   end
 
+  describe "new-sign-in alert (ADR-208)" do
+    @chrome "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36"
+
+    setup do
+      {:ok, _user} =
+        Identity.register(%{
+          nickname: "traveller",
+          password: "S3cur3P@ss!42",
+          role: :member,
+          email: "traveller@example.com"
+        })
+
+      :ok
+    end
+
+    defp sign_in(conn, device_id) do
+      conn
+      |> put_req_header("content-type", "application/json")
+      |> put_req_header("user-agent", @chrome)
+      |> then(&if(device_id, do: put_req_header(&1, "x-palee-device-id", device_id), else: &1))
+      |> post(
+        "/api/auth/login",
+        Jason.encode!(%{identifier: "traveller", password: "S3cur3P@ss!42"})
+      )
+    end
+
+    test "remembers the device in a long-lived cookie and alerts only on a new one", %{conn: conn} do
+      laptop = String.duplicate("L", 32)
+      first = sign_in(conn, laptop)
+      assert json_response(first, 200)["access_token"]
+      assert %{value: ^laptop, http_only: true} = first.resp_cookies["palee_device"]
+      refute_email_enqueued(kind: :security_new_sign_in)
+
+      # Same device again (cookie only): known.
+      build_conn() |> put_req_cookie("palee_device", laptop) |> sign_in(nil) |> json_response(200)
+      refute_email_enqueued(kind: :security_new_sign_in)
+
+      # A device never seen, without any id: the API gives it one, and alerts.
+      fresh = build_conn() |> sign_in(nil)
+      assert json_response(fresh, 200)
+      assert fresh.resp_cookies["palee_device"].value != laptop
+      message = assert_email_enqueued(kind: :security_new_sign_in, to: "traveller@example.com")
+      assert message.text =~ "Chrome on Windows"
+    end
+
+    test "a token refresh is not a sign-in", %{conn: conn} do
+      signed_in = sign_in(conn, String.duplicate("A", 32))
+      refresh_token = signed_in.resp_cookies["palee_refresh"].value
+
+      build_conn()
+      |> put_req_cookie("palee_refresh", refresh_token)
+      |> put_req_header("x-palee-device-id", String.duplicate("B", 32))
+      |> post("/api/auth/refresh", %{})
+      |> json_response(200)
+
+      assert [_one] = Palee.Repo.all(Palee.Identity.LoginDevice)
+      refute_email_enqueued(kind: :security_new_sign_in)
+    end
+  end
+
   describe "POST /api/auth/refresh" do
     test "returns no content when no refresh cookie is present", %{conn: conn} do
       conn =
@@ -633,6 +727,16 @@ defmodule PaleeWeb.AuthControllerTest do
       assert body["role"] == "member"
       assert body["vendor"] == false
       assert body["preferred_locale"] == "en"
+      # ADR-213: unverified until an emailed link is opened.
+      assert body["email_verified"] == false
+
+      :ok = Identity.mark_email_verified(user.login_id, user.email)
+
+      assert %{"email_verified" => true} =
+               build_conn()
+               |> put_req_header("authorization", "Bearer " <> access_token)
+               |> get("/api/auth/me")
+               |> json_response(200)
     end
 
     test "marks vendor accounts", %{conn: conn} do
@@ -847,7 +951,13 @@ defmodule PaleeWeb.AuthControllerTest do
 
       assert Organizations.list_memberships(stranger.id) == []
 
+      # ADR-209: an email-bound invitation needs the address confirmed.
       boss = Palee.TestFixtures.user_fixture(%{email: "boss@example.test"})
+
+      assert %{"code" => "invitation_email_unverified"} =
+               json_response(accept(build_conn(), boss, token), 403)
+
+      :ok = Identity.mark_email_verified(boss.login_id, "boss@example.test")
       assert %{"roles" => ["owner"]} = json_response(accept(build_conn(), boss, token), 200)
     end
 

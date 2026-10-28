@@ -19,6 +19,7 @@ import {
 } from "@/api/events";
 import { Field, inputStyle } from "@/components/community/ProposeGroupSheet";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { SendLinkByEmail } from "@/components/share/SendLinkByEmail";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -391,6 +392,7 @@ function GuestPass({ event, host = false }: { event: CommunityEvent; host?: bool
                 <input readOnly value={link} onFocus={(focus) => focus.currentTarget.select()} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
               </Field>
             ) : null}
+            <SendLinkByEmail link="guest_pass" token={invite.data?.token ?? null} />
             <span role="status" className="sr-only">{copied ? t("copied") : ""}</span>
             <ErrorLine message={eventError(invite.error)} />
           </div>

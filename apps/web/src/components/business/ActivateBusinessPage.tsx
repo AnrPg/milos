@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import { inspectActivation, redeemActivation } from "@/api/business-accounts";
+import { activationTokenFrom, inspectActivation, redeemActivation } from "@/api/business-accounts";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
@@ -16,8 +17,13 @@ import { setView } from "@/lib/view-mode";
  * ADR-184: the activation link. Opened while signed in as the account it
  * names, it shows the business and what activation does (demo data removed,
  * the owner's own setup kept, everything goes live), then activates it.
+ * ADR-205: the emailed link carries the token in the fragment
+ * (`#token=…`), which only the browser sees; older links use `?token=…`.
  */
-export function ActivateBusinessPage({ token }: { token: string }) {
+export function ActivateBusinessPage({ token: queryToken }: { token: string }) {
+  const [token] = useState(() =>
+    activationTokenFrom(queryToken, typeof window === "undefined" ? "" : window.location.hash),
+  );
   const t = useTranslations("Business");
   const i18n = useUiTranslations();
   const router = useRouter();

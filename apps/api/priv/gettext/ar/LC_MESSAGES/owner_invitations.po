@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Set up your admin account for %{business}"
+msgstr "أنشئ حساب المسؤول الخاص بك لـ «%{business}»"
+
+msgid "Set up your owner account for %{business}"
+msgstr "أنشئ حساب المالك الخاص بك لـ «%{business}»"
+
+msgid "Welcome to %{product}"
+msgstr "مرحبًا بك في %{product}"
+
+msgid "Set up my account"
+msgstr "إعداد حسابي"
+
+msgid "If you weren't expecting this email, you can ignore it."
+msgstr "إذا لم تكن تتوقع هذه الرسالة، فيمكنك تجاهلها."
+
+msgid "The %{product} team made you an admin of %{business}. Create your account to get started."
+msgstr "عيّنك فريق %{product} مسؤولًا عن «%{business}». أنشئ حسابك للبدء."
+
+msgid "The %{product} team made you the owner of %{business}. Create your account to get started."
+msgstr "عيّنك فريق %{product} مالكًا لـ «%{business}». أنشئ حسابك للبدء."
+
+msgid "If it has expired, ask the %{product} team for a new invitation."
+msgstr "إذا انتهت صلاحيته، فاطلب دعوة جديدة من فريق %{product}."
+
+msgid "You're receiving this email because the %{product} team set up %{business} with this address."
+msgstr "تصلك هذه الرسالة لأن فريق %{product} أنشأ «%{business}» بهذا العنوان."

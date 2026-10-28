@@ -28,7 +28,7 @@ import { FRESHNESS } from "@/lib/query-policy";
 
 const OPEN_TOUR_EVENT = "palee:open-tour";
 const OPEN_CHECKLIST_EVENT = "palee:open-onboarding";
-const HIDDEN_PATHS = /^\/(?:login|register|set-admin|join|welcome)(?:\/|$)/;
+const HIDDEN_PATHS = /^\/(?:login|register|set-admin|join|invite|welcome)(?:\/|$)/;
 
 // Staff pages, opened under /org/:slug. `team` links to the club itself (see
 // useTeamClubHref), so it is not here.

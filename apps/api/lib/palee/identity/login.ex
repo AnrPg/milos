@@ -19,6 +19,8 @@ defmodule Palee.Identity.Login do
     field :password_hash, :string
     field :security_version, :integer, default: 0
     field :email_verified_at, :utc_datetime_usec
+    # ADR-207: "this wasn't me" stops new email changes until then.
+    field :email_change_locked_until, :utc_datetime_usec
     field :last_used_user_id, :binary_id
 
     has_many :profiles, Palee.Identity.User
@@ -40,6 +42,12 @@ defmodule Palee.Identity.Login do
     |> cast(params, [:email, :password])
     |> then(fn changeset ->
       if get_change(changeset, :email), do: validate_email(changeset), else: changeset
+    end)
+    # ADR-213: a new address is unverified until a link to it is opened.
+    |> then(fn changeset ->
+      if get_change(changeset, :email),
+        do: put_change(changeset, :email_verified_at, nil),
+        else: changeset
     end)
     |> then(fn changeset ->
       if get_change(changeset, :password), do: validate_password(changeset), else: changeset
