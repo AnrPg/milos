@@ -30,6 +30,7 @@ import { usePartnerMatches, usePartnersToken } from "./use-partners";
 import { Popover } from "@/components/ui/Popover";
 import { inboxHref } from "@/components/chat/inbox/inbox-model";
 import { useRealtimeFallbackInterval } from "@/lib/realtime";
+import { BackLink } from "@/components/ui/BackLink";
 
 type Confirm = "end" | "block" | null;
 
@@ -126,9 +127,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href={inboxHref({ filter: "partners" })} className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>
-            ← {t("messagesBack")}
-          </Link>
+          <BackLink href={inboxHref({ filter: "partners" })} className="inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("messagesBack")}</BackLink>
           <div className="flex items-center gap-3">
             <PersonAvatar name={name} url={match?.person.avatar_url} size={40} />
             <div className="min-w-0">

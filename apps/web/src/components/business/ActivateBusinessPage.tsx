@@ -53,10 +53,20 @@ export function ActivateBusinessPage({ token: queryToken }: { token: string }) {
       <AuthShell title={t("activate.doneTitle")}>
         <div className="space-y-5">
           <AuthNotice tone="success">{t("activate.done", { name: redeem.data.organization.name })}</AuthNotice>
+          {/* ADR-221: live is not findable; the page has to be published too. */}
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("activate.publishNext")}</p>
           <button
             type="button"
             className={primaryButtonClass}
             style={primaryButtonStyle}
+            onClick={() => router.replace(`/org/${slug}/admin/public-page`)}
+          >
+            {t("activate.openPublicPage")}
+          </button>
+          <button
+            type="button"
+            className="min-h-11 w-full rounded-full text-sm font-semibold"
+            style={{ background: "var(--border)", color: "var(--text-soft)" }}
             onClick={() => router.replace(`/org/${slug}/admin`)}
           >
             {t("signUp.openConsole")}

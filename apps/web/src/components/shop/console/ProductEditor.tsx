@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -32,6 +31,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { addOptionValue, draftsFromProduct, MAX_OPTIONS, reconcileVariants, type VariantDraft } from "@/lib/shop/console";
 import { guideAnchor } from "@/lib/guides/anchors";
+import { BackLink } from "@/components/ui/BackLink";
 
 type Channel = "both" | "app" | "desk";
 
@@ -194,9 +194,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
   return (
     <form className="flex flex-col gap-5" onSubmit={submit} aria-labelledby="shop-editor-title">
       <div className="flex flex-col gap-2">
-        <Link href={adminHref("/admin/shop", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>
-          ‹ {t("back")}
-        </Link>
+        <BackLink href={adminHref("/admin/shop", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("back")}</BackLink>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 id="shop-editor-title" className="min-w-0 text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>
             {product ? product.title : t("newTitle")}

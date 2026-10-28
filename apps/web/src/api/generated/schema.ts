@@ -260,8 +260,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Public: describe the organization behind a join link */
+        /** Public: describe the organization behind its member join link */
         get: operations["PaleeWeb.OrganizationAccessController.inspect_join_link"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/join/{slug}/athlete/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public: describe the organization behind its athlete join link */
+        get: operations["PaleeWeb.OrganizationAccessController.inspect_athlete_join_link"];
         put?: never;
         post?: never;
         delete?: never;
@@ -592,6 +609,23 @@ export interface paths {
         put?: never;
         /** ADR-213: confirm the login's email with the emailed link's token */
         post: operations["PaleeWeb.EmailVerificationController.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-221: published, live boxes and independent coaches whose name holds the query (accents and case ignored) */
+        get: operations["PaleeWeb.BoxSearchController.index"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4233,8 +4267,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Join an organization through its public join link */
+        /** Join an organization as a box member through its member join link */
         post: operations["PaleeWeb.OrganizationAccessController.join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/memberships/join/{slug}/athlete/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an organization as an athlete through its athlete join link */
+        post: operations["PaleeWeb.OrganizationAccessController.join_as_athlete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9381,7 +9432,7 @@ export interface paths {
         };
         /** Get the organization's public join link settings */
         get: operations["PaleeWeb.OrganizationAccessController.show_join_link"];
-        /** Enable, disable or change the role of the public join link */
+        /** Turn one join link on or off, or give the athlete link a new key */
         put: operations["PaleeWeb.OrganizationAccessController.update_join_link"];
         post?: never;
         delete?: never;
@@ -12639,6 +12690,24 @@ export interface paths {
         patch: operations["PaleeWeb.PlatformPlanController.update"];
         trace?: never;
     };
+    "/api/platform/push-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The installation's Web Push settings (never the private key) */
+        get: operations["PaleeWeb.PlatformPushSettingsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Save or replace the installation's Web Push keys and contact */
+        patch: operations["PaleeWeb.PlatformPushSettingsController.update"];
+        trace?: never;
+    };
     "/api/platform/subscriptions": {
         parameters: {
             query?: never;
@@ -13623,7 +13692,7 @@ export interface components {
                 auto: boolean;
                 done: boolean;
                 /** @enum {string} */
-                id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 skipped: boolean;
             }[];
             total: number;
@@ -18356,6 +18425,8 @@ export interface components {
             lock_version: number;
             /** @description What the draft still needs before it can be published. */
             missing: ("about" | "disciplines")[];
+            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+            on_map?: boolean;
             photos: {
                 alt_text?: string | null;
                 content_type: string;
@@ -18458,6 +18529,8 @@ export interface components {
                 lock_version: number;
                 /** @description What the draft still needs before it can be published. */
                 missing: ("about" | "disciplines")[];
+                /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                on_map?: boolean;
                 photos: {
                     alt_text?: string | null;
                     content_type: string;
@@ -18511,6 +18584,41 @@ export interface components {
             /** @description Ready box_photo media of the gallery, in display order. */
             photo_ids?: string[];
             services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** BoxSearchResponse */
+        BoxSearchResponse: {
+            boxes: {
+                city?: string | null;
+                logo_url?: string | null;
+                /** @enum {string} */
+                my_status: "none" | "requested" | "active";
+                name: string;
+                neighbourhood?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @enum {string} */
+                provider_kind: "gym" | "coach";
+                slug: string;
+            }[];
+        };
+        /**
+         * BoxSearchResult
+         * @description ADR-221: a published, live box or independent coach found by name
+         */
+        BoxSearchResult: {
+            city?: string | null;
+            logo_url?: string | null;
+            /** @enum {string} */
+            my_status: "none" | "requested" | "active";
+            name: string;
+            neighbourhood?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            /** @enum {string} */
+            provider_kind: "gym" | "coach";
+            slug: string;
         };
         /** BoxTagSuggestion */
         BoxTagSuggestion: {
@@ -40683,6 +40791,56 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.OrganizationAccessController.inspect_athlete_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach" | "organiser";
+                            slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
+                        };
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AuthController.login": {
         parameters: {
             query?: never;
@@ -41796,6 +41954,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxSearchController.index": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Boxes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        boxes: {
+                            city?: string | null;
+                            logo_url?: string | null;
+                            /** @enum {string} */
+                            my_status: "none" | "requested" | "active";
+                            name: string;
+                            neighbourhood?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            /** @enum {string} */
+                            provider_kind: "gym" | "coach";
+                            slug: string;
+                        }[];
+                    };
                 };
             };
         };
@@ -59884,6 +60079,132 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.OrganizationAccessController.join_as_athlete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Already a member */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description capability => scope (all, own, status), ADR-099 */
+                        capabilities: {
+                            [key: string]: string;
+                        };
+                        /** @enum {string} */
+                        coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
+                        organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach" | "organiser";
+                            slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
+                        };
+                        role: string;
+                        roles: string[];
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Membership */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description capability => scope (all, own, status), ADR-099 */
+                        capabilities: {
+                            [key: string]: string;
+                        };
+                        /** @enum {string} */
+                        coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        location_scope?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
+                        organization: {
+                            /**
+                             * @description ADR-184 (memberships only): a business in demo mode works on demo data until the platform team activates it
+                             * @enum {string}
+                             */
+                            activation?: "demo" | "active";
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach" | "organiser";
+                            slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
+                        };
+                        role: string;
+                        roles: string[];
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** @description ADR-209: the box's language (its emails default to it) */
+                            default_locale?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.OrganizationAccessController.redeem": {
         parameters: {
             query?: never;
@@ -71662,7 +71983,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -71685,7 +72006,7 @@ export interface operations {
                     /** @enum {string} */
                     action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
                     /** @enum {string} */
-                    step?: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                    step?: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 };
             };
         };
@@ -71706,7 +72027,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "page" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -73114,6 +73435,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73242,6 +73565,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73467,6 +73792,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -73644,6 +73971,8 @@ export interface operations {
                             lock_version: number;
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
+                            /** @description ADR-221: an open location has a map point, so Γύρω μου can show the business once published. */
+                            on_map?: boolean;
                             photos: {
                                 alt_text?: string | null;
                                 content_type: string;
@@ -76119,18 +76448,6 @@ export interface operations {
                             updated_at?: string | null;
                             weekly_workout_target: number;
                         };
-                        notifications: {
-                            enabled: boolean;
-                            /** Format: uuid */
-                            id?: string | null;
-                            /** Format: date-time */
-                            inserted_at?: string | null;
-                            /** Format: date-time */
-                            updated_at?: string | null;
-                            vapid_private_key_configured: boolean;
-                            vapid_public_key?: string | null;
-                            vapid_subject?: string | null;
-                        };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
                             editable: boolean;
@@ -76194,11 +76511,6 @@ export interface operations {
                         streak_shield_reset_day?: number | null;
                         weekly_workout_target?: number;
                     };
-                    notifications?: {
-                        vapid_private_key?: string | null;
-                        vapid_public_key?: string | null;
-                        vapid_subject?: string | null;
-                    };
                     provider?: {
                         /** @enum {string} */
                         kind?: "gym" | "coach";
@@ -76255,18 +76567,6 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
-                        };
-                        notifications: {
-                            enabled: boolean;
-                            /** Format: uuid */
-                            id?: string | null;
-                            /** Format: date-time */
-                            inserted_at?: string | null;
-                            /** Format: date-time */
-                            updated_at?: string | null;
-                            vapid_private_key_configured: boolean;
-                            vapid_public_key?: string | null;
-                            vapid_subject?: string | null;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -87143,9 +87443,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        enabled: boolean;
-                        /** @enum {string} */
-                        role: "member" | "athlete";
+                        athlete: {
+                            enabled: boolean;
+                            /** @description Secret part of /join/<slug>/athlete/<key>; null until first enabled */
+                            key: string | null;
+                        };
+                        member: {
+                            enabled: boolean;
+                        };
                     };
                 };
             };
@@ -87165,7 +87470,9 @@ export interface operations {
                 "application/json": {
                     enabled?: boolean;
                     /** @enum {string} */
-                    role?: "member" | "athlete";
+                    role: "member" | "athlete";
+                    /** @description Athlete link only: retire the old address */
+                    rotate_key?: boolean;
                 };
             };
         };
@@ -87177,9 +87484,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        enabled: boolean;
-                        /** @enum {string} */
-                        role: "member" | "athlete";
+                        athlete: {
+                            enabled: boolean;
+                            /** @description Secret part of /join/<slug>/athlete/<key>; null until first enabled */
+                            key: string | null;
+                        };
+                        member: {
+                            enabled: boolean;
+                        };
                     };
                 };
             };
@@ -102877,6 +103189,76 @@ export interface operations {
                         price_status: "placeholder" | "confirmed";
                         public: boolean;
                         trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPushSettingsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Push settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** Format: date-time */
+                        inserted_at?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string | null;
+                        vapid_private_key_configured: boolean;
+                        vapid_public_key?: string | null;
+                        vapid_subject?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPushSettingsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    vapid_private_key?: string | null;
+                    vapid_public_key?: string | null;
+                    vapid_subject?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Push settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** Format: date-time */
+                        inserted_at?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string | null;
+                        vapid_private_key_configured: boolean;
+                        vapid_public_key?: string | null;
+                        vapid_subject?: string | null;
                     };
                 };
             };

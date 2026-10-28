@@ -10,7 +10,9 @@ defmodule Palee.Application.GetAdminUserFinance do
 
   def call(user_id, tenant_context, organization_slug \\ nil) do
     with {:ok, user} <- TenantUserAccess.fetch_active_user(tenant_context, user_id) do
-      if AdminProfilePolicy.finance_available?(user.role) do
+      if AdminProfilePolicy.finance_available?(
+           TenantUserAccess.tenant_roles(tenant_context, user.id)
+         ) do
         with {:ok, profile} <- GetFinanceMemberProfile.call(user_id, tenant_context) do
           entitlement =
             EntitlementClassTypeNames.put(

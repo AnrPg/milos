@@ -8,6 +8,7 @@ import { ApiError } from "@/api/client";
 import { PASSWORD_RESET_LOG_KEY, fetchPasswordResetLog } from "@/api/password-resets";
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 const EVENTS = new Set([
   "requested",
@@ -42,9 +43,7 @@ export function PasswordResetLogPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-5">
-        <Link href="/platform/organizations" className="text-sm text-[var(--text-soft)]">
-          ‹ {t("logBack")}
-        </Link>
+        <BackLink href="/platform/organizations" className="text-sm text-[var(--text-soft)]">{t("logBack")}</BackLink>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("logTitle")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("logSubtitle")}</p>
         <p className="mt-2 text-sm text-[var(--dim)]">{t("logHint")}</p>

@@ -148,7 +148,8 @@ test.describe("Schedule › duplicate and series edits", () => {
     });
 
     await openClass(page);
-    await page.getByRole("button", { name: "Duplicate" }).click();
+    await page.getByTestId("class-more-actions").click();
+    await page.getByRole("menuitem", { name: "Duplicate" }).click();
     const dialog = page.getByRole("dialog", { name: "Create scheduled class" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("radiogroup", { name: "Apply changes to" })).toHaveCount(0);

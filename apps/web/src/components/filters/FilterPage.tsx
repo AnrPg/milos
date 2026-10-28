@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Layer } from "@/components/ui/Layer";
+import { BackArrow } from "@/components/ui/BackLink";
 
 // «Φίλτρα (n)» opens this full-screen page (plan §5a decision 3): one section
 // per filter, «Καθαρισμός» and «Δείξε N» pinned at the bottom.
@@ -66,7 +67,7 @@ export function FilterPage({
           className="grid h-10 w-10 place-items-center rounded-full text-xl"
           style={{ color: "var(--text)" }}
         >
-          <span aria-hidden="true">‹</span>
+          <BackArrow />
         </button>
         <h2 id={headingId} className="text-xl font-extrabold" style={{ color: "var(--text)" }}>
           {title}

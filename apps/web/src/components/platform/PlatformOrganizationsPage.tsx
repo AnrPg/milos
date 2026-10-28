@@ -87,6 +87,7 @@ export function PlatformOrganizationsPage() {
   const purgeCopy = platformOrganizationPurgeCopy(locale);
   const slugCopy = platformOrganizationSlugCopy(locale);
   const tResets = useTranslations("passwordResets");
+  const tPush = useTranslations("PlatformPush");
   const tBusiness = useTranslations("Business");
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
@@ -296,6 +297,12 @@ export function PlatformOrganizationsPage() {
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {copy.plans}
+          </Link>
+          <Link
+            href="/platform/push"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tPush("title")}
           </Link>
           <Link
             href="/platform/password-resets"

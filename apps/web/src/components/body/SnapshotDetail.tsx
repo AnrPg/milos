@@ -28,6 +28,7 @@ import { useBodySettings, useBodySnapshots, useBodyToken } from "@/components/bo
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { METRICS, POSES, recordedMetrics, sharedPoses } from "@/lib/body";
+import { BackLink } from "@/components/ui/BackLink";
 
 function useSnapshot(snapshotId: string) {
   const token = useBodyToken();
@@ -86,7 +87,7 @@ export function SnapshotDetail({ snapshotId }: { snapshotId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
+          <BackLink href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("title")}</BackLink>
           <h2 className="mt-1 text-xl font-extrabold" style={{ color: "var(--text)" }}>{dates.dateTime(data.taken_at)}</h2>
           <p className="text-sm" style={{ color: "var(--dim)" }}>
             {data.source === "garmin" ? [t(key("visibility", data.visibility)), t("fromGarmin")].join(" · ") : t(key("visibility", data.visibility))}

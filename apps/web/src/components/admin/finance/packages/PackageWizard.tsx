@@ -61,6 +61,7 @@ import {
 } from "./package-catalog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackButton } from "@/components/ui/BackLink";
 
 const STORAGE_KEY = "palee.package-wizard.draft.v1";
 const TYPE_ICONS: Record<string, string> = {
@@ -304,9 +305,7 @@ export function PackageWizard({
               {t("pkgAdvancedDone")}
             </button>
           ) : stepIndex > 0 ? (
-            <button type="button" className="min-h-[2.75rem] rounded-full px-5 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={back}>
-              ← {t("pkgBack")}
-            </button>
+            <BackButton type="button" className="min-h-[2.75rem] rounded-full px-5 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={back}>{t("pkgBack")}</BackButton>
           ) : (
             <button type="button" className="min-h-[2.75rem] rounded-full px-5 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={close}>
               {t("pkgCancel")}
