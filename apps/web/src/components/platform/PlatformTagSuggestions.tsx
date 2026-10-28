@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -8,6 +7,7 @@ import { ApiError } from "@/api/client";
 import { listTagSuggestions, resolveTagSuggestion, type TagSuggestion } from "@/api/public-profile";
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * Platform review of tags gym owners could not find (board 3b Q5). «Added»
@@ -38,9 +38,7 @@ export function PlatformTagSuggestions() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
       <header className="flex flex-col gap-1 border-b border-[var(--border)] pb-5">
-        <Link href="/platform/organizations" className="text-sm text-[var(--text-soft)]">
-          ‹ {t("back")}
-        </Link>
+        <BackLink href="/platform/organizations" className="text-sm text-[var(--text-soft)]">{t("back")}</BackLink>
         <h1 className="text-3xl font-semibold text-[var(--text)]">{t("title")}</h1>
         <p className="text-sm text-[var(--text-soft)]">{t("subtitle")}</p>
       </header>

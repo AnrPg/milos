@@ -33,6 +33,7 @@ import { TOPIC_KEYS } from "../message-topics";
 import { TypingIndicator } from "../TypingIndicator";
 import { showsIn, visibleSegments, threadSegment, threadsIn, type InboxSegment, type ThreadSegmentContext } from "./inbox-model";
 import { INBOX_SOURCES, useHasPartners } from "./inbox-sections";
+import { BackButton } from "@/components/ui/BackLink";
 
 interface SearchResult {
   id: string;
@@ -235,15 +236,9 @@ export function InboxView({
     return (
       <div className="flex min-h-0 flex-1 flex-col" data-testid="inbox-thread">
         <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
-          <button
-            type="button"
-            onClick={() => onThreadChange(null)}
-            className="flex min-h-11 min-w-0 items-center gap-1 text-sm font-semibold"
-            style={{ color: "var(--text-soft)" }}
-          >
-            <span aria-hidden="true">←</span>
-            <span className="truncate">{threadName(activeThread)}</span>
-          </button>
+          <BackButton onClick={() => onThreadChange(null)} className="min-h-11 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
+            {threadName(activeThread)}
+          </BackButton>
           {end}
         </div>
         <div className="scroll-area flex flex-1 flex-col gap-2 overflow-y-auto p-4">
