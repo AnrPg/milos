@@ -24,6 +24,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { TOUR_STEPS, checklistSnoozed, snoozeChecklist, type TourAudience } from "@/lib/onboarding";
 import { setView } from "@/lib/view-mode";
 import { Dialog } from "@/components/ui/Dialog";
+import { FRESHNESS } from "@/lib/query-policy";
 
 const OPEN_TOUR_EVENT = "palee:open-tour";
 const OPEN_CHECKLIST_EVENT = "palee:open-onboarding";
@@ -65,7 +66,7 @@ function enterStaffView() {
 
 /** ADR-170: the coach's «Team» is their gym club; the clubs list until it loads. */
 function useTeamClubHref(enabled: boolean) {
-  const clubs = useMyClubs();
+  const clubs = useMyClubs(enabled);
   const { membership } = useSelectedMembershipRole();
   const club = enabled ? gymClubFor(clubs.data ?? [], membership?.organization.id) : null;
   return club ? `/clubs/${encodeURIComponent(club.id)}` : "/me/clubs";
@@ -99,7 +100,8 @@ function useAdminOnboarding(enabled: boolean) {
       const checklist = await fetchAdminOnboarding(token!);
       return Array.isArray(checklist?.steps) ? checklist : null;
     },
-    staleTime: 30_000,
+    // Changes only through this host's own actions, which write the answer back.
+    staleTime: FRESHNESS.account,
   });
 
   const mutation = useMutation({

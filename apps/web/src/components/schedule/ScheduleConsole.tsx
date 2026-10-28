@@ -75,6 +75,7 @@ import { stashClassDraft, takeClassDraft } from "@/components/schedule/class-dra
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
+import { FRESHNESS } from "@/lib/query-policy";
 
 /** The class form's fields, as the API names them (ADR-214 errors land on these). */
 const SLOT_FIELDS = [
@@ -248,6 +249,7 @@ export function ScheduleConsole({
     queryKey: ["admin", "locations"],
     queryFn: () => listAdminLocations(tokens!.access_token),
     enabled: isAdmin && Boolean(tokens?.access_token),
+    staleTime: FRESHNESS.reference,
   });
   const adminLocations = adminLocationsQuery.data ?? [];
   const manyBranches = showsAppliesTo(adminLocations);
@@ -256,7 +258,7 @@ export function ScheduleConsole({
     queryKey: ["staff", "members"],
     queryFn: () => fetchGymStaff(tokens!.access_token),
     enabled: canManageSchedule && Boolean(tokens?.access_token),
-    staleTime: 60_000,
+    staleTime: FRESHNESS.reference,
   });
   const coaches = coachOptions(coachesQuery.data ?? []);
   const isMemberSurface = !roleLoading && !isAdmin;

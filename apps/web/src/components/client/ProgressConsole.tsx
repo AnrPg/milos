@@ -63,7 +63,7 @@ export function ProgressConsole() {
   const token = tokens?.access_token ?? null;
   const { filter, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
   const query = useQuery({
-    queryKey: [...ACCOUNT_PROGRESS_KEY, token, filter],
+    queryKey: [...ACCOUNT_PROGRESS_KEY, filter],
     enabled: Boolean(token) && filter !== null,
     queryFn: () => fetchAccountProgress(token!, filter!),
     placeholderData: (previous) => previous,

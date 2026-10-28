@@ -138898,6 +138898,44 @@
         ]
       }
     },
+    "/api/notifications/unread-count": {
+      "get": {
+        "callbacks": {},
+        "description": "The bell's badge on every screen; the list itself loads only when the panel opens.",
+        "operationId": "PaleeWeb.NotificationController.unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "unread_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "unread_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unread count"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Count the current user's unread notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/notifications/{id}/click": {
       "post": {
         "callbacks": {},

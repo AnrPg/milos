@@ -54,6 +54,10 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
   await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ gamification: null, finance: null, scheduling: null })));
   await page.route("**/api/org/*/admin/onboarding", (route) => route.fulfill(json(checklist)));
+  // Settings › Invitations shows the two join links (ADR-216).
+  await page.route("**/api/org/*/join-link", (route) =>
+    route.fulfill(json({ member: { enabled: false }, athlete: { enabled: false, key: null } })),
+  );
 }
 
 async function openChecklist(page: Page, start: string) {

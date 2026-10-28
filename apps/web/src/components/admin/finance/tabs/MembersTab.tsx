@@ -535,7 +535,7 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
                     assignPending={assignPackageMutation.isPending}
                     onSave={(body) => updateMutation.mutate({ userId: field(member, "id"), body })}
                     onAssignPackage={(packageId) =>
-                      assignPackageMutation.mutate({ userId: field(member, "id"), packageId })
+                      assignPackageMutation.mutateAsync({ userId: field(member, "id"), packageId })
                     }
                     onOpenPanel={() => setParam({ member: field(member, "id"), tab: "members" })}
                     onOpenReferralWizard={() =>
@@ -601,7 +601,7 @@ function MemberRow({
   updatePending: boolean;
   assignPending: boolean;
   onSave: (body: FinanceRecord) => void;
-  onAssignPackage: (packageId: string) => void;
+  onAssignPackage: (packageId: string) => Promise<unknown>;
   onOpenPanel: () => void;
   onOpenReferralWizard: () => void;
 }) {
