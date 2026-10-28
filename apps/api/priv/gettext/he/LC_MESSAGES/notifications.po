@@ -709,6 +709,12 @@ msgstr "מפתח ה-SMTP של Palee פג ב-%{date}, ולכן Palee לא יכו�
 msgid "The email key has expired"
 msgstr "מפתח המייל פג"
 
+msgid "Your weekly goal changed"
+msgstr "היעד השבועי שלך השתנה"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} קבע/ה את היעד שלך ל-%{target} אימונים בשבוע. אפשר לשנות אותו."
+
 msgid "A box member is leaving"
 msgstr "חבר בבוקס עוזב"
 

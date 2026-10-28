@@ -68,7 +68,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
 
         {:ok, _settings} =
           Gamification.with_tenant_context(owner_ctx, fn ->
-            Gamification.update_settings(%{weekly_workout_target: 1, leaderboard_enabled: true})
+            Gamification.update_settings(%{streak_shields: 1, leaderboard_enabled: true})
           end)
 
         {:ok, challenge} =

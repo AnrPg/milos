@@ -229,15 +229,17 @@ function BrandingSection({ token }: { token: string }) {
 
 // ── Gamification section ─────────────────────────────────────────────────────
 
+// ADR-229: the box sets only the streak shields and when they renew; the
+// weekly workout goal is each person's own.
 type GamificationFormState = {
-  weeklyWorkoutTarget: string;
+  streakShields: string;
   streakShieldResetDay: string;
   leaderboardEnabled: boolean;
 };
 
 function formFromSettings(s: GamificationSettings): GamificationFormState {
   return {
-    weeklyWorkoutTarget: String(s.weekly_workout_target),
+    streakShields: String(s.streak_shields),
     streakShieldResetDay: s.streak_shield_reset_day ? String(s.streak_shield_reset_day) : "",
     leaderboardEnabled: s.leaderboard_enabled,
   };
@@ -245,9 +247,10 @@ function formFromSettings(s: GamificationSettings): GamificationFormState {
 
 function GamificationSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("TrainingGoal");
   const queryClient = useQueryClient();
   const [form, setForm] = useState<GamificationFormState>({
-    weeklyWorkoutTarget: "2",
+    streakShields: "1",
     streakShieldResetDay: "",
     leaderboardEnabled: true,
   });
@@ -269,7 +272,7 @@ function GamificationSection({ token }: { token: string }) {
     mutationFn: () =>
       updateAdminSettings(token, {
         gamification: {
-          weekly_workout_target: Number(form.weeklyWorkoutTarget),
+          streak_shields: Number(form.streakShields),
           streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null,
           leaderboard_enabled: form.leaderboardEnabled,
         },
@@ -290,34 +293,44 @@ function GamificationSection({ token }: { token: string }) {
 
   return (
     <div className="max-w-3xl space-y-4">
+      <p className="rounded-[1.4rem] px-4 py-3 text-sm leading-6" style={{ background: "var(--panel-muted)", color: "var(--muted)" }} data-testid="weekly-goal-is-personal">
+        {t("box.goalIsPersonal")}
+      </p>
+
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("weeklyWorkoutTarget8106ea7")}
+          <span id="streak-shields-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {t("box.shieldsLabel")}
           </span>
           <FieldInfo
-            active={activeHelp === "weekly"}
-            label={i18n("weeklyWorkoutTargetInfo19b03c8")}
-            onToggle={() => setActiveHelp(activeHelp === "weekly" ? null : "weekly")}
+            active={activeHelp === "shields"}
+            label={t("box.shieldsInfo")}
+            onToggle={() => setActiveHelp(activeHelp === "shields" ? null : "shields")}
           >
-            <p>{i18n("howManyCompletedWorkoutsAUserNeedsPere99943b")}</p>
-            <p>{i18n("validValuesInteger1Default281502ef")}</p>
+            <p>{t("box.shieldsHelp")}</p>
+            <p>{t("box.shieldsValues")}</p>
           </FieldInfo>
         </span>
         <input
           className="w-full rounded-2xl border px-4 py-3 text-sm"
           inputMode="numeric"
-          min={1}
+          max={5}
+          min={0}
           type="number"
+          aria-labelledby="streak-shields-label"
+          aria-describedby="streak-shields-hint"
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-          value={form.weeklyWorkoutTarget}
-          onChange={(e) => update("weeklyWorkoutTarget", e.target.value)}
+          value={form.streakShields}
+          onChange={(e) => update("streakShields", e.target.value)}
         />
+        <span id="streak-shields-hint" className="block text-xs leading-5" style={{ color: "var(--dim)" }}>
+          {t("box.shieldsHint")}
+        </span>
       </label>
 
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          <span id="streak-shield-renewal-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
             {i18n("streakShieldResetDayd22b9ea")}
           </span>
           <FieldInfo
@@ -325,7 +338,7 @@ function GamificationSection({ token }: { token: string }) {
             label={i18n("streakShieldResetDayInfo10555c2")}
             onToggle={() => setActiveHelp(activeHelp === "shield" ? null : "shield")}
           >
-            <p>{i18n("dayOfMonthWhenEachUserGetsTheir605b967")}</p>
+            <p>{t("box.renewalHelp")}</p>
           </FieldInfo>
         </span>
         <input
@@ -337,8 +350,13 @@ function GamificationSection({ token }: { token: string }) {
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
           type="number"
           value={form.streakShieldResetDay}
+          aria-labelledby="streak-shield-renewal-label"
+          aria-describedby="streak-shield-renewal-hint"
           onChange={(e) => update("streakShieldResetDay", e.target.value)}
         />
+        <span id="streak-shield-renewal-hint" className="block text-xs leading-5" style={{ color: "var(--dim)" }}>
+          {form.streakShieldResetDay.trim() ? t("box.renewalOnDay", { day: form.streakShieldResetDay.trim() }) : t("box.renewalOnSignup")}
+        </span>
       </label>
 
       <label

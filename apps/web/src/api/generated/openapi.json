@@ -76074,6 +76074,56 @@
         "title": "SupportRequestResponse",
         "type": "object"
       },
+      "TrainingGoal": {
+        "properties": {
+          "is_default": {
+            "description": "No one set a goal yet; the platform default applies",
+            "type": "boolean"
+          },
+          "max": {
+            "type": "integer"
+          },
+          "min": {
+            "type": "integer"
+          },
+          "set_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "set_by_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "set_by_role": {
+            "enum": [
+              "self",
+              "coach",
+              "staff"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "weekly_workout_target": {
+            "maximum": 14,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "is_default",
+          "max",
+          "min",
+          "weekly_workout_target"
+        ],
+        "title": "TrainingGoal",
+        "type": "object"
+      },
       "TrainingHistoryPage": {
         "properties": {
           "entries": {
@@ -94677,6 +94727,203 @@
         "summary": "Persist execution progress",
         "tags": [
           "Execution"
+        ]
+      }
+    },
+    "/api/gamification/goal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My weekly workout goal",
+        "tags": [
+          "Gamification"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "weekly_workout_target": {
+                    "maximum": 14,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "weekly_workout_target"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Goal",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set my weekly workout goal",
+        "tags": [
+          "Gamification"
         ]
       }
     },
@@ -180608,24 +180855,27 @@
                           "type": "boolean"
                         },
                         "streak_shield_reset_day": {
+                          "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                           "maximum": 28,
                           "minimum": 1,
                           "nullable": true,
+                          "type": "integer"
+                        },
+                        "streak_shields": {
+                          "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                          "maximum": 5,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
-                        },
-                        "weekly_workout_target": {
-                          "minimum": 1,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "weekly_workout_target",
-                        "leaderboard_enabled"
+                        "leaderboard_enabled",
+                        "streak_shields"
                       ],
                       "type": "object"
                     },
@@ -180830,13 +181080,16 @@
                         "type": "boolean"
                       },
                       "streak_shield_reset_day": {
+                        "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                         "maximum": 28,
                         "minimum": 1,
                         "nullable": true,
                         "type": "integer"
                       },
-                      "weekly_workout_target": {
-                        "minimum": 1,
+                      "streak_shields": {
+                        "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                        "maximum": 5,
+                        "minimum": 0,
                         "type": "integer"
                       }
                     },
@@ -180985,24 +181238,27 @@
                           "type": "boolean"
                         },
                         "streak_shield_reset_day": {
+                          "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                           "maximum": 28,
                           "minimum": 1,
                           "nullable": true,
+                          "type": "integer"
+                        },
+                        "streak_shields": {
+                          "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                          "maximum": 5,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
-                        },
-                        "weekly_workout_target": {
-                          "minimum": 1,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "weekly_workout_target",
-                        "leaderboard_enabled"
+                        "leaderboard_enabled",
+                        "streak_shields"
                       ],
                       "type": "object"
                     },
@@ -211508,6 +211764,37 @@
                     "gamification": {
                       "additionalProperties": true,
                       "properties": {
+                        "goal": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "properties": {
+                            "is_default": {
+                              "type": "boolean"
+                            },
+                            "set_by_nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "set_by_role": {
+                              "enum": [
+                                "self",
+                                "coach",
+                                "staff"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "weekly_workout_target": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "is_default",
+                            "weekly_workout_target"
+                          ],
+                          "type": "object"
+                        },
                         "settings": {
                           "properties": {
                             "leaderboard_enabled": {
@@ -211519,14 +211806,15 @@
                               "nullable": true,
                               "type": "integer"
                             },
-                            "weekly_workout_target": {
-                              "minimum": 1,
+                            "streak_shields": {
+                              "maximum": 5,
+                              "minimum": 0,
                               "type": "integer"
                             }
                           },
                           "required": [
-                            "weekly_workout_target",
-                            "leaderboard_enabled"
+                            "leaderboard_enabled",
+                            "streak_shields"
                           ],
                           "type": "object"
                         }
@@ -227145,6 +227433,245 @@
         "summary": "A client's muscle coverage, qualities radar and training load, from shared entries",
         "tags": [
           "Progress"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/training-goal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.client_show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's weekly workout goal",
+        "tags": [
+          "Gamification"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.client_update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "weekly_workout_target": {
+                    "maximum": 14,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "weekly_workout_target"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Goal",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not allowed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a client's weekly workout goal; the client is notified",
+        "tags": [
+          "Gamification"
         ]
       }
     },

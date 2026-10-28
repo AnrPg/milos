@@ -31,6 +31,7 @@ defmodule Palee.Notifications.Notification do
     :form_review_completed,
     :coaching_reply_overdue,
     :nutrition_plan_updated,
+    :training_goal_updated,
     :appointment_booked,
     :appointment_cancelled,
     :class_cancelled,

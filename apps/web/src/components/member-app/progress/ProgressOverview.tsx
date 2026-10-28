@@ -7,6 +7,7 @@ import { HelpIcon, InfoModal } from "@/components/InfoModal";
 import { LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { MilestoneBadges } from "@/components/member-app/progress/MilestoneBadges";
 import { useLanding } from "@/components/member-app/progress/use-landing";
+import { weeklyTarget } from "@/components/training-goal/training-goal";
 import { useUiTranslations } from "@/i18n/ui";
 
 const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3"] as const;
@@ -31,7 +32,8 @@ export function ProgressOverview() {
 
   const { gamification } = landing.data;
   const stats = gamification.stats;
-  const weeklyWorkoutTarget = gamification.settings.weekly_workout_target;
+  // ADR-229: the person's own goal (the default until someone sets one).
+  const weeklyWorkoutTarget = weeklyTarget(gamification.goal);
   const motivation = stats ? Math.round(stats.motivation_score ?? NaN) : NaN;
   const perseverance = stats ? Math.round(stats.perseverance_score ?? NaN) : NaN;
 

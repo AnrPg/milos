@@ -709,6 +709,12 @@ msgstr "Το κλειδί SMTP του Palee έληξε στις %{date}, οπό�
 msgid "The email key has expired"
 msgstr "Το κλειδί email έληξε"
 
+msgid "Your weekly goal changed"
+msgstr "Ο εβδομαδιαίος στόχος σου άλλαξε"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person}: ο στόχος σου είναι τώρα %{target} προπονήσεις την εβδομάδα. Μπορείς να τον αλλάξεις."
+
 msgid "A box member is leaving"
 msgstr "Ένα μέλος του box αποχωρεί"
 

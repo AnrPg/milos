@@ -220,3 +220,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
 | ADR-222 | Record money received at the desk; the billing setup picks the receipt, paid invoice or invoice it settles | Accepted |
 | ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |
+| ADR-229 | The weekly workout goal is personal (the person, their coach, full-scope staff set it); the box sets only streak shields and their renewal | Accepted |
