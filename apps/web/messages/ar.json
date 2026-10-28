@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "اختر جميع الفروع أو فرعًا واحدًا على الأقل.",
     "apiErrorOwnerLocationScope": "يعمل المالكون دائمًا في جميع الفروع.",
     "apiErrorCannotChangeOwnMembership": "يجب أن يغيّر شخص آخر صلاحياتك.",
-    "apiErrorRoleCeilingExceeded": "لا يمكنك منح دور أعلى مما يُسمح لك بمنحه.",
+    "apiErrorRoleCeilingExceeded": "يمكنك تغيير أدوار من هم أدنى منك فقط، وبالأدوار التي يحق لك منحها فقط.",
     "apiErrorPromotionLocationNotIncluded": "هذا العرض غير صالح في فروع هذه الباقة.",
     "mbErrLocationNotFound": "لم نتمكن من العثور على هذا الموقع. يرجى اختيار موقع آخر.",
     "mbNotifWaitlistPromotedTitle": "حصلت على مكان!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "اخترت عددًا كبيرًا: {count} كحد أقصى.",
     "formErrTooFewItems": "اختر {count} على الأقل.",
     "formErrInvalid": "هذه القيمة غير مقبولة. تحقّق منها وحاول مرة أخرى.",
-    "apiErrorValidationFailedDetail": "لم تُقبل بعض البيانات: {details}"
+    "apiErrorValidationFailedDetail": "لم تُقبل بعض البيانات: {details}",
+    "myRolesTitle": "أدواري في هذا البوكس",
+    "myRolesDescription": "أضف دورًا أدنى من دورك، مثل مدرب. يبقى دورك الأعلى دائمًا.",
+    "myRolesHelp": "يبقى دورك الأعلى دائمًا. يمكنك إضافة أو إزالة الأدوار الأدنى منه فقط.",
+    "apiErrorOwnTopRoleLocked": "يبقى دورك الأعلى دائمًا. يمكنك تغيير الأدوار الأدنى منه فقط."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "Выберите все филиалы или хотя бы один.",
     "apiErrorOwnerLocationScope": "Владельцы всегда работают во всех филиалах.",
     "apiErrorCannotChangeOwnMembership": "Ваш собственный доступ должен изменить кто-то другой.",
-    "apiErrorRoleCeilingExceeded": "Вы не можете выдать роль выше той, что вам разрешено выдавать.",
+    "apiErrorRoleCeilingExceeded": "Ты можешь менять роли только тех, кто ниже тебя, и только те роли, которые тебе разрешено выдавать.",
     "apiErrorPromotionLocationNotIncluded": "Эта акция не действует в филиалах этого пакета.",
     "mbErrLocationNotFound": "Не удалось найти это место. Выберите другое.",
     "mbNotifWaitlistPromotedTitle": "Для вас освободилось место!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "Выбрано слишком много: не более {count}.",
     "formErrTooFewItems": "Выберите не менее {count}.",
     "formErrInvalid": "Это значение не принимается. Проверьте его и попробуйте снова.",
-    "apiErrorValidationFailedDetail": "Некоторые данные не приняты: {details}"
+    "apiErrorValidationFailedDetail": "Некоторые данные не приняты: {details}",
+    "myRolesTitle": "Мои роли в этом боксе",
+    "myRolesDescription": "Добавь роль ниже своей, например тренер. Твоя главная роль остаётся всегда.",
+    "myRolesHelp": "Твоя главная роль остаётся всегда. Можно добавлять или убирать только роли ниже неё.",
+    "apiErrorOwnTopRoleLocked": "Твоя главная роль остаётся всегда. Можно менять только роли ниже неё."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",

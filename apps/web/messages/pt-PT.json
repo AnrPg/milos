@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "Escolhe todos os espaços ou pelo menos um.",
     "apiErrorOwnerLocationScope": "Os proprietários trabalham sempre em todos os espaços.",
     "apiErrorCannotChangeOwnMembership": "Outra pessoa tem de alterar o teu próprio acesso.",
-    "apiErrorRoleCeilingExceeded": "Não podes atribuir uma função acima da que te é permitida.",
+    "apiErrorRoleCeilingExceeded": "Só podes alterar papéis de pessoas abaixo de ti, e só papéis que podes atribuir.",
     "apiErrorPromotionLocationNotIncluded": "Esta promoção não é válida nos espaços deste pacote.",
     "mbErrLocationNotFound": "Não encontrámos esse local. Escolha outro.",
     "mbNotifWaitlistPromotedTitle": "Conseguiu um lugar!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "Escolheu demasiados: no máximo {count}.",
     "formErrTooFewItems": "Escolha pelo menos {count}.",
     "formErrInvalid": "Este valor não é aceite. Verifique-o e tente novamente.",
-    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}"
+    "apiErrorValidationFailedDetail": "Alguns dados não foram aceites: {details}",
+    "myRolesTitle": "Os meus papéis nesta box",
+    "myRolesDescription": "Adiciona um papel abaixo do teu, por exemplo coach. O teu papel principal fica sempre.",
+    "myRolesHelp": "O teu papel principal fica sempre. Só podes adicionar ou remover papéis abaixo dele.",
+    "apiErrorOwnTopRoleLocked": "O teu papel principal fica sempre. Só podes alterar papéis abaixo dele."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",

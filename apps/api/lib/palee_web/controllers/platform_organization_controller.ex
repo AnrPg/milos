@@ -313,7 +313,7 @@ defmodule PaleeWeb.PlatformOrganizationController do
   )
 
   operation(:membership_role,
-    summary: "Update a tenant membership role from the platform console",
+    summary: "Set a tenant membership's roles from the platform console (vendor, ADR-219)",
     parameters: [
       @organization_id,
       %Parameter{
@@ -329,10 +329,21 @@ defmodule PaleeWeb.PlatformOrganizationController do
         "application/json" => %MediaType{
           schema: %Schema{
             type: :object,
+            description: "`roles` (a set) wins over `role`, which replaces the set (ADR-219).",
             properties: %{
-              role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)}
-            },
-            required: [:role]
+              role: %Schema{
+                type: :string,
+                enum: Enum.map(Palee.Organizations.roles(), &to_string/1)
+              },
+              roles: %Schema{
+                type: :array,
+                minItems: 1,
+                items: %Schema{
+                  type: :string,
+                  enum: Enum.map(Palee.Organizations.roles(), &to_string/1)
+                }
+              }
+            }
           }
         }
       }
@@ -556,6 +567,7 @@ defmodule PaleeWeb.PlatformOrganizationController do
       id: membership.id,
       user_id: membership.user_id,
       role: membership.role,
+      roles: membership.roles || [membership.role],
       status: membership.status,
       joined_at: membership.joined_at,
       inserted_at: membership.inserted_at,

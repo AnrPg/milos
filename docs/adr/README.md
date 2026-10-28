@@ -212,3 +212,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-212 | Email deliverability: Brevo webhook, suppression state, one-click unsubscribe, budget and key-expiry alarms, retention | Accepted |
 | ADR-213 | Email verification at sign-up: emailed link, resend, banner, `email_verified` | Accepted |
 | ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |
+| ADR-219 | Role hierarchy enforced downwards (vendor › owner › admin › staff › clients); self-added roles below one's top role | Accepted |

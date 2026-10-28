@@ -9803,6 +9803,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set my roles in this gym; only roles below my top role may change (ADR-219) */
+        put: operations["PaleeWeb.MyRolesController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/search/users": {
         parameters: {
             query?: never;
@@ -12406,7 +12423,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a tenant membership role from the platform console */
+        /** Set a tenant membership's roles from the platform console (vendor, ADR-219) */
         patch: operations["PaleeWeb.PlatformOrganizationController.membership_role"];
         trace?: never;
     };
@@ -88834,6 +88851,48 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyRolesController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        membership: {
+                            role: string;
+                            roles: string[];
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description A role at or above my top role (own_top_role_locked) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PaleeWeb.MeController.search_users": {
         parameters: {
             query?: {
@@ -101976,7 +102035,8 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    role: "owner" | "admin" | "coach" | "member" | "athlete";
+                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
+                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
                 };
             };
         };

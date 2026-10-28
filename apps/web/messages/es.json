@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "Elige todas las sedes o al menos una.",
     "apiErrorOwnerLocationScope": "Los propietarios siempre trabajan en todas las sedes.",
     "apiErrorCannotChangeOwnMembership": "Otra persona tiene que cambiar tu propio acceso.",
-    "apiErrorRoleCeilingExceeded": "No puedes dar un rol superior al que tienes permitido.",
+    "apiErrorRoleCeilingExceeded": "Solo puedes cambiar roles de personas por debajo de ti, y solo roles que puedes otorgar.",
     "apiErrorPromotionLocationNotIncluded": "Esta promoción no es válida en las sedes de este paquete.",
     "mbErrLocationNotFound": "No encontramos esa sede. Elige otra.",
     "mbNotifWaitlistPromotedTitle": "¡Tienes plaza!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "Demasiados elegidos: como máximo {count}.",
     "formErrTooFewItems": "Elige al menos {count}.",
     "formErrInvalid": "Este valor no se acepta. Revísalo e inténtalo de nuevo.",
-    "apiErrorValidationFailedDetail": "Algunos datos no se aceptaron: {details}"
+    "apiErrorValidationFailedDetail": "Algunos datos no se aceptaron: {details}",
+    "myRolesTitle": "Mis roles en este box",
+    "myRolesDescription": "Añade un rol por debajo del tuyo, por ejemplo coach. Tu rol principal se mantiene siempre.",
+    "myRolesHelp": "Tu rol principal se mantiene siempre. Solo puedes añadir o quitar roles por debajo de él.",
+    "apiErrorOwnTopRoleLocked": "Tu rol principal se mantiene siempre. Solo puedes cambiar roles por debajo de él."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",

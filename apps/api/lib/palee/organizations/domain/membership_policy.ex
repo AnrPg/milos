@@ -37,6 +37,65 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
     end
   end
 
+  # The hierarchy (rights-per-account-type §4): owner › admin › staff ›
+  # clients. Roles of one tier are peers.
+  @tiers %{
+    owner: 4,
+    admin: 3,
+    coach: 2,
+    front_desk: 2,
+    accountant: 2,
+    janitor: 2,
+    member: 1,
+    athlete: 1
+  }
+
+  @doc "A role's rank in the hierarchy; higher outranks lower, equal ranks are peers."
+  def tier(role), do: Map.get(@tiers, role, 0)
+
+  @doc "The rank of a set's most privileged role (0 for none)."
+  def top_tier(roles), do: roles |> List.wrap() |> Enum.map(&tier/1) |> Enum.max(fn -> 0 end)
+
+  @doc """
+  Whether an account holding `actor_roles` may act on someone else holding
+  `target_roles`: only on people ranked below them. Owners also manage their
+  co-owners, so a gym is never stuck with an owner who left.
+  """
+  def can_manage_member?(actor_roles, target_roles) do
+    actor_roles = List.wrap(actor_roles)
+    target_roles = List.wrap(target_roles)
+
+    top_tier(actor_roles) > top_tier(target_roles) or
+      (:owner in actor_roles and :owner in target_roles)
+  end
+
+  @doc """
+  Whether someone holding `own_roles` may add or drop `role` on themselves:
+  only roles ranked below their top role, which therefore never changes (an
+  owner who also coaches stays owner).
+  """
+  def self_assignable_role?(own_roles, role), do: tier(role) < top_tier(own_roles)
+
+  @doc """
+  Checks a change of `current` roles to `requested` ones. On oneself only
+  roles below one's top role move; on someone else the actor must outrank
+  them and be allowed to grant every role added or removed.
+  """
+  def authorize_role_change(_actor_roles, current, requested, :self) do
+    if Enum.all?(changed(current, requested), &self_assignable_role?(current, &1)),
+      do: :ok,
+      else: {:error, :own_top_role_locked}
+  end
+
+  def authorize_role_change(actor_roles, current, requested, :other) do
+    if can_manage_member?(actor_roles, current) and
+         Enum.all?(changed(current, requested), &can_grant_role?(actor_roles, &1)),
+       do: :ok,
+       else: {:error, :role_ceiling_exceeded}
+  end
+
+  defp changed(a, b), do: Enum.uniq((a -- b) ++ (b -- a))
+
   @doc "The most privileged role of a set."
   def primary_role(roles), do: Enum.find(@roles, &(&1 in roles))
 

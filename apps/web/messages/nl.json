@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "Kies alle vestigingen of minstens één.",
     "apiErrorOwnerLocationScope": "Eigenaren werken altijd bij alle vestigingen.",
     "apiErrorCannotChangeOwnMembership": "Iemand anders moet je eigen toegang wijzigen.",
-    "apiErrorRoleCeilingExceeded": "Je kunt geen hogere rol geven dan je mag toekennen.",
+    "apiErrorRoleCeilingExceeded": "Je kunt alleen rollen wijzigen van mensen onder jou, en alleen rollen die je mag toekennen.",
     "apiErrorPromotionLocationNotIncluded": "Deze actie geldt niet bij de vestigingen van dit pakket.",
     "mbErrLocationNotFound": "We konden die locatie niet vinden. Kies een andere.",
     "mbNotifWaitlistPromotedTitle": "Je hebt een plek!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "Te veel gekozen: maximaal {count}.",
     "formErrTooFewItems": "Kies er minstens {count}.",
     "formErrInvalid": "Deze waarde wordt niet geaccepteerd. Controleer hem en probeer het opnieuw.",
-    "apiErrorValidationFailedDetail": "Sommige gegevens zijn niet geaccepteerd: {details}"
+    "apiErrorValidationFailedDetail": "Sommige gegevens zijn niet geaccepteerd: {details}",
+    "myRolesTitle": "Mijn rollen in deze box",
+    "myRolesDescription": "Voeg een rol onder je eigen rol toe, bijvoorbeeld coach. Je hoogste rol blijft altijd.",
+    "myRolesHelp": "Je hoogste rol blijft altijd. Je kunt alleen rollen daaronder toevoegen of verwijderen.",
+    "apiErrorOwnTopRoleLocked": "Je hoogste rol blijft altijd. Je kunt alleen rollen daaronder wijzigen."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

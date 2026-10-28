@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "יש לבחור את כל הסניפים או לפחות סניף אחד.",
     "apiErrorOwnerLocationScope": "בעלים עובדים תמיד בכל הסניפים.",
     "apiErrorCannotChangeOwnMembership": "את הגישה שלך צריך לשנות מישהו אחר.",
-    "apiErrorRoleCeilingExceeded": "אי אפשר לתת תפקיד גבוה ממה שמותר לך להעניק.",
+    "apiErrorRoleCeilingExceeded": "אפשר לשנות תפקידים רק של מי שמתחתיך, ורק תפקידים שמותר לך להעניק.",
     "apiErrorPromotionLocationNotIncluded": "המבצע הזה אינו תקף בסניפים של החבילה הזו.",
     "mbErrLocationNotFound": "לא מצאנו את המיקום הזה. בחרו מיקום אחר.",
     "mbNotifWaitlistPromotedTitle": "התפנה לך מקום!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "נבחרו יותר מדי: עד {count}.",
     "formErrTooFewItems": "בחרו לפחות {count}.",
     "formErrInvalid": "הערך הזה לא מתקבל. בדקו אותו ונסו שוב.",
-    "apiErrorValidationFailedDetail": "חלק מהפרטים לא התקבלו: {details}"
+    "apiErrorValidationFailedDetail": "חלק מהפרטים לא התקבלו: {details}",
+    "myRolesTitle": "התפקידים שלי בבוקס הזה",
+    "myRolesDescription": "הוסף תפקיד מתחת לשלך, למשל מאמן. התפקיד העליון שלך נשאר תמיד.",
+    "myRolesHelp": "התפקיד העליון שלך נשאר תמיד. אפשר להוסיף או להסיר רק תפקידים מתחתיו.",
+    "apiErrorOwnTopRoleLocked": "התפקיד העליון שלך נשאר תמיד. אפשר לשנות רק תפקידים מתחתיו."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

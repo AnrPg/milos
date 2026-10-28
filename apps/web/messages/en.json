@@ -3468,7 +3468,7 @@
     "apiErrorInvalidLocationScope": "Choose all branches or at least one branch.",
     "apiErrorOwnerLocationScope": "Owners always work at every branch.",
     "apiErrorCannotChangeOwnMembership": "Someone else has to change your own access.",
-    "apiErrorRoleCeilingExceeded": "You can't give a role higher than you may grant.",
+    "apiErrorRoleCeilingExceeded": "You can change roles only of people below you, and only roles you may grant.",
     "apiErrorPromotionLocationNotIncluded": "This promotion isn't valid at the branches of this package.",
     "mbErrLocationNotFound": "We couldn't find that branch. Please pick another one.",
     "mbNotifWaitlistPromotedTitle": "You got a spot!",
@@ -4602,7 +4602,11 @@
     "formErrTooManyItems": "Too many chosen: pick at most {count}.",
     "formErrTooFewItems": "Pick at least {count}.",
     "formErrInvalid": "This value isn't accepted. Check it and try again.",
-    "apiErrorValidationFailedDetail": "Some details weren't accepted: {details}"
+    "apiErrorValidationFailedDetail": "Some details weren't accepted: {details}",
+    "myRolesTitle": "My roles in this box",
+    "myRolesDescription": "Add a role below your own, for example coach. Your top role always stays.",
+    "myRolesHelp": "Your top role always stays. You can add or remove only roles below it.",
+    "apiErrorOwnTopRoleLocked": "Your top role always stays. You can change only roles below it."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
