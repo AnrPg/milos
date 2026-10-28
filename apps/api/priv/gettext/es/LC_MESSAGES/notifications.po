@@ -708,3 +708,9 @@ msgstr "La clave SMTP de Palee caducó el %{date}, así que Palee no puede envia
 
 msgid "The email key has expired"
 msgstr "La clave de email ha caducado"
+
+msgid "A box member is leaving"
+msgstr "Un miembro del box se va"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} deja el box. Último día: %{date}."

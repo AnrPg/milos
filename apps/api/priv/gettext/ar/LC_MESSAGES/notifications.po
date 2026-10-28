@@ -708,3 +708,9 @@ msgstr "انتهى مفتاح SMTP الخاص بـ Palee في %{date}، لذلك
 
 msgid "The email key has expired"
 msgstr "انتهت صلاحية مفتاح البريد الإلكتروني"
+
+msgid "A box member is leaving"
+msgstr "أحد أعضاء الصالة يغادر"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} يغادر الصالة. آخر يوم: %{date}."

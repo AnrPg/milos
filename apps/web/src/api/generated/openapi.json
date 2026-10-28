@@ -11847,6 +11847,9 @@
           "self_service_cancel_auto_renew": {
             "type": "boolean"
           },
+          "self_service_leave": {
+            "type": "boolean"
+          },
           "self_service_purchase": {
             "type": "boolean"
           }
@@ -11854,6 +11857,7 @@
         "required": [
           "self_service_purchase",
           "self_service_cancel_auto_renew",
+          "self_service_leave",
           "download_invoices"
         ],
         "title": "BillingActions",
@@ -12009,6 +12013,30 @@
             "nullable": true,
             "type": "string"
           },
+          "leave_preview_on": {
+            "description": "ADR-220: the last day the member would keep if they left today.",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "leave_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "leaving_on": {
+            "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "left_by": {
+            "enum": [
+              "member",
+              "staff"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "starts_on": {
             "format": "date",
             "nullable": true,
@@ -12146,6 +12174,9 @@
               "self_service_cancel_auto_renew": {
                 "type": "boolean"
               },
+              "self_service_leave": {
+                "type": "boolean"
+              },
               "self_service_purchase": {
                 "type": "boolean"
               }
@@ -12153,6 +12184,7 @@
             "required": [
               "self_service_purchase",
               "self_service_cancel_auto_renew",
+              "self_service_leave",
               "download_invoices"
             ],
             "title": "BillingActions",
@@ -12302,6 +12334,30 @@
               },
               "expires_on": {
                 "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "leave_preview_on": {
+                "description": "ADR-220: the last day the member would keep if they left today.",
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "leave_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "leaving_on": {
+                "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "left_by": {
+                "enum": [
+                  "member",
+                  "staff"
+                ],
                 "nullable": true,
                 "type": "string"
               },
@@ -12613,12 +12669,17 @@
             "items": {
               "properties": {
                 "auto_renew": {
+                  "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                   "nullable": true,
                   "type": "boolean"
                 },
                 "billing_period": {
                   "nullable": true,
                   "type": "string"
+                },
+                "can_change_auto_renew": {
+                  "description": "The member can turn renewal of this subscription on or off.",
+                  "type": "boolean"
                 },
                 "commitment_ends_on": {
                   "format": "date",
@@ -12900,12 +12961,17 @@
       "BillingSubscription": {
         "properties": {
           "auto_renew": {
+            "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
             "nullable": true,
             "type": "boolean"
           },
           "billing_period": {
             "nullable": true,
             "type": "string"
+          },
+          "can_change_auto_renew": {
+            "description": "The member can turn renewal of this subscription on or off.",
+            "type": "boolean"
           },
           "commitment_ends_on": {
             "format": "date",
@@ -45983,6 +46049,9 @@
                     "self_service_cancel_auto_renew": {
                       "type": "boolean"
                     },
+                    "self_service_leave": {
+                      "type": "boolean"
+                    },
                     "self_service_purchase": {
                       "type": "boolean"
                     }
@@ -45990,6 +46059,7 @@
                   "required": [
                     "self_service_purchase",
                     "self_service_cancel_auto_renew",
+                    "self_service_leave",
                     "download_invoices"
                   ],
                   "title": "BillingActions",
@@ -46139,6 +46209,30 @@
                     },
                     "expires_on": {
                       "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leave_preview_on": {
+                      "description": "ADR-220: the last day the member would keep if they left today.",
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leave_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leaving_on": {
+                      "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "left_by": {
+                      "enum": [
+                        "member",
+                        "staff"
+                      ],
                       "nullable": true,
                       "type": "string"
                     },
@@ -46450,12 +46544,17 @@
                   "items": {
                     "properties": {
                       "auto_renew": {
+                        "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                         "nullable": true,
                         "type": "boolean"
                       },
                       "billing_period": {
                         "nullable": true,
                         "type": "string"
+                      },
+                      "can_change_auto_renew": {
+                        "description": "The member can turn renewal of this subscription on or off.",
+                        "type": "boolean"
                       },
                       "commitment_ends_on": {
                         "format": "date",
@@ -95649,6 +95748,9 @@
                               "self_service_cancel_auto_renew": {
                                 "type": "boolean"
                               },
+                              "self_service_leave": {
+                                "type": "boolean"
+                              },
                               "self_service_purchase": {
                                 "type": "boolean"
                               }
@@ -95656,6 +95758,7 @@
                             "required": [
                               "self_service_purchase",
                               "self_service_cancel_auto_renew",
+                              "self_service_leave",
                               "download_invoices"
                             ],
                             "title": "BillingActions",
@@ -95805,6 +95908,30 @@
                               },
                               "expires_on": {
                                 "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leave_preview_on": {
+                                "description": "ADR-220: the last day the member would keep if they left today.",
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leave_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leaving_on": {
+                                "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "left_by": {
+                                "enum": [
+                                  "member",
+                                  "staff"
+                                ],
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -96116,12 +96243,17 @@
                             "items": {
                               "properties": {
                                 "auto_renew": {
+                                  "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                                   "nullable": true,
                                   "type": "boolean"
                                 },
                                 "billing_period": {
                                   "nullable": true,
                                   "type": "string"
+                                },
+                                "can_change_auto_renew": {
+                                  "description": "The member can turn renewal of this subscription on or off.",
+                                  "type": "boolean"
                                 },
                                 "commitment_ends_on": {
                                   "format": "date",
@@ -161677,6 +161809,109 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/leave": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.undo_member_left",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Undo a member's leave (ADR-220)",
+        "tags": [
+          "Admin Finance"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.mark_member_left",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "commitment_override_reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "leaving_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leave",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leave result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark a member as left the box (ADR-220)",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
       "post": {
         "callbacks": {},
@@ -162103,6 +162338,73 @@
           }
         ],
         "summary": "Record received money and immediately issue its receipt",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/subscriptions/{subscription_id}/auto-renew": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.set_member_auto_renew",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "auto_renew": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "auto_renew"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Renewal choice",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package subscription"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn a member's subscription renewal on or off (ADR-220)",
         "tags": [
           "Admin Finance"
         ]
@@ -212818,6 +213120,183 @@
           }
         ],
         "summary": "Get a presigned download URL for one of the current member's invoices",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/membership/leave": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.stay",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not leaving, or the last day has passed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change my mind before my last day at the box",
+        "tags": [
+          "Member Finance"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.leave",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leave",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leave result"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already leaving"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Leave the box: renewal stops and access ends with what I paid for",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/membership/subscriptions/{id}/auto-renew": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.set_auto_renew",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "auto_renew": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "auto_renew"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Renewal choice",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package subscription"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ended, or leaving the box"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No renewal choice here"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn renewal of one of my subscriptions on or off",
         "tags": [
           "Member Finance"
         ]

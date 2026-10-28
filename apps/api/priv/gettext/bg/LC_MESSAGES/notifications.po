@@ -708,3 +708,9 @@ msgstr "SMTP ключът на Palee изтече на %{date}, затова Pal
 
 msgid "The email key has expired"
 msgstr "Ключът за имейл изтече"
+
+msgid "A box member is leaving"
+msgstr "Член на залата напуска"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} напуска залата. Последен ден: %{date}."

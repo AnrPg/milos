@@ -347,6 +347,10 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Κοινοποίηση & ορατότητα:** what the coach sees, leaderboards/PR celebrations/challenges/partners opt-ins, PR share grants, default visibility for new entries.
 - **Συνδεδεμένες συσκευές:** Garmin; Apple Health and Health Connect marked as coming with native; Wallet pass; ICS feed.
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
+  The member owns their «Αυτόματη ανανέωση» (on by default when the package allows renewal) and can
+  leave the box («Αποχώρηση από το box»); either way they keep what they paid for, only invoices for later
+  periods or packages that never started are cancelled, and money owed for anything already used stays owed
+  (shown and reminded) until paid. Staff can do the same from the box member's profile (ADR-220).
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
   - *Notifications (ADR-199):* the card starts with push on this device, which moved here from Security. Below it is one row per category: bookings & classes, messages, clubs & community, coach, partners & buddies, journal reminders, and box operations (staff only). Each row has a switch for the bell and one for push. A push needs the bell on. Account & payments is always on and shown as locked. Everything is on until the person changes it. Each club's level is still set in Τα box και τα clubs μου.

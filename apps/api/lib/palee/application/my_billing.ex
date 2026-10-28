@@ -21,7 +21,7 @@ defmodule Palee.Application.MyBilling do
 
   require Logger
 
-  alias Palee.Application.{EntitlementClassTypeNames, MemberPerks, MyProviders}
+  alias Palee.Application.{EntitlementClassTypeNames, MemberPerks, MembershipRenewal, MyProviders}
   alias Palee.{Finance, Organizations, Referrals, Seasons, Trials}
 
   @client_roles ~w(member athlete)
@@ -110,6 +110,18 @@ defmodule Palee.Application.MyBilling do
                perks_ok?)
     })
     |> Map.delete(:referral_rewards)
+    |> put_member_actions()
+  end
+
+  # ADR-220: the member decides about renewing their current subscription and
+  # can leave the box while they are not already leaving.
+  defp put_member_actions(%{membership: membership, subscriptions: subscriptions} = section) do
+    Map.update!(section, :actions, fn actions ->
+      Map.merge(actions, %{
+        self_service_cancel_auto_renew: Enum.any?(subscriptions, & &1.can_change_auto_renew),
+        self_service_leave: not is_nil(membership) and is_nil(membership.leaving_on)
+      })
+    end)
   end
 
   defp header(provider, chat_slugs) do
@@ -119,6 +131,7 @@ defmodule Palee.Application.MyBilling do
     |> Map.put(:actions, %{
       self_service_purchase: false,
       self_service_cancel_auto_renew: false,
+      self_service_leave: false,
       download_invoices: true
     })
     # ADR-191: the partner perks the person claimed and can still use there
@@ -174,7 +187,7 @@ defmodule Palee.Application.MyBilling do
     credits = Enum.filter(profile.credit_ledger_entries, &(&1.referral_reward_id != nil))
 
     %{
-      membership: present_membership(profile.membership),
+      membership: present_membership(profile.membership, leave_preview(tenant, profile)),
       entitlement: entitlement(tenant, user_id),
       subscriptions:
         profile.package_subscriptions
@@ -205,20 +218,27 @@ defmodule Palee.Application.MyBilling do
     end
   end
 
-  defp present_membership(nil), do: nil
+  defp present_membership(nil, _leave_preview_on), do: nil
 
-  defp present_membership(membership) do
+  defp present_membership(membership, leave_preview_on) do
     %{
       status: to_string(membership.status),
       entitlement_status: membership.entitlement_status,
       starts_on: membership.starts_on,
-      expires_on: membership.expires_on
+      expires_on: membership.expires_on,
+      # ADR-220: the member is leaving (or left) on `leaving_on`; otherwise
+      # `leave_preview_on` is the last day they would keep if they left now.
+      leaving_on: Map.get(membership, :leaving_on),
+      left_by: Map.get(membership, :left_by),
+      leave_reason: Map.get(membership, :leave_reason),
+      leave_preview_on: leave_preview_on
     }
   end
 
-  defp present_subscription(subscription, active_id) do
-    fields = subscription.fields || %{}
+  defp leave_preview(_tenant, %{membership: %{leaving_on: %Date{}}}), do: nil
+  defp leave_preview(tenant, _profile), do: MembershipRenewal.leave_preview(tenant)
 
+  defp present_subscription(subscription, active_id) do
     %{
       id: subscription.id,
       status: subscription.status,
@@ -232,7 +252,11 @@ defmodule Palee.Application.MyBilling do
       starts_on: subscription.starts_on,
       ends_on: subscription.ends_on,
       commitment_ends_on: subscription.commitment_ends_on,
-      auto_renew: boolean_or_nil(fields["terms.auto_renew"]),
+      # ADR-220: the member's own choice; nil when the package does not renew
+      # or the subscription is not theirs to decide (an add-on, a company seat).
+      auto_renew: Map.get(subscription, :auto_renew),
+      can_change_auto_renew:
+        subscription.id == active_id and is_boolean(Map.get(subscription, :auto_renew)),
       corporate: subscription.corporate_client_id != nil
     }
   end
@@ -405,6 +429,4 @@ defmodule Palee.Application.MyBilling do
       {nil, false}
   end
 
-  defp boolean_or_nil(value) when is_boolean(value), do: value
-  defp boolean_or_nil(_value), do: nil
 end

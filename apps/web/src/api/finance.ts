@@ -151,6 +151,31 @@ export async function updateFinanceMember(token: string, userId: string, body: F
   });
 }
 
+/** ADR-220: staff turn a member's subscription renewal on or off. */
+export async function setFinanceMemberAutoRenew(token: string, userId: string, subscriptionId: string, autoRenew: boolean) {
+  return apiRequest<{ package_subscription: FinanceRecord }>(
+    `/admin/finance/members/${userId}/subscriptions/${encodeURIComponent(subscriptionId)}/auto-renew`,
+    { method: "PUT", token, body: { auto_renew: autoRenew } },
+  );
+}
+
+/** ADR-220: staff mark a member as leaving the box (no day: when what they paid for ends). */
+export async function markFinanceMemberLeft(
+  token: string,
+  userId: string,
+  body: { leaving_on?: string | null; reason?: string | null; commitment_override_reason?: string | null },
+) {
+  return apiRequest<{ membership: FinanceRecord; leaving_on: string; voided_invoice_count: number; outstanding_cents: number }>(
+    `/admin/finance/members/${userId}/leave`,
+    { method: "POST", token, body },
+  );
+}
+
+/** ADR-220: staff undo a member's leave. */
+export async function undoFinanceMemberLeft(token: string, userId: string) {
+  return apiRequest<{ membership: FinanceRecord }>(`/admin/finance/members/${userId}/leave`, { method: "DELETE", token });
+}
+
 export async function assignFinancePackage(token: string, userId: string, body: FinanceRecord) {
   return apiRequest<{ package_subscription: FinanceRecord }>(`/admin/finance/members/${userId}/packages`, {
     method: "POST",
