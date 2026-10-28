@@ -16,7 +16,7 @@ import {
   renamePlatformOrganization,
   fetchOwnerInvitationDeliveries,
   sendOwnerInvitationEmail,
-  updatePlatformOrganizationMembershipRole,
+  updatePlatformOrganizationMembershipRoles,
 } from "@/api/platform-organizations";
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { chooseValue } from "@/components/ui/select-test-utils";
@@ -58,7 +58,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
     issuePlatformOrganizationInvitation: vi.fn(),
     listPlatformOrganizations: vi.fn(),
     provisionPlatformOrganization: vi.fn(),
-    updatePlatformOrganizationMembershipRole: vi.fn(),
+    updatePlatformOrganizationMembershipRoles: vi.fn(),
     changePlatformOrganizationSettings: vi.fn(),
     renamePlatformOrganization: vi.fn(),
     sendOwnerInvitationEmail: vi.fn(),
@@ -153,7 +153,7 @@ describe("PlatformOrganizationsPage", () => {
         role: "coach",
       },
     });
-    vi.mocked(updatePlatformOrganizationMembershipRole).mockResolvedValue({
+    vi.mocked(updatePlatformOrganizationMembershipRoles).mockResolvedValue({
       membership: {
         id: "membership-1",
         user_id: "user-1",
@@ -460,14 +460,17 @@ describe("PlatformOrganizationsPage", () => {
     expect(await within(dialog).findByText("coach-invite-token")).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: /Generated invitations/ })).toBeInTheDocument();
 
-    chooseValue(within(dialog).getByLabelText("Tenant role"), "athlete");
+    // The vendor toggles any role on top of the current set (ADR-219).
+    const roles = within(dialog).getByRole("group", { name: /Tenant roles/ });
+    fireEvent.click(within(roles).getByRole("button", { name: "roleCoach" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "saveRoles" }));
 
     await waitFor(() => {
-      expect(updatePlatformOrganizationMembershipRole).toHaveBeenCalledWith(
+      expect(updatePlatformOrganizationMembershipRoles).toHaveBeenCalledWith(
         "token",
         "org-1",
         "membership-1",
-        "athlete",
+        expect.arrayContaining(["coach"]),
       );
     });
   });

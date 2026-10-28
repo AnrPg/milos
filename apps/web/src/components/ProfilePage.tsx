@@ -16,6 +16,7 @@ import { signOutAllDevices } from "@/api/auth";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { IdentitySettings, IDENTITY_FORM_ID } from "@/components/account/IdentitySettings";
 import { ProfilesSection } from "@/components/account/ProfilesSection";
+import { MyRolesSection } from "@/components/roles/MyRolesSection";
 import { RecoveryCodesSection } from "@/components/account/RecoveryCodesSection";
 import { DeleteAccountSection } from "@/components/account/DeleteAccountSection";
 import { BusinessAccountSettings } from "@/components/business/BusinessAccountSettings";
@@ -188,6 +189,9 @@ export function ProfilePage() {
         </div>
 
         <ProfilesSection />
+
+        {/* ADR-219: roles below one's top role in the selected box. */}
+        <MyRolesSection />
 
 
         <CollapsibleSection

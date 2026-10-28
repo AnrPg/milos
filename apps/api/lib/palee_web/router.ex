@@ -509,6 +509,8 @@ defmodule PaleeWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-219: roles below my top role (an owner who also coaches).
+    put("/roles", MyRolesController, :update)
     # ADR-167: Box › Συνδρομή › seasons.
     get("/seasons", SeasonController, :index)
     post("/seasons/:id/request", SeasonController, :request)
