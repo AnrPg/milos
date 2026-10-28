@@ -1,13 +1,15 @@
 import { create } from "zustand";
 
-import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
+import { formatLocalIsoDate, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 
 type ScheduleStore = {
   classTypeIds: string[];
-  days: 3 | 7 | 30;
+  days: ScheduleDays;
   startDate: string;
   setClassTypeIds: (value: string[]) => void;
-  setDays: (value: 3 | 7 | 30) => void;
+  setDays: (value: ScheduleDays) => void;
+  /** The day view of one date (a month cell's date or its "+N more"). */
+  openDay: (isoDate: string) => void;
   shiftWindow: (direction: -1 | 1) => void;
   resetWindow: () => void;
 };
@@ -34,6 +36,7 @@ export const useScheduleStore = create<ScheduleStore>((set, get) => ({
   startDate: todayIso(),
   setClassTypeIds: (classTypeIds) => set({ classTypeIds }),
   setDays: (days) => set({ days }),
+  openDay: (startDate) => set({ days: 1, startDate }),
   shiftWindow: (direction) => {
     const { days, startDate } = get();
     set({ startDate: days === 30 ? addMonths(startDate, direction) : addDays(startDate, days * direction) });
