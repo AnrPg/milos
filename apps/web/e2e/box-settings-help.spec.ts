@@ -78,6 +78,7 @@ async function stub(page: Page, user: ReturnType<typeof person>, writes: Array<{
       }
       return json(route, push);
     }
+    if (path.endsWith("/join-link")) return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     return json(route, {});
   });
 }

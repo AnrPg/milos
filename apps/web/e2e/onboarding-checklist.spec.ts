@@ -35,7 +35,9 @@ const checklist = {
 };
 
 async function stubApi(page: Page, roles: string[] = ["owner"]) {
-  await page.route("**/api/**", (route) => route.fulfill(json({})));
+  await page.route("**/api/**", (route) =>
+    route.fulfill(json(new URL(route.request().url()).pathname.endsWith("/join-link") ? { member: { enabled: false }, athlete: { enabled: false, key: null } } : {})),
+  );
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: tokenFor(), refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
   await page.route("**/api/memberships", (route) =>
