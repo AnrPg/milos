@@ -7,14 +7,12 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
 import {
   createScheduleSlot,
   createScheduleSlotsAt,
   createScheduleSeries,
-  linkScheduleSlotWorkout,
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
@@ -68,10 +66,9 @@ import { defaultClassStart, earliestPickable, startsInPast, todayKey } from "@/c
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
 import { dateTimeLocalInZone, dateTimeLocalToIso, formatInZone, zoneLabel, zonedText } from "@/lib/zoned-time";
-import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/organization-slug";
-import { RETURNED_WORKOUT_PARAM, newWorkoutHref } from "@/lib/workout-return";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { ContextualWorkoutCreator } from "@/components/workouts/creation/ContextualWorkoutCreator";
 import { WodPicker } from "@/components/schedule/WodPicker";
-import { stashClassDraft, takeClassDraft } from "@/components/schedule/class-draft-handoff";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
@@ -138,12 +135,8 @@ type SeriesEditorState = {
 /** What staff were adding when the gym turned out to have no class type yet. */
 type PendingCreate = { kind: "slot"; isoDate: string } | { kind: "series" };
 
-/** A class form left open for the WOD editor ("+ New WOD"). */
-type ClassDraft =
-  | { kind: "slot"; editor: SlotEditorState }
-  | { kind: "series"; editor: SeriesEditorState }
-  // A class without its WOD (ADR-176): the new WOD is linked to it on return.
-  | { kind: "link"; slotId: string };
+/** Which open class form «+ New WOD» writes a WOD for. */
+type NewWodTarget = "slot" | "series";
 
 const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !type.archived_at);
 
@@ -229,8 +222,7 @@ export function ScheduleConsole({
   const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
   const [pendingCreate, setPendingCreate] = useState<PendingCreate | null>(null);
   const [reopenSlotId, setReopenSlotId] = useState<string | null>(null);
-  const router = useRouter();
-  const organizationSlug = useOrganizationSlug();
+  const [newWodFor, setNewWodFor] = useState<NewWodTarget | null>(null);
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   // ADR-176: series follow the gym's time zone, not the editing device's.
   const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
@@ -393,39 +385,6 @@ export function ScheduleConsole({
     }
   }, [initialOpenSlotId, schedule]);
 
-  // Back from the WOD editor: reopen the class form as the coach left it, with
-  // the WOD they just published (`?wod=`) chosen, then tidy the address.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const returnedWorkoutId = url.searchParams.get(RETURNED_WORKOUT_PARAM);
-    const draft = takeClassDraft<ClassDraft>();
-    if (returnedWorkoutId) {
-      url.searchParams.delete(RETURNED_WORKOUT_PARAM);
-      router.replace(`${url.pathname}${url.search}`, { scroll: false });
-    }
-    if (!draft) return;
-    if (draft.kind === "link") {
-      const token = tokens?.access_token;
-      if (returnedWorkoutId && token) {
-        void linkScheduleSlotWorkout(token, draft.slotId, returnedWorkoutId)
-          .catch((reason) => setError(localizeError(reason, i18n)))
-          .finally(() => setReopenSlotId(draft.slotId));
-      } else {
-        const frame = window.requestAnimationFrame(() => setReopenSlotId(draft.slotId));
-        return () => window.cancelAnimationFrame(frame);
-      }
-      return;
-    }
-    const master_workout_id = returnedWorkoutId ?? draft.editor.values.master_workout_id;
-    const frame = window.requestAnimationFrame(() => {
-      if (draft.kind === "slot") setEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
-      else setSeriesEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
-    });
-    return () => window.cancelAnimationFrame(frame);
-    // Runs once on arrival; the session token is already there by then.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
-
   // Reopen the class the coach left from once the schedule has it.
   useEffect(() => {
     if (!reopenSlotId || loading) return;
@@ -440,9 +399,22 @@ export function ScheduleConsole({
 
   const classTypeName = (id: string | null | undefined) => classTypes.find((type) => type.id === id)?.name ?? null;
 
-  function createNewWod(draft: ClassDraft) {
-    stashClassDraft(draft);
-    router.push(newWorkoutHref(adminHref("/admin/workouts/new", organizationSlug), window.location.pathname));
+  // «+ New WOD» opens the editor over the class form, which stays as it is;
+  // the published WOD becomes the form's WOD (saved with the class).
+  function assignNewWod(target: NewWodTarget, workoutId: string) {
+    if (target === "slot") {
+      setEditor((current) => (current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current));
+    } else {
+      setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current));
+    }
+  }
+
+  function newWodTargetLabel(target: NewWodTarget) {
+    const values = target === "slot" ? editor?.values : seriesEditor?.values;
+    const name = values?.name?.trim() || classTypeName(values?.class_type_id) || null;
+    if (target === "series") return name;
+    const when = editor?.values.scheduled_at ? formatInZone(editor.values.scheduled_at, gymZone, locale, "day-time") : null;
+    return [name, when].filter(Boolean).join(" · ") || null;
   }
 
   // ADR-214: "it is 23:40 at the gym now", on the gym's clock.
@@ -899,6 +871,14 @@ export function ScheduleConsole({
         )}
       </div>
 
+      {newWodFor ? (
+        <ContextualWorkoutCreator
+          target={newWodTargetLabel(newWodFor)}
+          onPublished={(workoutId) => assignNewWod(newWodFor, workoutId)}
+          onClose={() => setNewWodFor(null)}
+        />
+      ) : null}
+
       {selectedSlot ? (
         <SlotPopup
           key={selectedSlot.id}
@@ -912,7 +892,6 @@ export function ScheduleConsole({
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
           canProgramVariations={can(membership, "manage_coaching")}
-          onCreateWorkout={() => createNewWod({ kind: "link", slotId: selectedSlot.id })}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
@@ -1058,7 +1037,7 @@ export function ScheduleConsole({
                           current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current,
                         )
                       }
-                      onCreateNew={() => createNewWod({ kind: "slot", editor })}
+                      onCreateNew={() => setNewWodFor("slot")}
                     />
                     <FieldError id="slot-error-master_workout_id">{editorFieldErrors.master_workout_id}</FieldError>
                   </div>
@@ -1275,7 +1254,7 @@ export function ScheduleConsole({
                   classTypeName={classTypeName(seriesEditor.values.class_type_id)}
                   value={seriesEditor.values.master_workout_id ?? null}
                   onChange={(workoutId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: workoutId } })}
-                  onCreateNew={() => createNewWod({ kind: "series", editor: seriesEditor })}
+                  onCreateNew={() => setNewWodFor("series")}
                   noneHint={i18n("classSeriesWodHint")}
                 />
                 <FieldError id="series-error-master_workout_id">{seriesFieldErrors.master_workout_id}</FieldError>

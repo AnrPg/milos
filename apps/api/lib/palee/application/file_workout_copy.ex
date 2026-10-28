@@ -68,9 +68,45 @@ defmodule Palee.Application.FileWorkoutCopy do
   defp title_suffix(%{folder_id: folder_id}, folder_id), do: "(copy)"
   defp title_suffix(_source, _folder_id), do: ""
 
-  defp maybe_publish(context, %{status: status}, draft) when status in [:published, "published"],
-    do: Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0})
+  defp maybe_publish(context, %{status: status} = source, draft)
+       when status in [:published, "published"],
+       do: publish_copy(context, draft, source)
 
   defp maybe_publish(context, _source, draft),
     do: {:ok, Workouts.get_workout_for_admin(context, draft.id) || draft}
+
+  @doc """
+  Publishes a fresh programming copy of `source`. A copy that cannot be
+  published is deleted, so a failed assignment never leaves a stray draft in
+  the folder, and the failure names the original WOD and what it lacks
+  (`{:error, :workout_not_assignable, details}`), because that is where the
+  coach has to fix it.
+  """
+  def publish_copy(context, %{id: draft_id}, source) do
+    case Workouts.publish_workout(context, draft_id, %{expected_source_revision: 0}) do
+      {:ok, published} ->
+        {:ok, published}
+
+      {:error, reason} ->
+        _result = Workouts.delete_workout(context, draft_id)
+        not_assignable(source, reason)
+    end
+  end
+
+  defp not_assignable(source, reason) do
+    case unpublishable_problem(reason) do
+      nil ->
+        {:error, reason}
+
+      problem ->
+        {:error, :workout_not_assignable,
+         %{workout_id: source.id, title: Map.get(source, :title), problem: problem}}
+    end
+  end
+
+  defp unpublishable_problem(:no_sections), do: "no_content"
+  defp unpublishable_problem(:no_free_text_body), do: "no_content"
+  defp unpublishable_problem({:invalid_text_sections, _problems}), do: "incomplete_sections"
+  defp unpublishable_problem(%Ecto.Changeset{}), do: "invalid_details"
+  defp unpublishable_problem(_reason), do: nil
 end

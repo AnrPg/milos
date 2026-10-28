@@ -55,6 +55,15 @@ describe("localizeError", () => {
     );
   });
 
+  it("names the WOD that cannot be assigned and what it lacks, never the generic validation copy", () => {
+    const error = new ApiError(422, "The workout cannot be assigned until it is complete (no_content)", {
+      code: "workout_not_assignable",
+      params: { workout_id: "w1", title: "Legs", problem: "no_content" },
+    });
+
+    expect(localizeError(error, translate)).toBe('apiErrorWorkoutNotAssignable_no_content:{"title":"Legs"}');
+  });
+
   it("falls back to a localized status category instead of backend prose", () => {
     const error = new ApiError(404, "Not found", {});
     expect(localizeError(error, translate)).toBe("apiErrorNotFound");

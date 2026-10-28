@@ -103,7 +103,6 @@ type SlotPopupProps = {
   /** The member's package includes guest passes (ADR-097). */
   guestsIncluded?: boolean;
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
-  onCreateWorkout?: () => void;
   /** ADR-201: staff who manage coaching can give attendees a variation. */
   canProgramVariations?: boolean;
 };
@@ -125,7 +124,6 @@ export function SlotPopup({
   onSlotChanged,
   locations,
   guestsIncluded = false,
-  onCreateWorkout,
   canProgramVariations = false,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
@@ -381,7 +379,7 @@ export function SlotPopup({
           ) : null}
 
           {isAdmin ? (
-            <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} onCreateNew={onCreateWorkout} />
+            <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} />
           ) : null}
 
           {/* Compact info strip (admin sees full detail; members get a summary) */}

@@ -17,7 +17,7 @@ import {
   type WorkoutFolder,
   type WorkoutRecord,
 } from "@/api/workouts";
-import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
+import { ContextualWorkoutCreator } from "@/components/workouts/creation/ContextualWorkoutCreator";
 import { compareFolders, folderDisplayName } from "@/components/workouts/library/library-folders";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -352,7 +352,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
       </div>
       </Dialog> : null}
 
-      {creating ? <Dialog bare dismissible={false} onClose={() => { setCreating(false); setEditingDraftId(null); }} ariaLabel={i18n("featureCreateNewWod")} size="full" variant="center"><WorkoutCreationCanvas embedded initialDraftId={editingDraftId} onCancel={() => { setCreating(false); setEditingDraftId(null); }} onPublished={(workout) => { setCreating(false); setEditingDraftId(null); void program(workout.id, false); }} /></Dialog> : null}
+      {creating ? <ContextualWorkoutCreator target={[nickname, selectedDate].filter(Boolean).join(" · ") || null} draftId={editingDraftId} onClose={() => { setCreating(false); setEditingDraftId(null); }} onPublished={(workoutId) => program(workoutId, false)} /> : null}
     </div>
   );
 }
