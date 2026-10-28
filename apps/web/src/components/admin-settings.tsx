@@ -228,7 +228,7 @@ function BrandingSection({ token }: { token: string }) {
 
 // ── Gamification section ─────────────────────────────────────────────────────
 
-// ADR-222: the box sets only the streak shields and when they renew; the
+// ADR-226: the box sets only the streak shields and when they renew; the
 // weekly workout goal is each person's own.
 type GamificationFormState = {
   streakShields: string;

@@ -128,7 +128,7 @@ defmodule PaleeWeb.EmailDeliverabilityControllerTest do
         |> put_req_header("content-type", "application/x-www-form-urlencoded")
         |> post("/api/email/unsubscribe/#{token()}", "List-Unsubscribe=One-Click")
 
-      assert html_response(conn, 200) =~ "Η εγγραφή σας καταργήθηκε"
+      assert html_response(conn, 200) =~ "Η εγγραφή σου καταργήθηκε"
       assert Email.opted_out?("jo@box.test", :sample_notice)
       refute Email.suppressed?("jo@box.test")
     end

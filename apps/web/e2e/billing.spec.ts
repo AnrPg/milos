@@ -53,8 +53,17 @@ function section(slug: string, name: string, overrides: Record<string, unknown> 
     primary_color: null,
     partial: false,
     contact: { box_chat_slug: slug },
-    actions: { self_service_purchase: false, self_service_cancel_auto_renew: false, download_invoices: true },
-    membership: { status: "active", entitlement_status: "active", starts_on: isoDay(-10), expires_on: null },
+    actions: { self_service_purchase: false, self_service_cancel_auto_renew: false, self_service_leave: false, download_invoices: true },
+    membership: {
+      status: "active",
+      entitlement_status: "active",
+      starts_on: isoDay(-10),
+      expires_on: null,
+      leaving_on: null,
+      left_by: null,
+      leave_reason: null,
+      leave_preview_on: null,
+    },
     entitlement: {
       status: "active",
       enforcement_mode: "enforce",
@@ -204,7 +213,7 @@ test.describe("billing", () => {
     await expect(page.getByRole("link", { name: "Contact the box" })).toHaveAttribute("href", "/b/kypseli/chat");
 
     // «Συνδρομή»: details and history.
-    await expect(page.getByText("Package history")).toBeVisible();
+    await expect(page.getByText("Subscription package history")).toBeVisible();
     await expect(page.getByText("Trial month")).toBeVisible();
 
     // «Συναλλαγές»: one feed, events at any host included; a row opens its details.
@@ -259,6 +268,88 @@ test.describe("billing", () => {
       expect(overflow).toBeLessThanOrEqual(0);
     });
   }
+
+  // ADR-220: the member decides about renewing and can leave the box.
+  test("a member turns renewal off and leaves the box, then changes their mind", async ({ page }) => {
+    const state = { autoRenew: true, endsOn: null as string | null, leavingOn: null as string | null };
+    const calls: Array<{ method: string; url: string; body: unknown }> = [];
+    const current = () =>
+      section("kypseli", "Box Kypseli", {
+        actions: { self_service_purchase: false, self_service_cancel_auto_renew: !state.leavingOn, self_service_leave: !state.leavingOn, download_invoices: true },
+        membership: {
+          status: "active",
+          entitlement_status: "active",
+          starts_on: isoDay(-10),
+          expires_on: state.leavingOn,
+          leaving_on: state.leavingOn,
+          left_by: state.leavingOn ? "member" : null,
+          leave_reason: null,
+          leave_preview_on: state.leavingOn ? null : isoDay(20),
+        },
+        subscriptions: [
+          {
+            id: "sub-1",
+            status: "active",
+            current: true,
+            package_name: "Unlimited monthly",
+            billing_period: "monthly",
+            price_cents: 6000,
+            starts_on: isoDay(-10),
+            ends_on: state.endsOn,
+            commitment_ends_on: null,
+            auto_renew: state.autoRenew,
+            can_change_auto_renew: !state.leavingOn,
+            corporate: false,
+          },
+        ],
+      });
+    await common(page, [membership("kypseli", "Box Kypseli", ["member"])], [current()]);
+    await page.route("**/api/me/billing", (route) => route.fulfill(json({ providers: [current()] })));
+    await page.route("**/api/org/kypseli/me/membership/**", (route) => {
+      const request = route.request();
+      calls.push({ method: request.method(), url: request.url(), body: request.postDataJSON() });
+      if (request.url().endsWith("/auto-renew")) {
+        state.autoRenew = (request.postDataJSON() as { auto_renew: boolean }).auto_renew;
+        state.endsOn = state.autoRenew ? null : isoDay(20);
+        return route.fulfill(json({ package_subscription: { id: "sub-1", auto_renew: state.autoRenew } }));
+      }
+      if (request.method() === "POST") {
+        state.leavingOn = isoDay(20);
+        state.autoRenew = false;
+        state.endsOn = isoDay(20);
+        return route.fulfill(json({ leaving_on: state.leavingOn, voided_invoice_count: 0, outstanding_cents: 4000 }));
+      }
+      state.leavingOn = null;
+      state.autoRenew = true;
+      state.endsOn = null;
+      return route.fulfill(json({ membership: { leaving_on: null } }));
+    });
+
+    await page.goto("/me/payments");
+    const renewal = page.getByRole("switch", { name: /Automatic renewal/ });
+    await expect(renewal).toBeChecked();
+    await expect(page.getByText("Your subscription package renews every period.", { exact: false })).toBeVisible();
+
+    await renewal.click();
+    await expect(renewal).not.toBeChecked();
+    await expect(page.getByText("No new invoice will be issued.", { exact: false })).toBeVisible();
+    expect(calls[0]).toMatchObject({ method: "PUT", body: { auto_renew: false } });
+
+    await page.getByTestId("billing-leave").click();
+    const dialog = page.getByRole("dialog", { name: "Leave the box" });
+    await expect(dialog.getByText("anything you have already used and not paid stays owed", { exact: false })).toBeVisible();
+    await dialog.getByRole("textbox").fill("Moving away");
+    await dialog.getByRole("button", { name: "Leave", exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    expect(calls[1]).toMatchObject({ method: "POST", body: { reason: "Moving away" } });
+
+    await expect(page.getByTestId("billing-leaving")).toContainText("Your last day at the box is");
+    await expect(page.getByRole("switch", { name: /Automatic renewal/ })).toHaveCount(0);
+
+    await page.getByRole("button", { name: "I'm staying at the box" }).click();
+    await expect(page.getByTestId("billing-leave")).toBeVisible();
+    expect(calls[2]).toMatchObject({ method: "DELETE" });
+  });
 
   // ADR-205: an email-domain company plan waits for a confirmed email.
   test("a company plan matched by an unconfirmed email asks to confirm it first, with a resend", async ({ page }) => {
@@ -347,7 +438,7 @@ test.describe("billing", () => {
     await chooseOption(page, picker, "nikos");
     await expect(page).toHaveURL(/box=nikos/);
     await expect(page.getByText("Independent coach")).toBeVisible();
-    await expect(page.getByText("No active package right now.")).toBeVisible();
+    await expect(page.getByText("No active subscription package right now.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Message your coach" })).toHaveAttribute("href", "/messages?filter=coach");
   });
 });

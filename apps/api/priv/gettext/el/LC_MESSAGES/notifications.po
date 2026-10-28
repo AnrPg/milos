@@ -29,13 +29,13 @@ msgid "Workout changed"
 msgstr "Η προπόνηση άλλαξε"
 
 msgid "Your coach changed a scheduled workout."
-msgstr "Ο coach σας άλλαξε μια προγραμματισμένη προπόνηση."
+msgstr "Ο coach σου άλλαξε μια προγραμματισμένη προπόνηση."
 
 msgid "Workout removed"
 msgstr "Η προπόνηση καταργήθηκε"
 
 msgid "Your coach removed a scheduled workout."
-msgstr "Ο coach σας αφαίρεσε μια προγραμματισμένη προπόνηση."
+msgstr "Ο coach σου αφαίρεσε μια προγραμματισμένη προπόνηση."
 
 msgid "Workout rejected"
 msgstr "Η προπόνηση απορρίφθηκε"
@@ -59,7 +59,7 @@ msgid "Message from %{nickname}"
 msgstr "Μήνυμα από %{nickname}"
 
 msgid "%{nickname} sent you a message."
-msgstr "Το %{nickname} σας έστειλε ένα μήνυμα."
+msgstr "Ο/Η %{nickname} σου έστειλε μήνυμα."
 
 msgid "Message from your coach"
 msgstr "Μήνυμα από τον coach σου"
@@ -80,7 +80,7 @@ msgid "You completed a challenge."
 msgstr "Ολοκληρώσατε μια πρόκληση."
 
 msgid "New message in your workout thread"
-msgstr "Νέο μήνυμα στο νήμα της προπόνησής σας"
+msgstr "Νέο μήνυμα στη συζήτηση της προπόνησής σου"
 
 msgid "New message"
 msgstr "Νέο μήνυμα"
@@ -101,7 +101,7 @@ msgid "New invoice"
 msgstr "Νέο τιμολόγιο"
 
 msgid "Invoice %{invoice_number} has been issued for your account."
-msgstr "Το τιμολόγιο %{invoice_number} έχει εκδοθεί για τον λογαριασμό σας."
+msgstr "Το τιμολόγιο %{invoice_number} εκδόθηκε για τον λογαριασμό σου."
 
 msgid "Payment reminder"
 msgstr "Υπενθύμιση πληρωμής"
@@ -131,16 +131,16 @@ msgid "A new %{target_type} review needs attention."
 msgstr "Μια νέα αξιολόγηση %{target_type} χρειάζεται έλεγχο."
 
 msgid "Class bookings approved"
-msgstr "Εγκρίθηκαν κρατήσεις μαθημάτων"
+msgstr "Εγκρίθηκαν κρατήσεις τμημάτων"
 
 msgid "Your coach approved one or more class booking requests."
-msgstr "Ο coach σας ενέκρινε ένα ή περισσότερα αιτήματα κράτησης μαθημάτων."
+msgstr "Ο coach σου ενέκρινε ένα ή περισσότερα αιτήματα κράτησης τμημάτων."
 
 msgid "New workouts assigned"
 msgstr "Ανατέθηκαν νέες προπονήσεις"
 
 msgid "Your coach assigned one or more workouts to you."
-msgstr "Ο coach σας ανέθεσε μία ή περισσότερες προπονήσεις."
+msgstr "Ο coach σου σού ανέθεσε μία ή περισσότερες προπονήσεις."
 
 msgid "You got a spot"
 msgstr "Βρέθηκε θέση για σένα"
@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Άνοιξε θέση στο %{class}. Η κράτησή σου επιβεβαιώθηκε ή περιμένει έγκριση."
 
 msgid "Your package ends soon"
-msgstr "Το πακέτο σου λήγει σύντομα"
+msgstr "Το πακέτο συνδρομής σου λήγει σύντομα"
 
 msgid "%{package} ends on %{date}."
 msgstr "Το %{package} λήγει στις %{date}."
@@ -197,10 +197,10 @@ msgid "%{coach} is now coaching %{client}."
 msgstr "Ο/Η %{coach} προπονεί πλέον τον/την %{client}."
 
 msgid "An admin read your note"
-msgstr "Ένας admin διάβασε τη σημείωσή σας"
+msgstr "Ένας διαχειριστής διάβασε τη σημείωσή σου"
 
 msgid "%{reader} read your note about %{client} at %{time}."
-msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σας για τον/την %{client} στις %{time}."
+msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σου για τον/την %{client} στις %{time}."
 
 msgid "A machine needs attention"
 msgstr "Ένα μηχάνημα χρειάζεται προσοχή"
@@ -227,31 +227,31 @@ msgid "%{item}: %{quantity} left."
 msgstr "%{item}: απομένουν %{quantity}."
 
 msgid "Your subscription ends soon"
-msgstr "Η συνδρομή σας λήγει σύντομα"
+msgstr "Η συνδρομή σου λήγει σύντομα"
 
 msgid "Your subscription has ended"
-msgstr "Η συνδρομή σας έληξε"
+msgstr "Η συνδρομή σου έληξε"
 
 msgid "your subscription"
-msgstr "η συνδρομή σας"
+msgstr "η συνδρομή σου"
 
 msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
-msgstr "Η συνδρομή %{package} λήγει στις %{date} (σε %{days} ημέρες). Ανανεώστε για να συνεχίσετε να κλείνετε μαθήματα."
+msgstr "Η συνδρομή %{package} λήγει στις %{date} (σε %{days} ημέρες). Ανανέωσέ τη για να συνεχίσεις να κλείνεις τμήματα."
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
-msgstr "Η συνδρομή %{package} έληξε. Διατηρείτε πρόσβαση έως τις %{date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα."
+msgstr "Η συνδρομή %{package} έληξε. Έχεις πρόσβαση έως τις %{date}· ανανέωσέ τη μέχρι τότε για να συνεχίσεις να κλείνεις τμήματα."
 
 msgid "Your access has ended"
-msgstr "Η πρόσβασή σας έληξε"
+msgstr "Η πρόσβασή σου έληξε"
 
 msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
-msgstr "Η πρόσβασή σας έχει παγώσει επειδή μια πληρωμή καθυστερεί. Εξοφλήστε το υπόλοιπο για να κλείνετε ξανά μαθήματα."
+msgstr "Η πρόσβασή σου έχει παγώσει επειδή μια πληρωμή καθυστερεί. Εξόφλησε το υπόλοιπο για να κλείνεις ξανά τμήματα."
 
 msgid "Your access has ended. Renew your subscription to book classes again."
-msgstr "Η πρόσβασή σας έληξε. Ανανεώστε τη συνδρομή σας για να κλείνετε ξανά μαθήματα."
+msgstr "Η πρόσβασή σου έληξε. Ανανέωσε τη συνδρομή σου για να κλείνεις ξανά τμήματα."
 
 msgid "Your upcoming bookings were cancelled: %{count}."
-msgstr "Οι επερχόμενες κρατήσεις σας ακυρώθηκαν: %{count}."
+msgstr "Οι επερχόμενες κρατήσεις σου ακυρώθηκαν: %{count}."
 
 msgid "Follow request"
 msgstr "Αίτημα ακολούθησης"
@@ -308,10 +308,10 @@ msgid "Want to keep training at %{box}? Send them a message."
 msgstr "Θες να συνεχίσεις στο %{box}; Στείλε τους μήνυμα."
 
 msgid "Trial class cancelled"
-msgstr "Ακυρώθηκε το μάθημα του δοκιμαστικού"
+msgstr "Ακυρώθηκε το δοκιμαστικό τμήμα"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
-msgstr "Το %{box} ακύρωσε το %{class} (%{when}). Διάλεξε άλλο μάθημα."
+msgstr "Το %{box} ακύρωσε το %{class} (%{when}). Διάλεξε άλλο τμήμα."
 
 msgid "New group to review"
 msgstr "Νέα ομάδα για έγκριση"
@@ -395,10 +395,10 @@ msgid "%{nickname} is coming to «%{event}» with your guest pass."
 msgstr "Ο/Η %{nickname} έρχεται στο «%{event}» με την πρόσκλησή σου."
 
 msgid "Try a class"
-msgstr "Δοκίμασε ένα μάθημα"
+msgstr "Δοκίμασε ένα τμήμα"
 
 msgid "Liked «%{event}»? %{box} invites you to a trial class."
-msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δοκιμαστικό μάθημα."
+msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δοκιμαστικό τμήμα."
 
 msgid "Message about «%{event}»"
 msgstr "Μήνυμα για το «%{event}»"
@@ -452,7 +452,7 @@ msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
 msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος."
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
-msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος. Οι δοκιμαστικές είναι ανοιχτές."
+msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος. Τα δοκιμαστικά είναι ανοιχτά."
 
 msgid "Time for a new measurement"
 msgstr "Ώρα για νέα μέτρηση"
@@ -575,7 +575,7 @@ msgid "You found a training partner"
 msgstr "Βρήκες συναθλητή"
 
 msgid "You and %{nickname} both want to train together. Say hi."
-msgstr "Εσύ και το %{nickname} θέλετε να προπονηθείτε μαζί. Πείτε ένα γεια."
+msgstr "Εσύ και ο/η %{nickname} θέλετε να προπονηθείτε μαζί. Πες ένα γεια."
 
 msgid "Training partner message"
 msgstr "Μήνυμα από συναθλητή"
@@ -588,7 +588,7 @@ msgstr "Ο/Η %{nickname} σε προσκάλεσε στην ομάδα του c
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
-msgstr "Μάθημα χωρίς WOD"
+msgstr "Τμήμα χωρίς WOD"
 
 msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
 msgstr "Το %{class} (%{when}) δεν έχει WOD, οπότε τα μέλη του box δεν το βλέπουν και δεν μπορούν να κλείσουν θέση. Σύνδεσε ένα για να δημοσιευτεί."
@@ -689,13 +689,13 @@ msgid "%{nickname} wants to send you a message."
 msgstr "Το %{nickname} θέλει να σου στείλει μήνυμα."
 
 msgid "Class cancelled"
-msgstr "Το μάθημα ακυρώθηκε"
+msgstr "Το τμήμα ακυρώθηκε"
 
 msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
-msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε: %{reason}. Η θέση σου αποδεσμεύτηκε."
+msgstr "Το τμήμα %{class} (%{time}) ακυρώθηκε: %{reason}. Η θέση σου αποδεσμεύτηκε."
 
 msgid "%{class} (%{time}) was cancelled. Your place was released."
-msgstr "Το μάθημα %{class} (%{time}) ακυρώθηκε. Η θέση σου αποδεσμεύτηκε."
+msgstr "Το τμήμα %{class} (%{time}) ακυρώθηκε. Η θέση σου αποδεσμεύτηκε."
 
 msgid "The email key expires soon"
 msgstr "Το κλειδί email λήγει σύντομα"
@@ -714,3 +714,9 @@ msgstr "Ο εβδομαδιαίος στόχος σου άλλαξε"
 
 msgid "%{person} set your goal to %{target} workouts a week. You can change it."
 msgstr "%{person}: ο στόχος σου είναι τώρα %{target} προπονήσεις την εβδομάδα. Μπορείς να τον αλλάξεις."
+
+msgid "A box member is leaving"
+msgstr "Ένα μέλος του box αποχωρεί"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "Ο/Η %{nickname} αποχωρεί από το box. Τελευταία ημέρα: %{date}."

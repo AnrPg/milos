@@ -1,5 +1,5 @@
 defmodule Palee.Gamification.TrainingGoal do
-  @moduledoc "A person's training goal of one kind (ADR-222); see `Domain.WeeklyGoal`."
+  @moduledoc "A person's training goal of one kind (ADR-226); see `Domain.WeeklyGoal`."
 
   use Ecto.Schema
   import Ecto.Changeset

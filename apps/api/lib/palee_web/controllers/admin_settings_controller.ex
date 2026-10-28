@@ -14,7 +14,7 @@ defmodule PaleeWeb.AdminSettingsController do
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true] when action in [:update]
 
-  # ADR-222: the box sets only the streak shields; the weekly goal is personal.
+  # ADR-226: the box sets only the streak shields; the weekly goal is personal.
   @streak_shields_schema %Schema{
     type: :integer,
     minimum: 0,

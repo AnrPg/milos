@@ -237,6 +237,13 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-222: recording money received at the desk.
+  payment_exceeds_invoice_balance: "apiErrorPaymentExceedsInvoiceBalance",
+  invoice_already_paid: "apiErrorInvoiceAlreadyPaid",
+  invoice_void: "apiErrorInvoiceVoid",
+  payment_purpose_required: "apiErrorPaymentPurposeRequired",
+  invalid_payment_amount: "apiErrorInvalidPaymentAmount",
+  invalid_payment_method: "apiErrorInvalidPaymentMethod",
   // ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
   space_unavailable: "apiErrorSpaceUnavailable",
   space_archived: "apiErrorSpaceArchived",
@@ -362,6 +369,15 @@ const API_ERROR_KEYS: Record<string, string> = {
   package_already_used: "apiErrorPackageAlreadyUsed",
   package_new_members_only: "apiErrorPackageNewMembersOnly",
   package_not_renewable: "apiErrorPackageNotRenewable",
+  // ADR-220: renewal choice and leaving the box.
+  renewal_turned_off: "apiErrorRenewalTurnedOff",
+  member_leaving: "apiErrorMemberLeaving",
+  renewal_choice_not_allowed: "apiErrorRenewalChoiceNotAllowed",
+  subscription_ended: "apiErrorSubscriptionEnded",
+  not_leaving: "apiErrorNotLeaving",
+  already_left: "apiErrorAlreadyLeft",
+  left_by_staff: "apiErrorLeftByStaff",
+  invalid_leaving_on: "apiErrorInvalidLeavingOn",
   invalid_athletes: "apiErrorInvalidAthletes",
   member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",

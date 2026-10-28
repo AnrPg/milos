@@ -24,6 +24,7 @@ defmodule Palee.Finance do
     FinalizeEntitlementSource,
     GrantAllowance,
     IssueInvoice,
+    ReceivePayment,
     RecordPayment,
     ReleaseEntitlement,
     ReleaseEntitlementSource,
@@ -119,6 +120,14 @@ defmodule Palee.Finance do
 
   def create_receipt(context, membership_id, params),
     do: scoped(context, fn -> create_receipt(membership_id, params) end)
+
+  defdelegate receive_payment(membership_id, params), to: ReceivePayment, as: :call
+
+  def receive_payment(context, membership_id, params),
+    do: scoped(context, fn -> receive_payment(membership_id, params) end)
+
+  @doc "ADR-222: how money can reach the box at the desk."
+  defdelegate received_payment_methods(), to: Palee.Finance.Domain.ReceivedPayment, as: :methods
 
   defdelegate create_manual_credit(membership_id, params), to: CreateManualCredit, as: :call
 
@@ -422,6 +431,22 @@ defmodule Palee.Finance do
 
   def subscriptions_needing_expiry_notice(context, kind, days),
     do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
+
+  # ADR-220: renewal choice and leaving the box.
+  def set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, by),
+    do:
+      scoped(context, fn ->
+        FinanceStore.set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)
+      end)
+
+  def membership_leave_preview(context, user_id),
+    do: scoped(context, fn -> FinanceStore.membership_leave_preview(user_id) end)
+
+  def leave_membership(context, user_id, params),
+    do: scoped(context, fn -> FinanceStore.leave_membership(user_id, params) end)
+
+  def undo_leave_membership(context, user_id, by),
+    do: scoped(context, fn -> FinanceStore.undo_leave_membership(user_id, by) end)
 
   def mark_subscription_notice_sent(context, subscription_id, kind),
     do:

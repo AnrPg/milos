@@ -8,16 +8,30 @@ const phoenix = vi.hoisted(() => {
   const sockets: MockSocket[] = [];
 
   class MockChannel {
-    handlers: Record<string, Receiver> = {};
+    handlers: Record<string, Receiver[]> = {};
+    joinHooks: Record<string, Receiver> = {};
     receivers: Record<string, Receiver> = {};
     left = false;
 
+    constructor(readonly topic: string) {}
+
     on(event: string, handler: Receiver) {
-      this.handlers[event] = handler;
+      (this.handlers[event] ??= []).push(handler);
+    }
+
+    emit(event: string, payload?: unknown) {
+      (this.handlers[event] ?? []).forEach((handler) => handler(payload));
     }
 
     join() {
-      return this;
+      const hooks = this.joinHooks;
+      const result = {
+        receive: (status: string, handler: Receiver) => {
+          hooks[status] = handler;
+          return result;
+        },
+      };
+      return result;
     }
 
     receive(status: string, handler: Receiver) {
@@ -51,6 +65,8 @@ const phoenix = vi.hoisted(() => {
 
   class MockSocket {
     connected = false;
+    openCallbacks: Receiver[] = [];
+    closeCallbacks: Receiver[] = [];
 
     constructor(
       readonly endpoint: string,
@@ -67,8 +83,24 @@ const phoenix = vi.hoisted(() => {
       this.connected = false;
     }
 
-    channel() {
-      const channel = new MockChannel();
+    onOpen(callback: Receiver) {
+      this.openCallbacks.push(callback);
+    }
+
+    onClose(callback: Receiver) {
+      this.closeCallbacks.push(callback);
+    }
+
+    onError(callback: Receiver) {
+      this.closeCallbacks.push(callback);
+    }
+
+    params() {
+      return (this.options as { params: () => Record<string, unknown> }).params();
+    }
+
+    channel(topic: string) {
+      const channel = new MockChannel(topic);
       channels.push(channel);
       return channel;
     }
@@ -83,6 +115,7 @@ import {
   ChannelPushError,
   joinChannelWithPush,
   organizationTopic,
+  realtimeConnected,
   resetRealtimeSocket,
   subscribeToTopic,
 } from "@/lib/realtime";
@@ -142,9 +175,96 @@ describe("joinChannelWithPush", () => {
 
     const unsubscribe = subscribeToTopic("token", "notifications:user-1", {});
 
-    expect(phoenix.sockets[0].options).toEqual({ params: { token: "token" } });
+    expect(phoenix.sockets[0].params()).toEqual({ token: "token" });
 
     unsubscribe();
+  });
+});
+
+describe("subscribeToTopic", () => {
+  const gymToken = tokenWithMemberships([{ organization_id: "org-1", organization_slug: "first-gym" }]);
+
+  beforeEach(() => {
+    phoenix.channels.length = 0;
+    phoenix.sockets.length = 0;
+    resetRealtimeSocket();
+    window.localStorage.clear();
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("shares one channel between subscribers of the same topic", () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    const stopFirst = subscribeToTopic("token", "notifications:user-1", { "notifications:changed": first });
+    const stopSecond = subscribeToTopic("token", "notifications:user-1", { "notifications:changed": second });
+
+    expect(phoenix.channels).toHaveLength(1);
+    phoenix.channels[0].emit("notifications:changed", { id: 1 });
+    expect(first).toHaveBeenCalledWith({ id: 1 });
+    expect(second).toHaveBeenCalledWith({ id: 1 });
+
+    stopFirst();
+    expect(phoenix.channels[0].left).toBe(false);
+    phoenix.channels[0].emit("notifications:changed", { id: 2 });
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledTimes(2);
+
+    stopSecond();
+    expect(phoenix.channels[0].left).toBe(true);
+  });
+
+  it("keeps user-wide and gym topics on their own sockets without reconnecting either", () => {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "first-gym");
+    subscribeToTopic(gymToken, "notifications:user-1", {});
+    const stopSchedule = subscribeToTopic(gymToken, "schedule:org-1", {});
+    subscribeToTopic(gymToken, "sync:user-1", {});
+
+    expect(phoenix.sockets).toHaveLength(2);
+    expect(phoenix.sockets.every((socket) => socket.connected)).toBe(true);
+    expect(phoenix.sockets[0].params()).toEqual({ token: gymToken });
+    expect(phoenix.sockets[1].params()).toEqual({ token: gymToken, organization_slug: "first-gym" });
+
+    // The gym's socket closes with its last topic; the person's stays.
+    stopSchedule();
+    expect(phoenix.sockets[1].connected).toBe(false);
+    expect(phoenix.sockets[0].connected).toBe(true);
+  });
+
+  it("keeps the socket across a token renewal and reconnects with the newest token", () => {
+    subscribeToTopic("old-token", "notifications:user-1", {});
+    subscribeToTopic("new-token", "sync:user-1", {});
+
+    expect(phoenix.sockets).toHaveLength(1);
+    expect(phoenix.sockets[0].connected).toBe(true);
+    expect(phoenix.sockets[0].params()).toEqual({ token: "new-token" });
+  });
+
+  it("reports the connection and asks subscribers to resync after a rejoin", () => {
+    const onJoin = vi.fn();
+    const onRejoin = vi.fn();
+    subscribeToTopic("token", "notifications:user-1", {}, { onJoin, onRejoin });
+    const socket = phoenix.sockets[0];
+
+    socket.openCallbacks.forEach((callback) => callback());
+    expect(realtimeConnected()).toBe(true);
+    phoenix.channels[0].joinHooks.ok();
+    expect(onJoin).toHaveBeenCalledTimes(1);
+    expect(onRejoin).not.toHaveBeenCalled();
+
+    socket.closeCallbacks.forEach((callback) => callback());
+    expect(realtimeConnected()).toBe(false);
+    socket.openCallbacks.forEach((callback) => callback());
+    phoenix.channels[0].joinHooks.ok();
+    expect(onRejoin).toHaveBeenCalledTimes(1);
+  });
+
+  it("tells a late subscriber the channel is already joined", () => {
+    subscribeToTopic("token", "notifications:user-1", {});
+    phoenix.channels[0].joinHooks.ok();
+    const onJoin = vi.fn();
+    subscribeToTopic("token", "notifications:user-1", {}, { onJoin });
+
+    expect(onJoin).toHaveBeenCalledTimes(1);
   });
 });
 

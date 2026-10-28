@@ -1,6 +1,6 @@
 defmodule PaleeWeb.TrainingGoalControllerTest do
   @moduledoc """
-  ADR-222: the weekly workout goal is the person's own. They set it; their
+  ADR-226: the weekly workout goal is the person's own. They set it; their
   coach or an owner/admin with full coaching scope may set it for them (and
   the person is told); nobody else may read or change it. Runs under real
   RLS (ConnCase), so `palee_training_goal_reachable` is exercised too.

@@ -1,6 +1,6 @@
 defmodule Palee.Application.GetTrainingGoal do
   @moduledoc """
-  A person's weekly workout goal as the API shows it (ADR-222): theirs, or
+  A person's weekly workout goal as the API shows it (ADR-226): theirs, or
   the platform default with `is_default: true` until someone sets one.
   Staff callers are authorised by the controller (ADR-099/100); the database
   bounds the read to the person or the staff of their box.

@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Er is een plek vrijgekomen in %{class}. Je boeking is bevestigd of wacht op goedkeuring."
 
 msgid "Your package ends soon"
-msgstr "Je pakket loopt binnenkort af"
+msgstr "Je abonnementspakket loopt binnenkort af"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} loopt af op %{date}."
@@ -714,3 +714,9 @@ msgstr "Je weekdoel is gewijzigd"
 
 msgid "%{person} set your goal to %{target} workouts a week. You can change it."
 msgstr "%{person} heeft je doel op %{target} trainingen per week gezet. Je kunt het aanpassen."
+
+msgid "A box member is leaving"
+msgstr "Een boxlid vertrekt"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} verlaat de box. Laatste dag: %{date}."

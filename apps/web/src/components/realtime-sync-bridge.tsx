@@ -30,7 +30,7 @@ export function RealtimeSyncBridge() {
       void queryClient.invalidateQueries({ queryKey: ["execution"] });
     }
 
-    // ADR-222: a coach changed my weekly goal.
+    // ADR-226: a coach changed my weekly goal.
     if (detail.scopes.includes("training_goal")) {
       void queryClient.invalidateQueries({ queryKey: TRAINING_GOAL_KEY });
     }

@@ -708,4 +708,9 @@ msgid "Your weekly goal changed"
 msgstr ""
 
 msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+
+msgid "A box member is leaving"
+msgstr ""
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr ""

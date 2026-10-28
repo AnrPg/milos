@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
 
 msgid "Your package ends soon"
-msgstr "Your package ends soon"
+msgstr "Your subscription package ends soon"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} ends on %{date}."
@@ -714,3 +714,9 @@ msgstr "Your weekly goal changed"
 
 msgid "%{person} set your goal to %{target} workouts a week. You can change it."
 msgstr "%{person} set your goal to %{target} workouts a week. You can change it."
+
+msgid "A box member is leaving"
+msgstr "A box member is leaving"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} is leaving the box. Last day: %{date}."

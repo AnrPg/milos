@@ -23,6 +23,7 @@ defmodule PaleeWeb.AdminFinanceController do
     GetFinancePackageCatalog,
     GetFinanceMemberProfile,
     GenerateFinanceRenewalInvoice,
+    MembershipRenewal,
     IssueFinanceInvoice,
     ListFinanceCleanupRecords,
     ListFinanceMembers,
@@ -33,6 +34,7 @@ defmodule PaleeWeb.AdminFinanceController do
     ListFinanceReferrals,
     ListFinanceReferralRewards,
     PresignInvoiceUpload,
+    ReceiveFinancePayment,
     RecordFinancePayment,
     PurgeFinanceRecord,
     RedeemFinancePromotion,
@@ -555,6 +557,40 @@ defmodule PaleeWeb.AdminFinanceController do
     }
   }
 
+  # ADR-222: the box's billing setup, not this body, picks the document.
+  @receive_payment_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:amount_cents, :idempotency_key, :payment_method],
+          properties: %{
+            amount_cents: %Schema{type: :integer, minimum: 1},
+            currency: %Schema{type: :string, minLength: 3, maxLength: 3, nullable: true},
+            paid_on: %Schema{type: :string, format: :date, nullable: true},
+            payment_method: %Schema{type: :string, enum: Finance.received_payment_methods()},
+            finance_invoice_id: %Schema{type: :string, format: :uuid, nullable: true},
+            membership_package_subscription_id: %Schema{
+              type: :string,
+              format: :uuid,
+              nullable: true
+            },
+            description: %Schema{type: :string, maxLength: 500, nullable: true},
+            charge_category: %Schema{
+              type: :string,
+              enum: ["product", "personal_training", "event", "other"],
+              nullable: true
+            },
+            notes: %Schema{type: :string, nullable: true},
+            idempotency_key: %Schema{type: :string, minLength: 1, maxLength: 200}
+          }
+        }
+      }
+    }
+  }
+
   @purge_request_body %RequestBody{
     required: true,
     content: %{
@@ -591,6 +627,7 @@ defmodule PaleeWeb.AdminFinanceController do
               :create_manual_credit,
               :create_invoice,
               :create_receipt,
+              :receive_payment,
               :apply_credit_to_payment,
               :apply_credit_to_invoice,
               :reverse_payment,
@@ -819,6 +856,78 @@ defmodule PaleeWeb.AdminFinanceController do
     end
   end
 
+  @subscription_id_parameter %Parameter{
+    name: :subscription_id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
+  }
+
+  operation(:set_member_auto_renew,
+    summary: "Turn a member's subscription renewal on or off (ADR-220)",
+    parameters: [@id_parameter, @subscription_id_parameter],
+    request_body:
+      {"Renewal choice", "application/json",
+       %Schema{
+         type: :object,
+         properties: %{auto_renew: %Schema{type: :boolean}},
+         required: [:auto_renew]
+       }},
+    responses: [ok: {"Package subscription", "application/json", @open_object}]
+  )
+
+  def set_member_auto_renew(conn, params) do
+    with {:ok, subscription} <-
+           MembershipRenewal.staff_set_auto_renew(
+             conn.assigns.tenant_context,
+             param_id(params),
+             params["subscription_id"],
+             (conn.body_params || %{})["auto_renew"]
+           ) do
+      json(conn, %{package_subscription: subscription})
+    end
+  end
+
+  operation(:mark_member_left,
+    summary: "Mark a member as left the box (ADR-220)",
+    parameters: [@id_parameter],
+    request_body:
+      {"Leave", "application/json",
+       %Schema{
+         type: :object,
+         properties: %{
+           leaving_on: %Schema{type: :string, format: :date, nullable: true},
+           reason: %Schema{type: :string, maxLength: 500, nullable: true},
+           commitment_override_reason: %Schema{type: :string, nullable: true}
+         }
+       }},
+    responses: [ok: {"Leave result", "application/json", @open_object}]
+  )
+
+  def mark_member_left(conn, params) do
+    with {:ok, result} <-
+           MembershipRenewal.staff_mark_left(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
+      json(conn, result)
+    end
+  end
+
+  operation(:undo_member_left,
+    summary: "Undo a member's leave (ADR-220)",
+    parameters: [@id_parameter],
+    responses: [ok: {"Membership", "application/json", @open_object}]
+  )
+
+  def undo_member_left(conn, params) do
+    with {:ok, membership} <-
+           MembershipRenewal.staff_undo_leave(conn.assigns.tenant_context, param_id(params)) do
+      json(conn, %{membership: membership})
+    end
+  end
+
   operation(:assign_package,
     summary: "Assign a package to a user's membership",
     parameters: [@id_parameter],
@@ -877,6 +986,31 @@ defmodule PaleeWeb.AdminFinanceController do
       conn
       |> put_status(:created)
       |> json(%{receipt: receipt})
+    end
+  end
+
+  operation(:receive_payment,
+    summary:
+      "Record money received from a client and issue the document the billing setup calls for",
+    parameters: [@id_parameter],
+    request_body: @receive_payment_request_body,
+    responses: [
+      created: {"Received payment and its document", "application/json", @open_object},
+      ok: {"The same request, already recorded", "application/json", @open_object}
+    ]
+  )
+
+  def receive_payment(conn, params) do
+    with {:ok, received} <-
+           ReceiveFinancePayment.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             current_user_id(conn),
+             body_params(conn, params)
+           ) do
+      conn
+      |> put_status(if(received.replayed, do: :ok, else: :created))
+      |> json(%{received: received})
     end
   end
 

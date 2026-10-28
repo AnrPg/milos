@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { useTranslations } from "next-intl";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,6 +26,7 @@ import { Combobox, type ComboboxOption } from "@/components/admin/finance/shared
 import { SemanticLabel } from "@/components/semantic-label";
 import { semanticLabel } from "@/i18n/presentation";
 import { MemberPanel } from "@/components/admin/finance/panels/MemberPanel";
+import { ReceivePaymentDialog } from "@/components/admin/finance/payments/ReceivePaymentDialog";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
 import { ReferralEventWizard } from "@/components/admin/finance/ReferralEventWizard";
@@ -136,6 +138,8 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
   const searchParams = useSearchParams();
 
   const openMemberId = searchParams.get("member");
+  // ADR-222: «Καταγραφή πληρωμής» opens over the ledger, deep-linkable.
+  const receiveFromId = searchParams.get("receive");
   const showReferralWizard = searchParams.get("new-referral") === "true";
   const prefillReferrerId = searchParams.get("referrer") ?? undefined;
 
@@ -245,6 +249,7 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
   }
 
   const openMember = members.find((m) => field(m, "id") === openMemberId) ?? null;
+  const receiveFrom = members.find((m) => field(m, "id") === receiveFromId) ?? null;
   const prefillUser = prefillReferrerId
     ? (members.find((m) => field(m, "id") === prefillReferrerId) ?? null)
     : null;
@@ -535,9 +540,10 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
                     assignPending={assignPackageMutation.isPending}
                     onSave={(body) => updateMutation.mutate({ userId: field(member, "id"), body })}
                     onAssignPackage={(packageId) =>
-                      assignPackageMutation.mutate({ userId: field(member, "id"), packageId })
+                      assignPackageMutation.mutateAsync({ userId: field(member, "id"), packageId })
                     }
                     onOpenPanel={() => setParam({ member: field(member, "id"), tab: "members" })}
+                    onReceivePayment={() => setParam({ receive: field(member, "id"), tab: "members" })}
                     onOpenReferralWizard={() =>
                       setParam({ "new-referral": "true", referrer: field(member, "id") })
                     }
@@ -554,6 +560,14 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
           userId={field(openMember, "id")}
           nickname={field(openMember, "nickname")}
           onClose={() => setParam({ member: null })}
+        />
+      ) : null}
+
+      {receiveFrom ? (
+        <ReceivePaymentDialog
+          userId={field(receiveFrom, "id")}
+          nickname={field(receiveFrom, "nickname")}
+          onClose={() => setParam({ receive: null })}
         />
       ) : null}
 
@@ -591,6 +605,7 @@ function MemberRow({
   onSave,
   onAssignPackage,
   onOpenPanel,
+  onReceivePayment,
   onOpenReferralWizard,
 }: {
   member: FinanceRecord;
@@ -601,11 +616,13 @@ function MemberRow({
   updatePending: boolean;
   assignPending: boolean;
   onSave: (body: FinanceRecord) => void;
-  onAssignPackage: (packageId: string) => void;
+  onAssignPackage: (packageId: string) => Promise<unknown>;
   onOpenPanel: () => void;
+  onReceivePayment: () => void;
   onOpenReferralWizard: () => void;
 }) {
   const i18n = useUiTranslations();
+  const receiveT = useTranslations("ReceivePayment");
   const uiLocale = useUiLocale();
   const eur = new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" });
   const membershipStatusOptions = [
@@ -744,21 +761,36 @@ function MemberRow({
         )}
       </td>
 
-      {/* Balance Due */}
+      {/* Balance Due, and the row's «Καταγραφή πληρωμής» (ADR-222) */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
-        {outstandingCents > 0 ? (
-          <span
-            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+        <div className="flex items-center gap-2">
+          {outstandingCents > 0 ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{
+                background: "color-mix(in srgb, var(--danger) 12%, transparent)",
+                color: "var(--danger)",
+              }}
+            >
+              {eur.format(outstandingCents / 100)} {i18n("due30cdf73")}
+            </span>
+          ) : (
+            <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
+          )}
+          <button
+            type="button"
+            onClick={onReceivePayment}
+            aria-label={receiveT("rowButtonLabel", { name: field(member, "nickname") })}
+            className="rounded-full px-2.5 py-1 text-xs font-semibold transition-opacity hover:opacity-80"
             style={{
-              background: "color-mix(in srgb, var(--danger) 12%, transparent)",
-              color: "var(--danger)",
+              background: "color-mix(in srgb, var(--success) 12%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--success) 24%, transparent)",
+              color: "var(--success)",
             }}
           >
-            {eur.format(outstandingCents / 100)} {i18n("due30cdf73")}
-          </span>
-        ) : (
-          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
-        )}
+            {receiveT("rowButton")}
+          </button>
+        </div>
       </td>
 
       {/* Notes */}

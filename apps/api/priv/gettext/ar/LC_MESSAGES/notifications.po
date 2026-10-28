@@ -131,10 +131,10 @@ msgid "A new %{target_type} review needs attention."
 msgstr "تحتاج مراجعة جديدة من نوع %{target_type} إلى الاهتمام."
 
 msgid "Class bookings approved"
-msgstr "تمت الموافقة على حجوزات الصفوف"
+msgstr "تمت الموافقة على حجوزات الحصص"
 
 msgid "Your coach approved one or more class booking requests."
-msgstr "وافق مدربك على طلب واحد أو أكثر لحجز الصفوف."
+msgstr "وافق مدربك على طلب واحد أو أكثر لحجز الحصص."
 
 msgid "New workouts assigned"
 msgstr "تم تعيين تمارين جديدة"
@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "توفر مكان في %{class}. حجزك مؤكد أو بانتظار الموافقة."
 
 msgid "Your package ends soon"
-msgstr "باقتك تنتهي قريبًا"
+msgstr "باقة اشتراكك تنتهي قريبًا"
 
 msgid "%{package} ends on %{date}."
 msgstr "تنتهي %{package} في %{date}."
@@ -689,7 +689,7 @@ msgid "%{nickname} wants to send you a message."
 msgstr "يريد %{nickname} أن يرسل إليك رسالة."
 
 msgid "Class cancelled"
-msgstr "أُلغي الصف"
+msgstr "أُلغيت الحصة"
 
 msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
 msgstr "أُلغي الصف %{class} (%{time}): %{reason}. تم تحرير مكانك."
@@ -714,3 +714,9 @@ msgstr "تغيّر هدفك الأسبوعي"
 
 msgid "%{person} set your goal to %{target} workouts a week. You can change it."
 msgstr "حدّد %{person} هدفك بـ %{target} تمارين في الأسبوع. يمكنك تغييره."
+
+msgid "A box member is leaving"
+msgstr "أحد أعضاء الصالة يغادر"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} يغادر الصالة. آخر يوم: %{date}."

@@ -1,6 +1,6 @@
 defmodule Palee.Application.SetTrainingGoal do
   @moduledoc """
-  Sets a person's weekly workout goal (ADR-222). The person sets their own;
+  Sets a person's weekly workout goal (ADR-226). The person sets their own;
   staff reach this only through `AuthorizeClientAccess` (`:manage_coaching`),
   so a coach sets it for a client they coach and an owner/admin with full
   coaching scope for any client of the box. When someone else changes it the

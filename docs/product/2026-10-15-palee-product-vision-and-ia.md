@@ -313,7 +313,7 @@ Show correlations only after enough data (e.g. ≥4 weeks), and always as **indi
 **ADR-194 (Πρόοδος / Ευεξία polish):**
 - Πρόοδος has no page title. The range chips come first and drive every card, including resting HR, which has no chips of its own.
 - Consistency is a single card holding the heatmap, the target and weeks on target. There is one streak only (a gym day streak, otherwise weeks).
-- **ADR-222 (ANR 2026-10-28):** the weekly target is the person's own «Εβδομαδιαίος στόχος», set in `Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης`. Their coach (or staff who coach every client) may set it from the client's profile; the person is notified and keeps the last word. Front desk and other roles never. Box settings keep only the streak shields per renewal (0–5) and when they renew.
+- **ADR-226 (ANR 2026-10-28):** the weekly target is the person's own «Εβδομαδιαίος στόχος», set in `Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης`. Their coach (or staff who coach every client) may set it from the client's profile; the person is notified and keeps the last word. Front desk and other roles never. Box settings keep only the streak shields per renewal (0–5) and when they renew.
 - Cards with no data are hidden, never shown as placeholders.
 - PR trends show estimated 1RM (Epley, ≤12 reps) and a retest hint after 84 days. Both come from one pure lib.
 - The member can hide the macros of the coach's plan. This is stored server-side (`hide_macros`). With no plan, no card is shown.
@@ -349,6 +349,10 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Κοινοποίηση & ορατότητα:** what the coach sees, leaderboards/PR celebrations/challenges/partners opt-ins, PR share grants, default visibility for new entries.
 - **Συνδεδεμένες συσκευές:** Garmin; Apple Health and Health Connect marked as coming with native; Wallet pass; ICS feed.
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
+  The member owns their «Αυτόματη ανανέωση» (on by default when the package allows renewal) and can
+  leave the box («Αποχώρηση από το box»); either way they keep what they paid for, only invoices for later
+  periods or packages that never started are cancelled, and money owed for anything already used stays owed
+  (shown and reminded) until paid. Staff can do the same from the box member's profile (ADR-220).
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
   *Decided 2026-10-28 (ADR-219):* «Οι ρόλοι μου» lets someone add or drop roles below their own top role at the selected box (an owner who also coaches adds «Coach» and stays owner). The top role is locked; the card is hidden for members and athletes, who have nothing below them. Others' roles change only downwards (vendor › owner › admin › staff › clients; co-owners manage each other).

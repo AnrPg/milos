@@ -76,7 +76,7 @@ export async function saveClientNutritionPlan(token: string, userId: string, bod
   return response.nutrition_plan ?? null;
 }
 
-/** ADR-222: a client's weekly goal, for their coach or full-scope staff. */
+/** ADR-226: a client's weekly goal, for their coach or full-scope staff. */
 export async function fetchClientTrainingGoal(token: string, userId: string): Promise<TrainingGoal> {
   const response = await apiRequest<{ goal: TrainingGoal }>(`/staff/clients/${userId}/training-goal`, { token });
   return response.goal;

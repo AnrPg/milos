@@ -65,7 +65,7 @@ test.describe("Schedule › class coach", () => {
     });
 
     await page.goto("/admin/schedule");
-    await page.getByRole("button", { name: "Create series" }).click();
+    await page.getByRole("button", { name: "New recurring class" }).click();
 
     const coach = page.getByRole("dialog").getByRole("combobox", { name: "Coach" });
     await coach.click();
@@ -74,7 +74,7 @@ test.describe("Schedule › class coach", () => {
     await page.keyboard.press("Escape");
 
     await chooseOption(page, coach, "owner-1");
-    await page.getByRole("dialog").getByRole("button", { name: "Create series" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Create recurring class" }).click();
     await expect.poll(() => created?.coach_user_id).toBe("owner-1");
   });
 });

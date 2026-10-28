@@ -158,7 +158,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
     if (!tokens?.access_token || !workout) return;
 
     const confirmed = window.confirm(
-      i18n("delete63346e8") + (workout.title) + i18n("permanentlyThisHardDeleteRemovesTheWorkoutDefinitionbb6e054"),
+      i18n("deleteWorkoutPermanentlyConfirm", { title: workout.title }),
     );
 
     if (!confirmed) return;

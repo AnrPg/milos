@@ -198,7 +198,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
 
     await openClass(page);
     const actions = page.getByTestId("class-actions");
-    await expect(actions.getByRole("button", { name: "Edit slot" })).toBeVisible();
+    await expect(actions.getByRole("button", { name: "Edit class" })).toBeVisible();
     await expect(actions.getByTestId("class-more-actions")).toBeVisible();
 
     // No action button sticks out of its card or breaks its label onto two lines.

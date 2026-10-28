@@ -28,6 +28,11 @@ defmodule Palee.Finance.MembershipPackageSubscription do
     field :corporate_enrolled_via, :string
     field :expiry_reminder_sent_at, :utc_datetime_usec
     field :grace_notice_sent_at, :utc_datetime_usec
+    # ADR-220: the member's choice; the package only says whether it may renew.
+    field :auto_renew, :boolean, default: true
+    field :renewal_changed_at, :utc_datetime_usec
+    field :renewal_changed_by, :string
+    field :ends_on_from_renewal_stop, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -68,6 +73,27 @@ defmodule Palee.Finance.MembershipPackageSubscription do
     |> validate_date_window()
     |> foreign_key_constraint(:membership_id)
     |> foreign_key_constraint(:membership_package_id)
+  end
+
+  @doc """
+  ADR-220: the member's (or staff's) renewal choice and the last day it
+  gives the subscription. Kept out of `changeset/2` so assigning or editing
+  a package cannot set it by accident.
+  """
+  def renewal_changeset(%__MODULE__{} = subscription, params) do
+    subscription
+    |> cast(params, [
+      :auto_renew,
+      :renewal_changed_at,
+      :renewal_changed_by,
+      :ends_on,
+      :ends_on_from_renewal_stop,
+      :expiry_reminder_sent_at,
+      :grace_notice_sent_at
+    ])
+    |> validate_required([:auto_renew, :renewal_changed_at, :renewal_changed_by])
+    |> validate_inclusion(:renewal_changed_by, ["member", "staff"])
+    |> validate_date_window()
   end
 
   defp validate_date_window(changeset) do

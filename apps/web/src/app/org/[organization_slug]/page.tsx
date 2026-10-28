@@ -1,19 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
-import { fetchOrganizationMemberships } from "@/api/organizations";
-import { useSession } from "@/components/session-provider";
+import { useOrganizationMemberships } from "@/lib/organization-slug";
 
 export default function OrganizationContextPage() {
   const params = useParams<{ organization_slug: string }>();
-  const { tokens } = useSession();
-  const memberships = useQuery({
-    queryKey: ["organization-memberships"],
-    enabled: Boolean(tokens?.access_token),
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-  });
+  const memberships = useOrganizationMemberships();
 
   const membership = memberships.data?.find(
     (entry) => entry.organization.slug === params.organization_slug,

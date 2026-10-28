@@ -71,7 +71,7 @@ export type PRHistoryEntry = {
 };
 
 /**
- * ADR-222: a person's weekly workout goal. Theirs to set; their coach, or an
+ * ADR-226: a person's weekly workout goal. Theirs to set; their coach, or an
  * owner/admin who may coach every client, may set it for them.
  */
 export type TrainingGoal = {

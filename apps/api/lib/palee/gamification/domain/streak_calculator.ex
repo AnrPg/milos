@@ -51,7 +51,7 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
     current_date = Keyword.fetch!(opts, :current_date)
     target = Keyword.get(opts, :target, @default_target)
     shield_reset_day = Keyword.get(opts, :shield_reset_day)
-    # ADR-222: each box sets how many shields a renewal hands out.
+    # ADR-226: each box sets how many shields a renewal hands out.
     shields = Keyword.get(opts, :shields, @default_shields)
     normalized_anchor_date = anchor_date || earliest_date(completed_dates)
     current_week = week_start_for_date(current_date, normalized_anchor_date)
