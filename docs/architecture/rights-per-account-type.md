@@ -9,7 +9,7 @@ Owner of changes: product. Code reads this through
 
 | Type | Where it lives | Scope | Who grants it |
 |---|---|---|---|
-| **Vendor** | `vendors` | The whole platform (us, the SaaS provider) | Mix task only |
+| **Vendor** | `vendors` | The whole platform (us, the SaaS provider); above every gym role and sets any role set (ADR-219) | Mix task only |
 | **Owner** | membership role | Every gym the person owns; may own many | Created with the gym, or granted by another owner of that gym |
 | **Admin** | membership role | One gym — the gym's boss, not a platform admin | An owner of that gym |
 | **Coach** | membership role | One gym; own clients and classes unless *head coach* | Owner or admin |
@@ -172,19 +172,32 @@ for its front desk in Settings › Role access.
 1. **Admins are bosses of one gym**, not platform admins. Only owners act
    across gyms (create, delete, transfer, pay the platform) and only owners
    grant owner or admin.
-2. Nobody grants a role above their own; a coach never grants roles. A coach
+2. **The hierarchy** is vendor › owner › admin › staff (coach, front desk,
+   accountant, janitor) › clients (member, athlete); roles of one tier are
+   peers (ADR-219). Changes go only **downwards**: you change the roles,
+   status, head-coach switch or branches of someone only if their top role
+   ranks below yours, and you grant or remove only roles you may grant.
+   Owners are the one exception: co-owners manage each other (ANR,
+   2026-10-28), and a gym always keeps an active owner. The vendor ranks
+   above every gym role and sets any role set from the platform console.
+   Nobody grants a role above their own; a coach never grants roles. A coach
    inviting a client chooses only *member* or *athlete*, and becomes that
    client's coach when the invitation is redeemed.
-3. Coaches never see money beyond **status**; front desk sees status and can
+3. **Roles on yourself** (Settings › «Οι ρόλοι μου», or your own profile in
+   the console): anyone adds or drops roles ranked **below** their top role,
+   e.g. an owner adds *coach* and stays owner; an admin adds *front desk*; a
+   coach adds *member*. The top role, and any role of the same tier, never
+   changes this way, and your own branches stay as they are.
+4. Coaches never see money beyond **status**; front desk sees status and can
    take payments, but not invoices, reports or settings.
-4. Accountants see money and billing contacts, never training or health data.
-5. Janitors see only the cleaning log and the inventory lists they report
+5. Accountants see money and billing contacts, never training or health data.
+6. Janitors see only the cleaning log and the inventory lists they report
    on (without prices).
-6. Data scope applies on the server: lists, details and actions of a scoped
+7. Data scope applies on the server: lists, details and actions of a scoped
    coach are filtered by `CoachScope`, not only hidden in the UI.
-7. Multi-role accounts get the **union** of rights; the UI groups them by
+8. Multi-role accounts get the **union** of rights; the UI groups them by
    *workspace* instead of showing every surface at once (ADR-103).
-8. A branch scope narrows every staff role of the membership (ADR-186). A
+9. A branch scope narrows every staff role of the membership (ADR-186). A
    branch manager grants only staff roles below admin, only inside their
    branches, and cannot touch staff who also work elsewhere; only owners
    appoint branch managers.

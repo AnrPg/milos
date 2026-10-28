@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -21,6 +20,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { addToCart, cartTotals, combinationKey, orderLabel, setCartQuantity, type CartLine } from "@/lib/shop/console";
+import { BackLink } from "@/components/ui/BackLink";
 
 function availableAt(variant: ShopVariant, locationId: string | null) {
   if (!variant.track_inventory) return null;
@@ -145,9 +145,7 @@ export function PosDesk() {
     <Shell>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <Link href={adminHref("/admin/shop", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>
-            ‹ {t("back")}
-          </Link>
+          <BackLink href={adminHref("/admin/shop", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("back")}</BackLink>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>{t("title")}</h1>
         </div>
         {branches.length >= 2 ? (

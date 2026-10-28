@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { listAdminLocations } from "@/api/facility";
 import { ALL_ROLES, updateCoachScope, updateLocationScope, updateMemberRoles, type RoleName } from "@/api/roles";
+import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { RoleLabel } from "@/components/semantic-label";
 import { BranchScopePicker } from "@/components/admin/users/BranchScopePicker";
@@ -19,17 +20,11 @@ import {
 } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can, membershipRoles } from "@/lib/role-navigation";
+import { canManageMember, editableRoles } from "@/lib/role-hierarchy";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const STAFF: RoleName[] = ["owner", "admin", "coach", "front_desk", "accountant", "janitor"];
-
-/** Which roles the signed-in member may hand out (mirrors MembershipPolicy). */
-export function grantableRoles(actorRoles: string[]): RoleName[] {
-  if (actorRoles.includes("owner")) return ALL_ROLES;
-  if (actorRoles.includes("admin")) return ALL_ROLES.filter((role) => role !== "owner" && role !== "admin");
-  return [];
-}
 
 /** Staff roles below owner carry a branch scope (ADR-186). */
 export function hasScopedStaffRole(roles: string[]) {
@@ -38,7 +33,9 @@ export function hasScopedStaffRole(roles: string[]) {
 
 /**
  * Roles held together in this gym, the head coach switch (ADR-099, ADR-100)
- * and the branches the person works at (ADR-186).
+ * and the branches the person works at (ADR-186). Only people ranked below
+ * the signed-in person are editable; on one's own profile only roles below
+ * one's top role move, and the branches stay as they are (ADR-219).
  */
 export function MemberRolesEditor({
   token,
@@ -52,11 +49,13 @@ export function MemberRolesEditor({
   const i18n = useUiTranslations();
   const t = useTranslations("BranchScope");
   const queryClient = useQueryClient();
+  const { currentUser } = useSession();
   const { membership: actor } = useSelectedMembershipRole();
   const actorRoles = membershipRoles(actor);
-  const grantable = grantableRoles(actorRoles);
   const actorScope = membershipLocationScope(actor);
   const current = (membership?.roles ?? []) as RoleName[];
+  const self = currentUser?.id === userId;
+  const grantable = editableRoles(actorRoles, current, self);
   const currentScope = toLocationScope(membership?.location_scope);
   const [draft, setDraft] = useState<RoleName[] | null>(null);
   const [scopeDraft, setScopeDraft] = useState<LocationScope | null>(null);
@@ -65,18 +64,19 @@ export function MemberRolesEditor({
   const fromActor = actorScope !== "all" && currentScope === "all" && !hasScopedStaffRole(current);
   const scope = scopeDraft ?? (fromActor ? actorScope : currentScope);
   const rolesChanged = draft !== null && [...draft].sort().join() !== [...current].sort().join();
-  const scoped = hasScopedStaffRole(roles);
+  const scoped = !self && hasScopedStaffRole(roles);
   const scopeChanged = scoped && !sameScope(scope, currentScope);
   const changed = rolesChanged || scopeChanged;
 
   const locations = useQuery({
     queryKey: ["admin", "locations"],
-    enabled: grantable.length > 0,
+    enabled: grantable.length > 0 && !self,
     queryFn: () => listAdminLocations(token),
   });
   const showBranches =
     scoped && (hasSeveralBranches(locations.data) || actorScope !== "all" || currentScope !== "all");
-  const branchManagerPreset = actorRoles.includes("owner") && hasSeveralBranches(locations.data) && !roles.includes("owner");
+  const branchManagerPreset =
+    !self && actorRoles.includes("owner") && hasSeveralBranches(locations.data) && !roles.includes("owner");
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
   const saveMutation = useMutation({
@@ -106,7 +106,8 @@ export function MemberRolesEditor({
     if (scope === "all") setScopeDraft([]);
   };
   const headCoach = membership.coach_scope === "all";
-  const showHeadCoach = current.includes("coach") && can(actor, "set_head_coach");
+  const showHeadCoach =
+    current.includes("coach") && can(actor, "set_head_coach") && (self || canManageMember(actorRoles, current));
   const visible = ALL_ROLES.filter((role) => grantable.includes(role) || current.includes(role));
   const invalidScope = showBranches && scope !== "all" && scope.length === 0;
 
@@ -116,7 +117,9 @@ export function MemberRolesEditor({
         <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
           {i18n("rolesInThisGym")}
         </span>
-        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{i18n("rolesInThisGymHelp")}</p>
+        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+          {i18n(self ? "myRolesHelp" : "rolesInThisGymHelp")}
+        </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {visible.map((role) => {
             const selected = roles.includes(role);

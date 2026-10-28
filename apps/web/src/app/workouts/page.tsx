@@ -26,6 +26,7 @@ import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
 import { PageHeader } from "@/components/PageHeader";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackButton } from "@/components/ui/BackLink";
 
 type Step = "type" | "week" | "preview";
 
@@ -414,13 +415,7 @@ function WorkoutsPageContent() {
           }}
         >
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-            {classTypes.filter((type) => !type.archived_at).length > 1 ? <button
-              onClick={() => setStep("type")}
-              className="text-sm"
-              style={{ color: "var(--muted)" }}
-            >
-              {i18n("backdc381ae")}
-            </button> : <span className="w-10" />}
+            {classTypes.filter((type) => !type.archived_at).length > 1 ? <BackButton onClick={() => setStep("type")} className="text-sm" style={{ color: "var(--muted)" }} >{i18n("backdc381ae")}</BackButton> : <span className="w-10" />}
             <div className="text-center">
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                 {selectedClassType?.name}
@@ -570,13 +565,7 @@ function WorkoutsPageContent() {
       style={{ background: "var(--bg)", color: "var(--text)" }}
     >
       <div className="mx-auto max-w-4xl">
-        <button
-          onClick={() => setStep("week")}
-          className="mb-5 text-sm"
-          style={{ color: "var(--muted)" }}
-        >
-          {i18n("backToWeekView1d615a5")}
-        </button>
+        <BackButton onClick={() => setStep("week")} className="mb-5 text-sm" style={{ color: "var(--muted)" }} >{i18n("backToWeekView1d615a5")}</BackButton>
 
         <div
           className="mb-6 rounded-[32px] border p-6"

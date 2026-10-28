@@ -13,6 +13,7 @@ import { MuscleChip, RoleLegend, ToggleChip } from "./GoalChips";
 import { MusclePickerSheet } from "./MusclePickerSheet";
 import { useGoalFeedback, useSaveGoalFeedback } from "./use-wod-goals";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackButton } from "@/components/ui/BackLink";
 
 type Layout = "page" | "inline";
 
@@ -234,9 +235,7 @@ function Frame({
     <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }} data-testid="felt-step">
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         {onBack ? (
-          <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-            {i18n("backc32ae9f")}
-          </button>
+          <BackButton type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>{i18n("backc32ae9f")}</BackButton>
         ) : <span />}
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
           {t("felt.skip")}

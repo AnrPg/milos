@@ -6,7 +6,7 @@ defmodule Palee.Application.UpdateAdminSettings do
     TenantStaffRecipients
   }
 
-  alias Palee.{Finance, Gamification, Notifications, Organizations, Scheduling}
+  alias Palee.{Finance, Gamification, Organizations, Scheduling}
 
   def call(context, params) do
     do_call(context, params)
@@ -17,14 +17,12 @@ defmodule Palee.Application.UpdateAdminSettings do
   defp do_call(context, params) do
     gamification_params = gamification_params(params)
     finance_params = finance_params(params)
-    notification_params = notification_params(params)
     scheduling_params = scheduling_params(params)
     workout_params = section_params(params, "workouts")
 
     with :ok <- maybe_update_provider(context, provider_params(params)),
          {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
          {:ok, finance_settings} <- maybe_update_finance(context, finance_params),
-         {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params),
          {:ok, workout_settings} <- maybe_update_workouts(context, workout_params) do
       InvalidateLandingPages.for_all_users()
@@ -35,7 +33,6 @@ defmodule Palee.Application.UpdateAdminSettings do
        %{
          gamification: gamification_settings,
          finance: finance_settings,
-         notifications: notification_settings,
          scheduling: scheduling_settings,
          workouts: workout_settings,
          provider: GetAdminSettings.provider(context)
@@ -70,12 +67,6 @@ defmodule Palee.Application.UpdateAdminSettings do
 
   defp maybe_update_finance(context, params), do: Finance.update_finance_settings(context, params)
 
-  defp maybe_update_notifications(params) when map_size(params) == 0 do
-    {:ok, Notifications.get_push_settings()}
-  end
-
-  defp maybe_update_notifications(params), do: Notifications.update_push_settings(params)
-
   defp maybe_update_scheduling(context, params) when map_size(params) == 0 do
     {:ok, Scheduling.get_settings(context)}
   end
@@ -101,12 +92,6 @@ defmodule Palee.Application.UpdateAdminSettings do
   defp finance_params(%{body: body}) when is_map(body), do: finance_params(body)
   defp finance_params(%{"body" => body}) when is_map(body), do: finance_params(body)
   defp finance_params(_), do: %{}
-
-  defp notification_params(%{notifications: n}) when is_map(n), do: n
-  defp notification_params(%{"notifications" => n}) when is_map(n), do: n
-  defp notification_params(%{body: body}) when is_map(body), do: notification_params(body)
-  defp notification_params(%{"body" => body}) when is_map(body), do: notification_params(body)
-  defp notification_params(_), do: %{}
 
   defp scheduling_params(%{scheduling: value}) when is_map(value), do: value
   defp scheduling_params(%{"scheduling" => value}) when is_map(value), do: value

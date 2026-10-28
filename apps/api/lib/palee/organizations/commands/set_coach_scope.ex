@@ -1,11 +1,12 @@
 defmodule Palee.Organizations.Commands.SetCoachScope do
   @moduledoc """
   Makes a coach a head coach (`:all`) or returns them to their own clients
-  (`:own`) (ADR-100). Only owners and admins decide this.
+  (`:own`) (ADR-100). Only owners and admins decide this, for coaches ranked
+  below them or for themselves (ADR-219).
   """
 
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.TenantAuthorization
+  alias Palee.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
   alias Palee.Organizations.OrganizationStore
 
   def call(context, user_id, scope) when is_binary(user_id) do
@@ -22,6 +23,7 @@ defmodule Palee.Organizations.Commands.SetCoachScope do
            OrganizationStore.get_membership(context.organization_id, user_id) ||
              {:error, :not_found},
          true <- :coach in membership.roles || {:error, :not_a_coach},
+         :ok <- authorize_hierarchy(context, membership),
          # ADR-186: only for a coach of the granter's own branches.
          :ok <-
            Palee.Organizations.Commands.SetMembershipLocationScope.authorize_manage(
@@ -35,6 +37,13 @@ defmodule Palee.Organizations.Commands.SetCoachScope do
         %{coach_scope: scope}
       )
     end
+  end
+
+  defp authorize_hierarchy(context, membership) do
+    if membership.user_id == context.user_id or
+         MembershipPolicy.can_manage_member?(TenantAuthorization.roles(context), membership.roles),
+       do: :ok,
+       else: {:error, :role_ceiling_exceeded}
   end
 
   defp normalize(scope) when scope in [:own, :all], do: {:ok, scope}

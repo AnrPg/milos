@@ -400,6 +400,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   owner_location_scope: "apiErrorOwnerLocationScope",
   cannot_change_own_membership: "apiErrorCannotChangeOwnMembership",
   role_ceiling_exceeded: "apiErrorRoleCeilingExceeded",
+  own_top_role_locked: "apiErrorOwnTopRoleLocked",
   promotion_location_not_included: "apiErrorPromotionLocationNotIncluded",
   location_not_found: "mbErrLocationNotFound",
   // ADR-097 admin codes

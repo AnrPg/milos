@@ -52,7 +52,7 @@ async function stubApi(page: Page, roles: string[] = ["owner"]) {
     ),
   );
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
-  await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ notifications: { enabled: false }, gamification: null, finance: null, scheduling: null })));
+  await page.route("**/api/org/*/admin/settings", (route) => route.fulfill(json({ gamification: null, finance: null, scheduling: null })));
   await page.route("**/api/org/*/admin/onboarding", (route) => route.fulfill(json(checklist)));
 }
 

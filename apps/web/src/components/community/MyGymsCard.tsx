@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { CLUBS_KEY } from "@/api/community";
-import { redeemInvitation } from "@/api/organizations";
+import { joinPath, redeemInvitation } from "@/api/organizations";
 import { clientErrorMessage } from "@/components/client/errors";
 import { clubInitials } from "@/components/community/community";
 import { HubCard } from "@/components/member-app/HubParts";
@@ -90,7 +90,7 @@ function JoinForm() {
       return;
     }
     if (input.kind === "join") {
-      router.push(`/join/${encodeURIComponent(input.slug)}`);
+      router.push(joinPath(input));
       return;
     }
     if (!tokens?.access_token) return;
