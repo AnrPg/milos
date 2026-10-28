@@ -171,6 +171,56 @@ defmodule PaleeWeb.ScheduleControllerTest do
     assert member_slot["current_user_booking"]["attendance_status"] == "attended"
   end
 
+  test "the day view (days=1) lists only that day's classes", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "day_view_admin"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
+    workout = workout_fixture(admin, %{title: "Day view WOD"})
+    class_type = class_type_fixture(%{name: "Day view class"})
+    slug = Palee.Organizations.legacy_organization_slug()
+    admin_conn = put_bearer_token(conn, admin)
+    day = Date.add(gym_today(), 1)
+
+    create = fn date ->
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/org/#{slug}/admin/schedule/slots",
+        Jason.encode!(%{
+          master_workout_id: workout.id,
+          class_type_id: class_type.id,
+          scheduled_at: DateTime.new!(date, ~T[10:00:00], "Etc/UTC"),
+          capacity: 8,
+          auto_approve: true,
+          booking_timeout_minutes: 30
+        })
+      )
+      |> json_response(201)
+      |> get_in(["slot", "id"])
+    end
+
+    on_day = create.(day)
+    next_day = create.(Date.add(day, 1))
+
+    ids =
+      admin_conn
+      |> recycle()
+      |> get(
+        "/api/org/#{slug}/schedule?start_date=#{day}&days=1&class_type_ids[]=#{class_type.id}"
+      )
+      |> json_response(200)
+      |> Map.fetch!("slots")
+      |> Enum.map(& &1["id"])
+
+    assert on_day in ids
+    refute next_day in ids
+
+    assert admin_conn
+           |> recycle()
+           |> get("/api/org/#{slug}/schedule?start_date=#{day}&days=2")
+           |> json_response(422)
+  end
+
   test "admin can delete an empty slot", %{conn: conn} do
     admin = admin_fixture(%{nickname: "slot_admin"})
     {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
