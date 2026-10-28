@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Освободи се място в %{class}. Резервацията ти е потвърдена или чака одобрение."
 
 msgid "Your package ends soon"
-msgstr "Пакетът ти изтича скоро"
+msgstr "Абонаментният ти пакет изтича скоро"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} изтича на %{date}."

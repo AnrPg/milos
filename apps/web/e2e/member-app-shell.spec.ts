@@ -376,7 +376,7 @@ test.describe("member app shell", () => {
     await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Your next session", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Open gym", { exact: true })).toHaveCount(0);
-    await expect(page.getByText(/Nothing planned|No booking yet|No active package/)).toHaveCount(0);
+    await expect(page.getByText(/Nothing planned|No booking yet|No active subscription package/)).toHaveCount(0);
   });
 
   test("Box offers open-gym check-in without a booking when the package covers it (§6.2)", async ({ page }) => {

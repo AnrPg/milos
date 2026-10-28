@@ -90,7 +90,7 @@ test.describe("Schedule › duplicate and series edits", () => {
     });
 
     await openClass(page);
-    await page.getByRole("button", { name: "Edit slot" }).click();
+    await page.getByRole("button", { name: "Edit class" }).click();
     const dialog = page.getByRole("dialog", { name: "Edit scheduled class" });
     const scope = dialog.getByRole("radiogroup", { name: "Apply changes to" });
     await expect(scope.getByRole("radio", { name: "Only this class" })).toHaveAttribute("aria-checked", "true");
@@ -114,7 +114,7 @@ test.describe("Schedule › duplicate and series edits", () => {
     const until = new Date(startsAt.getTime() + 14 * 86_400_000).toISOString().slice(0, 10);
 
     await openClass(page);
-    await page.getByRole("button", { name: "Edit slot" }).click();
+    await page.getByRole("button", { name: "Edit class" }).click();
     const dialog = page.getByRole("dialog", { name: "Edit scheduled class" });
     await dialog.getByRole("radio", { name: "Classes between dates" }).click();
     const to = dialog.getByRole("button", { name: "To", exact: true });
@@ -134,7 +134,7 @@ test.describe("Schedule › duplicate and series edits", () => {
     );
 
     await openClass(page);
-    await page.getByRole("button", { name: "Edit slot" }).click();
+    await page.getByRole("button", { name: "Edit class" }).click();
     await expect(page.getByRole("dialog", { name: "Edit scheduled class" })).toBeVisible();
     await expect(page.getByRole("radiogroup", { name: "Apply changes to" })).toHaveCount(0);
   });
@@ -152,7 +152,7 @@ test.describe("Schedule › duplicate and series edits", () => {
     const dialog = page.getByRole("dialog", { name: "Create scheduled class" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("radiogroup", { name: "Apply changes to" })).toHaveCount(0);
-    await dialog.getByRole("button", { name: "Create slot" }).click();
+    await dialog.getByRole("button", { name: "Create class" }).click();
 
     await expect.poll(() => created?.name).toBe("Morning WOD");
     expect(created).toMatchObject({ capacity: 12, duration_minutes: 60, class_type_id: "ct" });

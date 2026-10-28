@@ -11,6 +11,36 @@ function catalog(locale: string) {
   return JSON.parse(fs.readFileSync(path.resolve("messages", `${locale}.json`), "utf8")) as Record<string, unknown>;
 }
 
+// ontology §4.8: words that must never name a class (or a trial) in each locale.
+// `(?<!\p{L})` / `(?!\p{L})` are letter boundaries that also work for Greek,
+// Cyrillic, Arabic and Hebrew, where `\b` does not.
+const B = "(?<!\\p{L})";
+const E = "(?!\\p{L})";
+const BANNED: Record<string, string> = {
+  el: `κουλοχ|${B}[τΤ]άξ(η|ης|εις|εων)${E}|${B}[κΚ]λάσ(η|ης|εις|εων)${E}|${B}[δΔ]ίκ(η|ης|ες)${E}`,
+  ar: `${B}(ال)?فصول?${E}|${B}(ال)?صفوف${E}|${B}الطبقة${E}|فتح[ةا]ت?${E}|ماكينة القمار|آلة القمار`,
+  ru: `(?<![мМ]астер-)[кК]ласс(?!иф|ическ|ик|н)|${B}[уУ]рок|[сС]лот|игров(ой|ые) автомат`,
+  de: `[kK]lasse(?!ment)|Klassen|[sS]lot|Spielautomat|Steckplatz`,
+  es: `ranura|tragaperras|tragamonedas|${B}espacio de clase`,
+  "pt-PT": `[tT]urma|[cC]lasse|${B}slot|caça-níqueis|ranhura`,
+  he: `כית[הו]ת?|משבצ|מכונת מזל`,
+  it: `${B}[cC]lass[ie]${E}|${B}slot${E}|[sS]lot machine`,
+  bg: `${B}[кК]лас(ове|а|ът)?${E}|[сС]лот|ротатив|игрален автомат`,
+  nl: `${B}[kK]las(se)?${E}|[kK]lassen|[sS]leuf|gokkast|${B}[sS]lot`,
+  fr: `${B}[cC]lasses?${E}|[eE]mplacement de cours|machine à sous`,
+};
+
+/** Text without ICU placeholders such as `{slot}`, which are code, not words. */
+function words(text: string): string {
+  let previous = "";
+  let current = text;
+  while (current !== previous) {
+    previous = current;
+    current = current.replace(/\{[^{}]*\}/g, " ");
+  }
+  return current;
+}
+
 function strings(node: unknown): string[] {
   if (typeof node === "string") return [node];
   if (node && typeof node === "object") return Object.values(node).flatMap(strings);
@@ -35,5 +65,36 @@ describe("canonical wording", () => {
     expect(ui.roleJanitor).toBe("Προσωπικό καθαριότητας");
     expect(ui.roleAccountant).toBe("Λογιστής");
     expect(ui.roleMember).not.toBe("Μέλος");
+  });
+
+  it.each(Object.keys(BANNED))("never names a class with a banned word in %s", (locale) => {
+    const banned = new RegExp(BANNED[locale], "u");
+    const offending = strings(catalog(locale)).filter((text) => banned.test(words(text)));
+    expect(offending).toEqual([]);
+  });
+
+  it("uses the canonical class terms on the recurring-class form", () => {
+    const expected: Record<string, [string, string]> = {
+      en: ["New recurring class", "Class start time"],
+      el: ["Νέο επαναλαμβανόμενο τμήμα", "Ώρα έναρξης τμήματος"],
+      de: ["Neuer wiederkehrender Kurs", "Kursbeginn"],
+      fr: ["Nouveau cours récurrent", "Heure de début du cours"],
+      es: ["Nueva clase recurrente", "Hora de inicio de la clase"],
+      it: ["Nuova lezione ricorrente", "Ora di inizio della lezione"],
+      ru: ["Новое повторяющееся занятие", "Время начала занятия"],
+    };
+    for (const [locale, [series, startTime]] of Object.entries(expected)) {
+      const ui = catalog(locale).Ui as Record<string, string>;
+      expect(ui.featureCreateClassSeries, locale).toBe(series);
+      expect(ui.featureTime, locale).toBe(startTime);
+    }
+  });
+
+  it("calls the trial package type a trial and packages subscription packages in Greek", () => {
+    const ui = catalog("el").Ui as Record<string, string>;
+    expect(ui.pkgTypeTrial).toBe("Δοκιμαστικό");
+    expect(ui.trial5f7537c).toBe("Δοκιμαστικό");
+    expect(ui.package7431e3d).toBe("Πακέτο συνδρομής");
+    expect((catalog("en").Ui as Record<string, string>).package7431e3d).toBe("Subscription package");
   });
 });

@@ -74,7 +74,7 @@ test.describe("admin setup checklist", () => {
     const expected: Record<string, string> = {
       "Open settings": "/org/kypseli/admin/settings",
       "Set up classes": "/org/kypseli/admin/class-schedule",
-      "Create a package": "/org/kypseli/admin/finance?tab=packages",
+      "Create a subscription package": "/org/kypseli/admin/finance?tab=packages",
       "Write a workout": "/org/kypseli/admin/workouts/new",
     };
     for (const [name, href] of Object.entries(expected)) {

@@ -198,10 +198,10 @@ test.describe("member schedule", () => {
     await expect(page.getByRole("heading", { name: "Πρόγραμμα" })).toBeVisible();
     const list = page.getByRole("main");
     await expect(list.getByText("Olympic lifting")).toBeVisible();
-    await expect(list.getByText("Εκτός πακέτου")).toBeVisible();
+    await expect(list.getByText("Εκτός πακέτου συνδρομής")).toBeVisible();
     await shot(page, "day");
 
-    await page.getByRole("button", { name: "Στο πακέτο μου" }).click();
+    await page.getByRole("button", { name: "Στο πακέτο συνδρομής μου" }).click();
     await expect(list.getByText("Open gym")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Φίλτρα (1)" })).toBeVisible();
 

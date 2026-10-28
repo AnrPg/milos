@@ -204,7 +204,7 @@ test.describe("billing", () => {
     await expect(page.getByRole("link", { name: "Contact the box" })).toHaveAttribute("href", "/b/kypseli/chat");
 
     // «Συνδρομή»: details and history.
-    await expect(page.getByText("Package history")).toBeVisible();
+    await expect(page.getByText("Subscription package history")).toBeVisible();
     await expect(page.getByText("Trial month")).toBeVisible();
 
     // «Συναλλαγές»: one feed, events at any host included; a row opens its details.
@@ -347,7 +347,7 @@ test.describe("billing", () => {
     await chooseOption(page, picker, "nikos");
     await expect(page).toHaveURL(/box=nikos/);
     await expect(page.getByText("Independent coach")).toBeVisible();
-    await expect(page.getByText("No active package right now.")).toBeVisible();
+    await expect(page.getByText("No active subscription package right now.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Message your coach" })).toHaveAttribute("href", "/messages?filter=coach");
   });
 });

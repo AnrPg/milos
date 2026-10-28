@@ -60,10 +60,10 @@ test.describe("Schedule › class form errors", () => {
     });
 
     await page.goto("/admin/schedule");
-    await page.getByRole("button", { name: "+ Slot" }).first().click();
+    await page.getByRole("button", { name: "+ Class" }).first().click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await dialog.getByRole("button", { name: "Create slot" }).click();
+    await dialog.getByRole("button", { name: "Create class" }).click();
 
     // 00:00 on the 28th in Athens.
     await expect.poll(() => sent?.scheduled_at).toBe("2026-10-27T22:00:00.000Z");
@@ -76,9 +76,9 @@ test.describe("Schedule › class form errors", () => {
     );
 
     await page.goto("/admin/schedule");
-    await page.getByRole("button", { name: "+ Slot" }).first().click();
+    await page.getByRole("button", { name: "+ Class" }).first().click();
     const dialog = page.getByRole("dialog");
-    await dialog.getByRole("button", { name: "Create slot" }).click();
+    await dialog.getByRole("button", { name: "Create class" }).click();
 
     const capacity = dialog.getByRole("spinbutton", { name: "Capacity" });
     await expect(capacity).toHaveAttribute("aria-invalid", "true");
@@ -94,13 +94,13 @@ test.describe("Schedule › class form errors", () => {
     await expect(capacity).not.toHaveAttribute("aria-invalid", "true");
   });
 
-  test("past days offer no + Slot, since a class cannot start in the past", async ({ page }) => {
+  test("past days offer no + Class, since a class cannot start in the past", async ({ page }) => {
     await asBoxAdmin(page);
 
     await page.goto("/admin/schedule");
-    await expect(page.getByRole("button", { name: "+ Slot" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "+ Class" }).first()).toBeVisible();
     await page.getByRole("button", { name: "Prev" }).click();
     await expect(page.getByRole("button", { name: "Today" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "+ Slot" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "+ Class" })).toHaveCount(0);
   });
 });
