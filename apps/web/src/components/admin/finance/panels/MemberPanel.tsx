@@ -1047,7 +1047,7 @@ function InvoiceCard({
       className="rounded-[1.2rem] px-4 py-3 space-y-2"
       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
             {field(invoice, "invoice_number", invoiceId)}
@@ -1056,7 +1056,7 @@ function InvoiceCard({
             {money(uiLocale, invoice.total_cents)}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span
             className="text-xs font-semibold"
             style={{ color: statusColor(status) }}

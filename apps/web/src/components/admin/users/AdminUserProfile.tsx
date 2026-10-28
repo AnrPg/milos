@@ -73,6 +73,7 @@ import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackLink } from "@/components/ui/BackLink";
+import { displayRoles, rolesOf } from "@/lib/users-directory";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -626,15 +627,18 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     messages: messages.data?.threads.length ?? 0,
   });
   const sections = new Set(visibleSections);
-  if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
+  // ADR-217: the person's roles in this box, never the account-wide role
+  // (which reads "member" for every account, owners included).
+  const boxRoles = rolesOf({ role: profile.identity.role, roles: profile.membership?.roles });
+  const shownRoles = displayRoles({ role: profile.identity.role, roles: profile.membership?.roles, coach_scope: profile.membership?.coach_scope });
+  const clientRole = boxRoles.includes("athlete") ? "athlete" : boxRoles.includes("member") ? "member" : null;
   // ADR-100/101: coaches and private coach notes belong to client profiles.
-  const isClient = profile.membership?.roles?.length
-    ? profile.membership.roles.some((role) => role === "member" || role === "athlete")
-    : profile.identity.role === "member" || profile.identity.role === "athlete";
+  const isClient = clientRole !== null;
+  if (isClient) sections.add("schedule");
   const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
   const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
   const showBoxMessage = isClient && can(actor, "message_from_box");
-  const trains = profile.identity.role === "member" || profile.identity.role === "athlete";
+  const trains = isClient;
 
   // ADR-140 §8: six tabs, each shown when one of its sections is.
   const tabSections = new Set(sections);
@@ -677,7 +681,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     label: `${semanticLabel(incident.body_area, i18n)} · ${date(incident.started_on)}`,
   }));
   const overviewItems: Array<[string, React.ReactNode]> = [
-    [i18n("rolec3f104d"), <RoleLabel key="role" role={profile.identity.role} />],
+    [i18n("rolec3f104d"), <RoleList key="role" roles={shownRoles} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
     [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
     [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
@@ -698,11 +702,11 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={profile.identity} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><RoleLabel role={profile.identity.role} /></p>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><RoleList roles={shownRoles} /></p>
             <h1 className="mt-4 truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
             <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
           </div>
-          {token && profile.identity.role === "athlete" ? (
+          {token && clientRole === "athlete" ? (
             <HoverHint hint={i18n("featureAssignWorkoutHint")} align="end">
               <button
                 type="button"
@@ -718,7 +722,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               </button>
             </HoverHint>
           ) : null}
-          {token && profile.identity.role === "member" ? (
+          {token && boxRoles.includes("member") ? (
             <HoverHint hint={i18n("featureMoveToClassHint")} align="end">
               <button
                 type="button"
@@ -768,7 +772,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
 
-          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={profile.identity.role} nickname={profile.identity.nickname} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
+          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={clientRole ?? "member"} nickname={profile.identity.nickname} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
 
           {inTab("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
@@ -778,7 +782,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               id="training_history"
               queryKey={["admin", "users", userId]}
               fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
-              defaultKind={defaultHistoryKind(profile.identity.role)}
+              defaultKind={defaultHistoryKind(clientRole)}
             />
           ) : null}
 
@@ -880,5 +884,19 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
       </div>
     </main>
+  );
+}
+
+/** ADR-217: every role held in the box, e.g. «Ιδιοκτήτης · Head coach». */
+function RoleList({ roles }: { roles: string[] }) {
+  return (
+    <>
+      {roles.map((role, index) => (
+        <span key={role}>
+          {index > 0 ? " · " : null}
+          <RoleLabel role={role} />
+        </span>
+      ))}
+    </>
   );
 }

@@ -26,7 +26,7 @@ import {
   type StaffEvent,
 } from "@/api/admin-events";
 import { Badge } from "@/components/community/MembersTab";
-import { MoreMenu } from "@/components/community/PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { Field, inputStyle } from "@/components/community/ProposeGroupSheet";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { useEventLocations } from "@/components/events/EventFormParts";

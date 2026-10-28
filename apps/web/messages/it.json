@@ -237,6 +237,7 @@
     "classAction_cancel": "Annulla lezione",
     "classAction_restore": "Ripristina lezione",
     "classAction_delete": "Elimina",
+    "classMoreActions": "Altre azioni per questa lezione",
     "classActionTitle_pause": "Mettere in pausa le prenotazioni?",
     "classActionTitle_resume": "Riprendere le prenotazioni?",
     "classActionTitle_cancel": "Annullare questa lezione?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Proprietario",
     "roleAdmin": "Amministratore",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Head coach",
     "roleFrontDesk": "Receptionist",
     "roleAccountant": "Contabile",
     "roleJanitor": "Addetto alle pulizie",
@@ -4960,7 +4962,7 @@
       "all": "Tutti",
       "member": "Iscritti",
       "athlete": "Atleti",
-      "admin": "Staff"
+      "staff": "Staff"
     },
     "showing": "{shown} di {total} visualizzati",
     "clearFilters": "Azzera filtri",
@@ -4973,6 +4975,7 @@
     "listLabel": "Persone",
     "columns": {
       "person": "Persona",
+      "roles": "Ruoli",
       "finance": "Abbonamento",
       "joined": "Iscrizione",
       "open": "Apri profilo"

@@ -237,6 +237,7 @@
     "classAction_cancel": "Cancel class",
     "classAction_restore": "Restore class",
     "classAction_delete": "Delete",
+    "classMoreActions": "More actions for this class",
     "classActionTitle_pause": "Pause bookings?",
     "classActionTitle_resume": "Resume bookings?",
     "classActionTitle_cancel": "Cancel this class?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Head coach",
     "roleFrontDesk": "Front desk",
     "roleAccountant": "Accountant",
     "roleJanitor": "Cleaning staff",
@@ -4960,7 +4962,7 @@
       "all": "Everyone",
       "member": "Box members",
       "athlete": "Athletes (personal programming)",
-      "admin": "Staff"
+      "staff": "Staff"
     },
     "showing": "Showing {shown} of {total}",
     "clearFilters": "Clear filters",
@@ -4973,6 +4975,7 @@
     "listLabel": "People",
     "columns": {
       "person": "Person",
+      "roles": "Roles",
       "finance": "Membership",
       "joined": "Joined",
       "open": "Open profile"

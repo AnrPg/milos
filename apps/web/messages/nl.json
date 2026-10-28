@@ -237,6 +237,7 @@
     "classAction_cancel": "Les annuleren",
     "classAction_restore": "Les herstellen",
     "classAction_delete": "Verwijderen",
+    "classMoreActions": "Meer acties voor deze les",
     "classActionTitle_pause": "Boekingen pauzeren?",
     "classActionTitle_resume": "Boekingen hervatten?",
     "classActionTitle_cancel": "Deze les annuleren?",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Eigenaar",
     "roleAdmin": "Beheerder",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Hoofdcoach",
     "roleFrontDesk": "Receptiemedewerker",
     "roleAccountant": "Boekhouder",
     "roleJanitor": "Schoonmaakmedewerker",
@@ -4960,7 +4962,7 @@
       "all": "Iedereen",
       "member": "Leden",
       "athlete": "Atleten",
-      "admin": "Medewerkers"
+      "staff": "Medewerkers"
     },
     "showing": "{shown} van {total} getoond",
     "clearFilters": "Filters wissen",
@@ -4973,6 +4975,7 @@
     "listLabel": "Personen",
     "columns": {
       "person": "Persoon",
+      "roles": "Rollen",
       "finance": "Lidmaatschap",
       "joined": "Aangemeld",
       "open": "Profiel openen"

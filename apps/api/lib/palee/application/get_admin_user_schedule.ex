@@ -1,14 +1,19 @@
 defmodule Palee.Application.GetAdminUserSchedule do
-  alias Palee.{Identity, Scheduling, Workouts}
+  alias Palee.{Identity, Organizations, Scheduling, Workouts}
+
+  # ADR-217: the schedule follows the person's client role in this gym
+  # (athlete: assignments; member: classes and assignments), never the
+  # account-wide `users.role`. Staff-only people have no client schedule.
 
   def call(context, user_id, start_date, end_date) do
-    with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
+    with %{} = found <- Identity.find_by_id(user_id) || {:error, :not_found},
+         user = %{found | role: client_role(context, found)},
          {:ok, start_date} <- Date.from_iso8601(start_date),
          {:ok, end_date} <- Date.from_iso8601(end_date) do
       {:ok,
        %{
          user_id: user.id,
-         role: to_string(user.role),
+         role: user.role && to_string(user.role),
          start_date: Date.to_iso8601(start_date),
          end_date: Date.to_iso8601(end_date),
          items: items(context, user, start_date, end_date)
@@ -43,4 +48,10 @@ defmodule Palee.Application.GetAdminUserSchedule do
   end
 
   defp items(_context, _user, _start_date, _end_date), do: []
+
+  defp client_role(%{organization_id: organization_id} = context, user)
+       when is_binary(organization_id),
+       do: Organizations.client_role(context, user.id)
+
+  defp client_role(_context, user), do: user.role
 end
