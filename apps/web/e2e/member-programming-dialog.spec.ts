@@ -159,6 +159,8 @@ test.describe("member programming dialog", () => {
     await page.goto("/admin/users/u-1?tab=training");
     await page.getByTestId(`programming-day-${TOMORROW}`).click({ timeout: 60_000 });
     const dialog = page.getByTestId("programming-dialog");
+    // The title is the clicked day itself, never shifted by a time zone.
+    await expect(dialog.getByRole("heading")).toContainText(new RegExp(`\\b${Number(TOMORROW.slice(8))}\\b`));
 
     await expect(dialog.getByTestId("programming-no-class")).toContainText("No class booked this day");
     await expect(dialog.getByRole("radio", { name: "Adapt the class WOD" })).toHaveCount(0);

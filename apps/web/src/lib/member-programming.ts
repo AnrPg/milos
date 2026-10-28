@@ -83,3 +83,20 @@ export function programmingBlocker(input: {
   if (input.source === "library" && !input.workoutId) return "programmingMissingWod";
   return null;
 }
+
+/**
+ * A calendar day ("2026-10-29") as the locale writes it. The day is a plain
+ * date, not an instant: it is read and formatted in UTC so no device or gym
+ * time zone can move it to the day before or after.
+ */
+export function dayFormatter(locale: string, options: Intl.DateTimeFormatOptions) {
+  const format = new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" });
+  const instant = (day: string) => {
+    const [year, month, date] = day.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, date, 12));
+  };
+  return {
+    format: (day: string) => format.format(instant(day)),
+    formatRange: (from: string, to: string) => format.formatRange(instant(from), instant(to)),
+  };
+}

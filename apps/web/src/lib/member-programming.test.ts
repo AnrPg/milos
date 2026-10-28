@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MEMBER_PROGRAMMING_MODES,
   canProgramMorePeople,
+  dayFormatter,
   modeRequiresBookedClass,
   modeRequiresProgrammingEntitlement,
   programmingBlocker,
@@ -76,5 +77,13 @@ describe("programming dialog steps", () => {
     expect(programmingBlocker({ ...ready, source: "adapt_class", classHasWorkout: false })).toBe("memberProgrammingClassHasNoWorkout");
     expect(programmingBlocker({ ...ready, workoutId: "" })).toBe("programmingMissingWod");
     expect(programmingBlocker({ ...ready, needsClass: false, hasBookedClasses: false, slotId: "", source: "new" })).toBeNull();
+  });
+});
+
+describe("dayFormatter", () => {
+  it("writes the calendar day itself, never the day before or after", () => {
+    const long = dayFormatter("el", { weekday: "long", day: "numeric", month: "long" });
+    expect(long.format("2026-10-29")).toBe("Πέμπτη 29 Οκτωβρίου");
+    expect(dayFormatter("en", { day: "numeric", month: "short" }).formatRange("2026-10-28", "2026-11-03")).toMatch(/Oct 28.*Nov 3/);
   });
 });

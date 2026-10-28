@@ -25,6 +25,7 @@ import {
   MEMBER_PROGRAMMING_MODES,
   canProgramMorePeople,
   modeRequiresBookedClass,
+  dayFormatter,
   programmingBlocker,
   programmingSources,
   programmingSuccessKey,
@@ -72,10 +73,6 @@ const SOURCE_LABEL_KEYS: Record<ProgrammingSource, string> = {
 };
 
 const FIELD_STYLE = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
-
-function dayDate(day: string) {
-  return new Date(`${day}T12:00:00`);
-}
 
 /** A chip-like radio: the selected one carries the primary outline. */
 function choiceStyle(selected: boolean) {
@@ -229,8 +226,9 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
     classHasWorkout,
   });
 
-  const longDate = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" });
-  const shortDate = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
+  const longDate = dayFormatter(locale, { weekday: "long", day: "numeric", month: "long" });
+  const shortDate = dayFormatter(locale, { day: "numeric", month: "short" });
+  const dayCardDate = dayFormatter(locale, { weekday: "short", day: "numeric" });
   const classTime = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", ...(zone ? { timeZone: zone } : {}) });
 
   function classLabel(item: Record<string, unknown>) {
@@ -368,14 +366,14 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
             const date = new Date(`${startDate}T12:00:00`); date.setDate(date.getDate() + 7); setStartDate(isoDate(date));
           }}>{i18n("featureNextWeek")}</button>
         </div>
-        <p className="text-xs" style={{ color: "var(--muted)" }}>{shortDate.formatRange(dayDate(startDate), dayDate(endDate))}</p>
+        <p className="text-xs" style={{ color: "var(--muted)" }}>{shortDate.formatRange(startDate, endDate)}</p>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const items = (schedule?.items ?? []).filter((item) => itemDate(item) === day);
           return <button key={day} type="button" data-testid={`programming-day-${day}`} className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))" : "var(--panel-muted)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => openDay(day)}>
-            <span className="block text-xs font-semibold">{new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric" }).format(dayDate(day))}</span>
+            <span className="block text-xs font-semibold">{dayCardDate.format(day)}</span>
             <span className="mt-2 block text-xs" style={{ color: "var(--muted)" }}>{items.length ? i18n("featureScheduledCount", { count: items.length }) : i18n("featureOpenDay")}</span>
             {items.slice(0, 2).map((item) => <span key={itemId(item)} className="mt-1 block truncate text-xs">
               {isClassVariantItem(item) ? <span style={{ color: "var(--primary)" }}>{i18n("memberProgrammingClassVersionBadge")} · </span> : null}
@@ -394,7 +392,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
         onClose={() => setAssignmentModalOpen(false)}
         dismissible={!busy}
         eyebrow={nickname ? i18n("programmingDialogEyebrowFor", { name: nickname }) : i18n("featureScheduleProgramming")}
-        title={<span className="first-letter:uppercase">{longDate.format(dayDate(selectedDate))}</span>}
+        title={<span className="first-letter:uppercase">{longDate.format(selectedDate)}</span>}
         size="lg"
         variant="sheet"
         testId="programming-dialog"
