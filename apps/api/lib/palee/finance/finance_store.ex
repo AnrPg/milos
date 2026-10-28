@@ -37,6 +37,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def create_receipt(membership_id, params), do: adapter().create_receipt(membership_id, params)
   @impl true
+  def receive_payment(membership_id, params),
+    do: adapter().receive_payment(membership_id, params)
+
+  @impl true
   def create_manual_credit(membership_id, params),
     do: adapter().create_manual_credit(membership_id, params)
 

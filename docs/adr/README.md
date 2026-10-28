@@ -218,3 +218,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted |
 | ADR-219 | Role hierarchy enforced downwards (vendor › owner › admin › staff › clients); self-added roles below one's top role | Accepted |
 | ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
+| ADR-222 | Record money received at the desk; the billing setup picks the receipt, paid invoice or invoice it settles | Accepted |

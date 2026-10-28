@@ -215,6 +215,25 @@ export async function createFinanceReceipt(token: string, userId: string, body: 
   });
 }
 
+/**
+ * ADR-222: money received at the desk and the document it left: the open
+ * invoice it went against, a paid receipt or a paid invoice, as the box's
+ * billing setup says. `replayed` is true when the same idempotency key was
+ * already recorded, and the first answer comes back unchanged.
+ */
+export type ReceivedPayment = Omit<FinanceReceipt, "document_type"> & {
+  document_type: "receipt" | "invoice";
+  replayed: boolean;
+};
+
+export async function receiveFinancePayment(token: string, userId: string, body: FinanceRecord) {
+  return apiRequest<{ received: ReceivedPayment }>(`/admin/finance/members/${userId}/payments/receive`, {
+    method: "POST",
+    token,
+    body,
+  });
+}
+
 export async function createFinanceInvoice(token: string, userId: string, body: FinanceRecord) {
   return apiRequest<{ invoice: FinanceRecord }>(`/admin/finance/members/${userId}/invoices`, {
     method: "POST",

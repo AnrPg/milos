@@ -1872,6 +1872,16 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_payment_amount", error: "Payment amount must be greater than zero"})
   end
 
+  # ADR-222: a new receipt or invoice says what the money was for.
+  def call(conn, {:error, :payment_purpose_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "payment_purpose_required",
+      error: "Choose the subscription package or describe what the payment is for"
+    })
+  end
+
   def call(conn, {:error, :duplicate_renewal_invoice}) do
     conn
     |> put_status(:conflict)

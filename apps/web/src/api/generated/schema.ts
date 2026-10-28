@@ -6055,6 +6055,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/payments/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record money received from a client and issue the document the billing setup calls for */
+        post: operations["PaleeWeb.AdminFinanceController.receive_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/payments/{payment_id}/credits": {
         parameters: {
             query?: never;
@@ -69945,6 +69962,61 @@ export interface operations {
         };
         responses: {
             /** @description Membership payment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.receive_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    currency?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    finance_invoice_id?: string | null;
+                    idempotency_key: string;
+                    /** Format: uuid */
+                    membership_package_subscription_id?: string | null;
+                    notes?: string | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description The same request, already recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Received payment and its document */
             201: {
                 headers: {
                     [name: string]: unknown;
