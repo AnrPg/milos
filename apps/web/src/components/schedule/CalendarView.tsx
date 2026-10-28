@@ -7,7 +7,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { buildScheduleWindow, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 import { dateKeyInZone, formatInZone } from "@/lib/zoned-time";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
@@ -25,6 +25,8 @@ type CalendarViewProps = {
   locations?: ScheduleLocation[];
   onSelectSlot: (slot: ScheduleSlot) => void;
   onCreateSlot: (isoDate: string) => void;
+  /** Month view: a cell's date or its "+N more" opens that day's view. */
+  onOpenDay?: (isoDate: string) => void;
   /** ADR-179: the gym's zone; days and times are on its clock. */
   timeZone?: string | null;
 };
@@ -53,8 +55,9 @@ function slotClassType(slot: ScheduleSlot) {
   };
 }
 
-export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot, timeZone = null }: CalendarViewProps) {
+export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot, onOpenDay, timeZone = null }: CalendarViewProps) {
   const i18n = useUiTranslations();
+  const t = useTranslations("Schedule");
   const locale = useLocale();
   const todayKey = dateKeyInZone(new Date(), timeZone);
   // ADR-214: a class cannot start in the past, so past days offer no "+ Slot".
@@ -108,15 +111,19 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
+                  <button
+                    aria-label={t("openDayView", { date: formatDayLabel(locale, date) })}
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold transition-opacity hover:opacity-70"
+                    disabled={!onOpenDay}
+                    onClick={() => onOpenDay?.(date)}
                     style={{
                       background: isToday ? "var(--primary)" : "transparent",
                       color: isToday ? "var(--primary-contrast)" : outsideMonth ? "var(--border-strong)" : "var(--text)",
                     }}
+                    type="button"
                   >
                     {dayNum}
-                  </span>
+                  </button>
                   {canAddOn(date) && !outsideMonth ? (
                     <button
                       className="text-[11px] font-bold leading-none text-[var(--primary)] hover:opacity-70"
@@ -143,7 +150,16 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                   );
                 })}
                 {daySlots.length > 3 ? (
-                  <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>+{daySlots.length - 3} {i18n("moree7c95b4")}</p>
+                  <button
+                    aria-label={t("openDayView", { date: formatDayLabel(locale, date) })}
+                    className="mt-0.5 w-full rounded px-1 text-start text-[9px] font-semibold hover:underline"
+                    disabled={!onOpenDay}
+                    onClick={() => onOpenDay?.(date)}
+                    style={{ color: "var(--dim)" }}
+                    type="button"
+                  >
+                    +{daySlots.length - 3} {i18n("moree7c95b4")}
+                  </button>
                 ) : null}
               </section>
             );
@@ -153,11 +169,11 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
     );
   }
 
-  // 3-day or week view: column grid
+  // Day, 3-day or week view: column grid (the day view is one wide column).
   return (
     <div className="overflow-x-auto pb-2">
       <div
-        className={"grid min-w-full gap-4 " + (days === 3 ? "md:grid-cols-3" : "md:grid-cols-7")}
+        className={"grid min-w-full gap-4 " + (days === 1 ? "" : days === 3 ? "md:grid-cols-3" : "md:grid-cols-7")}
       >
         {visibleDates.map((date) => {
           const daySlots = slotMap[date] ?? [];
@@ -170,13 +186,17 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
               style={{
                 background: "var(--panel)",
                 border: `1px solid ${isToday ? "var(--primary)" : "var(--border)"}`,
-                minHeight: days === 3 ? "16rem" : "10rem",
+                minHeight: days === 7 ? "10rem" : "16rem",
               }}
               key={date}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  {days === 3 ? (
+                  {days === 1 ? (
+                    <h2 className="text-lg font-bold" style={{ color: isToday ? "var(--primary)" : "var(--text)" }}>
+                      {formatDayLabel(locale, date)}
+                    </h2>
+                  ) : days === 3 ? (
                     <>
                       <p className="text-base font-bold" style={{ color: "var(--text)" }}>{weekday}</p>
                       <p className="mt-0.5 text-xs">

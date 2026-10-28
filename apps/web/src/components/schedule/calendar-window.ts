@@ -1,6 +1,7 @@
 import { startOfDayInZone } from "@/lib/zoned-time";
 
-export type ScheduleDays = 3 | 7 | 30;
+/** 1 is the day view: one day's classes, opened from a month cell. */
+export type ScheduleDays = 1 | 3 | 7 | 30;
 
 export type ScheduleWindowBounds = {
   currentMonthKey: string;
