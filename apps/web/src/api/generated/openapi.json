@@ -981,6 +981,7 @@
                     "classes",
                     "packages",
                     "workout",
+                    "page",
                     "invite",
                     "tour",
                     "profile",
@@ -16166,6 +16167,10 @@
             },
             "type": "array"
           },
+          "on_map": {
+            "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+            "type": "boolean"
+          },
           "photos": {
             "items": {
               "properties": {
@@ -16626,6 +16631,10 @@
                 },
                 "type": "array"
               },
+              "on_map": {
+                "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+                "type": "boolean"
+              },
               "photos": {
                 "items": {
                   "properties": {
@@ -16941,6 +16950,128 @@
           }
         },
         "title": "BoxPublicProfileUpdate",
+        "type": "object"
+      },
+      "BoxSearchResponse": {
+        "properties": {
+          "boxes": {
+            "items": {
+              "description": "ADR-221: a published, live box or independent coach found by name",
+              "properties": {
+                "city": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "logo_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "my_status": {
+                  "enum": [
+                    "none",
+                    "requested",
+                    "active"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "neighbourhood": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "primary_color": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "provider_kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "my_status",
+                "name",
+                "organization_id",
+                "provider_kind",
+                "slug"
+              ],
+              "title": "BoxSearchResult",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "boxes"
+        ],
+        "title": "BoxSearchResponse",
+        "type": "object"
+      },
+      "BoxSearchResult": {
+        "description": "ADR-221: a published, live box or independent coach found by name",
+        "properties": {
+          "city": {
+            "nullable": true,
+            "type": "string"
+          },
+          "logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "my_status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "neighbourhood": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "provider_kind": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "my_status",
+          "name",
+          "organization_id",
+          "provider_kind",
+          "slug"
+        ],
+        "title": "BoxSearchResult",
         "type": "object"
       },
       "BoxTagSuggestion": {
@@ -88976,6 +89107,109 @@
         "summary": "ADR-213: confirm the login's email with the emailed link's token",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/box-search": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BoxSearchController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "boxes": {
+                      "items": {
+                        "description": "ADR-221: a published, live box or independent coach found by name",
+                        "properties": {
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "my_status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "provider_kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "my_status",
+                          "name",
+                          "organization_id",
+                          "provider_kind",
+                          "slug"
+                        ],
+                        "title": "BoxSearchResult",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "boxes"
+                  ],
+                  "title": "BoxSearchResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Boxes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-221: published, live boxes and independent coaches whose name holds the query (accents and case ignored)",
+        "tags": [
+          "Follows"
         ]
       }
     },
@@ -167905,6 +168139,7 @@
                               "classes",
                               "packages",
                               "workout",
+                              "page",
                               "invite",
                               "tour",
                               "profile",
@@ -167989,6 +168224,7 @@
                       "classes",
                       "packages",
                       "workout",
+                      "page",
                       "invite",
                       "tour",
                       "profile",
@@ -168046,6 +168282,7 @@
                               "classes",
                               "packages",
                               "workout",
+                              "page",
                               "invite",
                               "tour",
                               "profile",
@@ -171276,6 +171513,10 @@
                           },
                           "type": "array"
                         },
+                        "on_map": {
+                          "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+                          "type": "boolean"
+                        },
                         "photos": {
                           "items": {
                             "properties": {
@@ -171899,6 +172140,10 @@
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "on_map": {
+                          "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+                          "type": "boolean"
                         },
                         "photos": {
                           "items": {
@@ -172626,6 +172871,10 @@
                           },
                           "type": "array"
                         },
+                        "on_map": {
+                          "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+                          "type": "boolean"
+                        },
                         "photos": {
                           "items": {
                             "properties": {
@@ -173217,6 +173466,10 @@
                             "type": "string"
                           },
                           "type": "array"
+                        },
+                        "on_map": {
+                          "description": "ADR-221: an open location has a map point, so Γύρω μου can show the business once published.",
+                          "type": "boolean"
                         },
                         "photos": {
                           "items": {
@@ -221493,6 +221746,7 @@
             "required": false,
             "schema": {
               "enum": [
+                1,
                 3,
                 7,
                 30

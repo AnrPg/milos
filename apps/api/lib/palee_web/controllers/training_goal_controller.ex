@@ -1,6 +1,6 @@
 defmodule PaleeWeb.TrainingGoalController do
   @moduledoc """
-  The weekly workout goal is the person's own (ADR-221). The person reads and
+  The weekly workout goal is the person's own (ADR-222). The person reads and
   sets theirs; a coach (their clients) or an owner/admin with full coaching
   scope (any client of the box) reads and sets it from the client's profile.
   """

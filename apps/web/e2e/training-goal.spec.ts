@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "./support/test";
 
-// ADR-221: the weekly workout goal is the person's own. The member sets it in
+// ADR-222: the weekly workout goal is the person's own. The member sets it in
 // Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης and sees when their coach set it; a
 // coach sets it from the client's profile (Training tab); the box settings
 // keep only the streak shields and when they renew. The API is stubbed;
@@ -58,7 +58,7 @@ async function common(page: Page, role: Role) {
   await page.route("**/api/me/clubs", (route) => route.fulfill(json({ clubs: [] })));
 }
 
-test.describe("personal weekly goal (ADR-221)", () => {
+test.describe("personal weekly goal (ADR-222)", () => {
   test("a member sets their own goal and sees when their coach set it", async ({ page }) => {
     await common(page, "member");
     let goal = { weekly_workout_target: 2, is_default: true, set_by_role: null as string | null, set_by_nickname: null as string | null, min: 1, max: 14 };

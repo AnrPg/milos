@@ -754,7 +754,7 @@ defmodule PaleeWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
-    # ADR-221: a client's weekly goal, set by their coach or full-scope staff.
+    # ADR-222: a client's weekly goal, set by their coach or full-scope staff.
     get("/clients/:user_id/training-goal", TrainingGoalController, :client_show)
     put("/clients/:user_id/training-goal", TrainingGoalController, :client_update)
     get("/clients/:user_id/journal", JournalController, :client_journal)
@@ -1942,7 +1942,7 @@ defmodule PaleeWeb.Router do
 
     get("/preferences", GamificationPreferencesController, :show)
     put("/preferences", GamificationPreferencesController, :update)
-    # ADR-221: the weekly workout goal is the person's own.
+    # ADR-222: the weekly workout goal is the person's own.
     get("/goal", TrainingGoalController, :show)
     put("/goal", TrainingGoalController, :update)
   end
@@ -1980,6 +1980,8 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/people-search", PeopleController, :search)
+    # ADR-221: boxes and independent coaches by name.
+    get("/box-search", BoxSearchController, :index)
   end
 
   # ADR-129: personal PR sharing (global, not tenant-scoped).

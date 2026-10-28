@@ -55,13 +55,13 @@ defmodule Palee.Gamification do
 
   defdelegate upsert_user_preferences(user_id, params), to: GamificationStore
 
-  @doc "A person's weekly workout goal (ADR-221), or nil when none is set."
+  @doc "A person's weekly workout goal (ADR-222), or nil when none is set."
   def get_training_goal(user_id),
     do: GamificationStore.get_training_goal(user_id, Palee.Gamification.Domain.WeeklyGoal.kind())
 
   defdelegate put_training_goal(params), to: GamificationStore
 
-  @doc "The weekly goal targets the API accepts (ADR-221)."
+  @doc "The weekly goal targets the API accepts (ADR-222)."
   def weekly_goal_range,
     do:
       Palee.Gamification.Domain.WeeklyGoal.min_target()..Palee.Gamification.Domain.WeeklyGoal.max_target()

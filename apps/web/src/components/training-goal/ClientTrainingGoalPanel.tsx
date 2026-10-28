@@ -13,7 +13,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
- * A client's weekly goal on their profile (ADR-221), for their coach or an
+ * A client's weekly goal on their profile (ADR-222), for their coach or an
  * owner/admin who may coach every client. Saving tells the client, who can
  * change it back.
  */

@@ -291,7 +291,7 @@ function Consistency({ progress }: { progress: AccountProgress }) {
   const landing = useLanding();
   const [explain, setExplain] = useState(false);
   const gamification = landing.data?.gamification;
-  // ADR-221: my own weekly goal, with or without a gym.
+  // ADR-222: my own weekly goal, with or without a gym.
   const goal = useTrainingGoal();
   const target = goal.data ? weeklyTarget(goal.data) : null;
   const dayStreak = gamification?.stats?.current_streak;

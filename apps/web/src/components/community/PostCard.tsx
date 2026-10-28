@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -34,7 +34,6 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import type { PRRecord } from "@/api/gamification";
 import { pollDelay } from "@/lib/post-media";
-import { Popover } from "@/components/ui/Popover";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
@@ -260,56 +259,6 @@ function origin(post: CommunityPost, t: ReturnType<typeof useTranslations>) {
     return post.audience === "public" ? t("audiencePublic") : t("audienceFollowers");
   }
   return post.channel ? `${post.club.name} › #${channelName(post.channel, t)}` : post.club.name;
-}
-
-/** ⋯ on a post or comment: a short menu of what the reader may do with it. */
-export function MoreMenu({ label, items }: { label: string; items: { label: string; onSelect: () => void }[] }) {
-  const [open, setOpen] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  return (
-    <div className="relative shrink-0">
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-label={label}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-        className="flex h-11 w-11 items-center justify-center rounded-full text-lg font-bold"
-        style={{ color: "var(--dim)" }}
-      >
-        ⋯
-      </button>
-      <Popover
-        anchorRef={buttonRef}
-        open={open}
-        onClose={() => setOpen(false)}
-        align="end"
-        minWidth={160}
-        className="rounded-2xl py-1 shadow-lg"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-          <ul role="menu" aria-label={label}>
-            {items.map((item) => (
-              <li key={item.label} role="none">
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpen(false);
-                    item.onSelect();
-                  }}
-                  className="block min-h-11 w-full px-4 text-start text-sm font-semibold"
-                  style={{ color: "var(--text)" }}
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-      </Popover>
-    </div>
-  );
 }
 
 function SmallAction({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: string }) {
