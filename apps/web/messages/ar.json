@@ -2098,6 +2098,7 @@
     "roleOwner": "المالك",
     "roleAdmin": "مسؤول",
     "roleCoach": "مدرب",
+    "roleHeadCoach": "المدرب الرئيسي",
     "roleFrontDesk": "موظف استقبال",
     "roleAccountant": "محاسب",
     "roleJanitor": "عامل نظافة",
@@ -4933,7 +4934,7 @@
       "all": "الجميع",
       "member": "الأعضاء",
       "athlete": "الرياضيون",
-      "admin": "الطاقم"
+      "staff": "الطاقم"
     },
     "showing": "عرض {shown} من {total}",
     "clearFilters": "مسح عوامل التصفية",
@@ -4946,6 +4947,7 @@
     "listLabel": "الأشخاص",
     "columns": {
       "person": "الشخص",
+      "roles": "الأدوار",
       "finance": "الاشتراك",
       "joined": "تاريخ الانضمام",
       "open": "فتح الملف"

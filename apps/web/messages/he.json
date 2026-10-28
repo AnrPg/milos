@@ -2098,6 +2098,7 @@
     "roleOwner": "בעלים",
     "roleAdmin": "מנהל",
     "roleCoach": "מאמן",
+    "roleHeadCoach": "מאמן ראשי",
     "roleFrontDesk": "פקיד קבלה",
     "roleAccountant": "מנהל חשבונות",
     "roleJanitor": "צוות ניקיון",
@@ -4933,7 +4934,7 @@
       "all": "כולם",
       "member": "מנויים",
       "athlete": "ספורטאים",
-      "admin": "צוות"
+      "staff": "צוות"
     },
     "showing": "מוצגים {shown} מתוך {total}",
     "clearFilters": "ניקוי מסננים",
@@ -4946,6 +4947,7 @@
     "listLabel": "אנשים",
     "columns": {
       "person": "אדם",
+      "roles": "תפקידים",
       "finance": "מנוי",
       "joined": "הצטרפות",
       "open": "פתיחת פרופיל"

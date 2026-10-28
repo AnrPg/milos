@@ -470,6 +470,8 @@ const ROLE_KEYS: Record<string, string> = {
   owner: "roleOwner",
   admin: "roleAdmin",
   coach: "roleCoach",
+  // A coach with `coach_scope: all` (ontology §4.3).
+  head_coach: "roleHeadCoach",
   front_desk: "roleFrontDesk",
   accountant: "roleAccountant",
   janitor: "roleJanitor",

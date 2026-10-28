@@ -2098,6 +2098,7 @@
     "roleOwner": "Владелец",
     "roleAdmin": "Администратор",
     "roleCoach": "Тренер",
+    "roleHeadCoach": "Главный тренер",
     "roleFrontDesk": "Сотрудник ресепшн",
     "roleAccountant": "Бухгалтер",
     "roleJanitor": "Персонал по уборке",
@@ -4933,7 +4934,7 @@
       "all": "Все",
       "member": "Участники",
       "athlete": "Спортсмены",
-      "admin": "Сотрудники"
+      "staff": "Сотрудники"
     },
     "showing": "Показано {shown} из {total}",
     "clearFilters": "Сбросить фильтры",
@@ -4946,6 +4947,7 @@
     "listLabel": "Люди",
     "columns": {
       "person": "Человек",
+      "roles": "Роли",
       "finance": "Абонемент",
       "joined": "Вступил",
       "open": "Открыть профиль"

@@ -2098,6 +2098,7 @@
     "roleOwner": "Propriétaire",
     "roleAdmin": "Administrateur",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Coach principal",
     "roleFrontDesk": "Réceptionniste",
     "roleAccountant": "Comptable",
     "roleJanitor": "Agent d'entretien",
@@ -4933,7 +4934,7 @@
       "all": "Tout le monde",
       "member": "Membres",
       "athlete": "Athlètes",
-      "admin": "Équipe"
+      "staff": "Équipe"
     },
     "showing": "{shown} sur {total} affichés",
     "clearFilters": "Effacer les filtres",
@@ -4946,6 +4947,7 @@
     "listLabel": "Personnes",
     "columns": {
       "person": "Personne",
+      "roles": "Rôles",
       "finance": "Adhésion",
       "joined": "Inscription",
       "open": "Ouvrir le profil"
