@@ -252,6 +252,9 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFinanceController, :assign_package} => [:take_payments],
     {W.AdminFinanceController, :record_payment} => [:take_payments],
     {W.AdminFinanceController, :create_receipt} => [:take_payments],
+    # ADR-222: front desk takes the money and leaves the document the billing
+    # setup calls for, a paid invoice included.
+    {W.AdminFinanceController, :receive_payment} => [:take_payments],
     {W.AdminFinanceController, :redeem_promotion} => [:take_payments],
     {W.AdminFinanceController, :create_invoice} => [:manage_billing],
     {W.AdminFinanceController, :generate_renewal_invoice} => [:manage_billing],
