@@ -3,9 +3,9 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { ColumnKey, SortState } from "@/components/admin/finance/hooks/useSortFilter";
-import { AnchoredOverlay } from "./AnchoredOverlay";
+import { Popover } from "@/components/ui/Popover";
 
 interface Props {
   column: ColumnKey;
@@ -20,27 +20,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
   const i18n = useUiTranslations();
   const [filterOpen, setFilterOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
   const isActive = sort.column === column;
-
-  useEffect(() => {
-    if (!filterOpen) return;
-
-    function handleClick(e: MouseEvent) {
-      const target = e.target as Node;
-      if (!ref.current?.contains(target) && !overlayRef.current?.contains(target)) setFilterOpen(false);
-    }
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setFilterOpen(false);
-    }
-
-    document.addEventListener("mousedown", handleClick);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [filterOpen]);
 
   return (
     <th
@@ -78,17 +58,18 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
           </span>
         </button>
 
-        {filterOpen && (
-          <AnchoredOverlay
-            anchorRef={ref}
-            overlayRef={overlayRef}
-            minWidth={220}
-            className="rounded-xl p-3 shadow-xl"
-            style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
-          >
-            {filterSlot}
-          </AnchoredOverlay>
-        )}
+        <Popover
+          anchorRef={ref}
+          open={filterOpen}
+          onClose={() => setFilterOpen(false)}
+          minWidth={220}
+          role="dialog"
+          ariaLabel={label}
+          className="rounded-xl p-3 shadow-xl"
+          style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
+        >
+          {filterSlot}
+        </Popover>
       </div>
     </th>
   );
