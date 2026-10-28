@@ -56,6 +56,7 @@ defmodule Palee.Application.AdminOnboarding do
       "classes" => present?(Scheduling.list_class_types(context)),
       "packages" => present?(Finance.list_packages(context)),
       "workout" => present?(Workouts.list_workouts(context)),
+      "page" => published_profile?(context),
       "invite" => invited?(context)
     }
   end

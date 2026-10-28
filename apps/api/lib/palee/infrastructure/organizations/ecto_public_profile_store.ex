@@ -101,6 +101,34 @@ defmodule Palee.Infrastructure.Organizations.EctoPublicProfileStore do
     end)
   end
 
+  @impl true
+  def search_public_boxes([], _limit), do: []
+
+  def search_public_boxes(terms, limit) do
+    %{rows: rows} =
+      Repo.query!(
+        """
+        SELECT organization_id, slug, name, logo_url, primary_color, provider_kind,
+               neighbourhood, city
+        FROM palee_search_public_boxes($1, $2)
+        """,
+        [terms, limit]
+      )
+
+    Enum.map(rows, fn [id, slug, name, logo_url, color, kind, neighbourhood, city] ->
+      %{
+        organization_id: Ecto.UUID.load!(id),
+        slug: slug,
+        name: name,
+        logo_url: logo_url,
+        primary_color: color,
+        provider_kind: kind,
+        neighbourhood: neighbourhood,
+        city: city
+      }
+    end)
+  end
+
   defp dump_uuid(id) do
     case Ecto.UUID.dump(id) do
       {:ok, binary} -> [binary]

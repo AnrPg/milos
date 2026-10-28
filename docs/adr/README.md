@@ -213,3 +213,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-213 | Email verification at sign-up: emailed link, resend, banner, `email_verified` | Accepted |
 | ADR-214 | Form errors live in the form, on the field, in plain words; class starts never proposed in the past | Accepted |
 | ADR-217 | People are shown by their roles in the business, never `users.role`; only clients have a finance profile | Accepted |
+| ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
