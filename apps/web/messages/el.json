@@ -234,6 +234,7 @@
     "classAction_cancel": "Ακύρωση μαθήματος",
     "classAction_restore": "Επαναφορά μαθήματος",
     "classAction_delete": "Διαγραφή",
+    "classMoreActions": "Περισσότερες ενέργειες για το μάθημα",
     "classActionTitle_pause": "Παύση κρατήσεων;",
     "classActionTitle_resume": "Συνέχιση κρατήσεων;",
     "classActionTitle_cancel": "Ακύρωση αυτού του μαθήματος;",

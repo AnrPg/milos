@@ -234,6 +234,7 @@
     "classAction_cancel": "Kurs absagen",
     "classAction_restore": "Kurs wiederherstellen",
     "classAction_delete": "Löschen",
+    "classMoreActions": "Weitere Aktionen für diesen Kurs",
     "classActionTitle_pause": "Buchungen pausieren?",
     "classActionTitle_resume": "Buchungen fortsetzen?",
     "classActionTitle_cancel": "Diesen Kurs absagen?",

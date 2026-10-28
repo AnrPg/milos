@@ -234,6 +234,7 @@
     "classAction_cancel": "إلغاء الصف",
     "classAction_restore": "استعادة الصف",
     "classAction_delete": "حذف",
+    "classMoreActions": "إجراءات أخرى لهذا الصف",
     "classActionTitle_pause": "إيقاف الحجز مؤقتًا؟",
     "classActionTitle_resume": "استئناف الحجز؟",
     "classActionTitle_cancel": "إلغاء هذا الصف؟",

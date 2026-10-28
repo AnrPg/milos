@@ -234,6 +234,7 @@
     "classAction_cancel": "Annuler le cours",
     "classAction_restore": "Rétablir le cours",
     "classAction_delete": "Supprimer",
+    "classMoreActions": "Plus d’actions pour ce cours",
     "classActionTitle_pause": "Mettre les réservations en pause ?",
     "classActionTitle_resume": "Reprendre les réservations ?",
     "classActionTitle_cancel": "Annuler ce cours ?",
