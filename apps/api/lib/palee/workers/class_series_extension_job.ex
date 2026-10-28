@@ -1,7 +1,7 @@
 defmodule Palee.Workers.ClassSeriesExtensionJob do
   use Oban.Worker, queue: :default, max_attempts: 5, unique: [period: 86_400]
 
-  alias Palee.Application.ResolveJobTenantContext
+  alias Palee.Application.{DayWorkouts, ResolveJobTenantContext}
   alias Palee.Scheduling
 
   @impl Oban.Worker
@@ -15,7 +15,10 @@ defmodule Palee.Workers.ClassSeriesExtensionJob do
     with {:ok, context} <-
            ResolveJobTenantContext.call(organization_id, __MODULE__ |> Atom.to_string()),
          {:ok, horizon} <- Date.from_iso8601(horizon),
-         {:ok, _series} <- Scheduling.extend_class_series(context, series_id, horizon) do
+         {:ok, series} <- Scheduling.extend_class_series(context, series_id, horizon),
+         # ADR-224: new occurrences on days with a day WOD inherit it.
+         {:ok, _changed} <-
+           DayWorkouts.reconcile_range(context, series.starts_on, series.materialized_through) do
       :ok
     end
   end

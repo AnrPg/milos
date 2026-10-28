@@ -9,6 +9,7 @@ defmodule Palee.Application.UpdateScheduledSlot do
     ClassLocation,
     ClassSpace,
     ClassWorkoutFiling,
+    DayWorkouts,
     PromoteClassWaitlist,
     ScheduleRealtime,
     SeriesScope
@@ -43,7 +44,8 @@ defmodule Palee.Application.UpdateScheduledSlot do
            ClassLocation.check_change(context, params, ClassLocation.class_location(context, id)),
          {:ok, resolved} <- SeriesScope.resolve(context, id, scope),
          :ok <- ClassSpace.check_edit(context, id, params, resolved),
-         {:ok, {slot, others}} <- update(context, params, resolved) do
+         {:ok, {slot, others}} <- update(context, params, resolved),
+         {:ok, [slot | others]} <- inherit_day_workout(context, [slot | others]) do
       Enum.each([slot | others], &after_update(context, &1))
       {:ok, %{slot: slot, updated_count: 1 + length(others)}}
     end
@@ -106,6 +108,17 @@ defmodule Palee.Application.UpdateScheduledSlot do
       &update_slot(&1, id, &2),
       current_workout_id(context, id)
     )
+  end
+
+  # ADR-224: a class moved to another day or type, or whose own WOD was
+  # removed, takes the WOD of the day that covers it now.
+  defp inherit_day_workout(context, slots) do
+    with {:ok, changed_ids} <- DayWorkouts.reconcile_classes(context, slots) do
+      {:ok,
+       Enum.map(slots, fn slot ->
+         if slot.id in changed_ids, do: Scheduling.get_slot(context, slot.id) || slot, else: slot
+       end)}
+    end
   end
 
   defp after_update(context, slot) do

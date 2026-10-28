@@ -1,5 +1,12 @@
 defmodule Palee.Application.CreateRecurringClassSeries do
-  alias Palee.Application.{ClassLocation, ClassSpace, ScheduleRealtime, TrackAnalyticsEvent}
+  alias Palee.Application.{
+    ClassLocation,
+    ClassSpace,
+    DayWorkouts,
+    ScheduleRealtime,
+    TrackAnalyticsEvent
+  }
+
   alias Palee.Scheduling
   alias Palee.Workouts
 
@@ -51,7 +58,13 @@ defmodule Palee.Application.CreateRecurringClassSeries do
     end
   end
 
-  defp create_series(context, params), do: Scheduling.create_class_series(context, params)
+  # ADR-224: occurrences on days with a day WOD inherit it.
+  defp create_series(context, params) do
+    with {:ok, series} <- Scheduling.create_class_series(context, params),
+         {:ok, _changed} <-
+           DayWorkouts.reconcile_range(context, series.starts_on, series.materialized_through),
+         do: {:ok, series}
+  end
 
   defp fetch_workout(_context, nil), do: {:ok, nil}
 

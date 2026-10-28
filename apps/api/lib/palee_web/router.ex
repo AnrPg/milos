@@ -1105,6 +1105,12 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
+    # ADR-224: the WOD of a whole day.
+    post("/schedule/slots/:id/day-workout", AdminDayWorkoutController, :follow_day)
+    get("/schedule/day-workouts", AdminDayWorkoutController, :index)
+    post("/schedule/day-workouts/preview", AdminDayWorkoutController, :preview)
+    put("/schedule/day-workouts", AdminDayWorkoutController, :put)
+    delete("/schedule/day-workouts/:id", AdminDayWorkoutController, :delete)
     post("/schedule/slots/:id/state", AdminScheduleController, :change_state)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
 

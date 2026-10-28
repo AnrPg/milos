@@ -15,6 +15,8 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminWorkoutController => [:manage_workouts],
     # The class form's WOD picker: whoever schedules classes picks WODs.
     W.AdminWorkoutChoiceController => [:manage_schedule, :manage_workouts],
+    # ADR-224: the day's WOD, like linking a WOD to one class.
+    W.AdminDayWorkoutController => [:manage_schedule, :manage_workouts],
     W.AdminWorkoutDslController => [:manage_workouts],
     W.AdminWorkoutFolderController => [:manage_workouts],
     W.AdminWorkoutGoalsController => [:manage_workouts],

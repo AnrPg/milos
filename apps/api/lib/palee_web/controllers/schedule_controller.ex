@@ -96,6 +96,34 @@ defmodule PaleeWeb.ScheduleController do
                items: %Schema{type: :object, additionalProperties: true}
              },
              locations: %Schema{type: :array, items: @location_schema},
+             day_workouts: %Schema{
+               type: :array,
+               description:
+                 "ADR-224, staff only (empty for others): the WOD of each day in the window, " <>
+                   "for every class (class_type_id null) or one class type, and every branch " <>
+                   "(location_id null) or one.",
+               items: %Schema{
+                 type: :object,
+                 additionalProperties: true,
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   local_date: %Schema{type: :string, format: :date},
+                   class_type_id: %Schema{type: :string, format: :uuid, nullable: true},
+                   location_id: %Schema{type: :string, format: :uuid, nullable: true},
+                   master_workout_id: %Schema{type: :string, format: :uuid},
+                   workout: %Schema{
+                     type: :object,
+                     nullable: true,
+                     properties: %{
+                       id: %Schema{type: :string, format: :uuid},
+                       title: %Schema{type: :string},
+                       type: %Schema{type: :string, nullable: true}
+                     }
+                   }
+                 },
+                 required: [:id, :local_date, :class_type_id, :location_id, :master_workout_id]
+               }
+             },
              coaches: %Schema{
                type: :array,
                description: "The coaches of the window's classes.",
@@ -115,6 +143,19 @@ defmodule PaleeWeb.ScheduleController do
                  type: :object,
                  additionalProperties: true,
                  properties: %{
+                   day_workout_id: %Schema{
+                     type: :string,
+                     format: :uuid,
+                     nullable: true,
+                     description: "ADR-224: the day WOD the class's WOD comes from."
+                   },
+                   workout_source: %Schema{
+                     type: :string,
+                     nullable: true,
+                     enum: ["day", "class"],
+                     description:
+                       "ADR-224: day = inherited from the day's WOD, class = set on the class."
+                   },
                    space_id: %Schema{type: :string, format: :uuid, nullable: true},
                    space: %Schema{
                      type: :object,
@@ -182,7 +223,7 @@ defmodule PaleeWeb.ScheduleController do
                }
              }
            },
-           required: [:start_date, :end_date, :days, :class_types, :slots]
+           required: [:start_date, :end_date, :days, :class_types, :day_workouts, :slots]
          }}
     ]
   )

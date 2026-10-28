@@ -1,5 +1,12 @@
 defmodule Palee.Application.CreateScheduledSlot do
-  alias Palee.Application.{ClassLocation, ClassSpace, ScheduleRealtime, TrackAnalyticsEvent}
+  alias Palee.Application.{
+    ClassLocation,
+    ClassSpace,
+    DayWorkouts,
+    ScheduleRealtime,
+    TrackAnalyticsEvent
+  }
+
   alias Palee.Scheduling
   alias Palee.Workouts
 
@@ -13,7 +20,8 @@ defmodule Palee.Application.CreateScheduledSlot do
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          :ok <- ClassLocation.check(context, params),
          :ok <- ClassSpace.check(context, params),
-         {:ok, slot} <- create_slot(context, params) do
+         {:ok, slot} <- create_slot(context, params),
+         {:ok, [slot]} <- inherit_day_workout(context, [slot]) do
       broadcast_slot_created(slot)
       TrackAnalyticsEvent.call("class_slot_created", context, slot)
       {:ok, slot}
@@ -44,7 +52,8 @@ defmodule Palee.Application.CreateScheduledSlot do
     with {:ok, _workout} <- fetch_workout(context, value(params, :master_workout_id)),
          {:ok, _class_type} <- fetch_class_type(context, value(params, :class_type_id)),
          :ok <- ClassSpace.check_all(context, items),
-         {:ok, slots} <- ClassLocation.create_all(context, items, &create_slot(context, &1)) do
+         {:ok, slots} <- ClassLocation.create_all(context, items, &create_slot(context, &1)),
+         {:ok, slots} <- inherit_day_workout(context, slots) do
       Enum.each(slots, fn slot ->
         broadcast_slot_created(slot)
         TrackAnalyticsEvent.call("class_slot_created", context, slot)
@@ -57,6 +66,17 @@ defmodule Palee.Application.CreateScheduledSlot do
   defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
 
   defp create_slot(context, params), do: Scheduling.create_slot(context, params)
+
+  # ADR-224: a class created on a day with a day WOD inherits it.
+  defp inherit_day_workout(context, slots) do
+    with {:ok, changed_ids} <- DayWorkouts.reconcile_classes(context, slots) do
+      {:ok, Enum.map(slots, &refetch_if_changed(context, &1, changed_ids))}
+    end
+  end
+
+  defp refetch_if_changed(context, slot, changed_ids) do
+    if slot.id in changed_ids, do: Scheduling.get_slot(context, slot.id) || slot, else: slot
+  end
 
   # ADR-176: a class may be saved before its WOD exists.
   defp fetch_workout(_context, nil), do: {:ok, nil}
