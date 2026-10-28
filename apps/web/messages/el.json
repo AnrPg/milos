@@ -237,6 +237,7 @@
     "classAction_cancel": "Ακύρωση μαθήματος",
     "classAction_restore": "Επαναφορά μαθήματος",
     "classAction_delete": "Διαγραφή",
+    "classMoreActions": "Περισσότερες ενέργειες για το μάθημα",
     "classActionTitle_pause": "Παύση κρατήσεων;",
     "classActionTitle_resume": "Συνέχιση κρατήσεων;",
     "classActionTitle_cancel": "Ακύρωση αυτού του μαθήματος;",
@@ -2101,6 +2102,7 @@
     "roleOwner": "Ιδιοκτήτης",
     "roleAdmin": "Διαχειριστής",
     "roleCoach": "Coach",
+    "roleHeadCoach": "Head coach",
     "roleFrontDesk": "Υπάλληλος υποδοχής",
     "roleAccountant": "Λογιστής",
     "roleJanitor": "Προσωπικό καθαριότητας",
@@ -4964,7 +4966,7 @@
       "all": "Όλοι",
       "member": "Μέλη box",
       "athlete": "Αθλητές (προσωπικό πρόγραμμα)",
-      "admin": "Προσωπικό"
+      "staff": "Προσωπικό"
     },
     "showing": "Εμφανίζονται {shown} από {total}",
     "clearFilters": "Καθαρισμός φίλτρων",
@@ -4977,6 +4979,7 @@
     "listLabel": "Άτομα",
     "columns": {
       "person": "Άτομο",
+      "roles": "Ρόλοι",
       "finance": "Συνδρομή",
       "joined": "Εγγραφή",
       "open": "Άνοιγμα προφίλ"

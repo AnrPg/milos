@@ -237,6 +237,7 @@
     "classAction_cancel": "إلغاء الصف",
     "classAction_restore": "استعادة الصف",
     "classAction_delete": "حذف",
+    "classMoreActions": "إجراءات أخرى لهذا الصف",
     "classActionTitle_pause": "إيقاف الحجز مؤقتًا؟",
     "classActionTitle_resume": "استئناف الحجز؟",
     "classActionTitle_cancel": "إلغاء هذا الصف؟",
@@ -2101,6 +2102,7 @@
     "roleOwner": "المالك",
     "roleAdmin": "مسؤول",
     "roleCoach": "مدرب",
+    "roleHeadCoach": "المدرب الرئيسي",
     "roleFrontDesk": "موظف استقبال",
     "roleAccountant": "محاسب",
     "roleJanitor": "عامل نظافة",
@@ -4964,7 +4966,7 @@
       "all": "الجميع",
       "member": "الأعضاء",
       "athlete": "الرياضيون",
-      "admin": "الطاقم"
+      "staff": "الطاقم"
     },
     "showing": "عرض {shown} من {total}",
     "clearFilters": "مسح عوامل التصفية",
@@ -4977,6 +4979,7 @@
     "listLabel": "الأشخاص",
     "columns": {
       "person": "الشخص",
+      "roles": "الأدوار",
       "finance": "الاشتراك",
       "joined": "تاريخ الانضمام",
       "open": "فتح الملف"

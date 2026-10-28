@@ -1413,7 +1413,7 @@ export function AssignedWorkoutsConsole({
                 value={viewMode}
               />
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}

@@ -24,7 +24,7 @@ import { ClubSquadsCard } from "@/components/community/squads/ClubSquadsCard";
 import { MembersTab } from "@/components/community/MembersTab";
 import { OpenClubLanding } from "@/components/community/OpenClubLanding";
 import { CLUB_POSTS_SHAPE, PostFilters, narrowsPosts, postsFeedFilter } from "@/components/community/PostFilters";
-import { MoreMenu } from "@/components/community/PostCard";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { WodCard } from "@/components/community/WodCard";
 import { ClubEventsTab } from "@/components/events/ClubEventsTab";

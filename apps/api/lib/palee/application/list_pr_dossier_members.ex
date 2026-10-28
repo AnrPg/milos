@@ -26,6 +26,8 @@ defmodule Palee.Application.ListPRDossierMembers do
   def call(_context), do: {:error, :organization_context_required}
 
   defp members(context) do
+    roles_by_user = Organizations.member_roles_by_user(context)
+
     context
     |> TenantUserAccess.list_active_users()
     |> Enum.reject(&(&1.id == context.user_id))
@@ -35,7 +37,8 @@ defmodule Palee.Application.ListPRDossierMembers do
         id: user.id,
         nickname: user.nickname,
         avatar_url: user.avatar_url,
-        role: to_string(user.role),
+        # ADR-217: the person's primary role in this gym.
+        role: to_string(get_in(roles_by_user, [user.id, :role]) || user.role),
         joined_at: timestamp(user.inserted_at)
       }
     end)

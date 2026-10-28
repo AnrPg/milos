@@ -22,6 +22,27 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
   def authorized_status?(status), do: status == :active
 
   @doc """
+  ADR-217: whether a role set makes someone a client of the business. Only a
+  member or athlete role does; staff roles never imply one.
+  """
+  def client?(roles), do: Enum.any?(List.wrap(roles), &(parse_role(&1) in @client_roles))
+
+  @doc "ADR-217: whether a role set holds any staff role (owner and admin included)."
+  def staff?(roles),
+    do: Enum.any?(List.wrap(roles), &(parse_role(&1) in (@admin_roles ++ @staff_roles)))
+
+  @doc "ADR-217: the client role of a role set (`:athlete` before `:member`), or nil."
+  def client_role(roles) do
+    roles = Enum.map(List.wrap(roles), &parse_role/1)
+
+    cond do
+      :athlete in roles -> :athlete
+      :member in roles -> :member
+      true -> nil
+    end
+  end
+
+  @doc """
   Whether an account holding `issuer_roles` may grant `target_role` to someone
   else: owners grant any role, admins grant staff and client roles, coaches
   and front desk invite clients, nobody else grants roles.
