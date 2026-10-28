@@ -26149,6 +26149,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * FreeTextWorkoutBody
+         * @description One text written with the WOD assistant
+         */
+        FreeTextWorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** GarminConnectRequest */
         GarminConnectRequest: {
             /**
@@ -36653,6 +36671,415 @@ export interface components {
                 unmatched_exercises: number;
             };
         };
+        /** StructuredSection */
+        StructuredSection: {
+            exercises: {
+                /** Format: uuid */
+                alternating_group_id?: string | null;
+                applied_variation?: {
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
+                    excluded?: boolean;
+                    exercise_name_override?: string | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** @enum {string|null} */
+                    load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                    load_progression?: {
+                        /** @enum {string} */
+                        direction: "increase" | "decrease";
+                        /** @enum {string} */
+                        mode: "linear" | "per_set";
+                        per_set_values: (number | null)[];
+                        /** @enum {string} */
+                        start_mode: "absolute" | "pct_1rm" | "bw";
+                        start_value: number;
+                        step_value: number;
+                    } | null;
+                    load_value?: number | null;
+                    note?: string | null;
+                    prescription_metadata?: {
+                        [key: string]: unknown;
+                    };
+                    /** @enum {string|null} */
+                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                    prescription_value?: number | null;
+                    scale_level?: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        is_active?: boolean;
+                        label?: string;
+                        slug?: string;
+                        sort_order?: number;
+                    } | null;
+                    scale_level_slug?: string | null;
+                    set_prescriptions?: {
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_value?: number | null;
+                        metadata?: {
+                            [key: string]: unknown;
+                        };
+                        note?: string | null;
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        set_index: number;
+                    }[] | null;
+                    sets?: number | null;
+                } | null;
+                cluster_rest_seconds?: number | null;
+                content?: {
+                    body: string;
+                    document?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** @enum {string} */
+                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                }[];
+                description?: string | null;
+                excluded?: boolean;
+                exercise_ref?: string | null;
+                group_config?: {
+                    [key: string]: unknown;
+                } | null;
+                hr_zone?: number | null;
+                /** Format: uuid */
+                id?: string | null;
+                interval_assignment?: number | null;
+                is_bodyweight?: boolean;
+                /**
+                 * @default exercise
+                 * @enum {string}
+                 */
+                item_type: "exercise" | "header";
+                /** @enum {string|null} */
+                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                load_progression?: {
+                    /** @enum {string} */
+                    direction: "increase" | "decrease";
+                    /** @enum {string} */
+                    mode: "linear" | "per_set";
+                    per_set_values: (number | null)[];
+                    /** @enum {string} */
+                    start_mode: "absolute" | "pct_1rm" | "bw";
+                    start_value: number;
+                    step_value: number;
+                } | null;
+                load_value?: number | null;
+                name: string;
+                note?: string | null;
+                order?: number;
+                pacing?: number | null;
+                prescription_metadata?: {
+                    [key: string]: unknown;
+                };
+                prescription_step?: number | null;
+                /** @enum {string|null} */
+                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                prescription_value?: number | null;
+                rest_pause_seconds?: number | null;
+                rest_seconds?: number | null;
+                set_prescriptions?: {
+                    /** @enum {string|null} */
+                    load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                    load_value?: number | null;
+                    metadata?: {
+                        [key: string]: unknown;
+                    };
+                    note?: string | null;
+                    /** @enum {string|null} */
+                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                    prescription_value?: number | null;
+                    set_index: number;
+                }[];
+                sets?: number | null;
+                subtitle?: string | null;
+                /** Format: uuid */
+                superset_group_id?: string | null;
+                tempo?: string | null;
+                variations?: {
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
+                    excluded?: boolean;
+                    exercise_name_override?: string | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** @enum {string|null} */
+                    load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                    load_progression?: {
+                        /** @enum {string} */
+                        direction: "increase" | "decrease";
+                        /** @enum {string} */
+                        mode: "linear" | "per_set";
+                        per_set_values: (number | null)[];
+                        /** @enum {string} */
+                        start_mode: "absolute" | "pct_1rm" | "bw";
+                        start_value: number;
+                        step_value: number;
+                    } | null;
+                    load_value?: number | null;
+                    note?: string | null;
+                    prescription_metadata?: {
+                        [key: string]: unknown;
+                    };
+                    /** @enum {string|null} */
+                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                    prescription_value?: number | null;
+                    scale_level?: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        is_active?: boolean;
+                        label?: string;
+                        slug?: string;
+                        sort_order?: number;
+                    } | null;
+                    scale_level_slug?: string | null;
+                    set_prescriptions?: {
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_value?: number | null;
+                        metadata?: {
+                            [key: string]: unknown;
+                        };
+                        note?: string | null;
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        set_index: number;
+                    }[] | null;
+                    sets?: number | null;
+                }[];
+            }[];
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            scoreable: boolean;
+            subtitle?: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * StructuredWorkoutBody
+         * @description Exercises with every parameter (structured editor, Quick Text)
+         */
+        StructuredWorkoutBody: {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                exercises: {
+                    /** Format: uuid */
+                    alternating_group_id?: string | null;
+                    applied_variation?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
+                        excluded?: boolean;
+                        exercise_name_override?: string | null;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_progression?: {
+                            /** @enum {string} */
+                            direction: "increase" | "decrease";
+                            /** @enum {string} */
+                            mode: "linear" | "per_set";
+                            per_set_values: (number | null)[];
+                            /** @enum {string} */
+                            start_mode: "absolute" | "pct_1rm" | "bw";
+                            start_value: number;
+                            step_value: number;
+                        } | null;
+                        load_value?: number | null;
+                        note?: string | null;
+                        prescription_metadata?: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        scale_level?: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            is_active?: boolean;
+                            label?: string;
+                            slug?: string;
+                            sort_order?: number;
+                        } | null;
+                        scale_level_slug?: string | null;
+                        set_prescriptions?: {
+                            /** @enum {string|null} */
+                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                            load_value?: number | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            note?: string | null;
+                            /** @enum {string|null} */
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                            prescription_value?: number | null;
+                            set_index: number;
+                        }[] | null;
+                        sets?: number | null;
+                    } | null;
+                    cluster_rest_seconds?: number | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
+                    description?: string | null;
+                    excluded?: boolean;
+                    exercise_ref?: string | null;
+                    group_config?: {
+                        [key: string]: unknown;
+                    } | null;
+                    hr_zone?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    interval_assignment?: number | null;
+                    is_bodyweight?: boolean;
+                    /**
+                     * @default exercise
+                     * @enum {string}
+                     */
+                    item_type: "exercise" | "header";
+                    /** @enum {string|null} */
+                    load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                    load_progression?: {
+                        /** @enum {string} */
+                        direction: "increase" | "decrease";
+                        /** @enum {string} */
+                        mode: "linear" | "per_set";
+                        per_set_values: (number | null)[];
+                        /** @enum {string} */
+                        start_mode: "absolute" | "pct_1rm" | "bw";
+                        start_value: number;
+                        step_value: number;
+                    } | null;
+                    load_value?: number | null;
+                    name: string;
+                    note?: string | null;
+                    order?: number;
+                    pacing?: number | null;
+                    prescription_metadata?: {
+                        [key: string]: unknown;
+                    };
+                    prescription_step?: number | null;
+                    /** @enum {string|null} */
+                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                    prescription_value?: number | null;
+                    rest_pause_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    set_prescriptions?: {
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_value?: number | null;
+                        metadata?: {
+                            [key: string]: unknown;
+                        };
+                        note?: string | null;
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        set_index: number;
+                    }[];
+                    sets?: number | null;
+                    subtitle?: string | null;
+                    /** Format: uuid */
+                    superset_group_id?: string | null;
+                    tempo?: string | null;
+                    variations?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
+                        excluded?: boolean;
+                        exercise_name_override?: string | null;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_progression?: {
+                            /** @enum {string} */
+                            direction: "increase" | "decrease";
+                            /** @enum {string} */
+                            mode: "linear" | "per_set";
+                            per_set_values: (number | null)[];
+                            /** @enum {string} */
+                            start_mode: "absolute" | "pct_1rm" | "bw";
+                            start_value: number;
+                            step_value: number;
+                        } | null;
+                        load_value?: number | null;
+                        note?: string | null;
+                        prescription_metadata?: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        scale_level?: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            is_active?: boolean;
+                            label?: string;
+                            slug?: string;
+                            sort_order?: number;
+                        } | null;
+                        scale_level_slug?: string | null;
+                        set_prescriptions?: {
+                            /** @enum {string|null} */
+                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                            load_value?: number | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            note?: string | null;
+                            /** @enum {string|null} */
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                            prescription_value?: number | null;
+                            set_index: number;
+                        }[] | null;
+                        sets?: number | null;
+                    }[];
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
             /** Format: uuid */
@@ -37006,6 +37433,65 @@ export interface components {
                 /** Format: date-time */
                 undo_until?: string;
             };
+        };
+        /** TextSection */
+        TextSection: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            id: string | null;
+            /** @description What the section counts (SectionScoring metrics), empty when not scored */
+            scoring: {
+                [key: string]: unknown;
+            }[];
+            text: string;
+            /** SectionTimerPreset */
+            timer: {
+                duration_seconds?: number | null;
+                /** @enum {string} */
+                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                interval_seconds?: number | null;
+                rest_seconds?: number | null;
+                rounds?: number | null;
+                work_seconds?: number | null;
+            } | null;
+            /** @description Null when untitled */
+            title: string | null;
+        };
+        /**
+         * TextSectionsWorkoutBody
+         * @description ADR-180: text sections written without the assistant, a timer each
+         */
+        TextSectionsWorkoutBody: {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
         };
         /** TrainingHistoryPage */
         TrainingHistoryPage: {
@@ -38259,6 +38745,265 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+        };
+        /** WorkoutBody */
+        WorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        } | {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        } | {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                exercises: {
+                    /** Format: uuid */
+                    alternating_group_id?: string | null;
+                    applied_variation?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
+                        excluded?: boolean;
+                        exercise_name_override?: string | null;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_progression?: {
+                            /** @enum {string} */
+                            direction: "increase" | "decrease";
+                            /** @enum {string} */
+                            mode: "linear" | "per_set";
+                            per_set_values: (number | null)[];
+                            /** @enum {string} */
+                            start_mode: "absolute" | "pct_1rm" | "bw";
+                            start_value: number;
+                            step_value: number;
+                        } | null;
+                        load_value?: number | null;
+                        note?: string | null;
+                        prescription_metadata?: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        scale_level?: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            is_active?: boolean;
+                            label?: string;
+                            slug?: string;
+                            sort_order?: number;
+                        } | null;
+                        scale_level_slug?: string | null;
+                        set_prescriptions?: {
+                            /** @enum {string|null} */
+                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                            load_value?: number | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            note?: string | null;
+                            /** @enum {string|null} */
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                            prescription_value?: number | null;
+                            set_index: number;
+                        }[] | null;
+                        sets?: number | null;
+                    } | null;
+                    cluster_rest_seconds?: number | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
+                    description?: string | null;
+                    excluded?: boolean;
+                    exercise_ref?: string | null;
+                    group_config?: {
+                        [key: string]: unknown;
+                    } | null;
+                    hr_zone?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    interval_assignment?: number | null;
+                    is_bodyweight?: boolean;
+                    /**
+                     * @default exercise
+                     * @enum {string}
+                     */
+                    item_type: "exercise" | "header";
+                    /** @enum {string|null} */
+                    load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                    load_progression?: {
+                        /** @enum {string} */
+                        direction: "increase" | "decrease";
+                        /** @enum {string} */
+                        mode: "linear" | "per_set";
+                        per_set_values: (number | null)[];
+                        /** @enum {string} */
+                        start_mode: "absolute" | "pct_1rm" | "bw";
+                        start_value: number;
+                        step_value: number;
+                    } | null;
+                    load_value?: number | null;
+                    name: string;
+                    note?: string | null;
+                    order?: number;
+                    pacing?: number | null;
+                    prescription_metadata?: {
+                        [key: string]: unknown;
+                    };
+                    prescription_step?: number | null;
+                    /** @enum {string|null} */
+                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                    prescription_value?: number | null;
+                    rest_pause_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    set_prescriptions?: {
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_value?: number | null;
+                        metadata?: {
+                            [key: string]: unknown;
+                        };
+                        note?: string | null;
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        set_index: number;
+                    }[];
+                    sets?: number | null;
+                    subtitle?: string | null;
+                    /** Format: uuid */
+                    superset_group_id?: string | null;
+                    tempo?: string | null;
+                    variations?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
+                        excluded?: boolean;
+                        exercise_name_override?: string | null;
+                        /** Format: uuid */
+                        id?: string | null;
+                        /** @enum {string|null} */
+                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                        load_progression?: {
+                            /** @enum {string} */
+                            direction: "increase" | "decrease";
+                            /** @enum {string} */
+                            mode: "linear" | "per_set";
+                            per_set_values: (number | null)[];
+                            /** @enum {string} */
+                            start_mode: "absolute" | "pct_1rm" | "bw";
+                            start_value: number;
+                            step_value: number;
+                        } | null;
+                        load_value?: number | null;
+                        note?: string | null;
+                        prescription_metadata?: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string|null} */
+                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                        prescription_value?: number | null;
+                        scale_level?: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            is_active?: boolean;
+                            label?: string;
+                            slug?: string;
+                            sort_order?: number;
+                        } | null;
+                        scale_level_slug?: string | null;
+                        set_prescriptions?: {
+                            /** @enum {string|null} */
+                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                            load_value?: number | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            note?: string | null;
+                            /** @enum {string|null} */
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                            prescription_value?: number | null;
+                            set_index: number;
+                        }[] | null;
+                        sets?: number | null;
+                    }[];
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
+        /** WorkoutBodySummary */
+        WorkoutBodySummary: {
+            excerpt?: string | null;
+            /** @enum {string} */
+            kind: "free_text" | "text_sections" | "structured";
+            sections?: {
+                [key: string]: unknown;
+            }[];
+            structured?: boolean;
+            timer?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** WorkoutChoice */
         WorkoutChoice: {
@@ -79762,9 +80507,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        workouts: {
+                        workouts: ({
+                            /** WorkoutBodySummary */
+                            body?: {
+                                excerpt?: string | null;
+                                /** @enum {string} */
+                                kind: "free_text" | "text_sections" | "structured";
+                                sections?: {
+                                    [key: string]: unknown;
+                                }[];
+                                structured?: boolean;
+                                timer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                            };
+                        } & {
                             [key: string]: unknown;
-                        }[];
+                        })[];
                     };
                 };
             };
@@ -80371,6 +81130,252 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    exercises: {
+                                        /** Format: uuid */
+                                        alternating_group_id?: string | null;
+                                        applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        } | null;
+                                        cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
+                                        description?: string | null;
+                                        excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        hr_zone?: number | null;
+                                        /** Format: uuid */
+                                        id?: string | null;
+                                        interval_assignment?: number | null;
+                                        is_bodyweight?: boolean;
+                                        /**
+                                         * @default exercise
+                                         * @enum {string}
+                                         */
+                                        item_type: "exercise" | "header";
+                                        /** @enum {string|null} */
+                                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                        load_progression?: {
+                                            /** @enum {string} */
+                                            direction: "increase" | "decrease";
+                                            /** @enum {string} */
+                                            mode: "linear" | "per_set";
+                                            per_set_values: (number | null)[];
+                                            /** @enum {string} */
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
+                                            start_value: number;
+                                            step_value: number;
+                                        } | null;
+                                        load_value?: number | null;
+                                        name: string;
+                                        note?: string | null;
+                                        order?: number;
+                                        pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
+                                        prescription_step?: number | null;
+                                        /** @enum {string|null} */
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                        prescription_value?: number | null;
+                                        rest_pause_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        set_prescriptions?: {
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            note?: string | null;
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            set_index: number;
+                                        }[];
+                                        sets?: number | null;
+                                        subtitle?: string | null;
+                                        /** Format: uuid */
+                                        superset_group_id?: string | null;
+                                        tempo?: string | null;
+                                        variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        }[];
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -82601,6 +83606,252 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    exercises: {
+                                        /** Format: uuid */
+                                        alternating_group_id?: string | null;
+                                        applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        } | null;
+                                        cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
+                                        description?: string | null;
+                                        excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        hr_zone?: number | null;
+                                        /** Format: uuid */
+                                        id?: string | null;
+                                        interval_assignment?: number | null;
+                                        is_bodyweight?: boolean;
+                                        /**
+                                         * @default exercise
+                                         * @enum {string}
+                                         */
+                                        item_type: "exercise" | "header";
+                                        /** @enum {string|null} */
+                                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                        load_progression?: {
+                                            /** @enum {string} */
+                                            direction: "increase" | "decrease";
+                                            /** @enum {string} */
+                                            mode: "linear" | "per_set";
+                                            per_set_values: (number | null)[];
+                                            /** @enum {string} */
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
+                                            start_value: number;
+                                            step_value: number;
+                                        } | null;
+                                        load_value?: number | null;
+                                        name: string;
+                                        note?: string | null;
+                                        order?: number;
+                                        pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
+                                        prescription_step?: number | null;
+                                        /** @enum {string|null} */
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                        prescription_value?: number | null;
+                                        rest_pause_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        set_prescriptions?: {
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            note?: string | null;
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            set_index: number;
+                                        }[];
+                                        sets?: number | null;
+                                        subtitle?: string | null;
+                                        /** Format: uuid */
+                                        superset_group_id?: string | null;
+                                        tempo?: string | null;
+                                        variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        }[];
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -98623,6 +99874,252 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    exercises: {
+                                        /** Format: uuid */
+                                        alternating_group_id?: string | null;
+                                        applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        } | null;
+                                        cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
+                                        description?: string | null;
+                                        excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        hr_zone?: number | null;
+                                        /** Format: uuid */
+                                        id?: string | null;
+                                        interval_assignment?: number | null;
+                                        is_bodyweight?: boolean;
+                                        /**
+                                         * @default exercise
+                                         * @enum {string}
+                                         */
+                                        item_type: "exercise" | "header";
+                                        /** @enum {string|null} */
+                                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                        load_progression?: {
+                                            /** @enum {string} */
+                                            direction: "increase" | "decrease";
+                                            /** @enum {string} */
+                                            mode: "linear" | "per_set";
+                                            per_set_values: (number | null)[];
+                                            /** @enum {string} */
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
+                                            start_value: number;
+                                            step_value: number;
+                                        } | null;
+                                        load_value?: number | null;
+                                        name: string;
+                                        note?: string | null;
+                                        order?: number;
+                                        pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
+                                        prescription_step?: number | null;
+                                        /** @enum {string|null} */
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                        prescription_value?: number | null;
+                                        rest_pause_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        set_prescriptions?: {
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            note?: string | null;
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            set_index: number;
+                                        }[];
+                                        sets?: number | null;
+                                        subtitle?: string | null;
+                                        /** Format: uuid */
+                                        superset_group_id?: string | null;
+                                        tempo?: string | null;
+                                        variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        }[];
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -99258,6 +100755,252 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    exercises: {
+                                        /** Format: uuid */
+                                        alternating_group_id?: string | null;
+                                        applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        } | null;
+                                        cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
+                                        description?: string | null;
+                                        excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        hr_zone?: number | null;
+                                        /** Format: uuid */
+                                        id?: string | null;
+                                        interval_assignment?: number | null;
+                                        is_bodyweight?: boolean;
+                                        /**
+                                         * @default exercise
+                                         * @enum {string}
+                                         */
+                                        item_type: "exercise" | "header";
+                                        /** @enum {string|null} */
+                                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                        load_progression?: {
+                                            /** @enum {string} */
+                                            direction: "increase" | "decrease";
+                                            /** @enum {string} */
+                                            mode: "linear" | "per_set";
+                                            per_set_values: (number | null)[];
+                                            /** @enum {string} */
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
+                                            start_value: number;
+                                            step_value: number;
+                                        } | null;
+                                        load_value?: number | null;
+                                        name: string;
+                                        note?: string | null;
+                                        order?: number;
+                                        pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
+                                        prescription_step?: number | null;
+                                        /** @enum {string|null} */
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                        prescription_value?: number | null;
+                                        rest_pause_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        set_prescriptions?: {
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            note?: string | null;
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            set_index: number;
+                                        }[];
+                                        sets?: number | null;
+                                        subtitle?: string | null;
+                                        /** Format: uuid */
+                                        superset_group_id?: string | null;
+                                        tempo?: string | null;
+                                        variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        }[];
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -99805,6 +101548,252 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    exercises: {
+                                        /** Format: uuid */
+                                        alternating_group_id?: string | null;
+                                        applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        } | null;
+                                        cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
+                                        description?: string | null;
+                                        excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        hr_zone?: number | null;
+                                        /** Format: uuid */
+                                        id?: string | null;
+                                        interval_assignment?: number | null;
+                                        is_bodyweight?: boolean;
+                                        /**
+                                         * @default exercise
+                                         * @enum {string}
+                                         */
+                                        item_type: "exercise" | "header";
+                                        /** @enum {string|null} */
+                                        load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                        load_progression?: {
+                                            /** @enum {string} */
+                                            direction: "increase" | "decrease";
+                                            /** @enum {string} */
+                                            mode: "linear" | "per_set";
+                                            per_set_values: (number | null)[];
+                                            /** @enum {string} */
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
+                                            start_value: number;
+                                            step_value: number;
+                                        } | null;
+                                        load_value?: number | null;
+                                        name: string;
+                                        note?: string | null;
+                                        order?: number;
+                                        pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
+                                        prescription_step?: number | null;
+                                        /** @enum {string|null} */
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                        prescription_value?: number | null;
+                                        rest_pause_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        set_prescriptions?: {
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            note?: string | null;
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            set_index: number;
+                                        }[];
+                                        sets?: number | null;
+                                        subtitle?: string | null;
+                                        /** Format: uuid */
+                                        superset_group_id?: string | null;
+                                        tempo?: string | null;
+                                        variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
+                                            excluded?: boolean;
+                                            exercise_name_override?: string | null;
+                                            /** Format: uuid */
+                                            id?: string | null;
+                                            /** @enum {string|null} */
+                                            load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                            load_progression?: {
+                                                /** @enum {string} */
+                                                direction: "increase" | "decrease";
+                                                /** @enum {string} */
+                                                mode: "linear" | "per_set";
+                                                per_set_values: (number | null)[];
+                                                /** @enum {string} */
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
+                                                start_value: number;
+                                                step_value: number;
+                                            } | null;
+                                            load_value?: number | null;
+                                            note?: string | null;
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
+                                            /** @enum {string|null} */
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                            prescription_value?: number | null;
+                                            scale_level?: {
+                                                /** Format: uuid */
+                                                id?: string | null;
+                                                is_active?: boolean;
+                                                label?: string;
+                                                slug?: string;
+                                                sort_order?: number;
+                                            } | null;
+                                            scale_level_slug?: string | null;
+                                            set_prescriptions?: {
+                                                /** @enum {string|null} */
+                                                load_mode?: "absolute" | "pct_1rm" | "bw" | null;
+                                                load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
+                                                note?: string | null;
+                                                /** @enum {string|null} */
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
+                                                prescription_value?: number | null;
+                                                set_index: number;
+                                            }[] | null;
+                                            sets?: number | null;
+                                        }[];
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
