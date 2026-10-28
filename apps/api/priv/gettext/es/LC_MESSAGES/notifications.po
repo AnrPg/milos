@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Se ha liberado una plaza en %{class}. Tu reserva está confirmada o pendiente de aprobación."
 
 msgid "Your package ends soon"
-msgstr "Tu paquete termina pronto"
+msgstr "Tu paquete de suscripción termina pronto"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} termina el %{date}."

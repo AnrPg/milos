@@ -235,7 +235,7 @@ export function nextMatch(slots: ScheduleSlot[], after: Date) {
   );
 }
 
-/** The two choices of the «Πακέτο» section on the filter page. */
+/** The two choices of the «Πακέτο συνδρομής» section on the filter page. */
 export const PACKAGE_ONLY = "only";
 export const PACKAGE_ALL = "all";
 export type PackageChoice = typeof PACKAGE_ONLY | typeof PACKAGE_ALL;

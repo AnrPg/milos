@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Im Kurs %{class} ist ein Platz frei geworden. Deine Buchung ist bestätigt oder wartet auf Freigabe."
 
 msgid "Your package ends soon"
-msgstr "Dein Paket endet bald"
+msgstr "Dein Abo-Paket endet bald"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} endet am %{date}."
@@ -395,7 +395,7 @@ msgid "%{nickname} is coming to «%{event}» with your guest pass."
 msgstr "%{nickname} kommt mit deinem Gästepass zu «%{event}»."
 
 msgid "Try a class"
-msgstr "Probier ein Training aus"
+msgstr "Probier einen Kurs aus"
 
 msgid "Liked «%{event}»? %{box} invites you to a trial class."
 msgstr "Hat dir «%{event}» gefallen? %{box} lädt dich zu einem Probetraining ein."
@@ -588,7 +588,7 @@ msgstr "%{nickname} hat dich in die PT-Squad «%{group}» eingeladen."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
-msgstr "Eine Stunde hat kein WOD"
+msgstr "Ein Kurs hat kein WOD"
 
 msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
 msgstr "%{class} (%{when}) hat kein WOD, daher können Box-Mitglieder sie weder sehen noch buchen. Verknüpfe eines, um sie zu veröffentlichen."

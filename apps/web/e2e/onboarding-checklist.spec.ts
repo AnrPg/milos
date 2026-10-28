@@ -78,7 +78,7 @@ test.describe("admin setup checklist", () => {
     const expected: Record<string, string> = {
       "Open settings": "/org/kypseli/admin/settings",
       "Set up classes": "/org/kypseli/admin/class-schedule",
-      "Create a package": "/org/kypseli/admin/finance?tab=packages",
+      "Create a subscription package": "/org/kypseli/admin/finance?tab=packages",
       "Write a workout": "/org/kypseli/admin/workouts/new",
       // ADR-221: until the page is published nobody finds the box.
       "Open the public page": "/org/kypseli/admin/public-page",

@@ -178,7 +178,7 @@ defmodule PaleeWeb.CalendarFeedControllerTest do
       |> get("/api/calendar/feed.ics", %{token: links["token"]})
       |> response(200)
 
-    assert feed =~ "SUMMARY:Κατηγορία: CrossFit"
+    assert feed =~ "SUMMARY:Τμήμα: CrossFit"
   end
 
   test "regenerating calendar links revokes prior feed tokens", %{conn: conn} do

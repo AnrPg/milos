@@ -131,10 +131,10 @@ msgid "A new %{target_type} review needs attention."
 msgstr "Нов отзив за %{target_type} изисква внимание."
 
 msgid "Class bookings approved"
-msgstr "Одобрени резервации за класове"
+msgstr "Одобрени записвания за занятия"
 
 msgid "Your coach approved one or more class booking requests."
-msgstr "Вашият треньор одобри една или повече заявки за класове."
+msgstr "Треньорът ти одобри една или повече заявки за записване за занятия."
 
 msgid "New workouts assigned"
 msgstr "Зададени са нови тренировки"
@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Освободи се място в %{class}. Резервацията ти е потвърдена или чака одобрение."
 
 msgid "Your package ends soon"
-msgstr "Пакетът ти изтича скоро"
+msgstr "Абонаментният ти пакет изтича скоро"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} изтича на %{date}."
@@ -236,19 +236,19 @@ msgid "your subscription"
 msgstr "абонаментът ви"
 
 msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
-msgstr "%{package} изтича на %{date} (след %{days} дни). Подновете, за да продължите да записвате часове."
+msgstr "%{package} изтича на %{date} (след %{days} дни). Поднови, за да продължиш да се записваш за занятия."
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
-msgstr "%{package} изтече. Запазвате достъп до %{date}; подновете дотогава, за да продължите да записвате часове."
+msgstr "%{package} изтече. Запазваш достъп до %{date}; поднови дотогава, за да продължиш да се записваш за занятия."
 
 msgid "Your access has ended"
 msgstr "Достъпът ви изтече"
 
 msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
-msgstr "Достъпът ви е спрян заради просрочено плащане. Платете дължимото, за да записвате отново часове."
+msgstr "Достъпът ти е спрян заради просрочено плащане. Плати дължимото, за да се записваш отново за занятия."
 
 msgid "Your access has ended. Renew your subscription to book classes again."
-msgstr "Достъпът ви изтече. Подновете абонамента си, за да записвате отново часове."
+msgstr "Достъпът ти изтече. Поднови абонамента си, за да се записваш отново за занятия."
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Предстоящите ви записвания бяха отменени: %{count}."
@@ -308,10 +308,10 @@ msgid "Want to keep training at %{box}? Send them a message."
 msgstr "Искаш ли да продължиш в %{box}? Пиши им."
 
 msgid "Trial class cancelled"
-msgstr "Тренировката е отменена"
+msgstr "Пробното занятие е отменено"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
-msgstr "%{box} отмени %{class} (%{when}). Избери друга тренировка."
+msgstr "%{box} отмени %{class} (%{when}). Избери друго занятие."
 
 msgid "New group to review"
 msgstr "Нова група за одобрение"
@@ -395,10 +395,10 @@ msgid "%{nickname} is coming to «%{event}» with your guest pass."
 msgstr "%{nickname} идва на «%{event}» с твоята гост покана."
 
 msgid "Try a class"
-msgstr "Пробвай тренировка"
+msgstr "Пробвай занятие"
 
 msgid "Liked «%{event}»? %{box} invites you to a trial class."
-msgstr "Хареса ли ти «%{event}»? %{box} те кани на пробна тренировка."
+msgstr "Хареса ли ти «%{event}»? %{box} те кани на пробно занятие."
 
 msgid "Message about «%{event}»"
 msgstr "Съобщение за «%{event}»"
@@ -588,7 +588,7 @@ msgstr "%{nickname} те покани в PT скуада «%{group}»."
 
 # ADR-176: a class without its WOD.
 msgid "A class has no WOD"
-msgstr "Тренировка без WOD"
+msgstr "Занятие без WOD"
 
 msgid "%{class} (%{when}) has no WOD, so box members can't see or book it. Link one to publish it."
 msgstr "%{class} (%{when}) няма WOD, затова членовете на залата не я виждат и не могат да се запишат. Свържи WOD, за да я публикуваш."
@@ -689,7 +689,7 @@ msgid "%{nickname} wants to send you a message."
 msgstr "%{nickname} иска да ви изпрати съобщение."
 
 msgid "Class cancelled"
-msgstr "Часът е отменен"
+msgstr "Занятието е отменено"
 
 msgid "%{class} (%{time}) was cancelled: %{reason}. Your place was released."
 msgstr "Часът %{class} (%{time}) е отменен: %{reason}. Мястото ти е освободено."

@@ -198,10 +198,10 @@ test.describe("member schedule", () => {
     await expect(page.getByRole("heading", { name: "Πρόγραμμα" })).toBeVisible();
     const list = page.getByRole("main");
     await expect(list.getByText("Olympic lifting")).toBeVisible();
-    await expect(list.getByText("Εκτός πακέτου")).toBeVisible();
+    await expect(list.getByText("Εκτός πακέτου συνδρομής")).toBeVisible();
     await shot(page, "day");
 
-    await page.getByRole("button", { name: "Στο πακέτο μου" }).click();
+    await page.getByRole("button", { name: "Στο πακέτο συνδρομής μου" }).click();
     await expect(list.getByText("Open gym")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Φίλτρα (1)" })).toBeVisible();
 
@@ -235,12 +235,12 @@ test.describe("member schedule", () => {
     await page.goto("/box/schedule");
     await page.getByRole("button", { name: /δείξε τον μήνα/ }).click();
     const grid = page.getByRole("grid", { name: "Μήνας" });
-    await expect(grid.getByRole("gridcell", { name: /4 μαθήματα/ })).toBeVisible();
+    await expect(grid.getByRole("gridcell", { name: /4 τμήματα/ })).toBeVisible();
     await shot(page, "month");
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     await grid.getByRole("gridcell", { name: new RegExp(`^\\S+ ${tomorrow.getDate()} `) }).first().click();
-    await expect(page.getByText("Δεν υπάρχουν μαθήματα")).toBeVisible();
+    await expect(page.getByText("Δεν υπάρχουν τμήματα")).toBeVisible();
   });
 
   test("opens a class as a sheet with its facts, the WOD names and Κράτηση at the bottom", async ({ page }) => {

@@ -876,7 +876,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                     type="button"
                     disabled={!canDelete || deleteMutation.isPending}
                     onClick={() => {
-                      if (window.confirm(i18n("delete63346e8") + profile.identity.nickname + "\"?")) deleteMutation.mutate();
+                      if (window.confirm(i18n("deleteNamedConfirm", { name: profile.identity.nickname }))) deleteMutation.mutate();
                     }}
                     className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
                     style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
