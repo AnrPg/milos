@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Dit pakket is al afgelopen.",
     "apiErrorNotLeaving": "Dit boxlid vertrekt niet.",
     "apiErrorAlreadyLeft": "De laatste dag is voorbij, dit kan niet meer ongedaan worden gemaakt.",
+    "apiErrorLeftByStaff": "De box heeft je vertrek geregistreerd, vraag hen het ongedaan te maken.",
     "apiErrorInvalidLeavingOn": "De laatste dag moet vandaag of later zijn.",
     "admRenewalTitle": "Automatische verlenging",
     "admRenewalOnHint": "Verlengt elke periode. Het boxlid kan dit in de app uitzetten.",

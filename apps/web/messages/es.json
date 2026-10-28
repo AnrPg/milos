@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Este paquete ya terminó.",
     "apiErrorNotLeaving": "Este miembro del box no se va.",
     "apiErrorAlreadyLeft": "El último día ya pasó, así que esto ya no se puede deshacer.",
+    "apiErrorLeftByStaff": "El box registró tu salida, así que pídeles que la deshagan.",
     "apiErrorInvalidLeavingOn": "El último día debe ser hoy o más adelante.",
     "admRenewalTitle": "Renovación automática",
     "admRenewalOnHint": "Se renueva cada periodo. El miembro del box puede desactivarla en la app.",

@@ -17,7 +17,7 @@ defmodule Palee.Finance.Domain.MemberRenewal do
 
   alias Palee.Finance.Domain.{InvoiceLifecycle, SubscriptionSelection}
 
-  @recurring_periods ~w(monthly quarterly annual)
+  @period_months %{"monthly" => 1, "quarterly" => 3, "semiannual" => 6, "annual" => 12}
   @paid_statuses ~w(paid partially_paid)
   @unpaid_statuses ~w(draft issued overdue)
 
@@ -85,13 +85,15 @@ defmodule Palee.Finance.Domain.MemberRenewal do
     period = field(subscription, :billing_period_snapshot)
     starts_on = field(subscription, :starts_on) || today
 
-    if period in @recurring_periods do
-      months = %{"monthly" => 1, "quarterly" => 3, "annual" => 12}[period]
+    case Map.fetch(@period_months, period) do
+      {:ok, months} ->
+        Stream.iterate(1, &(&1 + 1))
+        |> Stream.map(&Date.shift(starts_on, month: &1 * months))
+        |> Enum.find(&(Date.compare(&1, today) == :gt))
+        |> Date.add(-1)
 
-      Stream.iterate(1, &(&1 + 1))
-      |> Stream.map(&Date.shift(starts_on, month: &1 * months))
-      |> Enum.find(&(Date.compare(&1, today) == :gt))
-      |> Date.add(-1)
+      :error ->
+        nil
     end
   end
 

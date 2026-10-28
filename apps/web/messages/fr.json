@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Ce forfait est déjà terminé.",
     "apiErrorNotLeaving": "Ce membre ne quitte pas la box.",
     "apiErrorAlreadyLeft": "Le dernier jour est passé : ce n'est plus annulable.",
+    "apiErrorLeftByStaff": "La box a enregistré ton départ : demande-lui de l'annuler.",
     "apiErrorInvalidLeavingOn": "Le dernier jour doit être aujourd'hui ou plus tard.",
     "admRenewalTitle": "Renouvellement automatique",
     "admRenewalOnHint": "Se renouvelle à chaque période. Le membre peut le désactiver dans l'application.",

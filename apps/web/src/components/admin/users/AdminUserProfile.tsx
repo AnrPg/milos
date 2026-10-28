@@ -312,6 +312,15 @@ function FinanceDetails({
     signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
     notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
   }));
+  // ADR-220: leaving (or undoing it) changes status and expiry on the server;
+  // the cards show what the refreshed profile says, not the earlier edit.
+  const serverStatus = valueText(membership?.status) === "—" ? "active" : valueText(membership?.status);
+  const serverExpiresOn = typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "";
+  const [synced, setSynced] = useState({ status: serverStatus, expires_on: serverExpiresOn });
+  if (synced.status !== serverStatus || synced.expires_on !== serverExpiresOn) {
+    setSynced({ status: serverStatus, expires_on: serverExpiresOn });
+    setDraft((current) => ({ ...current, status: serverStatus, expires_on: serverExpiresOn }));
+  }
   const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),

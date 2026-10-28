@@ -289,7 +289,7 @@ function MembershipSegment({
           {/* ADR-220: the member's own choice; otherwise the box arranges it. */}
           {current.can_change_auto_renew ? (
             <RenewalSwitch provider={provider} subscription={current} />
-          ) : provider.actions.self_service_purchase ? null : (
+          ) : provider.actions.self_service_purchase || provider.membership?.leaving_on ? null : (
             <p className="mt-3 text-xs" style={{ color: "var(--dim)" }}>{t("renewWithBox")}</p>
           )}
         </HubCard>

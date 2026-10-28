@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Questo pacchetto è già terminato.",
     "apiErrorNotLeaving": "Questo membro del box non sta lasciando il box.",
     "apiErrorAlreadyLeft": "L'ultimo giorno è passato, quindi non si può più annullare.",
+    "apiErrorLeftByStaff": "Il box ha registrato la tua uscita, chiedi a loro di annullarla.",
     "apiErrorInvalidLeavingOn": "L'ultimo giorno deve essere oggi o dopo.",
     "admRenewalTitle": "Rinnovo automatico",
     "admRenewalOnHint": "Si rinnova a ogni periodo. Il membro del box può disattivarlo dall'app.",

@@ -369,6 +369,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   subscription_ended: "apiErrorSubscriptionEnded",
   not_leaving: "apiErrorNotLeaving",
   already_left: "apiErrorAlreadyLeft",
+  left_by_staff: "apiErrorLeftByStaff",
   invalid_leaving_on: "apiErrorInvalidLeavingOn",
   invalid_athletes: "apiErrorInvalidAthletes",
   member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",

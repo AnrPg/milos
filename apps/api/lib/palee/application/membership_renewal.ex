@@ -12,6 +12,7 @@ defmodule Palee.Application.MembershipRenewal do
   """
 
   alias Palee.{Finance, Identity, Notifications}
+  alias Palee.Application.RevokeAccess
 
   @doc "The member turns renewal of one of their subscriptions on or off."
   def member_set_auto_renew(%{user_id: user_id} = context, subscription_id, auto_renew)
@@ -64,12 +65,25 @@ defmodule Palee.Application.MembershipRenewal do
   (none: when what they paid for ends). What was already used stays owed.
   """
   def staff_mark_left(context, user_id, params) when is_map(params) do
-    Finance.leave_membership(context, user_id, %{
-      "by" => "staff",
-      "reason" => reason(params),
-      "leaving_on" => Map.get(params, "leaving_on"),
-      "commitment_override_reason" => Map.get(params, "commitment_override_reason")
-    })
+    with {:ok, result} <-
+           Finance.leave_membership(context, user_id, %{
+             "by" => "staff",
+             "reason" => reason(params),
+             "leaving_on" => Map.get(params, "leaving_on"),
+             "commitment_override_reason" => Map.get(params, "commitment_override_reason")
+           }) do
+      # Gone today: access ends now, so their upcoming bookings go as well
+      # (the daily expiry run would not see this change any more).
+      if result.membership.status == "cancelled",
+        do:
+          RevokeAccess.call(context, %{
+            user_id: user_id,
+            membership_id: result.membership.id,
+            status: "cancelled"
+          })
+
+      {:ok, result}
+    end
   end
 
   @doc "Staff undo a leave (the member came back or it was a mistake)."

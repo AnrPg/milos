@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "This package has already ended.",
     "apiErrorNotLeaving": "This box member is not leaving.",
     "apiErrorAlreadyLeft": "The last day has passed, so this can no longer be undone.",
+    "apiErrorLeftByStaff": "The box recorded your leaving, so ask them to undo it.",
     "apiErrorInvalidLeavingOn": "The last day must be today or later.",
     "admRenewalTitle": "Automatic renewal",
     "admRenewalOnHint": "Renews each period. The box member can turn it off in the app.",

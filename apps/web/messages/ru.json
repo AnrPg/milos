@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Этот пакет уже закончился.",
     "apiErrorNotLeaving": "Этот участник не уходит из бокса.",
     "apiErrorAlreadyLeft": "Последний день прошёл, отменить это уже нельзя.",
+    "apiErrorLeftByStaff": "Бокс зафиксировал твой уход, попроси их отменить его.",
     "apiErrorInvalidLeavingOn": "Последний день должен быть сегодня или позже.",
     "admRenewalTitle": "Автопродление",
     "admRenewalOnHint": "Продлевается каждый период. Участник может отключить это в приложении.",

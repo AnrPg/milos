@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "החבילה הזו כבר הסתיימה.",
     "apiErrorNotLeaving": "חבר זה לא עוזב את הבוקס.",
     "apiErrorAlreadyLeft": "היום האחרון עבר, ולכן כבר אי אפשר לבטל.",
+    "apiErrorLeftByStaff": "ה-box רשם את העזיבה שלך, אז בקש מהם לבטל אותה.",
     "apiErrorInvalidLeavingOn": "היום האחרון חייב להיות היום או מאוחר יותר.",
     "admRenewalTitle": "חידוש אוטומטי",
     "admRenewalOnHint": "מתחדש בכל תקופה. חבר הבוקס יכול לכבות זאת באפליקציה.",

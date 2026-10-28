@@ -987,6 +987,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   # both take the same one.
   defp renewal_with_referral_discounts(%Membership{} = membership, subscription, invoice_params) do
     Repo.transaction(fn ->
+      renewal_still_allowed!(membership, subscription)
+
       rewards =
         ReferralReward
         |> tenant_scope()
@@ -1016,6 +1018,25 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
+  end
+
+  # ADR-220: the member may turn renewal off (or leave) while this invoice is
+  # being made; both rows are locked in the same order as those changes and
+  # the choice is checked again, so no renewal slips past it.
+  defp renewal_still_allowed!(membership, subscription) do
+    locked_membership =
+      Membership |> tenant_scope() |> lock("FOR UPDATE") |> Repo.get(membership.id)
+
+    locked_subscription = locked_subscription(membership.id, subscription.id)
+
+    with %Membership{} <- locked_membership,
+         %MembershipPackageSubscription{} <- locked_subscription,
+         :ok <- MemberRenewal.renewal_allowed(locked_subscription, locked_membership) do
+      :ok
+    else
+      nil -> Repo.rollback(:not_found)
+      {:error, reason} -> Repo.rollback(reason)
+    end
   end
 
   # Voiding a renewal frees the discount rewards it took for the next one.
@@ -2262,6 +2283,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> join(:inner, [subscription], membership in Membership,
       on: membership.id == subscription.membership_id
     )
+    # ADR-220: someone leaving the box is not asked to renew.
+    |> where([_subscription, membership], is_nil(membership.left_at))
     |> select([subscription, membership], {subscription, membership.user_id})
     |> Repo.all()
     |> Enum.flat_map(fn {subscription, user_id} ->
@@ -6655,7 +6678,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
             do:
               void_invoices!(
                 membership.id,
-                &(&1.membership_package_subscription_id == subscription.id and
+                &(&1.subscription_ids == [subscription.id] and
                     MemberRenewal.void_after_leaving?(&1, updated.ends_on || today)),
                 "Renewal turned off"
               )
@@ -6710,7 +6733,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           void_invoices!(
             membership.id,
             &(MemberRenewal.void_after_leaving?(&1, leaving_on) or
-                (&1.membership_package_subscription_id in not_begun and
+                (&1.subscription_ids != [] and
+                   Enum.all?(&1.subscription_ids, fn id -> id in not_begun end) and
                    MemberRenewal.unpaid_untouched?(&1))),
             "Member left the box"
           )
@@ -6873,15 +6897,34 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.all()
   end
 
+  # Periods of the subscription's invoices that were paid, or partly paid
+  # (also once such an invoice falls overdue). An invoice belongs to the
+  # subscription through its header or any of its lines.
   defp paid_periods(subscription_id) do
     FinanceInvoice
     |> tenant_scope()
-    |> where([invoice], invoice.membership_package_subscription_id == ^subscription_id)
-    |> where([invoice], invoice.status in ^MemberRenewal.paid_statuses())
+    |> where([invoice], invoice.id in subquery(invoice_ids_for_subscription(subscription_id)))
+    |> where([invoice], invoice.status not in ["draft", "void"])
     |> where([invoice], is_nil(invoice.deleted_at))
     |> where([invoice], not is_nil(invoice.service_period_end))
-    |> select([invoice], {invoice.service_period_start, invoice.service_period_end})
     |> Repo.all()
+    |> Enum.filter(
+      &(&1.status in MemberRenewal.paid_statuses() or invoice_paid_cents(&1.id) > 0 or
+          invoice_credit_applied_cents(&1.id) > 0)
+    )
+    |> Enum.map(&{&1.service_period_start, &1.service_period_end})
+  end
+
+  defp invoice_ids_for_subscription(subscription_id) do
+    header =
+      FinanceInvoice
+      |> where([invoice], invoice.membership_package_subscription_id == ^subscription_id)
+      |> select([invoice], invoice.id)
+
+    FinanceInvoiceLine
+    |> where([line], line.membership_package_subscription_id == ^subscription_id)
+    |> select([line], line.finance_invoice_id)
+    |> union(^header)
   end
 
   defp not_leaving(%Membership{left_at: nil}), do: :ok
@@ -6889,6 +6932,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   defp undo_open(%Membership{left_at: nil}, _by, _today), do: {:error, :not_leaving}
   defp undo_open(_membership, "staff", _today), do: :ok
+  defp undo_open(%Membership{left_by: "staff"}, "member", _today), do: {:error, :left_by_staff}
   defp undo_open(membership, "member", today), do: MemberRenewal.undo_allowed(membership, today)
 
   # Members keep everything they paid for; staff may name the day, today at
@@ -6942,18 +6986,36 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         {:error, reason} -> Repo.rollback(reason)
       end
     else
-      open_ended? = is_nil(subscription.ends_on) or subscription.ends_on_from_renewal_stop
-
-      update_renewal!(subscription, %{
-        auto_renew: false,
-        renewal_changed_at: now,
-        renewal_changed_by: by,
-        ends_on: earliest_date(subscription.ends_on, leaving_on),
-        ends_on_from_renewal_stop: open_ended?
-      })
-
+      stop_for_leaving!(subscription, leaving_on, by, now)
       nil
     end
+  end
+
+  # Renewal the member had already turned off keeps who turned it off and
+  # when, so undoing the leave leaves it off; only its last day may move in.
+  defp stop_for_leaving!(%{auto_renew: false} = subscription, leaving_on, _by, _now) do
+    ends_on = earliest_date(subscription.ends_on, leaving_on)
+
+    if ends_on != subscription.ends_on,
+      do:
+        update_renewal!(subscription, %{
+          auto_renew: false,
+          renewal_changed_at: subscription.renewal_changed_at,
+          renewal_changed_by: subscription.renewal_changed_by,
+          ends_on: ends_on
+        })
+  end
+
+  defp stop_for_leaving!(subscription, leaving_on, by, now) do
+    open_ended? = is_nil(subscription.ends_on) or subscription.ends_on_from_renewal_stop
+
+    update_renewal!(subscription, %{
+      auto_renew: false,
+      renewal_changed_at: now,
+      renewal_changed_by: by,
+      ends_on: earliest_date(subscription.ends_on, leaving_on),
+      ends_on_from_renewal_stop: open_ended?
+    })
   end
 
   defp resume_after_leave!(subscription, by, now) do
@@ -6997,8 +7059,23 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # The subscriptions an invoice is for: its header's and its lines'.
+  defp invoice_subscription_ids(invoice) do
+    FinanceInvoiceLine
+    |> where([line], line.finance_invoice_id == ^invoice.id)
+    |> where([line], not is_nil(line.membership_package_subscription_id))
+    |> select([line], line.membership_package_subscription_id)
+    |> Repo.all()
+    |> then(
+      &Enum.uniq(
+        Enum.reject([invoice.membership_package_subscription_id | &1], fn id -> is_nil(id) end)
+      )
+    )
+  end
+
   # Voids the membership's open invoices `void?` picks (it gets each invoice
-  # with what was paid and credited on it); returns how many.
+  # with what was paid and credited on it and the subscriptions it is for);
+  # returns how many.
   defp void_invoices!(membership_id, void?, note) do
     FinanceInvoice
     |> tenant_scope()
@@ -7013,6 +7090,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       |> Map.merge(%{
         paid_cents: invoice_paid_cents(invoice.id),
         credit_applied_cents: invoice_credit_applied_cents(invoice.id),
+        subscription_ids: invoice_subscription_ids(invoice),
         invoice: invoice
       })
     end)

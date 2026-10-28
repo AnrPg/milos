@@ -249,6 +249,18 @@ defmodule PaleeWeb.MyMembershipControllerTest do
     assert body["outstanding_cents"] == 6_000
     assert reminded?(ctx)
 
+    # Gone today: access ended now and the member heard it.
+    assert bypass_rls(fn ->
+             Repo.exists?(
+               from n in Notification,
+                 where: n.type == :access_ended and n.user_id == ^ctx.member.id
+             )
+           end)
+
+    # Only the box can undo a leave it recorded.
+    assert %{"code" => "left_by_staff"} =
+             ctx.conn |> authed(ctx.member) |> delete("#{me(ctx)}/leave") |> json_response(409)
+
     # Staff can undo it (they came back).
     body = ctx.conn |> authed(ctx.owner) |> delete("#{admin(ctx)}/leave") |> json_response(200)
     assert %{"status" => "active", "leaving_on" => nil} = body["membership"]
@@ -282,6 +294,52 @@ defmodule PaleeWeb.MyMembershipControllerTest do
 
     profile = Finance.get_member_profile(ctx.staff, ctx.member.id)
     assert Enum.find(profile.package_subscriptions, &(&1.id == later.id)).status == "cancelled"
+  end
+
+  test "renewal the member had turned off stays off after leaving and staying", ctx do
+    ctx.conn
+    |> authed(ctx.member)
+    |> put("#{me(ctx)}/subscriptions/#{ctx.subscription.id}/auto-renew", %{auto_renew: false})
+    |> json_response(200)
+
+    ctx.conn |> authed(ctx.member) |> post("#{me(ctx)}/leave", %{}) |> json_response(200)
+    ctx.conn |> authed(ctx.member) |> delete("#{me(ctx)}/leave") |> json_response(200)
+
+    profile = Finance.get_member_profile(ctx.staff, ctx.member.id)
+
+    assert [%{auto_renew: false, renewal_changed_by: "member", ends_on: ends_on}] =
+             profile.package_subscriptions
+
+    assert ends_on == ctx.period_end
+  end
+
+  test "an invoice linked to a package only through its lines goes with that package", ctx do
+    {:ok, later} =
+      Finance.assign_package(
+        ctx.staff,
+        ctx.membership.id,
+        ctx.subscription.membership_package_id,
+        %{starts_on: Date.add(ctx.period_end, 10)}
+      )
+
+    {:ok, invoice} =
+      Finance.create_invoice(ctx.staff, ctx.membership.id, %{
+        "due_date" => ctx.subscription.starts_on,
+        "lines" => [
+          %{
+            "membership_package_subscription_id" => later.id,
+            "line_type" => "membership_package",
+            "description" => "Next block",
+            "quantity" => 1,
+            "unit_amount_cents" => 6_000
+          }
+        ]
+      })
+
+    {:ok, _issued} = Finance.issue_invoice(ctx.staff, invoice.id, %{})
+
+    ctx.conn |> authed(ctx.member) |> post("#{me(ctx)}/leave", %{}) |> json_response(200)
+    assert invoice_status(ctx, invoice.id) == "void"
   end
 
   test "a package that does not renew leaves the member no choice", ctx do

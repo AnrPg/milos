@@ -62,6 +62,9 @@ defmodule Palee.Finance.Domain.MemberRenewalTest do
 
       quarterly = subscription(%{billing_period_snapshot: "quarterly"})
       assert MemberRenewal.last_day(quarterly, [], ~D[2026-03-10]) == ~D[2026-04-29]
+
+      semiannual = subscription(%{billing_period_snapshot: "semiannual"})
+      assert MemberRenewal.last_day(semiannual, [], ~D[2026-03-10]) == ~D[2026-07-30]
     end
 
     test "a later paid period and a commitment are kept" do

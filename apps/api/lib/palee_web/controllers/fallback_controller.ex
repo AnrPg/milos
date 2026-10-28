@@ -1286,6 +1286,16 @@ defmodule PaleeWeb.FallbackController do
         %{}
       )
 
+  def call(conn, {:error, :left_by_staff}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "left_by_staff",
+        "The box recorded this leave; ask them to undo it",
+        %{}
+      )
+
   def call(conn, {:error, :already_left}),
     do:
       package_contract_error(

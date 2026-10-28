@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "انتهى هذا الاشتراك بالفعل.",
     "apiErrorNotLeaving": "هذا العضو لا يغادر الصالة.",
     "apiErrorAlreadyLeft": "مرّ اليوم الأخير، لذلك لم يعد بالإمكان التراجع.",
+    "apiErrorLeftByStaff": "سجّل الـ box مغادرتك، لذلك اطلب منهم التراجع عنها.",
     "apiErrorInvalidLeavingOn": "يجب أن يكون اليوم الأخير اليوم أو بعده.",
     "admRenewalTitle": "التجديد التلقائي",
     "admRenewalOnHint": "يتجدد كل فترة. يمكن للعضو إيقافه من التطبيق.",

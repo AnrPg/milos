@@ -4612,6 +4612,7 @@
     "apiErrorSubscriptionEnded": "Dieses Paket ist bereits abgelaufen.",
     "apiErrorNotLeaving": "Dieses Box-Mitglied verlässt die Box nicht.",
     "apiErrorAlreadyLeft": "Der letzte Tag ist vorbei, das lässt sich nicht mehr rückgängig machen.",
+    "apiErrorLeftByStaff": "Die Box hat deinen Austritt eingetragen. Bitte sie, ihn rückgängig zu machen.",
     "apiErrorInvalidLeavingOn": "Der letzte Tag muss heute oder später sein.",
     "admRenewalTitle": "Automatische Verlängerung",
     "admRenewalOnHint": "Verlängert sich jeden Zeitraum. Das Box-Mitglied kann sie in der App ausschalten.",

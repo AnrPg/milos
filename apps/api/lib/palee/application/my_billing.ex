@@ -192,7 +192,7 @@ defmodule Palee.Application.MyBilling do
       subscriptions:
         profile.package_subscriptions
         |> Enum.take(@history_limit)
-        |> Enum.map(&present_subscription(&1, active_id)),
+        |> Enum.map(&present_subscription(&1, active_id, leaving?(profile.membership))),
       invoices: Enum.take(invoices, @history_limit),
       payments: profile.payments |> Enum.take(@history_limit) |> Enum.map(&present_payment/1),
       promotions: promotions(tenant, profile.promotion_redemptions),
@@ -238,7 +238,9 @@ defmodule Palee.Application.MyBilling do
   defp leave_preview(_tenant, %{membership: %{leaving_on: %Date{}}}), do: nil
   defp leave_preview(tenant, _profile), do: MembershipRenewal.leave_preview(tenant)
 
-  defp present_subscription(subscription, active_id) do
+  defp leaving?(membership), do: not is_nil(membership && Map.get(membership, :leaving_on))
+
+  defp present_subscription(subscription, active_id, leaving?) do
     %{
       id: subscription.id,
       status: subscription.status,
@@ -255,8 +257,10 @@ defmodule Palee.Application.MyBilling do
       # ADR-220: the member's own choice; nil when the package does not renew
       # or the subscription is not theirs to decide (an add-on, a company seat).
       auto_renew: Map.get(subscription, :auto_renew),
+      # Leaving the box turned renewal off; staying turns it back on.
       can_change_auto_renew:
-        subscription.id == active_id and is_boolean(Map.get(subscription, :auto_renew)),
+        not leaving? and subscription.id == active_id and
+          is_boolean(Map.get(subscription, :auto_renew)),
       corporate: subscription.corporate_client_id != nil
     }
   end
