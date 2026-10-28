@@ -10,7 +10,7 @@ import { useSetTrainingGoal, useTrainingGoal } from "@/components/training-goal/
 
 /**
  * Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης: my own weekly workout goal
- * (ADR-216). Saved on every step; a goal my coach set says so, and I can
+ * (ADR-221). Saved on every step; a goal my coach set says so, and I can
  * still change it.
  */
 export function WeeklyGoalSetting() {

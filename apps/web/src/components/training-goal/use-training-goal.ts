@@ -6,7 +6,7 @@ import { TRAINING_GOAL_KEY, fetchTrainingGoal, updateTrainingGoal } from "@/api/
 import { LANDING_QUERY_KEY } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
 
-/** My weekly goal (ADR-216): one shared query for settings and Πρόοδος. */
+/** My weekly goal (ADR-221): one shared query for settings and Πρόοδος. */
 export function useTrainingGoal() {
   const { tokens } = useSession();
   return useQuery({

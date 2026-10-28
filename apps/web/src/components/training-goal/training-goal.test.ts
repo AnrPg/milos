@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { goalBounds, goalSetterNote, stepGoal, weeklyTarget } from "@/components/training-goal/training-goal";
 
-describe("training goal helpers (ADR-216)", () => {
+describe("training goal helpers (ADR-221)", () => {
   it("keeps steps inside the bounds the API accepts", () => {
     expect(stepGoal(2, 1)).toBe(3);
     expect(stepGoal(1, -1)).toBe(1);

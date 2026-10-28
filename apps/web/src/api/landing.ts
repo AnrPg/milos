@@ -73,7 +73,7 @@ export type LandingPayload = {
       streak_shield_reset_day: number | null;
       leaderboard_enabled: boolean;
     };
-    /** ADR-216: the person's own weekly goal (absent for staff landings). */
+    /** ADR-221: the person's own weekly goal (absent for staff landings). */
     goal?: TrainingGoal | null;
     stats: {
       current_streak: number;

@@ -722,7 +722,7 @@ defmodule Palee.Notifications do
         url: "/box/coach"
       })
 
-  # ADR-216: a coach or the box's staff changed the person's weekly goal.
+  # ADR-221: a coach or the box's staff changed the person's weekly goal.
   def process_event("training_goal_updated", payload),
     do:
       enqueue_simple(:training_goal_updated, payload, %{

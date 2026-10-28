@@ -228,7 +228,7 @@ function BrandingSection({ token }: { token: string }) {
 
 // ── Gamification section ─────────────────────────────────────────────────────
 
-// ADR-216: the box sets only the streak shields and when they renew; the
+// ADR-221: the box sets only the streak shields and when they renew; the
 // weekly workout goal is each person's own.
 type GamificationFormState = {
   streakShields: string;
@@ -298,7 +298,7 @@ function GamificationSection({ token }: { token: string }) {
 
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          <span id="streak-shields-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
             {t("box.shieldsLabel")}
           </span>
           <FieldInfo
@@ -316,6 +316,7 @@ function GamificationSection({ token }: { token: string }) {
           max={5}
           min={0}
           type="number"
+          aria-labelledby="streak-shields-label"
           aria-describedby="streak-shields-hint"
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
           value={form.streakShields}
@@ -328,7 +329,7 @@ function GamificationSection({ token }: { token: string }) {
 
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          <span id="streak-shield-renewal-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
             {i18n("streakShieldResetDayd22b9ea")}
           </span>
           <FieldInfo
@@ -348,6 +349,7 @@ function GamificationSection({ token }: { token: string }) {
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
           type="number"
           value={form.streakShieldResetDay}
+          aria-labelledby="streak-shield-renewal-label"
           aria-describedby="streak-shield-renewal-hint"
           onChange={(e) => update("streakShieldResetDay", e.target.value)}
         />

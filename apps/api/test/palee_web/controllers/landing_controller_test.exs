@@ -122,7 +122,7 @@ defmodule PaleeWeb.LandingControllerTest do
     assert get_in(landing, ["gamification", "stats", "current_streak"]) == 1
     assert get_in(landing, ["gamification", "settings", "streak_shields"]) == 3
     refute Map.has_key?(get_in(landing, ["gamification", "settings"]), "weekly_workout_target")
-    # ADR-216: the weekly goal is the person's own, the default until set.
+    # ADR-221: the weekly goal is the person's own, the default until set.
     assert %{"weekly_workout_target" => 2, "is_default" => true} =
              get_in(landing, ["gamification", "goal"])
 

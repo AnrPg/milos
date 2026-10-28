@@ -190,7 +190,7 @@ async function stubMemberApi(page: Page) {
     route.fulfill(json({ level: "none", warnings: [], warning_count: 0 })),
   );
   await page.route(/\/api(?:\/org\/[^/]+)?\/landing$/, (route) => route.fulfill(json(landing)));
-  // ADR-216: the weekly goal is read on its own (also without a gym).
+  // ADR-221: the weekly goal is read on its own (also without a gym).
   await page.route("**/api/gamification/goal", (route) => route.fulfill(json({ goal: landing.gamification.goal })));
   await page.route(/\/api(?:\/org\/[^/]+)?\/prs$/, (route) => route.fulfill(json({ prs: [] })));
   await page.route(/\/api(?:\/org\/[^/]+)?\/executions\/vault$/, (route) =>

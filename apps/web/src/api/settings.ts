@@ -2,7 +2,7 @@ import { apiRequest } from "@/api/client";
 
 export type GamificationSettings = {
   id?: string | null;
-  /** ADR-216: streak shields each member gets at every renewal (0–5, 0 = off). */
+  /** ADR-221: streak shields each member gets at every renewal (0–5, 0 = off). */
   streak_shields: number;
   /** Day of the month the shields renew; null = each member's sign-up day. */
   streak_shield_reset_day: number | null;

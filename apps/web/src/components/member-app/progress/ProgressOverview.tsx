@@ -32,7 +32,7 @@ export function ProgressOverview() {
 
   const { gamification } = landing.data;
   const stats = gamification.stats;
-  // ADR-216: the person's own goal (the default until someone sets one).
+  // ADR-221: the person's own goal (the default until someone sets one).
   const weeklyWorkoutTarget = weeklyTarget(gamification.goal);
   const motivation = stats ? Math.round(stats.motivation_score ?? NaN) : NaN;
   const perseverance = stats ? Math.round(stats.perseverance_score ?? NaN) : NaN;

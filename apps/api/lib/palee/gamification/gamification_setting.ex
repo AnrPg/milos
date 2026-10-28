@@ -1,6 +1,6 @@
 defmodule Palee.Gamification.GamificationSetting do
   @moduledoc """
-  A box's streak rules (ADR-216): how many streak shields each member gets
+  A box's streak rules (ADR-221): how many streak shields each member gets
   and when they renew, and whether the leaderboard shows. The weekly workout
   goal is each person's own (`Palee.Gamification.Domain.WeeklyGoal`).
   """
