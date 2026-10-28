@@ -271,11 +271,11 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
         <div className="flex gap-2">
           <button type="button" className="rounded-full px-3 py-2 text-sm" style={{ background: "var(--panel-muted)" }} onClick={() => {
             const date = new Date(`${startDate}T12:00:00`); date.setDate(date.getDate() - 7); setStartDate(isoDate(date));
-          }}>{i18n("featurePreviousWeek")}</button>
+          }}><span aria-hidden="true" className="inline-block rtl:-scale-x-100">←</span> {i18n("featurePreviousWeek")}</button>
           <button type="button" className="rounded-full px-3 py-2 text-sm" style={{ background: "var(--panel-muted)" }} onClick={() => setStartDate(isoDate(new Date()))}>{i18n("featureToday")}</button>
           <button type="button" className="rounded-full px-3 py-2 text-sm" style={{ background: "var(--panel-muted)" }} onClick={() => {
             const date = new Date(`${startDate}T12:00:00`); date.setDate(date.getDate() + 7); setStartDate(isoDate(date));
-          }}>{i18n("featureNextWeek")}</button>
+          }}>{i18n("featureNextWeek")} <span aria-hidden="true" className="inline-block rtl:-scale-x-100">→</span></button>
         </div>
         <p className="text-xs" style={{ color: "var(--muted)" }}>{startDate} — {endDate}</p>
       </div>

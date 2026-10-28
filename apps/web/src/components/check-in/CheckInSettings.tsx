@@ -12,6 +12,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { DEFAULT_RULES, modeChangeNeedsConfirm, ROTATION_CHOICES, validateRules, type RulesDraft } from "./check-in";
 import { checkInErrorKey } from "./errors";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { BackLink } from "@/components/ui/BackLink";
 
 /**
  * Ρυθμίσεις › Check-in (ADR-155 §9): the window around a class, open gym,
@@ -78,9 +79,7 @@ function Form({ token, initial }: { token: string; initial: RulesDraft }) {
         }}
       >
         <header className="flex flex-col gap-1">
-          <Link href={adminHref("/admin/settings", slug)} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>
-            ‹ {t("backToSettings")}
-          </Link>
+          <BackLink href={adminHref("/admin/settings", slug)} className="text-sm font-semibold" style={{ color: "var(--primary-strong)" }}>{t("backToSettings")}</BackLink>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("settingsTitle")}</h1>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("settingsIntro")}</p>
         </header>

@@ -56,6 +56,7 @@ import { FreeTextTimerFields } from "../creation/FreeTextTimerFields";
 import { CastView } from "./CastView";
 import { FinishWizard } from "./FinishWizard";
 import { displaySeconds, type TimerPhase, TimerDisplay } from "./TimerDisplay";
+import { BackButton } from "@/components/ui/BackLink";
 
 type TimerStatus = "setup" | "running" | "paused" | "finished";
 
@@ -413,9 +414,7 @@ export function FreeTextExecutionMode() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <header className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
-        <button type="button" onClick={() => router.back()} className="rounded-xl px-3 py-2 text-sm" style={{ color: "var(--muted)" }}>
-          {i18n("backdc381ae")}
-        </button>
+        <BackButton type="button" onClick={() => router.back()} className="rounded-xl px-3 py-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("backdc381ae")}</BackButton>
         <div className="min-w-0 text-center">
           <div className="truncate text-sm font-bold">{workout.title}</div>
           <div className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
