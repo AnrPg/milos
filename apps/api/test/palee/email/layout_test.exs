@@ -40,9 +40,9 @@ defmodule Palee.Email.LayoutTest do
     {html, text} = render("el")
 
     assert html =~ ~s(<html lang="el" dir="ltr">)
-    assert html =~ "Γεια σας,"
+    assert html =~ "Γεια σου,"
     assert html =~ "Αν το κουμπί δεν λειτουργεί, αντιγράψτε αυτόν τον σύνδεσμο"
-    assert text =~ "Λαμβάνετε αυτό το email επειδή έχετε λογαριασμό στο Palee."
+    assert text =~ "Λαμβάνεις αυτό το email επειδή έχεις λογαριασμό στο Palee."
     assert text =~ "Αυτό το email στάλθηκε αυτόματα από το Palee."
   end
 

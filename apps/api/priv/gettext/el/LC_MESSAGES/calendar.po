@@ -5,19 +5,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Google Calendar: copy the HTTPS .ics URL, then use Other calendars → From URL."
-msgstr "Ημερολόγιο Google: αντιγράψτε τη διεύθυνση URL HTTPS .ics και, στη συνέχεια, χρησιμοποιήστε Άλλα ημερολόγια → Από τη διεύθυνση URL."
+msgstr "Ημερολόγιο Google: αντίγραψε τη διεύθυνση HTTPS .ics και μετά διάλεξε Άλλα ημερολόγια → Από URL."
 
 msgid "Apple Calendar: use Subscribe with the webcal:// link for automatic updates."
-msgstr "Ημερολόγιο Apple: χρησιμοποιήστε την Εγγραφή με τον σύνδεσμο webcal:// για αυτόματες ενημερώσεις."
+msgstr "Ημερολόγιο Apple: διάλεξε Συνδρομή με τον σύνδεσμο webcal:// για αυτόματες ενημερώσεις."
 
 msgid "Outlook: use Add calendar → Subscribe from web and paste the HTTPS .ics URL."
-msgstr "Outlook: χρησιμοποιήστε Προσθήκη ημερολογίου → Εγγραφή από τον ιστό και επικολλήστε τη διεύθυνση URL HTTPS .ics."
+msgstr "Outlook: διάλεξε Προσθήκη ημερολογίου → Συνδρομή από το web και επικόλλησε τη διεύθυνση HTTPS .ics."
 
 msgid "Downloading the .ics file imports a one-off snapshot and will not stay synchronized."
 msgstr "Η λήψη του αρχείου .ics εισάγει ένα μεμονωμένο στιγμιότυπο και δεν θα παραμείνει συγχρονισμένο."
 
 msgid "Class: %{name}"
-msgstr "Κατηγορία: %{name}"
+msgstr "Τμήμα: %{name}"
 
 msgid "Assigned workout"
 msgstr "Ανατεθειμένη προπόνηση"
@@ -29,7 +29,7 @@ msgid "Assigned workout in Palee."
 msgstr "Ανατέθηκε προπόνηση στο Palee."
 
 msgid "Scheduled %{name} class in Palee."
-msgstr "Προγραμματισμένο %{name} μάθημα στο Palee."
+msgstr "Προγραμματισμένο τμήμα %{name} στο Palee."
 
 msgid "Pending"
 msgstr "Εκκρεμής"
@@ -41,7 +41,7 @@ msgid "Scheduled"
 msgstr "Προγραμματισμένος"
 
 msgid "Palee class booking status: %{status}."
-msgstr "Κατάσταση κράτησης για το προπονητικό μάθημα Palee: %{status}."
+msgstr "Κατάσταση κράτησης για τμήμα στο Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Δοκιμαστικό στο %{box}: %{name}"
