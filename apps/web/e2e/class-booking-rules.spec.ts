@@ -152,7 +152,7 @@ test.describe("Schedule › how long a request waits", () => {
 
     await page.goto("/admin/schedule");
     await page.getByRole("button", { name: /CrossFit/ }).first().click();
-    await page.getByRole("button", { name: "Edit slot" }).click();
+    await page.getByRole("button", { name: "Edit class" }).click();
     const dialog = page.getByRole("dialog", { name: "Edit scheduled class" });
     await expect(dialog.getByTestId("slot-approval-wait-hours")).toHaveValue("1");
     await expect(dialog.getByTestId("slot-approval-wait-minutes")).toHaveValue("30");
