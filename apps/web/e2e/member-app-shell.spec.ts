@@ -423,6 +423,28 @@ test.describe("member app shell", () => {
 
     await expect(page.getByRole("heading", { name: "You're not in a box yet" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Find a box" })).toHaveAttribute("href", "/around?kind=boxes");
+    // ADR-216: or by name, when they already know which box.
+    await page.route("**/api/box-search**", (route) =>
+      route.fulfill(
+        json({
+          boxes: [
+            {
+              organization_id: "org-9",
+              slug: "tolaras-box",
+              name: "Τολάρας Box",
+              logo_url: null,
+              primary_color: null,
+              provider_kind: "gym",
+              neighbourhood: null,
+              city: "Αθήνα",
+              my_status: "none",
+            },
+          ],
+        }),
+      ),
+    );
+    await page.getByLabel("Or search by name").fill("tolaras");
+    await expect(page.getByRole("link", { name: /Τολάρας Box/ })).toHaveAttribute("href", "/b/tolaras-box");
     await expect(page.getByText("Today's workout", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Membership", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Schedule" })).toHaveCount(0);

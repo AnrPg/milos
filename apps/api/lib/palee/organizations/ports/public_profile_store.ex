@@ -14,4 +14,7 @@ defmodule Palee.Organizations.Ports.PublicProfileStore do
   @callback public_box_by_slug(slug :: String.t()) ::
               %{organization_id: String.t(), slug: String.t()} | nil
   @callback public_boxes(organization_ids :: [String.t()]) :: [map()]
+  # ADR-216: published, live businesses whose name, brand name or slug holds
+  # one of the folded `terms`, word starts first.
+  @callback search_public_boxes(terms :: [String.t()], limit :: pos_integer()) :: [map()]
 end

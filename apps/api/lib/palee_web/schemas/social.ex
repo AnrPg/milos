@@ -360,6 +360,33 @@ defmodule PaleeWeb.Schemas.Social do
     }
   end
 
+  def box_search_response do
+    box = %Schema{
+      title: "BoxSearchResult",
+      type: :object,
+      description: "ADR-216: a published, live box or independent coach found by name",
+      properties: %{
+        organization_id: @uuid,
+        slug: %Schema{type: :string},
+        name: %Schema{type: :string},
+        logo_url: %Schema{type: :string, nullable: true},
+        primary_color: %Schema{type: :string, nullable: true},
+        provider_kind: %Schema{type: :string, enum: ~w(gym coach)},
+        neighbourhood: %Schema{type: :string, nullable: true},
+        city: %Schema{type: :string, nullable: true},
+        my_status: status()
+      },
+      required: [:my_status, :name, :organization_id, :provider_kind, :slug]
+    }
+
+    %Schema{
+      title: "BoxSearchResponse",
+      type: :object,
+      properties: %{boxes: %Schema{type: :array, items: box}},
+      required: [:boxes]
+    }
+  end
+
   def booking_sharing do
     %Schema{
       title: "BookingSharing",

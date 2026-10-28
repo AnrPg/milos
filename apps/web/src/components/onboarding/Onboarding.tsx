@@ -37,6 +37,8 @@ const STEP_LINKS: Partial<Record<OnboardingStepId, string>> = {
   classes: "/admin/class-schedule",
   packages: "/admin/finance?tab=packages",
   workout: "/admin/workouts/new",
+  // ADR-216: until the page is published nobody finds the box.
+  page: "/admin/public-page",
   // ADR-170: an independent coach's practice.
   profile: "/admin/public-page",
   sessions: "/admin/appointments",

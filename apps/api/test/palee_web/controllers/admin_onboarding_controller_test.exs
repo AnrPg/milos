@@ -1,6 +1,7 @@
 defmodule PaleeWeb.AdminOnboardingControllerTest do
   use PaleeWeb.ConnCase, async: false
 
+  alias Palee.Application.{PublishBoxPublicProfile, UpdateBoxPublicProfile}
   alias Palee.{Identity, Organizations}
 
   import Palee.TestFixtures
@@ -42,7 +43,7 @@ defmodule PaleeWeb.AdminOnboardingControllerTest do
   test "a new organization sees an open checklist", context do
     checklist = context |> authed() |> get(path(context)) |> json_response(200)
 
-    assert checklist["total"] == 7
+    assert checklist["total"] == 8
     refute checklist["dismissed"]
     refute checklist["finished"]
 
@@ -81,6 +82,34 @@ defmodule PaleeWeb.AdminOnboardingControllerTest do
 
     assert %{"done" => true, "auto" => true} =
              Enum.find(checklist["steps"], &(&1["id"] == "invite"))
+  end
+
+  # ADR-216: until the page is published nobody finds the box, so publishing
+  # it is a step of its own, done by the publication itself.
+  test "publishing the public page completes the page step automatically", context do
+    page = fn ->
+      context
+      |> authed()
+      |> get(path(context))
+      |> json_response(200)
+      |> Map.fetch!("steps")
+      |> Enum.find(&(&1["id"] == "page"))
+    end
+
+    assert %{"done" => false} = page.()
+
+    {:ok, tenant} = Organizations.resolve_tenant_context(context.owner, context.organization.slug)
+
+    {:ok, profile} =
+      UpdateBoxPublicProfile.call(tenant, %{
+        "about" => "Καλώς ήρθες.",
+        "disciplines" => ["crossfit"]
+      })
+
+    {:ok, _published} =
+      PublishBoxPublicProfile.publish(tenant, %{"lock_version" => profile.lock_version})
+
+    assert %{"done" => true, "auto" => true} = page.()
   end
 
   test "unknown actions are rejected", context do

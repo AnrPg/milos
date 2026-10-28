@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 import type { OrganizationMembership } from "@/api/organizations";
 import { entitledFeatures } from "@/components/client/entitlement";
@@ -16,6 +16,9 @@ import { boxExtensionsFor } from "@/components/member-app/box/box-extensions";
 import { CoachActions, NextCoachSession, SessionPackageSummary } from "@/components/member-app/box/CoachBox";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
 import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
+import { BoxResults } from "@/components/social/BoxSearch";
+import { PeopleSearchField } from "@/components/social/PeopleSearch";
+import { useDebounced } from "@/hooks/useDebounced";
 import { TodayAcrossCard } from "@/components/providers/TodayAcrossCard";
 import { SeasonsEntry } from "@/components/seasons/MySeasons";
 import { useHasBillingProviders } from "@/lib/billing-providers";
@@ -97,15 +100,24 @@ export function BoxHub() {
   );
 }
 
-/** Box for someone who is not in any box or with any coach yet. */
+/**
+ * Box for someone who is not in any box or with any coach yet: near me in
+ * Γύρω μου, or by name (ADR-216) when they already know which one.
+ */
 function FindABox() {
   const t = useTranslations("MemberApp");
+  const [query, setQuery] = useState("");
+  const term = useDebounced(query.trim(), 250);
   return (
     <HubPage title={t("boxTitle")}>
       <HubCard>
         <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>{t("boxFindTitle")}</h2>
         <p className="mb-4 mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("boxFindBody")}</p>
         <HubButton href={aroundKindHref("boxes")} primary>{t("boxFindAction")}</HubButton>
+        <div className="mt-4 flex flex-col gap-3">
+          <PeopleSearchField id="find-box-by-name" value={query} onChange={setQuery} label={t("boxFindByName")} />
+          <BoxResults term={term} />
+        </div>
       </HubCard>
     </HubPage>
   );

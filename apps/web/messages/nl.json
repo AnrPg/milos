@@ -4992,6 +4992,11 @@
         "body": "Schrijf hem zoals op het whiteboard. De assistent doet de rest.",
         "cta": "Training schrijven"
       },
+      "page": {
+        "title": "Publiceer je openbare pagina",
+        "body": "Tot ze gepubliceerd is, vindt niemand je box: niet op naam en niet in In de buurt.",
+        "cta": "Openbare pagina openen"
+      },
       "invite": {
         "title": "Nodig je klanten uit",
         "body": "Stuur een persoonlijke link of zet de aanmeldlink van je sportschool aan.",
@@ -5228,6 +5233,7 @@
     "boxFindTitle": "Je zit nog niet bij een box",
     "boxFindBody": "Zoek een box of coach bij jou in de buurt om lessen te boeken, de WOD te volgen en je lidmaatschap hier te zien.",
     "boxFindAction": "Zoek een box",
+    "boxFindByName": "Of zoek op naam",
     "membershipOpen": "Lidmaatschap en betalingen",
     "newEntry": "Nieuwe invoer",
     "meSharing": "Delen en zichtbaarheid",
@@ -6018,6 +6024,9 @@
     "checkAbout": "Een paar woorden over de gym",
     "checkDisciplines": "Minstens één discipline",
     "checkPhotos": "Foto's (optioneel, maar ze helpen)",
+    "checkOnMap": "Adres op de kaart (om in In de buurt te verschijnen)",
+    "checkOnMapAction": "Toevoegen",
+    "findableHint": "Zolang de pagina een concept is, vindt niemand de box op naam of in In de buurt.",
     "publish": "Publiceren",
     "unpublish": "Offline halen",
     "publishedNotice": "Gepubliceerd. De pagina is nu zichtbaar.",
@@ -6177,10 +6186,13 @@
     "relationNearby": "In de buurt",
     "relationYouFollow": "Je volgt",
     "findPeople": "Mensen vinden",
-    "findClubsAndPeople": "Clubs en mensen zoeken",
+    "findClubsBoxesPeople": "Clubs, boxen en mensen zoeken",
     "peopleTitle": "Mensen",
     "peopleNoMatch": "Niemand gevonden. Privéaccounts verschijnen alleen voor mensen die ze al kennen.",
     "peopleSearchFailed": "Zoeken lukte niet. Probeer het opnieuw.",
+    "boxesTitle": "Boxen en coaches",
+    "boxNoMatch": "Geen box of coach met die naam. Alleen bedrijven die hun pagina hebben gepubliceerd verschijnen.",
+    "boxSearchFailed": "Het zoeken lukte niet. Probeer het opnieuw.",
     "searchBuddies": "Maatjes zoeken",
     "buddiesEmpty": "Nog geen maatjes. Als iemand die jij volgt jou terugvolgt, zijn jullie maatjes.",
     "followYouEmpty": "Niemand hier. Hier staan mensen die jou volgen maar die jij niet volgt.",
@@ -6524,7 +6536,7 @@
     "clubLeaveTitle": "Deze club verlaten?",
     "clubLeaveBody": "De berichten verdwijnen uit je feed. Je kunt opnieuw meedoen via Vinden.",
     "find": "Vinden",
-    "findTitle": "Clubs en mensen vinden",
+    "findTitle": "Clubs, boxen en mensen vinden",
     "findOpenClubs": "Open clubs",
     "findGroups": "Groepen in je boxen",
     "findNoClubs": "De boxen waar je lid van bent of die je volgt hebben nog geen open clubs.",
@@ -9861,7 +9873,9 @@
       "confirm": "Activeren",
       "working": "Bezig met activeren…",
       "doneTitle": "Je bent live",
-      "done": "{name} is actief. De demogegevens zijn weg en alles wat je hebt ingesteld staat klaar."
+      "done": "{name} is actief. De demogegevens zijn weg en alles wat je hebt ingesteld staat klaar.",
+      "publishNext": "Nog één stap zodat mensen je vinden: publiceer je openbare pagina. Tot dan verschijnt je box niet in de zoekresultaten en niet in In de buurt.",
+      "openPublicPage": "Pagina publiceren"
     },
     "settings": {
       "title": "Zakelijk account",

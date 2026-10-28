@@ -874,6 +874,13 @@ defmodule Palee.Organizations do
   @doc "Name, slug, logo and colour of the published gyms among `ids`."
   def public_boxes(ids), do: Palee.Organizations.PublicProfileStore.public_boxes(ids)
 
+  @doc """
+  ADR-216: published, live businesses (boxes and independent coaches) whose
+  name, brand name or slug holds one of the already folded `terms`.
+  """
+  def search_public_boxes(terms, limit),
+    do: Palee.Organizations.PublicProfileStore.search_public_boxes(terms, limit)
+
   def resolve_tag_suggestion(id, status),
     do: Palee.Organizations.PublicProfileStore.resolve_suggestion(id, status)
 

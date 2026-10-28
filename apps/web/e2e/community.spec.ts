@@ -332,7 +332,7 @@ test.describe("community", () => {
     await page.goto("/");
     await page.goto("/clubs/find");
 
-    await expect(page.getByRole("heading", { name: "Find clubs and people" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Find clubs, boxes and people" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Hyrox crew/ })).toContainText("CrossFit Gazi · 14 club members");
     await expect(page.getByText("Groups in your boxes")).toBeVisible();
 
@@ -344,6 +344,48 @@ test.describe("community", () => {
 
     await expect(page.getByRole("tablist", { name: "Hyrox crew" })).toBeVisible();
     expect(calls.joins).toEqual(["open-1"]);
+  });
+
+  // ADR-216: the same field finds a live, published box or coach by name.
+  test("«Find» finds a box by name and opens its public page", async ({ page }) => {
+    await member(page);
+    const queries: string[] = [];
+    await page.route("**/api/box-search**", (route) => {
+      const q = new URL(route.request().url()).searchParams.get("q") ?? "";
+      queries.push(q);
+      return route.fulfill(
+        json({
+          boxes: q.toLowerCase().startsWith("tol")
+            ? [
+                {
+                  organization_id: "org-9",
+                  slug: "tolaras-box",
+                  name: "Τολάρας Box",
+                  logo_url: null,
+                  primary_color: null,
+                  provider_kind: "gym",
+                  neighbourhood: "Κυψέλη",
+                  city: "Αθήνα",
+                  my_status: "none",
+                },
+              ]
+            : [],
+        }),
+      );
+    });
+    await page.goto("/clubs/find");
+
+    const field = page.getByPlaceholder("Search clubs, boxes and people");
+    await field.fill("zz");
+    await expect.poll(() => queries).toContain("zz");
+    // Nothing matched: no empty card.
+    await expect(page.getByText("Boxes and coaches")).toHaveCount(0);
+
+    await field.fill("tolaras");
+    const card = page.getByRole("link", { name: /Τολάρας Box/ });
+    await expect(page.getByText("Boxes and coaches")).toBeVisible();
+    await expect(card).toContainText("Box · Κυψέλη");
+    await expect(card).toHaveAttribute("href", "/b/tolaras-box");
   });
 });
 
