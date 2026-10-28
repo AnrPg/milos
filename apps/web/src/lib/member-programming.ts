@@ -32,3 +32,54 @@ export function programmingSuccessKey(
   if (mode === "personal") return "memberProgrammingPersonalAssigned";
   return "featureClassWodAttached";
 }
+
+/**
+ * Where the programmed workout comes from, offered as the dialog's second
+ * step. "adapt_class" and "new" open the workout editor first; the others
+ * assign straight away.
+ */
+export type ProgrammingSource = "adapt_class" | "class_as_is" | "library" | "new";
+
+/** The workout sources that fit a role and mode, the recommended one first. */
+export function programmingSources(
+  role: "member" | "athlete" | "admin",
+  mode: MemberProgrammingMode,
+): readonly ProgrammingSource[] {
+  if (role === "member" && mode === "class_variant") return ["adapt_class", "class_as_is", "library", "new"];
+  return ["library", "new"];
+}
+
+/** Sources that build on the booked class's own workout. */
+export function sourceUsesClassWorkout(source: ProgrammingSource): boolean {
+  return source === "adapt_class" || source === "class_as_is";
+}
+
+/** Sources whose primary action opens the editor (assigned when published). */
+export function sourceOpensEditor(source: ProgrammingSource): boolean {
+  return source === "adapt_class" || source === "new";
+}
+
+/** Replacing the class's workout already reaches everyone booked in it. */
+export function canProgramMorePeople(role: "member" | "athlete" | "admin", mode: MemberProgrammingMode): boolean {
+  return !(role === "member" && mode === "class_workout");
+}
+
+/**
+ * The first thing still missing before the dialog's one primary action can
+ * run, as a translation key, or null when it is ready. The dialog shows it
+ * next to the disabled button so staff always know why it waits.
+ */
+export function programmingBlocker(input: {
+  needsClass: boolean;
+  hasBookedClasses: boolean;
+  slotId: string;
+  source: ProgrammingSource;
+  workoutId: string;
+  classHasWorkout: boolean;
+}): string | null {
+  if (input.needsClass && !input.hasBookedClasses) return "programmingDialogNoClass";
+  if (input.needsClass && !input.slotId) return "programmingMissingClass";
+  if (sourceUsesClassWorkout(input.source) && !input.classHasWorkout) return "memberProgrammingClassHasNoWorkout";
+  if (input.source === "library" && !input.workoutId) return "programmingMissingWod";
+  return null;
+}

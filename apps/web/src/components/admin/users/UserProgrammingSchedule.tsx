@@ -23,9 +23,15 @@ import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import {
   MEMBER_PROGRAMMING_MODES,
+  canProgramMorePeople,
   modeRequiresBookedClass,
+  programmingBlocker,
+  programmingSources,
   programmingSuccessKey,
+  sourceOpensEditor,
+  type ProgrammingSource,
 } from "@/lib/member-programming";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
@@ -45,17 +51,40 @@ type Props = {
   onAssignRequestHandled?: () => void;
 };
 
+// Outcome-first labels: each says who gets the change, its hint says how.
 const MODE_LABEL_KEYS: Record<MemberProgrammingMode, string> = {
-  class_variant: "memberProgrammingModeClassVariant",
-  personal: "memberProgrammingModePersonal",
-  class_workout: "memberProgrammingModeClassWorkout",
+  class_variant: "programmingModeVariant",
+  personal: "programmingModePersonal",
+  class_workout: "programmingModeClass",
 };
 
 const MODE_HINT_KEYS: Record<MemberProgrammingMode, string> = {
-  class_variant: "memberProgrammingModeClassVariantHint",
-  personal: "memberProgrammingModePersonalHint",
-  class_workout: "memberProgrammingModeClassWorkoutHint",
+  class_variant: "programmingModeVariantHint",
+  personal: "programmingModePersonalHint",
+  class_workout: "programmingModeClassHint",
 };
+
+const SOURCE_LABEL_KEYS: Record<ProgrammingSource, string> = {
+  adapt_class: "programmingSourceAdapt",
+  class_as_is: "programmingSourceAsIs",
+  library: "programmingSourceLibrary",
+  new: "programmingSourceNew",
+};
+
+const FIELD_STYLE = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
+
+function dayDate(day: string) {
+  return new Date(`${day}T12:00:00`);
+}
+
+/** A chip-like radio: the selected one carries the primary outline. */
+function choiceStyle(selected: boolean) {
+  return {
+    background: selected ? "color-mix(in srgb, var(--primary) 12%, var(--panel))" : "var(--panel)",
+    border: selected ? "1px solid var(--primary)" : "1px solid var(--border)",
+    color: "var(--text)",
+  };
+}
 
 function isoDate(date: Date) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -89,6 +118,7 @@ function isClassVariantItem(item: Record<string, unknown>) {
 export function UserProgrammingSchedule({ token, userId, role, nickname, assignRequestDate, onAssignRequestHandled }: Props) {
   const i18n = useUiTranslations();
   const locale = useLocale();
+  const zone = useOrganizationTimeZone();
   const isMember = role === "member";
   const [startDate, setStartDate] = useState(() => isoDate(new Date()));
   const [schedule, setSchedule] = useState<AdminUserSchedule | null>(null);
@@ -99,6 +129,8 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
   const [memberMode, setMemberMode] = useState<MemberProgrammingMode>("class_variant");
+  const [source, setSource] = useState<ProgrammingSource>(() => programmingSources(role, "class_variant")[0]);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [editingDraftId, setEditingDraftId] = useState<string | null>(null);
@@ -110,9 +142,9 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   const [outcomeRows, setOutcomeRows] = useState<GroupOutcomeRow[]>([]);
 
   const needsClass = isMember && modeRequiresBookedClass(memberMode);
-  // Replacing the class's workout already reaches everyone in the class.
-  const canAddPeople = !(isMember && memberMode === "class_workout");
+  const canAddPeople = canProgramMorePeople(role, memberMode);
   const groupPeople = canAddPeople ? extraPeople : [];
+  const sources = programmingSources(role, memberMode);
   const automaticFolderLabel = !isMember
     ? i18n("featureAutoAthleteFolder")
     : memberMode === "class_workout"
@@ -155,23 +187,82 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, userId, startDate, endDate, i18n]);
 
+  // Every opening starts from the recommended path with extras folded away.
+  function openDay(day: string) {
+    setSelectedDate(day);
+    setSelectedSlotId("");
+    setSelectedWorkoutId("");
+    setSource(programmingSources(role, memberMode)[0]);
+    setMoreOpen(extraPeople.length > 0);
+    setError(null);
+    setAssignmentModalOpen(true);
+  }
+
   useEffect(() => {
     if (!assignRequestDate) return;
     const frame = window.requestAnimationFrame(() => {
-      setSelectedDate(assignRequestDate);
-      setSelectedSlotId("");
-      setAssignmentModalOpen(true);
+      openDay(assignRequestDate);
       onAssignRequestHandled?.();
     });
     return () => window.cancelAnimationFrame(frame);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assignRequestDate, onAssignRequestHandled]);
+
+  function chooseMode(mode: MemberProgrammingMode) {
+    setMemberMode(mode);
+    setSource(programmingSources(role, mode)[0]);
+    setError(null);
+  }
 
   const dayItems = (schedule?.items ?? []).filter((item) => itemDate(item) === selectedDate);
   const selectedDaySlots = isMember ? dayItems.filter(isClassItem) : [];
-  const selectedSlot = selectedDaySlots.find((item) => itemId(item) === selectedSlotId);
+  // One booked class that day is the only possible answer: pick it for staff.
+  const slotId = selectedSlotId || (selectedDaySlots.length === 1 ? itemId(selectedDaySlots[0]) : "");
+  const selectedSlot = selectedDaySlots.find((item) => itemId(item) === slotId);
+  const classHasWorkout = typeof selectedSlot?.master_workout_id === "string";
+  const blocker = programmingBlocker({
+    needsClass,
+    hasBookedClasses: selectedDaySlots.length > 0,
+    slotId,
+    source,
+    workoutId: selectedWorkoutId,
+    classHasWorkout,
+  });
+
+  const longDate = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" });
+  const shortDate = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
+  const classTime = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", ...(zone ? { timeZone: zone } : {}) });
+
+  function classLabel(item: Record<string, unknown>) {
+    const title = itemTitle(item, i18n("featureScheduledClass"));
+    const at = typeof item.scheduled_at === "string" && item.scheduled_at.includes("T") ? new Date(item.scheduled_at) : null;
+    return at && !Number.isNaN(at.getTime()) ? `${classTime.format(at)} · ${title}` : title;
+  }
+
+  const folderName = selectedFolderId
+    ? folders.find((folder) => folder.id === selectedFolderId)
+    : null;
+  const moreSummary = i18n("programmingMoreSummary", {
+    folder: folderName ? folderDisplayName(folderName, folderLabels, locale) : i18n("programmingFolderAuto"),
+    count: groupPeople.length,
+  });
+
+  function submit() {
+    if (blocker || busy) return;
+    if (source === "adapt_class") void editClassWorkoutForMember();
+    else if (source === "class_as_is") void program(null, true);
+    else if (source === "library") void program(selectedWorkoutId, true);
+    else openCreator();
+  }
+
+  const primaryLabel = sourceOpensEditor(source)
+    ? i18n("programmingSubmitEditor")
+    : isMember && memberMode === "class_workout"
+      ? i18n("programmingSubmitReplaceClass")
+      : i18n("programmingSubmitAssign", { count: groupPeople.length + 1 });
 
   function validateTarget() {
-    if (needsClass && !selectedSlotId) {
+    if (needsClass && !slotId) {
       setError(i18n("featureChooseBookedClass"));
       return false;
     }
@@ -189,7 +280,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
       // Empty = file automatically in the athlete's, class-day or member variations folder.
       folder_id: selectedFolderId || null,
       scheduled_for: selectedDate,
-      slot_id: needsClass ? selectedSlotId : undefined,
+      slot_id: needsClass ? slotId : undefined,
       copy_source: copySource,
       ...(isMember ? { mode: memberMode } : {}),
     };
@@ -254,7 +345,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
     setBusy(true);
     setError(null);
     try {
-      const draft = await duplicateWorkout(token, sourceWorkoutId, { slot_id: selectedSlotId });
+      const draft = await duplicateWorkout(token, sourceWorkoutId, { slot_id: slotId });
       useWorkoutCreationStore.getState().resetDraft();
       setEditingDraftId(draft.id);
       setCreating(true);
@@ -277,14 +368,14 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
             const date = new Date(`${startDate}T12:00:00`); date.setDate(date.getDate() + 7); setStartDate(isoDate(date));
           }}>{i18n("featureNextWeek")}</button>
         </div>
-        <p className="text-xs" style={{ color: "var(--muted)" }}>{startDate} — {endDate}</p>
+        <p className="text-xs" style={{ color: "var(--muted)" }}>{shortDate.formatRange(dayDate(startDate), dayDate(endDate))}</p>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const items = (schedule?.items ?? []).filter((item) => itemDate(item) === day);
-          return <button key={day} type="button" className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))" : "var(--panel-muted)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => { setSelectedDate(day); setSelectedSlotId(""); setError(null); setAssignmentModalOpen(true); }}>
-            <span className="block text-xs font-semibold">{new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric" }).format(new Date(`${day}T12:00:00`))}</span>
+          return <button key={day} type="button" data-testid={`programming-day-${day}`} className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))" : "var(--panel-muted)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => openDay(day)}>
+            <span className="block text-xs font-semibold">{new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric" }).format(dayDate(day))}</span>
             <span className="mt-2 block text-xs" style={{ color: "var(--muted)" }}>{items.length ? i18n("featureScheduledCount", { count: items.length }) : i18n("featureOpenDay")}</span>
             {items.slice(0, 2).map((item) => <span key={itemId(item)} className="mt-1 block truncate text-xs">
               {isClassVariantItem(item) ? <span style={{ color: "var(--primary)" }}>{i18n("memberProgrammingClassVersionBadge")} · </span> : null}
@@ -299,57 +390,87 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
       {error && !assignmentModalOpen ? <ErrorNotice>{error}</ErrorNotice> : null}
       <GroupOutcomeList rows={outcomeRows} />
 
-      {assignmentModalOpen ? <Dialog onClose={() => setAssignmentModalOpen(false)} eyebrow={i18n("featureScheduleProgramming")} title={selectedDate} size="3xl" variant="center">
-      {isMember ? <fieldset className="mb-4 rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-        <legend className="px-1 text-xs font-semibold">{i18n("memberProgrammingModeLegend")}</legend>
-        <div className="grid gap-2 md:grid-cols-3">
-          {MEMBER_PROGRAMMING_MODES.map((mode) => <label key={mode} className="flex cursor-pointer gap-2 rounded-xl p-3 text-xs" style={{ background: memberMode === mode ? "color-mix(in srgb, var(--primary) 12%, var(--panel))" : "var(--panel)", border: memberMode === mode ? "1px solid var(--primary)" : "1px solid var(--border)" }}>
-            <input type="radio" name="member-programming-mode" value={mode} checked={memberMode === mode} onChange={() => setMemberMode(mode)} />
-            <span>
-              <span className="block font-semibold" style={{ color: "var(--text)" }}>{i18n(MODE_LABEL_KEYS[mode])}</span>
-              <span className="mt-1 block" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[mode])}</span>
-            </span>
-          </label>)}
-        </div>
-      </fieldset> : null}
-      <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-        <div className="grid gap-3 md:grid-cols-3">
-          <label className="text-xs font-semibold">{i18n("featureSaveInFolder")}
-            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedFolderId} onValueChange={(value) => setSelectedFolderId(value)}>
-              <option value="">{automaticFolderLabel}</option>
-              {[...folders].sort(compareFolders).map((folder) => (
-                <option key={folder.id} value={folder.id}>
-                  {folderDisplayName(folder, folderLabels, locale)}
-                </option>
-              ))}
+      {assignmentModalOpen ? <Dialog
+        onClose={() => setAssignmentModalOpen(false)}
+        dismissible={!busy}
+        eyebrow={nickname ? i18n("programmingDialogEyebrowFor", { name: nickname }) : i18n("featureScheduleProgramming")}
+        title={<span className="first-letter:uppercase">{longDate.format(dayDate(selectedDate))}</span>}
+        size="lg"
+        variant="sheet"
+        testId="programming-dialog"
+        error={error}
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+        footerStart={blocker && blocker !== "programmingDialogNoClass" ? <p className="text-xs" data-testid="programming-blocker" style={{ color: "var(--muted)" }}>{i18n(blocker)}</p> : sourceOpensEditor(source) ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("programmingEditorHint")}</p> : null}
+        footer={<div className="ms-auto flex gap-2">
+          <button type="button" className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setAssignmentModalOpen(false)}>
+            {i18n("cancel77dfd21")}
+          </button>
+          <button type="submit" data-testid="programming-submit" disabled={busy || Boolean(blocker)} className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+            {primaryLabel}
+          </button>
+        </div>}
+      >
+        <div className="space-y-5">
+          {isMember ? <fieldset>
+            <legend className="mb-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingDialogWhat")}</legend>
+            <div className="space-y-2">
+              {MEMBER_PROGRAMMING_MODES.map((mode) => <label key={mode} className="flex cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5" style={choiceStyle(memberMode === mode)}>
+                <input type="radio" className="mt-1" name="member-programming-mode" value={mode} checked={memberMode === mode} onChange={() => chooseMode(mode)} />
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold">{i18n(MODE_LABEL_KEYS[mode])}</span>
+                  <span className="block text-xs" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[mode])}</span>
+                </span>
+              </label>)}
+            </div>
+          </fieldset> : null}
+
+          {needsClass ? selectedDaySlots.length ? <label className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingDialogClass")}
+            <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={FIELD_STYLE} value={slotId} onValueChange={(value) => { setSelectedSlotId(value); setError(null); }}>
+              <option value="">{i18n("programmingDialogChooseClass")}</option>
+              {selectedDaySlots.map((item) => <option key={itemId(item)} value={itemId(item)}>{classLabel(item)}</option>)}
             </Select>
-          </label>
-          <label className="text-xs font-semibold">{i18n("featureExistingWod")}
-            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedWorkoutId} onValueChange={(value) => setSelectedWorkoutId(value)}>
-              <option value="">{i18n("featureChooseWod")}</option>
+          </label> : <p className="rounded-xl px-3 py-2.5 text-sm" data-testid="programming-no-class" style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}>{i18n("programmingDialogNoClass")}</p> : null}
+
+          {!(needsClass && !selectedDaySlots.length) ? <fieldset>
+            <legend className="mb-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingDialogWorkout")}</legend>
+            <div className="flex flex-wrap gap-2">
+              {sources.map((option) => <label key={option} className="cursor-pointer whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2" style={choiceStyle(source === option)}>
+                <input type="radio" className="sr-only" name="programming-source" value={option} checked={source === option} onChange={() => { setSource(option); setError(null); }} />
+                {i18n(SOURCE_LABEL_KEYS[option])}
+              </label>)}
+            </div>
+            {source === "library" ? <Select aria-label={i18n("featureExistingWod")} className="mt-3 w-full rounded-xl px-3 py-2 text-sm" style={FIELD_STYLE} value={selectedWorkoutId} onValueChange={(value) => { setSelectedWorkoutId(value); setError(null); }}>
+              <option value="">{i18n("programmingDialogChooseWod")}</option>
               {workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}
-            </Select>
-          </label>
-          {needsClass ? <label className="text-xs font-semibold">{i18n("featureBookedClass")}
-            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedSlotId} onValueChange={(value) => setSelectedSlotId(value)}>
-              <option value="">{i18n("featureChooseClass")}</option>
-              {selectedDaySlots.map((item) => <option key={itemId(item)} value={itemId(item)}>{itemTitle(item, i18n("featureScheduledClass"))}</option>)}
-            </Select>
-          </label> : <div />}
+            </Select> : null}
+          </fieldset> : null}
+
+          <div className="border-t pt-3" style={{ borderColor: "var(--border)" }}>
+            <button type="button" className="flex w-full items-center justify-between gap-3 text-start" aria-expanded={moreOpen} aria-controls="programming-more" onClick={() => setMoreOpen((open) => !open)}>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingMoreOptions")}</span>
+                {!moreOpen ? <span className="block truncate text-xs" style={{ color: "var(--muted)" }}>{moreSummary}</span> : null}
+              </span>
+              <span aria-hidden="true" style={{ color: "var(--muted)" }}>{moreOpen ? "▴" : "▾"}</span>
+            </button>
+            {moreOpen ? <div id="programming-more" className="mt-3 space-y-3">
+              <label className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingFolder")}
+                <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={FIELD_STYLE} value={selectedFolderId} onValueChange={(value) => setSelectedFolderId(value)}>
+                  <option value="">{automaticFolderLabel}</option>
+                  {[...folders].sort(compareFolders).map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folderDisplayName(folder, folderLabels, locale)}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+              {canAddPeople ? <AdditionalPeoplePicker token={token} excludeUserId={userId} picked={extraPeople} onChange={setExtraPeople} needsBooking={needsClass} collapsible={false} /> : null}
+            </div> : null}
+          </div>
         </div>
-        {canAddPeople ? <AdditionalPeoplePicker token={token} excludeUserId={userId} picked={extraPeople} onChange={setExtraPeople} needsBooking={needsClass} /> : null}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {isMember && memberMode === "class_variant" ? <>
-            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} disabled={busy || !selectedSlotId} onClick={() => void editClassWorkoutForMember()}>{i18n("memberProgrammingEditClassWodForMember")}</button>
-            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} disabled={busy || !selectedSlotId} onClick={() => void program(null, true)}>{i18n("memberProgrammingCopyClassWodForMember")}</button>
-          </> : null}
-          <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: isMember && memberMode === "class_variant" ? "var(--panel)" : "var(--primary)", color: isMember && memberMode === "class_variant" ? "var(--text)" : "var(--primary-contrast)", border: "1px solid var(--border)" }} disabled={busy || !selectedWorkoutId} onClick={() => void program(selectedWorkoutId, true)}>{i18n("featureCopyAndAssign")}</button>
-          <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={openCreator}>{i18n("featureCreateNewWod")}</button>
-        </div>
-        {isMember ? <p className="mt-3 text-xs" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[memberMode])}</p> : null}
-        {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
-        {error ? <ErrorNotice className="mt-3">{error}</ErrorNotice> : null}
-      </div>
       </Dialog> : null}
 
       {creating ? <Dialog bare dismissible={false} onClose={() => { setCreating(false); setEditingDraftId(null); }} ariaLabel={i18n("featureCreateNewWod")} size="full" variant="center"><WorkoutCreationCanvas embedded initialDraftId={editingDraftId} onCancel={() => { setCreating(false); setEditingDraftId(null); }} onPublished={(workout) => { setCreating(false); setEditingDraftId(null); void program(workout.id, false); }} /></Dialog> : null}
