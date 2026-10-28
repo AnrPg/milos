@@ -377,7 +377,11 @@ defmodule PaleeWeb.Schemas.Workout do
               subtitle: @nullable_string,
               timer: %Schema{type: :object, nullable: true, additionalProperties: true},
               scoreable: %Schema{type: :boolean},
-              exercises: %Schema{type: :array, items: workout_item_schema()}
+              exercises: %Schema{
+                type: :array,
+                items: %Schema{type: :object, additionalProperties: true},
+                description: "Every exercise with its full prescription (the WorkoutItem shape)"
+              }
             },
             required: [:id, :name, :timer, :scoreable, :exercises],
             additionalProperties: false
