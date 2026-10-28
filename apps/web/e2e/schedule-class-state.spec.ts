@@ -81,6 +81,12 @@ async function openClass(page: Page) {
   await page.getByRole("button", { name: /CrossFit/ }).first().click();
 }
 
+/** Edit (and Restore) stay in view; the other class actions sit behind ⋯. */
+async function chooseClassAction(page: Page, name: string) {
+  await page.getByTestId("class-more-actions").click();
+  await page.getByRole("menu", { name: "More actions for this class" }).getByRole("menuitem", { name, exact: true }).click();
+}
+
 
 const result = (overrides: Record<string, unknown> = {}) => ({
   action: "pause",
@@ -109,7 +115,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     });
 
     await openClass(page);
-    await page.getByTestId("class-actions").getByRole("button", { name: "Pause bookings" }).click();
+    await chooseClassAction(page, "Pause bookings");
     const dialog = page.getByRole("dialog", { name: "Pause bookings?" });
     await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
     await chooseOption(page, dialog.getByRole("combobox", { name: "Which of them" }), "2");
@@ -129,7 +135,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     });
 
     await openClass(page);
-    await page.getByTestId("class-actions").getByRole("button", { name: "Cancel class" }).click();
+    await chooseClassAction(page, "Cancel class");
     const dialog = page.getByRole("dialog", { name: "Cancel this class?" });
     await expect(dialog.getByRole("radio", { name: "Only this class" })).toHaveAttribute("aria-checked", "true");
     await dialog.getByLabel("Reason (box members see it)").fill("Water leak");
@@ -148,7 +154,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     );
 
     await openClass(page);
-    await page.getByRole("button", { name: "Delete", exact: true }).click();
+    await chooseClassAction(page, "Delete");
     const dialog = page.getByRole("dialog", { name: "Delete this class?" });
     await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
     await dialog.getByRole("button", { name: "Delete", exact: true }).click();
@@ -167,7 +173,11 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await expect(page.getByTestId("class-state-notice")).toHaveText("This class is cancelled: Coach is ill");
     const actions = page.getByTestId("class-actions");
     await expect(actions.getByRole("button", { name: "Restore class" })).toBeVisible();
-    await expect(actions.getByRole("button", { name: "Pause bookings" })).toHaveCount(0);
+    await page.getByTestId("class-more-actions").click();
+    const menu = page.getByRole("menu", { name: "More actions for this class" });
+    await expect(menu.getByRole("menuitem", { name: "Delete", exact: true })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: "Pause bookings" })).toHaveCount(0);
+    await expect(menu.getByRole("menuitem", { name: "Restore class" })).toHaveCount(0);
   });
 
   test("a paused class offers resume", async ({ page }) => {
@@ -176,9 +186,39 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
 
     await openClass(page);
     await expect(page.getByTestId("class-state-notice")).toContainText("Booking for this class is paused.");
-    await page.getByTestId("class-actions").getByRole("button", { name: "Resume bookings" }).click();
+    await chooseClassAction(page, "Resume bookings");
     // Not in a series: no scope choice.
     const dialog = page.getByRole("dialog", { name: "Resume bookings?" });
     await expect(dialog.getByRole("radiogroup")).toHaveCount(0);
+  });
+
+  test("on a phone, the class and workout action rows stay inside the card", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await asOwner(page);
+
+    await openClass(page);
+    const actions = page.getByTestId("class-actions");
+    await expect(actions.getByRole("button", { name: "Edit slot" })).toBeVisible();
+    await expect(actions.getByTestId("class-more-actions")).toBeVisible();
+
+    // No action button sticks out of its card or breaks its label onto two lines.
+    const problems = await page.getByRole("dialog").evaluate((dialog) =>
+      Array.from(dialog.querySelectorAll<HTMLElement>("[data-testid=class-actions] button, [data-testid=workout-actions] button")).flatMap(
+        (button) => {
+          const box = button.getBoundingClientRect();
+          const card = button.closest("section, [data-testid=class-actions]")!.getBoundingClientRect();
+          const tops = new Set<number>();
+          const texts = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
+          for (let node = texts.nextNode(); node; node = texts.nextNode()) {
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            for (const rect of range.getClientRects()) tops.add(Math.round(rect.top));
+          }
+          const lines = tops.size;
+          return box.left < card.left - 1 || box.right > card.right + 1 || lines > 1 ? [button.textContent!.trim()] : [];
+        },
+      ),
+    );
+    expect(problems).toEqual([]);
   });
 });

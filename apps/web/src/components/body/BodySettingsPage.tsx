@@ -22,6 +22,7 @@ import { bodyErrorMessage } from "@/components/body/errors";
 import { useBodySettings, useBodyToken, useHealthConsents, useUpdateBodySettings } from "@/components/body/use-body";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { BackLink } from "@/components/ui/BackLink";
 
 const REMINDERS: (number | null)[] = [null, 2, 4];
 
@@ -72,7 +73,7 @@ export function BodySettingsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
+        <BackLink href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("title")}</BackLink>
         <h1 className="mt-1 text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("settingsTitle")}</h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("settingsIntro")}</p>
         <p className="mt-2 flex flex-wrap gap-x-4 text-sm font-semibold">

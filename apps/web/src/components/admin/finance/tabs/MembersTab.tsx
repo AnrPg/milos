@@ -621,7 +621,8 @@ function MemberRow({
   const referralsMade = (member.referrals_made_user_ids as string[]) ?? [];
 
   const expiresOn = field(activeSub, "ends_on") || field(membership, "expires_on");
-  const membershipStatus = field(membership, "status", "trial");
+  // ADR-217: no profile yet means no status, never a made-up "trial".
+  const membershipStatus = field(membership, "status");
   const referredById = field(membership, "referred_by_user_id");
   const creditCents =
     typeof member.credit_balance === "number"
@@ -678,6 +679,7 @@ function MemberRow({
         <InlineToggle
           value={membershipStatus}
           options={membershipStatusOptions}
+          placeholder={i18n("noFinanceProfilef804f44")}
           onSave={(status) => onSave({ status })}
         />
       </td>

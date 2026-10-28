@@ -298,13 +298,29 @@ defmodule PaleeWeb.OrganizationAccessController do
     required: [:results, :sent, :failed, :skipped]
   }
 
+  # ADR-216: one link per client role, each switched on or off on its own.
   @join_link_schema %Schema{
     type: :object,
     properties: %{
-      enabled: %Schema{type: :boolean},
-      role: %Schema{type: :string, enum: ~w(member athlete)}
+      member: %Schema{
+        type: :object,
+        properties: %{enabled: %Schema{type: :boolean}},
+        required: [:enabled]
+      },
+      athlete: %Schema{
+        type: :object,
+        properties: %{
+          enabled: %Schema{type: :boolean},
+          key: %Schema{
+            type: :string,
+            nullable: true,
+            description: "Secret part of /join/<slug>/athlete/<key>; null until first enabled"
+          }
+        },
+        required: [:enabled, :key]
+      }
     },
-    required: [:enabled, :role]
+    required: [:athlete, :member]
   }
 
   @public_join_link_schema %Schema{
@@ -319,6 +335,13 @@ defmodule PaleeWeb.OrganizationAccessController do
 
   @public_slug_parameter %Parameter{
     name: :slug,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string}
+  }
+
+  @join_key_parameter %Parameter{
+    name: :key,
     in: :path,
     required: true,
     schema: %Schema{type: :string}
@@ -383,7 +406,7 @@ defmodule PaleeWeb.OrganizationAccessController do
   )
 
   operation(:update_join_link,
-    summary: "Enable, disable or change the role of the public join link",
+    summary: "Turn one join link on or off, or give the athlete link a new key",
     security: [%{"bearerAuth" => []}],
     parameters: [@organization_slug_parameter],
     request_body: %RequestBody{
@@ -393,9 +416,14 @@ defmodule PaleeWeb.OrganizationAccessController do
           schema: %Schema{
             type: :object,
             properties: %{
+              role: %Schema{type: :string, enum: ~w(member athlete)},
               enabled: %Schema{type: :boolean},
-              role: %Schema{type: :string, enum: ~w(member athlete)}
-            }
+              rotate_key: %Schema{
+                type: :boolean,
+                description: "Athlete link only: retire the old address"
+              }
+            },
+            required: [:role]
           }
         }
       }
@@ -404,15 +432,31 @@ defmodule PaleeWeb.OrganizationAccessController do
   )
 
   operation(:inspect_join_link,
-    summary: "Public: describe the organization behind a join link",
+    summary: "Public: describe the organization behind its member join link",
     parameters: [@public_slug_parameter],
     responses: [ok: {"Join link", "application/json", @public_join_link_schema}]
   )
 
+  operation(:inspect_athlete_join_link,
+    summary: "Public: describe the organization behind its athlete join link",
+    parameters: [@public_slug_parameter, @join_key_parameter],
+    responses: [ok: {"Join link", "application/json", @public_join_link_schema}]
+  )
+
   operation(:join,
-    summary: "Join an organization through its public join link",
+    summary: "Join an organization as a box member through its member join link",
     security: [%{"bearerAuth" => []}],
     parameters: [@public_slug_parameter],
+    responses: [
+      ok: {"Already a member", "application/json", @membership_schema},
+      created: {"Membership", "application/json", @membership_schema}
+    ]
+  )
+
+  operation(:join_as_athlete,
+    summary: "Join an organization as an athlete through its athlete join link",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@public_slug_parameter, @join_key_parameter],
     responses: [
       ok: {"Already a member", "application/json", @membership_schema},
       created: {"Membership", "application/json", @membership_schema}
@@ -464,8 +508,14 @@ defmodule PaleeWeb.OrganizationAccessController do
     end
   end
 
-  def inspect_join_link(conn, %{"slug" => slug}) do
-    with {:ok, link} <- InspectOrganizationJoinLink.call(slug) do
+  def inspect_join_link(conn, %{"slug" => slug}),
+    do: render_join_link(conn, %{slug: slug, role: "member"})
+
+  def inspect_athlete_join_link(conn, %{"slug" => slug, "key" => key}),
+    do: render_join_link(conn, %{slug: slug, role: "athlete", key: key})
+
+  defp render_join_link(conn, link) do
+    with {:ok, link} <- InspectOrganizationJoinLink.call(link) do
       json(conn, %{
         organization: %{
           id: link.organization.id,
@@ -478,10 +528,15 @@ defmodule PaleeWeb.OrganizationAccessController do
     end
   end
 
-  def join(conn, %{"slug" => slug}) do
+  def join(conn, %{"slug" => slug}), do: join_by(conn, %{slug: slug, role: "member"})
+
+  def join_as_athlete(conn, %{"slug" => slug, "key" => key}),
+    do: join_by(conn, %{slug: slug, role: "athlete", key: key})
+
+  defp join_by(conn, link) do
     user = GuardianPlug.current_resource(conn)
 
-    with {:ok, result} <- JoinOrganizationByLink.call(user, slug) do
+    with {:ok, result} <- JoinOrganizationByLink.call(user, link) do
       conn
       |> put_status(if(result.created, do: :created, else: :ok))
       |> json(serialize_membership(result))

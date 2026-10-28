@@ -578,7 +578,8 @@ defmodule PaleeWeb.Phase8FinanceControllerTest do
     profile = Finance.get_member_profile(context, member.id)
 
     assert profile.membership.user_type_snapshot == "member"
-    assert profile.membership.status == "trial"
+    # ADR-217: a new profile starts active; the package says what they have.
+    assert profile.membership.status == "active"
     assert profile.membership.signup_source == "admin_created"
     assert response["package_subscription"]["membership_id"] == profile.membership.id
     assert response["package_subscription"]["membership_package_id"] == package.id

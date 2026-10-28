@@ -1,7 +1,7 @@
 defmodule Palee.Application.AssignFinanceMemberPackage do
   alias Palee.Application.UpdateFinanceMember
   alias Palee.Finance.Domain.PackageAssignmentPolicy
-  alias Palee.{Finance, Identity}
+  alias Palee.{Finance, Identity, Organizations}
 
   @doc """
   `opts`: `:price_cents` sets the subscription's price instead of the
@@ -15,6 +15,7 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
       |> put_price(opts[:price_cents])
 
     with user when not is_nil(user) <- Identity.find_by_id(user_id),
+         :ok <- ensure_client(context, user.id),
          package_id when is_binary(package_id) <- package_id(params),
          package when not is_nil(package) <- Finance.get_package(package_id),
          :ok <- PackageAssignmentPolicy.can_assign?(package),
@@ -27,6 +28,14 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
     end
   end
 
+  # ADR-217: packages are for clients only; staff never get one, not even a
+  # leftover profile from before they became staff.
+  defp ensure_client(context, user_id) do
+    if Organizations.client_role(context, user_id), do: :ok, else: {:error, :not_a_client}
+  end
+
+  # A new profile starts active: the package, not a placeholder status,
+  # says what the person has (ADR-217; it used to start as "trial").
   defp ensure_membership(context, user_id, params) do
     case Finance.get_member_profile(user_id) do
       %{membership: membership} ->
@@ -34,7 +43,7 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
 
       nil ->
         UpdateFinanceMember.call(context, user_id, %{
-          "status" => "trial",
+          "status" => "active",
           "signup_source" => signup_source(params)
         })
     end

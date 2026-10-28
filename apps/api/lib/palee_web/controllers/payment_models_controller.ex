@@ -185,7 +185,7 @@ defmodule PaleeWeb.PaymentModelsController do
     user_id = Map.get(conn.body_params, :user_id)
 
     with {:ok, seat} <-
-           Finance.enroll_corporate_seat(conn.assigns.tenant_context, id, user_id, %{}) do
+           EnrollCorporateSeat.by_staff(conn.assigns.tenant_context, id, user_id) do
       conn |> put_status(:created) |> json(%{seat: Map.put(seat, :user_id, user_id)})
     end
   end

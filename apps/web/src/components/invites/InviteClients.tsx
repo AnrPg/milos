@@ -20,6 +20,7 @@ import {
   type BulkInvitationResult,
   type ClientRole,
   type IssuedInvitation,
+  type JoinLinkChange,
   type PendingInvitation,
 } from "@/api/organizations";
 import { LOCALE_NAMES, SUPPORTED_LOCALES, isAppLocale, type AppLocale } from "@/i18n/locales";
@@ -498,56 +499,118 @@ function BulkInvite({ t, slug, token }: { t: Translate; slug: string; token: str
   );
 }
 
+/** ADR-216: one join link per client role, both usable at once; the visitor never picks the role. */
 function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token: string }) {
   const queryClient = useQueryClient();
   const uiT = useTranslations("Ui");
   const joinLink = useQuery({ queryKey: ["join-link", slug], queryFn: () => fetchJoinLink(token, slug) });
   const save = useMutation({
-    mutationFn: (body: { enabled?: boolean; role?: ClientRole }) => updateJoinLink(token, slug, body),
+    mutationFn: (body: JoinLinkChange) => updateJoinLink(token, slug, body),
     onSuccess: (data) => {
       queryClient.setQueryData(["join-link", slug], data);
       void queryClient.invalidateQueries({ queryKey: ["admin-onboarding"] });
     },
   });
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
 
   if (joinLink.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("loading")}</p>;
   if (joinLink.error) return <ErrorNotice>{localizeError(joinLink.error, uiT)}</ErrorNotice>;
 
   const data = joinLink.data!;
-  const url = joinUrl(origin, slug);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4 rounded-xl p-3" style={{ border: "1px solid var(--border)" }}>
+      <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{t("publicIntro")}</p>
+      <JoinLinkCard t={t} slug={slug} role="member" enabled={data.member.enabled} save={save} />
+      <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data.athlete.enabled} athleteKey={data.athlete.key} save={save} />
+      <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicStaffNote")}</p>
+      {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
+    </div>
+  );
+}
+
+function JoinLinkCard({
+  t,
+  slug,
+  role,
+  enabled,
+  athleteKey,
+  save,
+}: {
+  t: Translate;
+  slug: string;
+  role: ClientRole;
+  enabled: boolean;
+  athleteKey?: string | null;
+  save: { mutate: (body: JoinLinkChange) => void; isPending: boolean };
+}) {
+  const [confirmRotate, setConfirmRotate] = useState(false);
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  const url = joinUrl(origin, { slug, athleteKey: role === "athlete" ? athleteKey : null });
+  const title = t(`publicLinks.${role}.title`);
+  const live = enabled && (role === "member" || Boolean(athleteKey));
+
+  return (
+    <section aria-label={title} data-join-link={role} className="space-y-3 rounded-xl p-3" style={{ border: "1px solid var(--border)" }}>
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("publicTitle")}</p>
-          <p className="mt-0.5 text-xs leading-5" style={{ color: "var(--muted)" }}>{t("publicHint")}</p>
+          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{title}</p>
+          <p className="mt-0.5 text-xs leading-5" style={{ color: "var(--muted)" }}>{t(`publicLinks.${role}.hint`)}</p>
         </div>
         <button
           type="button"
           role="switch"
-          aria-checked={data.enabled}
-          aria-label={t("publicTitle")}
+          aria-checked={enabled}
+          aria-label={title}
           disabled={save.isPending}
-          onClick={() => save.mutate({ enabled: !data.enabled })}
+          onClick={() => save.mutate({ role, enabled: !enabled })}
           className="relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50"
-          style={{ background: data.enabled ? "var(--success, var(--primary))" : "var(--border-strong, var(--border))" }}
+          style={{ background: enabled ? "var(--success, var(--primary))" : "var(--border-strong, var(--border))" }}
         >
-          <span className="absolute top-1 h-5 w-5 rounded-full bg-[var(--control-knob)] transition-all" style={{ insetInlineStart: data.enabled ? "1.5rem" : "0.25rem" }} />
+          <span className="absolute top-1 h-5 w-5 rounded-full bg-[var(--control-knob)] transition-all" style={{ insetInlineStart: enabled ? "1.5rem" : "0.25rem" }} />
         </button>
       </div>
-      <RolePicker t={t} value={data.role as ClientRole} onChange={(role) => save.mutate({ role })} />
-      {data.enabled ? (
+      {live ? (
         <>
-          <ShareBox t={t} url={url} message={t("joinMessage", { url })} subject={t("joinSubject")} />
-          <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicWarning", { role: t(`roles.${data.role as ClientRole}`) })}</p>
+          <ShareBox t={t} url={url} message={t(`publicLinks.${role}.message`, { url })} subject={t("joinSubject")} />
+          <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicWarning", { role: t(`roles.${role}`) })}</p>
+          {role === "athlete" ? (
+            confirmRotate ? (
+              <div role="group" aria-label={t("rotateKey")} className="space-y-2 rounded-xl p-3" style={{ background: "var(--panel-muted, var(--bg))" }}>
+                <p className="text-xs leading-5" style={{ color: "var(--text-soft)" }}>{t("rotateKeyHint")}</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={save.isPending}
+                    onClick={() => {
+                      save.mutate({ role, rotate_key: true });
+                      setConfirmRotate(false);
+                    }}
+                    className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                    style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
+                  >
+                    {t("confirmRotate")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRotate(false)}
+                    className="rounded-lg px-3 py-1.5 text-xs font-semibold"
+                    style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+                  >
+                    {t("keep")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" onClick={() => setConfirmRotate(true)} className="text-xs font-semibold underline" style={{ color: "var(--primary)" }}>
+                {t("rotateKey")}
+              </button>
+            )
+          ) : null}
         </>
       ) : (
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("publicOff")}</p>
       )}
-      {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
-    </div>
+    </section>
   );
 }
 

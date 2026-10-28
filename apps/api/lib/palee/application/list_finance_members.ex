@@ -1,8 +1,9 @@
 defmodule Palee.Application.ListFinanceMembers do
   alias Palee.Application.BranchReport
   alias Palee.{Finance, Identity, Organizations}
+  alias Palee.Organizations.Domain.MembershipPolicy
 
-  # TD-092: the rows are the gym's own active members. The `users` table has no
+  # TD-092: the rows are the gym's own active clients. The `users` table has no
   # RLS, so listing every account leaked the nickname and id of every user on
   # the platform to any gym's finance desk (their finance columns were merely
   # empty). The finance reads run in the caller's tenant scope (the controller
@@ -16,15 +17,19 @@ defmodule Palee.Application.ListFinanceMembers do
     limit = parse_limit(params["limit"] || params[:limit])
     report = BranchReport.resolve_list(context, params)
 
+    # ADR-217: the ledger lists clients only (a member or athlete role).
+    # Owners, coaches and other staff never have a package, so they are
+    # neither listed nor shown with a placeholder status.
     users =
       context
-      |> Organizations.list_active_membership_user_ids()
+      |> Organizations.list_client_user_ids()
       |> BranchReport.people_only(report, & &1)
       |> Identity.list_by_ids()
       |> Enum.reject(&(&1.role == :admin))
       |> Enum.sort_by(& &1.nickname)
 
     user_ids = Enum.map(users, & &1.id)
+    roles_by_user = Organizations.member_roles_by_user(context)
 
     finance_summaries =
       Finance.search_member_summaries(%{
@@ -38,7 +43,7 @@ defmodule Palee.Application.ListFinanceMembers do
 
     members =
       users
-      |> Enum.map(&build_row(&1, finance_summaries, referrals_made))
+      |> Enum.map(&build_row(&1, finance_summaries, referrals_made, roles_by_user))
       |> Enum.take(limit)
 
     {:ok,
@@ -49,7 +54,7 @@ defmodule Palee.Application.ListFinanceMembers do
      }}
   end
 
-  defp build_row(user, finance_summaries, referrals_made) do
+  defp build_row(user, finance_summaries, referrals_made, roles_by_user) do
     profile = Map.get(finance_summaries, user.id)
     membership = if profile, do: profile.membership, else: nil
     active_sub = if profile, do: profile.active_package_subscription, else: nil
@@ -62,7 +67,7 @@ defmodule Palee.Application.ListFinanceMembers do
     %{
       id: user.id,
       nickname: user.nickname,
-      identity_role: to_string(user.role),
+      identity_role: client_role(roles_by_user, user),
       membership: membership,
       active_package_subscription: active_sub,
       referrals_made_user_ids: made,
@@ -73,6 +78,13 @@ defmodule Palee.Application.ListFinanceMembers do
       last_payment_amount_cents: profile && Map.get(profile, :last_payment_amount_cents),
       notes: membership && Map.get(membership, :notes)
     }
+  end
+
+  defp client_role(roles_by_user, user) do
+    case Map.get(roles_by_user, user.id) do
+      %{roles: roles} -> roles |> MembershipPolicy.client_role() |> to_string()
+      nil -> "member"
+    end
   end
 
   defp parse_limit(nil), do: 5_000

@@ -1,6 +1,6 @@
 # ADR-049: Admin-managed browser push configuration
 Date: 2026-07-16
-Status: Accepted
+Status: Accepted (editor moved to the platform console by ADR-218)
 
 ## Context
 Browser push was treated as a deployment-only capability controlled by API
