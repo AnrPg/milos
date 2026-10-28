@@ -4902,7 +4902,7 @@
     "clientAccess": "Toegang voor klanten",
     "clientAccessIntro": "Kies hoe nieuwe klanten in je app komen: met een persoonlijke eenmalige link of met de openbare aanmeldlink.",
     "tabPersonal": "Persoonlijke link",
-    "tabPublic": "Aanmeldlink",
+    "tabPublic": "Aanmeldlinks",
     "tabPending": "Openstaand ({count})",
     "joinsAs": "Meldt zich aan als",
     "roles": {
@@ -4924,12 +4924,26 @@
     "createAnother": "Nog een link maken",
     "inviteSubject": "Je uitnodiging voor {organization}",
     "inviteMessage": "Je bent uitgenodigd voor {organization}. Maak hier je account aan: {url}",
-    "publicTitle": "Openbare aanmeldlink",
-    "publicHint": "Iedereen met het adres van je sportschool kan zich aanmelden. Zet hem altijd uit wanneer je wilt.",
-    "publicOff": "De aanmeldlink staat uit. Zet hem aan voor een adres voor je website, sociale media of een QR-code bij de balie.",
+    "publicOff": "Uit. Zet hem aan als je een adres wilt voor je website, sociale media of een QR-code bij de balie.",
     "publicWarning": "Iedereen die dit adres gebruikt, wordt {role}. Medewerkers hebben nog steeds een persoonlijke link nodig.",
+    "publicIntro": "Elke rol heeft een eigen link. De link die je deelt bepaalt de rol, niet degene die zich aanmeldt. Beide kunnen tegelijk aan staan.",
+    "publicLinks": {
+      "member": {
+        "title": "Link voor boxleden",
+        "hint": "Het adres van je box. Wie het gebruikt, wordt lid van de box en boekt plekken in lessen. Leden kunnen het ook zelf invullen bij ‘Mijn boxen en clubs’.",
+        "message": "Meld je aan bij onze box in de app: {url}"
+      },
+      "athlete": {
+        "title": "Link voor atleten",
+        "hint": "Wie hem gebruikt, wordt atleet en krijgt persoonlijke programmering. Hij heeft een eigen geheime sleutel, dus niemand kan hem afleiden uit de ledenlink.",
+        "message": "Meld je als atleet aan bij onze box voor je persoonlijke programmering: {url}"
+      }
+    },
+    "publicStaffNote": "Aanmeldlinks geven alleen klantrollen. Gebruik voor personeel een persoonlijke link. Wie al in je box zit, houdt zijn rol.",
+    "rotateKey": "Nieuwe link voor atleten",
+    "rotateKeyHint": "De huidige link werkt meteen niet meer, net als elke QR-code of post waarin hij staat. Wie al lid werd, blijft zoals hij is.",
+    "confirmRotate": "Ja, maak een nieuwe",
     "joinSubject": "Doe mee",
-    "joinMessage": "Meld je aan bij onze sportschool in de app: {url}",
     "noPending": "Geen openstaande uitnodigingen. Links die je maakt staan hier tot ze gebruikt worden of verlopen.",
     "emailBound": "gekoppeld aan e-mail",
     "expires": "Verloopt op {date}",

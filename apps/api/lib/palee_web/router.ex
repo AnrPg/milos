@@ -370,6 +370,7 @@ defmodule PaleeWeb.Router do
     post("/register-admin", AuthController, :register_admin)
     post("/invitations/inspect", OrganizationAccessController, :inspect)
     get("/join/:slug", OrganizationAccessController, :inspect_join_link)
+    get("/join/:slug/athlete/:key", OrganizationAccessController, :inspect_athlete_join_link)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -446,6 +447,7 @@ defmodule PaleeWeb.Router do
 
     post("/memberships/redeem", OrganizationAccessController, :redeem)
     post("/memberships/join/:slug", OrganizationAccessController, :join)
+    post("/memberships/join/:slug/athlete/:key", OrganizationAccessController, :join_as_athlete)
     # ADR-204: same as redeem, plus the staff surface role and a new session.
     post("/auth/accept-invitation", AuthController, :accept_invitation)
   end

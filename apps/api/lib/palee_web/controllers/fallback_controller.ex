@@ -665,7 +665,10 @@ defmodule PaleeWeb.FallbackController do
   def call(conn, {:error, :invalid_join_link}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> json(%{code: "invalid_join_link", error: "Choose member or athlete and on or off"})
+    |> json(%{
+      code: "invalid_join_link",
+      error: "Choose the member or athlete link and turn it on or off"
+    })
   end
 
   def call(conn, {:error, :stale_dsl_revision}) do

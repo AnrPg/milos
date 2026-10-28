@@ -4902,7 +4902,7 @@
     "clientAccess": "Accès des clients",
     "clientAccessIntro": "Choisis comment les nouveaux clients entrent dans ton app : un lien personnel à usage unique ou le lien d’inscription public.",
     "tabPersonal": "Lien personnel",
-    "tabPublic": "Lien d’inscription",
+    "tabPublic": "Liens d’inscription",
     "tabPending": "En attente ({count})",
     "joinsAs": "Rejoint en tant que",
     "roles": {
@@ -4924,12 +4924,26 @@
     "createAnother": "Créer un autre lien",
     "inviteSubject": "Ton invitation à {organization}",
     "inviteMessage": "Tu es invité à rejoindre {organization}. Crée ton compte ici : {url}",
-    "publicTitle": "Lien d’inscription public",
-    "publicHint": "Toute personne ayant l’adresse de ta salle peut s’inscrire. Désactivable à tout moment.",
-    "publicOff": "Le lien d’inscription est désactivé. Active-le pour obtenir une adresse à mettre sur ton site, tes réseaux ou un QR code à l’accueil.",
+    "publicOff": "Désactivé. Active-le quand tu veux une adresse pour ton site, tes réseaux sociaux ou un QR code à l’accueil.",
     "publicWarning": "Toute personne utilisant cette adresse rejoint en tant que {role}. L’équipe a toujours besoin d’un lien personnel.",
+    "publicIntro": "Chaque rôle a son propre lien. C’est le lien que tu partages qui fixe le rôle, pas la personne qui s’inscrit. Les deux peuvent être actifs en même temps.",
+    "publicLinks": {
+      "member": {
+        "title": "Lien pour les membres de la box",
+        "hint": "L’adresse de ta box. Qui l’utilise devient membre de la box et réserve des places aux cours. Les membres peuvent aussi la saisir eux-mêmes dans « Mes box et mes clubs ».",
+        "message": "Rejoins notre box dans l’app : {url}"
+      },
+      "athlete": {
+        "title": "Lien pour les athlètes",
+        "hint": "Qui l’utilise devient athlète et reçoit une programmation personnelle. Il a sa propre clé secrète, personne ne peut donc le déduire du lien des membres.",
+        "message": "Rejoins notre box en tant qu’athlète pour ta programmation personnelle : {url}"
+      }
+    },
+    "publicStaffNote": "Les liens d’inscription ne donnent que des rôles de client. Pour le personnel, utilise un lien personnel. Une personne déjà dans ta box garde son rôle.",
+    "rotateKey": "Nouveau lien pour les athlètes",
+    "rotateKeyHint": "Le lien actuel cesse de fonctionner tout de suite, avec chaque QR code ou publication qui le contient. Ceux qui ont déjà rejoint restent tels quels.",
+    "confirmRotate": "Oui, en créer un nouveau",
     "joinSubject": "Rejoins-nous",
-    "joinMessage": "Rejoins notre salle dans l’app : {url}",
     "noPending": "Aucune invitation en attente. Les liens que tu crées apparaissent ici jusqu’à leur utilisation ou expiration.",
     "emailBound": "lié à un e-mail",
     "expires": "Expire le {date}",

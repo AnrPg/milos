@@ -534,11 +534,16 @@ defmodule Palee.Organizations do
 
   def onboarding_audience(_context), do: "gym"
 
-  def inspect_join_link(slug), do: Palee.Organizations.Queries.InspectJoinLink.call(slug)
+  @doc """
+  ADR-216: describes the organization behind one of its join links. `link` is
+  `%{slug: slug, role: "member" | "athlete", key: key | nil}`.
+  """
+  def inspect_join_link(%{slug: slug, role: role} = link),
+    do: Palee.Organizations.Queries.InspectJoinLink.call(slug, role, Map.get(link, :key))
 
-  def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
+  def join_by_link(link, user_id, joined_at \\ DateTime.utc_now()),
     do:
-      slug
+      link
       |> Palee.Organizations.Commands.JoinByLink.call(user_id, joined_at)
       |> announce_activation()
 

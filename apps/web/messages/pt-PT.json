@@ -4902,7 +4902,7 @@
     "clientAccess": "Acesso de clientes",
     "clientAccessIntro": "Escolhe como os novos clientes entram na tua app: um link pessoal de utilização única ou o link público de adesão.",
     "tabPersonal": "Link pessoal",
-    "tabPublic": "Link de adesão",
+    "tabPublic": "Links de adesão",
     "tabPending": "Pendentes ({count})",
     "joinsAs": "Entra como",
     "roles": {
@@ -4924,12 +4924,26 @@
     "createAnother": "Criar outro link",
     "inviteSubject": "O teu convite para {organization}",
     "inviteMessage": "Foste convidado para te juntares a {organization}. Cria a tua conta aqui: {url}",
-    "publicTitle": "Link público de adesão",
-    "publicHint": "Qualquer pessoa com o endereço do teu ginásio pode registar-se. Desativa quando quiseres.",
-    "publicOff": "O link de adesão está desativado. Ativa-o para teres um endereço para o site, redes sociais ou um código QR na receção.",
+    "publicOff": "Desativado. Ativa-o quando quiseres um endereço para o teu site, as redes sociais ou um código QR na receção.",
     "publicWarning": "Quem usar este endereço entra como {role}. A equipa continua a precisar de um link pessoal.",
+    "publicIntro": "Cada papel tem o seu próprio link. É o link que partilhas que define o papel, não quem se regista. Os dois podem estar ativos ao mesmo tempo.",
+    "publicLinks": {
+      "member": {
+        "title": "Link para sócios da box",
+        "hint": "O endereço da tua box. Quem o usa torna-se sócio da box e reserva lugares nas aulas. Os sócios também o podem escrever em «As minhas boxes e clubs».",
+        "message": "Adere à nossa box na app: {url}"
+      },
+      "athlete": {
+        "title": "Link para atletas",
+        "hint": "Quem o usa torna-se atleta e recebe programação pessoal. Tem a sua própria chave secreta, por isso ninguém o consegue tirar do link dos sócios.",
+        "message": "Adere à nossa box como atleta para a tua programação pessoal: {url}"
+      }
+    },
+    "publicStaffNote": "Os links de adesão só dão papéis de cliente. Para a equipa, usa um link pessoal. Quem já está na tua box mantém o seu papel.",
+    "rotateKey": "Novo link para atletas",
+    "rotateKeyHint": "O link atual deixa de funcionar de imediato, com cada QR ou publicação que o tenha. Quem já aderiu fica como está.",
+    "confirmRotate": "Sim, criar um novo",
     "joinSubject": "Junta-te a nós",
-    "joinMessage": "Adere ao nosso ginásio na app: {url}",
     "noPending": "Sem convites pendentes. Os links que crias aparecem aqui até serem usados ou expirarem.",
     "emailBound": "associado a email",
     "expires": "Expira a {date}",
