@@ -66,7 +66,7 @@ defmodule PaleeWeb.ScheduleController do
     in: :query,
     description: "Window size in days",
     required: false,
-    schema: %Schema{type: :integer, enum: [3, 7, 30]}
+    schema: %Schema{type: :integer, enum: [1, 3, 7, 30]}
   }
 
   @class_types_param %Parameter{

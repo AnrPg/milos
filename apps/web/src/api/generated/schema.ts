@@ -91616,7 +91616,7 @@ export interface operations {
                 /** @description Explicit UTC window end datetime */
                 end_at?: string;
                 /** @description Window size in days */
-                days?: 3 | 7 | 30;
+                days?: 1 | 3 | 7 | 30;
                 /** @description Optional class type filters */
                 class_type_ids?: string[];
             };

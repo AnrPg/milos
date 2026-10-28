@@ -350,6 +350,16 @@ test.describe("member app shell", () => {
     // On a phone the two sources don't fit one row, so they are a dropdown (SegmentPicker).
     const sources = page.getByRole("combobox", { name: "Today's workouts by source" });
     await expect(sources).toContainText("Class");
+    // The folded tabs are the page's main switch: a Dojo fill, never a grey field (ANR 2026-10-28).
+    const dojo = await sources.evaluate((node) => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--primary)";
+      node.appendChild(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    await expect(sources).toHaveCSS("background-color", dojo);
     await expect(page.getByRole("button", { name: /Start/ })).toBeEnabled();
     await expect(page.getByRole("link", { name: "Videos" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Coach" })).toBeVisible();
