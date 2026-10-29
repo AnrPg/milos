@@ -410,9 +410,17 @@ defmodule Palee.Payments do
 
       account ->
         changes =
-          if intent.initiation == "merchant" and intent.status == "scheduled",
-            do: charge(context, account, intent, now),
-            else: check_checkout(account, intent, now)
+          cond do
+            # ADR-249: a card tapped on the provider's terminal app.
+            intent.initiation == "terminal" ->
+              Palee.Payments.Terminal.check(context, account, intent, now)
+
+            intent.initiation == "merchant" and intent.status == "scheduled" ->
+              charge(context, account, intent, now)
+
+            true ->
+              check_checkout(account, intent, now)
+          end
 
         {:ok, updated} = apply_outcome(context, account, intent, changes)
         finish(intent, updated)
@@ -716,7 +724,9 @@ defmodule Palee.Payments do
           (event[:provider_ref] &&
              PaymentStore.get_intent_by_ref(context, account.provider, event.provider_ref)) ||
             (event[:transaction_id] &&
-               PaymentStore.get_intent_by_ref(context, account.provider, event.transaction_id))
+               PaymentStore.get_intent_by_ref(context, account.provider, event.transaction_id)) ||
+            (event[:reference] &&
+               Palee.Payments.Terminal.open_by_reference(context, event.reference))
 
         case intent do
           %{} = intent ->
