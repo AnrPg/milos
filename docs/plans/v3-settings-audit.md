@@ -53,9 +53,9 @@ Table `organization_settings` (columns, and the `settings` JSON map for keys bel
 | `branding.brand_name` | `organization_settings.brand_name`; `/admin/branding` | business name | Owner, once | **Basic** |
 | `branding.logo` | `brand_logo_object_key`; logo upload (ADR-121) | none | Owner, once | **Basic** |
 | `branding.primary_color` | `brand_primary_color` | Palee palette | Owner, rarely | **Derive** (from the logo, `BrandPalette`), editable in «Προχωρημένα» |
-| `provider.kind` | `settings["provider_kind"]`; `PATCH /admin/settings` `provider` | `gym` | Owner, once | **Derive** (from the setup recipe; «Ανεξάρτητος coach» sets `coach`) |
+| `provider.kind` | `organizations.provider_kind`; `PATCH /admin/settings` `provider` (ADR-162) | `gym` | Owner, once | **Derive** (from the setup recipe; «Ανεξάρτητος coach» sets `coach`) |
 | `access.role_grants` | `settings["role_grants"]`; `PUT /admin/role-access/:role` | none (role defaults, ADR-099) | Owner of a box with front desk staff | **Advanced** |
-| `join_link.member` | `settings["join_link"]`; `/admin/join-links` (ADR-216) | off | Owner, once | **Basic** |
+| `join_link.member` | `settings["join_link"]`; `PUT /api/org/:slug/join-link` (ADR-216) | off | Owner, once | **Basic** |
 | `join_link.athlete` | `settings["join_link"]` | off | Coach with remote athletes | **Advanced** |
 | `workouts.wod_goals_visible_by_default` | `settings["workouts"]`; `PATCH /admin/settings` (ADR-163) | off | Head coach | **Advanced** |
 | `workouts.wod_assistant_enabled` | `settings["workouts"]` (ADR-180) | on | Head coach | **Advanced** |
@@ -123,7 +123,7 @@ Table `community_settings`; `PUT /admin/community/settings` (ADR-143, ADR-169).
 
 ## G. Business: trial visitors («Δοκιμαστικό»)
 
-Table `trial_policies`; `PUT /admin/trial-policy`.
+Table `scheduling_trial_policies`; `PUT /admin/trial-policy`.
 
 | Key | Default | Who needs it | Verdict |
 |---|---|---|---|
@@ -210,7 +210,7 @@ business screen; no change proposed here except that the defaults already follow
 | Area | Settings | Where |
 |---|---|---|
 | Notifications | one switch per category × channel (ADR-199) | `/notifications/preferences` |
-| Social | share bookings, hide from members, visible in Γύρω μου, private account, searchable | `/me/community/social-settings` |
+| Social | share bookings, hide from members, visible in Γύρω μου, private account, searchable | `/me/social/*` |
 | Body | units, weight display, journal sections, measure reminder, default visibility, blur photos, compare mode, «πώς ένιωσες» prompt | `/me/body/settings` |
 | Buddies | quiet hours, time zone, share phone | `/me/buddies/settings` |
 | Partners | training-partner profile and discovery | `/me/partners/settings` |
