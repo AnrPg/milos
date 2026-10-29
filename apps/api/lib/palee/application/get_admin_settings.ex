@@ -1,5 +1,5 @@
 defmodule Palee.Application.GetAdminSettings do
-  alias Palee.{Finance, Gamification, Organizations, Scheduling}
+  alias Palee.{Finance, Gamification, Organizations, Scheduling, Setup}
 
   def call, do: {:error, :organization_context_required}
 
@@ -14,7 +14,9 @@ defmodule Palee.Application.GetAdminSettings do
        workouts: Organizations.get_workout_settings(context),
        provider: provider(context),
        # ADR-176: the gym's zone and whether an admin confirmed it.
-       time_zone: Organizations.timezone_status(context.organization_id)
+       time_zone: Organizations.timezone_status(context.organization_id),
+       # ADR-255 (CP-H1): settings the web keeps under «Προχωρημένα».
+       advanced_settings: Setup.advanced_settings()
      }}
   end
 

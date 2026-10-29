@@ -56,6 +56,8 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminAiSettingsController => [:manage_settings],
     # ADR-184: demo data and the activation request (owners and admins).
     W.AdminBusinessController => [:manage_settings],
+    # ADR-255: settings catalog and setup recipes (applying is owner only, in the service).
+    W.AdminSetupController => [:manage_settings],
     # ADR-191: partner perks.
     W.AdminPerkController => [:manage_perks],
     # ADR-253: box screens (TVs on the wall), their codes and overrides.

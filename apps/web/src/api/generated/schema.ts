@@ -8423,6 +8423,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/setup/recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Setup recipes per kind of box, and the recipes this business applied */
+        get: operations["PaleeWeb.AdminSetupController.recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply a recipe (owner only); applying it again changes nothing
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.
+         */
+        post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What applying a recipe would change now (dry run; nothing is saved) */
+        post: operations["PaleeWeb.AdminSetupController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every business setting with its level (basic or under «Προχωρημένα»)
+         * @description CP-H1: the web shows the settings with `advanced: false` and keeps the rest under «Προχωρημένα», closed by default. `verdict` says why (derive: the app or a recipe sets it; remove: not shown to owners).
+         */
+        get: operations["PaleeWeb.AdminSetupController.settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/shop/pricing-targets": {
         parameters: {
             query?: never;
@@ -82430,6 +82504,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -82557,6 +82633,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -82657,6 +82735,344 @@ export interface operations {
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recipes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applications: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        }[];
+                        /** @description Only the owner applies a recipe */
+                        can_apply: boolean;
+                        recipes: {
+                            class_types: string[];
+                            documents: string[];
+                            key: string;
+                            /** @description In the business's language */
+                            name: string;
+                            /** @description The same text in English and Greek */
+                            names: {
+                                el: string;
+                                en: string;
+                            };
+                            packages: {
+                                base_price_cents: number;
+                                billing_period: string;
+                                code: string;
+                                name: string;
+                                package_type: string;
+                            }[];
+                            /** @enum {string} */
+                            provider_kind: "coach" | "gym" | "organiser";
+                            role_grants: {
+                                [key: string]: string[];
+                            };
+                            settings: {
+                                advanced: boolean;
+                                key: string;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                value: unknown;
+                            }[];
+                            /** @description The same text in English and Greek */
+                            summaries: {
+                                el: string;
+                                en: string;
+                            };
+                            summary: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.apply_recipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applied */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description An applied recipe: which, when, by whom and what changed */
+                        application: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        };
+                        /** @description What applying the recipe changes now (a dry run until applied) */
+                        plan: {
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            name: string;
+                            recipe: string;
+                            unchanged: string[];
+                            version: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not the owner */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description A step failed; nothing changed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change_count: number;
+                        changes: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        manual: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        name: string;
+                        recipe: string;
+                        unchanged: string[];
+                        version: number;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced_settings: string[];
+                        counts: {
+                            advanced: number;
+                            basic: number;
+                            derive: number;
+                            remove: number;
+                        };
+                        settings: {
+                            advanced: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            default: unknown;
+                            field: string;
+                            /** @description `<section>.<field>` */
+                            key: string;
+                            section: string;
+                            set_by_recipe: boolean;
+                            /** @enum {string} */
+                            verdict: "advanced" | "basic" | "derive" | "remove";
+                        }[];
                     };
                 };
             };

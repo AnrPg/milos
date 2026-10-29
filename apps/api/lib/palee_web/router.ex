@@ -1098,6 +1098,11 @@ defmodule PaleeWeb.Router do
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     put("/settings/time-zone", AdminSettingsController, :update_time_zone)
+    # ADR-255: the settings catalog («Προχωρημένα») and the setup recipes.
+    get("/setup/settings", AdminSetupController, :settings)
+    get("/setup/recipes", AdminSetupController, :recipes)
+    post("/setup/recipes/:key/preview", AdminSetupController, :preview)
+    post("/setup/recipes/:key/apply", AdminSetupController, :apply_recipe)
     # ADR-174: the gym's AI settings (own key, scaling switch, usage).
     get("/ai-settings", AdminAiSettingsController, :show)
     put("/ai-settings", AdminAiSettingsController, :update)

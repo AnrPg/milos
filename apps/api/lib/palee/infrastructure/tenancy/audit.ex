@@ -57,6 +57,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     box_screens
     document_settings document_templates document_versions document_signature_requests
     document_signatures document_audit_events health_certificates
+    setup_recipe_applications
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

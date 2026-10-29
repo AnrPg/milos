@@ -122,6 +122,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     payments/payment_store
     box_screens/box_screen_store
     documents/document_store
+    setup/recipe_application_store
   )
 
   defp tenant_scope_violations do
