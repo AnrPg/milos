@@ -363,6 +363,44 @@ defmodule Palee.Fiscal do
     do:
       FiscalStore.list_documents(context, %{corrects_document_id: document_id, limit: 200}).documents
 
+  @doc """
+  Journals that a document was sent by email (ADR-265): who sent it, to
+  whom (`recipient: "buyer" | "address"` and a digest of the address,
+  never the address itself: the journal is never erased) and the outbox
+  message.
+
+  `send` runs in the same transaction and returns `{:ok, sent}` with
+  `recipient`, `recipient_digest`, `message_id` and `language`; the outbox
+  joins that transaction, so an email is queued only when it is journaled.
+  `{:ok, sent}` or `{:error, reason}`.
+  """
+  def email_document(context, document, send, actor_id, %DateTime{} = now)
+      when is_function(send, 0) do
+    FiscalStore.transaction(context, fn ->
+      with {:ok, sent} <- send.(),
+           {:ok, _entry} <- record_document_emailed(context, document, sent, actor_id, now) do
+        {:ok, sent}
+      end
+    end)
+  end
+
+  defp record_document_emailed(context, document, sent, actor_id, now) do
+    append(context, %{
+        event_type: "document_emailed",
+        subject_type: "fiscal_document",
+        subject_id: document.id,
+        actor_id: actor_id,
+        occurred_at: now,
+        payload: %{
+          number: document.number,
+          recipient: sent.recipient,
+          recipient_digest: sent.recipient_digest,
+          email_message_id: sent.message_id,
+          language: sent.language
+        }
+      })
+  end
+
   # ── Journal ─────────────────────────────────────────────────────────────
 
   @doc false

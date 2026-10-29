@@ -56,6 +56,9 @@ defmodule Palee.Fiscal.Domain.DocumentView do
       language: language,
       title: title,
       number: document.number,
+      # ADR-265: the email names the document with these.
+      issue_date_text: date(document.issue_date, format),
+      gross_text: money(document.gross_cents, document.currency, format),
       meta: meta(document, original, label, format),
       seller: party(seller, country, label),
       buyer: buyer && party(buyer, country, label),

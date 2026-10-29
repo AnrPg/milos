@@ -208,3 +208,21 @@ msgstr ""
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr ""
+
+msgid "%{title} %{number} from %{business}"
+msgstr ""
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr ""
+
+msgid "Document"
+msgstr ""
+
+msgid "Date of issue"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr ""

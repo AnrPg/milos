@@ -20,6 +20,10 @@ defmodule PaleeWeb.AdminFiscalTaxController do
   tags(["Fiscal"])
   security([%{"bearerAuth" => []}])
 
+  # ADR-265: a person sends a few documents a minute, never a flood.
+  plug PaleeWeb.Plugs.RateLimit,
+       [max: 20, interval: 60_000, bucket: "fiscal-email"] when action == :email_document
+
   plug OpenApiSpex.Plug.CastAndValidate, json_render_error_v2: true
 
   @id %Parameter{name: :id, in: :path, required: true, schema: F.uuid()}
@@ -85,6 +89,30 @@ defmodule PaleeWeb.AdminFiscalTaxController do
   )
 
   def document_html(conn, %{id: id} = params), do: document_file(conn, id, :html, params)
+
+  operation(:email_document,
+    summary: "Email a fiscal document's PDF to its buyer or to a typed address (ADR-265)",
+    description:
+      "Queued in the email outbox with the PDF attached, in the document's language (or " <>
+        "`language`), and journaled. Without `to` the buyer's email printed on the document is " <>
+        "used. Idempotent by `idempotency_key`; one address gets at most a few a day " <>
+        "(`throttled`); a business in demo mode cannot send (`business_not_activated`).",
+    parameters: [@id],
+    request_body: F.body(T.document_email_body()),
+    responses: [
+      accepted: {"Queued", "application/json", T.document_email()},
+      ok: {"The email of an earlier identical request", "application/json", T.document_email()}
+    ]
+  )
+
+  def email_document(conn, %{id: id}) do
+    with {:ok, email, mode} <-
+           FiscalDocumentRendering.email(conn.assigns.tenant_context, id, conn.body_params) do
+      conn
+      |> put_status(if(mode == :replayed, do: :ok, else: :accepted))
+      |> json(%{email: email})
+    end
+  end
 
   defp document_file(conn, id, format, params) do
     with {:ok, %{content: content, content_type: content_type, filename: filename}} <-

@@ -18,6 +18,7 @@ defmodule Palee.Fiscal.Domain.JournalChain do
     sales_tax_rates_saved export_settings_saved accounting_exported
     network_connection_saved document_delivered
     till_connection_saved receipt_signed till_device_failed
+    document_emailed registry_connection_saved
   )
 
   @hashed_fields ~w(position organization_id event_type subject_type subject_id actor_id occurred_at payload)a
