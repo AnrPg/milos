@@ -50,6 +50,11 @@ async function signIn(page: Page) {
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
   await page.route("**/api/memberships", (route) => route.fulfill(json([membership])));
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
+  // The finance page around the documents tab.
+  await page.route("**/api/org/box1/admin/finance/package-catalog", (route) => route.fulfill(json({ types: [], modules: [] })));
+  await page.route("**/api/org/box1/admin/locations", (route) => route.fulfill(json({ locations: [] })));
+  await page.route("**/api/org/box1/admin/finance/summary**", (route) => route.fulfill(json({ totals: {} })));
+  await page.route("**/api/org/box1/admin/finance/queues**", (route) => route.fulfill(json({ queues: {} })));
 }
 
 const GR = {
