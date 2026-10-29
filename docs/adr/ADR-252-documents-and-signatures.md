@@ -198,12 +198,30 @@ Turning on the health-certificate block also turns on
 | Area | Capabilities that grant access | Why |
 |---|---|---|
 | Documents: templates, versions, settings, audit | `manage_settings` | Writing the box's documents is a setting of the business. |
-| Requests, signatures, evidence, a client's documents | `manage_settings` or `manage_memberships` | The people who enrol clients chase their signatures. |
-| Health certificates: full rows and files | **`manage_health_certificates`** (new) | Art. 9 data needs a right of its own, not one bundled with settings. |
+| Requests, signatures, a client's documents, who has not signed | `manage_settings`, `manage_memberships` or **`request_signatures`** (new) | The people who enrol clients chase their signatures. |
+| The evidence PDF | `manage_settings` or `manage_memberships` | It carries the IP address and device of the signature. |
+| Health certificates: full rows and files | **`manage_health_certificates`** (new) or **`view_health_certificates`** (new) | Art. 9 data needs a right of its own, not one bundled with settings. |
+| Health certificates: upload for a client, delete | `manage_health_certificates` | Changing the record is narrower than reading it. |
 | Health certificates: status only | `view_health` (coaches, own clients) | Coaches need to know a certificate is valid, not what it says. |
 
 `manage_health_certificates` belongs to owner and admin. A box can grant it to
 front desk. The web role editor and its 12 translations were updated.
+
+Product owner, 2026-10-29: front desk («Υποδοχή») asks clients to sign and
+sees health certificates by default, so `request_signatures` and
+`view_health_certificates` belong to owner, admin and front desk.
+
+Publishing a mandatory document blocks at once the clients who have not
+signed it. The staff screen therefore asks first, and says how many clients
+that is (product owner, 2026-10-29):
+
+- for a new document or a major version, `clients` from `outstanding` (every
+  client of the box);
+- for a document switched to mandatory, that document's `outstanding`.
+
+Starter texts keep their «Προσχέδιο για νομικό έλεγχο» flag; Palee's law
+consultant reviews them. Signatures and certificates are kept 5 years after
+a box is deleted (confirmed).
 
 ### 8. Endpoints
 Staff endpoints are under `/api/org/:slug/admin/documents`:
