@@ -6849,6 +6849,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's imports, newest first */
+        get: operations["PaleeWeb.AdminImportController.index"];
+        put?: never;
+        /**
+         * Upload a CSV file (≤ 5 MB, ≤ 20,000 rows) as a draft import
+         * @description The encoding (UTF-8/16, Windows-1252, ISO-8859-7, Windows-1253) and the delimiter (`,` `;` tab) are detected; the columns get a proposed mapping from the chosen system's preset, or the best matching one.
+         */
+        post: operations["PaleeWeb.AdminImportController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fields, presets (best guesses), date orders, limits and codes of imports */
+        get: operations["PaleeWeb.AdminImportController.catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One import with its dry run, counts per row status and outcome, and report */
+        get: operations["PaleeWeb.AdminImportController.show"];
+        put?: never;
+        post?: never;
+        /** Delete an import that was never applied */
+        delete: operations["PaleeWeb.AdminImportController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply the import in the background (each row once; again only finishes the rest) */
+        post: operations["PaleeWeb.AdminImportController.apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email invitations to the people the import brought in (at most 200 per call)
+         * @description Only people with an address who have not claimed their profile and were not invited yet; within the business's daily invitation limits.
+         */
+        post: operations["PaleeWeb.AdminImportController.invitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save the mapping and options of a draft and run the dry run
+         * @description Nothing is written outside the import: every row gets its outcome and warnings.
+         */
+        post: operations["PaleeWeb.AdminImportController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An import's rows with their outcome, warnings and what applying them did */
+        get: operations["PaleeWeb.AdminImportController.rows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo an applied import (within 7 days of its end) */
+        post: operations["PaleeWeb.AdminImportController.undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/locations": {
         parameters: {
             query?: never;
@@ -19978,7 +20125,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             /** @enum {string} */
@@ -20216,7 +20363,7 @@ export interface components {
             /** @enum {string} */
             kind: "class" | "open_gym";
             /** @enum {string|null} */
-            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
             override?: boolean;
         } | null;
         /** CheckInRules */
@@ -20308,7 +20455,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             choices?: {
@@ -44073,7 +44220,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         choices?: {
@@ -63210,7 +63357,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -63368,7 +63515,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -73584,6 +73731,714 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Imports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        imports: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description The CSV file (≤ 5 MB)
+                     */
+                    file: string;
+                    /** @enum {string|null} */
+                    source?: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        date_orders: ("dmy" | "mdy" | "ymd")[];
+                        encodings: ("utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253")[];
+                        errors: ("missing_person" | "missing_name")[];
+                        fields: {
+                            /** @enum {string} */
+                            group: "person" | "package" | "credit" | "payment" | "visit";
+                            /** @enum {string} */
+                            key: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date";
+                            /** @enum {string} */
+                            type: "text" | "email" | "phone" | "role" | "date" | "status" | "money" | "payment_method";
+                        }[];
+                        limits: {
+                            max_bytes: number;
+                            max_invitations: number;
+                            max_rows: number;
+                            undo_days: number;
+                        };
+                        outcomes: ("create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid")[];
+                        presets: {
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            key: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            name: string;
+                        }[];
+                        roles: ("member" | "athlete")[];
+                        row_statuses: ("pending" | "applied" | "skipped" | "failed" | "undone")[];
+                        statuses: ("draft" | "queued" | "applying" | "applied" | "failed" | "undone")[];
+                        warnings: ("invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    limit?: number;
+                    person_ids?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Invitations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        failed: number;
+                        remaining: number;
+                        results: {
+                            email: string;
+                            error: string | null;
+                            /** Format: uuid */
+                            person_id: string;
+                            /** @enum {string} */
+                            status: "queued" | "failed";
+                        }[];
+                        sent: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    date_order?: "dmy" | "mdy" | "ymd";
+                    /** @enum {string} */
+                    default_role?: "member" | "athlete";
+                    mapping?: {
+                        column: number;
+                        /** @enum {string|null} */
+                        field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.rows": {
+        parameters: {
+            query?: {
+                status?: "pending" | "applied" | "skipped" | "failed" | "undone";
+                outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid";
+                after_row?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_after_row: number | null;
+                        rows: {
+                            /** Format: date-time */
+                            applied_at?: string | null;
+                            cells: string[];
+                            error_code?: string | null;
+                            errors: {
+                                /** @enum {string} */
+                                code: "missing_person" | "missing_name";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid" | null;
+                            result: {
+                                [key: string]: unknown;
+                            };
+                            row_number: number;
+                            /** @enum {string} */
+                            status: "pending" | "applied" | "skipped" | "failed" | "undone";
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            warnings: {
+                                /** @enum {string} */
+                                code: "invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
                     };
                 };
             };

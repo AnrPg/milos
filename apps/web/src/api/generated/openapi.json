@@ -20190,7 +20190,8 @@
                   "member_qr",
                   "wallet",
                   "desk_search",
-                  "self"
+                  "self",
+                  "imported"
                 ],
                 "nullable": true,
                 "type": "string"
@@ -20905,7 +20906,8 @@
               "member_qr",
               "wallet",
               "desk_search",
-              "self"
+              "self",
+              "imported"
             ],
             "nullable": true,
             "type": "string"
@@ -21168,7 +21170,8 @@
                   "member_qr",
                   "wallet",
                   "desk_search",
-                  "self"
+                  "self",
+                  "imported"
                 ],
                 "nullable": true,
                 "type": "string"
@@ -93794,7 +93797,8 @@
                             "member_qr",
                             "wallet",
                             "desk_search",
-                            "self"
+                            "self",
+                            "imported"
                           ],
                           "nullable": true,
                           "type": "string"
@@ -143774,7 +143778,8 @@
                             "member_qr",
                             "wallet",
                             "desk_search",
-                            "self"
+                            "self",
+                            "imported"
                           ],
                           "nullable": true,
                           "type": "string"
@@ -144187,7 +144192,8 @@
                             "member_qr",
                             "wallet",
                             "desk_search",
-                            "self"
+                            "self",
+                            "imported"
                           ],
                           "nullable": true,
                           "type": "string"
@@ -171925,6 +171931,2393 @@
         "summary": "The address and neighbourhood at a map point (ADR-141)",
         "tags": [
           "Admin Facility"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "imports": {
+                      "items": {
+                        "properties": {
+                          "byte_size": {
+                            "type": "integer"
+                          },
+                          "counts": {
+                            "nullable": true,
+                            "properties": {
+                              "outcomes": {
+                                "additionalProperties": {
+                                  "type": "integer"
+                                },
+                                "type": "object"
+                              },
+                              "statuses": {
+                                "additionalProperties": {
+                                  "type": "integer"
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "outcomes",
+                              "statuses"
+                            ],
+                            "type": "object"
+                          },
+                          "date_order": {
+                            "enum": [
+                              "dmy",
+                              "mdy",
+                              "ymd"
+                            ],
+                            "type": "string"
+                          },
+                          "default_role": {
+                            "enum": [
+                              "member",
+                              "athlete"
+                            ],
+                            "type": "string"
+                          },
+                          "delimiter": {
+                            "type": "string"
+                          },
+                          "encoding": {
+                            "enum": [
+                              "utf8",
+                              "utf16le",
+                              "utf16be",
+                              "windows1252",
+                              "iso88597",
+                              "windows1253"
+                            ],
+                            "type": "string"
+                          },
+                          "file_warnings": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "filename": {
+                            "type": "string"
+                          },
+                          "finished_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "header": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "last_error": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "mapping": {
+                            "items": {
+                              "properties": {
+                                "column": {
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "field": {
+                                  "enum": [
+                                    "full_name",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone",
+                                    "role",
+                                    "joined_on",
+                                    "membership_status",
+                                    "notes",
+                                    "external_id",
+                                    "package_name",
+                                    "package_price",
+                                    "package_starts_on",
+                                    "package_ends_on",
+                                    "credit_balance",
+                                    "payment_amount",
+                                    "payment_date",
+                                    "payment_method",
+                                    "payment_note",
+                                    "visit_date"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "column",
+                                "field"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "preview": {
+                            "nullable": true,
+                            "properties": {
+                              "actions": {
+                                "additionalProperties": {
+                                  "type": "integer"
+                                },
+                                "type": "object"
+                              },
+                              "outcomes": {
+                                "additionalProperties": {
+                                  "type": "integer"
+                                },
+                                "type": "object"
+                              },
+                              "rows": {
+                                "type": "integer"
+                              },
+                              "warnings": {
+                                "additionalProperties": {
+                                  "type": "integer"
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "previewed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "queued_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "row_count": {
+                            "type": "integer"
+                          },
+                          "source": {
+                            "enum": [
+                              "wodify",
+                              "pushpress",
+                              "zen_planner",
+                              "arbox",
+                              "excel"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "draft",
+                              "queued",
+                              "applying",
+                              "applied",
+                              "failed",
+                              "undone"
+                            ],
+                            "type": "string"
+                          },
+                          "summary": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "undo_until": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "undone_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "byte_size",
+                          "date_order",
+                          "default_role",
+                          "delimiter",
+                          "encoding",
+                          "filename",
+                          "header",
+                          "id",
+                          "mapping",
+                          "row_count",
+                          "source",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "imports"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Imports"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The business's imports, newest first",
+        "tags": [
+          "Imports"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "The encoding (UTF-8/16, Windows-1252, ISO-8859-7, Windows-1253) and the delimiter (`,` `;` tab) are detected; the columns get a proposed mapping from the chosen system's preset, or the best matching one.",
+        "operationId": "PaleeWeb.AdminImportController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "The CSV file (≤ 5 MB)",
+                    "format": "binary",
+                    "type": "string"
+                  },
+                  "source": {
+                    "enum": [
+                      "wodify",
+                      "pushpress",
+                      "zen_planner",
+                      "arbox",
+                      "excel"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "import": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "nullable": true,
+                          "properties": {
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "statuses": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "outcomes",
+                            "statuses"
+                          ],
+                          "type": "object"
+                        },
+                        "date_order": {
+                          "enum": [
+                            "dmy",
+                            "mdy",
+                            "ymd"
+                          ],
+                          "type": "string"
+                        },
+                        "default_role": {
+                          "enum": [
+                            "member",
+                            "athlete"
+                          ],
+                          "type": "string"
+                        },
+                        "delimiter": {
+                          "type": "string"
+                        },
+                        "encoding": {
+                          "enum": [
+                            "utf8",
+                            "utf16le",
+                            "utf16be",
+                            "windows1252",
+                            "iso88597",
+                            "windows1253"
+                          ],
+                          "type": "string"
+                        },
+                        "file_warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "header": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mapping": {
+                          "items": {
+                            "properties": {
+                              "column": {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "field": {
+                                "enum": [
+                                  "full_name",
+                                  "first_name",
+                                  "last_name",
+                                  "email",
+                                  "phone",
+                                  "role",
+                                  "joined_on",
+                                  "membership_status",
+                                  "notes",
+                                  "external_id",
+                                  "package_name",
+                                  "package_price",
+                                  "package_starts_on",
+                                  "package_ends_on",
+                                  "credit_balance",
+                                  "payment_amount",
+                                  "payment_date",
+                                  "payment_method",
+                                  "payment_note",
+                                  "visit_date"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "column",
+                              "field"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "preview": {
+                          "nullable": true,
+                          "properties": {
+                            "actions": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "rows": {
+                              "type": "integer"
+                            },
+                            "warnings": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "previewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "queued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_count": {
+                          "type": "integer"
+                        },
+                        "source": {
+                          "enum": [
+                            "wodify",
+                            "pushpress",
+                            "zen_planner",
+                            "arbox",
+                            "excel"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "draft",
+                            "queued",
+                            "applying",
+                            "applied",
+                            "failed",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "undone_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "date_order",
+                        "default_role",
+                        "delimiter",
+                        "encoding",
+                        "filename",
+                        "header",
+                        "id",
+                        "mapping",
+                        "row_count",
+                        "source",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "import"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Import"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Upload a CSV file (≤ 5 MB, ≤ 20,000 rows) as a draft import",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/catalog": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "date_orders": {
+                      "items": {
+                        "enum": [
+                          "dmy",
+                          "mdy",
+                          "ymd"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "encodings": {
+                      "items": {
+                        "enum": [
+                          "utf8",
+                          "utf16le",
+                          "utf16be",
+                          "windows1252",
+                          "iso88597",
+                          "windows1253"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "errors": {
+                      "items": {
+                        "enum": [
+                          "missing_person",
+                          "missing_name"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "fields": {
+                      "items": {
+                        "properties": {
+                          "group": {
+                            "enum": [
+                              "person",
+                              "package",
+                              "credit",
+                              "payment",
+                              "visit"
+                            ],
+                            "type": "string"
+                          },
+                          "key": {
+                            "enum": [
+                              "full_name",
+                              "first_name",
+                              "last_name",
+                              "email",
+                              "phone",
+                              "role",
+                              "joined_on",
+                              "membership_status",
+                              "notes",
+                              "external_id",
+                              "package_name",
+                              "package_price",
+                              "package_starts_on",
+                              "package_ends_on",
+                              "credit_balance",
+                              "payment_amount",
+                              "payment_date",
+                              "payment_method",
+                              "payment_note",
+                              "visit_date"
+                            ],
+                            "type": "string"
+                          },
+                          "type": {
+                            "enum": [
+                              "text",
+                              "email",
+                              "phone",
+                              "role",
+                              "date",
+                              "status",
+                              "money",
+                              "payment_method"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "group",
+                          "key",
+                          "type"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "limits": {
+                      "properties": {
+                        "max_bytes": {
+                          "type": "integer"
+                        },
+                        "max_invitations": {
+                          "type": "integer"
+                        },
+                        "max_rows": {
+                          "type": "integer"
+                        },
+                        "undo_days": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "max_bytes",
+                        "max_invitations",
+                        "max_rows",
+                        "undo_days"
+                      ],
+                      "type": "object"
+                    },
+                    "outcomes": {
+                      "items": {
+                        "enum": [
+                          "create_person",
+                          "update_person",
+                          "already_imported",
+                          "duplicate_row",
+                          "invalid"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "presets": {
+                      "items": {
+                        "properties": {
+                          "date_order": {
+                            "enum": [
+                              "dmy",
+                              "mdy",
+                              "ymd"
+                            ],
+                            "type": "string"
+                          },
+                          "key": {
+                            "enum": [
+                              "wodify",
+                              "pushpress",
+                              "zen_planner",
+                              "arbox",
+                              "excel"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "date_order",
+                          "key",
+                          "name"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "roles": {
+                      "items": {
+                        "enum": [
+                          "member",
+                          "athlete"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "row_statuses": {
+                      "items": {
+                        "enum": [
+                          "pending",
+                          "applied",
+                          "skipped",
+                          "failed",
+                          "undone"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "statuses": {
+                      "items": {
+                        "enum": [
+                          "draft",
+                          "queued",
+                          "applying",
+                          "applied",
+                          "failed",
+                          "undone"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "warnings": {
+                      "items": {
+                        "enum": [
+                          "invalid_email",
+                          "invalid_phone",
+                          "invalid_date",
+                          "invalid_amount",
+                          "invalid_role",
+                          "invalid_status",
+                          "negative_balance",
+                          "payment_without_date",
+                          "package_created",
+                          "subscription_exists",
+                          "visit_exists",
+                          "credit_already_imported",
+                          "not_a_client",
+                          "undecodable_bytes"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "date_orders",
+                    "encodings",
+                    "errors",
+                    "fields",
+                    "limits",
+                    "outcomes",
+                    "presets",
+                    "roles",
+                    "row_statuses",
+                    "statuses",
+                    "warnings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Catalog"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fields, presets (best guesses), date orders, limits and codes of imports",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete an import that was never applied",
+        "tags": [
+          "Imports"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "import": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "nullable": true,
+                          "properties": {
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "statuses": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "outcomes",
+                            "statuses"
+                          ],
+                          "type": "object"
+                        },
+                        "date_order": {
+                          "enum": [
+                            "dmy",
+                            "mdy",
+                            "ymd"
+                          ],
+                          "type": "string"
+                        },
+                        "default_role": {
+                          "enum": [
+                            "member",
+                            "athlete"
+                          ],
+                          "type": "string"
+                        },
+                        "delimiter": {
+                          "type": "string"
+                        },
+                        "encoding": {
+                          "enum": [
+                            "utf8",
+                            "utf16le",
+                            "utf16be",
+                            "windows1252",
+                            "iso88597",
+                            "windows1253"
+                          ],
+                          "type": "string"
+                        },
+                        "file_warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "header": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mapping": {
+                          "items": {
+                            "properties": {
+                              "column": {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "field": {
+                                "enum": [
+                                  "full_name",
+                                  "first_name",
+                                  "last_name",
+                                  "email",
+                                  "phone",
+                                  "role",
+                                  "joined_on",
+                                  "membership_status",
+                                  "notes",
+                                  "external_id",
+                                  "package_name",
+                                  "package_price",
+                                  "package_starts_on",
+                                  "package_ends_on",
+                                  "credit_balance",
+                                  "payment_amount",
+                                  "payment_date",
+                                  "payment_method",
+                                  "payment_note",
+                                  "visit_date"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "column",
+                              "field"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "preview": {
+                          "nullable": true,
+                          "properties": {
+                            "actions": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "rows": {
+                              "type": "integer"
+                            },
+                            "warnings": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "previewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "queued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_count": {
+                          "type": "integer"
+                        },
+                        "source": {
+                          "enum": [
+                            "wodify",
+                            "pushpress",
+                            "zen_planner",
+                            "arbox",
+                            "excel"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "draft",
+                            "queued",
+                            "applying",
+                            "applied",
+                            "failed",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "undone_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "date_order",
+                        "default_role",
+                        "delimiter",
+                        "encoding",
+                        "filename",
+                        "header",
+                        "id",
+                        "mapping",
+                        "row_count",
+                        "source",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "import"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Import"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One import with its dry run, counts per row status and outcome, and report",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}/apply": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.apply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "import": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "nullable": true,
+                          "properties": {
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "statuses": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "outcomes",
+                            "statuses"
+                          ],
+                          "type": "object"
+                        },
+                        "date_order": {
+                          "enum": [
+                            "dmy",
+                            "mdy",
+                            "ymd"
+                          ],
+                          "type": "string"
+                        },
+                        "default_role": {
+                          "enum": [
+                            "member",
+                            "athlete"
+                          ],
+                          "type": "string"
+                        },
+                        "delimiter": {
+                          "type": "string"
+                        },
+                        "encoding": {
+                          "enum": [
+                            "utf8",
+                            "utf16le",
+                            "utf16be",
+                            "windows1252",
+                            "iso88597",
+                            "windows1253"
+                          ],
+                          "type": "string"
+                        },
+                        "file_warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "header": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mapping": {
+                          "items": {
+                            "properties": {
+                              "column": {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "field": {
+                                "enum": [
+                                  "full_name",
+                                  "first_name",
+                                  "last_name",
+                                  "email",
+                                  "phone",
+                                  "role",
+                                  "joined_on",
+                                  "membership_status",
+                                  "notes",
+                                  "external_id",
+                                  "package_name",
+                                  "package_price",
+                                  "package_starts_on",
+                                  "package_ends_on",
+                                  "credit_balance",
+                                  "payment_amount",
+                                  "payment_date",
+                                  "payment_method",
+                                  "payment_note",
+                                  "visit_date"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "column",
+                              "field"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "preview": {
+                          "nullable": true,
+                          "properties": {
+                            "actions": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "rows": {
+                              "type": "integer"
+                            },
+                            "warnings": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "previewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "queued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_count": {
+                          "type": "integer"
+                        },
+                        "source": {
+                          "enum": [
+                            "wodify",
+                            "pushpress",
+                            "zen_planner",
+                            "arbox",
+                            "excel"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "draft",
+                            "queued",
+                            "applying",
+                            "applied",
+                            "failed",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "undone_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "date_order",
+                        "default_role",
+                        "delimiter",
+                        "encoding",
+                        "filename",
+                        "header",
+                        "id",
+                        "mapping",
+                        "row_count",
+                        "source",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "import"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Import"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Apply the import in the background (each row once; again only finishes the rest)",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}/invitations": {
+      "post": {
+        "callbacks": {},
+        "description": "Only people with an address who have not claimed their profile and were not invited yet; within the business's daily invitation limits.",
+        "operationId": "PaleeWeb.AdminImportController.invitations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "person_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "failed": {
+                      "type": "integer"
+                    },
+                    "remaining": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "items": {
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "person_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued",
+                              "failed"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "email",
+                          "error",
+                          "person_id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "sent": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "failed",
+                    "remaining",
+                    "results",
+                    "sent"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email invitations to the people the import brought in (at most 200 per call)",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}/preview": {
+      "post": {
+        "callbacks": {},
+        "description": "Nothing is written outside the import: every row gets its outcome and warnings.",
+        "operationId": "PaleeWeb.AdminImportController.preview",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "date_order": {
+                    "enum": [
+                      "dmy",
+                      "mdy",
+                      "ymd"
+                    ],
+                    "type": "string"
+                  },
+                  "default_role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  },
+                  "mapping": {
+                    "items": {
+                      "properties": {
+                        "column": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "field": {
+                          "enum": [
+                            "full_name",
+                            "first_name",
+                            "last_name",
+                            "email",
+                            "phone",
+                            "role",
+                            "joined_on",
+                            "membership_status",
+                            "notes",
+                            "external_id",
+                            "package_name",
+                            "package_price",
+                            "package_starts_on",
+                            "package_ends_on",
+                            "credit_balance",
+                            "payment_amount",
+                            "payment_date",
+                            "payment_method",
+                            "payment_note",
+                            "visit_date"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "column",
+                        "field"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "import": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "nullable": true,
+                          "properties": {
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "statuses": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "outcomes",
+                            "statuses"
+                          ],
+                          "type": "object"
+                        },
+                        "date_order": {
+                          "enum": [
+                            "dmy",
+                            "mdy",
+                            "ymd"
+                          ],
+                          "type": "string"
+                        },
+                        "default_role": {
+                          "enum": [
+                            "member",
+                            "athlete"
+                          ],
+                          "type": "string"
+                        },
+                        "delimiter": {
+                          "type": "string"
+                        },
+                        "encoding": {
+                          "enum": [
+                            "utf8",
+                            "utf16le",
+                            "utf16be",
+                            "windows1252",
+                            "iso88597",
+                            "windows1253"
+                          ],
+                          "type": "string"
+                        },
+                        "file_warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "header": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mapping": {
+                          "items": {
+                            "properties": {
+                              "column": {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "field": {
+                                "enum": [
+                                  "full_name",
+                                  "first_name",
+                                  "last_name",
+                                  "email",
+                                  "phone",
+                                  "role",
+                                  "joined_on",
+                                  "membership_status",
+                                  "notes",
+                                  "external_id",
+                                  "package_name",
+                                  "package_price",
+                                  "package_starts_on",
+                                  "package_ends_on",
+                                  "credit_balance",
+                                  "payment_amount",
+                                  "payment_date",
+                                  "payment_method",
+                                  "payment_note",
+                                  "visit_date"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "column",
+                              "field"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "preview": {
+                          "nullable": true,
+                          "properties": {
+                            "actions": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "rows": {
+                              "type": "integer"
+                            },
+                            "warnings": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "previewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "queued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_count": {
+                          "type": "integer"
+                        },
+                        "source": {
+                          "enum": [
+                            "wodify",
+                            "pushpress",
+                            "zen_planner",
+                            "arbox",
+                            "excel"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "draft",
+                            "queued",
+                            "applying",
+                            "applied",
+                            "failed",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "undone_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "date_order",
+                        "default_role",
+                        "delimiter",
+                        "encoding",
+                        "filename",
+                        "header",
+                        "id",
+                        "mapping",
+                        "row_count",
+                        "source",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "import"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Import"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save the mapping and options of a draft and run the dry run",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}/rows": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.rows",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "applied",
+                "skipped",
+                "failed",
+                "undone"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "enum": [
+                "create_person",
+                "update_person",
+                "already_imported",
+                "duplicate_row",
+                "invalid"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after_row",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "next_after_row": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "rows": {
+                      "items": {
+                        "properties": {
+                          "applied_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "cells": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "error_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "errors": {
+                            "items": {
+                              "properties": {
+                                "code": {
+                                  "enum": [
+                                    "missing_person",
+                                    "missing_name"
+                                  ],
+                                  "type": "string"
+                                },
+                                "field": {
+                                  "enum": [
+                                    "full_name",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone",
+                                    "role",
+                                    "joined_on",
+                                    "membership_status",
+                                    "notes",
+                                    "external_id",
+                                    "package_name",
+                                    "package_price",
+                                    "package_starts_on",
+                                    "package_ends_on",
+                                    "credit_balance",
+                                    "payment_amount",
+                                    "payment_date",
+                                    "payment_method",
+                                    "payment_note",
+                                    "visit_date"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "code",
+                                "field"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "outcome": {
+                            "enum": [
+                              "create_person",
+                              "update_person",
+                              "already_imported",
+                              "duplicate_row",
+                              "invalid"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "result": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "row_number": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "applied",
+                              "skipped",
+                              "failed",
+                              "undone"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "warnings": {
+                            "items": {
+                              "properties": {
+                                "code": {
+                                  "enum": [
+                                    "invalid_email",
+                                    "invalid_phone",
+                                    "invalid_date",
+                                    "invalid_amount",
+                                    "invalid_role",
+                                    "invalid_status",
+                                    "negative_balance",
+                                    "payment_without_date",
+                                    "package_created",
+                                    "subscription_exists",
+                                    "visit_exists",
+                                    "credit_already_imported",
+                                    "not_a_client",
+                                    "undecodable_bytes"
+                                  ],
+                                  "type": "string"
+                                },
+                                "field": {
+                                  "enum": [
+                                    "full_name",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone",
+                                    "role",
+                                    "joined_on",
+                                    "membership_status",
+                                    "notes",
+                                    "external_id",
+                                    "package_name",
+                                    "package_price",
+                                    "package_starts_on",
+                                    "package_ends_on",
+                                    "credit_balance",
+                                    "payment_amount",
+                                    "payment_date",
+                                    "payment_method",
+                                    "payment_note",
+                                    "visit_date"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "code",
+                                "field"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "cells",
+                          "errors",
+                          "id",
+                          "result",
+                          "row_number",
+                          "status",
+                          "warnings"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "next_after_row",
+                    "rows"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rows"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "An import's rows with their outcome, warnings and what applying them did",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/imports/{id}/undo": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminImportController.undo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "import": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "nullable": true,
+                          "properties": {
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "statuses": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "outcomes",
+                            "statuses"
+                          ],
+                          "type": "object"
+                        },
+                        "date_order": {
+                          "enum": [
+                            "dmy",
+                            "mdy",
+                            "ymd"
+                          ],
+                          "type": "string"
+                        },
+                        "default_role": {
+                          "enum": [
+                            "member",
+                            "athlete"
+                          ],
+                          "type": "string"
+                        },
+                        "delimiter": {
+                          "type": "string"
+                        },
+                        "encoding": {
+                          "enum": [
+                            "utf8",
+                            "utf16le",
+                            "utf16be",
+                            "windows1252",
+                            "iso88597",
+                            "windows1253"
+                          ],
+                          "type": "string"
+                        },
+                        "file_warnings": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "header": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mapping": {
+                          "items": {
+                            "properties": {
+                              "column": {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "field": {
+                                "enum": [
+                                  "full_name",
+                                  "first_name",
+                                  "last_name",
+                                  "email",
+                                  "phone",
+                                  "role",
+                                  "joined_on",
+                                  "membership_status",
+                                  "notes",
+                                  "external_id",
+                                  "package_name",
+                                  "package_price",
+                                  "package_starts_on",
+                                  "package_ends_on",
+                                  "credit_balance",
+                                  "payment_amount",
+                                  "payment_date",
+                                  "payment_method",
+                                  "payment_note",
+                                  "visit_date"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "column",
+                              "field"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "preview": {
+                          "nullable": true,
+                          "properties": {
+                            "actions": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "outcomes": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            },
+                            "rows": {
+                              "type": "integer"
+                            },
+                            "warnings": {
+                              "additionalProperties": {
+                                "type": "integer"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "previewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "queued_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_count": {
+                          "type": "integer"
+                        },
+                        "source": {
+                          "enum": [
+                            "wodify",
+                            "pushpress",
+                            "zen_planner",
+                            "arbox",
+                            "excel"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "draft",
+                            "queued",
+                            "applying",
+                            "applied",
+                            "failed",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "undone_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "date_order",
+                        "default_role",
+                        "delimiter",
+                        "encoding",
+                        "filename",
+                        "header",
+                        "id",
+                        "mapping",
+                        "row_count",
+                        "source",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "import"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Import"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Undo an applied import (within 7 days of its end)",
+        "tags": [
+          "Imports"
         ]
       }
     },
