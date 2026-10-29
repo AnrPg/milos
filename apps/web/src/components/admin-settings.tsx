@@ -292,7 +292,8 @@ export function GamificationSection({ token, part = "basic" }: { token: string; 
     if (!settingsQuery.data?.gamification) return;
     const next = formFromSettings(settingsQuery.data.gamification);
     queueMicrotask(() => {
-      setForm((current) => mergeServerForm(current, lastServer.current, next));
+      const previous = lastServer.current;
+      setForm((current) => mergeServerForm(current, previous, next));
       lastServer.current = next;
       setInitialized(true);
     });
@@ -1093,7 +1094,8 @@ export function SchedulingDefaultsSection({ token, part = "basic" }: { token: st
     if (value) {
       const next = schedulingFormFromSettings(value);
       queueMicrotask(() => {
-        setForm((current) => mergeServerForm(current, lastServer.current, next));
+        const previous = lastServer.current;
+        setForm((current) => mergeServerForm(current, previous, next));
         lastServer.current = next;
       });
     }

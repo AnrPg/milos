@@ -188,6 +188,6 @@ test("Settings keep the settings with a good default in one closed «Advanced» 
   await expect(page.getByTestId("advanced-group-bookings")).toHaveCount(0);
 
   await page.getByTestId("advanced-group-motivation").getByRole("spinbutton", { name: /Streak shields per renewal/ }).fill("2");
-  await page.getByTestId("advanced-group-motivation").getByRole("button", { name: "Save", exact: true }).click();
+  await page.getByTestId("advanced-group-motivation").getByRole("button", { name: "Save", exact: true }).first().click();
   await expect.poll(() => writes.find((write) => write.path === "/api/admin/settings")?.body).toEqual({ gamification: { streak_shields: 2 } });
 });

@@ -197,7 +197,7 @@ test.describe("personal weekly goal (ADR-229)", () => {
     await shields.fill("2");
     await motivation.getByRole("spinbutton", { name: /Shield renewal day/ }).fill("5");
     await expect(motivation).toContainText("Shields renew for everyone on day 5 of every month.");
-    await motivation.getByRole("button", { name: "Save", exact: true }).click();
+    await motivation.getByRole("button", { name: "Save", exact: true }).first().click();
 
     await expect.poll(() => patches.length).toBe(1);
     expect(patches[0]).toEqual({ gamification: { streak_shields: 2, streak_shield_reset_day: 5 } });
