@@ -602,7 +602,8 @@ defmodule PaleeWeb.OrganizationAccessController do
   end
 
   def guest_boxes(conn, _params) do
-    with {:ok, boxes} <- ListOrganizationMemberships.guest_boxes(GuardianPlug.current_resource(conn)) do
+    with {:ok, boxes} <-
+           ListOrganizationMemberships.guest_boxes(GuardianPlug.current_resource(conn)) do
       json(conn, %{boxes: boxes})
     end
   end

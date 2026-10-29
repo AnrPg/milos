@@ -45,7 +45,10 @@ defmodule Palee.Application.Payments.TerminalFulfilment do
   defp front_desk_roles(context, intent) do
     if (intent[:tip_cents] || 0) > 0 and
          not (is_binary(intent[:created_by_id]) and TipAttribution.started_on(intent) == "phone"),
-       do: context |> Organizations.member_roles_by_user() |> Map.new(fn {id, m} -> {id, m.roles} end),
+       do:
+         context
+         |> Organizations.member_roles_by_user()
+         |> Map.new(fn {id, m} -> {id, m.roles} end),
        else: %{}
   end
 

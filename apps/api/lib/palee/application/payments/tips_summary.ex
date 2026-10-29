@@ -49,7 +49,13 @@ defmodule Palee.Application.Payments.TipsSummary do
 
   defp tipped(context, from, to) do
     {starts, ends} = bounds(context, from, to)
-    page(context, %{tipped: true, status: "succeeded", succeeded_from: starts, succeeded_to: ends}, 0, [])
+
+    page(
+      context,
+      %{tipped: true, status: "succeeded", succeeded_from: starts, succeeded_to: ends},
+      0,
+      []
+    )
   end
 
   defp page(context, filters, offset, acc) do
@@ -57,7 +63,10 @@ defmodule Palee.Application.Payments.TipsSummary do
       Payments.list_raw(context, Map.merge(filters, %{limit: @page, offset: offset}))
 
     acc = acc ++ intents
-    if offset + @page < total and intents != [], do: page(context, filters, offset + @page, acc), else: acc
+
+    if offset + @page < total and intents != [],
+      do: page(context, filters, offset + @page, acc),
+      else: acc
   end
 
   defp names(intents) do

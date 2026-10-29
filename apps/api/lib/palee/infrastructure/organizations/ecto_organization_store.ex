@@ -301,9 +301,14 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
            Ecto.UUID.dump!(organization_id),
            Ecto.UUID.dump!(user_id)
          ]) do
-      {:ok, %{rows: [[id]]}} -> {:ok, Ecto.UUID.cast!(id)}
-      {:error, %Postgrex.Error{postgres: %{code: :insufficient_privilege}}} -> {:error, :forbidden}
-      {:error, error} -> {:error, error}
+      {:ok, %{rows: [[id]]}} ->
+        {:ok, Ecto.UUID.cast!(id)}
+
+      {:error, %Postgrex.Error{postgres: %{code: :insufficient_privilege}}} ->
+        {:error, :forbidden}
+
+      {:error, error} ->
+        {:error, error}
     end
   end
 

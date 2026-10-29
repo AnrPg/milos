@@ -32,7 +32,6 @@ defmodule Palee.Application.ListOrganizationMemberships do
      end)}
   end
 
-
   defp with_location_scope(%{membership: membership} = entry, user_id) do
     scopes =
       Organizations.membership_location_scopes(

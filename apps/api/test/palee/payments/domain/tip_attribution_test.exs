@@ -9,7 +9,11 @@ defmodule Palee.Payments.Domain.TipAttributionTest do
   @owner "00000000-0000-0000-0000-0000000000ff"
 
   defp intent(attrs),
-    do: Map.merge(%{tip_cents: 200, tip_attribution: nil, created_by_id: @starter, metadata: %{}}, attrs)
+    do:
+      Map.merge(
+        %{tip_cents: 200, tip_attribution: nil, created_by_id: @starter, metadata: %{}},
+        attrs
+      )
 
   test "no tip, or a tip already attributed: nothing to write" do
     assert TipAttribution.attribute(intent(%{tip_cents: 0}), %{}) == nil
@@ -24,7 +28,11 @@ defmodule Palee.Payments.Domain.TipAttributionTest do
   test "started at the desk: the only front desk person, owners and admins never counted" do
     desk = intent(%{metadata: %{"started_on" => "desk"}})
 
-    roles = %{@desk_a => [:front_desk], @owner => [:owner, :front_desk], "x" => [:admin, "front_desk"]}
+    roles = %{
+      @desk_a => [:front_desk],
+      @owner => [:owner, :front_desk],
+      "x" => [:admin, "front_desk"]
+    }
 
     assert TipAttribution.attribute(desk, roles) ==
              %{tip_attribution: "sole_front_desk", tip_recipient_user_id: @desk_a}

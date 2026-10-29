@@ -15,6 +15,7 @@ defmodule Palee.Application.Fiscal.ReceiptLinks do
 
   alias Palee.Application.Fiscal.FiscalDocumentRendering
   alias Palee.Fiscal
+  alias Palee.Payments.Terminal
 
   @salt "palee-fiscal-receipt-link"
   @max_age 90 * 24 * 3_600
@@ -62,15 +63,6 @@ defmodule Palee.Application.Fiscal.ReceiptLinks do
 
   def render(_token), do: {:error, :not_found}
 
-  defp secret do
-    case Application.get_env(:palee, :payment_terminal_secret) do
-      secret when is_binary(secret) and byte_size(secret) >= 32 ->
-        secret
-
-      _none ->
-        :palee
-        |> Application.get_env(PaleeWeb.Endpoint, [])
-        |> Keyword.get(:secret_key_base, "palee-dev-receipts")
-    end
-  end
+  # Derived from the payments' signing key; the salt keeps it apart.
+  defp secret, do: Terminal.signing_key()
 end

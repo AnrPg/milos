@@ -324,7 +324,8 @@ defmodule Palee.Application.Payments.DeskBuyers do
   # ── Helpers ────────────────────────────────────────────────────────────
 
   defp roles_by_user(context),
-    do: context |> Organizations.member_roles_by_user() |> Map.new(fn {id, m} -> {id, m.roles} end)
+    do:
+      context |> Organizations.member_roles_by_user() |> Map.new(fn {id, m} -> {id, m.roles} end)
 
   defp buyer?(roles_by_user, user_id),
     do: roles_by_user |> Map.get(user_id, []) |> MembershipPolicy.buyer?()
@@ -336,7 +337,9 @@ defmodule Palee.Application.Payments.DeskBuyers do
     end
   end
 
-  defp normalize_query(query) when is_binary(query), do: query |> String.trim() |> String.slice(0, 120)
+  defp normalize_query(query) when is_binary(query),
+    do: query |> String.trim() |> String.slice(0, 120)
+
   defp normalize_query(_query), do: ""
 
   defp email?(text), do: Regex.match?(~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/, text)

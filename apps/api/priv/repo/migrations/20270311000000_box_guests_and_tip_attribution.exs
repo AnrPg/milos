@@ -138,7 +138,10 @@ defmodule Palee.Repo.Migrations.BoxGuestsAndTipAttribution do
 
     execute("UPDATE registration_invitations SET role = roles[1] WHERE role = 'guest'")
 
-    execute("UPDATE memberships SET user_type_snapshot = 'member' WHERE user_type_snapshot = 'guest'")
+    execute(
+      "UPDATE memberships SET user_type_snapshot = 'member' WHERE user_type_snapshot = 'guest'"
+    )
+
     replace_user_type_check(~w(member athlete))
     replace_role_checks(@old_roles)
   end

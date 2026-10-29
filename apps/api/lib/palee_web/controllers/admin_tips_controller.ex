@@ -21,8 +21,18 @@ defmodule PaleeWeb.AdminTipsController do
       "Tips are the staff's, not revenue (ADR-264). Each is attributed to whoever started " <>
         "the payment on their phone, or to the front desk (ADR-272).",
     parameters: [
-      %Parameter{name: :from, in: :query, required: false, schema: %Schema{type: :string, format: :date}},
-      %Parameter{name: :to, in: :query, required: false, schema: %Schema{type: :string, format: :date}}
+      %Parameter{
+        name: :from,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, format: :date}
+      },
+      %Parameter{
+        name: :to,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, format: :date}
+      }
     ],
     responses: [ok: {"Tips", "application/json", T.tips()}]
   )

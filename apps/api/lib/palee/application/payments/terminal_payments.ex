@@ -43,20 +43,20 @@ defmodule Palee.Application.Payments.TerminalPayments do
          :ok <- GoLive.check_payment(context, purpose.user_id || user_id),
          {:ok, payment} <-
            Terminal.start(
-        context,
-        %{
-          purpose_type: params[:purpose],
-          purpose_id: purpose.purpose_id,
-          user_id: purpose.user_id,
-          amount_cents: params[:amount_cents],
-          currency: purpose.currency,
-          description: purpose.description,
-          metadata: Map.merge(purpose[:metadata] || %{}, started_on(params)),
-          idempotency_key: params[:idempotency_key],
-          created_by_id: Map.get(context, :user_id)
-        },
-        now()
-      ) do
+             context,
+             %{
+               purpose_type: params[:purpose],
+               purpose_id: purpose.purpose_id,
+               user_id: purpose.user_id,
+               amount_cents: params[:amount_cents],
+               currency: purpose.currency,
+               description: purpose.description,
+               metadata: Map.merge(purpose[:metadata] || %{}, started_on(params)),
+               idempotency_key: params[:idempotency_key],
+               created_by_id: Map.get(context, :user_id)
+             },
+             now()
+           ) do
       {:ok, decorate(context, payment)}
     end
   end

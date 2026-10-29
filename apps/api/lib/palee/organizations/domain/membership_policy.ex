@@ -81,12 +81,17 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
     issuer_roles = List.wrap(issuer_roles)
 
     cond do
-      :owner in issuer_roles -> target_role in @roles
-      :admin in issuer_roles -> target_role in (@staff_roles ++ @client_roles ++ @guest_roles)
+      :owner in issuer_roles ->
+        target_role in @roles
+
+      :admin in issuer_roles ->
+        target_role in (@staff_roles ++ @client_roles ++ @guest_roles)
+
       Enum.any?(issuer_roles, &(&1 in [:coach, :front_desk])) ->
         target_role in (@client_roles ++ @guest_roles)
 
-      true -> false
+      true ->
+        false
     end
   end
 

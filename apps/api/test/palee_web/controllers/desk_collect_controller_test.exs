@@ -28,6 +28,7 @@ defmodule PaleeWeb.DeskCollectControllerTest do
   setup do
     owner = admin_fixture(%{nickname: "desk_owner"})
     desk = user_fixture(%{nickname: "desk_eleni", display_name: "Ελένη Υποδοχή"})
+
     member =
       user_fixture(%{
         nickname: "desk_maria",
@@ -36,7 +37,9 @@ defmodule PaleeWeb.DeskCollectControllerTest do
       })
 
     {:ok, organization} =
-      Organizations.create_organization(%{name: "Desk Tenant #{System.unique_integer([:positive])}"})
+      Organizations.create_organization(%{
+        name: "Desk Tenant #{System.unique_integer([:positive])}"
+      })
 
     add(organization, owner, [:owner])
     add(organization, desk, [:front_desk])
@@ -102,7 +105,10 @@ defmodule PaleeWeb.DeskCollectControllerTest do
   describe "availability (ADR-272)" do
     test "says why Tap to Pay is not possible", %{conn: conn} = ctx do
       availability = fn ->
-        conn |> as(ctx.desk) |> get(admin_path(ctx, "/terminal/availability")) |> json_response(200)
+        conn
+        |> as(ctx.desk)
+        |> get(admin_path(ctx, "/terminal/availability"))
+        |> json_response(200)
       end
 
       assert %{"available" => false, "reason" => "no_viva", "provider" => nil} = availability.()
@@ -214,7 +220,8 @@ defmodule PaleeWeb.DeskCollectControllerTest do
          %{conn: conn} = ctx do
       connect_sandbox(conn, ctx)
       # The owner also holds the front desk role: still not counted.
-      {:ok, _owner} = Organizations.set_membership_roles(ctx.context, ctx.owner.id, [:owner, :front_desk])
+      {:ok, _owner} =
+        Organizations.set_membership_roles(ctx.context, ctx.owner.id, [:owner, :front_desk])
 
       payment =
         start(conn, ctx, ctx.owner, %{
@@ -310,9 +317,17 @@ defmodule PaleeWeb.DeskCollectControllerTest do
       # Accents and case do not matter.
       assert [%{"user_id" => ^member_id}] = people.("?q=μαρια")
 
-      outsider = user_fixture(%{nickname: "desk_outsider", email: "out#{System.unique_integer([:positive])}@example.com"})
+      outsider =
+        user_fixture(%{
+          nickname: "desk_outsider",
+          email: "out#{System.unique_integer([:positive])}@example.com"
+        })
+
       assert people.("?q=desk_outsider") == []
-      assert [%{"user_id" => outsider_id, "relation" => "none"}] = people.("?q=" <> outsider.email)
+
+      assert [%{"user_id" => outsider_id, "relation" => "none"}] =
+               people.("?q=" <> outsider.email)
+
       assert outsider_id == outsider.id
     end
 
@@ -362,7 +377,8 @@ defmodule PaleeWeb.DeskCollectControllerTest do
       assert %{"status" => "succeeded", "fulfilment_status" => "done"} =
                complete(conn, ctx, ctx.desk, payment)
 
-      assert %{active_package_subscription: %{}} = Finance.get_member_profile(ctx.context, guest.id)
+      assert %{active_package_subscription: %{}} =
+               Finance.get_member_profile(ctx.context, guest.id)
 
       # The box is not one of the guest's gyms: no member app, no club, no console.
       memberships = conn |> as(guest) |> get("/api/memberships") |> json_response(200)
@@ -387,7 +403,10 @@ defmodule PaleeWeb.DeskCollectControllerTest do
       assert %{"added" => true, "created_profile" => true, "person" => person} =
                conn
                |> as(ctx.desk)
-               |> post(admin_path(ctx, "/desk/guests"), %{name: "Γιώργος Επισκέπτης", email: email})
+               |> post(admin_path(ctx, "/desk/guests"), %{
+                 name: "Γιώργος Επισκέπτης",
+                 email: email
+               })
                |> json_response(201)
 
       assert person["name"] == "Γιώργος Επισκέπτης"

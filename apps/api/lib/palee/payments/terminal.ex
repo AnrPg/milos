@@ -40,11 +40,20 @@ defmodule Palee.Payments.Terminal do
 
     reason =
       case {account, terminal_account(context)} do
-        {_account, {:ok, _ready}} -> nil
-        {nil, _error} -> "no_viva"
-        {%{provider: "stripe"}, _error} -> "stripe_only"
-        {%{status: "active"}, _error} -> "provider_without_terminal"
-        {%{provider: provider}, _error} -> if gateway(provider), do: "account_not_ready", else: "provider_without_terminal"
+        {_account, {:ok, _ready}} ->
+          nil
+
+        {nil, _error} ->
+          "no_viva"
+
+        {%{provider: "stripe"}, _error} ->
+          "stripe_only"
+
+        {%{status: "active"}, _error} ->
+          "provider_without_terminal"
+
+        {%{provider: provider}, _error} ->
+          if gateway(provider), do: "account_not_ready", else: "provider_without_terminal"
       end
 
     %{
@@ -356,6 +365,9 @@ defmodule Palee.Payments.Terminal do
       _not_launchable -> nil
     end
   end
+
+  @doc "ADR-272: the key other signed links of a payment (the walk-in's receipt) derive from."
+  def signing_key, do: key()
 
   # The key that signs references: its own secret when configured,
   # otherwise derived from the endpoint secret.
