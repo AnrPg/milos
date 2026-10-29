@@ -286,7 +286,8 @@ defmodule PaleeWeb.FallbackController do
     recipe_not_found: {:not_found, "There is no such setup recipe"},
     recipe_owner_only: {:forbidden, "Only the owner applies a setup recipe"},
     invalid_recipe_prices:
-      {:unprocessable_entity, "Each price must be a whole number of cents for a package of the recipe"}
+      {:unprocessable_entity,
+       "Each price must be a whole number of cents for a package of the recipe"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@setup_errors, reason) do

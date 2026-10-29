@@ -38,7 +38,9 @@ defmodule Palee.Setup.Domain.RecipesTest do
       assert {:ok, ^recipe} = Recipe.with_prices(recipe, %{})
     end
 
-    test "refuses unknown codes and prices that are not whole non-negative cents", %{recipe: recipe} do
+    test "refuses unknown codes and prices that are not whole non-negative cents", %{
+      recipe: recipe
+    } do
       for prices <- [
             %{"setup_bowling" => 100},
             %{"setup_unlimited" => -1},

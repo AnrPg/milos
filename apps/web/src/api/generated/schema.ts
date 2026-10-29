@@ -8842,7 +8842,7 @@ export interface paths {
         put?: never;
         /**
          * Apply a recipe (owner only); applying it again changes nothing
-         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code.
          */
         post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
         delete?: never;
@@ -84748,6 +84748,8 @@ export interface operations {
                         }[];
                         /** @description Only the owner applies a recipe */
                         can_apply: boolean;
+                        /** @description ISO currency of the suggested prices */
+                        currency: string;
                         recipes: {
                             class_types: string[];
                             documents: string[];
@@ -84799,7 +84801,16 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description The owner's prices for the recipe's packages: package code => cents */
+                    prices?: {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
         responses: {
             /** @description Applied */
             200: {
@@ -84909,7 +84920,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description A step failed; nothing changed */
+            /** @description A step failed or a price is not valid; nothing changed */
             422: {
                 headers: {
                     [name: string]: unknown;
