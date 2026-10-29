@@ -35,9 +35,14 @@ defmodule Palee.Application.ReceiveFinancePayment do
       # ADR-262: an online payment is fulfilled only with its document, so
       # a failure makes the payment's fulfilment try again later.
       case PaymentDocuments.issue(context, received, nil, DateTime.utc_now()) do
-        {:ok, :not_configured} -> {:ok, Map.put(received, :fiscal_document, nil)}
-        {:ok, document} -> {:ok, Map.put(received, :fiscal_document, PaymentDocuments.summary(document))}
-        {:error, reason} -> {:error, {:fiscal_document_not_issued, reason}}
+        {:ok, :not_configured} ->
+          {:ok, Map.put(received, :fiscal_document, nil)}
+
+        {:ok, document} ->
+          {:ok, Map.put(received, :fiscal_document, PaymentDocuments.summary(document))}
+
+        {:error, reason} ->
+          {:error, {:fiscal_document_not_issued, reason}}
       end
     end
   end
