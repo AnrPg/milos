@@ -129,14 +129,8 @@ export function Avatar({ text, url }: { text: string; url?: string | null }) {
   );
 }
 
-/** An error shown under its field, inside the form. */
-export function FieldError({ id, children }: { id: string; children: ReactNode }) {
-  return (
-    <span id={id} role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>
-      {children}
-    </span>
-  );
-}
+/** An error shown under its field, inside the form (ADR-195, ADR-214). */
+export { FieldError } from "@/components/ui/ErrorNotice";
 
 export const fieldInputClass = "w-full rounded-xl px-3 py-2.5 text-base";
 
