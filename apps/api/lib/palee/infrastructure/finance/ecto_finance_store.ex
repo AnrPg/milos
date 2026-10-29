@@ -538,6 +538,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       "provider" => params["provider"],
       "provider_transaction_id" => params["provider_transaction_id"]
     })
+    # ADR-264: the card's tip (owed to staff, not revenue) and surcharge
+    # (recorded apart) stay on the payment for reconciliation with the provider.
+    |> Map.merge(Map.take(params, ["tip_cents", "surcharge_cents"]))
   end
 
   defp online_reference(_params, stored), do: stored

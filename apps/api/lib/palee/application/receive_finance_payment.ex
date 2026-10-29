@@ -39,7 +39,9 @@ defmodule Palee.Application.ReceiveFinancePayment do
   @doc """
   ADR-249: records a card tapped on the Viva.com Terminal app at the desk,
   after the provider confirmed it (`card_terminal`). Idempotent through the
-  payment's `idempotency_key`; the document follows ADR-222.
+  payment's `idempotency_key`; the document follows ADR-222. ADR-264: a
+  card surcharge (`surcharge_cents`, recorded in Finance apart) goes on the
+  same fiscal document, described as `surcharge_description`.
   """
   def record_terminal(context, user_id, params) do
     with :ok <- GoLive.check_payment(context, user_id),
@@ -48,12 +50,45 @@ defmodule Palee.Application.ReceiveFinancePayment do
              call(
                user_id,
                params["created_by_id"],
-               Map.put(params, "payment_method", "card_terminal")
+               params
+               |> Map.delete("surcharge_description")
+               |> Map.put("payment_method", "card_terminal")
              )
            end) do
-      with_fiscal_document(context, received, params["created_by_id"])
+      received
+      |> Map.merge(surcharge(params))
+      |> then(&with_fiscal_document(context, &1, params["created_by_id"]))
     end
   end
+
+  @doc """
+  ADR-264: a walk-in's sale paid by Tap to Pay (no membership): the Finance
+  stream invoice and payment `sale` (`Finance.record_stream_sale/2`,
+  idempotent per its source) and its fiscal document (ADR-262), issued from
+  that payment like any other.
+  """
+  def record_walk_in(context, sale, actor_id) do
+    with :ok <- GoLive.check_payment(context, nil),
+         {:ok, recorded} <- Finance.record_stream_sale(context, sale) do
+      received = %{
+        payment: recorded.payment,
+        invoice: recorded.invoice,
+        description: walk_in_description(recorded.invoice),
+        amount_cents: recorded.payment.amount_cents,
+        replayed: recorded.replayed
+      }
+
+      with_fiscal_document(context, received, actor_id)
+    end
+  end
+
+  defp walk_in_description(%{lines: [%{description: description} | _]}), do: description
+  defp walk_in_description(invoice), do: invoice[:invoice_number]
+
+  defp surcharge(%{"surcharge_cents" => cents} = params) when is_integer(cents) and cents > 0,
+    do: %{surcharge_cents: cents, surcharge_description: params["surcharge_description"]}
+
+  defp surcharge(_params), do: %{}
 
   # ADR-262: money a provider confirmed is fulfilled only with its fiscal
   # document, so a failure makes the payment's fulfilment try again later.
