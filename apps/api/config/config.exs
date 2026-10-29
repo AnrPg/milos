@@ -231,18 +231,26 @@ config :palee, :domain_event_handlers, %{
   attendance_recorded: [
     Palee.Application.TrialReactions,
     Palee.Application.ReferralReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
   # ADR-156: the invite funnel follows events, trials, joining and paying.
   event_attendance_recorded: [Palee.Application.ReferralReactions],
   membership_payment_recorded: [Palee.Application.ReferralReactions],
   booking_cancelled: [
     Palee.Application.TrialReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
-  booking_made: [Palee.Application.WalletReactions],
-  class_cancelled: [Palee.Application.TrialReactions]
+  booking_made: [Palee.Application.WalletReactions, Palee.Application.BoxScreenReactions],
+  class_cancelled: [Palee.Application.TrialReactions, Palee.Application.BoxScreenReactions],
+  # ADR-253: box screens refresh their leaderboards.
+  workout_result_recorded: [Palee.Application.BoxScreenReactions]
 }
+
+# ADR-253: box screens (store and the clock they run on).
+config :palee, :box_screen_store, Palee.Infrastructure.BoxScreens.EctoBoxScreenStore
+config :palee, :box_screen_clock, Palee.Infrastructure.BoxScreens.SystemClock
 
 config :palee,
        :saved_filter_store,

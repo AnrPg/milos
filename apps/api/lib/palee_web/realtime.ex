@@ -48,6 +48,26 @@ defmodule PaleeWeb.Realtime do
     Endpoint.broadcast("class_timer:#{scheduled_class_id}", "class_timer:updated", payload)
   end
 
+  @doc "ADR-253: a hint for every screen of a box (`%{kind, slot_id}`, never who)."
+  def broadcast_box_screen_refresh(organization_id, kind, slot_id) do
+    Endpoint.broadcast("box_screen:#{organization_id}", "box_screen:refresh", %{
+      kind: kind,
+      slot_id: slot_id
+    })
+  end
+
+  @doc "ADR-253: a screen's override; only that screen's channel pushes it."
+  def broadcast_box_screen_override(organization_id, screen_id, override) do
+    Endpoint.broadcast("box_screen:#{organization_id}", "box_screen:override", %{
+      screen_id: screen_id,
+      override: override
+    })
+  end
+
+  @doc "ADR-253: closes a removed or re-paired screen's socket."
+  def disconnect_box_screen(screen_id),
+    do: Endpoint.broadcast(PaleeWeb.BoxScreenSocket.socket_id(screen_id), "disconnect", %{})
+
   def broadcast_execution_completed(execution_id, payload) do
     Endpoint.broadcast("execution:#{execution_id}", "execution:completed", payload)
   end

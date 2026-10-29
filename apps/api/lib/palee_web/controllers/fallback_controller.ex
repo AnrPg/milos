@@ -230,6 +230,27 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: message})
   end
 
+  # ADR-253: box screens.
+  @box_screen_errors %{
+    invalid_pairing_code:
+      {:unprocessable_entity, "This code is wrong or has expired; ask staff for a new one"},
+    invalid_screen_name: {:unprocessable_entity, "Give the screen a name (up to 60 characters)"},
+    invalid_screen_branch: {:unprocessable_entity, "Choose one of your branches"},
+    invalid_screen_override:
+      {:unprocessable_entity, "Choose what to show, a class of today and an end within 24 hours"},
+    too_many_screens: {:conflict, "A box can have up to 20 screens"},
+    box_screen_not_found: {:not_found, "Box screen not found"},
+    invalid_screen_token: {:unauthorized, "Pair this screen again"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@box_screen_errors, reason) do
+    {status, message} = Map.fetch!(@box_screen_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   # ADR-214: field errors stay in the form, one code per field.
   def call(conn, {:error, {:invalid_fields, errors}}) when is_map(errors) do
     conn
