@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import { signUpBusiness, type BusinessKind } from "@/api/business-accounts";
+import { AgeConfirmationField } from "@/components/auth/AgeConfirmationField";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
 import { CheckInboxNotice } from "@/components/auth/CheckInboxNotice";
@@ -39,7 +40,7 @@ export function BusinessSignUpLink({ className = "" }: { className?: string }) {
   );
 }
 
-type AccountForm = { display_name: string; handle: string; email: string; password: string };
+type AccountForm = { display_name: string; handle: string; email: string; password: string; age_confirmed: boolean };
 type BusinessForm = { business_kind: BusinessKind; business_name: string; city: string; phone: string };
 
 const MAX_DISPLAY_NAME_LENGTH = 50;
@@ -58,7 +59,13 @@ export function BusinessSignUp() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { status, tokens, signUp } = useSession();
-  const [account, setAccount] = useState<AccountForm>({ display_name: "", handle: "", email: "", password: "" });
+  const [account, setAccount] = useState<AccountForm>({
+    display_name: "",
+    handle: "",
+    email: "",
+    password: "",
+    age_confirmed: false,
+  });
   const [business, setBusiness] = useState<BusinessForm>({ business_kind: "gym", business_name: "", city: "", phone: "" });
   const [handleEdited, setHandleEdited] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -120,6 +127,7 @@ export function BusinessSignUp() {
     }
     if (account.handle.trim().length < 3) errors.handle = [tAuth("handleRule")];
     if (account.password.length < MIN_PASSWORD_LENGTH) errors.password = [tAuth("passwordRule")];
+    if (!account.age_confirmed) errors.age_confirmed = [tAuth("minimumAgeRule")];
     return errors;
   }
 
@@ -144,6 +152,7 @@ export function BusinessSignUp() {
         display_name: account.display_name.trim(),
         email: account.email.trim(),
         password: account.password,
+        age_confirmed: account.age_confirmed,
         role: "member",
       });
       if (!result.user) {
@@ -279,6 +288,11 @@ export function BusinessSignUp() {
               placeholder={tAuth("passwordRule")}
               errors={fieldErrors.password}
               onChange={(password) => setAccount((form) => ({ ...form, password }))}
+            />
+            <AgeConfirmationField
+              checked={account.age_confirmed}
+              errors={fieldErrors.age_confirmed}
+              onChange={(age_confirmed) => setAccount((form) => ({ ...form, age_confirmed }))}
             />
           </fieldset>
         ) : null}
