@@ -12308,5 +12308,233 @@
       "round": "Γύρος",
       "slot": "Διάστημα"
     }
+  },
+  "PlanCore": {
+    "flow": {
+      "sets": "Σετ",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Ξεκούραση"
+    },
+    "flowHint": {
+      "sets": "χωρίς ρολόι: σετ με ξεκούραση ανάμεσα",
+      "for_time": "τελειώνεις όσο πιο γρήγορα",
+      "amrap": "όσοι γύροι προλάβεις σε χρόνο",
+      "emom": "κάθε Χ λεπτά ξεκινάς ξανά",
+      "intervals": "δουλειά και ξεκούραση με σταθερό ρυθμό",
+      "rest": "παύση ανάμεσα σε ενότητες"
+    },
+    "param": {
+      "sets": "Σετ",
+      "rest": "Ξεκούραση",
+      "restBetween": "Ξεκούραση ανάμεσα",
+      "restWindows": "Ξεκούραση ανάμεσα σε παράθυρα",
+      "rounds": "Γύροι",
+      "cap": "Όριο χρόνου",
+      "dur": "Διάρκεια",
+      "every": "Κάθε",
+      "times": "Φορές",
+      "work": "Δουλειά",
+      "off": "Ξεκούραση",
+      "intEvery": "Διακοπή κάθε",
+      "hrTarget": "Ξεκούραση μέχρι"
+    },
+    "struct": {
+      "single": "Απλό",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "μία άσκηση, όπως είναι",
+      "cluster": "το σετ σπάει σε κομμάτια με μικρή παύση",
+      "drop": "μειώνεις το βάρος και συνεχίζεις",
+      "restpause": "μέχρι αποτυχία, παύση, ξανά",
+      "superset": "όλες οι ασκήσεις, μετά το επόμενο σετ",
+      "complex": "όλες χωρίς να αφήσεις τη μπάρα"
+    },
+    "structParam": {
+      "clusters": "κομμάτια",
+      "intra": "παύση",
+      "drops": "μειώσεις",
+      "dropby": "κάθε φορά",
+      "minis": "μίνι σετ"
+    },
+    "mod": {
+      "interrupt": "Διακοπή κάθε…",
+      "hr": "Ξεκούραση μέχρι να πέσουν οι παλμοί"
+    },
+    "modHint": {
+      "interrupt": "κάθε Χ λεπτά σταματάς για άλλη άσκηση",
+      "hr": "η ξεκούραση τελειώνει στους Χ παλμούς"
+    },
+    "measure": {
+      "pace": "Ρυθμός",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Ζώνη παλμών",
+      "height": "Ύψος / στόχος",
+      "dist": "Απόσταση",
+      "hold": "Κράτημα",
+      "side": "Ανά πλευρά"
+    },
+    "measureHint": {
+      "tempo": "δευτ. κατέβασμα, παύση, ανέβασμα (X = εκρηκτικά), παύση"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "επαν. ακόμα",
+      "zone": "ζώνη",
+      "cm": "cm",
+      "m": "m",
+      "sec": "δευτ."
+    },
+    "score": {
+      "none": "Χωρίς σκορ",
+      "best_load": "Φορτίο (καλύτερο σετ)",
+      "reps": "Επαναλήψεις",
+      "time": "Χρόνος",
+      "rounds_reps": "Γύροι + επαναλήψεις",
+      "done": "Ολοκληρώθηκε",
+      "total_reps": "Επαναλήψεις (σύνολο)",
+      "lowest_round": "Χαμηλότερος γύρος",
+      "distance": "Απόσταση"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Ανάκαμψη παλμών (HRR)",
+      "even_odd": "Εναλλάξ (μονά / ζυγά)",
+      "ladder": "Σκάλα / πυραμίδα",
+      "calorie_target": "Στόχος θερμίδων",
+      "to_failure": "Μέχρι αποτυχία",
+      "superset": "Superset / γιγάντιο σετ",
+      "interrupt": "Με διακοπή"
+    },
+    "roundWord": {
+      "set": "Σετ",
+      "interval": "Διάστημα",
+      "round": "Γύρος"
+    },
+    "block": {
+      "one": "{word, select, set {Σετ} interval {Διάστημα} other {Γύρος}} {n}",
+      "list": "{word, select, set {Σετ} interval {Διάστημα} other {Γύρος}} {list}",
+      "slot": "{word, select, set {Σετ} interval {Διάστημα} other {Γύρος}} {list} · {at}",
+      "minute": "Λεπτό {list}"
+    },
+    "caption": {
+      "sets": "{count} σετ",
+      "setsRange": "{min} ή {max} σετ",
+      "max": "{unit, select, kcal {όσες περισσότερες θερμίδες} m {όσα περισσότερα μέτρα} other {όσες περισσότερες}}",
+      "maxWithin": "{unit, select, kcal {όσες περισσότερες θερμίδες} m {όσα περισσότερα μέτρα} other {όσες περισσότερες}} σε {within}",
+      "setList": "{count} σετ: {list}",
+      "perList": "ανά {word, select, set {σετ} interval {διάστημα} other {γύρο}}: {list}",
+      "cont": "μετά {step} κάθε {word, select, set {σετ} interval {διάστημα} other {γύρο}}",
+      "range": "εύρος {range}, το αποφασίζει ο αθλητής",
+      "reps": "{count, plural, one {# επανάληψη} other {# επαναλήψεις}}",
+      "value": "{value}",
+      "perSide": "ανά πλευρά",
+      "badDose": "π.χ. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30s, 500m, max"
+    },
+    "loadCaption": {
+      "bw": "σωματικό βάρος",
+      "text": "ως κείμενο για τον αθλητή",
+      "zone": "ζώνη παλμών {zone}",
+      "rpe": "πόσο δύσκολο (1–10)",
+      "pace": "ρυθμός {pace} ανά {per}",
+      "perSet": "ανά σετ: {list}{kind, select, pct { του 1RM} other {}}",
+      "buildUp": "ξεκινά από {value}{kind, select, pct { του 1RM} other {}} και ανεβαίνει",
+      "range": "εύρος {value}{kind, select, pct { του 1RM} other {}}, διαλέγει ο αθλητής",
+      "value": "{value}{kind, select, pct { του 1RM} other {}}"
+    },
+    "show": {
+      "perSide": "/πλευρά",
+      "within": "σε",
+      "from": "από",
+      "zone": "ζώνη"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓εκρηκτικά",
+      "bottom": "κάτω {secs}″",
+      "bottomExplosive": "κάτω: χωρίς παύση",
+      "up": "↑{secs}″",
+      "upExplosive": "↑εκρηκτικά",
+      "top": "πάνω {secs}″",
+      "topExplosive": "πάνω: χωρίς παύση"
+    },
+    "human": {
+      "min": "{min, plural, one {# λεπτό} other {# λεπτά}}",
+      "sec": "{sec} δευτ.",
+      "minSec": "{min, plural, one {# λεπτό} other {# λεπτά}} {sec} δευτ."
+    },
+    "describe": {
+      "emom": "Κάθε {every}, {times} φορές: {total} συνολικά.",
+      "emomOpen": "Κάθε {every}, μέχρι να μην προλαβαίνεις.",
+      "amrapWindows": "{count} παράθυρα AMRAP ({list}).",
+      "amrapWindowsRest": "{count} παράθυρα AMRAP ({list}), {rest} ξεκούραση ανάμεσα.",
+      "amrap": "Όσοι γύροι προλάβεις σε {dur}.",
+      "forTime": "{rounds, plural, one {Μία φορά} other {# γύροι}}, όσο πιο γρήγορα.",
+      "forTimeCap": "{rounds, plural, one {Μία φορά} other {# γύροι}}, όσο πιο γρήγορα, όριο {cap}.",
+      "intervals": "{rounds} γύροι: {work} δουλειά, {off} ξεκούραση.",
+      "intervalsHr": "{rounds} γύροι: {work} δουλειά, ξεκούραση μέχρι οι παλμοί να πέσουν στους {hr}.",
+      "sets": "{sets} σετ.",
+      "setsRest": "{sets} σετ, {rest} ξεκούραση ανάμεσα.",
+      "rest": "Ξεκούραση {dur}.",
+      "interrupt": "Κάθε {every} σταματάς για τη διακοπή και μετά συνεχίζεις από εκεί που σταμάτησες."
+    },
+    "summary": {
+      "emom": "κάθε {every} × {times}",
+      "emomOpen": "κάθε {every}",
+      "sets": "{sets} σετ",
+      "windows": "{count} παράθυρα",
+      "dur": "{dur}",
+      "rounds": "{rounds} γύροι",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/παλμοί",
+      "interrupt": "διακοπή κάθε {every}",
+      "perSide": "(ανά πλευρά)"
+    },
+    "error": {
+      "bad_dose": "Δεν διαβάζεται: π.χ. 10, 8-12, max, 400 m",
+      "missing_unit": "Γράψε kg ή % σε ένα σετ της γραμμής· τα υπόλοιπα το παίρνουν από εκεί",
+      "mixed_unit": "Ίδια μονάδα σε όλη τη γραμμή: kg ή %",
+      "bad_tempo": "Tempo σε 4 σημάδια, π.χ. 31X1",
+      "bad_measure_value": "Αριθμός, +x ή a→b",
+      "rpe_over_max": "Το RPE φτάνει ως το 10",
+      "bad_param": "Δεν διαβάζεται αυτή η τιμή",
+      "unknown_param": "Δεν είναι παράμετρος αυτής της ροής",
+      "unknown_flow": "Άγνωστη ροή",
+      "unknown_measure": "Άγνωστη μέτρηση",
+      "duplicate_measure": "Η μέτρηση υπάρχει δύο φορές",
+      "unknown_struct": "Άγνωστη δομή σετ",
+      "struct_not_allowed": "Αυτή η δομή σετ δεν ταιριάζει σε αυτή τη ροή",
+      "bad_struct_param": "Δεν διαβάζεται αυτή η τιμή",
+      "mod_not_allowed": "Αυτή η προσθήκη δεν ταιριάζει σε αυτή τη ροή",
+      "unknown_score": "Διάλεξε σκορ για αυτή τη ροή",
+      "bad_version": "Μη υποστηριζόμενη έκδοση πλάνου",
+      "bad_row_kind": "Άγνωστη γραμμή",
+      "duplicate_id": "Διπλή γραμμή",
+      "blocks_not_allowed": "Η ξεκούραση δεν έχει ασκήσεις",
+      "too_many_blocks": "Το πολύ 12 διαφορετικοί γύροι",
+      "too_many_rows": "Το πολύ 60 ασκήσεις",
+      "too_many_cells": "Το πολύ 30 σετ",
+      "too_long": "Το πολύ 200 χαρακτήρες",
+      "note_too_long": "Το πολύ 2000 χαρακτήρες"
+    }
   }
 }
