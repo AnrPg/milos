@@ -9,8 +9,9 @@ defmodule Palee.Application.AthleteTrainingVolume do
 
     * completed executions: the exercises of the workout done (at its scale
       level when one was chosen), each with the coach's set count, else 1;
-      a structured plan execution (ADR-270) counts the sets the athlete
-      recorded (`execution_plan_sets`) instead;
+      a structured plan workout (ADR-270) counts the sets done, with their
+      reps and volume (`volume_kg` on the performance), from its plan
+      actuals, else from its prescription (`PlanPrescriptions.workload/3`);
     * logged training-log entries (voided ones never): their performed
       exercises with the sets written, else 1; an entry without performed
       exercises falls back to the exercises of its workout;
@@ -33,6 +34,7 @@ defmodule Palee.Application.AthleteTrainingVolume do
   """
 
   alias Palee.{Execution, Journal, Organizations, Workouts}
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   @log_limit 2_000
 
@@ -45,8 +47,16 @@ defmodule Palee.Application.AthleteTrainingVolume do
           source: String.t(),
           minutes: float() | nil,
           rpe: 1..10 | nil,
+          volume_kg: number() | nil,
           exercises: [
-            %{exercise_ref: String.t() | nil, name: String.t() | nil, sets: pos_integer()}
+            %{
+              required(:exercise_ref) => String.t() | nil,
+              required(:name) => String.t() | nil,
+              required(:sets) => pos_integer(),
+              optional(:reps) => number(),
+              optional(:volume_kg) => number(),
+              optional(:estimated) => boolean()
+            }
           ]
         }
 
@@ -62,12 +72,19 @@ defmodule Palee.Application.AthleteTrainingVolume do
     user_id = Keyword.get(opts, :user_id, context.user_id)
     scope = Keyword.get(opts, :scope, :owner)
 
-    {executions, logs, felt} =
+    {executions, logs, felt, plan_sets} =
       Execution.with_execution_context(context, fn ->
         executions =
           user_id
           |> list_executions(scope)
           |> Enum.filter(&completed_since?(&1, since))
+
+        # ADR-270: what was done in each set of a structured plan workout.
+        plan_sets =
+          executions
+          |> Enum.map(& &1.id)
+          |> Execution.list_plan_sets()
+          |> Enum.group_by(& &1.execution_id)
 
         logs =
           user_id
@@ -78,14 +95,15 @@ defmodule Palee.Application.AthleteTrainingVolume do
           feedback("execution", executions, user_id) ++
             feedback("training_log", logs, user_id)
 
-        {attach_plan_sets(executions), logs, felt}
+        {executions, logs, felt, plan_sets}
       end)
 
     workouts = workouts(executions ++ Enum.filter(logs, &needs_workout?/1))
 
     %{
       performances:
-        Enum.map(executions, &execution(&1, workouts)) ++ Enum.map(logs, &log(&1, workouts)),
+        Enum.map(executions, &execution(&1, workouts, Map.get(plan_sets, &1.id, []))) ++
+          Enum.map(logs, &log(&1, workouts)),
       felt: felt
     }
   end
@@ -124,7 +142,9 @@ defmodule Palee.Application.AthleteTrainingVolume do
     )
   end
 
-  defp execution(execution, workouts) do
+  defp execution(execution, workouts, plan_sets) do
+    workload = plan_workload(execution, workouts, plan_sets)
+
     %{
       kind: "execution",
       id: execution.id,
@@ -134,39 +154,47 @@ defmodule Palee.Application.AthleteTrainingVolume do
       source: source(execution.organization_id, nil),
       minutes: minutes_from_ms(Map.get(execution, :total_elapsed_ms)),
       rpe: nil,
+      volume_kg: workload && workload.totals.volume_kg,
       exercises:
-        case plan_exercises(Map.get(execution, :plan_sets, [])) do
-          [] -> workout_exercises(execution, workouts)
-          exercises -> exercises
-        end
+        if(workload, do: plan_exercises(workload), else: workout_exercises(execution, workouts))
     }
   end
 
-  # ADR-270: a structured plan execution counts what the athlete did, set by
-  # set (`execution_plan_sets`), not the plan's materialised exercises.
-  defp attach_plan_sets([]), do: []
-
-  defp attach_plan_sets(executions) do
-    by_execution =
-      executions
-      |> Enum.map(& &1.id)
-      |> Execution.list_plan_sets()
-      |> Enum.group_by(& &1.execution_id)
-
-    Enum.map(executions, &Map.put(&1, :plan_sets, Map.get(by_execution, &1.id, [])))
+  # ADR-270: a structured plan workout counts what was done in each set (its
+  # actuals; without them its prescription and scored rounds), not one set
+  # per materialised exercise.
+  defp plan_workload(
+         %{organization_id: org_id, master_workout_id: workout_id} = execution,
+         workouts,
+         plan_sets
+       )
+       when is_binary(org_id) and is_binary(workout_id) do
+    with %{} = workout <- Map.get(workouts, {org_id, workout_id}),
+         true <- PlanPrescriptions.plan_workout?(workout) do
+      PlanPrescriptions.workload(workout, plan_sets,
+        section_scores: Map.get(execution, :section_scores),
+        section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+      )
+    else
+      _other -> nil
+    end
   end
 
-  # One entry per plan row done, in run order; a set is a record of its first
-  # part (cluster / drop parts are one set).
-  defp plan_exercises(sets) do
-    sets
-    |> Enum.filter(&(&1.part_index == 0 and is_binary(&1.exercise_name) and &1.exercise_name != ""))
-    |> Enum.group_by(&{&1.section_id, &1.row_id})
-    |> Enum.sort_by(fn {_row, [first | _rest]} -> {first.inserted_at, first.id} end)
-    |> Enum.map(fn {_row, [first | _rest] = done} ->
-      entry = Workouts.resolve_catalog_exercise(first.exercise_ref, first.exercise_name)
-      %{exercise_ref: entry && entry.id, name: first.exercise_name, sets: length(done)}
-    end)
+  defp plan_workload(_execution, _workouts, _plan_sets), do: nil
+
+  defp plan_exercises(workload) do
+    for exercise <- workload.exercises, exercise.sets > 0, is_binary(exercise.name) do
+      entry = Workouts.resolve_catalog_exercise(exercise.exercise_ref, exercise.name)
+
+      %{
+        exercise_ref: entry && entry.id,
+        name: exercise.name,
+        sets: exercise.sets |> round() |> max(1),
+        reps: exercise.reps,
+        volume_kg: exercise.volume_kg,
+        estimated: exercise.estimated
+      }
+    end
   end
 
   defp log(entry, workouts) do
@@ -185,6 +213,7 @@ defmodule Palee.Application.AthleteTrainingVolume do
       source: source(entry.organization_id, Map.get(entry, :source_type)),
       minutes: minutes_from_seconds(Map.get(entry, :duration_seconds)),
       rpe: rpe(Map.get(entry, :perceived_effort)),
+      volume_kg: nil,
       exercises: exercises
     }
   end

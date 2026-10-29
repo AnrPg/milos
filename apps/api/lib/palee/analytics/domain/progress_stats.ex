@@ -3,6 +3,10 @@ defmodule Palee.Analytics.Domain.ProgressStats do
   Advanced progress statistics for a client's own training (ADR-098), built
   from completed executions: weekly volume, consistency, where sessions came
   from, and the score history of sections the client did more than once.
+  Structured plan workouts (ADR-270) add their lifted volume (`volume_kg`,
+  kg × reps, in the totals and per week) and `exercise_loads`: the heaviest
+  set of each exercise per session, for exercises done in more than one
+  session (`plan_workload` of `ListWorkoutExecutions`).
   `weeks` (default 12) is how many calendar weeks, this one included, the
   weekly chart, the consistency and `days` (sessions per day with training,
   for the calendar heatmap, ADR-194) cover.
@@ -24,7 +28,9 @@ defmodule Palee.Analytics.Domain.ProgressStats do
       totals: %{
         sessions: length(completed),
         minutes: completed |> Enum.map(&minutes/1) |> Enum.sum(),
-        workouts: completed |> Enum.map(&value(&1, :master_workout_id)) |> Enum.uniq() |> length()
+        workouts:
+          completed |> Enum.map(&value(&1, :master_workout_id)) |> Enum.uniq() |> length(),
+        volume_kg: completed |> Enum.map(&volume_kg/1) |> Enum.sum() |> round_kg()
       },
       weekly: weekly,
       days: days(completed, hd(weekly).week_start, today),
@@ -35,7 +41,8 @@ defmodule Palee.Analytics.Domain.ProgressStats do
         current_streak_weeks: streak(Enum.reverse(weekly))
       },
       sources: Enum.frequencies_by(completed, &to_string(value(&1, :source))),
-      score_history: score_history(completed)
+      score_history: score_history(completed),
+      exercise_loads: exercise_loads(completed)
     }
   end
 
@@ -50,7 +57,8 @@ defmodule Palee.Analytics.Domain.ProgressStats do
       %{
         week_start: week_start,
         sessions: length(sessions),
-        minutes: sessions |> Enum.map(&minutes/1) |> Enum.sum()
+        minutes: sessions |> Enum.map(&minutes/1) |> Enum.sum(),
+        volume_kg: sessions |> Enum.map(&volume_kg/1) |> Enum.sum() |> round_kg()
       }
     end
   end
@@ -113,6 +121,61 @@ defmodule Palee.Analytics.Domain.ProgressStats do
       }
     end)
   end
+
+  # The heaviest set of each exercise per session, oldest first, for the
+  # exercises lifted in more than one session.
+  defp exercise_loads(completed) do
+    completed
+    |> Enum.flat_map(fn execution ->
+      execution
+      |> value(:plan_workload)
+      |> top_sets()
+      |> Enum.map(fn top ->
+        %{
+          key: exercise_key(top),
+          name: value(top, :name),
+          exercise_ref: value(top, :exercise_ref),
+          execution_id: value(execution, :id),
+          completed_on: execution.completed_on,
+          load_kg: value(top, :load_kg),
+          reps: value(top, :reps)
+        }
+      end)
+    end)
+    |> Enum.group_by(& &1.key)
+    |> Enum.map(fn {_key, points} ->
+      points = Enum.sort_by(points, & &1.completed_on, Date)
+      latest = List.last(points)
+
+      %{
+        name: latest.name,
+        exercise_ref: latest.exercise_ref,
+        points: Enum.map(points, &Map.take(&1, [:execution_id, :completed_on, :load_kg, :reps]))
+      }
+    end)
+    |> Enum.filter(&(length(&1.points) > 1))
+    |> Enum.sort_by(&(&1.name || ""))
+  end
+
+  defp top_sets(%{} = workload), do: List.wrap(value(workload, :top_sets))
+  defp top_sets(_workload), do: []
+
+  defp exercise_key(top) do
+    case value(top, :exercise_ref) do
+      ref when is_binary(ref) -> {:ref, ref}
+      _none -> {:name, top |> value(:name) |> to_string() |> String.trim() |> String.downcase()}
+    end
+  end
+
+  defp volume_kg(execution) do
+    case execution |> value(:plan_workload) |> value(:volume_kg) do
+      kg when is_number(kg) -> kg
+      _none -> 0
+    end
+  end
+
+  defp round_kg(kg) when is_float(kg), do: Float.round(kg, 1)
+  defp round_kg(kg), do: kg
 
   @timeline_limit 50
 

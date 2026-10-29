@@ -16,7 +16,7 @@ defmodule Palee.Workouts.Domain.ExerciseDescriptors do
   base exercise's catalog ref.
   """
 
-  alias Palee.Workouts.Domain.FreeTextExercises
+  alias Palee.Workouts.Domain.{FreeTextExercises, PlanWorkload}
   alias Palee.Workouts.Domain.WorkoutDsl.ExerciseCatalog
 
   def from_workout(%{sections: sections}) when is_list(sections) do
@@ -36,7 +36,8 @@ defmodule Palee.Workouts.Domain.ExerciseDescriptors do
   when the coach gave one, else 1.
 
   Structured and Quick Text workouts read their sections (a draft's sections
-  come from its draft data). A free-text workout without sections is read
+  come from its draft data); a structured plan section (ADR-270) weighs each
+  exercise by the sets its plan prescribes. A free-text workout without sections is read
   line by line (`FreeTextExercises`). Names are resolved leniently (a plural
   such as "Thrusters" matches "Thruster"); an unresolved exercise keeps a
   `nil` ref so the caller can count it as unmatched.
@@ -57,11 +58,21 @@ defmodule Palee.Workouts.Domain.ExerciseDescriptors do
   defp section_exercises(workout) do
     (field(workout, :sections) || [])
     |> Enum.filter(&is_map/1)
-    |> Enum.flat_map(&(field(&1, :exercises) || []))
+    |> Enum.flat_map(&weighted_exercises/1)
     |> Enum.filter(&is_map/1)
     |> Enum.reject(&(to_string(field(&1, :item_type) || "exercise") == "header"))
     |> Enum.reject(&(field(&1, :excluded) == true))
     |> Enum.filter(&is_binary(field(&1, :name)))
+  end
+
+  # ADR-270: a plan section weighs each exercise by the sets its plan
+  # prescribes (every round of an EMOM, the rounds of each block), which its
+  # materialised rows cannot say.
+  defp weighted_exercises(section) do
+    case field(section, :plan) do
+      %{} = plan -> PlanWorkload.exercise_weights(plan)
+      _none -> field(section, :exercises) || []
+    end
   end
 
   defp weighted_descriptor(exercise) do

@@ -43,7 +43,11 @@ defmodule PaleeWeb.Schemas.Content do
       properties: %{
         week_start: %Schema{type: :string, format: :date},
         sessions: %Schema{type: :integer},
-        minutes: %Schema{type: :integer}
+        minutes: %Schema{type: :integer},
+        volume_kg: %Schema{
+          type: :number,
+          description: "ADR-270: kg × reps lifted in structured plan workouts"
+        }
       },
       required: [:week_start, :sessions, :minutes]
     }
@@ -67,7 +71,8 @@ defmodule PaleeWeb.Schemas.Content do
           properties: %{
             sessions: %Schema{type: :integer},
             minutes: %Schema{type: :integer},
-            workouts: %Schema{type: :integer}
+            workouts: %Schema{type: :integer},
+            volume_kg: %Schema{type: :number}
           },
           required: [:sessions, :minutes, :workouts]
         },
@@ -108,6 +113,32 @@ defmodule PaleeWeb.Schemas.Content do
               points: %Schema{type: :array, items: point}
             },
             required: [:workout_id, :points]
+          }
+        },
+        exercise_loads: %Schema{
+          type: :array,
+          description:
+            "ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              name: %Schema{type: :string, nullable: true},
+              exercise_ref: %Schema{type: :string, nullable: true},
+              points: %Schema{
+                type: :array,
+                items: %Schema{
+                  type: :object,
+                  properties: %{
+                    execution_id: %Schema{type: :string, format: :uuid},
+                    completed_on: %Schema{type: :string, format: :date},
+                    load_kg: %Schema{type: :number},
+                    reps: %Schema{type: :number, nullable: true}
+                  },
+                  required: [:execution_id, :completed_on, :load_kg]
+                }
+              }
+            },
+            required: [:points]
           }
         },
         pr_timeline: %Schema{

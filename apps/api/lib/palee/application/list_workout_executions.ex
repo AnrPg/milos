@@ -3,6 +3,7 @@ defmodule Palee.Application.ListWorkoutExecutions do
   alias Palee.Execution
   alias Palee.Execution.ExecutionStore
   alias Palee.{Organizations, Seasons, Workouts}
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   def call(context, user_id),
     do: ExecutionStore.with_user_context(context, fn -> call(user_id) end)
@@ -21,6 +22,9 @@ defmodule Palee.Application.ListWorkoutExecutions do
   Executions as readers see them: with their Σχόλια, the title, type and
   section names of the workout done and, for a season's workout, the season
   (ADR-167). Each gym's context is resolved once and each workout read once.
+  A completed structured plan workout (ADR-270) also carries `plan_workload`:
+  its sets, reps and volume and the heaviest set of each exercise, from its
+  plan actuals (else its prescription and scored rounds).
   """
   def summarize(executions) do
     contexts =
@@ -37,10 +41,12 @@ defmodule Palee.Application.ListWorkoutExecutions do
       |> Map.new(&{{&1.organization_id, &1.master_workout_id}, fetch_workout(&1, contexts)})
 
     seasons = season_labels(executions, contexts)
+    plan_sets = plan_sets(executions, workouts)
 
     executions
     |> JournalComments.attach("execution")
     |> Enum.map(&attach_workout_summary(&1, workouts))
+    |> Enum.map(&attach_plan_workload(&1, workouts, plan_sets))
     |> Enum.map(
       &Map.put(
         &1,
@@ -99,6 +105,56 @@ defmodule Palee.Application.ListWorkoutExecutions do
             attach_section_names(execution.section_scores || [], section_name_lookup(workout))
         })
     end
+  end
+
+  # ADR-270: the actuals of the completed executions of plan workouts, read once.
+  defp plan_sets(executions, workouts) do
+    executions
+    |> Enum.filter(&(completed?(&1) and plan_workout?(&1, workouts)))
+    |> Enum.map(& &1.id)
+    |> Execution.list_plan_sets()
+    |> Enum.group_by(& &1.execution_id)
+  end
+
+  defp attach_plan_workload(execution, workouts, plan_sets) do
+    if completed?(execution) and plan_workout?(execution, workouts) do
+      workout = Map.get(workouts, {execution.organization_id, execution.master_workout_id})
+
+      workload =
+        PlanPrescriptions.workload(workout, Map.get(plan_sets, execution.id, []),
+          section_scores: execution.section_scores,
+          section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+        )
+
+      Map.put(execution, :plan_workload, workload && plan_summary(workload))
+    else
+      execution
+    end
+  end
+
+  defp plan_summary(%{totals: totals, exercises: exercises}) do
+    totals
+    |> Map.take([:sets, :logged_sets, :reps, :volume_kg, :estimated])
+    |> Map.put(
+      :top_sets,
+      for(
+        %{top_set: %{} = top} = exercise <- exercises,
+        do: %{
+          name: exercise.name,
+          exercise_ref: exercise.exercise_ref,
+          load_kg: top.load_kg,
+          reps: top.reps
+        }
+      )
+    )
+  end
+
+  defp completed?(execution), do: to_string(Map.get(execution, :status)) == "completed"
+
+  defp plan_workout?(execution, workouts) do
+    workouts
+    |> Map.get({execution.organization_id, execution.master_workout_id})
+    |> PlanPrescriptions.plan_workout?()
   end
 
   # The workout belongs to the gym where it was done; the user-scoped history
