@@ -263,7 +263,9 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
       %{content: content, skipped: 0} =
         render(Datev, %{"consultant_number" => 29_098, "client_number" => 55_003})
 
-      assert String.valid?(content) == false or not String.contains?(content, "Ü")
+      # Column names such as "BU-Schlüssel" are Windows-1252, not UTF-8.
+      assert :binary.match(content, <<"Schl", 0xFC, "ssel">>) != :nomatch
+      refute String.valid?(content)
       [header, columns | bookings] = String.split(content, "\r\n", trim: true)
 
       assert String.split(header, ";") |> Enum.take(17) == [
