@@ -34,6 +34,12 @@ defmodule Palee.Repo.Migrations.PersonalDataExportsAndAgeConfirmation do
 
     create index(:personal_data_exports, [:user_id, :requested_at])
 
+    # One request in progress per profile, even when two arrive together.
+    create unique_index(:personal_data_exports, [:user_id],
+             where: "status = 'pending'",
+             name: :personal_data_exports_one_pending_index
+           )
+
     create constraint(:personal_data_exports, :personal_data_exports_check,
              check: """
              status IN ('pending', 'ready', 'failed')
