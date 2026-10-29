@@ -5,13 +5,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import type { PlanSection } from "@/lib/structured-plan/types";
 
 import { useGridActions } from "./actions";
-import { GridContext, useGrid, useGridT, type GridContextValue, type PickerState } from "./context";
+import { GridContext, SHORTCUT, useGrid, useGridT, type GridContextValue, type PickerState } from "./context";
 import { HintLine } from "./HintLine";
-import { occurrences, setsRange, totalRounds } from "./lib-shim";
+import { occurrences, setsRange, totalRounds } from "./lib";
 import { attr, blockTitle, parseFieldKey, roundWordKey } from "./model";
 import { findRow } from "./mutations";
 import { RowMenu } from "./RowMenu";
-import { usePlanSection, usePlanWriter, useWodExerciseNames } from "./store-adapter";
+import { consumeFocus, requestFocus, usePendingFocus, usePlanSection, usePlanWriter, useWodExerciseNames } from "./store-adapter";
 import { ExerciseTable, SetTable } from "./Tables";
 import { useExerciseCatalog } from "./useExerciseCatalog";
 import s from "./grid.module.css";
@@ -32,7 +32,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
   const usedNames = useWodExerciseNames();
   const rootRef = useRef<HTMLDivElement>(null);
   const phone = usePhoneLayout(rootRef);
-  const [pending, setPending] = useState<string | null>(null);
+  const pending = usePendingFocus();
   const [focused, setFocused] = useState<string | null>(null);
   const [notesOpen, setNotesOpen] = useState<ReadonlySet<string>>(() => new Set());
   const [picker, setPicker] = useState<PickerState | null>(null);
@@ -44,7 +44,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
     if (!el) return;
     el.focus();
     if (el instanceof HTMLInputElement) el.select();
-    setPending(null);
+    consumeFocus(pending);
   }, [pending, plan, phone]);
 
   const ctx = useMemo<GridContextValue | null>(
@@ -55,7 +55,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
             plan,
             write,
             phone,
-            focusKey: setPending,
+            focusKey: requestFocus,
             notesOpen,
             openNote: (rowId) => setNotesOpen((open) => new Set(open).add(rowId)),
             openPicker: setPicker,
@@ -70,7 +70,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
     (refocus: boolean) => {
       const back = picker?.returnKey;
       setPicker(null);
-      if (refocus && back) setPending(back);
+      if (refocus && back) requestFocus(back);
       else if (refocus) picker?.anchor.focus();
     },
     [picker],
@@ -154,7 +154,7 @@ function SetsFlow() {
 
 function BoxesFlow() {
   const { plan } = useGrid();
-  const { t, msg } = useGridT();
+  const { t, msg, kbd } = useGridT();
   const act = useGridActions();
   const k = plan.blocks.length;
   const total = totalRounds(plan);
@@ -174,7 +174,7 @@ function BoxesFlow() {
               onClick={() => act.addRow({ afterId: rows.at(-1)?.id, b })}
             >
               {k === 1 ? t("add.exercise") : t("add.exerciseHere")}
-              {k === 1 ? <kbd className={s.kbd}>Enter</kbd> : null}
+              {k === 1 ? <kbd className={s.kbd}>{kbd(SHORTCUT.enter)}</kbd> : null}
             </button>
           </div>
         );
@@ -201,7 +201,7 @@ function InterruptLane() {
 
 function Footer() {
   const { plan } = useGrid();
-  const { t } = useGridT();
+  const { t, kbd } = useGridT();
   const act = useGridActions();
   const k = plan.blocks.length;
   const total = totalRounds(plan);
@@ -223,12 +223,12 @@ function Footer() {
             onClick={() => act.addRow({ afterId: plan.blocks[lastBlock]?.at(-1)?.id, b: Math.max(0, lastBlock) })}
           >
             {t("add.exercise")}
-            <kbd className={s.kbd}>Enter</kbd>
+            <kbd className={s.kbd}>{kbd(SHORTCUT.enter)}</kbd>
           </button>
         ) : null}
         <button type="button" className={s.add} data-testid="plan-add-round" onClick={() => act.addRound()}>
           {t(`add.round.${word}`)}
-          <kbd className={s.kbd}>Alt+S</kbd>
+          <kbd className={s.kbd}>{kbd(SHORTCUT.round)}</kbd>
         </button>
       </div>
       {k > 1 ? <p className={s.uhint}>{k >= total ? t(`how.own.${word}`) : t("how.alternate", { cycle })}</p> : null}

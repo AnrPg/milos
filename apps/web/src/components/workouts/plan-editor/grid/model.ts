@@ -7,7 +7,7 @@
  */
 import type { PlanCell, PlanMeasure, PlanRow, PlanSection } from "@/lib/structured-plan/types";
 
-import { MEASURES, parseClock, parseDose, parseTempo, progress, repeatDose, repeatText, setLoads, type Dose } from "./lib-shim";
+import { MEASURES, measureUnit as libMeasureUnit, parseClock, parseDose, parseTempo, progress, repeatDose, repeatText, setLoads, type Dose } from "./lib";
 
 export type Msg = { key: string; values?: Record<string, string | number> };
 export type MeasureKey = Exclude<PlanMeasure, "side">;
@@ -44,7 +44,7 @@ const arrow = (t: string) => t.replace("->", "→");
 
 /** Unit token of a measure's header or suffix ("/10", "cm", "sec"…); `sec` is translated by the UI. */
 export function measureUnit(k: MeasureKey, value?: string): string {
-  return MEASURES[k].unit(value ?? MEASURES[k].ph);
+  return libMeasureUnit(k, value ?? "");
 }
 
 /** Bare reps in a rest row: up to 10 reads as minutes, above as seconds. */
@@ -130,7 +130,7 @@ export function rowCells(row: PlanRow, n: number): RowCells {
       placeholder: shown || EMPTY,
       display: t && !err && shown && shown !== t ? shown : "",
       badge: t && !err && isRelative(t) ? bare(arrow(t)) : "",
-      error: err === "missing_unit" ? { key: "error.loadMissingUnit" } : err === "mixed_units" ? { key: "error.loadMixedUnits", values: { unit: loads.unit ?? "" } } : null,
+      error: err === "missing_unit" ? { key: "error.loadMissingUnit" } : err === "mixed_unit" ? { key: "error.loadMixedUnits", values: { unit: loads.unit ?? "" } } : null,
       suffix: "",
     };
   });
@@ -234,6 +234,8 @@ export const fieldKey = {
   note: (rowId: string) => `r:${rowId}:note`,
   x: (rowId: string, k: MeasureKey) => `r:${rowId}:x:${k}`,
   cell: (rowId: string, col: number, k: ColKey) => `c:${rowId}:${col}:${k}`,
+  /** A structure field (clusters, intra…) of a unit. */
+  struct: (unitKey: string, field: string) => `s:${unitKey}:${field}`,
 };
 
 /** The test id of a value field: column `same` for same-every-round values, else the 0-based set / round. */
@@ -316,7 +318,10 @@ export function hintFor(plan: PlanSection, key: FieldKey | null, roundWord: stri
       } else if (key.k === "l") {
         meaning = view?.display ? { key: "mean.equals", values: { value: `${view.display}${loadUnitText(row, n)}` } } : null;
       } else if (MEASURES[key.k].text) meaning = tempoMeaning(value);
-      else if (view?.display) meaning = { key: "mean.equals", values: { value: `${view.display} ${measureUnit(key.k, view.display)}`.trim() } };
+      else if (view?.display) {
+        const unit = measureUnit(key.k, view.display);
+        meaning = unit ? { key: "mean.equalsUnit", values: { value: view.display, unit } } : { key: "mean.equals", values: { value: view.display } };
+      }
     }
     let tips =
       row.kind === "rest"
