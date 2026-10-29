@@ -568,6 +568,14 @@ defmodule Palee.Organizations do
   def resolve_platform_context(account, request_metadata \\ %{}),
     do: ResolvePlatformContext.call(account, request_metadata)
 
+  @doc "ADR-273: a vendor change to a box, in the vendors' audit log."
+  def record_platform_event(platform_context, organization_id, attrs),
+    do: Palee.Organizations.Commands.RecordPlatformEvent.call(platform_context, organization_id, attrs)
+
+  @doc "ADR-273: whether the organization exists, read as the vendor."
+  def platform_organization_exists?(platform_context, organization_id),
+    do: Palee.Organizations.Commands.RecordPlatformEvent.exists?(platform_context, organization_id)
+
   def grant_vendor(user_id), do: OrganizationStore.grant_vendor(user_id)
 
   @doc "The user ids of every active vendor, for platform alerts (ADR-212)."

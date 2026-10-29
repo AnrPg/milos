@@ -249,6 +249,13 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
   def get_organization_by_id(id), do: Repo.get(Organization, id)
 
   @impl true
+  def insert_provisioning_event(attrs) do
+    %OrganizationProvisioningEvent{}
+    |> OrganizationProvisioningEvent.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @impl true
   def get_organization_by_slug(slug), do: Repo.get_by(Organization, slug: slug)
 
   @impl true

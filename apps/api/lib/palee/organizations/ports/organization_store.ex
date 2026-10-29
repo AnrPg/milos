@@ -25,6 +25,8 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
   @callback redeem_invitation(binary(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, :invalid_invitation | Ecto.Changeset.t()}
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil
+  @doc "ADR-273: one row of the vendors' audit log (`organization_provisioning_events`)."
+  @callback insert_provisioning_event(map()) :: {:ok, map()} | {:error, term()}
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
   # ADR-122 retired slug aliases.

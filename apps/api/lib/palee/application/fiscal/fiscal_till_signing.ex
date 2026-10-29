@@ -6,6 +6,7 @@ defmodule Palee.Application.Fiscal.FiscalTillSigning do
   due (right after an issue and every few minutes).
   """
 
+  alias Palee.Application.Fiscal.FiscalConnections
   alias Palee.Fiscal.TillSigning
   alias Palee.Workers.SignTillReceiptsJob
 
@@ -16,18 +17,25 @@ defmodule Palee.Application.Fiscal.FiscalTillSigning do
       environments: TillSigning.environments()
     }
 
-  def save_connection(context, device, params, now \\ DateTime.utc_now()) do
+  @doc """
+  Saves (and, when needed, provisions) the till device, then checks it
+  (ADR-273): `{:ok, %{connection, check}}`.
+  """
+  def save_connection(context, device, params, now \\ DateTime.utc_now(), opts \\ []) do
     params = %{
       environment: param(params, :environment),
       api_key: param(params, :api_key),
       api_secret: param(params, :api_secret),
-      reprovision: param(params, :reprovision) == true
+      reprovision: param(params, :reprovision) == true,
+      updated_by_platform: Keyword.get(opts, :platform) == true
     }
 
-    with {:ok, connection} <-
+    with :ok <- FiscalConnections.guard(context, opts),
+         {:ok, _connection} <-
            TillSigning.save_connection(context, device, params, Map.get(context, :user_id), now) do
+      result = FiscalConnections.after_save(context, device, now)
       schedule(context)
-      {:ok, connection}
+      {:ok, result}
     end
   end
 
