@@ -65547,6 +65547,12 @@
             "nullable": true,
             "type": "string"
           },
+          "exemption_reason": {
+            "description": "Required with exempt: the article of the VAT law printed on the document",
+            "maxLength": 300,
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -65670,6 +65676,21 @@
             ],
             "type": "string"
           },
+          "tax_category": {
+            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+            "enum": [
+              "standard",
+              "reduced",
+              "second_reduced",
+              "super_reduced",
+              "special",
+              "zero",
+              "exempt",
+              "sales_tax"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "title": {
             "maxLength": 160,
             "minLength": 1,
@@ -65699,6 +65720,10 @@
                 },
                 "currency": {
                   "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                "exemption_reason": {
+                  "nullable": true,
                   "type": "string"
                 },
                 "id": {
@@ -65781,7 +65806,24 @@
                   ],
                   "type": "string"
                 },
+                "tax_category": {
+                  "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                  "enum": [
+                    "standard",
+                    "reduced",
+                    "second_reduced",
+                    "super_reduced",
+                    "special",
+                    "zero",
+                    "exempt",
+                    "sales_tax"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "tax_class": {
+                  "deprecated": true,
+                  "description": "Use tax_category (ADR-244)",
                   "nullable": true,
                   "type": "string"
                 },
@@ -65836,6 +65878,12 @@
           },
           "description": {
             "maxLength": 8000,
+            "nullable": true,
+            "type": "string"
+          },
+          "exemption_reason": {
+            "description": "Required with exempt: the article of the VAT law printed on the document",
+            "maxLength": 300,
             "nullable": true,
             "type": "string"
           },
@@ -65913,6 +65961,21 @@
             ],
             "type": "string"
           },
+          "tax_category": {
+            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+            "enum": [
+              "standard",
+              "reduced",
+              "second_reduced",
+              "super_reduced",
+              "special",
+              "zero",
+              "exempt",
+              "sales_tax"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "title": {
             "maxLength": 160,
             "minLength": 1,
@@ -65939,6 +66002,12 @@
                 },
                 "currency": {
                   "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                "exemption_reason": {
+                  "description": "Required with exempt: the article of the VAT law printed on the document",
+                  "maxLength": 300,
+                  "nullable": true,
                   "type": "string"
                 },
                 "initial_quantity": {
@@ -65973,7 +66042,24 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "tax_category": {
+                  "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                  "enum": [
+                    "standard",
+                    "reduced",
+                    "second_reduced",
+                    "super_reduced",
+                    "special",
+                    "zero",
+                    "exempt",
+                    "sales_tax"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "tax_class": {
+                  "deprecated": true,
+                  "description": "Deprecated alias of tax_category (ADR-244)",
                   "enum": [
                     "standard",
                     "reduced",
@@ -66181,6 +66267,12 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "exemption_reason": {
+                  "description": "Required with exempt: the article of the VAT law printed on the document",
+                  "maxLength": 300,
+                  "nullable": true,
+                  "type": "string"
+                },
                 "id": {
                   "format": "uuid",
                   "type": "string"
@@ -66304,6 +66396,21 @@
                   ],
                   "type": "string"
                 },
+                "tax_category": {
+                  "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                  "enum": [
+                    "standard",
+                    "reduced",
+                    "second_reduced",
+                    "super_reduced",
+                    "special",
+                    "zero",
+                    "exempt",
+                    "sales_tax"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "title": {
                   "maxLength": 160,
                   "minLength": 1,
@@ -66333,6 +66440,10 @@
                       },
                       "currency": {
                         "pattern": "^[A-Z]{3}$",
+                        "type": "string"
+                      },
+                      "exemption_reason": {
+                        "nullable": true,
                         "type": "string"
                       },
                       "id": {
@@ -66415,7 +66526,24 @@
                         ],
                         "type": "string"
                       },
+                      "tax_category": {
+                        "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                        "enum": [
+                          "standard",
+                          "reduced",
+                          "second_reduced",
+                          "super_reduced",
+                          "special",
+                          "zero",
+                          "exempt",
+                          "sales_tax"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "tax_class": {
+                        "deprecated": true,
+                        "description": "Use tax_category (ADR-244)",
                         "nullable": true,
                         "type": "string"
                       },
@@ -66538,6 +66666,12 @@
             "nullable": true,
             "type": "string"
           },
+          "exemption_reason": {
+            "description": "Required with exempt: the article of the VAT law printed on the document",
+            "maxLength": 300,
+            "nullable": true,
+            "type": "string"
+          },
           "location_ids": {
             "items": {
               "format": "uuid",
@@ -66607,6 +66741,21 @@
             ],
             "type": "string"
           },
+          "tax_category": {
+            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+            "enum": [
+              "standard",
+              "reduced",
+              "second_reduced",
+              "super_reduced",
+              "special",
+              "zero",
+              "exempt",
+              "sales_tax"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "title": {
             "maxLength": 160,
             "minLength": 1,
@@ -66634,6 +66783,12 @@
                 },
                 "currency": {
                   "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                "exemption_reason": {
+                  "description": "Required with exempt: the article of the VAT law printed on the document",
+                  "maxLength": 300,
+                  "nullable": true,
                   "type": "string"
                 },
                 "id": {
@@ -66673,7 +66828,24 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "tax_category": {
+                  "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                  "enum": [
+                    "standard",
+                    "reduced",
+                    "second_reduced",
+                    "super_reduced",
+                    "special",
+                    "zero",
+                    "exempt",
+                    "sales_tax"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "tax_class": {
+                  "deprecated": true,
+                  "description": "Deprecated alias of tax_category (ADR-244)",
                   "enum": [
                     "standard",
                     "reduced",
@@ -68078,6 +68250,10 @@
             "pattern": "^[A-Z]{3}$",
             "type": "string"
           },
+          "exemption_reason": {
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -68158,7 +68334,24 @@
             ],
             "type": "string"
           },
+          "tax_category": {
+            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+            "enum": [
+              "standard",
+              "reduced",
+              "second_reduced",
+              "super_reduced",
+              "special",
+              "zero",
+              "exempt",
+              "sales_tax"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "tax_class": {
+            "deprecated": true,
+            "description": "Use tax_category (ADR-244)",
             "nullable": true,
             "type": "string"
           },
@@ -68202,6 +68395,12 @@
             "pattern": "^[A-Z]{3}$",
             "type": "string"
           },
+          "exemption_reason": {
+            "description": "Required with exempt: the article of the VAT law printed on the document",
+            "maxLength": 300,
+            "nullable": true,
+            "type": "string"
+          },
           "low_stock_threshold": {
             "minimum": 0,
             "nullable": true,
@@ -68225,7 +68424,24 @@
             "nullable": true,
             "type": "string"
           },
+          "tax_category": {
+            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+            "enum": [
+              "standard",
+              "reduced",
+              "second_reduced",
+              "super_reduced",
+              "special",
+              "zero",
+              "exempt",
+              "sales_tax"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "tax_class": {
+            "deprecated": true,
+            "description": "Deprecated alias of tax_category (ADR-244)",
             "enum": [
               "standard",
               "reduced",
@@ -164191,6 +164407,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with `exempt`: the article of the VAT law printed on the document.",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "fields": {
                     "additionalProperties": false,
                     "description": "Entitlement catalog v2 field values keyed by catalog field key (ADR-096)",
@@ -164722,6 +164944,21 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -164846,6 +165083,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with `exempt`: the article of the VAT law printed on the document.",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "fields": {
                     "additionalProperties": false,
                     "description": "Entitlement catalog v2 field values keyed by catalog field key (ADR-096)",
@@ -165377,6 +165620,21 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -170636,6 +170894,119 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/html": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTaxController.document_html",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Render in this language instead of the document's own",
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "enum": [
+                "el",
+                "en",
+                "de",
+                "fr",
+                "it",
+                "nl",
+                "es"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "HTML"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A fiscal document as printable HTML",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/pdf": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTaxController.document_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Render in this language instead of the document's own",
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "enum": [
+                "el",
+                "en",
+                "de",
+                "fr",
+                "it",
+                "nl",
+                "es"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "PDF"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A fiscal document as PDF, with its country's mentions (and the Swiss QR-bill)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/fiscal/documents/{id}/transmission/retry": {
       "post": {
         "callbacks": {},
@@ -170765,6 +171136,298 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/fiscal/exports/formats": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTaxController.export_formats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "formats": {
+                      "items": {
+                        "properties": {
+                          "content_type": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "file_extension": {
+                            "type": "string"
+                          },
+                          "file_prefix": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "options": {
+                            "items": {
+                              "properties": {
+                                "default": {
+                                  "nullable": true
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "enum": [
+                                    "string",
+                                    "integer",
+                                    "boolean",
+                                    "enum",
+                                    "map"
+                                  ],
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "default",
+                                "description",
+                                "key",
+                                "type"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "content_type",
+                          "description",
+                          "file_extension",
+                          "file_prefix",
+                          "id",
+                          "name",
+                          "options"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "settings": {
+                      "items": {
+                        "properties": {
+                          "format": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "options": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "saved": {
+                            "type": "boolean"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "format",
+                          "name",
+                          "options",
+                          "saved",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "formats",
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Formats"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accounting export formats and the gym's options for each",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/exports/settings/{format}": {
+      "put": {
+        "callbacks": {},
+        "description": "Unknown options are dropped and missing ones take their default; invalid ones come back as `validation_failed` with `options.<key>` fields.",
+        "operationId": "PaleeWeb.AdminFiscalTaxController.save_export_settings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,30}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "options": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "options"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "setting": {
+                      "properties": {
+                        "format": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "options": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "saved": {
+                          "type": "boolean"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "format",
+                        "name",
+                        "options",
+                        "saved",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "setting"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Setting"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save the gym's options of an accounting export format (journaled)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/exports/{format}": {
+      "get": {
+        "callbacks": {},
+        "description": "Fiscal documents issued in the period (credit notes negative) and Finance payments, in the format's file layout, with the gym's saved options. The export is journaled. `x-palee-export-skipped` counts documents or payments the format cannot carry.",
+        "operationId": "PaleeWeb.AdminFiscalTaxController.export",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,30}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Export file"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Download the accounting export of a period (at most 366 days)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/fiscal/identity": {
       "get": {
         "callbacks": {},
@@ -170819,6 +171482,11 @@
                         "fiscal_year_start_month": {
                           "type": "integer"
                         },
+                        "iban": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -170834,6 +171502,11 @@
                           "type": "string"
                         },
                         "postal_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "qr_iban": {
                           "maxLength": 200,
                           "nullable": true,
                           "type": "string"
@@ -171064,6 +171737,11 @@
                     "minimum": 1,
                     "type": "integer"
                   },
+                  "iban": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "legal_name": {
                     "maxLength": 200,
                     "nullable": true,
@@ -171075,6 +171753,11 @@
                     "type": "string"
                   },
                   "postal_code": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "qr_iban": {
                     "maxLength": 200,
                     "nullable": true,
                     "type": "string"
@@ -171178,6 +171861,11 @@
                         "fiscal_year_start_month": {
                           "type": "integer"
                         },
+                        "iban": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -171193,6 +171881,11 @@
                           "type": "string"
                         },
                         "postal_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "qr_iban": {
                           "maxLength": 200,
                           "nullable": true,
                           "type": "string"
@@ -171425,6 +172118,276 @@
           }
         ],
         "summary": "Recompute the journal's hash chain and signatures",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/sales-tax-rates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTaxController.sales_tax_rates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "applies": {
+                      "type": "boolean"
+                    },
+                    "rates": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "label": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rate_bp": {
+                            "maximum": 9999,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "state": {
+                            "maxLength": 2,
+                            "minLength": 2,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "zip": {
+                            "maxLength": 5,
+                            "minLength": 5,
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "rate_bp",
+                          "state",
+                          "zip"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "states": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "applies",
+                    "rates",
+                    "states"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sales tax rates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's US sales tax rates by state and ZIP code",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "Only for a business whose legal identity is in the US (`sales_tax_not_applicable` otherwise). A ZIP code rate wins over its state's rate.",
+        "operationId": "PaleeWeb.AdminFiscalTaxController.save_sales_tax_rates",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "rates": {
+                    "items": {
+                      "properties": {
+                        "label": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "rate_bp": {
+                          "type": "integer"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "minLength": 2,
+                          "type": "string"
+                        },
+                        "zip": {
+                          "maxLength": 5,
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "rate_bp",
+                        "state"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 2000,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "rates"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "applies": {
+                      "type": "boolean"
+                    },
+                    "rates": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "label": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rate_bp": {
+                            "maximum": 9999,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "state": {
+                            "maxLength": 2,
+                            "minLength": 2,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "zip": {
+                            "maxLength": 5,
+                            "minLength": 5,
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "rate_bp",
+                          "state",
+                          "zip"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "states": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "applies",
+                    "rates",
+                    "states"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sales tax rates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace the gym's US sales tax rates (journaled)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/tax-categories": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTaxController.tax_categories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "categories": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "country": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "default": {
+                      "type": "string"
+                    },
+                    "max_exemption_reason": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "categories",
+                    "country",
+                    "default",
+                    "max_exemption_reason"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Tax categories"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Tax categories the gym may give packages and products, and the default one",
         "tags": [
           "Fiscal"
         ]
@@ -244987,6 +245950,12 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "exemption_reason": {
+                            "description": "Required with exempt: the article of the VAT law printed on the document",
+                            "maxLength": 300,
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -245110,6 +246079,21 @@
                             ],
                             "type": "string"
                           },
+                          "tax_category": {
+                            "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                            "enum": [
+                              "standard",
+                              "reduced",
+                              "second_reduced",
+                              "super_reduced",
+                              "special",
+                              "zero",
+                              "exempt",
+                              "sales_tax"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "title": {
                             "maxLength": 160,
                             "minLength": 1,
@@ -245139,6 +246123,10 @@
                                 },
                                 "currency": {
                                   "pattern": "^[A-Z]{3}$",
+                                  "type": "string"
+                                },
+                                "exemption_reason": {
+                                  "nullable": true,
                                   "type": "string"
                                 },
                                 "id": {
@@ -245221,7 +246209,24 @@
                                   ],
                                   "type": "string"
                                 },
+                                "tax_category": {
+                                  "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                                  "enum": [
+                                    "standard",
+                                    "reduced",
+                                    "second_reduced",
+                                    "super_reduced",
+                                    "special",
+                                    "zero",
+                                    "exempt",
+                                    "sales_tax"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                },
                                 "tax_class": {
+                                  "deprecated": true,
+                                  "description": "Use tax_category (ADR-244)",
                                   "nullable": true,
                                   "type": "string"
                                 },
@@ -245311,6 +246316,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with exempt: the article of the VAT law printed on the document",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "location_ids": {
                     "items": {
                       "format": "uuid",
@@ -245385,6 +246396,21 @@
                     ],
                     "type": "string"
                   },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "title": {
                     "maxLength": 160,
                     "minLength": 1,
@@ -245411,6 +246437,12 @@
                         },
                         "currency": {
                           "pattern": "^[A-Z]{3}$",
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
+                          "nullable": true,
                           "type": "string"
                         },
                         "initial_quantity": {
@@ -245445,7 +246477,24 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Deprecated alias of tax_category (ADR-244)",
                           "enum": [
                             "standard",
                             "reduced",
@@ -245515,6 +246564,12 @@
                         },
                         "description": {
                           "maxLength": 8000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
                           "nullable": true,
                           "type": "string"
                         },
@@ -245641,6 +246696,21 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "title": {
                           "maxLength": 160,
                           "minLength": 1,
@@ -245670,6 +246740,10 @@
                               },
                               "currency": {
                                 "pattern": "^[A-Z]{3}$",
+                                "type": "string"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
                                 "type": "string"
                               },
                               "id": {
@@ -245752,7 +246826,24 @@
                                 ],
                                 "type": "string"
                               },
+                              "tax_category": {
+                                "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                                "enum": [
+                                  "standard",
+                                  "reduced",
+                                  "second_reduced",
+                                  "super_reduced",
+                                  "special",
+                                  "zero",
+                                  "exempt",
+                                  "sales_tax"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "tax_class": {
+                                "deprecated": true,
+                                "description": "Use tax_category (ADR-244)",
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -245857,6 +246948,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -245980,6 +247077,21 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "title": {
                           "maxLength": 160,
                           "minLength": 1,
@@ -246009,6 +247121,10 @@
                               },
                               "currency": {
                                 "pattern": "^[A-Z]{3}$",
+                                "type": "string"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
                                 "type": "string"
                               },
                               "id": {
@@ -246091,7 +247207,24 @@
                                 ],
                                 "type": "string"
                               },
+                              "tax_category": {
+                                "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                                "enum": [
+                                  "standard",
+                                  "reduced",
+                                  "second_reduced",
+                                  "super_reduced",
+                                  "special",
+                                  "zero",
+                                  "exempt",
+                                  "sales_tax"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "tax_class": {
+                                "deprecated": true,
+                                "description": "Use tax_category (ADR-244)",
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -246187,6 +247320,12 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with exempt: the article of the VAT law printed on the document",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "location_ids": {
                     "items": {
                       "format": "uuid",
@@ -246256,6 +247395,21 @@
                     ],
                     "type": "string"
                   },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "title": {
                     "maxLength": 160,
                     "minLength": 1,
@@ -246283,6 +247437,12 @@
                         },
                         "currency": {
                           "pattern": "^[A-Z]{3}$",
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
+                          "nullable": true,
                           "type": "string"
                         },
                         "id": {
@@ -246322,7 +247482,24 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Deprecated alias of tax_category (ADR-244)",
                           "enum": [
                             "standard",
                             "reduced",
@@ -246386,6 +247563,12 @@
                         },
                         "description": {
                           "maxLength": 8000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
                           "nullable": true,
                           "type": "string"
                         },
@@ -246512,6 +247695,21 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "title": {
                           "maxLength": 160,
                           "minLength": 1,
@@ -246541,6 +247739,10 @@
                               },
                               "currency": {
                                 "pattern": "^[A-Z]{3}$",
+                                "type": "string"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
                                 "type": "string"
                               },
                               "id": {
@@ -246623,7 +247825,24 @@
                                 ],
                                 "type": "string"
                               },
+                              "tax_category": {
+                                "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                                "enum": [
+                                  "standard",
+                                  "reduced",
+                                  "second_reduced",
+                                  "super_reduced",
+                                  "special",
+                                  "zero",
+                                  "exempt",
+                                  "sales_tax"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "tax_class": {
+                                "deprecated": true,
+                                "description": "Use tax_category (ADR-244)",
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -247807,6 +249026,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "exemption_reason": {
+                          "description": "Required with exempt: the article of the VAT law printed on the document",
+                          "maxLength": 300,
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -247930,6 +249155,21 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "title": {
                           "maxLength": 160,
                           "minLength": 1,
@@ -247959,6 +249199,10 @@
                               },
                               "currency": {
                                 "pattern": "^[A-Z]{3}$",
+                                "type": "string"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
                                 "type": "string"
                               },
                               "id": {
@@ -248041,7 +249285,24 @@
                                 ],
                                 "type": "string"
                               },
+                              "tax_category": {
+                                "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                                "enum": [
+                                  "standard",
+                                  "reduced",
+                                  "second_reduced",
+                                  "super_reduced",
+                                  "special",
+                                  "zero",
+                                  "exempt",
+                                  "sales_tax"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "tax_class": {
+                                "deprecated": true,
+                                "description": "Use tax_category (ADR-244)",
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -248145,6 +249406,12 @@
                     "pattern": "^[A-Z]{3}$",
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with exempt: the article of the VAT law printed on the document",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "low_stock_threshold": {
                     "minimum": 0,
                     "nullable": true,
@@ -248168,7 +249435,24 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "tax_class": {
+                    "deprecated": true,
+                    "description": "Deprecated alias of tax_category (ADR-244)",
                     "enum": [
                       "standard",
                       "reduced",
@@ -248224,6 +249508,10 @@
                         },
                         "currency": {
                           "pattern": "^[A-Z]{3}$",
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "id": {
@@ -248306,7 +249594,24 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Use tax_category (ADR-244)",
                           "nullable": true,
                           "type": "string"
                         },
@@ -248399,6 +249704,12 @@
                     "pattern": "^[A-Z]{3}$",
                     "type": "string"
                   },
+                  "exemption_reason": {
+                    "description": "Required with exempt: the article of the VAT law printed on the document",
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "low_stock_threshold": {
                     "minimum": 0,
                     "nullable": true,
@@ -248422,7 +249733,24 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "tax_category": {
+                    "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                    "enum": [
+                      "standard",
+                      "reduced",
+                      "second_reduced",
+                      "super_reduced",
+                      "special",
+                      "zero",
+                      "exempt",
+                      "sales_tax"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "tax_class": {
+                    "deprecated": true,
+                    "description": "Deprecated alias of tax_category (ADR-244)",
                     "enum": [
                       "standard",
                       "reduced",
@@ -248478,6 +249806,10 @@
                         },
                         "currency": {
                           "pattern": "^[A-Z]{3}$",
+                          "type": "string"
+                        },
+                        "exemption_reason": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "id": {
@@ -248560,7 +249892,24 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Use tax_category (ADR-244)",
                           "nullable": true,
                           "type": "string"
                         },
@@ -248659,6 +250008,10 @@
                           "pattern": "^[A-Z]{3}$",
                           "type": "string"
                         },
+                        "exemption_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -248739,7 +250092,24 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Use tax_category (ADR-244)",
                           "nullable": true,
                           "type": "string"
                         },
@@ -249785,6 +251155,10 @@
                           "pattern": "^[A-Z]{3}$",
                           "type": "string"
                         },
+                        "exemption_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "type": "string"
@@ -249865,7 +251239,24 @@
                           ],
                           "type": "string"
                         },
+                        "tax_category": {
+                          "description": "ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "second_reduced",
+                            "super_reduced",
+                            "special",
+                            "zero",
+                            "exempt",
+                            "sales_tax"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tax_class": {
+                          "deprecated": true,
+                          "description": "Use tax_category (ADR-244)",
                           "nullable": true,
                           "type": "string"
                         },
