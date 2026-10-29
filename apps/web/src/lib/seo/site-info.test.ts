@@ -31,6 +31,9 @@ describe("site info", () => {
     expect(text).toContain("Two sides in one app.");
     expect(text).toContain("### Events\n\nOpen WODs and runs.\n\n- Waitlist and guest passes");
     expect(text).toContain("- [About Palee](https://palee.example/about)");
+    // ADR-267: the privacy policy and the terms are public pages too.
+    expect(text).toContain("- [Privacy policy](https://palee.example/privacy)");
+    expect(text).toContain("- [Terms of use](https://palee.example/terms)");
     expect(text).toContain("### What is Palee?\n\nA training platform.");
   });
 
