@@ -229,3 +229,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
 | ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
 | ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
+| ADR-244 | Tax categories on packages, products and variants; stable sale lines for `Fiscal.issue`; US sales tax port with a manual rate table | Accepted |
+| ADR-245 | Country document templates (PDF/HTML, Swiss QR-bill, myDATA mentions) and accounting exports (DATEV, Xero, QuickBooks, Sage, bexio, CSV, JSON) | Accepted |

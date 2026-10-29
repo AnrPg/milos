@@ -50,7 +50,7 @@ VAT rates do not apply there.
    Rules: own category, else the parent's, else the country default; a
    `small_business` seller prints every line `exempt` with its country's
    legal mention (`TaxCategories.small_business_reason/1`, e.g. DE "Gemäß
-   § 19 UStG wird keine Umsatzsteuer berechnet.", FR "TVA non applicable,
+   § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung)", FR "TVA non applicable,
    art. 293 B du CGI"); an `exempt` scheme keeps the items' reasons.
 
    Builders: `package_item/2` (Finance package), `variant_item/3` (Shop
