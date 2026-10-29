@@ -153,7 +153,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   # ── rows ─────────────────────────────────────────────
 
   defp unit_rows(plan, clock, rows, block_index) do
-    rows = Enum.filter(rows, &is_map/1)
+    rows = if is_list(rows), do: Enum.filter(rows, &is_map/1), else: []
     rounds = block_rounds(plan, clock, rows, block_index)
 
     rows
