@@ -97,3 +97,88 @@ transaction signed twice is a gap auditors see.
   RKSV (https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20009390),
   BMF Registrierkassen (https://www.bmf.gv.at/themen/steuern/fuer-unternehmen/registrierkassen.html),
   fiskaly SIGN AT (https://workspace.fiskaly.com/api/rksv/v1/).
+
+## Update 2026-10-29: invoices paid at the till are signed too
+Product-owner decision of 2026-10-29, checked against the sources below.
+
+**Rule.** §146a (1) AO asks an electronic recording system with a till
+function to record *every* transaction it records ("jeden
+aufzeichnungspflichtigen Geschäftsvorfall und anderen Vorgang") and to
+protect it with the TSE. A system has a till function as soon as it can
+record payments that are at least partly in cash (AEAO zu §146a Nr. 1.2;
+the BMF FAQ applies this to invoicing software or an invoicing module that
+can record cash payments). DSFinV-K Anhang B, process type `Beleg`: "umfasst
+alle Vorgänge, die über die Kasse abgeschlossen werden. Der Vorgangstyp
+umfasst neben der Rechnung (§ 14 UStG) auch Gutschriften und
+Korrekturrechnungen", with every payment type (cash and non-cash). An
+invoice paid at Palee's desk is therefore a till transaction like a
+receipt. An invoice paid later by bank transfer or online is not closed at
+the till: the BMF FAQ puts only "this part" of a mixed system under §146a,
+and DSFinV-K only describes invoices paid later when the till itself
+records the claim (`Forderungsentstehung`, settled by a `Beleg` with
+`Forderungsaufloesung`). Palee's transfer invoices are issued by its
+invoicing, not at the till, so they stay unsigned.
+
+Austria: the cash register duty and RKSV signing apply to every cash sale
+(Barumsatz). §131b (1) Z 3 BAO counts payment by debit or credit card and
+comparable forms as cash payment, and a later payment by bank transfer or
+e-banking is not a cash sale (oesterreich.gv.at / USP "Bargeldgeschäft");
+online-shop sales the customer does not pay in cash at the business are
+exempt (USP Registrierkassen). Same rule as Germany.
+
+**Decision 1, amended.** A document is signed when its country profile
+names a till device and it records money taken at the till
+(`TillSigningPolicy.required?/3`):
+- a receipt;
+- an invoice with `payment_method` `cash` or `card` (desk card payments,
+  including the card terminal `card_terminal` of ADR-249, are issued as
+  `card`);
+- a credit note correcting one of these (it copies the corrected
+  document's payment method and is a "Korrekturrechnung" / storno receipt).
+
+Invoices with `bank_transfer`, `online`, `other` or no payment method, and
+their credit notes, are not signed. The signature row's kind stays
+`receipt` for all of them (DSFinV-K `Beleg`, process type
+`Kassenbeleg-V1`, receipt type `RECEIPT`), so the German 5-minute outage
+rule applies to till invoices too.
+
+**Printing (ADR-245).** Every signed document, receipt or invoice, prints a
+till block next to the authority block in its HTML and PDF template:
+title "Technical security system (TSE)" / "Cash register security device
+(RKSV)" in the document's language, then the lines of §6 KassenSichV
+(TSE serial, till serial, transaction number, signature counter, start and
+end, algorithm, time format, signature) or, in Austria, the cash register
+id, receipt number and "Sicherheitseinrichtung ausgefallen" when the unit
+was out, with the machine-readable code as a QR code (RKSV
+Detailspezifikation Z 12; DSFinV-K Anhang I for Germany). Long values wrap
+inside the block. A pending German signature prints "Signatur ausstehend"
+and a TSE failure "TSE ausgefallen", as before.
+
+**Open points.** `other` payments at the desk (e.g. a voucher) are not
+signed on invoices; AEAO Nr. 1.2 counts vouchers accepted instead of money
+as till payments, so if boxes use `other` for that it should be mapped to a
+till method. Receipts are still signed whatever their method, including
+`online` receipts of online payments; whether those should leave the TSE
+(online-shop sales are outside §146a / the RKSV) is a separate decision.
+
+**Sources.** AEAO zu §146a Nr. 1.2 (summarised by Bayerisches Landesamt für
+Steuern, https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Weitere_Themen/Elektronische_Kassensysteme/2019-06-17-einfuehrung-paragraf-146a-AO_eKassen.pdf),
+BMF FAQ on invoicing and inventory systems (quoted in
+https://ecovis-kso.com/blog/tse-auch-fuer-warenwirtschaftssystem-und-faktura-system/),
+DSFinV-K 2.4 Anhang B (`Beleg`, `AVRechnung`) and Anhang C
+(`Forderungsentstehung`, `Forderungsaufloesung`) and the examples of
+Anhang H (https://kassensichv.com/downloads/DSFinV-K-Vers-2-4.pdf; official
+https://www.bzst.de/DE/Unternehmen/Aussenpruefungen/DigitaleSchnittstelleFinV/digitaleschnittstellefinv_node.html),
+fiskaly DSFinV-K process types (https://developer.fiskaly.com/dsfinvk/process_types_business_transaction_types),
+§131b BAO (https://www.ris.bka.gv.at/eli/bgbl/1961/194/P131b/NOR40186000),
+USP Registrierkassen (https://www.usp.gv.at/steuern-finanzen/steuerliche-rechte-und-pflichten/registrierkassen.html),
+USP "Bargeldgeschäft" (https://www.usp.gv.at/services/suchen-und-finden/lexikon/bargeldgeschaeft.html).
+
+## Update 2026-10-29: France (SIGN FR) and shared fiskaly credentials
+- France is the third device, `sign_fr`, through fiskaly SIGN FR on the
+  Unified API (ADR-266), with the same outbox, side table and endpoints.
+- The e-invoicing connection (ADR-250 update) reuses this connection's
+  fiskaly key and secret of the same environment when it has none of its
+  own. Open: SIGN DE v2 and SIGN AT v1 keys are older per-product keys and
+  may not be accepted by the Unified API; a business may then need a
+  Unified API key on the e-invoicing connection itself.

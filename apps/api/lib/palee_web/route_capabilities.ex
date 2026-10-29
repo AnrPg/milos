@@ -290,22 +290,72 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
     # ADR-252: documents are box rules (manage_settings: which are
     # mandatory, their text, the booking gate); asking clients to sign and
-    # reading who signed is membership work too.
-    {W.AdminDocumentsController, :index} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :show} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :version} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :request} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :requests} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :cancel_request} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :signatures} => [:manage_settings, :manage_memberships],
+    # reading who signed is membership work too, and front desk work
+    # (request_signatures; the evidence PDF stays with the first two).
+    {W.AdminDocumentsController, :index} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :show} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :version} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :request} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :requests} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :cancel_request} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :signatures} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
     {W.AdminDocumentsController, :evidence} => [:manage_settings, :manage_memberships],
-    {W.AdminDocumentsController, :member} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :member} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :outstanding} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
     # ADR-252: health certificates are health data (GDPR art. 9): dates and
     # files need manage_health_certificates; view_health (coaches, own
     # clients) sees only valid / expired / missing in the list.
     {W.AdminHealthCertificatesController, :index} => [
       :manage_health_certificates,
+      :view_health_certificates,
       :view_health
+    ],
+    # Front desk sees certificates by default (product owner, 2026-10-29):
+    # a client's dates and the file; uploading and deleting stay with
+    # manage_health_certificates.
+    {W.AdminHealthCertificatesController, :client} => [
+      :manage_health_certificates,
+      :view_health_certificates
+    ],
+    {W.AdminHealthCertificatesController, :file} => [
+      :manage_health_certificates,
+      :view_health_certificates
     ],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.

@@ -201,3 +201,9 @@ msgstr "Factuurfout"
 
 msgid "Subscription cancelled"
 msgstr "Abonnement opgezegd"
+
+msgid "Technical security system (TSE)"
+msgstr "Technische beveiligingsvoorziening (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Beveiligingsvoorziening van het kassasysteem (RKSV)"

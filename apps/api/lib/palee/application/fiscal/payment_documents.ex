@@ -15,6 +15,11 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
     online fulfilment or a replayed desk request returns the same document.
   * A refund or reversal credits that document by the amount given back
     (`credit/5`, idempotent per reversal).
+  * ADR-264: a card surcharge the provider added (`received.surcharge_cents`,
+    recorded in Finance apart) is on the same receipt, as lines that follow
+    the sale's taxes (`received.surcharge_description`); a tip is not on it
+    (it is the staff's, not the sale's). A walk-in's sale is a Finance
+    stream invoice and payment with no membership, issued the same way.
   """
 
   require Logger
@@ -63,12 +68,13 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
              taxes(context),
              identity
            ),
-         {:ok, lines} <-
+         {:ok, paid} <-
            SaleLines.payment_part(
              sale.lines,
              payment.amount_cents,
              received[:description] || invoice.invoice_number || "Payment"
            ),
+         {:ok, lines} <- with_surcharge(paid, received),
          {:ok, document, _mode} <-
            Fiscal.issue(
              context,
@@ -97,6 +103,21 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
         error
     end
   end
+
+  # ADR-264: the card surcharge follows the taxes of what it was paid for.
+  defp with_surcharge(lines, %{surcharge_cents: cents} = received)
+       when is_integer(cents) and cents > 0 do
+    with {:ok, surcharge} <-
+           SaleLines.follow_sale(
+             lines,
+             cents,
+             received[:surcharge_description] || "Card surcharge"
+           ) do
+      {:ok, lines ++ surcharge}
+    end
+  end
+
+  defp with_surcharge(lines, _received), do: {:ok, lines}
 
   @doc """
   For money recorded at the desk: the payment stays recorded either way;

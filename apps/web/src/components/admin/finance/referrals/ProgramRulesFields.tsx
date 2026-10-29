@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import type { ProgramRules } from "./program-rules";
 import { Select } from "@/components/ui/Select";
+import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
 
 const inputStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
 const inputClass = "w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none";
@@ -61,36 +62,39 @@ export function ProgramRulesFields({
         ) : null}
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Field label={t("rules.counts")}>
-          <Select className={inputClass} style={inputStyle} value={rules.qualifying_stage} onValueChange={(value) => set("qualifying_stage", value as ProgramRules["qualifying_stage"])}>
-            <option value="paid">{t("rules.counts_paid")}</option>
-            <option value="trial">{t("rules.counts_trial")}</option>
-          </Select>
-        </Field>
-        <Field label={t("rules.approval")}>
-          <Select className={inputClass} style={inputStyle} value={rules.approval} onValueChange={(value) => set("approval", value as ProgramRules["approval"])}>
-            <option value="manual">{t("rules.approval_manual")}</option>
-            <option value="auto">{t("rules.approval_auto")}</option>
-          </Select>
-        </Field>
-        <Field label={t("rules.window")}>
-          <input className={inputClass} style={inputStyle} type="number" min={7} max={365} value={rules.attribution_days} onChange={(e) => set("attribution_days", e.target.value)} />
-        </Field>
-        <Field label={t("rules.cap")}>
-          <input
-            className={inputClass}
-            style={inputStyle}
-            type="number"
-            min={1}
-            max={1000}
-            placeholder={t("rules.capNone")}
-            value={rules.yearly_cap}
-            onChange={(e) => set("yearly_cap", e.target.value)}
-          />
-        </Field>
-      </div>
-      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{t("rules.hint")}</p>
+      {/* ADR-255: when an invite counts, how long it holds, the yearly cap and approval have good defaults. */}
+      <AdvancedDisclosure count={4} testId="referral-rules-advanced">
+        <div className="grid gap-3 md:grid-cols-2">
+          <Field label={t("rules.counts")}>
+            <Select className={inputClass} style={inputStyle} value={rules.qualifying_stage} onValueChange={(value) => set("qualifying_stage", value as ProgramRules["qualifying_stage"])}>
+              <option value="paid">{t("rules.counts_paid")}</option>
+              <option value="trial">{t("rules.counts_trial")}</option>
+            </Select>
+          </Field>
+          <Field label={t("rules.approval")}>
+            <Select className={inputClass} style={inputStyle} value={rules.approval} onValueChange={(value) => set("approval", value as ProgramRules["approval"])}>
+              <option value="manual">{t("rules.approval_manual")}</option>
+              <option value="auto">{t("rules.approval_auto")}</option>
+            </Select>
+          </Field>
+          <Field label={t("rules.window")}>
+            <input className={inputClass} style={inputStyle} type="number" min={7} max={365} value={rules.attribution_days} onChange={(e) => set("attribution_days", e.target.value)} />
+          </Field>
+          <Field label={t("rules.cap")}>
+            <input
+              className={inputClass}
+              style={inputStyle}
+              type="number"
+              min={1}
+              max={1000}
+              placeholder={t("rules.capNone")}
+              value={rules.yearly_cap}
+              onChange={(e) => set("yearly_cap", e.target.value)}
+            />
+          </Field>
+        </div>
+        <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{t("rules.hint")}</p>
+      </AdvancedDisclosure>
     </div>
   );
 }

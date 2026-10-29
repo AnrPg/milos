@@ -20,7 +20,7 @@ const fieldStyle = { background: "var(--panel-raised)", border: "1px solid var(-
 
 /**
  * The gym's AI settings (ADR-174): scaling suggestions off by default, the
- * gym's own key (write-only, shown as «•••• last4»), an optional model and
+ * gym's own key (write-only, shown as «•••• last4») and
  * this month's usage. One switch, one key field: no other controls.
  */
 // ADR-175: voice logging has its own switch next to scaling, same key.
@@ -63,7 +63,6 @@ export function AiScalingSettings({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [key, setKey] = useState("");
-  const [model, setModel] = useState<string | null>(null);
   const settings = useQuery({ queryKey: AI_SETTINGS_KEY, queryFn: () => fetchAiSettings(token) });
   // The update being saved, set in the same event as the tap: the mutation's
   // own pending state reaches React a tick later, and a controlled switch
@@ -74,7 +73,6 @@ export function AiScalingSettings({ token }: { token: string }) {
     onSuccess: (data) => {
       queryClient.setQueryData<GymAiSettings>(AI_SETTINGS_KEY, data);
       setKey("");
-      setModel(null);
     },
     onSettled: () => setPendingUpdate(null),
   });
@@ -95,7 +93,6 @@ export function AiScalingSettings({ token }: { token: string }) {
   const usage = data.usage ?? { suggestions: 0, cost_usd: 0 };
   const enabled = data.scaling_enabled === true;
   const status = data.key_status ?? "unknown";
-  const modelValue = model ?? data.model ?? "";
 
   return (
     <div className="space-y-5" data-testid="ai-scaling-settings">
@@ -166,36 +163,7 @@ export function AiScalingSettings({ token }: { token: string }) {
         ) : null}
       </form>
 
-      <form
-        className="space-y-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          submit({ model: modelValue.trim() === "" ? null : modelValue.trim() });
-        }}
-      >
-        <label className="text-sm font-semibold" htmlFor="ai-model" style={{ color: "var(--text)" }}>
-          {t("settings.model")}
-        </label>
-        <div className="flex gap-2">
-          <input
-            id="ai-model"
-            className={fieldClass}
-            style={fieldStyle}
-            value={modelValue}
-            placeholder={data.default_model}
-            onChange={(event) => setModel(event.target.value)}
-          />
-          <button
-            type="submit"
-            className="min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold disabled:opacity-60"
-            style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            disabled={model === null || busy}
-          >
-            {t("settings.saveModel")}
-          </button>
-        </div>
-      </form>
-
+      {/* ADR-255: the model is no owner's choice any more ("remove"); the default model is used. */}
       <p className="text-xs" style={{ color: "var(--dim)" }} data-testid="ai-usage">
         {t("settings.usage", { count: usage.suggestions, cost: (usage.cost_usd ?? 0).toFixed(2) })}
       </p>

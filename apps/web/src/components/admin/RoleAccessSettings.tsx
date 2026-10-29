@@ -36,8 +36,8 @@ export function RoleAccessSettings({ token }: { token: string }) {
 
   return (
     <div className="space-y-6">
-      {Object.entries(access.data.grantable).map(([role, grantable]) => {
-        const granted = access.data.grants[role] ?? [];
+      {Object.entries(access.data.grantable ?? {}).map(([role, grantable]) => {
+        const granted = access.data.grants?.[role] ?? [];
         return (
           <fieldset key={role} className="space-y-3">
             <legend className="text-sm font-semibold" style={{ color: "var(--text)" }}>

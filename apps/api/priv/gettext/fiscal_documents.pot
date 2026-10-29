@@ -200,4 +200,9 @@ msgid "Billing error"
 msgstr ""
 
 msgid "Subscription cancelled"
+
+msgid "Technical security system (TSE)"
+msgstr ""
+
+msgid "Cash register security device (RKSV)"
 msgstr ""

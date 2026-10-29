@@ -131,7 +131,7 @@ screens shipped without them:
   unreliable. Rejected.
 
 ## Consequences
-- Migration `20270221000000_v3_fiscal_extras.exs`.
+- Migration `20270224000000_v3_fiscal_extras.exs`.
 - The staff screens get the reason chips, the refund switch, the email
   dialog and the look-up button (mockups s1 C, s2 A).
 - There is no screen yet for entering the AADE registry credentials (the

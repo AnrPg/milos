@@ -3,7 +3,8 @@ defmodule PaleeWeb.AdminTerminalPaymentsController do
   Staff › desk › Tap to Pay (ADR-249): open a card payment for the
   provider's terminal app on the staff phone, post back what the app
   returned (confirmed with the provider before anything is recorded),
-  follow it and give up on it.
+  follow it and give up on it. ADR-264: a walk-in may pay a free sale; a
+  tip and a card surcharge the provider confirmed are shown apart.
   """
 
   use PaleeWeb, :controller
@@ -101,7 +102,10 @@ defmodule PaleeWeb.AdminTerminalPaymentsController do
            TerminalPayments.sandbox_complete(
              conn.assigns.tenant_context,
              id,
-             conn.body_params.outcome
+             conn.body_params.outcome,
+             conn.body_params
+             |> Map.take([:tip_cents, :surcharge_cents, :amount_cents])
+             |> Map.reject(fn {_key, value} -> is_nil(value) end)
            ) do
       json(conn, %{payment: payment})
     end

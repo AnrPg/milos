@@ -201,3 +201,9 @@ msgstr "Error de facturación"
 
 msgid "Subscription cancelled"
 msgstr "Cancelación de la suscripción"
+
+msgid "Technical security system (TSE)"
+msgstr "Dispositivo técnico de seguridad (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Dispositivo de seguridad de la caja registradora (RKSV)"

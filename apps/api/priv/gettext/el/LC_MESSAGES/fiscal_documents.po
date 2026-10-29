@@ -201,3 +201,9 @@ msgstr "Λάθος χρέωση"
 
 msgid "Subscription cancelled"
 msgstr "Ακύρωση συνδρομής"
+
+msgid "Technical security system (TSE)"
+msgstr "Τεχνικό σύστημα ασφαλείας (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Μηχανισμός ασφαλείας ταμειακής μηχανής (RKSV)"

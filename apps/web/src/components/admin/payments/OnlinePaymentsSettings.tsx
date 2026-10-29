@@ -354,6 +354,9 @@ function ConnectedView({
               {t("connectedHint", { provider })}
               {account.environment === "test" ? ` · ${t("testMode")}` : ""}
             </p>
+            <p className="mt-1 text-xs leading-5" style={{ color: "var(--dim)" }}>
+              {t("methodsHint", { provider })}
+            </p>
           </div>
           <span className="rounded-full px-3 py-1 text-xs font-semibold" style={SPARK_ACTIVE_STYLE}>
             ✓ {t("statusActive")}

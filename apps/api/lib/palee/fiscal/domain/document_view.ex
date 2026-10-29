@@ -20,6 +20,10 @@ defmodule Palee.Fiscal.Domain.DocumentView do
       mentions, the corrected document of a credit note;
     * the authority block (myDATA MARK, UID, authentication code, QR link)
       or a pending notice for Greek documents not yet accepted;
+    * the till signature block (ADR-251) of a document signed by the TSE
+      (Germany) or the RKSV unit (Austria): a receipt, an invoice paid at
+      the till or their credit note, with the lines §6 KassenSichV and
+      the RKSV ask and the machine-readable code as a QR code;
     * bank details, and the Swiss QR-bill for CH/LI invoices to be paid.
   """
 
@@ -36,7 +40,8 @@ defmodule Palee.Fiscal.Domain.DocumentView do
   @doc """
   The view of `document`. Options: `:labels` (translated), `:language`,
   `:original` (the corrected document), `:transmission`, `:identity` (the
-  seller's current identity, for bank details).
+  seller's current identity, for bank details), `:till_signature` (its
+  till signature with `print` lines and `qr_code_data`).
   """
   def build(document, opts \\ []) do
     labels = Keyword.get(opts, :labels, %{})
@@ -78,6 +83,7 @@ defmodule Palee.Fiscal.Domain.DocumentView do
       totals: totals(document, label, format, sales_tax?),
       mentions: mentions(document, seller, buyer, label),
       authority: authority(document, transmission, label),
+      till: till(Keyword.get(opts, :till_signature), label),
       bank: bank(document, identity, label),
       qr_bill: qr_bill(document, identity, language, "#{title} #{document.number}"),
       footer: [label.(:footer_journal)],
@@ -319,6 +325,31 @@ defmodule Palee.Fiscal.Domain.DocumentView do
         nil
     end
   end
+
+  # The till signature (ADR-251) in the authority block's shape: its print
+  # lines (German, as §6 KassenSichV / RKSV ask) and its machine-readable
+  # code as a QR code (RKSV Detailspezifikation Z 12, DSFinV-K Anhang I).
+  defp till(nil, _label), do: nil
+
+  defp till(%{device: device} = signature, label) when device in ["tse", "rksv"] do
+    lines = Map.get(signature, :print) || []
+    code = Map.get(signature, :qr_code_data)
+
+    %{
+      title: if(device == "tse", do: label.(:till_tse_title), else: label.(:till_rksv_title)),
+      rows:
+        lines
+        |> Enum.map(&{field(&1, :label), field(&1, :value)})
+        |> Enum.reject(fn {term, _value} -> term == "QR" end),
+      qr: qr(code),
+      qr_url: nil,
+      pending: nil
+    }
+  end
+
+  defp till(_signature, _label), do: nil
+
+  defp field(map, key), do: Map.get(map, key) || Map.get(map, Atom.to_string(key))
 
   defp qr(nil), do: nil
 

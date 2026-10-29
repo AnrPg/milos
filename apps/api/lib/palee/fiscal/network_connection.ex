@@ -2,9 +2,11 @@ defmodule Palee.Fiscal.NetworkConnection do
   @moduledoc """
   An organization's connection to an e-invoicing network (ADR-250): the
   access point provider, environment, the business's Peppol identifier
-  and, outside the sandbox, its credentials. The API key is encrypted at
-  rest and never returned, journaled or logged; the webhook token is kept
-  only as a SHA-256 hash.
+  and, outside the sandbox, its credentials. API key and secret are
+  encrypted at rest and never returned, journaled or logged; the webhook
+  token is kept only as a SHA-256 hash. A `fiskaly` connection without
+  its own key uses the business's fiskaly till connection (one fiskaly
+  account per business).
   """
 
   use Ecto.Schema
@@ -15,7 +17,7 @@ defmodule Palee.Fiscal.NetworkConnection do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   @fields ~w(network provider environment peppol_scheme peppol_identifier legal_entity_id api_key
-             webhook_token_hash status last_error updated_by_id)a
+             api_secret webhook_token_hash status last_error updated_by_id)a
 
   schema "fiscal_network_connections" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -26,6 +28,7 @@ defmodule Palee.Fiscal.NetworkConnection do
     field :peppol_identifier, :string
     field :legal_entity_id, :string
     field :api_key, EncryptedBinary, redact: true
+    field :api_secret, EncryptedBinary, redact: true
     field :webhook_token_hash, :string, redact: true
     field :status, :string, default: "active"
     field :last_error, :string

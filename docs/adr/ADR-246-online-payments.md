@@ -64,3 +64,34 @@ idempotency key, so a resend after a timeout can charge twice.
 - Shop payments (ADR-190's provider port) should move onto this context.
 - Online payments of bookings, packages and shop orders (V3-M5) only need
   new fulfilment purposes.
+
+## Update 2026-10-29: PayPal, Klarna and wallets need no new vendor
+Product owner decision (2026-10-29): PayPal and Klarna are offered through
+the providers already connected, not through a new vendor.
+- **Stripe.** Checkout sessions do not pin `payment_method_types`, so Stripe's
+  dynamic payment methods show what the business switched on in its own
+  dashboard (cards, Apple Pay, Google Pay, PayPal, Klarna, ...).
+  `payment_intent_data[setup_future_usage]=off_session` is sent only when the
+  member chose to save the card (`save_method`, `save_card` in the request);
+  a one-off payment sends none, so methods that cannot be saved stay on
+  offer. Saving a card for autopay works as before (cards only).
+- **Klarna on Stripe:** one-off payments only (not offered when the card is
+  being saved), B2C only, currencies AUD, CAD, CHF, CZK, DKK, EUR, GBP, NOK,
+  NZD, PLN, RON, SEK and USD, and amount limits per country and Klarna
+  option (for example France pay in full up to 4,000 EUR, pay later up to
+  500 EUR; Germany pay later 0.10 to 10,000 EUR; Belgium pay later 1 to
+  1,500 EUR; Greece pay in full up to 4,000 EUR). Stripe hides Klarna by
+  itself outside these limits.
+- **PayPal on Stripe:** for businesses in the EEA, UK and Switzerland, in
+  EUR, GBP, USD, CHF, CZK, DKK, NOK, PLN, SEK and a few more; saving PayPal
+  for later charges needs Stripe's approval. Stripe does not offer PayPal to
+  Connect platforms using direct charges, so a business connected with the
+  one-button Stripe connection (ADR-261, `Stripe-Account` header) will not
+  see PayPal; one that pasted its own API keys will.
+- **Viva.** Smart Checkout shows the methods the business enabled at Viva
+  (PayPal and Klarna included where Viva offers them); `allowRecurring` is
+  set only when the card is saved.
+- The payments settings screen says this in one line («methodsHint», all 12
+  locales). Sources: Stripe Klarna (https://docs.stripe.com/payments/klarna),
+  Stripe PayPal (https://docs.stripe.com/payments/paypal), Stripe dynamic
+  payment methods (https://docs.stripe.com/payments/payment-methods/dynamic-payment-methods).

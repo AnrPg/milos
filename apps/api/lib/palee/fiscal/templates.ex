@@ -3,7 +3,8 @@ defmodule Palee.Fiscal.Templates do
   Country document templates (ADR-245): a fiscal document rendered as
   printable HTML or as PDF, in the document's language or another one,
   with the mentions its country asks for, its VAT breakdown, the document
-  it corrects, its myDATA MARK/UID/QR once reported (ADR-243) and, for
+  it corrects, its myDATA MARK/UID/QR once reported (ADR-243), its TSE /
+  RKSV till signature when it was taken at the till (ADR-251) and, for
   Swiss and Liechtenstein invoices to be paid, the QR-bill.
 
   The document itself never changes; rendering reads it, the corrected
@@ -11,7 +12,7 @@ defmodule Palee.Fiscal.Templates do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{FiscalStore, Reporting}
+  alias Palee.Fiscal.{FiscalStore, Reporting, TillSigning}
   alias Palee.Fiscal.Domain.{DocumentHtml, DocumentLabels, DocumentPdf, DocumentView}
 
   @languages ~w(el en de fr it nl es)
@@ -45,10 +46,20 @@ defmodule Palee.Fiscal.Templates do
           language: language,
           original: original,
           transmission: transmission,
+          till_signature: till_signature(context, document),
           identity: FiscalStore.get_identity(context)
         )
 
       {:ok, %{view: view, document: document}}
+    end
+  end
+
+  # A receipt, an invoice paid at the till or their credit note prints its
+  # TSE / RKSV signature (ADR-251).
+  defp till_signature(context, document) do
+    case context |> TillSigning.signatures_for([document.id]) |> Map.get(document.id) do
+      nil -> nil
+      signature -> Map.put(signature, :print, TillSigning.print(signature))
     end
   end
 

@@ -48,6 +48,7 @@ import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentatio
 import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
+import { MemberDocumentsPanel } from "@/components/documents/staff/MemberDocumentsPanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
 import { ClientTrainingGoalPanel } from "@/components/training-goal/ClientTrainingGoalPanel";
 import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
@@ -780,6 +781,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               <StatGrid items={overviewItems} />
             </Panel>
           ) : null}
+
+          {/* ADR-252: the client's documents, signatures and health certificate. */}
+          {isClient && tab === "overview" ? <MemberDocumentsPanel userId={userId} name={profile.identity.nickname} /> : null}
 
           {inTab("box_message") ? (
             <Panel id="box_message" title={i18n("bmTitle")}>

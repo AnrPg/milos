@@ -415,6 +415,89 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
     end
   end
 
+  describe "till signature (ADR-251)" do
+    defp german_invoice do
+      swiss_invoice(%{
+        number: "I-000043",
+        currency: "EUR",
+        country_code: "DE",
+        language: "de",
+        payment_method: "card",
+        tax_breakdown: [
+          %{
+            "tax_category" => "standard",
+            "rate_bp" => 1900,
+            "net_cents" => 16_807,
+            "tax_cents" => 3_193,
+            "gross_cents" => 20_000
+          }
+        ]
+      })
+    end
+
+    @tse_signature %{
+      device: "tse",
+      status: "signed",
+      qr_code_data:
+        "V0;PALEE-1;Kassenbeleg-V1;Beleg^200.00_0.00_0.00_0.00_0.00^200.00:Unbar;7;12",
+      print: [
+        %{label: "TSE-Seriennummer", value: "SANDBOX-TSE-1"},
+        %{label: "Transaktionsnummer", value: "7"},
+        %{label: "Signaturzähler", value: "12"},
+        %{label: "Signatur", value: String.duplicate("MEUCIQDx", 14)}
+      ]
+    }
+
+    test "an invoice paid at the till prints its TSE block with the QR code" do
+      labels = DocumentLabels.messages()
+
+      view =
+        DocumentView.build(german_invoice(),
+          labels: labels,
+          language: "de",
+          till_signature: @tse_signature
+        )
+
+      assert view.authority == nil
+      assert view.till.title == labels.till_tse_title
+      assert {"Transaktionsnummer", "7"} in view.till.rows
+      assert %{size: _size} = view.till.qr
+
+      html = DocumentHtml.render(view)
+      assert html =~ labels.till_tse_title
+      assert html =~ "Signaturzähler"
+
+      texts =
+        view |> DocumentPdf.texts(Fonts.sans()) |> Enum.map(&text_of/1) |> Enum.join(" ")
+
+      assert texts =~ labels.till_tse_title
+      assert texts =~ "Transaktionsnummer: 7"
+      # The long signature wraps inside the block instead of running off the page.
+      assert texts =~ "Signatur: MEUCIQDx"
+    end
+
+    test "an RKSV signature prints its code as a QR code, not as a row; none without one" do
+      code = "_R1-AT1_PALEE-1_7_2027-02-03T10:00:00_200,00_0,00_0,00_0,00_0,00_x_y_z_sig"
+
+      view =
+        DocumentView.build(german_invoice(),
+          labels: DocumentLabels.messages(),
+          language: "de",
+          till_signature: %{
+            device: "rksv",
+            status: "signed",
+            qr_code_data: code,
+            print: [%{label: "Belegnummer", value: "7"}, %{label: "QR", value: code}]
+          }
+        )
+
+      assert view.till.rows == [{"Belegnummer", "7"}]
+      assert %{size: _size} = view.till.qr
+
+      assert DocumentView.build(german_invoice(), labels: DocumentLabels.messages()).till == nil
+    end
+  end
+
   describe "renderings" do
     test "HTML is self-contained, escaped, with the QR-bill's Swiss cross" do
       view =

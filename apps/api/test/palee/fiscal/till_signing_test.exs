@@ -5,7 +5,10 @@ defmodule Palee.Fiscal.TillSigningTest do
   sign through the sandbox or fiskaly (stubbed), read uncertain
   transactions back instead of signing them twice, record a German TSE
   failure after the outage window and an Austrian unit outage, and journal
-  every signature. Runs with Row Level Security enforced.
+  every signature. France (ADR-266): receipts and credit notes are
+  recorded at fiskaly SIGN FR (sandbox or stubbed), a credit note refers
+  to its receipt's record, a late receipt is flagged offline. Runs with
+  Row Level Security enforced.
   """
 
   use Palee.DataCase, async: false
@@ -38,6 +41,17 @@ defmodule Palee.Fiscal.TillSigningTest do
     building_number: "1",
     postal_code: "1010",
     city: "Wien"
+  }
+
+  @france %{
+    legal_name: "Box Paris SAS",
+    country_code: "FR",
+    registration_number: "73282932000074",
+    vat_number: "FR44732829320",
+    street: "Rue de Grenelle",
+    building_number: "47",
+    postal_code: "75007",
+    city: "Paris"
   }
 
   setup do
@@ -150,6 +164,48 @@ defmodule Palee.Fiscal.TillSigningTest do
 
       assert %{status: "pending", attempts: 0, last_error_code: "connection_missing"} =
                signature(context, receipt)
+    end
+
+    test "an invoice paid at the till (cash or card) and its credit note are signed", %{
+      context: context,
+      owner: owner
+    } do
+      buyer = %{
+        name: "Firma",
+        street: "Weg 1",
+        postal_code: "10115",
+        city: "Berlin",
+        country_code: "DE"
+      }
+
+      cash = issue(context, owner, "k-cash", %{kind: "invoice", buyer: buyer})
+
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+
+      online =
+        issue(context, owner, "k-online", %{
+          kind: "invoice",
+          payment_method: "online",
+          buyer: buyer
+        })
+
+      assert %{device: "tse", kind: "receipt", status: "pending"} = signature(context, cash)
+      assert %{device: "tse", kind: "receipt"} = signature(context, card)
+      assert signature(context, online) == nil
+
+      {:ok, credit, :issued} =
+        Fiscal.credit(context, card.id, :all, ~D[2027-02-08], "credit-card", owner.id, @now)
+
+      {:ok, online_credit, :issued} =
+        Fiscal.credit(context, online.id, :all, ~D[2027-02-08], "credit-online", owner.id, @now)
+
+      assert %{device: "tse"} = signature(context, credit)
+      assert signature(context, online_credit) == nil
+
+      assert {:ok, _connection} = connect(context, owner, "tse", "sandbox")
+      assert {:ok, %{signed: 3}} = TillSigning.transmit(context, :due, later(5))
+      assert %{status: "signed"} = signature(context, cash)
     end
 
     test "the sandbox provisions, signs, prints and journals", %{context: context, owner: owner} do
@@ -351,6 +407,32 @@ defmodule Palee.Fiscal.TillSigningTest do
       :ok
     end
 
+    test "an invoice paid by card at the till is a cash sale and is signed; a transfer is not", %{
+      context: context,
+      owner: owner
+    } do
+      buyer = %{
+        name: "Firma",
+        street: "Weg 1",
+        postal_code: "1010",
+        city: "Wien",
+        country_code: "AT"
+      }
+
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+
+      transfer =
+        issue(context, owner, "k-transfer", %{
+          kind: "invoice",
+          payment_method: "bank_transfer",
+          buyer: buyer
+        })
+
+      assert %{device: "rksv", kind: "receipt", status: "pending"} = signature(context, card)
+      assert signature(context, transfer) == nil
+    end
+
     test "the sandbox signs the start receipt, receipts and null receipts", %{
       context: context,
       owner: owner
@@ -437,6 +519,150 @@ defmodule Palee.Fiscal.TillSigningTest do
                TillSigning.print(failed),
                &(&1.value == "Sicherheitseinrichtung ausgefallen")
              )
+    end
+  end
+
+  # ── France ──────────────────────────────────────────────────────────────
+
+  describe "France (SIGN FR)" do
+    setup %{context: context, owner: owner} do
+      identity(context, owner, @france)
+      :ok
+    end
+
+    test "the sandbox records receipts and the credit note refers to its receipt", %{
+      context: context,
+      owner: owner
+    } do
+      receipt = issue(context, owner, "k-1", %{payment_method: "card"})
+      assert %{device: "sign_fr", status: "pending"} = signature(context, receipt)
+
+      assert {:ok, %{status: "active", provider: "sandbox"}} =
+               connect(context, owner, "sign_fr", "sandbox")
+
+      # Austria and Germany devices are not for a French business.
+      assert {:error, {:invalid_fields, %{device: ["not_for_country"]}}} =
+               connect(context, owner, "tse", "sandbox")
+
+      assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(5))
+      signed = signature(context, receipt)
+      assert %{status: "signed", receipt_number: "sandbox-" <> _} = signed
+      labels = signed |> TillSigning.print() |> Enum.map(& &1.label)
+      assert "N° séquence fiskaly" in labels and "Signature" in labels
+
+      {:ok, credit, :issued} =
+        Fiscal.credit(context, receipt.id, :all, ~D[2027-02-08], "credit-1", owner.id, @now)
+
+      assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(10))
+
+      [%{request_body: body}] =
+        bypass_rls(fn ->
+          Repo.all(
+            from a in TillSignatureAttempt,
+              where: a.signature_id == ^signature(context, credit).id
+          )
+        end)
+
+      assert %{"kind" => "credit_note", "original_record_id" => record} = Jason.decode!(body)
+      assert record == signed.receipt_number
+
+      events = context |> journal() |> Enum.map(& &1.event_type)
+      assert Enum.count(events, &(&1 == "receipt_signed")) == 2
+      assert {:ok, %{valid: true}} = Fiscal.verify_journal(context, owner.id, later(20))
+    end
+
+    test "fiskaly SIGN FR: taxpayer, location and System set-up, then INTENTION and RECEIPT", %{
+      context: context,
+      owner: owner
+    } do
+      test_pid = self()
+
+      Req.Test.stub(Palee.FiscalHttp, fn conn ->
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+
+        send(
+          test_pid,
+          {:fiskaly, conn.method, conn.request_path,
+           Plug.Conn.get_req_header(conn, "x-idempotency-key"), body}
+        )
+
+        fiskaly_fr(conn, body)
+      end)
+
+      assert {:ok, %{status: "active", unit_serial: "tp-1", register_serial: "sys-1"}} =
+               connect(context, owner, "sign_fr", "test", %{
+                 api_key: "fk-key",
+                 api_secret: "fk-secret"
+               })
+
+      setup_calls = drain()
+
+      assert Enum.map(setup_calls, fn {method, path, _key, _body} -> {method, path} end) == [
+               {"POST", "/tokens"},
+               {"POST", "/taxpayers"},
+               {"PATCH", "/taxpayers/tp-1"},
+               {"POST", "/locations"},
+               {"PATCH", "/locations/loc-1"},
+               {"POST", "/systems"},
+               {"PATCH", "/systems/sys-1"}
+             ]
+
+      {_, _, _, taxpayer} = Enum.at(setup_calls, 1)
+
+      assert %{
+               "type" => "FR",
+               "tax_id_number" => "732829320",
+               "credentials" => %{"type" => "SELF_ATTESTATION"}
+             } = Jason.decode!(taxpayer)["content"]["fiscalization"]
+
+      {_, _, _, location} = Enum.at(setup_calls, 3)
+      assert Jason.decode!(location)["content"]["label"] == "73282932000074"
+
+      receipt = issue(context, owner, "k-1")
+      assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(5))
+
+      [_token, _system, {"POST", "/records", [intention_key], _}, {"POST", "/records", _, body}] =
+        drain()
+
+      external_id = signature(context, receipt).external_id
+
+      assert intention_key ==
+               Palee.Infrastructure.Fiscal.FiskalyUnified.idempotency_key(
+                 "sign_fr:#{external_id}:intention"
+               )
+
+      operation = Jason.decode!(body)["content"]["operation"]
+      assert operation["type"] == "RECEIPT"
+      refute Map.has_key?(operation["document"], "offline")
+
+      assert [%{"code" => "STANDARD"}, %{"code" => "REDUCED_1"}] =
+               Enum.sort_by(operation["breakdown"], & &1["percentage"], :desc)
+
+      assert %{
+               status: "signed",
+               transaction_number: 42,
+               signature_value: "sig-42",
+               receipt_number: "rec-receipt",
+               register_serial: "sys-1"
+             } = signature(context, receipt)
+
+      # A receipt sent after an outage is flagged offline.
+      late = issue(context, owner, "k-2")
+      assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(600))
+      {"POST", "/records", _, late_body} = List.last(drain())
+
+      assert %{"offline" => %{"reason" => _}} =
+               Jason.decode!(late_body)["content"]["operation"]["document"]
+
+      assert %{status: "signed"} = signature(context, late)
+
+      # Credentials never reach the attempt log.
+      attempts = bypass_rls(fn -> Repo.all(TillSignatureAttempt) end)
+
+      for attempt <- attempts, text <- ["fk-key", "fk-secret", "jwt-fr"] do
+        refute (attempt.request_body || "") =~ text
+        refute (attempt.response_body || "") =~ text
+      end
     end
   end
 
@@ -553,5 +779,59 @@ defmodule Palee.Fiscal.TillSigningTest do
         "_R1-AT1_kasse-1_#{number}_2027-02-08T11:00:05_59,50_0,00_3,00_0,00_0,00_" <>
           "dGVzdA==_5c8e5_cHJldg==_" <> signature
     }
+  end
+
+  defp fiskaly_fr(conn, body) do
+    reply = fn json -> Req.Test.json(conn, %{"content" => json}) end
+
+    case {conn.method, conn.request_path} do
+      {"POST", "/tokens"} ->
+        reply.(%{"authentication" => %{"bearer" => "jwt-fr"}})
+
+      {"POST", "/taxpayers"} ->
+        reply.(%{"id" => "tp-1", "state" => "ACQUIRED"})
+
+      {"POST", "/locations"} ->
+        reply.(%{"id" => "loc-1", "state" => "ACQUIRED"})
+
+      {"POST", "/systems"} ->
+        reply.(%{"id" => "sys-1", "state" => "ACQUIRED"})
+
+      {"PATCH", "/" <> _path} ->
+        reply.(%{"state" => "COMMISSIONED"})
+
+      {"GET", "/systems/sys-1"} ->
+        reply.(%{
+          "id" => "sys-1",
+          "vat_rates" => [
+            %{"code" => "STANDARD", "percentage" => "20.00"},
+            %{"code" => "REDUCED_1", "percentage" => "10.00"},
+            %{"code" => "REDUCED_2", "percentage" => "5.50"},
+            %{"code" => "REDUCED_3", "percentage" => "2.10"}
+          ],
+          "vat_exemptions" => []
+        })
+
+      {"POST", "/records"} ->
+        case Jason.decode!(body)["content"]["type"] do
+          "INTENTION" ->
+            reply.(%{"id" => "rec-intention", "state" => "COMPLETED"})
+
+          "TRANSACTION" ->
+            reply.(%{
+              "id" => "rec-receipt",
+              "state" => "COMPLETED",
+              "mode" => "FINISHED",
+              "journal" => %{
+                "signature" => "journal-sig",
+                "signed_at" => "2027-02-08T10:00:05+00:00"
+              },
+              "compliance" => %{
+                "data" => "x",
+                "sequence" => %{"number" => 42, "signature" => "sig-42", "type" => "TICKET"}
+              }
+            })
+        end
+    end
   end
 end

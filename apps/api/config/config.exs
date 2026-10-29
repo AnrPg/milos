@@ -209,22 +209,25 @@ config :palee, :fiscal_accounting_export_formats, [
   Palee.Infrastructure.Fiscal.Exports.GenericJson
 ]
 
-# ADR-250: Peppol e-invoicing, the access point per connection provider.
+# ADR-250: Peppol e-invoicing, the access point per connection provider (fiskaly
+# E-INVOICE since 2026-10-29; Storecove retired, old rows show as invalid).
 config :palee, :fiscal_einvoice_store, Palee.Infrastructure.Fiscal.EctoEInvoiceStore
 
 config :palee, :fiscal_einvoice_networks, %{
   "sandbox" => Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork,
-  "storecove" => Palee.Infrastructure.Fiscal.StorecoveNetwork
+  "fiskaly" => Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork
 }
 
-# ADR-251: TSE (DE) and RKSV (AT) signing, the provider per connection.
+# ADR-251/266: TSE (DE), RKSV (AT) and SIGN FR (FR) signing, the provider per connection.
 config :palee, :fiscal_till_store, Palee.Infrastructure.Fiscal.EctoTillSignatureStore
 
 config :palee, :fiscal_cash_register_security, %{
   {"tse", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
   {"rksv", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
   {"tse", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignDe,
-  {"rksv", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignAt
+  {"rksv", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignAt,
+  {"sign_fr", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"sign_fr", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignFr
 }
 
 # ADR-246/247: online payments through the business's own provider account.

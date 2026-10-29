@@ -14,8 +14,8 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
   a whole-box screen needs staff of every branch.
   """
 
-  alias Palee.{BoxScreens, Facility, Identity, Organizations}
-  alias Palee.Application.BoxScreens.{BoxScreenSignals, BoxScreenToday}
+  alias Palee.{BoxScreens, Facility, Organizations}
+  alias Palee.Application.BoxScreens.{BoxScreenSignals, BoxScreenToday, ScreenPresenter}
 
   def list(context) do
     now = BoxScreens.now()
@@ -26,10 +26,10 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
       |> BoxScreens.list()
       |> Enum.filter(&BoxScreens.in_scope?(scope, &1.location_id))
 
-    names = names(Enum.map(screens, & &1.focus_changed_by_id))
+    names = ScreenPresenter.names(Enum.map(screens, & &1.focus_changed_by_id))
 
     %{
-      screens: Enum.map(screens, &view(&1, names, now)),
+      screens: Enum.map(screens, &ScreenPresenter.view(&1, names, now)),
       max_screens: BoxScreens.max_screens(),
       override_views: BoxScreens.override_views()
     }
@@ -48,7 +48,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
              context.user_id,
              now
            ) do
-      {:ok, %{screen: view(screen, %{}, now), pairing_code: code}}
+      {:ok, %{screen: ScreenPresenter.view(screen, %{}, now), pairing_code: code}}
     end
   end
 
@@ -59,7 +59,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
          {:ok, changes} <- changes(context, params),
          {:ok, screen} <- BoxScreens.update(context, id, changes) do
       BoxScreenSignals.hint(context.organization_id, "screen")
-      {:ok, %{screen: view(screen, names([screen.focus_changed_by_id]), now)}}
+      {:ok, %{screen: ScreenPresenter.view(screen, now)}}
     end
   end
 
@@ -77,7 +77,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
 
     with {:ok, _screen} <- fetch(context, id),
          {:ok, screen, code} <- BoxScreens.new_pairing_code(context, id, now) do
-      {:ok, %{screen: view(screen, names([screen.focus_changed_by_id]), now), pairing_code: code}}
+      {:ok, %{screen: ScreenPresenter.view(screen, now), pairing_code: code}}
     end
   end
 
@@ -100,8 +100,8 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
              context.user_id,
              now
            ) do
-      announce(context, screen, now)
-      {:ok, %{screen: view(screen, names([screen.focus_changed_by_id]), now)}}
+      ScreenPresenter.announce(context, screen, now)
+      {:ok, %{screen: ScreenPresenter.view(screen, now)}}
     end
   end
 
@@ -111,15 +111,9 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
 
     with {:ok, _screen} <- fetch(context, id),
          {:ok, screen} <- BoxScreens.clear_override(context, id, context.user_id, now) do
-      announce(context, screen, now)
-      {:ok, %{screen: view(screen, names([screen.focus_changed_by_id]), now)}}
+      ScreenPresenter.announce(context, screen, now)
+      {:ok, %{screen: ScreenPresenter.view(screen, now)}}
     end
-  end
-
-  defp announce(context, screen, now) do
-    override = BoxScreens.active_override(screen, now)
-    BoxScreenSignals.override(context.organization_id, screen.id, override)
-    BoxScreenSignals.hint(context.organization_id, "override", override && override.slot_id)
   end
 
   defp fetch(context, id) do
@@ -166,43 +160,6 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
 
       true ->
         {:error, :invalid_screen_branch}
-    end
-  end
-
-  defp view(screen, names, now) do
-    %{
-      id: screen.id,
-      name: screen.name,
-      location_id: screen.location_id,
-      paired: not is_nil(screen.paired_at),
-      paired_at: screen.paired_at,
-      last_seen_at: screen.last_seen_at,
-      pairing_expires_at: pending_code(screen, now),
-      override: BoxScreens.active_override(screen, now),
-      focus_changed:
-        screen.focus_changed_at &&
-          %{
-            at: screen.focus_changed_at,
-            by:
-              screen.focus_changed_by_id &&
-                %{
-                  id: screen.focus_changed_by_id,
-                  name: Map.get(names, screen.focus_changed_by_id)
-                }
-          },
-      inserted_at: screen.inserted_at
-    }
-  end
-
-  defp pending_code(%{pairing_code_expires_at: %DateTime{} = at}, now),
-    do: if(DateTime.compare(at, now) == :gt, do: at)
-
-  defp pending_code(_screen, _now), do: nil
-
-  defp names(ids) do
-    case ids |> Enum.reject(&is_nil/1) |> Enum.uniq() do
-      [] -> %{}
-      ids -> ids |> Identity.list_by_ids() |> Map.new(&{&1.id, &1.nickname})
     end
   end
 
