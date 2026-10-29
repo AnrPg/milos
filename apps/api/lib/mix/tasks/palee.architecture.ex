@@ -119,6 +119,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     shop/shop_report_store
     fiscal/fiscal_store
     fiscal/transmission_store
+    payments/payment_store
   )
 
   defp tenant_scope_violations do

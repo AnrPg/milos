@@ -83,13 +83,13 @@ defmodule Palee.Payments do
   end
 
   defp validate_choice(value, allowed, field) do
-    if value in allowed, do: :ok, else: {:error, {:invalid_fields, %{field => ["invalid"]}}}
+    if value in allowed, do: :ok, else: {:error, {:invalid_fields, %{field => "invalid"}}}
   end
 
   defp sandbox_rules("sandbox", environment) do
     cond do
-      not sandbox_enabled?() -> {:error, {:invalid_fields, %{provider: ["unavailable"]}}}
-      environment != "test" -> {:error, {:invalid_fields, %{environment: ["invalid"]}}}
+      not sandbox_enabled?() -> {:error, {:invalid_fields, %{provider: "unavailable"}}}
+      environment != "test" -> {:error, {:invalid_fields, %{environment: "invalid"}}}
       true -> :ok
     end
   end
@@ -115,10 +115,10 @@ defmodule Palee.Payments do
 
         cond do
           not is_binary(value) or value == "" ->
-            {acc, Map.put(errors, key, ["required"])}
+            {acc, Map.put(errors, key, "required")}
 
           byte_size(value) > @max_credential_length ->
-            {acc, Map.put(errors, key, ["too_long"])}
+            {acc, Map.put(errors, key, "too_long")}
 
           true ->
             {Map.put(acc, key, value), errors}
@@ -127,7 +127,7 @@ defmodule Palee.Payments do
 
     if errors == %{},
       do: {:ok, merged},
-      else: {:error, {:invalid_fields, %{credentials: errors |> Map.keys() |> Enum.sort()}}}
+      else: {:error, {:invalid_fields, errors}}
   end
 
   defp settings(gateway, params) do
@@ -147,13 +147,13 @@ defmodule Palee.Payments do
         :ok
 
       {:error, {:unauthorized, _}} ->
-        {:error, {:invalid_fields, %{credentials: ["rejected"]}}}
+        {:error, {:invalid_fields, %{credentials: "rejected"}}}
 
       {:error, {:invalid, :key_mode_mismatch}} ->
-        {:error, {:invalid_fields, %{environment: ["mismatch"]}}}
+        {:error, {:invalid_fields, %{environment: "mismatch"}}}
 
       {:error, {:invalid, :sandbox_disabled}} ->
-        {:error, {:invalid_fields, %{provider: ["unavailable"]}}}
+        {:error, {:invalid_fields, %{provider: "unavailable"}}}
 
       {:error, _other} ->
         {:error, :payment_provider_unavailable}
@@ -804,6 +804,16 @@ defmodule Palee.Payments do
 
   def autopay_methods(context), do: PaymentStore.autopay_methods(context)
 
+  @doc """
+  The sandbox provider's page (dev and test only): the payer pressed pay or
+  cancel; returns the transaction id the provider would send back.
+  """
+  def sandbox_transaction(provider_ref, outcome, decline_card?) do
+    if sandbox_enabled?(),
+      do: {:ok, gateway("sandbox").complete(provider_ref, outcome, decline_card? == true)},
+      else: {:error, :not_found}
+  end
+
   # ── Reading ─────────────────────────────────────────────────────────────
 
   def get(context, intent_id) do
@@ -855,4 +865,17 @@ defmodule Palee.Payments do
       :inserted_at
     ])
   end
+
+  # ── Tenant data (ADR-117) ───────────────────────────────────────────────
+
+  def tenant_data_policy, do: Palee.Payments.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: Palee.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: Palee.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: Palee.TenantData.TableStore.purge(tenant_data_policy(), context)
 end

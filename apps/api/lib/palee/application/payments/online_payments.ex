@@ -36,7 +36,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
   end
 
   def save_account(context, params) do
-    with {:ok, _account} <- Payments.save_account(context, params, context[:user_id], now()) do
+    with {:ok, _account} <-
+           Payments.save_account(context, params, Map.get(context, :user_id), now()) do
       {:ok, account(context)}
     end
   end
@@ -50,7 +51,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
   end
 
   def refund(context, id, params),
-    do: Payments.refund(context, id, params, context[:user_id], now())
+    do: Payments.refund(context, id, params, Map.get(context, :user_id), now())
 
   def retry(context, id), do: Payments.refresh(context, id, nil, now())
 
@@ -162,6 +163,20 @@ defmodule Palee.Application.Payments.OnlinePayments do
 
     with {:ok, payment} <- my_payment(context, intent_id) do
       Payments.refresh(context, payment.id, params[:transaction_id], now())
+    end
+  end
+
+  @doc "Dev/test only: completes a sandbox checkout as the provider's page would."
+  def sandbox_complete(context, params) do
+    with {:ok, payment} <- Payments.get_by_ref(context, params.provider_ref),
+         {:ok, _mine} <- my_payment(context, payment.id),
+         {:ok, transaction_id} <-
+           Payments.sandbox_transaction(
+             params.provider_ref,
+             params.outcome,
+             params[:decline_card]
+           ) do
+      Payments.refresh(context, payment.id, transaction_id, now())
     end
   end
 
