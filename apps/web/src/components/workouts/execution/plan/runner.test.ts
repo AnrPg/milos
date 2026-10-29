@@ -67,6 +67,7 @@ describe("runReducer", () => {
     s = runReducer(seq, s, at(240));
     expect(s.interruptsFired).toBe(2);
     expect(name(seq, s)).toBe("Burpee over Bar");
+    expect(s.completedInterrupts).toEqual([{ key: seq.interrupt!.steps[0].key, fire: 1, phase: 0 }]);
   });
 
   it("moves EMOM slots on the clock and waits when the athlete is done early", () => {

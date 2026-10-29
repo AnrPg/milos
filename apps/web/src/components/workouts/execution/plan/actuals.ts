@@ -6,11 +6,12 @@
  * (`sections[].plan`) without depending on materialised exercise rows.
  *
  * Sent with the execution's completion as `plan_actuals`; a set the
- * athlete did not log counts as done as prescribed (`logged: false`).
+ * athlete did not log counts as done as prescribed (`logged: false`). A load
+ * prescribed in % becomes kg when the athlete's 1RM is known (their PRs).
  */
 import type { PlanSetActual } from "@/api/executions";
 
-import type { RunState } from "./runner";
+import { logKeyOf, type RunState } from "./runner";
 import type { RunLogs } from "./score";
 import type { RunSequence, RunWork } from "./sequence";
 
@@ -27,41 +28,82 @@ const kgOf = (load: string): number | null => {
   const m = /^(\d+(?:\.\d+)?) kg$/.exec(load.trim());
   return m ? Number(m[1]) : null;
 };
+const pctOf = (load: string): number | null => {
+  const m = /^(\d+(?:\.\d+)?)%$/.exec(load.trim());
+  return m ? Number(m[1]) : null;
+};
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** One record per done work step of the main run, in the order done. */
-export function planActuals(seq: RunSequence, state: RunState, logs: RunLogs, sectionId: string): PlanSetActual[] {
+/** The athlete's 1RM in kg for an exercise, when known. */
+export type OneRepMaxLookup = (name: string, exerciseRef: string | null) => number | null;
+
+export type ActualsOptions = { oneRepMaxKg?: OneRepMaxLookup };
+
+/** The load a step prescribes in kg: written in kg, or a % of a known 1RM. */
+export function prescribedKg(step: RunWork, oneRepMaxKg?: OneRepMaxLookup): { kg: number | null; pct: number | null; oneRm: number | null } {
+  const kg = kgOf(step.values.load);
+  const pct = pctOf(step.values.load);
+  const oneRm = pct != null ? (oneRepMaxKg?.(step.name, step.exerciseRef) ?? null) : null;
+  return { kg: kg ?? (pct != null && oneRm != null ? round2((pct / 100) * oneRm) : null), pct, oneRm };
+}
+
+function record(
+  sectionId: string,
+  step: RunWork,
+  phase: number,
+  round: number,
+  log: { reps?: string; load?: string },
+  options: ActualsOptions,
+): PlanSetActual {
+  const prescribedReps = repsOf(step.values.dose);
+  const { kg, pct, oneRm } = prescribedKg(step, options.oneRepMaxKg);
+  const loggedReps = decimal(log.reps);
+  const loggedKg = decimal(log.load);
+  return {
+    section_id: sectionId,
+    row_id: step.rowId,
+    exercise_name: step.name,
+    exercise_ref: step.exerciseRef,
+    block_index: step.block,
+    round_index: round,
+    part_index: step.part?.index ?? 0,
+    phase_index: phase,
+    interrupt: step.interrupt,
+    prescribed_reps_text: step.values.dose,
+    prescribed_load_text: step.values.load,
+    prescribed_reps: prescribedReps,
+    prescribed_load_kg: kg,
+    prescribed_load_pct: pct,
+    one_rep_max_kg: oneRm,
+    actual_reps: loggedReps ?? prescribedReps,
+    actual_load_kg: loggedKg ?? kg,
+    logged: loggedReps != null || loggedKg != null,
+  };
+}
+
+/**
+ * One record per done work step: the main run in the order done, then the
+ * rows done at each interruption (`round_index` = which interruption).
+ */
+export function planActuals(
+  seq: RunSequence,
+  state: RunState,
+  logs: RunLogs,
+  sectionId: string,
+  options: ActualsOptions = {},
+): PlanSetActual[] {
   const where = new Map<string, { step: RunWork; phase: number }>();
   seq.phases.forEach((phase, p) => {
     for (const step of phase.steps) if (step.kind === "work") where.set(step.key, { step, phase: p });
   });
-  return state.completed.flatMap((key) => {
+  const main = state.completed.flatMap((key) => {
     const found = where.get(key);
-    if (!found) return [];
-    const { step, phase } = found;
-    const log = logs[key] ?? {};
-    const prescribedReps = repsOf(step.values.dose);
-    const prescribedKg = kgOf(step.values.load);
-    const loggedReps = decimal(log.reps);
-    const loggedKg = decimal(log.load);
-    return [
-      {
-        section_id: sectionId,
-        row_id: step.rowId,
-        exercise_name: step.name,
-        exercise_ref: step.exerciseRef,
-        block_index: step.block,
-        round_index: step.round,
-        part_index: step.part?.index ?? 0,
-        phase_index: phase,
-        interrupt: step.interrupt,
-        prescribed_reps_text: step.values.dose,
-        prescribed_load_text: step.values.load,
-        prescribed_reps: prescribedReps,
-        prescribed_load_kg: prescribedKg,
-        actual_reps: loggedReps ?? prescribedReps,
-        actual_load_kg: loggedKg ?? prescribedKg,
-        logged: loggedReps != null || loggedKg != null,
-      },
-    ];
+    return found ? [record(sectionId, found.step, found.phase, found.step.round, logs[key] ?? {}, options)] : [];
   });
+  const rows = new Map((seq.interrupt?.steps ?? []).flatMap((s) => (s.kind === "work" ? [[s.key, s] as const] : [])));
+  const interrupts = state.completedInterrupts.flatMap(({ key, fire, phase }) => {
+    const step = rows.get(key);
+    return step ? [record(sectionId, step, phase, fire, logs[logKeyOf(step, fire)] ?? {}, options)] : [];
+  });
+  return [...main, ...interrupts];
 }

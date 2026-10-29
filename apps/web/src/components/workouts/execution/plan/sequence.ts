@@ -15,7 +15,7 @@
  *     (the runner fires them from the clock: `interrupt`).
  */
 import type { PlanFlow, PlanMeasure, PlanRow, PlanSection, PlanUnit } from "@/lib/structured-plan/types";
-import { setsRange, structOf, unitKey, unitsOf, usesCells as rowUsesCells } from "@/lib/structured-plan/rounds";
+import { paramSecs, setsRange, structOf, totalRounds, unitKey, unitsOf, usesCells as rowUsesCells } from "@/lib/structured-plan/rounds";
 
 import {
   parseClock,
@@ -405,9 +405,12 @@ function amrapPhases(ctx: Ctx): RunPhase[] {
   return phases;
 }
 
+/** EMOM slots. Without times it is open-ended like the core's `totalRounds` (Infinity): slots until the athlete stops. */
 function emomPhases(ctx: Ctx): RunPhase[] {
-  const every = secsOf(ctx.section.params.every, "smart") ?? 60;
-  const times = count(ctx.section.params.times);
+  // No invented default: an unreadable "every" leaves the slots untimed.
+  const every = paramSecs(ctx.section, "every");
+  const rounds = totalRounds(ctx.section);
+  const times = Number.isFinite(rounds) ? rounds : null;
   const total = times ?? EMOM_OPEN_SLOTS;
   const phases: RunPhase[] = [];
   for (let r = 1; r <= total; r++) {
@@ -471,7 +474,7 @@ export function buildSequence(section: PlanSection, words: ShowWords = SHOW_WORD
     case "amrap":
       return { flow: "amrap", clock: "down", capSecs: null, phases: amrapPhases(ctx), interrupt, open: true };
     case "emom":
-      return { flow: "emom", clock: "down", capSecs: null, phases: emomPhases(ctx), interrupt: null, open: !count(section.params.times) };
+      return { flow: "emom", clock: "down", capSecs: null, phases: emomPhases(ctx), interrupt: null, open: !Number.isFinite(totalRounds(section)) };
     case "intervals":
       return { flow: "intervals", clock: "down", capSecs: null, phases: intervalPhases(ctx), interrupt: null, open: false };
     case "rest": {
