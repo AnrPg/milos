@@ -16,7 +16,7 @@ import { describePreset, readTextSections, type TextSection } from "@/lib/text-s
 import { getFormatLabels } from "@/types/workout";
 import { ExerciseContent, WorkoutContentBlock, type WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import { PlanView } from "@/components/workouts/plan-view/PlanView";
-import { readPlanSections, STRUCTURED_PLAN_MODE } from "@/components/workouts/plan-view/read";
+import { readPlanSections } from "@/components/workouts/plan-view/read";
 
 export type PreviewExercise = {
   id?: string;
@@ -104,7 +104,7 @@ type Props = {
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
-  authoringMode?: WorkoutAuthoringMode | typeof STRUCTURED_PLAN_MODE;
+  authoringMode?: WorkoutAuthoringMode;
   freeTextBody?: string | null;
   freeTextDocument?: Record<string, unknown> | null;
 };

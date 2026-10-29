@@ -143,7 +143,7 @@ export function planIsEmpty(sections: PlanEditorSection[]): boolean {
 }
 
 /** Seconds the timed sections take, for WOD goals; null when any section has no clock. */
-export function planTimeDomain(sections: PlanEditorSection[], total: (plan: PlanSection) => number): number | null {
+export function planTimeDomain(sections: PlanEditorSection[], total: (plan: PlanSection) => number | null): number | null {
   let seconds = 0;
   for (const section of sections) {
     const length = total(section.plan);
