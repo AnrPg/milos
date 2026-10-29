@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import el from "../../../../messages/el.json";
 import type { FailedCharge } from "@/api/online-payments";
 
-// Mockup s3 B: failed saved-card charges that need a person, in Οικονομικά › Ουρές.
+// Mockup s3 B: failed saved-card charges that need a person, in Οικονομικά › Εκκρεμότητες.
 
 const api = vi.hoisted(() => ({ actOnFailedCharge: vi.fn() }));
 vi.mock("@/api/online-payments", async (original) => ({ ...(await original<object>()), ...api }));

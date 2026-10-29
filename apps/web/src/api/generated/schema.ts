@@ -7963,7 +7963,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Saved-card charges that need a person (Ουρές)
+         * Saved-card charges that need a person (Εκκρεμότητες)
          * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid. Each names the member (`member_name`).
          */
         get: operations["PaleeWeb.AdminPaymentsController.attention"];
