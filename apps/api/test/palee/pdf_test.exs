@@ -20,7 +20,9 @@ defmodule Palee.PdfTest do
     subset = TrueType.subset(regular, [0, a, alpha])
     assert is_binary(subset)
     assert byte_size(subset) < 60_000
-    assert %TrueType{} = TrueType.parse(subset)
+    # A CID font program: glyph ids kept, no cmap (the PDF maps codes itself).
+    assert <<0, 1, 0, 0, tables::16, _rest::binary>> = subset
+    assert tables >= 6
     assert Map.has_key?(fonts, :bold)
   end
 
@@ -38,7 +40,7 @@ defmodule Palee.PdfTest do
 
     pdf = Pdf.add_page(pdf)
     assert Pdf.page_count(pdf) == 2
-    assert [%{text: "Τιμολόγιο Παροχής Υπηρεσιών – Grüße"} | _rest] = Pdf.texts(pdf)
+    assert ["Τιμολόγιο Παροχής Υπηρεσιών – Grüße"] = Pdf.texts(pdf)
 
     info = [title: "Test", created_at: ~U[2027-02-03 10:00:00Z]]
     file = Pdf.render(pdf, info)
