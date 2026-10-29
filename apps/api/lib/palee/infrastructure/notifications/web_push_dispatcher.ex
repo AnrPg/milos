@@ -5,9 +5,11 @@ defmodule Palee.Infrastructure.Notifications.WebPushDispatcher do
 
   @impl true
   def send_push(subscription, message) do
-    with :ok <- PushConfig.apply_to_web_push_elixir(),
-         true <- PushConfig.enabled?(),
-         true <- Code.ensure_loaded?(WebPushElixir) do
+    config = PushConfig.config()
+
+    with true <- PushConfig.ready?(config),
+         true <- Code.ensure_loaded?(WebPushElixir),
+         :ok <- PushConfig.apply_to_web_push_elixir(config) do
       subscription
       |> encode_subscription()
       |> WebPushElixir.send_notification(Jason.encode!(message))

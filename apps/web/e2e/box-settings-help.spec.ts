@@ -2,8 +2,9 @@ import { expect, test, type Page, type Route } from "./support/test";
 
 // The box settings explain themselves (2026-10-28): difficulty levels ask
 // only for a name and say what the fixed code is for, the installation's push
-// keys are gone from the box (ADR-218) and live in the platform console with
-// a help line under every field. The API is stubbed.
+// keys are gone from the box (ADR-218), and the platform console shows only
+// status and the contact, because the server makes the keys itself (ADR-275).
+// The API is stubbed.
 
 const json = (route: Route, body: unknown, status = 200) =>
   route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
@@ -44,7 +45,15 @@ const savedLevels = [
 ];
 
 async function stub(page: Page, user: ReturnType<typeof person>, writes: Array<{ path: string; body: unknown }>) {
-  let push = { enabled: false, vapid_public_key: null as string | null, vapid_private_key_configured: false, vapid_subject: null as string | null };
+  let push = {
+    enabled: true,
+    source: "palee",
+    vapid_subject: "mailto:alerts@palee.app",
+    subject_source: "default",
+    keys_created_at: "2026-10-29T21:00:00Z",
+    device_count: 3,
+    last_sent_at: "2026-10-29T21:14:00Z",
+  };
   await page.route("**/api/**", async (route) => {
     const path = tenantless(new URL(route.request().url()).pathname);
     const method = route.request().method();
@@ -67,17 +76,13 @@ async function stub(page: Page, user: ReturnType<typeof person>, writes: Array<{
       }
       return json(route, { scale_levels: savedLevels });
     }
-    if (path === "/api/platform/push-settings") {
+    if (path.startsWith("/api/platform/push-settings")) {
       if (!user.vendor) return json(route, { code: "vendor_required" }, 403);
       if (method === "PATCH") {
-        const patch = body as { vapid_public_key?: string; vapid_private_key?: string; vapid_subject?: string };
-        push = {
-          enabled: Boolean(patch.vapid_public_key && patch.vapid_private_key && patch.vapid_subject),
-          vapid_public_key: patch.vapid_public_key ?? null,
-          vapid_private_key_configured: Boolean(patch.vapid_private_key),
-          vapid_subject: patch.vapid_subject ?? null,
-        };
+        const contact = (body as { vapid_subject: string }).vapid_subject.trim();
+        push = { ...push, vapid_subject: contact.includes(":") ? contact : `mailto:${contact}`, subject_source: "palee" };
       }
+      if (method === "POST") push = { ...push, device_count: 0, keys_created_at: "2026-10-29T22:00:00Z" };
       return json(route, push);
     }
     return json(route, {});
@@ -116,27 +121,34 @@ test("difficulty levels ask only for a name and explain the fixed code", async (
   });
 });
 
-test("the platform team sets the push keys with a help line under every field", async ({ page }) => {
+test("the platform team sees status and the contact, never a key, and can replace the keys", async ({ page }) => {
   const writes: Array<{ path: string; body: unknown }> = [];
   await stub(page, person("vendor-1", true), writes);
   await page.goto("/platform/push");
 
   await expect(page.getByRole("heading", { name: "Browser alerts" })).toBeVisible();
-  await expect(page.getByTestId("push-status")).toHaveText(/^Off/);
-  await expect(page.getByText(/Push services use it only to reach us/)).toBeVisible();
-  await expect(page.getByText(/It is safe to share/)).toBeVisible();
-  await expect(page.getByText(/Palee's server signs each alert with it/)).toBeVisible();
+  await expect(page.getByTestId("push-status")).toHaveText("On");
+  await expect(page.getByText(/You don't send anything to anyone/)).toBeVisible();
+  await expect(page.getByTestId("push-stats")).toContainText("3 devices allow alerts");
+  await expect(page.getByText(/Public key|Private key/)).toHaveCount(0);
+  await expect(page.locator("textarea")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Create keys" }).click();
-  await expect(page.getByLabel("Public key")).not.toHaveValue("");
-  await page.getByLabel("Contact for push services").fill("alerts@palee.app");
-  await page.getByRole("button", { name: "Save", exact: true }).click();
+  const contact = page.getByLabel("Contact for Google, Apple and Mozilla");
+  await expect(contact).toHaveValue("mailto:alerts@palee.app");
+  await contact.fill("ops@palee.app");
+  await page.getByRole("button", { name: "Save contact" }).click();
+  await expect(page.getByText("Saved", { exact: true })).toBeVisible();
+  await expect(contact).toHaveValue("mailto:ops@palee.app");
+  expect(writes.find((w) => w.path === "/api/platform/push-settings")?.body).toEqual({ vapid_subject: "ops@palee.app" });
 
-  await expect(page.getByTestId("push-status")).toHaveText(/^On/);
-  const saved = writes.find((w) => w.path === "/api/platform/push-settings")?.body as Record<string, string>;
-  expect(saved.vapid_subject).toBe("mailto:alerts@palee.app");
-  expect(saved.vapid_public_key).toMatch(/^[A-Za-z0-9_-]{87}$/);
-  expect(saved.vapid_private_key).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  // The one rare action sits behind «Advanced» and asks first.
+  await expect(page.getByRole("button", { name: "New keys…" })).toBeHidden();
+  await page.getByText("Advanced").click();
+  await page.getByRole("button", { name: "New keys…" }).click();
+  await expect(page.getByTestId("push-rotate-confirm")).toContainText("3 devices stop getting alerts");
+  await page.getByRole("button", { name: "Replace the keys" }).click();
+  await expect(page.getByText("New keys in use")).toBeVisible();
+  await expect(page.getByTestId("push-stats")).toContainText("0 devices allow alerts");
 });
 
 test("a box owner opening the push page is told it is not theirs", async ({ page }) => {

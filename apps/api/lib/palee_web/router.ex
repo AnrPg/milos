@@ -1367,9 +1367,10 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
-    # ADR-218: the installation's Web Push keys (formerly in each gym's settings).
+    # ADR-218 / ADR-275: browser alerts for the installation (keys made by the server).
     get("/push-settings", PlatformPushSettingsController, :show)
     patch("/push-settings", PlatformPushSettingsController, :update)
+    post("/push-settings/rotate", PlatformPushSettingsController, :rotate)
     # ADR-187: the password reset security log.
     get("/password-reset-log", PasswordRecoveryController, :log)
     # ADR-170: platform plans, prices and each organization's plan.

@@ -12930,15 +12930,32 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The installation's Web Push settings (never the private key) */
+        /** Browser alerts for the installation: status, contact, devices (never a key) */
         get: operations["PaleeWeb.PlatformPushSettingsController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Save or replace the installation's Web Push keys and contact */
+        /** Save the contact push services use to reach the Palee team */
         patch: operations["PaleeWeb.PlatformPushSettingsController.update"];
+        trace?: never;
+    };
+    "/api/platform/push-settings/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Replace the key pair; every device subscribes again on its next visit */
+        post: operations["PaleeWeb.PlatformPushSettingsController.rotate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/platform/subscriptions": {
@@ -111497,23 +111514,27 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Push settings */
+            /** @description Push status */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
+                        device_count: number;
                         enabled: boolean;
-                        /** Format: uuid */
-                        id?: string | null;
                         /** Format: date-time */
-                        inserted_at?: string | null;
+                        keys_created_at: string | null;
                         /** Format: date-time */
-                        updated_at?: string | null;
-                        vapid_private_key_configured: boolean;
-                        vapid_public_key?: string | null;
-                        vapid_subject?: string | null;
+                        last_sent_at: string | null;
+                        /**
+                         * @description palee: the pair the server made; server: WEB_PUSH_* env
+                         * @enum {string}
+                         */
+                        source: "palee" | "server" | "none";
+                        /** @enum {string} */
+                        subject_source: "palee" | "server" | "default";
+                        vapid_subject: string | null;
                     };
                 };
             };
@@ -111529,30 +111550,67 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    vapid_private_key?: string | null;
-                    vapid_public_key?: string | null;
-                    vapid_subject?: string | null;
+                    vapid_subject: string;
                 };
             };
         };
         responses: {
-            /** @description Push settings */
+            /** @description Push status */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
+                        device_count: number;
                         enabled: boolean;
-                        /** Format: uuid */
-                        id?: string | null;
                         /** Format: date-time */
-                        inserted_at?: string | null;
+                        keys_created_at: string | null;
                         /** Format: date-time */
-                        updated_at?: string | null;
-                        vapid_private_key_configured: boolean;
-                        vapid_public_key?: string | null;
-                        vapid_subject?: string | null;
+                        last_sent_at: string | null;
+                        /**
+                         * @description palee: the pair the server made; server: WEB_PUSH_* env
+                         * @enum {string}
+                         */
+                        source: "palee" | "server" | "none";
+                        /** @enum {string} */
+                        subject_source: "palee" | "server" | "default";
+                        vapid_subject: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPushSettingsController.rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Push status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        device_count: number;
+                        enabled: boolean;
+                        /** Format: date-time */
+                        keys_created_at: string | null;
+                        /** Format: date-time */
+                        last_sent_at: string | null;
+                        /**
+                         * @description palee: the pair the server made; server: WEB_PUSH_* env
+                         * @enum {string}
+                         */
+                        source: "palee" | "server" | "none";
+                        /** @enum {string} */
+                        subject_source: "palee" | "server" | "default";
+                        vapid_subject: string | null;
                     };
                 };
             };

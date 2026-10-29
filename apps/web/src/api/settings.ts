@@ -24,15 +24,19 @@ export type FinanceSettings = {
   updated_at?: string | null;
 };
 
-/** ADR-218: the installation's Web Push keys; only the platform team reads or edits them. */
-export type NotificationPushSettings = {
-  id?: string | null;
+/**
+ * ADR-218 / ADR-275: browser alerts for the installation, for the platform team
+ * only. The server makes and keeps the key pair; no key is ever sent here.
+ */
+export type PlatformPushStatus = {
   enabled: boolean;
-  vapid_public_key: string | null;
-  vapid_private_key_configured: boolean;
+  /** palee: the pair the server made; server: WEB_PUSH_* given to the server. */
+  source: "palee" | "server" | "none";
   vapid_subject: string | null;
-  inserted_at?: string | null;
-  updated_at?: string | null;
+  subject_source: "palee" | "server" | "default";
+  keys_created_at: string | null;
+  device_count: number;
+  last_sent_at: string | null;
 };
 
 export type SchedulingSettings = {
@@ -87,12 +91,6 @@ export type GamificationUpdate = Partial<
 
 export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days" | "subscription_expiry_reminder_days" | "subscription_grace_days" | "document_mode" | "package_modules">>;
 
-export type NotificationPushUpdate = Partial<{
-  vapid_public_key: string | null;
-  vapid_private_key: string | null;
-  vapid_subject: string | null;
-}>;
-
 export type AdminSettingsUpdate = {
   provider?: { kind: ProviderKind };
   gamification?: GamificationUpdate;
@@ -123,11 +121,22 @@ export async function updateAdminSettings(token: string, payload: AdminSettingsU
 }
 
 export async function fetchPlatformPushSettings(token: string) {
-  return apiRequest<NotificationPushSettings>("/platform/push-settings", { token, scope: "account" });
+  return apiRequest<PlatformPushStatus>("/platform/push-settings", { token, scope: "account" });
 }
 
-export async function updatePlatformPushSettings(token: string, payload: NotificationPushUpdate) {
-  return apiRequest<NotificationPushSettings>("/platform/push-settings", { method: "PATCH", token, body: payload, scope: "account" });
+/** The server adds mailto: to a plain email and refuses anything else. */
+export async function updatePlatformPushContact(token: string, vapidSubject: string) {
+  return apiRequest<PlatformPushStatus>("/platform/push-settings", {
+    method: "PATCH",
+    token,
+    body: { vapid_subject: vapidSubject },
+    scope: "account",
+  });
+}
+
+/** New key pair; every device subscribes again by itself on its next visit. */
+export async function replacePlatformPushKeys(token: string) {
+  return apiRequest<PlatformPushStatus>("/platform/push-settings/rotate", { method: "POST", token, scope: "account" });
 }
 
 /** ADR-176: confirm the gym's zone, or report this device's zone as a guess. */

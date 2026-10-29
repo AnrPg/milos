@@ -351,21 +351,13 @@ defmodule PaleeWeb.NotificationControllerTest do
   end
 
   test "exposes push configuration without private key data", %{conn: conn} do
-    previous_config = Application.get_env(:web_push_elixir, :vapid_config)
-
-    Application.put_env(:web_push_elixir, :vapid_config,
-      vapid_public_key: "public-key",
-      vapid_private_key: "private-key",
-      vapid_subject: "mailto:test@example.com"
+    Application.put_env(:palee, :web_push_server_keys,
+      public_key: "public-key",
+      private_key: "private-key",
+      subject: "mailto:test@example.com"
     )
 
-    on_exit(fn ->
-      if previous_config do
-        Application.put_env(:web_push_elixir, :vapid_config, previous_config)
-      else
-        Application.delete_env(:web_push_elixir, :vapid_config)
-      end
-    end)
+    on_exit(fn -> Application.delete_env(:palee, :web_push_server_keys) end)
 
     response_conn =
       conn

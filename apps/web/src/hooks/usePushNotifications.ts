@@ -7,12 +7,14 @@ import {
   fetchPushNotificationConfig,
   fetchPushSubscriptionStatus,
   markNotificationClicked,
+  deletePushSubscription,
   savePushSubscription,
   type PushNotificationConfig,
   type PushSubscriptionPayload,
 } from "@/api/notifications";
 import { clearBrowserPushSubscription, registerAppServiceWorker } from "@/lib/push-subscription";
 import { isNative, nativePushProvider } from "@/lib/platform";
+import { base64UrlToBytes, subscriptionUsesKey } from "@/lib/vapid-key-match";
 import {
   nativePushPermission,
   nativePushSupported,
@@ -26,19 +28,6 @@ import { localizeError } from "@/i18n/presentation";
 
 const PUSH_CONFIG_CACHE = "palee-push-config-v1";
 const PUSH_CONFIG_REQUEST = "/__palee_push_config__";
-
-function base64UrlToUint8Array(value: string) {
-  const padding = "=".repeat((4 - (value.length % 4)) % 4);
-  const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const raw = window.atob(base64);
-  const output = new Uint8Array(raw.length);
-
-  for (let index = 0; index < raw.length; index += 1) {
-    output[index] = raw.charCodeAt(index);
-  }
-
-  return output;
-}
 
 function toPayload(subscription: PushSubscription): PushSubscriptionPayload {
   const json = subscription.toJSON();
@@ -186,7 +175,16 @@ function useWebPushNotifications(accessToken: string | null | undefined, active:
     }
 
     setStep("browser-subscription");
-    const existing = await registration.pushManager.getSubscription();
+    let existing = await registration.pushManager.getSubscription();
+
+    // ADR-275: after the platform replaces its keys, a subscription made with
+    // the old public key is never delivered again. Drop it; where alerts are
+    // already allowed the code below subscribes again with no prompt.
+    if (existing && !subscriptionUsesKey(existing, config.vapid_public_key)) {
+      await deletePushSubscription(token, { endpoint: existing.endpoint }).catch(() => undefined);
+      await existing.unsubscribe().catch(() => false);
+      existing = null;
+    }
 
     if (existing) {
       setStep("server-save");
@@ -217,7 +215,7 @@ function useWebPushNotifications(accessToken: string | null | undefined, active:
 
     const created = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: base64UrlToUint8Array(config.vapid_public_key),
+      applicationServerKey: base64UrlToBytes(config.vapid_public_key),
     });
 
     setStep("server-save");

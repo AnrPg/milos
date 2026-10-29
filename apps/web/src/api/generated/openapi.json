@@ -285620,29 +285620,38 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "device_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
                     "enabled": {
                       "type": "boolean"
                     },
-                    "id": {
-                      "format": "uuid",
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "inserted_at": {
+                    "keys_created_at": {
                       "format": "date-time",
                       "nullable": true,
                       "type": "string"
                     },
-                    "updated_at": {
+                    "last_sent_at": {
                       "format": "date-time",
                       "nullable": true,
                       "type": "string"
                     },
-                    "vapid_private_key_configured": {
-                      "type": "boolean"
+                    "source": {
+                      "description": "palee: the pair the server made; server: WEB_PUSH_* env",
+                      "enum": [
+                        "palee",
+                        "server",
+                        "none"
+                      ],
+                      "type": "string"
                     },
-                    "vapid_public_key": {
-                      "nullable": true,
+                    "subject_source": {
+                      "enum": [
+                        "palee",
+                        "server",
+                        "default"
+                      ],
                       "type": "string"
                     },
                     "vapid_subject": {
@@ -285651,14 +285660,19 @@
                     }
                   },
                   "required": [
+                    "device_count",
                     "enabled",
-                    "vapid_private_key_configured"
+                    "keys_created_at",
+                    "last_sent_at",
+                    "source",
+                    "subject_source",
+                    "vapid_subject"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Push settings"
+            "description": "Push status"
           }
         },
         "security": [
@@ -285666,7 +285680,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "The installation's Web Push settings (never the private key)",
+        "summary": "Browser alerts for the installation: status, contact, devices (never a key)",
         "tags": [
           "Platform"
         ]
@@ -285680,19 +285694,14 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "vapid_private_key": {
-                    "nullable": true,
-                    "type": "string"
-                  },
-                  "vapid_public_key": {
-                    "nullable": true,
-                    "type": "string"
-                  },
                   "vapid_subject": {
-                    "nullable": true,
+                    "maxLength": 255,
                     "type": "string"
                   }
                 },
+                "required": [
+                  "vapid_subject"
+                ],
                 "type": "object"
               }
             }
@@ -285705,29 +285714,38 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "device_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
                     "enabled": {
                       "type": "boolean"
                     },
-                    "id": {
-                      "format": "uuid",
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "inserted_at": {
+                    "keys_created_at": {
                       "format": "date-time",
                       "nullable": true,
                       "type": "string"
                     },
-                    "updated_at": {
+                    "last_sent_at": {
                       "format": "date-time",
                       "nullable": true,
                       "type": "string"
                     },
-                    "vapid_private_key_configured": {
-                      "type": "boolean"
+                    "source": {
+                      "description": "palee: the pair the server made; server: WEB_PUSH_* env",
+                      "enum": [
+                        "palee",
+                        "server",
+                        "none"
+                      ],
+                      "type": "string"
                     },
-                    "vapid_public_key": {
-                      "nullable": true,
+                    "subject_source": {
+                      "enum": [
+                        "palee",
+                        "server",
+                        "default"
+                      ],
                       "type": "string"
                     },
                     "vapid_subject": {
@@ -285736,14 +285754,19 @@
                     }
                   },
                   "required": [
+                    "device_count",
                     "enabled",
-                    "vapid_private_key_configured"
+                    "keys_created_at",
+                    "last_sent_at",
+                    "source",
+                    "subject_source",
+                    "vapid_subject"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Push settings"
+            "description": "Push status"
           }
         },
         "security": [
@@ -285751,7 +285774,84 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Save or replace the installation's Web Push keys and contact",
+        "summary": "Save the contact push services use to reach the Palee team",
+        "tags": [
+          "Platform"
+        ]
+      }
+    },
+    "/api/platform/push-settings/rotate": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPushSettingsController.rotate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "device_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "keys_created_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "last_sent_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "source": {
+                      "description": "palee: the pair the server made; server: WEB_PUSH_* env",
+                      "enum": [
+                        "palee",
+                        "server",
+                        "none"
+                      ],
+                      "type": "string"
+                    },
+                    "subject_source": {
+                      "enum": [
+                        "palee",
+                        "server",
+                        "default"
+                      ],
+                      "type": "string"
+                    },
+                    "vapid_subject": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "device_count",
+                    "enabled",
+                    "keys_created_at",
+                    "last_sent_at",
+                    "source",
+                    "subject_source",
+                    "vapid_subject"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Push status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace the key pair; every device subscribes again on its next visit",
         "tags": [
           "Platform"
         ]
