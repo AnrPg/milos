@@ -53,6 +53,9 @@ defmodule PaleeWeb.ClassTimerController do
     required: [:class, :segments, :timer, :server_now]
   }
 
+  @doc "The class timer payload (ADR-253 reuses it for box screens)."
+  def payload_schema, do: @payload_schema
+
   @error_schema %Schema{
     type: :object,
     properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}},

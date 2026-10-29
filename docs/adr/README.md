@@ -232,3 +232,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-246 | Online payments through the business's own provider account (Viva, Stripe, sandbox), webhooks as hints | Accepted |
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
+| ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override | Accepted |

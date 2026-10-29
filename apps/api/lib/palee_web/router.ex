@@ -150,6 +150,27 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "widget")
   end
 
+  # ADR-253: box screens. Pairing has no sign-in, so a tight budget per
+  # address bounds guessing codes; a paired screen polls with its own token.
+  pipeline :box_screen_pairing do
+    plug(PaleeWeb.Plugs.RateLimit, max: 10, interval: 60_000, bucket: "box-screen-pair")
+  end
+
+  pipeline :box_screen do
+    plug(PaleeWeb.Plugs.AuthenticateBoxScreen)
+    plug(PaleeWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "box-screen")
+  end
+
+  # Staff create screens and pairing codes (each POST makes a code).
+  pipeline :box_screen_code_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit,
+      max: 30,
+      interval: 3_600_000,
+      bucket: "box-screen-codes",
+      methods: ["POST"]
+    )
+  end
+
   # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
   pipeline :check_in_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
@@ -909,6 +930,26 @@ defmodule PaleeWeb.Router do
     post("/appointment-slots/:id/bookings", AppointmentsController, :book_for_client)
     post("/appointments/:id/attendance", AppointmentsController, :attendance)
     post("/appointments/:id/cancel", AppointmentsController, :cancel)
+  end
+
+  # ADR-253: box screens, their pairing codes and overrides.
+  scope "/api/org/:organization_slug/admin", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited,
+      :box_screen_code_rate_limited
+    ])
+
+    get("/box-screens", AdminBoxScreenController, :index)
+    post("/box-screens", AdminBoxScreenController, :create)
+    patch("/box-screens/:id", AdminBoxScreenController, :update)
+    delete("/box-screens/:id", AdminBoxScreenController, :delete)
+    post("/box-screens/:id/pairing-code", AdminBoxScreenController, :pairing_code)
+    put("/box-screens/:id/override", AdminBoxScreenController, :put_override)
+    delete("/box-screens/:id/override", AdminBoxScreenController, :delete_override)
   end
 
   scope "/api/org/:organization_slug/admin", PaleeWeb do
@@ -1910,6 +1951,21 @@ defmodule PaleeWeb.Router do
     get("/me/check-in/geofences", ScanCheckInController, :geofences)
     get("/me/connected-devices", WalletController, :devices)
     delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  # ADR-253: the box screen (a TV): pairing, then its display token only.
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen_pairing])
+
+    post("/pair", BoxScreenController, :pair)
+  end
+
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen])
+
+    get("/today", BoxScreenController, :today)
+    post("/token", BoxScreenController, :token)
+    get("/classes/:slot_id/timer", BoxScreenController, :class_timer)
   end
 
   scope "/api/widget", PaleeWeb do

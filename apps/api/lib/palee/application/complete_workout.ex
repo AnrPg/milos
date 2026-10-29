@@ -31,6 +31,7 @@ defmodule Palee.Application.CompleteWorkout do
            ),
          :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
+      publish_result(execution, execution.completed_at_utc)
 
       TrackAnalyticsEvent.call("workout_execution_completed", nil, execution, %{
         user_id: user_id,
@@ -143,6 +144,22 @@ defmodule Palee.Application.CompleteWorkout do
       {:workout_completed, execution}
     )
   end
+
+  @doc """
+  ADR-253: a result of a box's workout was finished or logged; box screens
+  refresh that WOD's leaderboard. Personal workouts (no box or no workout)
+  announce nothing.
+  """
+  def publish_result(%{organization_id: organization_id, master_workout_id: workout_id}, at)
+      when is_binary(organization_id) and is_binary(workout_id) do
+    Palee.DomainEvents.publish(:workout_result_recorded, %{
+      organization_id: organization_id,
+      workout_id: workout_id,
+      at: at || DateTime.utc_now()
+    })
+  end
+
+  def publish_result(_result, _at), do: :ok
 
   defp completion_options(execution_id) do
     if Application.get_env(:palee, :start_oban, true) do

@@ -19,6 +19,11 @@ defmodule PaleeWeb.Endpoint do
     websocket: true,
     longpoll: false
 
+  # ADR-253: box screens, with their display token only.
+  socket "/box_screen_socket", PaleeWeb.BoxScreenSocket,
+    websocket: true,
+    longpoll: false
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # When code reloading is disabled (e.g., in production),

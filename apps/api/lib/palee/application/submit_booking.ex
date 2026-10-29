@@ -55,6 +55,7 @@ defmodule Palee.Application.SubmitBooking do
 
           Palee.DomainEvents.publish(:booking_made, %{
             organization_id: slot.organization_id,
+            scheduled_class_id: slot.id,
             booking_id: booking.id,
             user_id: user_id,
             at: now
