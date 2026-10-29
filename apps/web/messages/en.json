@@ -12228,6 +12228,7 @@
       "keyEmptyCell": "empty cell",
       "keyUnit": "kg or %",
       "keyDeleteRow": "⌫ on an empty name"
-    }
+    },
+    "perSide": "per side"
   }
 }
