@@ -27,7 +27,7 @@ export const backSquat = () =>
     ],
   ]);
 
-export const spreadLoad = () => section("sets", { sets: "4", rest: "90″" }, [[row("Deadlift", { cells: [{ d: "5", l: "60→80%" }] })]], { score: "load" });
+export const spreadLoad = () => section("sets", { sets: "4", rest: "90″" }, [[row("Deadlift", { cells: [{ d: "5", l: "60→80%" }] })]], { score: "best_load" });
 
 export const giantSet = () =>
   section("sets", { sets: "3-4", rest: "90″" }, [

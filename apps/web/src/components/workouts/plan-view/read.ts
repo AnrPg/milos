@@ -1,4 +1,4 @@
-import { PLAN_VERSION, type PlanSection } from "@/lib/structured-plan/types";
+import { FLOW_KEYS, PLAN_VERSION, type PlanFlow, type PlanSection } from "@/lib/structured-plan";
 
 import type { PlanViewSource } from "./PlanView";
 
@@ -7,7 +7,7 @@ export const STRUCTURED_PLAN_MODE = "structured_plan";
 
 type SectionLike = { id?: string | null; name?: string | null; plan?: unknown };
 
-const FLOWS = new Set(["sets", "for_time", "amrap", "emom", "intervals", "rest"]);
+const FLOWS = new Set<string>(FLOW_KEYS);
 
 /** Whether a stored value reads as a plan section (version and shape); anything else is ignored. */
 export function isPlanSection(value: unknown): value is PlanSection {
@@ -55,7 +55,7 @@ export function readPlanSummary(workout: { authoring_mode?: string | null; body?
       if (isPlanSection(section.plan)) return [{ name, flow: section.plan.flow, exerciseCount: planExerciseCount(section.plan) }];
       if (typeof section.flow === "string" && FLOWS.has(section.flow)) {
         const count = typeof section.exercise_count === "number" ? section.exercise_count : 0;
-        return [{ name, flow: section.flow as PlanSection["flow"], exerciseCount: count }];
+        return [{ name, flow: section.flow as PlanFlow, exerciseCount: count }];
       }
       return [];
     });

@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "Ladder / pyramid",
-      "kcal_target": "Calorie target",
+      "calorie_target": "Calorie target",
       "to_failure": "To failure",
       "superset": "Superset / giant set",
       "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
       "interrupt": "With interruptions"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "Every {time}, stop for",
     "scoreLine": "Score: {score}",
     "score": {
-      "load": "Load (best set)",
+      "best_load": "Load (best set)",
       "reps": "Reps",
       "time": "Time",
       "rounds_reps": "Rounds + reps",

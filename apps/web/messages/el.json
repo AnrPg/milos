@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "Σκάλα / πυραμίδα",
-      "kcal_target": "Στόχος θερμίδων",
+      "calorie_target": "Στόχος θερμίδων",
       "to_failure": "Μέχρι αποτυχία",
       "superset": "Superset / giant set",
       "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
       "interrupt": "Με διακοπή"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "Κάθε {time} σταματάς για",
     "scoreLine": "Σκορ: {score}",
     "score": {
-      "load": "Φορτίο (καλύτερο σετ)",
+      "best_load": "Φορτίο (καλύτερο σετ)",
       "reps": "Επαναλήψεις",
       "time": "Χρόνος",
       "rounds_reps": "Γύροι + επαναλήψεις",
