@@ -385,7 +385,11 @@ defmodule PaleeWeb.Schemas.StructuredPlan do
 
   @doc "ADR-270: a stored plan actual, as execution reads show it."
   def plan_set_schema do
-    properties = actual_properties()
+    properties =
+      Map.merge(actual_properties(), %{
+        id: %Schema{type: :string, format: :uuid},
+        inserted_at: %Schema{type: :string, format: :"date-time"}
+      })
 
     %Schema{
       title: "ExecutionPlanSet",

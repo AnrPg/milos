@@ -44,6 +44,8 @@ defmodule Palee.Execution.ExecutionPlanSet do
 
   @doc "The record as the API shows it (no owner columns)."
   def to_map(%__MODULE__{} = set) do
-    Map.take(set, @fields -- ~w(execution_id user_id organization_id master_workout_id)a)
+    set
+    |> Map.take(@fields -- ~w(execution_id user_id organization_id master_workout_id)a)
+    |> Map.merge(%{id: set.id, inserted_at: set.inserted_at})
   end
 end

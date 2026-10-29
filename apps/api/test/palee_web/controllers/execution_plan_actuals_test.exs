@@ -5,7 +5,9 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
   import Palee.StructuredPlanFixtures
 
   alias Palee.{Execution, Identity, Organizations, Repo}
+  alias Palee.Application.AthleteTrainingVolume
   alias Palee.Execution.ExecutionPlanSet
+  alias Palee.Identity.UserContext
 
   defp create_user!(nickname, role) do
     {:ok, user} =
@@ -191,6 +193,12 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
     assert Enum.all?(rows, &(&1.user_id == athlete.id and &1.execution_id == execution_id))
 
     assert [_, _, _] = Execution.list_plan_sets([execution_id])
+
+    # Training volume counts the sets done, not the plan's materialised rows.
+    assert %{performances: [%{kind: "execution", exercises: exercises}]} =
+             AthleteTrainingVolume.load(UserContext.new(athlete), nil)
+
+    assert [%{name: "Back Squat", sets: 2}, %{name: "Burpee", sets: 1}] = exercises
   end
 
   test "a completion without plan actuals stores none", %{conn: conn} do
