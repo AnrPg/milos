@@ -139,7 +139,7 @@ function issueText(t: T, code: string) {
 }
 
 function rowIssues(t: T, row: ImportRow) {
-  const codes = [...row.errors.map((issue) => issue.code), ...row.warnings.map((issue) => issue.code)];
+  const codes: string[] = [...row.errors.map((issue) => issue.code), ...row.warnings.map((issue) => issue.code)];
   if (row.error_code) codes.push(row.error_code);
   return [...new Set(codes)].map((code) => issueText(t, code)).join(" · ");
 }

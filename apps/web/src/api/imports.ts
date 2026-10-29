@@ -60,7 +60,7 @@ export async function fetchImport(token: string, id: string) {
 export function fetchImportRows(token: string, id: string, filters: ImportRowFilters = {}) {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
-    if (value !== undefined && value !== null && value !== "") search.set(key, String(value));
+    if (value !== undefined && value !== null) search.set(key, String(value));
   }
   const query = search.toString();
   return apiRequest<ImportRowsPage>(`${BASE}/${id}/rows${query ? `?${query}` : ""}`, { token });
