@@ -39,6 +39,7 @@ import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerS
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 import { IntegerInput } from "@/components/integer-input";
+import { DurationLimitField } from "@/components/schedule/BookingRuleFields";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
@@ -228,15 +229,17 @@ function BrandingSection({ token }: { token: string }) {
 
 // ── Gamification section ─────────────────────────────────────────────────────
 
+// ADR-229: the box sets only the streak shields and when they renew; the
+// weekly workout goal is each person's own.
 type GamificationFormState = {
-  weeklyWorkoutTarget: string;
+  streakShields: string;
   streakShieldResetDay: string;
   leaderboardEnabled: boolean;
 };
 
 function formFromSettings(s: GamificationSettings): GamificationFormState {
   return {
-    weeklyWorkoutTarget: String(s.weekly_workout_target),
+    streakShields: String(s.streak_shields),
     streakShieldResetDay: s.streak_shield_reset_day ? String(s.streak_shield_reset_day) : "",
     leaderboardEnabled: s.leaderboard_enabled,
   };
@@ -244,9 +247,10 @@ function formFromSettings(s: GamificationSettings): GamificationFormState {
 
 function GamificationSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("TrainingGoal");
   const queryClient = useQueryClient();
   const [form, setForm] = useState<GamificationFormState>({
-    weeklyWorkoutTarget: "2",
+    streakShields: "1",
     streakShieldResetDay: "",
     leaderboardEnabled: true,
   });
@@ -268,7 +272,7 @@ function GamificationSection({ token }: { token: string }) {
     mutationFn: () =>
       updateAdminSettings(token, {
         gamification: {
-          weekly_workout_target: Number(form.weeklyWorkoutTarget),
+          streak_shields: Number(form.streakShields),
           streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null,
           leaderboard_enabled: form.leaderboardEnabled,
         },
@@ -289,34 +293,44 @@ function GamificationSection({ token }: { token: string }) {
 
   return (
     <div className="max-w-3xl space-y-4">
+      <p className="rounded-[1.4rem] px-4 py-3 text-sm leading-6" style={{ background: "var(--panel-muted)", color: "var(--muted)" }} data-testid="weekly-goal-is-personal">
+        {t("box.goalIsPersonal")}
+      </p>
+
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("weeklyWorkoutTarget8106ea7")}
+          <span id="streak-shields-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {t("box.shieldsLabel")}
           </span>
           <FieldInfo
-            active={activeHelp === "weekly"}
-            label={i18n("weeklyWorkoutTargetInfo19b03c8")}
-            onToggle={() => setActiveHelp(activeHelp === "weekly" ? null : "weekly")}
+            active={activeHelp === "shields"}
+            label={t("box.shieldsInfo")}
+            onToggle={() => setActiveHelp(activeHelp === "shields" ? null : "shields")}
           >
-            <p>{i18n("howManyCompletedWorkoutsAUserNeedsPere99943b")}</p>
-            <p>{i18n("validValuesInteger1Default281502ef")}</p>
+            <p>{t("box.shieldsHelp")}</p>
+            <p>{t("box.shieldsValues")}</p>
           </FieldInfo>
         </span>
         <input
           className="w-full rounded-2xl border px-4 py-3 text-sm"
           inputMode="numeric"
-          min={1}
+          max={5}
+          min={0}
           type="number"
+          aria-labelledby="streak-shields-label"
+          aria-describedby="streak-shields-hint"
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-          value={form.weeklyWorkoutTarget}
-          onChange={(e) => update("weeklyWorkoutTarget", e.target.value)}
+          value={form.streakShields}
+          onChange={(e) => update("streakShields", e.target.value)}
         />
+        <span id="streak-shields-hint" className="block text-xs leading-5" style={{ color: "var(--dim)" }}>
+          {t("box.shieldsHint")}
+        </span>
       </label>
 
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          <span id="streak-shield-renewal-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
             {i18n("streakShieldResetDayd22b9ea")}
           </span>
           <FieldInfo
@@ -324,7 +338,7 @@ function GamificationSection({ token }: { token: string }) {
             label={i18n("streakShieldResetDayInfo10555c2")}
             onToggle={() => setActiveHelp(activeHelp === "shield" ? null : "shield")}
           >
-            <p>{i18n("dayOfMonthWhenEachUserGetsTheir605b967")}</p>
+            <p>{t("box.renewalHelp")}</p>
           </FieldInfo>
         </span>
         <input
@@ -336,8 +350,13 @@ function GamificationSection({ token }: { token: string }) {
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
           type="number"
           value={form.streakShieldResetDay}
+          aria-labelledby="streak-shield-renewal-label"
+          aria-describedby="streak-shield-renewal-hint"
           onChange={(e) => update("streakShieldResetDay", e.target.value)}
         />
+        <span id="streak-shield-renewal-hint" className="block text-xs leading-5" style={{ color: "var(--dim)" }}>
+          {form.streakShieldResetDay.trim() ? t("box.renewalOnDay", { day: form.streakShieldResetDay.trim() }) : t("box.renewalOnSignup")}
+        </span>
       </label>
 
       <label
@@ -943,33 +962,41 @@ function formatCleanupAmount(record: FinanceCleanupRecord) {
   return new Intl.NumberFormat("el-GR", { style: "currency", currency }).format(cents / 100);
 }
 
-// A number setting where null means "no limit" (ADR-097 booking window and cancellation cutoff).
+// A number setting where null means "no limit" (ADR-097 booking window).
 function OptionalLimitField({
   label,
   hint,
+  unit,
+  noLimitLabel,
   value,
   min,
   max,
   fallback,
   onChange,
+  testId,
 }: {
   label: string;
   hint: string;
+  unit: string;
+  noLimitLabel: string;
   value: number | null;
   min: number;
   max: number;
   fallback: number;
   onChange: (value: number | null) => void;
+  testId?: string;
 }) {
-  const i18n = useUiTranslations();
   return (
-    <div className="text-sm font-semibold">
+    <div className="text-sm font-semibold" data-testid={testId}>
       <span>{label}</span>
-      <div className="mt-2 flex items-center gap-3">
-        <IntegerInput aria-label={label} disabled={value === null} min={min} max={max} emptyValue={min} className="w-28 rounded-xl px-4 py-3 disabled:opacity-40" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={value} onValueChange={(next) => onChange(next ?? min)} />
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm font-normal" style={{ color: "var(--muted)" }}>
-          <input type="checkbox" checked={value === null} onChange={(event) => onChange(event.target.checked ? null : fallback)} />
-          {i18n("admNoLimit")}
+          <IntegerInput aria-label={label} data-testid={testId ? `${testId}-value` : undefined} disabled={value === null} min={min} max={max} emptyValue={min} className="w-24 rounded-xl px-3 py-3 disabled:opacity-40" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={value} onValueChange={(next) => onChange(next ?? min)} />
+          {unit}
+        </label>
+        <label className="flex items-center gap-2 text-sm font-normal" style={{ color: "var(--muted)" }}>
+          <input type="checkbox" data-testid={testId ? `${testId}-no-limit` : undefined} checked={value === null} onChange={(event) => onChange(event.target.checked ? null : fallback)} />
+          {noLimitLabel}
         </label>
       </div>
       <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{hint}</p>
@@ -979,27 +1006,29 @@ function OptionalLimitField({
 
 type SchedulingForm = {
   capacity: number;
-  timeout: number;
+  /** ADR-226: null = a request waits for approval until the class starts. */
+  timeout: number | null;
   autoApprove: boolean;
   windowDays: number | null;
-  cutoffHours: number | null;
+  /** ADR-226: minutes before the class; null = cancelling is always free. */
+  cutoffMinutes: number | null;
 };
 
 function schedulingFormFromSettings(value: SchedulingSettings): SchedulingForm {
   return {
     capacity: value.default_capacity,
-    timeout: value.default_booking_timeout_minutes,
+    timeout: value.default_booking_timeout_minutes ?? null,
     autoApprove: value.default_auto_approve,
     windowDays: value.default_booking_window_days ?? null,
-    cutoffHours: value.default_cancellation_cutoff_hours ?? null,
+    cutoffMinutes: value.default_cancellation_cutoff_minutes ?? null,
   };
 }
 
 function SchedulingDefaultsSection({ token }: { token: string }) {
-  const i18n = useUiTranslations();
+  const rules = useTranslations("BookingRules");
   const queryClient = useQueryClient();
   const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
-  const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffHours: null });
+  const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffMinutes: null });
 
   useEffect(() => {
     const value = settingsQuery.data?.scheduling;
@@ -1014,7 +1043,7 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
       default_booking_timeout_minutes: form.timeout,
       default_auto_approve: form.autoApprove,
       default_booking_window_days: form.windowDays,
-      default_cancellation_cutoff_hours: form.cutoffHours,
+      default_cancellation_cutoff_minutes: form.cutoffMinutes,
     } }),
     onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
   });
@@ -1022,12 +1051,20 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
   const saved = current ? schedulingFormFromSettings(current) : null;
   const dirty = Boolean(saved) && (Object.keys(form) as Array<keyof SchedulingForm>).some((key) => form[key] !== saved![key]);
 
-  return <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-    <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<IntegerInput min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} /></label>
-    <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<IntegerInput min={1} max={10080} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onValueChange={(timeout) => setForm({ ...form, timeout: timeout ?? 1 })} /></label>
-    <OptionalLimitField label={i18n("admBookingWindowDays")} hint={i18n("admBookingWindowHint")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
-    <OptionalLimitField label={i18n("admCancellationCutoffHours")} hint={i18n("admCancellationCutoffHint")} value={form.cutoffHours} min={0} max={168} fallback={12} onChange={(cutoffHours) => setForm({ ...form, cutoffHours })} />
-    <label className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{i18n("featureAutoApproveClassBookings")}</label>
+  // ADR-226: every rule says what it does, for whom, and what "no limit" means.
+  return <div className="grid max-w-3xl gap-5 sm:grid-cols-2" data-testid="class-booking-defaults">
+    <div className="text-sm font-semibold">
+      <label htmlFor="class-default-capacity">{rules("capacityLabel")}</label>
+      <IntegerInput id="class-default-capacity" data-testid="class-default-capacity" min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} />
+      <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("capacityHelp")}</p>
+    </div>
+    <div className="text-sm font-semibold">
+      <label className="flex items-center gap-3"><input type="checkbox" data-testid="class-default-auto-approve" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{rules("autoApproveLabel")}</label>
+      <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("autoApproveHelp")}</p>
+    </div>
+    <DurationLimitField testId="class-default-approval-wait" label={rules("approvalWaitLabel")} help={rules("approvalWaitHelp")} noLimitLabel={rules("approvalWaitNoLimit")} value={form.timeout} min={1} max={10080} fallback={60} onChange={(timeout) => setForm({ ...form, timeout })} />
+    <OptionalLimitField testId="class-default-booking-window" label={rules("bookingWindowLabel")} hint={rules("bookingWindowHelp")} unit={rules("days")} noLimitLabel={rules("noLimit")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
+    <DurationLimitField testId="class-default-late-cancellation" label={rules("lateCancellationLabel")} help={rules("lateCancellationHelp")} noLimitLabel={rules("noLimit")} value={form.cutoffMinutes} min={0} max={10080} fallback={720} onChange={(cutoffMinutes) => setForm({ ...form, cutoffMinutes })} />
     <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => saved && setForm(saved)} /></div>
   </div>;
 }

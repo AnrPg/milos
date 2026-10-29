@@ -19,6 +19,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   alias Palee.Scheduling.Domain.{
     BookingOperationPolicy,
+    BookingPolicy,
     ClassTypeArchivePolicy,
     ClassWorkoutReadiness,
     RecurrenceRule
@@ -574,7 +575,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
           default_auto_approve: false,
           default_booking_timeout_minutes: 60,
           default_booking_window_days: nil,
-          default_cancellation_cutoff_hours: nil
+          default_cancellation_cutoff_minutes: nil
         }
 
       settings ->
@@ -903,9 +904,9 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         })
       )
     )
-    |> Multi.run(:timeout_job, fn repo, %{booking: booking} ->
+    |> Multi.run(:timeout_job, fn repo, %{booking: booking, slot: slot} ->
       booking
-      |> timeout_job_changeset(timeout_minutes)
+      |> timeout_job_changeset(timeout_minutes, slot.scheduled_at)
       |> repo.insert()
     end)
     |> Multi.update(:attach_timeout_job, fn %{booking: booking, timeout_job: job} ->
@@ -1196,7 +1197,9 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
       if status == :pending do
         {:ok, job} =
-          promoted |> timeout_job_changeset(slot.booking_timeout_minutes) |> Repo.insert()
+          promoted
+          |> timeout_job_changeset(slot.booking_timeout_minutes, slot.scheduled_at)
+          |> Repo.insert()
 
         promoted |> Booking.timeout_job_changeset(job.id) |> Repo.update!()
       else
@@ -1479,18 +1482,20 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   defp normalize_attendance_result(record), do: {:ok, normalize_attendance(record)}
 
-  defp timeout_job_changeset(booking, timeout_minutes) do
-    scheduled_at =
-      booking.inserted_at
-      |> ensure_datetime()
-      |> DateTime.add(timeout_minutes * 60, :second)
-
+  # ADR-226: counted from now, not `inserted_at`, so a promoted waitlist
+  # entry gets the full time to be answered.
+  defp timeout_job_changeset(booking, timeout_minutes, class_starts_at) do
     BookingTimeoutJob.new(
       %{
         "organization_id" => booking.organization_id,
         "booking_id" => booking.id
       },
-      scheduled_at: scheduled_at
+      scheduled_at:
+        BookingPolicy.approval_deadline(
+          DateTime.utc_now(),
+          timeout_minutes,
+          ensure_datetime(class_starts_at)
+        )
     )
   end
 
@@ -1547,6 +1552,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       id: slot.id,
       organization_id: slot.organization_id,
       master_workout_id: slot.master_workout_id,
+      # ADR-230: set when the WOD is inherited from the day's WOD.
+      day_workout_id: slot.day_workout_id,
       class_series_id: slot.class_series_id,
       class_series: normalize_loaded_class_series(slot.class_series),
       name: slot.name,
@@ -1781,7 +1788,10 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         {:error, :not_found}
 
       %ScheduledClass{} = slot ->
-        case slot |> Ecto.Changeset.change(master_workout_id: new_workout_id) |> Repo.update() do
+        # ADR-230: a WOD set on the class itself overrides the day's WOD.
+        case slot
+             |> Ecto.Changeset.change(master_workout_id: new_workout_id, day_workout_id: nil)
+             |> Repo.update() do
           {:ok, updated} -> {:ok, %{id: updated.id}}
           {:error, changeset} -> {:error, changeset}
         end
@@ -1811,7 +1821,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       default_auto_approve: settings.default_auto_approve,
       default_booking_timeout_minutes: settings.default_booking_timeout_minutes,
       default_booking_window_days: settings.default_booking_window_days,
-      default_cancellation_cutoff_hours: settings.default_cancellation_cutoff_hours,
+      default_cancellation_cutoff_minutes: settings.default_cancellation_cutoff_minutes,
       inserted_at: settings.inserted_at,
       updated_at: settings.updated_at
     }

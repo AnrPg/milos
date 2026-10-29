@@ -68,6 +68,16 @@ defmodule Palee.Notifications do
     end)
   end
 
+  @doc """
+  The person's unread inbox count alone: what the bell shows on every screen,
+  without loading a page of notifications.
+  """
+  def unread_count(user_id) do
+    NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+      GetUnreadCount.call(user_id)
+    end)
+  end
+
   def mark_all_read(user_id) do
     marked_count =
       NotificationStore.with_user_context(%{user_id: user_id}, fn -> MarkAllRead.call(user_id) end)
@@ -584,6 +594,30 @@ defmodule Palee.Notifications do
     end)
   end
 
+  # ADR-220: a member is leaving the box. The staff who manage billing hear
+  # the last day and the reason, once per leave.
+  def process_event("member_leaving", payload) do
+    organization_id = field(payload, :organization_id)
+    member_id = field(payload, :member_user_id)
+
+    organization_id
+    |> Organizations.list_user_ids_with_capability(:manage_billing)
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(:member_leaving, %{user_id: staff_id}, %{
+             organization_id: organization_id,
+             member_user_id: member_id,
+             person_nickname: field(payload, :person_nickname),
+             leaving_on: field(payload, :leaving_on),
+             reason: field(payload, :reason),
+             dedupe_key: "member_leaving:#{field(payload, :left_at)}:#{member_id}:#{staff_id}",
+             url: "/admin/users/#{member_id}"
+           }) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)
@@ -720,6 +754,16 @@ defmodule Palee.Notifications do
       enqueue_simple(:nutrition_plan_updated, payload, %{
         title: field(payload, :title),
         url: "/box/coach"
+      })
+
+  # ADR-229: a coach or the box's staff changed the person's weekly goal.
+  def process_event("training_goal_updated", payload),
+    do:
+      enqueue_simple(:training_goal_updated, payload, %{
+        target: field(payload, :target),
+        set_by_role: field(payload, :set_by_role),
+        set_by_nickname: field(payload, :set_by_nickname),
+        url: "/me/settings#training-schedule"
       })
 
   def process_event("appointment_booked", payload),

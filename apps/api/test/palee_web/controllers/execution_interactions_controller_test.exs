@@ -145,6 +145,7 @@ defmodule PaleeWeb.ExecutionInteractionsControllerTest do
       {organization, owner, context} = organization_fixture()
       {athlete, _athlete_context} = member_context(organization, :athlete)
       {other_athlete, _} = member_context(organization, :athlete)
+      TestFixtures.programming_grant_fixture(context, athlete)
       workout = TestFixtures.workout_fixture(owner, %{tenant_context: context})
 
       {:ok, assignment} =

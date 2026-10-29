@@ -9,7 +9,7 @@ import { useSession } from "@/components/session-provider";
 import { emptyListFilter, parseListFilter, type ListFilter, type ListFilterShape } from "./list-filter";
 
 /** The saved filters of a surface; one cache entry however many screens read it. */
-export const savedFiltersKey = (surface: FilterSurface, token: string | null) => ["saved-filters", surface, token] as const;
+export const savedFiltersKey = (surface: FilterSurface) => ["saved-filters", surface] as const;
 
 /**
  * A list screen's filter that follows the member across devices (ADR-151):
@@ -32,7 +32,7 @@ export function useRememberedFilter<T extends object>(
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const queryClient = useQueryClient();
-  const key = savedFiltersKey(surface, token);
+  const key = savedFiltersKey(surface);
   const saved = useQuery({
     queryKey: key,
     enabled: Boolean(token),
@@ -53,7 +53,7 @@ export function useRememberedFilter<T extends object>(
     (next: T) => {
       setChosen({ within, value: next });
       if (!persist || !token) return;
-      const cacheKey = savedFiltersKey(surface, token);
+      const cacheKey = savedFiltersKey(surface);
       const current = queryClient.getQueryData<SavedFilters>(cacheKey)?.last_used ?? {};
       const params = within === null ? { v: 1, ...next } : { ...current, [within]: next };
       void rememberFilters(token, surface, params)

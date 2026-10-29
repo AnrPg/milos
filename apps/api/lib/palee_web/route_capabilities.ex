@@ -15,6 +15,8 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminWorkoutController => [:manage_workouts],
     # The class form's WOD picker: whoever schedules classes picks WODs.
     W.AdminWorkoutChoiceController => [:manage_schedule, :manage_workouts],
+    # ADR-230: the day's WOD, like linking a WOD to one class.
+    W.AdminDayWorkoutController => [:manage_schedule, :manage_workouts],
     W.AdminWorkoutDslController => [:manage_workouts],
     W.AdminWorkoutFolderController => [:manage_workouts],
     W.AdminWorkoutGoalsController => [:manage_workouts],
@@ -250,9 +252,15 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFinanceController, :members} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :member} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :update_member} => [:manage_billing],
+    {W.AdminFinanceController, :set_member_auto_renew} => [:manage_billing],
+    {W.AdminFinanceController, :mark_member_left} => [:manage_billing],
+    {W.AdminFinanceController, :undo_member_left} => [:manage_billing],
     {W.AdminFinanceController, :assign_package} => [:take_payments],
     {W.AdminFinanceController, :record_payment} => [:take_payments],
     {W.AdminFinanceController, :create_receipt} => [:take_payments],
+    # ADR-222: front desk takes the money and leaves the document the billing
+    # setup calls for, a paid invoice included.
+    {W.AdminFinanceController, :receive_payment} => [:take_payments],
     {W.AdminFinanceController, :redeem_promotion} => [:take_payments],
     {W.AdminFinanceController, :create_invoice} => [:manage_billing],
     {W.AdminFinanceController, :generate_renewal_invoice} => [:manage_billing],
@@ -313,6 +321,10 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.CoachNotesController, :delete} => [:write_coach_notes],
     {W.CoachNotesController, :reads} => [:write_coach_notes],
     {W.CoachNotesController, :visibility} => [:write_coach_notes],
+
+    # A client's weekly goal (ADR-229); the scope check narrows to own clients.
+    {W.TrainingGoalController, :client_show} => [:manage_coaching],
+    {W.TrainingGoalController, :client_update} => [:manage_coaching],
 
     # Cleaning log (ADR-102)
     {W.CleaningController, :areas} => [:record_cleaning, :review_cleaning, :manage_cleaning_areas],

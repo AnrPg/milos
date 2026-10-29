@@ -1,14 +1,14 @@
 defmodule Palee.Application.UpdateAssignedWorkout do
   @moduledoc """
   Edits an assignment's assignees, date and notes. ADR-125: assignees may be
-  athletes or members (tenant membership roles); members newly added to the
-  assignment need the explicit personal-programming grant, and a class variant
+  athletes or members (tenant membership roles); people newly added to the
+  assignment need online programming or personal training (ADR-225), and a class variant
   keeps exactly one member who must still hold the class booking when the
   member is changed.
   """
 
   alias Palee.Application.{
-    AuthorizeMemberProgramming,
+    AuthorizeProgramming,
     BroadcastUserSync,
     CoveringBranches,
     TenantAssigneeRoles
@@ -42,7 +42,7 @@ defmodule Palee.Application.UpdateAssignedWorkout do
          {:ok, classified} <- AssignmentAudiencePolicy.classify(athlete_ids, roles),
          :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
          :ok <- variant_member_booked(context, source_slot_id, classified, previous_ids),
-         :ok <- AuthorizeMemberProgramming.call(context, classified.members -- previous_ids) do
+         :ok <- AuthorizeProgramming.call(context, athlete_ids -- previous_ids) do
       athletes = Identity.list_by_ids(athlete_ids)
 
       if valid_athletes?(context, athlete_ids, athletes) do

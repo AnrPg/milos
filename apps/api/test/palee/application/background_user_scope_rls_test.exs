@@ -68,7 +68,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
 
         {:ok, _settings} =
           Gamification.with_tenant_context(owner_ctx, fn ->
-            Gamification.update_settings(%{weekly_workout_target: 1, leaderboard_enabled: true})
+            Gamification.update_settings(%{streak_shields: 1, leaderboard_enabled: true})
           end)
 
         {:ok, challenge} =
@@ -445,6 +445,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
           add!(gym, owner, :owner)
           add!(gym, athlete, :athlete)
           owner_ctx = tenant!(owner, gym)
+          programming_grant_fixture(owner_ctx, athlete)
           workout = workout_fixture(owner, %{tenant_context: owner_ctx})
 
           {:ok, _assignment} =

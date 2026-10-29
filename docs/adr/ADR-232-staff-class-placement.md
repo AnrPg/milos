@@ -1,4 +1,4 @@
-# ADR-225: Staff book or move a member into a class from the member's profile
+# ADR-232: Staff book or move a member into a class from the member's profile
 Date: 2026-10-28
 Status: Accepted
 
@@ -8,7 +8,7 @@ A member's console profile has a «Μετακίνηση σε τμήμα» action
 - A move withdrew the old booking as if the member had cancelled. Inside the package's cancellation cutoff that consumed the visit (ADR-097) while the new booking took another one: one move, two visits.
 - The new booking was written first, so a member with one visit left could not be moved at all, and the two steps were not one transaction: a failed withdrawal left two bookings.
 - The dialog listed every class of the next 30 days on the browser's clock (not the box's, ADR-179), including draft classes and classes the package does not cover; staff only learned why after pressing the button.
-- Its labels used «Τμήμα» and «τάξη»; the canonical term is «Μάθημα» (ontology).
+- Its labels mixed «Τμήμα», «Μάθημα» and «τάξη»; the canonical term is «Τμήμα» (ontology, ADR-230).
 
 ## Decision
 1. **A move is one transaction, never a late cancellation.** `PlaceMemberInClass` withdraws the old booking first and returns its visit (`WithdrawBooking.write/4` with `late_cancellation: false`), then writes the new booking (`SubmitBooking.write/4`), both inside `Scheduling.transaction/2`. If the new booking is refused, nothing changes. Notifications, realtime updates, the waitlist promotion of the freed place and analytics run only after the commit (`announce/…`). The cancellation event says `by: :staff`.

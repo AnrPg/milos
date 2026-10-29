@@ -50,6 +50,8 @@ async function stub(page: Page, { staff = false, notifications = [] as unknown[]
   await page.route("**/api/notifications?**", (route) =>
     route.fulfill(json({ notifications, next_cursor: null, unread_count: notifications.length })),
   );
+  // The bell's badge reads the count alone; the list loads when the panel opens.
+  await page.route("**/api/notifications/unread-count", (route) => route.fulfill(json({ unread_count: notifications.length })));
   await page.route("**/api/notifications/preferences", (route) => route.fulfill(json({ preferences: rows })));
   await page.route("**/api/notifications/preferences/*", (route) => {
     const category = route.request().url().split("/").pop()!;

@@ -56,12 +56,38 @@ defmodule PaleeWeb.PhaseBControllerTest do
     settings =
       admin_conn
       |> send_json(:patch, "#{base}/admin/settings", %{
-        scheduling: %{default_booking_window_days: 14, default_cancellation_cutoff_hours: 6}
+        scheduling: %{default_booking_window_days: 14, default_cancellation_cutoff_minutes: 390}
       })
       |> json_response(200)
 
-    assert %{"default_booking_window_days" => 14, "default_cancellation_cutoff_hours" => 6} =
+    assert %{"default_booking_window_days" => 14, "default_cancellation_cutoff_minutes" => 390} =
              settings["scheduling"]
+  end
+
+  test "booking requests may wait without a limit; the cutoff takes minutes up to 7 days (ADR-226)",
+       %{admin_conn: admin_conn, base: base} do
+    settings =
+      admin_conn
+      |> send_json(:patch, "#{base}/admin/settings", %{
+        scheduling: %{
+          default_booking_timeout_minutes: nil,
+          default_cancellation_cutoff_minutes: 0
+        }
+      })
+      |> json_response(200)
+
+    assert %{"default_booking_timeout_minutes" => nil, "default_cancellation_cutoff_minutes" => 0} =
+             settings["scheduling"]
+
+    for scheduling <- [
+          %{default_cancellation_cutoff_minutes: 10_081},
+          %{default_cancellation_cutoff_minutes: -1},
+          %{default_booking_timeout_minutes: 0}
+        ] do
+      assert admin_conn
+             |> send_json(:patch, "#{base}/admin/settings", %{scheduling: scheduling})
+             |> json_response(422)
+    end
   end
 
   test "class types carry a level and audiences for the schedule filters", %{

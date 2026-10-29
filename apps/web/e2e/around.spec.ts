@@ -535,7 +535,7 @@ test.describe("Γύρω μου", () => {
     const [datesBox, todayBox] = [await dates.boundingBox(), await sheet.getByRole("button", { name: "Σήμερα" }).boundingBox()];
     expect(datesBox && todayBox && datesBox.y < todayBox.y).toBe(true);
     await dates.getByRole("button", { name: "Από" }).click();
-    const calendar = page.getByRole("dialog", { name: "Επιλέξτε ημερομηνία" });
+    const calendar = page.getByRole("dialog", { name: "Διάλεξε ημερομηνία" });
     await calendar.locator("button[data-day]:not([disabled])").nth(1).click();
     await expect.poll(() => lastSearch(calls).filter).toMatchObject({ when: "range" });
     const range = lastSearch(calls).filter as unknown as { date_from: string; date_to: string };

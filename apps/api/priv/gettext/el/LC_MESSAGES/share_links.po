@@ -17,7 +17,7 @@ msgid "Open the invitation"
 msgstr "Άνοιγμα της πρόσκλησης"
 
 msgid "%{name} invited you to an event on %{product} as their guest. Open the invitation to see it and say if you're coming."
-msgstr "Λάβατε πρόσκληση από %{name} σε μια εκδήλωση στο %{product}. Ανοίξτε την πρόσκληση για να δείτε την εκδήλωση και να απαντήσετε αν θα έρθετε."
+msgstr "Ο/Η %{name} σε προσκάλεσε σε μια εκδήλωση στο %{product}. Άνοιξε την πρόσκληση για να τη δεις και να απαντήσεις αν θα έρθεις."
 
 msgid "%{name} asked you to be their check-in buddy on %{product}: someone they can turn to for support."
 msgstr "Λάβατε πρόσκληση από %{name} να γίνετε φιλαράκι στήριξης στο %{product}: ένα άτομο στο οποίο μπορεί να απευθύνεται για στήριξη."
@@ -26,7 +26,7 @@ msgid "%{name} invited you to train together on %{product}."
 msgstr "Λάβατε πρόσκληση από %{name} για κοινή προπόνηση στο %{product}."
 
 msgid "%{name} typed in your address to send you this link. If you don't know them, ignore this email."
-msgstr "Τον σύνδεσμο σάς τον έστειλε %{name}, γράφοντας τη διεύθυνσή σας. Αν δεν γνωρίζετε αυτό το άτομο, αγνοήστε αυτό το email."
+msgstr "Τον σύνδεσμο σού τον έστειλε ο/η %{name}, γράφοντας τη διεύθυνσή σου. Αν δεν γνωρίζεις αυτό το άτομο, αγνόησε αυτό το email."
 
 msgid "You're receiving this email because %{name} sent you an invitation through %{product}."
-msgstr "Λαμβάνετε αυτό το email επειδή λάβατε πρόσκληση από %{name} μέσω του %{product}."
+msgstr "Λαμβάνεις αυτό το email επειδή σου έστειλε πρόσκληση ο/η %{name} μέσω του %{product}."

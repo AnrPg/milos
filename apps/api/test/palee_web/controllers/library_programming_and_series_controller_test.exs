@@ -74,7 +74,7 @@ defmodule PaleeWeb.LibraryProgrammingAndSeriesControllerTest do
              "default_auto_approve" => true,
              "default_booking_timeout_minutes" => 25,
              "default_booking_window_days" => nil,
-             "default_cancellation_cutoff_hours" => nil,
+             "default_cancellation_cutoff_minutes" => nil,
              "id" => payload["scheduling"]["id"],
              "organization_id" => payload["scheduling"]["organization_id"],
              "inserted_at" => payload["scheduling"]["inserted_at"],

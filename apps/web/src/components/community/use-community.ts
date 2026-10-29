@@ -16,13 +16,17 @@ import {
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 
-/** The member's clubs across every gym they belong to (ADR-138). */
-export function useMyClubs() {
+/**
+ * The member's clubs across every gym they belong to (ADR-138). `enabled`
+ * false reads only what is already cached (shell parts that need the clubs
+ * only now and then).
+ */
+export function useMyClubs(enabled = true) {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   return useQuery({
     queryKey: CLUBS_KEY,
-    enabled: Boolean(token),
+    enabled: Boolean(token) && enabled,
     queryFn: () => fetchMyClubs(token!),
     staleTime: 60_000,
   });

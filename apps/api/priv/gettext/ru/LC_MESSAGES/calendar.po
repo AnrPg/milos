@@ -17,7 +17,7 @@ msgid "Downloading the .ics file imports a one-off snapshot and will not stay sy
 msgstr "При загрузке файла .ics импортируется одноразовый снимок, который не будет синхронизироваться."
 
 msgid "Class: %{name}"
-msgstr "Класс: %{name}"
+msgstr "Занятие: %{name}"
 
 msgid "Assigned workout"
 msgstr "Назначенная тренировка"

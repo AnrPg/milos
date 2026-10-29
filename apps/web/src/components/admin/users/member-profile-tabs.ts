@@ -13,6 +13,8 @@ export const SECTION_TAB: Record<string, ProfileTab> = {
   overview: "overview",
   box_message: "overview",
   schedule: "training",
+  // ADR-229: the client's own weekly goal, which their coach may set.
+  training_goal: "training",
   training_history: "training",
   // ADR-165: the client's coverage, qualities and load (shared entries only).
   training_depth: "training",

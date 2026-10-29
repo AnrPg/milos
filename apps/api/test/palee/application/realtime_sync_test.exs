@@ -58,6 +58,7 @@ defmodule Palee.Application.RealtimeSyncTest do
     workout = workout_fixture(admin)
     context = legacy_tenant_context!(admin, :owner)
     add_legacy_membership!(athlete, :athlete)
+    programming_grant_fixture(context, athlete)
 
     assert {:ok, assignment} =
              AssignWorkout.call(context, %{
@@ -90,7 +91,7 @@ defmodule Palee.Application.RealtimeSyncTest do
     assert {:ok, _settings} =
              UpdateAdminSettings.call(context, %{
                gamification: %{
-                 weekly_workout_target: 3,
+                 streak_shields: 3,
                  streak_shield_reset_day: 7,
                  leaderboard_enabled: true
                }

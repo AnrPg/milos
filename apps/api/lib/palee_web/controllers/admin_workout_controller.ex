@@ -82,7 +82,11 @@ defmodule PaleeWeb.AdminWorkoutController do
            properties: %{
              workouts: %Schema{
                type: :array,
-               items: %Schema{type: :object, additionalProperties: true}
+               items: %Schema{
+                 type: :object,
+                 properties: %{body: WorkoutSchema.body_summary_schema()},
+                 additionalProperties: true
+               }
              }
            },
            required: [:workouts]

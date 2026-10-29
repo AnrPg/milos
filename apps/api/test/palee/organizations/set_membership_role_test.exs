@@ -282,6 +282,7 @@ defmodule Palee.Organizations.SetMembershipRoleTest do
 
       Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
 
+      TestFixtures.programming_grant_fixture(home_context, athlete)
       workout = TestFixtures.workout_fixture(admin)
 
       assert {:ok, assignment} =
@@ -339,6 +340,7 @@ defmodule Palee.Organizations.SetMembershipRoleTest do
 
       Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
 
+      TestFixtures.programming_grant_fixture(context, athlete)
       workout = TestFixtures.workout_fixture(admin)
 
       assert {:ok, assignment} =

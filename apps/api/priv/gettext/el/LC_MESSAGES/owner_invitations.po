@@ -5,10 +5,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Set up your admin account for %{business}"
-msgstr "Ρυθμίστε τον λογαριασμό διαχειριστή για την επιχείρηση «%{business}»"
+msgstr "Ρύθμισε τον λογαριασμό διαχειριστή για την επιχείρηση «%{business}»"
 
 msgid "Set up your owner account for %{business}"
-msgstr "Ρυθμίστε τον λογαριασμό ιδιοκτήτη για την επιχείρηση «%{business}»"
+msgstr "Ρύθμισε τον λογαριασμό ιδιοκτήτη για την επιχείρηση «%{business}»"
 
 msgid "Welcome to %{product}"
 msgstr "Καλώς ήρθατε στο %{product}"
@@ -17,16 +17,16 @@ msgid "Set up my account"
 msgstr "Ρύθμιση του λογαριασμού μου"
 
 msgid "If you weren't expecting this email, you can ignore it."
-msgstr "Αν δεν περιμένατε αυτό το email, μπορείτε να το αγνοήσετε."
+msgstr "Αν δεν περίμενες αυτό το email, μπορείς να το αγνοήσεις."
 
 msgid "The %{product} team made you an admin of %{business}. Create your account to get started."
-msgstr "Η ομάδα του %{product} σας όρισε διαχειριστή της επιχείρησης «%{business}». Δημιουργήστε τον λογαριασμό σας για να ξεκινήσετε."
+msgstr "Η ομάδα του %{product} σε όρισε διαχειριστή της επιχείρησης «%{business}». Δημιούργησε τον λογαριασμό σου για να ξεκινήσεις."
 
 msgid "The %{product} team made you the owner of %{business}. Create your account to get started."
-msgstr "Η ομάδα του %{product} σας όρισε ιδιοκτήτη της επιχείρησης «%{business}». Δημιουργήστε τον λογαριασμό σας για να ξεκινήσετε."
+msgstr "Η ομάδα του %{product} σε όρισε ιδιοκτήτη της επιχείρησης «%{business}». Δημιούργησε τον λογαριασμό σου για να ξεκινήσεις."
 
 msgid "If it has expired, ask the %{product} team for a new invitation."
-msgstr "Αν έχει λήξει, ζητήστε νέα πρόσκληση από την ομάδα του %{product}."
+msgstr "Αν έχει λήξει, ζήτησε νέα πρόσκληση από την ομάδα του %{product}."
 
 msgid "You're receiving this email because the %{product} team set up %{business} with this address."
-msgstr "Λαμβάνετε αυτό το email επειδή η ομάδα του %{product} δημιούργησε την επιχείρηση «%{business}» με αυτή τη διεύθυνση."
+msgstr "Λαμβάνεις αυτό το email επειδή η ομάδα του %{product} δημιούργησε την επιχείρηση «%{business}» με αυτή τη διεύθυνση."

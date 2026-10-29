@@ -6,7 +6,31 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchOrganizationMemberships, type OrganizationMembership } from "@/api/organizations";
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { useSession } from "@/components/session-provider";
+import { FRESHNESS } from "@/lib/query-policy";
 import { hasStaffRole } from "@/lib/role-navigation";
+
+export const ORGANIZATION_MEMBERSHIPS_KEY = ["organization-memberships"] as const;
+
+/**
+ * The signed-in person's gym memberships: one cache entry per person, shared
+ * by every screen and the shell. The key is the user, not the access token: a
+ * token renewal must not turn the query back into a first load, or every page
+ * gated on it (the schedule, the shell) unmounts and loses what is open on it.
+ * The fetch always uses the current token. Changes arrive through the actions
+ * that invalidate the key and the realtime `organization_branding` sync.
+ */
+export function useOrganizationMemberships() {
+  const { status, tokens, currentUser } = useSession();
+  const token = tokens?.access_token ?? null;
+  const userId = currentUser?.id ?? null;
+
+  return useQuery({
+    queryKey: [...ORGANIZATION_MEMBERSHIPS_KEY, userId],
+    enabled: status === "authenticated" && Boolean(token && userId),
+    queryFn: () => fetchOrganizationMemberships(token!),
+    staleTime: FRESHNESS.account,
+  });
+}
 
 export function adminHref(href: string, organizationSlug: string | null) {
   if (href === "/") return "/";
@@ -46,15 +70,7 @@ function storedOrganizationSlug() {
  */
 export function useOrganizationSlug(): string | null {
   const pathname = usePathname();
-  const { status, tokens } = useSession();
-  const authenticated = status === "authenticated" && Boolean(tokens?.access_token);
-
-  const membershipsQuery = useQuery({
-    queryKey: ["organization-memberships", tokens?.access_token],
-    enabled: authenticated,
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-    staleTime: 60_000,
-  });
+  const membershipsQuery = useOrganizationMemberships();
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
 
   const pathOrganizationSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
@@ -69,14 +85,7 @@ export function useOrganizationSlug(): string | null {
  */
 export function useOrganizationTimeZoneStatus(slug?: string | null): { zone: string | null; confirmed: boolean } {
   const currentSlug = useOrganizationSlug();
-  const { status, tokens } = useSession();
-  const authenticated = status === "authenticated" && Boolean(tokens?.access_token);
-  const membershipsQuery = useQuery({
-    queryKey: ["organization-memberships", tokens?.access_token],
-    enabled: authenticated,
-    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
-    staleTime: 60_000,
-  });
+  const membershipsQuery = useOrganizationMemberships();
   const target = slug ?? currentSlug;
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const organization = memberships.find((membership) => membership.organization.slug === target)?.organization as

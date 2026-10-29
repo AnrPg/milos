@@ -302,6 +302,10 @@ defmodule Palee.Scheduling do
     to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
     as: :workout_status
 
+  defdelegate class_workout_source(slot),
+    to: Palee.Scheduling.Domain.DayWorkoutInheritance,
+    as: :source
+
   defdelegate class_workout_alert_due(slot, now, zone),
     to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
     as: :alert_due

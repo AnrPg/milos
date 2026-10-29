@@ -28,6 +28,7 @@ import { updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
 import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
+import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
@@ -48,6 +49,7 @@ import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
+import { ClientTrainingGoalPanel } from "@/components/training-goal/ClientTrainingGoalPanel";
 import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
 import { CoachWellnessPanel } from "@/components/buddy/CoachWellnessPanel";
 import { CoachTrainingDepthPanel } from "@/components/member-app/progress/CoachTrainingDepthPanel";
@@ -312,6 +314,15 @@ function FinanceDetails({
     signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
     notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
   }));
+  // ADR-220: leaving (or undoing it) changes status and expiry on the server;
+  // the cards show what the refreshed profile says, not the earlier edit.
+  const serverStatus = valueText(membership?.status) === "—" ? "active" : valueText(membership?.status);
+  const serverExpiresOn = typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "";
+  const [synced, setSynced] = useState({ status: serverStatus, expires_on: serverExpiresOn });
+  if (synced.status !== serverStatus || synced.expires_on !== serverExpiresOn) {
+    setSynced({ status: serverStatus, expires_on: serverExpiresOn });
+    setDraft((current) => ({ ...current, status: serverStatus, expires_on: serverExpiresOn }));
+  }
   const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
@@ -345,7 +356,7 @@ function FinanceDetails({
           <div className="space-y-2">
             <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
               <Select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onValueChange={(value) => { const status = value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
-                {['active', 'inactive', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
+                {['active', 'paused', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
               </Select>
             </EditableFinanceCard>
             {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
@@ -369,6 +380,7 @@ function FinanceDetails({
               />
             ) : null}
             <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
+            <MembershipLeaving token={token} userId={userId} membership={membership} subscriptions={subscriptions} onRefresh={onRefresh} />
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
@@ -532,6 +544,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const tPrSharing = useTranslations("PrSharing");
   const tDepth = useTranslations("Depth");
+  const tGoal = useTranslations("TrainingGoal");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const organizationSlug = useOrganizationSlug();
@@ -644,6 +657,8 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const tabSections = new Set(sections);
   if (trains) tabSections.add("training_history");
   if (showCoaches) tabSections.add("coaching_relationships");
+  // ADR-229: a coach (or full-scope staff) may set the client's weekly goal.
+  if (isClient && can(actor, "manage_coaching")) tabSections.add("training_goal");
   if (showCoachNotes) tabSections.add("coach_notes");
   if (showBoxMessage) tabSections.add("box_message");
   // ADR-158: a client's coach sees the body snapshots the member shared.
@@ -772,7 +787,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
 
-          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={clientRole ?? "member"} nickname={profile.identity.nickname} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
+          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={clientRole ?? "member"} nickname={profile.identity.nickname} programming={profile.programming} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
 
           {inTab("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
@@ -784,6 +799,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
               defaultKind={defaultHistoryKind(clientRole)}
             />
+          ) : null}
+
+          {token && inTab("training_goal") ? (
+            <Panel id="training_goal" title={tGoal("title")}>
+              <ClientTrainingGoalPanel userId={userId} nickname={profile.identity.nickname} />
+            </Panel>
           ) : null}
 
           {token && inTab("training_depth") ? (
@@ -865,7 +886,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                     type="button"
                     disabled={!canDelete || deleteMutation.isPending}
                     onClick={() => {
-                      if (window.confirm(i18n("delete63346e8") + profile.identity.nickname + "\"?")) deleteMutation.mutate();
+                      if (window.confirm(i18n("deleteNamedConfirm", { name: profile.identity.nickname }))) deleteMutation.mutate();
                     }}
                     className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
                     style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}

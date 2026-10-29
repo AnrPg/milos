@@ -64,8 +64,16 @@ defmodule PaleeWeb.MyBillingControllerTest do
     assert box["partial"] == false
     assert box["outstanding_cents"] == 4_000
 
-    assert [%{"id" => subscription_id, "current" => true, "package_name" => "12 visits"}] =
-             box["subscriptions"]
+    # ADR-220: a renewing package leaves renewal to the member, on by default.
+    assert [
+             %{
+               "id" => subscription_id,
+               "current" => true,
+               "package_name" => "12 visits",
+               "auto_renew" => true,
+               "can_change_auto_renew" => true
+             }
+           ] = box["subscriptions"]
 
     assert subscription_id == subscription.id
 
@@ -74,9 +82,13 @@ defmodule PaleeWeb.MyBillingControllerTest do
 
     assert box["actions"] == %{
              "self_service_purchase" => false,
-             "self_service_cancel_auto_renew" => false,
+             "self_service_cancel_auto_renew" => true,
+             "self_service_leave" => true,
              "download_invoices" => true
            }
+
+    assert box["membership"]["leaving_on"] == nil
+    assert box["membership"]["leave_preview_on"]
 
     assert box["referrals"]["invited"] == 0
 

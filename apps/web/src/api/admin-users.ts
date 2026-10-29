@@ -28,6 +28,17 @@ export type AdminUserDirectoryEntry = {
   attention_count: number;
 };
 
+/**
+ * ADR-225: whether a WOD may be assigned to a client. Their subscription
+ * package needs online programming or personal training; `reason` is the
+ * finance refusal when neither is included.
+ */
+export type AdminUserProgramming = {
+  allowed: boolean;
+  grant: "online_programming" | "personal_training" | null;
+  reason: string | null;
+};
+
 export type AdminUserProfileShell = {
   identity: Pick<AdminUserDirectoryEntry, "id" | "nickname" | "avatar_url" | "role" | "joined_at">;
   account_status: string;
@@ -39,6 +50,8 @@ export type AdminUserProfileShell = {
     location_scope?: { all_locations: boolean; location_ids: string[] } | null;
   } | null;
   available_sections: string[];
+  /** ADR-225: clients only; null for staff. */
+  programming?: AdminUserProgramming | null;
   attention: Array<Record<string, unknown>>;
   operational_links: Record<string, string>;
 };

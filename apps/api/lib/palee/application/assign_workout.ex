@@ -3,14 +3,15 @@ defmodule Palee.Application.AssignWorkout do
   Assigns a published workout to athletes and - ADR-125 - members.
 
   Assignees are classified by their active membership role in the acting
-  organization. Members additionally need an explicit `personal_programming`
-  package grant, checked before any write. A `source_slot_id` makes the
-  assignment a class variant: one member's version of a class they booked.
-  Every assignee then goes through the ADR-040 coaching-touchpoint saga.
+  organization. Every assignee needs online programming or personal training
+  in their package (ADR-225), checked before any write. A `source_slot_id`
+  makes the assignment a class variant: one member's version of a class they
+  booked. Assignees programmed through online programming then go through the
+  ADR-040 coaching-touchpoint saga; personal training includes its programme.
   """
 
   alias Palee.Application.{
-    AuthorizeMemberProgramming,
+    AuthorizeProgramming,
     BroadcastUserSync,
     CoveringBranches,
     TenantAssigneeRoles,
@@ -19,6 +20,7 @@ defmodule Palee.Application.AssignWorkout do
   }
 
   alias Palee.{Finance, Identity, Notifications, Scheduling, Workouts}
+  alias Palee.Finance.Domain.ProgrammingGrant
   alias Palee.Workouts.Domain.AssignmentAudiencePolicy
 
   def call(%{organization_id: organization_id} = context, params)
@@ -34,8 +36,8 @@ defmodule Palee.Application.AssignWorkout do
          {:ok, classified} <- AssignmentAudiencePolicy.classify(assignee_ids, roles),
          :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
          {:ok, params} <- attach_source_slot(context, params, source_slot_id, classified),
-         :ok <- AuthorizeMemberProgramming.call(context, classified.members) do
-      do_assign(context, params, Identity.list_by_ids(assignee_ids), classified)
+         {:ok, grants} <- AuthorizeProgramming.grants(context, assignee_ids) do
+      do_assign(context, params, Identity.list_by_ids(assignee_ids), classified, grants)
     end
   end
 
@@ -43,7 +45,7 @@ defmodule Palee.Application.AssignWorkout do
 
   def call(_params), do: {:error, :organization_context_required}
 
-  defp do_assign(context, params, athletes, classified) do
+  defp do_assign(context, params, athletes, classified, grants) do
     athlete_ids =
       params
       |> athlete_ids()
@@ -51,7 +53,9 @@ defmodule Palee.Application.AssignWorkout do
     if valid_athletes?(context, athlete_ids, athletes) do
       delivery_id = Ecto.UUID.generate()
 
-      with {:ok, reservations} <- reserve_touchpoints(context, athletes, delivery_id),
+      metered = Enum.filter(athletes, &ProgrammingGrant.meters_touchpoints?(grants[&1.id]))
+
+      with {:ok, reservations} <- reserve_touchpoints(context, metered, delivery_id),
            {:ok, assignment} <- create_assignment(context, params, reservations),
            :ok <- finalize_touchpoints(context, reservations, assignment, delivery_id) do
         broadcast_assignment_refresh(context, assignment)

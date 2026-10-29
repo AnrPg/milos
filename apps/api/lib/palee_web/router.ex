@@ -483,6 +483,15 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-220: the member's renewal choice and leaving the box.
+    put(
+      "/membership/subscriptions/:id/auto-renew",
+      MyMembershipController,
+      :set_auto_renew
+    )
+
+    post("/membership/leave", MyMembershipController, :leave)
+    delete("/membership/leave", MyMembershipController, :stay)
     # ADR-155: Box › Check-in.
     get("/check-in/code", MyCheckInController, :code)
     post("/check-in/code/reset", MyCheckInController, :reset_code)
@@ -758,6 +767,9 @@ defmodule PaleeWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    # ADR-229: a client's weekly goal, set by their coach or full-scope staff.
+    get("/clients/:user_id/training-goal", TrainingGoalController, :client_show)
+    put("/clients/:user_id/training-goal", TrainingGoalController, :client_update)
     get("/clients/:user_id/journal", JournalController, :client_journal)
     # ADR-158: shared body snapshots (audited in the client's access log).
     get("/clients/:user_id/body", ClientBodyController, :index)
@@ -1110,6 +1122,12 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
+    # ADR-230: the WOD of a whole day.
+    post("/schedule/slots/:id/day-workout", AdminDayWorkoutController, :follow_day)
+    get("/schedule/day-workouts", AdminDayWorkoutController, :index)
+    post("/schedule/day-workouts/preview", AdminDayWorkoutController, :preview)
+    put("/schedule/day-workouts", AdminDayWorkoutController, :put)
+    delete("/schedule/day-workouts/:id", AdminDayWorkoutController, :delete)
     post("/schedule/slots/:id/state", AdminScheduleController, :change_state)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
 
@@ -1198,7 +1216,17 @@ defmodule PaleeWeb.Router do
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
+    # ADR-220: renewal choice and leaving the box.
+    put(
+      "/finance/members/:id/subscriptions/:subscription_id/auto-renew",
+      AdminFinanceController,
+      :set_member_auto_renew
+    )
+
+    post("/finance/members/:id/leave", AdminFinanceController, :mark_member_left)
+    delete("/finance/members/:id/leave", AdminFinanceController, :undo_member_left)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
+    post("/finance/members/:id/payments/receive", AdminFinanceController, :receive_payment)
     post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
 
@@ -1492,6 +1520,7 @@ defmodule PaleeWeb.Router do
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
     get("/notifications", NotificationController, :index)
+    get("/notifications/unread-count", NotificationController, :unread_count)
     post("/notifications/read-all", NotificationController, :mark_all_read)
     post("/notifications/:id/read", NotificationController, :mark_read)
     post("/notifications/:id/click", NotificationController, :mark_clicked)
@@ -1947,6 +1976,9 @@ defmodule PaleeWeb.Router do
 
     get("/preferences", GamificationPreferencesController, :show)
     put("/preferences", GamificationPreferencesController, :update)
+    # ADR-229: the weekly workout goal is the person's own.
+    get("/goal", TrainingGoalController, :show)
+    put("/goal", TrainingGoalController, :update)
   end
 
   scope "/api/prs", PaleeWeb do

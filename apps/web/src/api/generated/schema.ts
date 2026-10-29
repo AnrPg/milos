@@ -1065,6 +1065,24 @@ export interface paths {
         patch: operations["PaleeWeb.ExecutionController.update_progress"];
         trace?: never;
     };
+    "/api/gamification/goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.show"];
+        /** Set my weekly workout goal */
+        put: operations["PaleeWeb.TrainingGoalController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gamification/preferences": {
         parameters: {
             query?: never;
@@ -4469,6 +4487,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the current user's unread notifications
+         * @description The bell's badge on every screen; the list itself loads only when the panel opens.
+         */
+        get: operations["PaleeWeb.NotificationController.unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications/{id}/click": {
         parameters: {
             query?: never;
@@ -4549,7 +4587,7 @@ export interface paths {
         put?: never;
         /**
          * Assign a published workout to one or more athletes or members
-         * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
+         * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Every assignee needs a package with online programming or personal training, ADR-225 (403 `programming_not_in_package`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
          */
         post: operations["PaleeWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
@@ -5983,6 +6021,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a member as left the box (ADR-220) */
+        post: operations["PaleeWeb.AdminFinanceController.mark_member_left"];
+        /** Undo a member's leave (ADR-220) */
+        delete: operations["PaleeWeb.AdminFinanceController.undo_member_left"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
         parameters: {
             query?: never;
@@ -6011,6 +6067,23 @@ export interface paths {
         put?: never;
         /** Record a manual membership payment */
         post: operations["PaleeWeb.AdminFinanceController.record_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/payments/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record money received from a client and issue the document the billing setup calls for */
+        post: operations["PaleeWeb.AdminFinanceController.receive_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6079,6 +6152,23 @@ export interface paths {
         put?: never;
         /** Record received money and immediately issue its receipt */
         post: operations["PaleeWeb.AdminFinanceController.create_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/subscriptions/{subscription_id}/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Turn a member's subscription renewal on or off (ADR-220) */
+        put: operations["PaleeWeb.AdminFinanceController.set_member_auto_renew"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7186,6 +7276,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Day WODs of a date range */
+        get: operations["PaleeWeb.AdminDayWorkoutController.index"];
+        /**
+         * Set the WOD of a day
+         * @description ADR-230: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.
+         */
+        put: operations["PaleeWeb.AdminDayWorkoutController.put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What setting a day WOD would change */
+        post: operations["PaleeWeb.AdminDayWorkoutController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a day WOD */
+        delete: operations["PaleeWeb.AdminDayWorkoutController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots": {
         parameters: {
             query?: never;
@@ -7236,6 +7381,23 @@ export interface paths {
         head?: never;
         /** Update a scheduled class slot */
         patch: operations["PaleeWeb.AdminScheduleController.update_slot"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/day-workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give a class the day's WOD in place of its own */
+        post: operations["PaleeWeb.AdminDayWorkoutController.follow_day"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
@@ -7778,7 +7940,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the common role-aware admin user profile shell */
+        /**
+         * Get the common role-aware admin user profile shell
+         * @description `programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.
+         */
         get: operations["PaleeWeb.AdminUserController.show"];
         put?: never;
         post?: never;
@@ -8040,7 +8205,7 @@ export interface paths {
         put?: never;
         /**
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
-         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.
          */
         post: operations["PaleeWeb.AdminUserController.program_workout"];
         delete?: never;
@@ -9718,6 +9883,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/membership/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Leave the box: renewal stops and access ends with what I paid for */
+        post: operations["PaleeWeb.MyMembershipController.leave"];
+        /** Change my mind before my last day at the box */
+        delete: operations["PaleeWeb.MyMembershipController.stay"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/membership/subscriptions/{id}/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Turn renewal of one of my subscriptions on or off */
+        put: operations["PaleeWeb.MyMembershipController.set_auto_renew"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/nutrition-plan": {
         parameters: {
             query?: never;
@@ -10861,6 +11061,24 @@ export interface paths {
         /** A client's muscle coverage, qualities radar and training load, from shared entries */
         get: operations["PaleeWeb.TrainingDepthController.client"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/training-goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.client_show"];
+        /** Set a client's weekly workout goal; the client is notified */
+        put: operations["PaleeWeb.TrainingGoalController.client_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -17115,6 +17333,7 @@ export interface components {
         BillingActions: {
             download_invoices: boolean;
             self_service_cancel_auto_renew: boolean;
+            self_service_leave: boolean;
             self_service_purchase: boolean;
         };
         /** BillingAvailableOffer */
@@ -17166,6 +17385,19 @@ export interface components {
             entitlement_status?: string | null;
             /** Format: date */
             expires_on?: string | null;
+            /**
+             * Format: date
+             * @description ADR-220: the last day the member would keep if they left today.
+             */
+            leave_preview_on?: string | null;
+            leave_reason?: string | null;
+            /**
+             * Format: date
+             * @description ADR-220: the member is leaving (or left) the box; their last day.
+             */
+            leaving_on?: string | null;
+            /** @enum {string|null} */
+            left_by?: "member" | "staff" | null;
             /** Format: date */
             starts_on?: string | null;
             status: string;
@@ -17215,6 +17447,7 @@ export interface components {
             actions: {
                 download_invoices: boolean;
                 self_service_cancel_auto_renew: boolean;
+                self_service_leave: boolean;
                 self_service_purchase: boolean;
             };
             /** @description Codes of running campaigns the box shows to members. */
@@ -17264,6 +17497,19 @@ export interface components {
                 entitlement_status?: string | null;
                 /** Format: date */
                 expires_on?: string | null;
+                /**
+                 * Format: date
+                 * @description ADR-220: the last day the member would keep if they left today.
+                 */
+                leave_preview_on?: string | null;
+                leave_reason?: string | null;
+                /**
+                 * Format: date
+                 * @description ADR-220: the member is leaving (or left) the box; their last day.
+                 */
+                leaving_on?: string | null;
+                /** @enum {string|null} */
+                left_by?: "member" | "staff" | null;
                 /** Format: date */
                 starts_on?: string | null;
                 status: string;
@@ -17352,8 +17598,11 @@ export interface components {
             }[];
             slug: string;
             subscriptions: {
+                /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                 auto_renew?: boolean | null;
                 billing_period?: string | null;
+                /** @description The member can turn renewal of this subscription on or off. */
+                can_change_auto_renew?: boolean;
                 /** Format: date */
                 commitment_ends_on?: string | null;
                 corporate?: boolean;
@@ -17435,8 +17684,11 @@ export interface components {
         };
         /** BillingSubscription */
         BillingSubscription: {
+            /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
             auto_renew?: boolean | null;
             billing_period?: string | null;
+            /** @description The member can turn renewal of this subscription on or off. */
+            can_change_auto_renew?: boolean;
             /** Format: date */
             commitment_ends_on?: string | null;
             corporate?: boolean;
@@ -26275,6 +26527,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * FreeTextWorkoutBody
+         * @description One text written with the WOD assistant
+         */
+        FreeTextWorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** GarminConnectRequest */
         GarminConnectRequest: {
             /**
@@ -27804,6 +28074,7 @@ export interface components {
                 actions: {
                     download_invoices: boolean;
                     self_service_cancel_auto_renew: boolean;
+                    self_service_leave: boolean;
                     self_service_purchase: boolean;
                 };
                 /** @description Codes of running campaigns the box shows to members. */
@@ -27853,6 +28124,19 @@ export interface components {
                     entitlement_status?: string | null;
                     /** Format: date */
                     expires_on?: string | null;
+                    /**
+                     * Format: date
+                     * @description ADR-220: the last day the member would keep if they left today.
+                     */
+                    leave_preview_on?: string | null;
+                    leave_reason?: string | null;
+                    /**
+                     * Format: date
+                     * @description ADR-220: the member is leaving (or left) the box; their last day.
+                     */
+                    leaving_on?: string | null;
+                    /** @enum {string|null} */
+                    left_by?: "member" | "staff" | null;
                     /** Format: date */
                     starts_on?: string | null;
                     status: string;
@@ -27941,8 +28225,11 @@ export interface components {
                 }[];
                 slug: string;
                 subscriptions: {
+                    /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                     auto_renew?: boolean | null;
                     billing_period?: string | null;
+                    /** @description The member can turn renewal of this subscription on or off. */
+                    can_change_auto_renew?: boolean;
                     /** Format: date */
                     commitment_ends_on?: string | null;
                     corporate?: boolean;
@@ -36779,6 +37066,43 @@ export interface components {
                 unmatched_exercises: number;
             };
         };
+        /** StructuredSection */
+        StructuredSection: {
+            /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+            exercises: {
+                [key: string]: unknown;
+            }[];
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            scoreable: boolean;
+            subtitle?: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * StructuredWorkoutBody
+         * @description Exercises with every parameter (structured editor, Quick Text)
+         */
+        StructuredWorkoutBody: {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
             /** Format: uuid */
@@ -37132,6 +37456,80 @@ export interface components {
                 /** Format: date-time */
                 undo_until?: string;
             };
+        };
+        /** TextSection */
+        TextSection: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            id: string | null;
+            /** @description What the section counts (SectionScoring metrics), empty when not scored */
+            scoring: {
+                [key: string]: unknown;
+            }[];
+            text: string;
+            /** SectionTimerPreset */
+            timer: {
+                duration_seconds?: number | null;
+                /** @enum {string} */
+                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                interval_seconds?: number | null;
+                rest_seconds?: number | null;
+                rounds?: number | null;
+                work_seconds?: number | null;
+            } | null;
+            /** @description Null when untitled */
+            title: string | null;
+        };
+        /**
+         * TextSectionsWorkoutBody
+         * @description ADR-180: text sections written without the assistant, a timer each
+         */
+        TextSectionsWorkoutBody: {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        };
+        /** TrainingGoal */
+        TrainingGoal: {
+            /** @description No one set a goal yet; the platform default applies */
+            is_default: boolean;
+            max: number;
+            min: number;
+            /** Format: uuid */
+            set_by_id?: string | null;
+            set_by_nickname?: string | null;
+            /** @enum {string|null} */
+            set_by_role?: "self" | "coach" | "staff" | null;
+            /** Format: date-time */
+            updated_at?: string | null;
+            weekly_workout_target: number;
         };
         /** TrainingHistoryPage */
         TrainingHistoryPage: {
@@ -38385,6 +38783,79 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+        };
+        /** WorkoutBody */
+        WorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        } | {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        } | {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
+        /** WorkoutBodySummary */
+        WorkoutBodySummary: {
+            excerpt?: string | null;
+            /** @enum {string} */
+            kind: "free_text" | "text_sections" | "structured";
+            sections?: {
+                [key: string]: unknown;
+            }[];
+            structured?: boolean;
+            timer?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** WorkoutChoice */
         WorkoutChoice: {
@@ -44042,6 +44513,96 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.TrainingGoalController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.GamificationPreferencesController.show": {
         parameters: {
             query?: never;
@@ -44720,6 +45281,7 @@ export interface operations {
                             actions: {
                                 download_invoices: boolean;
                                 self_service_cancel_auto_renew: boolean;
+                                self_service_leave: boolean;
                                 self_service_purchase: boolean;
                             };
                             /** @description Codes of running campaigns the box shows to members. */
@@ -44769,6 +45331,19 @@ export interface operations {
                                 entitlement_status?: string | null;
                                 /** Format: date */
                                 expires_on?: string | null;
+                                /**
+                                 * Format: date
+                                 * @description ADR-220: the last day the member would keep if they left today.
+                                 */
+                                leave_preview_on?: string | null;
+                                leave_reason?: string | null;
+                                /**
+                                 * Format: date
+                                 * @description ADR-220: the member is leaving (or left) the box; their last day.
+                                 */
+                                leaving_on?: string | null;
+                                /** @enum {string|null} */
+                                left_by?: "member" | "staff" | null;
                                 /** Format: date */
                                 starts_on?: string | null;
                                 status: string;
@@ -44857,8 +45432,11 @@ export interface operations {
                             }[];
                             slug: string;
                             subscriptions: {
+                                /** @description ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs. */
                                 auto_renew?: boolean | null;
                                 billing_period?: string | null;
+                                /** @description The member can turn renewal of this subscription on or off. */
+                                can_change_auto_renew?: boolean;
                                 /** Format: date */
                                 commitment_ends_on?: string | null;
                                 corporate?: boolean;
@@ -60706,6 +61284,28 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.NotificationController.unread_count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unread count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        unread_count: number;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.NotificationController.mark_clicked": {
         parameters: {
             query?: never;
@@ -69660,6 +70260,64 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFinanceController.mark_member_left": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Leave */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    commitment_override_reason?: string | null;
+                    /** Format: date */
+                    leaving_on?: string | null;
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Leave result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.undo_member_left": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceController.assign_package": {
         parameters: {
             query?: never;
@@ -69708,6 +70366,61 @@ export interface operations {
         };
         responses: {
             /** @description Membership payment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.receive_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    currency?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    finance_invoice_id?: string | null;
+                    idempotency_key: string;
+                    /** Format: uuid */
+                    membership_package_subscription_id?: string | null;
+                    notes?: string | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description The same request, already recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Received payment and its document */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -69853,6 +70566,38 @@ export interface operations {
         responses: {
             /** @description Paid receipt */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.set_member_auto_renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Renewal choice */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    auto_renew: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Package subscription */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -75114,6 +75859,247 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDayWorkoutController.index": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Day WODs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day_workouts: ({
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.put": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Empty or missing: every class of the day */
+                    class_type_ids?: string[];
+                    /**
+                     * Format: date
+                     * @description The gym's own date
+                     */
+                    date: string;
+                    /**
+                     * Format: uuid
+                     * @description Null: every branch
+                     */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    /** @description Also replace the WODs set on single classes in this scope */
+                    replace_own?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Day WODs set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed_count: number;
+                        day_workouts: ({
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Empty or missing: every class of the day */
+                    class_type_ids?: string[];
+                    /**
+                     * Format: date
+                     * @description The gym's own date
+                     */
+                    date: string;
+                    /**
+                     * Format: uuid
+                     * @description Null: every branch
+                     */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    /** @description Also replace the WODs set on single classes in this scope */
+                    replace_own?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Classes by outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        inherit: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        own: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        started: ({
+                            class_type_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed_count: number;
+                        day_workout: {
+                            /**
+                             * Format: uuid
+                             * @description Null: every class (events only by type)
+                             */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /**
+                             * Format: uuid
+                             * @description Null: every branch
+                             */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminScheduleController.create_slot": {
         parameters: {
             query?: never;
@@ -75125,7 +76111,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75177,7 +76163,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75254,7 +76240,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75303,6 +76289,32 @@ export interface operations {
                         };
                         /** @description Classes the edit changed, the edited one included */
                         updated_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDayWorkoutController.follow_day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Slot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        slot: {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -76419,10 +77431,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -76432,9 +77446,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -76484,8 +77500,10 @@ export interface operations {
                     };
                     gamification?: {
                         leaderboard_enabled?: boolean;
+                        /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                         streak_shield_reset_day?: number | null;
-                        weekly_workout_target?: number;
+                        /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                        streak_shields?: number;
                     };
                     provider?: {
                         /** @enum {string} */
@@ -76493,11 +77511,12 @@ export interface operations {
                     };
                     scheduling?: {
                         default_auto_approve?: boolean;
-                        default_booking_timeout_minutes?: number;
+                        /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                        default_booking_timeout_minutes?: number | null;
                         /** @description How many days ahead members may book when their package sets no window */
                         default_booking_window_days?: number | null;
-                        /** @description Withdrawals closer to the class than this use the visit */
-                        default_cancellation_cutoff_hours?: number | null;
+                        /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                        default_cancellation_cutoff_minutes?: number | null;
                         default_capacity?: number;
                     };
                     workouts?: {
@@ -76539,10 +77558,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -76552,9 +77573,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -80129,9 +81152,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        workouts: {
+                        workouts: ({
+                            /** WorkoutBodySummary */
+                            body?: {
+                                excerpt?: string | null;
+                                /** @enum {string} */
+                                kind: "free_text" | "text_sections" | "structured";
+                                sections?: {
+                                    [key: string]: unknown;
+                                }[];
+                                structured?: boolean;
+                                timer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                            };
+                        } & {
                             [key: string]: unknown;
-                        }[];
+                        })[];
                     };
                 };
             };
@@ -80738,6 +81775,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -82968,6 +84065,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -87550,10 +88707,19 @@ export interface operations {
                             thread_id: string;
                         }[];
                         gamification: {
+                            goal?: ({
+                                is_default: boolean;
+                                set_by_nickname?: string | null;
+                                /** @enum {string|null} */
+                                set_by_role?: "self" | "coach" | "staff" | null;
+                                weekly_workout_target: number;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
                             settings: {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
-                                weekly_workout_target: number;
+                                streak_shields: number;
                             };
                         } & {
                             [key: string]: unknown;
@@ -88585,6 +89751,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Leave */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Leave result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Already leaving */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.stay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not leaving, or the last day has passed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyMembershipController.set_auto_renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Renewal choice */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    auto_renew: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Package subscription */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Ended, or leaving the box */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description No renewal choice here */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -91908,6 +93200,27 @@ export interface operations {
                             id: string;
                             nickname: string;
                         }[];
+                        /** @description ADR-230, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one. */
+                        day_workouts: ({
+                            /** Format: uuid */
+                            class_type_id: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            local_date: string;
+                            /** Format: uuid */
+                            location_id: string | null;
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string;
+                                title?: string;
+                                type?: string | null;
+                            } | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
                         days: number;
                         /** Format: date */
                         end_date: string;
@@ -91945,6 +93258,11 @@ export interface operations {
                             cancel_free_until?: string | null;
                             /** @description Members only: whether the viewer's package includes this class, regardless of visits left. */
                             covered_by_package?: boolean;
+                            /**
+                             * Format: uuid
+                             * @description ADR-230: the day WOD the class's WOD comes from.
+                             */
+                            day_workout_id?: string | null;
                             /** @description Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip). */
                             friends_going?: {
                                 avatar_url?: string | null;
@@ -91970,6 +93288,11 @@ export interface operations {
                             } & {
                                 [key: string]: unknown;
                             }) | null;
+                            /**
+                             * @description ADR-230: day = inherited from the day's WOD, class = set on the class.
+                             * @enum {string|null}
+                             */
+                            workout_source?: "day" | "class" | null;
                         } & {
                             [key: string]: unknown;
                         })[];
@@ -93521,6 +94844,122 @@ export interface operations {
                 content: {
                     "application/json": {
                         error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -99044,6 +100483,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -99679,6 +101178,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -100226,6 +101785,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {

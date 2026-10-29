@@ -24,6 +24,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { FRESHNESS } from "@/lib/query-policy";
 
 /**
  * ADR-184: a gym or coach in demo mode. On every admin screen one floating
@@ -54,7 +55,7 @@ export function DemoModeHost() {
     queryKey: [...ADMIN_BUSINESS_KEY, membership?.organization.slug],
     enabled,
     queryFn: () => fetchBusinessStatus(token!),
-    staleTime: 30_000,
+    staleTime: FRESHNESS.account,
   });
 
   return (

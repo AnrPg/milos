@@ -15,7 +15,7 @@ export function useMyProviders() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   return useQuery({
-    queryKey: [...MY_PROVIDERS_KEY, token],
+    queryKey: MY_PROVIDERS_KEY,
     enabled: Boolean(token),
     queryFn: () => fetchMyProviders(token!),
     staleTime: 60_000,
@@ -58,7 +58,7 @@ export function useSwitchProvider() {
         const providers = await selectProvider(token, provider.organization_id);
         rememberSelectedOrganization(provider.slug);
         queryClient.clear();
-        queryClient.setQueryData([...MY_PROVIDERS_KEY, token], providers);
+        queryClient.setQueryData(MY_PROVIDERS_KEY, providers);
         const scoped = pathname.match(/^\/org\/[^/]+(\/.*)?$/);
         if (scoped) router.push(`/org/${provider.slug}${scoped[1] ?? ""}`);
         else router.refresh();

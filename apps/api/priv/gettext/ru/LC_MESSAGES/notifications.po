@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Освободилось место на занятии %{class}. Ваша запись подтверждена или ожидает одобрения."
 
 msgid "Your package ends soon"
-msgstr "Ваш пакет скоро закончится"
+msgstr "Твой абонементный пакет скоро закончится"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} заканчивается %{date}."
@@ -708,3 +708,15 @@ msgstr "SMTP-ключ Palee истёк %{date}, поэтому Palee не мож
 
 msgid "The email key has expired"
 msgstr "Ключ для email истёк"
+
+msgid "Your weekly goal changed"
+msgstr "Ваша недельная цель изменена"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} установил(а) вашу цель: %{target} тренировок в неделю. Вы можете её изменить."
+
+msgid "A box member is leaving"
+msgstr "Участник бокса уходит"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} уходит из бокса. Последний день: %{date}."

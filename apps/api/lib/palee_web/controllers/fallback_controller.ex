@@ -1238,6 +1238,107 @@ defmodule PaleeWeb.FallbackController do
     )
   end
 
+  # ADR-220: renewal choice and leaving the box.
+  def call(conn, {:error, :renewal_turned_off}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "renewal_turned_off",
+        "The member turned renewal off",
+        %{}
+      )
+
+  def call(conn, {:error, :member_leaving}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "member_leaving",
+        "The member is leaving the box",
+        %{}
+      )
+
+  def call(conn, {:error, :renewal_choice_not_allowed}),
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "renewal_choice_not_allowed",
+        "This subscription has no renewal choice",
+        %{}
+      )
+
+  def call(conn, {:error, :subscription_ended}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "subscription_ended",
+        "The subscription has already ended",
+        %{}
+      )
+
+  def call(conn, {:error, :not_leaving}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "not_leaving",
+        "The member is not leaving the box",
+        %{}
+      )
+
+  def call(conn, {:error, :left_by_staff}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "left_by_staff",
+        "The box recorded this leave; ask them to undo it",
+        %{}
+      )
+
+  def call(conn, {:error, :already_left}),
+    do:
+      package_contract_error(
+        conn,
+        :conflict,
+        "already_left",
+        "The member's last day has passed",
+        %{}
+      )
+
+  def call(conn, {:error, :invalid_leaving_on}),
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_leaving_on",
+        "The last day is not a valid date",
+        %{}
+      )
+
+  def call(conn, {:error, :invalid_leave_actor}),
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_leave_actor",
+        "Unknown leave actor",
+        %{}
+      )
+
+  def call(conn, {:error, :invalid_auto_renew}),
+    do:
+      package_contract_error(
+        conn,
+        :unprocessable_entity,
+        "invalid_auto_renew",
+        "auto_renew must be true or false",
+        %{}
+      )
+
   def call(conn, {:error, :package_not_renewable}) do
     package_contract_error(
       conn,
@@ -1771,6 +1872,16 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_payment_amount", error: "Payment amount must be greater than zero"})
   end
 
+  # ADR-222: a new receipt or invoice says what the money was for.
+  def call(conn, {:error, :payment_purpose_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "payment_purpose_required",
+      error: "Choose the subscription package or describe what the payment is for"
+    })
+  end
+
   def call(conn, {:error, :duplicate_renewal_invoice}) do
     conn
     |> put_status(:conflict)
@@ -1888,15 +1999,26 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
-  # ADR-125: personal member programming needs an explicit package grant.
-  def call(conn, {:error, :member_programming_not_entitled, details}) do
+  # ADR-225: programming a person needs online programming or personal
+  # training in their package.
+  def call(conn, {:error, :programming_not_in_package, details}) do
     conn
     |> put_status(:forbidden)
     |> json(%{
-      code: "member_programming_not_entitled",
-      error:
-        "The member's package does not include personal programming " <>
-          "(personal_programming channel and execute_assigned_workouts capability)",
+      code: "programming_not_in_package",
+      error: "The person's package includes neither online programming nor personal training",
+      params: details
+    })
+  end
+
+  # A WOD whose programming copy cannot be published: the WOD itself has to
+  # be fixed in its editor, so the reply names it and what it lacks.
+  def call(conn, {:error, :workout_not_assignable, details}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "workout_not_assignable",
+      error: "The workout cannot be assigned until it is complete (#{details.problem})",
       params: details
     })
   end
@@ -2557,6 +2679,10 @@ defmodule PaleeWeb.FallbackController do
     slot_not_full: {:conflict, "The class still has free spots"},
     # ADR-176: a draft class has no WOD yet.
     class_not_published: {:conflict, "This class isn't open yet"},
+    # ADR-230: day WODs.
+    day_in_the_past: {:unprocessable_entity, "A day WOD can be set from today on"},
+    no_day_workout: {:conflict, "No day WOD covers this class"},
+    day_class_started: {:conflict, "This class has started; its WOD stays as it was"},
     invalid_time_zone: {:unprocessable_entity, "Choose a known time zone"},
     time_zone_required: {:unprocessable_entity, "The gym's time zone must be set"},
     invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},

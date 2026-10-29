@@ -237,6 +237,13 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-222: recording money received at the desk.
+  payment_exceeds_invoice_balance: "apiErrorPaymentExceedsInvoiceBalance",
+  invoice_already_paid: "apiErrorInvoiceAlreadyPaid",
+  invoice_void: "apiErrorInvoiceVoid",
+  payment_purpose_required: "apiErrorPaymentPurposeRequired",
+  invalid_payment_amount: "apiErrorInvalidPaymentAmount",
+  invalid_payment_method: "apiErrorInvalidPaymentMethod",
   // ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
   space_unavailable: "apiErrorSpaceUnavailable",
   space_archived: "apiErrorSpaceArchived",
@@ -362,8 +369,17 @@ const API_ERROR_KEYS: Record<string, string> = {
   package_already_used: "apiErrorPackageAlreadyUsed",
   package_new_members_only: "apiErrorPackageNewMembersOnly",
   package_not_renewable: "apiErrorPackageNotRenewable",
+  // ADR-220: renewal choice and leaving the box.
+  renewal_turned_off: "apiErrorRenewalTurnedOff",
+  member_leaving: "apiErrorMemberLeaving",
+  renewal_choice_not_allowed: "apiErrorRenewalChoiceNotAllowed",
+  subscription_ended: "apiErrorSubscriptionEnded",
+  not_leaving: "apiErrorNotLeaving",
+  already_left: "apiErrorAlreadyLeft",
+  left_by_staff: "apiErrorLeftByStaff",
+  invalid_leaving_on: "apiErrorInvalidLeavingOn",
   invalid_athletes: "apiErrorInvalidAthletes",
-  member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
+  programming_not_in_package: "apiErrorProgrammingNotInPackage",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",
   slot_not_booked_by_member: "apiErrorSlotNotBookedByMember",
   // ADR-201: a coach with scope own programming someone who is not their client.
@@ -386,6 +402,10 @@ const API_ERROR_KEYS: Record<string, string> = {
   slot_not_full: "mbErrSlotNotFull",
   // ADR-176
   class_not_published: "apiErrorClassNotPublished",
+  // ADR-230: day WODs.
+  day_in_the_past: "apiErrorDayInThePast",
+  no_day_workout: "apiErrorNoDayWorkout",
+  day_class_started: "apiErrorDayClassStarted",
   invalid_time_zone: "apiErrorInvalidTimeZone",
   time_zone_required: "apiErrorTimeZoneRequired",
   already_booked: "mbErrAlreadyBooked",
@@ -424,6 +444,8 @@ const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
   finance_allowance_exhausted: "apiErrorFinanceAllowanceExhausted",
   finance_class_type_not_included: "apiErrorFinanceClassTypeNotIncluded",
 };
+
+const WORKOUT_PROBLEMS = new Set(["no_content", "incomplete_sections", "invalid_details"]);
 
 const PACKAGE_RULES = new Set([
   "validity_required",
@@ -507,6 +529,13 @@ export function localizeError(error: unknown, translate: UiTranslator): string {
   const rule = error.payload.params?.rule;
   if (error.payload.code === "package_rule_violated" && typeof rule === "string" && PACKAGE_RULES.has(rule)) {
     return translate(`apiErrorPackageRule_${rule}`);
+  }
+
+  // A WOD that cannot be given to anyone: name it and what it lacks.
+  const problem = error.payload.params?.problem;
+  if (error.payload.code === "workout_not_assignable" && typeof problem === "string" && WORKOUT_PROBLEMS.has(problem)) {
+    const title = error.payload.params?.title;
+    return translate(`apiErrorWorkoutNotAssignable_${problem}`, { title: typeof title === "string" && title ? title : "WOD" });
   }
 
   const key = error.payload.code ? API_ERROR_KEYS[error.payload.code] : undefined;

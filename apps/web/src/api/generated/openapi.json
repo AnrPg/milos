@@ -11848,6 +11848,9 @@
           "self_service_cancel_auto_renew": {
             "type": "boolean"
           },
+          "self_service_leave": {
+            "type": "boolean"
+          },
           "self_service_purchase": {
             "type": "boolean"
           }
@@ -11855,6 +11858,7 @@
         "required": [
           "self_service_purchase",
           "self_service_cancel_auto_renew",
+          "self_service_leave",
           "download_invoices"
         ],
         "title": "BillingActions",
@@ -12010,6 +12014,30 @@
             "nullable": true,
             "type": "string"
           },
+          "leave_preview_on": {
+            "description": "ADR-220: the last day the member would keep if they left today.",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "leave_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "leaving_on": {
+            "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "left_by": {
+            "enum": [
+              "member",
+              "staff"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "starts_on": {
             "format": "date",
             "nullable": true,
@@ -12147,6 +12175,9 @@
               "self_service_cancel_auto_renew": {
                 "type": "boolean"
               },
+              "self_service_leave": {
+                "type": "boolean"
+              },
               "self_service_purchase": {
                 "type": "boolean"
               }
@@ -12154,6 +12185,7 @@
             "required": [
               "self_service_purchase",
               "self_service_cancel_auto_renew",
+              "self_service_leave",
               "download_invoices"
             ],
             "title": "BillingActions",
@@ -12303,6 +12335,30 @@
               },
               "expires_on": {
                 "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "leave_preview_on": {
+                "description": "ADR-220: the last day the member would keep if they left today.",
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "leave_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "leaving_on": {
+                "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "left_by": {
+                "enum": [
+                  "member",
+                  "staff"
+                ],
                 "nullable": true,
                 "type": "string"
               },
@@ -12614,12 +12670,17 @@
             "items": {
               "properties": {
                 "auto_renew": {
+                  "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                   "nullable": true,
                   "type": "boolean"
                 },
                 "billing_period": {
                   "nullable": true,
                   "type": "string"
+                },
+                "can_change_auto_renew": {
+                  "description": "The member can turn renewal of this subscription on or off.",
+                  "type": "boolean"
                 },
                 "commitment_ends_on": {
                   "format": "date",
@@ -12901,12 +12962,17 @@
       "BillingSubscription": {
         "properties": {
           "auto_renew": {
+            "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
             "nullable": true,
             "type": "boolean"
           },
           "billing_period": {
             "nullable": true,
             "type": "string"
+          },
+          "can_change_auto_renew": {
+            "description": "The member can turn renewal of this subscription on or off.",
+            "type": "boolean"
           },
           "commitment_ends_on": {
             "format": "date",
@@ -41123,6 +41189,46 @@
         "title": "FreeTextWorkoutAnalysis",
         "type": "object"
       },
+      "FreeTextWorkoutBody": {
+        "additionalProperties": false,
+        "description": "One text written with the WOD assistant",
+        "properties": {
+          "document": {
+            "additionalProperties": true,
+            "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+            "nullable": true,
+            "type": "object"
+          },
+          "kind": {
+            "enum": [
+              "free_text"
+            ],
+            "type": "string"
+          },
+          "structured": {
+            "description": "The assistant also derived exercises (see `sections`)",
+            "type": "boolean"
+          },
+          "text": {
+            "nullable": true,
+            "type": "string"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "text",
+          "document",
+          "timer",
+          "structured"
+        ],
+        "title": "FreeTextWorkoutBody",
+        "type": "object"
+      },
       "GarminConnectRequest": {
         "properties": {
           "backfill_days": {
@@ -46114,6 +46220,9 @@
                     "self_service_cancel_auto_renew": {
                       "type": "boolean"
                     },
+                    "self_service_leave": {
+                      "type": "boolean"
+                    },
                     "self_service_purchase": {
                       "type": "boolean"
                     }
@@ -46121,6 +46230,7 @@
                   "required": [
                     "self_service_purchase",
                     "self_service_cancel_auto_renew",
+                    "self_service_leave",
                     "download_invoices"
                   ],
                   "title": "BillingActions",
@@ -46270,6 +46380,30 @@
                     },
                     "expires_on": {
                       "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leave_preview_on": {
+                      "description": "ADR-220: the last day the member would keep if they left today.",
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leave_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "leaving_on": {
+                      "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "left_by": {
+                      "enum": [
+                        "member",
+                        "staff"
+                      ],
                       "nullable": true,
                       "type": "string"
                     },
@@ -46581,12 +46715,17 @@
                   "items": {
                     "properties": {
                       "auto_renew": {
+                        "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                         "nullable": true,
                         "type": "boolean"
                       },
                       "billing_period": {
                         "nullable": true,
                         "type": "string"
+                      },
+                      "can_change_auto_renew": {
+                        "description": "The member can turn renewal of this subscription on or off.",
+                        "type": "boolean"
                       },
                       "commitment_ends_on": {
                         "format": "date",
@@ -74858,6 +74997,111 @@
         "title": "StaffWorkoutGoalsResponse",
         "type": "object"
       },
+      "StructuredSection": {
+        "additionalProperties": false,
+        "properties": {
+          "exercises": {
+            "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scoreable": {
+            "type": "boolean"
+          },
+          "subtitle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "timer",
+          "scoreable",
+          "exercises"
+        ],
+        "title": "StructuredSection",
+        "type": "object"
+      },
+      "StructuredWorkoutBody": {
+        "additionalProperties": false,
+        "description": "Exercises with every parameter (structured editor, Quick Text)",
+        "properties": {
+          "kind": {
+            "enum": [
+              "structured"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "exercises": {
+                  "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "scoreable": {
+                  "type": "boolean"
+                },
+                "subtitle": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "timer": {
+                  "additionalProperties": true,
+                  "nullable": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "timer",
+                "scoreable",
+                "exercises"
+              ],
+              "title": "StructuredSection",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "sections"
+        ],
+        "title": "StructuredWorkoutBody",
+        "type": "object"
+      },
       "SubscriptionBeneficiary": {
         "properties": {
           "id": {
@@ -75973,6 +76217,245 @@
           "support_request"
         ],
         "title": "SupportRequestResponse",
+        "type": "object"
+      },
+      "TextSection": {
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "additionalProperties": true,
+            "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+            "nullable": true,
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "scoring": {
+            "description": "What the section counts (SectionScoring metrics), empty when not scored",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          },
+          "timer": {
+            "nullable": true,
+            "properties": {
+              "duration_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "format": {
+                "enum": [
+                  "untimed",
+                  "for_time",
+                  "amrap",
+                  "emom",
+                  "tabata",
+                  "custom_hiit",
+                  "death_by"
+                ],
+                "type": "string"
+              },
+              "interval_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "rest_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "rounds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "work_seconds": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "format"
+            ],
+            "title": "SectionTimerPreset",
+            "type": "object"
+          },
+          "title": {
+            "description": "Null when untitled",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "text",
+          "document",
+          "timer",
+          "scoring"
+        ],
+        "title": "TextSection",
+        "type": "object"
+      },
+      "TextSectionsWorkoutBody": {
+        "additionalProperties": false,
+        "description": "ADR-180: text sections written without the assistant, a timer each",
+        "properties": {
+          "kind": {
+            "enum": [
+              "text_sections"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "document": {
+                  "additionalProperties": true,
+                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scoring": {
+                  "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "timer": {
+                  "nullable": true,
+                  "properties": {
+                    "duration_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "format": {
+                      "enum": [
+                        "untimed",
+                        "for_time",
+                        "amrap",
+                        "emom",
+                        "tabata",
+                        "custom_hiit",
+                        "death_by"
+                      ],
+                      "type": "string"
+                    },
+                    "interval_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "rest_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "rounds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "work_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "format"
+                  ],
+                  "title": "SectionTimerPreset",
+                  "type": "object"
+                },
+                "title": {
+                  "description": "Null when untitled",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "text",
+                "document",
+                "timer",
+                "scoring"
+              ],
+              "title": "TextSection",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "sections"
+        ],
+        "title": "TextSectionsWorkoutBody",
+        "type": "object"
+      },
+      "TrainingGoal": {
+        "properties": {
+          "is_default": {
+            "description": "No one set a goal yet; the platform default applies",
+            "type": "boolean"
+          },
+          "max": {
+            "type": "integer"
+          },
+          "min": {
+            "type": "integer"
+          },
+          "set_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "set_by_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "set_by_role": {
+            "enum": [
+              "self",
+              "coach",
+              "staff"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "weekly_workout_target": {
+            "maximum": 14,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "is_default",
+          "max",
+          "min",
+          "weekly_workout_target"
+        ],
+        "title": "TrainingGoal",
         "type": "object"
       },
       "TrainingHistoryPage": {
@@ -80141,6 +80624,259 @@
           "wod_assistant_enabled"
         ],
         "title": "WorkoutAuthoringSettings",
+        "type": "object"
+      },
+      "WorkoutBody": {
+        "discriminator": {
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "One text written with the WOD assistant",
+            "properties": {
+              "document": {
+                "additionalProperties": true,
+                "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                "nullable": true,
+                "type": "object"
+              },
+              "kind": {
+                "enum": [
+                  "free_text"
+                ],
+                "type": "string"
+              },
+              "structured": {
+                "description": "The assistant also derived exercises (see `sections`)",
+                "type": "boolean"
+              },
+              "text": {
+                "nullable": true,
+                "type": "string"
+              },
+              "timer": {
+                "additionalProperties": true,
+                "nullable": true,
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "text",
+              "document",
+              "timer",
+              "structured"
+            ],
+            "title": "FreeTextWorkoutBody",
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "ADR-180: text sections written without the assistant, a timer each",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "text_sections"
+                ],
+                "type": "string"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "document": {
+                      "additionalProperties": true,
+                      "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scoring": {
+                      "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "timer": {
+                      "nullable": true,
+                      "properties": {
+                        "duration_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "format": {
+                          "enum": [
+                            "untimed",
+                            "for_time",
+                            "amrap",
+                            "emom",
+                            "tabata",
+                            "custom_hiit",
+                            "death_by"
+                          ],
+                          "type": "string"
+                        },
+                        "interval_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "rest_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "rounds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "work_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "format"
+                      ],
+                      "title": "SectionTimerPreset",
+                      "type": "object"
+                    },
+                    "title": {
+                      "description": "Null when untitled",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "text",
+                    "document",
+                    "timer",
+                    "scoring"
+                  ],
+                  "title": "TextSection",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "sections"
+            ],
+            "title": "TextSectionsWorkoutBody",
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Exercises with every parameter (structured editor, Quick Text)",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "structured"
+                ],
+                "type": "string"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "exercises": {
+                      "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "scoreable": {
+                      "type": "boolean"
+                    },
+                    "subtitle": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "timer": {
+                      "additionalProperties": true,
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "timer",
+                    "scoreable",
+                    "exercises"
+                  ],
+                  "title": "StructuredSection",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "sections"
+            ],
+            "title": "StructuredWorkoutBody",
+            "type": "object"
+          }
+        ],
+        "title": "WorkoutBody"
+      },
+      "WorkoutBodySummary": {
+        "additionalProperties": false,
+        "properties": {
+          "excerpt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "free_text",
+              "text_sections",
+              "structured"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "structured": {
+            "type": "boolean"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "WorkoutBodySummary",
         "type": "object"
       },
       "WorkoutChoice": {
@@ -94581,6 +95317,203 @@
         ]
       }
     },
+    "/api/gamification/goal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My weekly workout goal",
+        "tags": [
+          "Gamification"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "weekly_workout_target": {
+                    "maximum": 14,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "weekly_workout_target"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Goal",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set my weekly workout goal",
+        "tags": [
+          "Gamification"
+        ]
+      }
+    },
     "/api/gamification/preferences": {
       "get": {
         "callbacks": {},
@@ -96003,6 +96936,9 @@
                               "self_service_cancel_auto_renew": {
                                 "type": "boolean"
                               },
+                              "self_service_leave": {
+                                "type": "boolean"
+                              },
                               "self_service_purchase": {
                                 "type": "boolean"
                               }
@@ -96010,6 +96946,7 @@
                             "required": [
                               "self_service_purchase",
                               "self_service_cancel_auto_renew",
+                              "self_service_leave",
                               "download_invoices"
                             ],
                             "title": "BillingActions",
@@ -96159,6 +97096,30 @@
                               },
                               "expires_on": {
                                 "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leave_preview_on": {
+                                "description": "ADR-220: the last day the member would keep if they left today.",
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leave_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "leaving_on": {
+                                "description": "ADR-220: the member is leaving (or left) the box; their last day.",
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "left_by": {
+                                "enum": [
+                                  "member",
+                                  "staff"
+                                ],
                                 "nullable": true,
                                 "type": "string"
                               },
@@ -96470,12 +97431,17 @@
                             "items": {
                               "properties": {
                                 "auto_renew": {
+                                  "description": "ADR-220: the member's renewal choice; null when the package does not renew or the choice is not theirs.",
                                   "nullable": true,
                                   "type": "boolean"
                                 },
                                 "billing_period": {
                                   "nullable": true,
                                   "type": "string"
+                                },
+                                "can_change_auto_renew": {
+                                  "description": "The member can turn renewal of this subscription on or off.",
+                                  "type": "boolean"
                                 },
                                 "commitment_ends_on": {
                                   "format": "date",
@@ -138766,6 +139732,44 @@
         ]
       }
     },
+    "/api/notifications/unread-count": {
+      "get": {
+        "callbacks": {},
+        "description": "The bell's badge on every screen; the list itself loads only when the panel opens.",
+        "operationId": "PaleeWeb.NotificationController.unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "unread_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "unread_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unread count"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Count the current user's unread notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/notifications/{id}/click": {
       "post": {
         "callbacks": {},
@@ -139204,7 +140208,7 @@
     "/api/org/{organization_slug}/admin/assigned-workouts": {
       "post": {
         "callbacks": {},
-        "description": "ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).",
+        "description": "ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Every assignee needs a package with online programming or personal training, ADR-225 (403 `programming_not_in_package`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).",
         "operationId": "PaleeWeb.AdminAssignedWorkoutController.create",
         "parameters": [],
         "requestBody": {
@@ -162352,6 +163356,109 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/leave": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.undo_member_left",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Undo a member's leave (ADR-220)",
+        "tags": [
+          "Admin Finance"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.mark_member_left",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "commitment_override_reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "leaving_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leave",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leave result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark a member as left the box (ADR-220)",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
       "post": {
         "callbacks": {},
@@ -162447,6 +163554,132 @@
           }
         ],
         "summary": "Record a manual membership payment",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/payments/receive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.receive_payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_cents": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "charge_category": {
+                    "enum": [
+                      "product",
+                      "personal_training",
+                      "event",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "currency": {
+                    "maxLength": 3,
+                    "minLength": 3,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "finance_invoice_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "membership_package_subscription_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "paid_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "payment_method": {
+                    "enum": [
+                      "cash",
+                      "card_manual",
+                      "bank_transfer",
+                      "other"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount_cents",
+                  "idempotency_key",
+                  "payment_method"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The same request, already recorded"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Received payment and its document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record money received from a client and issue the document the billing setup calls for",
         "tags": [
           "Admin Finance"
         ]
@@ -162778,6 +164011,73 @@
           }
         ],
         "summary": "Record received money and immediately issue its receipt",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/subscriptions/{subscription_id}/auto-renew": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.set_member_auto_renew",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "auto_renew": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "auto_renew"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Renewal choice",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package subscription"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn a member's subscription renewal on or off (ADR-220)",
         "tags": [
           "Admin Finance"
         ]
@@ -176735,6 +178035,523 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.index",
+        "parameters": [
+          {
+            "description": "",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "day_workouts": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "description": "Null: every class (events only by type)",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "Null: every branch",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "day_workouts"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Day WODs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Day WODs of a date range",
+        "tags": [
+          "Admin Schedule"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "ADR-230: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.",
+        "operationId": "PaleeWeb.AdminDayWorkoutController.put",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "class_type_ids": {
+                    "description": "Empty or missing: every class of the day",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "date": {
+                    "description": "The gym's own date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "description": "Null: every branch",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "replace_own": {
+                    "description": "Also replace the WODs set on single classes in this scope",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "date",
+                  "master_workout_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "changed_count": {
+                      "type": "integer"
+                    },
+                    "day_workouts": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "description": "Null: every class (events only by type)",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "Null: every branch",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "day_workouts",
+                    "changed_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Day WODs set"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set the WOD of a day",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/preview": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.preview",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "class_type_ids": {
+                    "description": "Empty or missing: every class of the day",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "date": {
+                    "description": "The gym's own date",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "description": "Null: every branch",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "replace_own": {
+                    "description": "Also replace the WODs set on single classes in this scope",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "date",
+                  "master_workout_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "inherit": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "own": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "started": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "inherit",
+                    "own",
+                    "started"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Classes by outcome"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What setting a day WOD would change",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/day-workouts/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "changed_count": {
+                      "type": "integer"
+                    },
+                    "day_workout": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "class_type_id": {
+                          "description": "Null: every class (events only by type)",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "local_date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "Null: every branch",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "master_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "workout": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "local_date",
+                        "class_type_id",
+                        "location_id",
+                        "master_workout_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "day_workout",
+                    "changed_count"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a day WOD",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/schedule/slots": {
       "post": {
         "callbacks": {},
@@ -176749,6 +178566,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
+                    "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -176871,7 +178691,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
                     "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -177058,6 +178880,9 @@
                     "type": "boolean"
                   },
                   "booking_timeout_minutes": {
+                    "maximum": 10080,
+                    "minimum": 1,
+                    "nullable": true,
                     "type": "integer"
                   },
                   "capacity": {
@@ -177172,6 +178997,53 @@
           }
         ],
         "summary": "Update a scheduled class slot",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/day-workout": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDayWorkoutController.follow_day",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slot": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "slot"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slot"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give a class the day's WOD in place of its own",
         "tags": [
           "Admin Schedule"
         ]
@@ -180134,24 +182006,27 @@
                           "type": "boolean"
                         },
                         "streak_shield_reset_day": {
+                          "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                           "maximum": 28,
                           "minimum": 1,
                           "nullable": true,
+                          "type": "integer"
+                        },
+                        "streak_shields": {
+                          "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                          "maximum": 5,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
-                        },
-                        "weekly_workout_target": {
-                          "minimum": 1,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "weekly_workout_target",
-                        "leaderboard_enabled"
+                        "leaderboard_enabled",
+                        "streak_shields"
                       ],
                       "type": "object"
                     },
@@ -180182,8 +182057,10 @@
                           "type": "boolean"
                         },
                         "default_booking_timeout_minutes": {
+                          "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                           "maximum": 10080,
                           "minimum": 1,
+                          "nullable": true,
                           "type": "integer"
                         },
                         "default_booking_window_days": {
@@ -180192,8 +182069,9 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "default_cancellation_cutoff_hours": {
-                          "maximum": 168,
+                        "default_cancellation_cutoff_minutes": {
+                          "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                          "maximum": 10080,
                           "minimum": 0,
                           "nullable": true,
                           "type": "integer"
@@ -180353,13 +182231,16 @@
                         "type": "boolean"
                       },
                       "streak_shield_reset_day": {
+                        "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                         "maximum": 28,
                         "minimum": 1,
                         "nullable": true,
                         "type": "integer"
                       },
-                      "weekly_workout_target": {
-                        "minimum": 1,
+                      "streak_shields": {
+                        "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                        "maximum": 5,
+                        "minimum": 0,
                         "type": "integer"
                       }
                     },
@@ -180383,8 +182264,10 @@
                         "type": "boolean"
                       },
                       "default_booking_timeout_minutes": {
+                        "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                         "maximum": 10080,
                         "minimum": 1,
+                        "nullable": true,
                         "type": "integer"
                       },
                       "default_booking_window_days": {
@@ -180394,9 +182277,9 @@
                         "nullable": true,
                         "type": "integer"
                       },
-                      "default_cancellation_cutoff_hours": {
-                        "description": "Withdrawals closer to the class than this use the visit",
-                        "maximum": 168,
+                      "default_cancellation_cutoff_minutes": {
+                        "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                        "maximum": 10080,
                         "minimum": 0,
                         "nullable": true,
                         "type": "integer"
@@ -180506,24 +182389,27 @@
                           "type": "boolean"
                         },
                         "streak_shield_reset_day": {
+                          "description": "Day of the month the shields renew; null renews each member's on their sign-up day",
                           "maximum": 28,
                           "minimum": 1,
                           "nullable": true,
+                          "type": "integer"
+                        },
+                        "streak_shields": {
+                          "description": "Streak shields each member gets at every renewal (0 turns shields off)",
+                          "maximum": 5,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
-                        },
-                        "weekly_workout_target": {
-                          "minimum": 1,
-                          "type": "integer"
                         }
                       },
                       "required": [
-                        "weekly_workout_target",
-                        "leaderboard_enabled"
+                        "leaderboard_enabled",
+                        "streak_shields"
                       ],
                       "type": "object"
                     },
@@ -180554,8 +182440,10 @@
                           "type": "boolean"
                         },
                         "default_booking_timeout_minutes": {
+                          "description": "Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts",
                           "maximum": 10080,
                           "minimum": 1,
+                          "nullable": true,
                           "type": "integer"
                         },
                         "default_booking_window_days": {
@@ -180564,8 +182452,9 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "default_cancellation_cutoff_hours": {
-                          "maximum": 168,
+                        "default_cancellation_cutoff_minutes": {
+                          "description": "Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff",
+                          "maximum": 10080,
                           "minimum": 0,
                           "nullable": true,
                           "type": "integer"
@@ -184550,6 +186439,7 @@
       },
       "get": {
         "callbacks": {},
+        "description": "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.",
         "operationId": "PaleeWeb.AdminUserController.show",
         "parameters": [
           {
@@ -186342,7 +188232,7 @@
     "/api/org/{organization_slug}/admin/users/{id}/programming": {
       "post": {
         "callbacks": {},
-        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
+        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.",
         "operationId": "PaleeWeb.AdminUserController.program_workout",
         "parameters": [
           {
@@ -189478,6 +191368,45 @@
                     "workouts": {
                       "items": {
                         "additionalProperties": true,
+                        "properties": {
+                          "body": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "excerpt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "free_text",
+                                  "text_sections",
+                                  "structured"
+                                ],
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "structured": {
+                                "type": "boolean"
+                              },
+                              "timer": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "kind"
+                            ],
+                            "title": "WorkoutBodySummary",
+                            "type": "object"
+                          }
+                        },
                         "type": "object"
                       },
                       "type": "array"
@@ -191088,6 +193017,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {
@@ -198465,6 +200610,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {
@@ -211161,6 +213522,37 @@
                     "gamification": {
                       "additionalProperties": true,
                       "properties": {
+                        "goal": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "properties": {
+                            "is_default": {
+                              "type": "boolean"
+                            },
+                            "set_by_nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "set_by_role": {
+                              "enum": [
+                                "self",
+                                "coach",
+                                "staff"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "weekly_workout_target": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "is_default",
+                            "weekly_workout_target"
+                          ],
+                          "type": "object"
+                        },
                         "settings": {
                           "properties": {
                             "leaderboard_enabled": {
@@ -211172,14 +213564,15 @@
                               "nullable": true,
                               "type": "integer"
                             },
-                            "weekly_workout_target": {
-                              "minimum": 1,
+                            "streak_shields": {
+                              "maximum": 5,
+                              "minimum": 0,
                               "type": "integer"
                             }
                           },
                           "required": [
-                            "weekly_workout_target",
-                            "leaderboard_enabled"
+                            "leaderboard_enabled",
+                            "streak_shields"
                           ],
                           "type": "object"
                         }
@@ -213595,6 +215988,183 @@
           }
         ],
         "summary": "Get a presigned download URL for one of the current member's invoices",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/membership/leave": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.stay",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not leaving, or the last day has passed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change my mind before my last day at the box",
+        "tags": [
+          "Member Finance"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.leave",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leave",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leave result"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already leaving"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Leave the box: renewal stops and access ends with what I paid for",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/membership/subscriptions/{id}/auto-renew": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyMembershipController.set_auto_renew",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "auto_renew": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "auto_renew"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Renewal choice",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package subscription"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ended, or leaving the box"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No renewal choice here"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn renewal of one of my subscriptions on or off",
         "tags": [
           "Member Finance"
         ]
@@ -222142,6 +224712,62 @@
                       },
                       "type": "array"
                     },
+                    "day_workouts": {
+                      "description": "ADR-230, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one.",
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "class_type_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "local_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "local_date",
+                          "class_type_id",
+                          "location_id",
+                          "master_workout_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "days": {
                       "type": "integer"
                     },
@@ -222275,6 +224901,12 @@
                             "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
                             "type": "boolean"
                           },
+                          "day_workout_id": {
+                            "description": "ADR-230: the day WOD the class's WOD comes from.",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "friends_going": {
                             "description": "Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip).",
                             "items": {
@@ -222353,6 +224985,15 @@
                               }
                             },
                             "type": "object"
+                          },
+                          "workout_source": {
+                            "description": "ADR-230: day = inherited from the day's WOD, class = set on the class.",
+                            "enum": [
+                              "day",
+                              "class"
+                            ],
+                            "nullable": true,
+                            "type": "string"
                           }
                         },
                         "type": "object"
@@ -222369,6 +225010,7 @@
                     "end_date",
                     "days",
                     "class_types",
+                    "day_workouts",
                     "slots"
                   ],
                   "type": "object"
@@ -226621,6 +229263,245 @@
         "summary": "A client's muscle coverage, qualities radar and training load, from shared entries",
         "tags": [
           "Progress"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/training-goal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.client_show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's weekly workout goal",
+        "tags": [
+          "Gamification"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.TrainingGoalController.client_update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "weekly_workout_target": {
+                    "maximum": 14,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "weekly_workout_target"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Goal",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "goal": {
+                      "properties": {
+                        "is_default": {
+                          "description": "No one set a goal yet; the platform default applies",
+                          "type": "boolean"
+                        },
+                        "max": {
+                          "type": "integer"
+                        },
+                        "min": {
+                          "type": "integer"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_role": {
+                          "enum": [
+                            "self",
+                            "coach",
+                            "staff"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "weekly_workout_target": {
+                          "maximum": 14,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "is_default",
+                        "max",
+                        "min",
+                        "weekly_workout_target"
+                      ],
+                      "title": "TrainingGoal",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goal"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not allowed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a client's weekly workout goal; the client is notified",
+        "tags": [
+          "Gamification"
         ]
       }
     },
@@ -242783,6 +245664,222 @@
                           },
                           "type": "array"
                         },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
+                        },
                         "content": {
                           "items": {
                             "additionalProperties": false,
@@ -244984,6 +248081,222 @@
                             },
                             "type": "array"
                           },
+                          "body": {
+                            "discriminator": {
+                              "propertyName": "kind"
+                            },
+                            "oneOf": [
+                              {
+                                "additionalProperties": false,
+                                "description": "One text written with the WOD assistant",
+                                "properties": {
+                                  "document": {
+                                    "additionalProperties": true,
+                                    "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                    "nullable": true,
+                                    "type": "object"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "free_text"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "structured": {
+                                    "description": "The assistant also derived exercises (see `sections`)",
+                                    "type": "boolean"
+                                  },
+                                  "text": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "timer": {
+                                    "additionalProperties": true,
+                                    "nullable": true,
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "text",
+                                  "document",
+                                  "timer",
+                                  "structured"
+                                ],
+                                "title": "FreeTextWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "ADR-180: text sections written without the assistant, a timer each",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "text_sections"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "document": {
+                                          "additionalProperties": true,
+                                          "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                          "nullable": true,
+                                          "type": "object"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "scoring": {
+                                          "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "text": {
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "nullable": true,
+                                          "properties": {
+                                            "duration_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "format": {
+                                              "enum": [
+                                                "untimed",
+                                                "for_time",
+                                                "amrap",
+                                                "emom",
+                                                "tabata",
+                                                "custom_hiit",
+                                                "death_by"
+                                              ],
+                                              "type": "string"
+                                            },
+                                            "interval_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rest_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rounds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "work_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "required": [
+                                            "format"
+                                          ],
+                                          "title": "SectionTimerPreset",
+                                          "type": "object"
+                                        },
+                                        "title": {
+                                          "description": "Null when untitled",
+                                          "nullable": true,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "title",
+                                        "text",
+                                        "document",
+                                        "timer",
+                                        "scoring"
+                                      ],
+                                      "title": "TextSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "TextSectionsWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "Exercises with every parameter (structured editor, Quick Text)",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "structured"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "exercises": {
+                                          "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "scoreable": {
+                                          "type": "boolean"
+                                        },
+                                        "subtitle": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "additionalProperties": true,
+                                          "nullable": true,
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "name",
+                                        "timer",
+                                        "scoreable",
+                                        "exercises"
+                                      ],
+                                      "title": "StructuredSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "StructuredWorkoutBody",
+                                "type": "object"
+                              }
+                            ],
+                            "title": "WorkoutBody"
+                          },
                           "content": {
                             "items": {
                               "additionalProperties": false,
@@ -246989,6 +250302,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {

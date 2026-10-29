@@ -57,7 +57,7 @@ describe("groupOutcomeRows", () => {
         {
           user_id: "u2",
           status: "error",
-          code: "member_programming_not_entitled",
+          code: "programming_not_in_package",
           params: { nickname: "Zoe", reason: "finance_channel_not_included" },
         },
         { user_id: "u3", status: "error", code: "slot_not_booked_by_member" },
@@ -78,7 +78,7 @@ describe("groupOutcomeRows", () => {
     expect(rows[1].error).toBeInstanceOf(ApiError);
     expect(rows[1].error?.status).toBe(403);
     expect(rows[1].error?.payload).toEqual({
-      code: "member_programming_not_entitled",
+      code: "programming_not_in_package",
       params: { nickname: "Zoe", reason: "finance_channel_not_included" },
     });
     expect(rows[2].error?.status).toBe(422);

@@ -77,10 +77,53 @@ describe("WorkoutPreviewDetail composition groups", () => {
 
     expect(screen.getByText("AMRAP 20").tagName).toBe("STRONG");
     expect(screen.getByText("AMRAP 20").closest("p")).toHaveStyle({ textAlign: "center" });
-    expect(screen.getByText("Red zone")).toHaveStyle({ color: "#ef4444" });
+    // The coach's colour, blended with the theme's text colour.
+    expect(screen.getByText("Red zone").getAttribute("style") ?? "").toContain("#ef4444");
     expect(screen.getByText("Safe color")).not.toHaveAttribute("style");
     expect(screen.getByText("10 pull-ups").tagName).toBe("MARK");
     expect(screen.getByRole("list")).toBeInTheDocument();
+  });
+
+  it("shows each text section with its title, timer, scoring and the coach's formatting", () => {
+    render(
+      <WorkoutPreviewDetail
+        authoringMode="sectioned_text"
+        freeTextBody={"A\nBack squat 5x5\n\n21-15-9"}
+        sections={[
+          {
+            id: "s1",
+            name: "A",
+            exercises: [],
+            free_text_body: "Back squat 5x5",
+            free_text_document: {
+              type: "doc",
+              content: [{ type: "paragraph", content: [{ type: "text", text: "Back squat 5x5", marks: [{ type: "underline" }] }] }],
+            },
+            timer_preset: { format: "emom", interval_seconds: 120, rounds: 5 },
+            score_config: { metrics: [{ key: "load", label: "Load", kind: "load", unit: "kg" }] },
+          },
+          {
+            id: "s2",
+            name: "2",
+            section_metadata: { untitled: true },
+            exercises: [],
+            free_text_body: "21-15-9",
+            timer_preset: { format: "for_time", duration_seconds: 900 },
+          },
+        ]}
+      />,
+    );
+
+    const sections = within(screen.getByRole("list", { name: "textSectionsPreviewLabel" })).getAllByRole("listitem");
+    expect(sections).toHaveLength(2);
+    expect(within(sections[0]).getByRole("heading", { name: "A" })).toBeInTheDocument();
+    expect(within(sections[0]).getByText("Back squat 5x5").tagName).toBe("U");
+    expect(within(sections[0]).getByText(/5 × 2:00/)).toBeInTheDocument();
+    expect(within(sections[0]).getByText("textSectionScoredBy")).toBeInTheDocument();
+    // An untitled section is named by its position, never by its stored number.
+    expect(within(sections[1]).getByRole("heading", { name: "textSectionNumber" })).toBeInTheDocument();
+    expect(within(sections[1]).getByText("21-15-9")).toBeInTheDocument();
+    expect(screen.queryByText("freeTextPreviewEmpty")).not.toBeInTheDocument();
   });
 
   it("renders one group header with set count and child exercises without repeated group labels", () => {

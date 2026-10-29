@@ -231,4 +231,131 @@ defmodule PaleeWeb.ClassesWithoutWodTest do
     assert payload["scheduled_class_id"] == slot["id"]
     assert payload["published"] in [false, "false"]
   end
+
+  # A WOD written as text (free text or text sections) is filed for the class
+  # as a copy; the copy must keep the way it was written, or publishing it
+  # fails with `no_sections` and the class can never get its WOD.
+  defp publish_text_wod(conn, ctx, draft_payload) do
+    base = path("/admin/workouts")
+
+    draft_id =
+      conn |> json_conn(ctx.admin) |> post(base) |> json_response(201) |> get_in(["draft", "id"])
+
+    conn
+    |> recycle()
+    |> json_conn(ctx.admin)
+    |> patch(
+      "#{base}/#{draft_id}/draft",
+      Jason.encode!(Map.put(draft_payload, :expected_source_revision, 0))
+    )
+    |> json_response(200)
+
+    conn
+    |> recycle()
+    |> json_conn(ctx.admin)
+    |> post("#{base}/#{draft_id}/publish", Jason.encode!(%{expected_source_revision: 1}))
+    |> json_response(200)
+    |> Map.fetch!("workout")
+  end
+
+  defp link_and_load_class_wod(conn, ctx, workout_id) do
+    slot = create_draft(conn, ctx)
+
+    linked =
+      conn
+      |> recycle()
+      |> json_conn(ctx.admin)
+      |> put(
+        path("/admin/schedule/slots/#{slot["id"]}/workout"),
+        Jason.encode!(%{master_workout_id: workout_id})
+      )
+      |> json_response(200)
+      |> Map.fetch!("slot")
+
+    conn
+    |> recycle()
+    |> json_conn(ctx.admin)
+    |> get(path("/admin/workouts/#{linked["master_workout_id"]}"))
+    |> json_response(200)
+    |> Map.fetch!("workout")
+  end
+
+  test "a WOD written in text sections links to a class and its copy keeps the sections", ctx do
+    %{conn: conn} = ctx
+
+    workout =
+      publish_text_wod(conn, ctx, %{
+        title: "Sectioned class WOD",
+        type: "strength",
+        authoring_mode: "sectioned_text",
+        sections: [
+          %{
+            name: "A",
+            order: 1,
+            exercises: [],
+            free_text_body: "Back squat 5x5",
+            timer_preset: %{format: "emom", interval_seconds: 120, rounds: 5}
+          }
+        ]
+      })
+
+    copy = link_and_load_class_wod(conn, ctx, workout["id"])
+
+    assert copy["id"] != workout["id"]
+    assert copy["status"] == "published"
+    assert copy["authoring_mode"] == "sectioned_text"
+    assert copy["free_text_body"] == workout["free_text_body"]
+    assert [%{"name" => "A", "free_text_body" => "Back squat 5x5"}] = copy["sections"]
+  end
+
+  test "a free-text WOD links to a class and its copy keeps the text", ctx do
+    %{conn: conn} = ctx
+
+    workout =
+      publish_text_wod(conn, ctx, %{
+        title: "Free text class WOD",
+        type: "crossfit",
+        authoring_mode: "free_text",
+        free_text_body: "AMRAP 20\n10 pull-ups",
+        sections: []
+      })
+
+    copy = link_and_load_class_wod(conn, ctx, workout["id"])
+
+    assert copy["status"] == "published"
+    assert copy["authoring_mode"] == "free_text"
+    assert copy["free_text_body"] == "AMRAP 20\n10 pull-ups"
+  end
+
+  test "a WOD that cannot be published for the class is named, with nothing left behind", ctx do
+    %{conn: conn} = ctx
+    # A published WOD whose content was lost: its class copy cannot be published.
+    Repo.query!("DELETE FROM workout_sections WHERE master_workout_id = $1", [
+      Ecto.UUID.dump!(ctx.workout.id)
+    ])
+
+    slot = create_draft(conn, ctx)
+
+    body =
+      conn
+      |> recycle()
+      |> json_conn(ctx.admin)
+      |> put(
+        path("/admin/schedule/slots/#{slot["id"]}/workout"),
+        Jason.encode!(%{master_workout_id: ctx.workout.id})
+      )
+      |> json_response(422)
+
+    assert body["code"] == "workout_not_assignable"
+    assert body["params"]["workout_id"] == ctx.workout.id
+    assert body["params"]["title"] == "Fran"
+    assert body["params"]["problem"] == "no_content"
+
+    assert Repo.aggregate(
+             from(w in "master_workouts",
+               where: w.source_workout_id == type(^ctx.workout.id, Ecto.UUID)
+             ),
+             :count
+           ) == 0
+  end
 end

@@ -18,7 +18,7 @@ function isoDay(offset: number) {
 const TODAY = isoDay(0);
 const TOMORROW = isoDay(1);
 
-async function stub(page: Page) {
+async function stub(page: Page, programming: Record<string, unknown> | null = { allowed: true, grant: "online_programming", reason: null }) {
   const user = {
     id: "coach-1",
     nickname: "Kostas",
@@ -63,6 +63,7 @@ async function stub(page: Page) {
           account_status: "active",
           membership: { roles: ["member"], coach_scope: "assigned" },
           available_sections: [],
+          programming,
           attention: [],
           operational_links: {},
         },
@@ -171,5 +172,31 @@ test.describe("member programming dialog", () => {
     await dialog.getByRole("radio", { name: "New WOD" }).click({ force: true });
     await expect(dialog.getByTestId("programming-submit")).toHaveText("Continue to the editor");
     await expect(dialog.getByTestId("programming-submit")).toBeEnabled();
+  });
+
+  test("without online programming or personal training, the schedule says so and only the class WOD can change", async ({ page }) => {
+    const posts = await stub(page, { allowed: false, grant: null, reason: "finance_channel_not_included" });
+    await page.goto("/admin/users/u-1?tab=training");
+
+    await expect(page.getByTestId("programming-not-in-package")).toContainText(
+      "WODs can't be assigned to Eleni: their subscription package includes neither online programming nor personal training.",
+      { timeout: 60_000 },
+    );
+    await expect(page.getByTestId("programming-not-in-package")).toContainText("You can still change the WOD of a class they booked.");
+
+    await page.getByTestId(`programming-day-${TODAY}`).click();
+    const dialog = page.getByTestId("programming-dialog");
+    await expect(dialog.getByRole("radio", { name: "Change it for the whole class" })).toBeChecked();
+    await expect(dialog.getByRole("radio", { name: /Change it for this member only/ })).toBeDisabled();
+    await expect(dialog.getByRole("radio", { name: /Separate workout/ })).toBeDisabled();
+
+    // The class's own WOD is not personal programming, so it stays open.
+    const submit = dialog.getByTestId("programming-submit");
+    await dialog.getByRole("radio", { name: "From the library" }).click({ force: true });
+    await chooseOption(page, dialog.locator('[aria-label="Existing WOD"]'), "w-fran");
+    await expect(submit).toBeEnabled();
+    await submit.click();
+    await expect(dialog).toBeHidden();
+    expect(posts.at(-1)).toMatchObject({ mode: "class_workout" });
   });
 });

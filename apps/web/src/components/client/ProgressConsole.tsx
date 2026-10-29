@@ -33,6 +33,8 @@ import { InsightsCard } from "@/components/member-app/progress/InsightsCard";
 import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
 import { useLanding } from "@/components/member-app/progress/use-landing";
+import { weeklyTarget } from "@/components/training-goal/training-goal";
+import { useTrainingGoal } from "@/components/training-goal/use-training-goal";
 import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
 import { PersonalRecordsSection } from "@/components/pantheon/PersonalRecordsSection";
 import { formatDay } from "@/components/client/format";
@@ -63,7 +65,7 @@ export function ProgressConsole() {
   const token = tokens?.access_token ?? null;
   const { filter, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
   const query = useQuery({
-    queryKey: [...ACCOUNT_PROGRESS_KEY, token, filter],
+    queryKey: [...ACCOUNT_PROGRESS_KEY, filter],
     enabled: Boolean(token) && filter !== null,
     queryFn: () => fetchAccountProgress(token!, filter!),
     placeholderData: (previous) => previous,
@@ -289,7 +291,9 @@ function Consistency({ progress }: { progress: AccountProgress }) {
   const landing = useLanding();
   const [explain, setExplain] = useState(false);
   const gamification = landing.data?.gamification;
-  const target = gamification?.settings.weekly_workout_target || null;
+  // ADR-229: my own weekly goal, with or without a gym.
+  const goal = useTrainingGoal();
+  const target = goal.data ? weeklyTarget(goal.data) : null;
   const dayStreak = gamification?.stats?.current_streak;
   const today = localToday();
   const weeks = useMemo(

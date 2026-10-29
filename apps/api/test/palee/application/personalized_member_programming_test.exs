@@ -11,7 +11,7 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
 
   alias Palee.Application.{
     AssignWorkout,
-    AuthorizeMemberProgramming,
+    AuthorizeProgramming,
     AuthorizeWorkoutExecutionSource,
     GetAssignedWorkoutWeek,
     ProgramUserWorkout,
@@ -110,7 +110,10 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
   test "member programming copies stay out of the library; athlete copies remain listed" do
     ctx = tenant()
     member = ctx |> customer(:member) |> then(&entitle(ctx, &1))
-    athlete = customer(ctx, :athlete)
+
+    athlete =
+      ctx |> customer(:athlete) |> then(&TestFixtures.programming_grant_fixture(ctx.context, &1))
+
     source = workout(ctx)
     today = Date.to_iso8601(Date.utc_today())
 
@@ -145,21 +148,30 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
     assert id == member_copy.id
   end
 
-  test "AuthorizeMemberProgramming accepts only explicit grants and names the member" do
+  test "AuthorizeProgramming needs online programming or personal training, for members and athletes alike" do
     gym = tenant()
     entitled = gym |> customer(:member) |> then(&entitle(gym, &1))
+
+    pt_athlete =
+      gym
+      |> customer(:athlete)
+      |> then(&TestFixtures.programming_grant_fixture(gym.context, &1, :personal_training))
+
     plain = customer(gym, :member)
+    plain_athlete = customer(gym, :athlete)
 
-    assert :ok = with_runtime_role(fn -> AuthorizeMemberProgramming.call(gym.context, []) end)
+    assert {:ok, %{}} = with_runtime_role(fn -> AuthorizeProgramming.grants(gym.context, []) end)
 
-    assert :ok =
+    assert {:ok, grants} =
              with_runtime_role(fn ->
-               AuthorizeMemberProgramming.call(gym.context, [entitled.id])
+               AuthorizeProgramming.grants(gym.context, [entitled.id, pt_athlete.id])
              end)
 
-    assert {:error, :member_programming_not_entitled, details} =
+    assert grants == %{entitled.id => :online_programming, pt_athlete.id => :personal_training}
+
+    assert {:error, :programming_not_in_package, details} =
              with_runtime_role(fn ->
-               AuthorizeMemberProgramming.call(gym.context, [entitled.id, plain.id])
+               AuthorizeProgramming.call(gym.context, [entitled.id, plain.id])
              end)
 
     assert details == %{
@@ -168,8 +180,57 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
              reason: "finance_profile_missing"
            }
 
+    # The athlete role never implies the grant.
+    assert {:error, :programming_not_in_package, %{user_id: athlete_id}} =
+             with_runtime_role(fn ->
+               AuthorizeProgramming.call(gym.context, [plain_athlete.id])
+             end)
+
+    assert athlete_id == plain_athlete.id
+
     assert {:error, :organization_context_required} =
-             AuthorizeMemberProgramming.call(%{}, [plain.id])
+             AuthorizeProgramming.call(%{}, [plain.id])
+  end
+
+  test "an athlete without either grant is refused before any copy is filed" do
+    gym = tenant()
+    athlete = customer(gym, :athlete)
+    source = workout(gym)
+    before = with_runtime_role(fn -> gym.context |> Workouts.list_workouts() |> length() end)
+
+    assert {:error, :programming_not_in_package, %{user_id: user_id}} =
+             with_runtime_role(fn ->
+               ProgramUserWorkout.call(gym.context, gym.owner, athlete.id, %{
+                 "master_workout_id" => source.id,
+                 "scheduled_for" => Date.to_iso8601(Date.utc_today())
+               })
+             end)
+
+    assert user_id == athlete.id
+
+    assert with_runtime_role(fn -> gym.context |> Workouts.list_workouts() |> length() end) ==
+             before
+  end
+
+  test "personal training includes its programme: no coaching touchpoint is metered" do
+    gym = tenant()
+
+    athlete =
+      gym
+      |> customer(:athlete)
+      |> then(&TestFixtures.programming_grant_fixture(gym.context, &1, :personal_training))
+
+    assert {:ok, _assignment} = assign(gym, workout(gym), [athlete.id])
+
+    metered =
+      Repo.one(
+        from(entry in "finance_entitlement_usage_entries",
+          where: like(entry.idempotency_key, ^"programming-delivery:%:#{athlete.id}"),
+          select: count()
+        )
+      )
+
+    assert metered == 0
   end
 
   test "a member assignment meters a coaching touchpoint; extensions top up an exhausted allowance" do
@@ -189,7 +250,7 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
 
   test "updating an assignment checks newly added members and keeps variants single-member" do
     gym = tenant()
-    athlete = customer(gym, :athlete)
+    athlete = gym |> customer(:athlete) |> then(&entitle(gym, &1))
     entitled = gym |> customer(:member) |> then(&entitle(gym, &1))
     plain = customer(gym, :member)
     coach = customer(gym, :coach)
@@ -205,7 +266,7 @@ defmodule Palee.Application.PersonalizedMemberProgrammingTest do
       end)
     end
 
-    assert {:error, :member_programming_not_entitled, %{user_id: plain_id}} =
+    assert {:error, :programming_not_in_package, %{user_id: plain_id}} =
              update.([athlete.id, plain.id])
 
     assert plain_id == plain.id

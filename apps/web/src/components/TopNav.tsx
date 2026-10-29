@@ -11,8 +11,9 @@ import { useTranslations } from "next-intl";
 
 import { BODY_SETTINGS_KEY, fetchBodySettings } from "@/api/body";
 import { fetchMyFinance } from "@/api/my-finance";
-import { fetchUnreadCount } from "@/api/messaging";
-import { PASSWORD_RESETS_KEY, fetchPasswordResets } from "@/api/password-resets";
+import { PASSWORD_RESETS_KEY } from "@/api/password-resets";
+import { gymUnreadKey, useGymUnreadCount } from "@/components/chat/use-messages-unread";
+import { usePasswordResetsInbox } from "@/components/member-app/me/use-password-resets";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
@@ -168,34 +169,25 @@ export function TopNav() {
   const mobileLinks = isVendor
     ? [{ id: "platform", href: "/platform/organizations", label: t("platform") }, ...(showTenantShell ? navLinks : [])]
     : navLinks;
-  const unreadQuery = useQuery({
-    queryKey: ["messages", "unread", selectedOrganizationSlug],
-    enabled: authenticated && showTenantShell && Boolean(selectedOrganizationSlug),
-    queryFn: () => fetchUnreadCount(tokens!.access_token, selectedOrganizationSlug),
-    staleTime: 15 * 1000,
-  });
+  const unreadQuery = useGymUnreadCount(authenticated && showTenantShell);
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
   // ADR-187: handlers (vendor, staff, coaches) reach the password reset
   // requests from the account menu, while there are any (the vendor always).
-  const canHandleResets = isVendor || memberships.some((membership) => hasStaffRole(membership));
-  const resetsQuery = useQuery({
-    queryKey: PASSWORD_RESETS_KEY,
-    enabled: authenticated && canHandleResets,
-    queryFn: () => fetchPasswordResets(tokens!.access_token),
-    staleTime: 60 * 1000,
-  });
+  const resetsQuery = usePasswordResetsInbox();
   const resetRequests = resetsQuery.data?.requests ?? [];
   const resetsToAct = resetRequests.filter((request) => ["open", "mine", "expired"].includes(request.state)).length;
 
   // Chat delivery records notify recipients only. The event refreshes the
-  // Messages badge without exposing the delivery record in Notifications.
+  // Messages badge without exposing the delivery record in Notifications,
+  // and the resets inbox (a new request notifies its handlers). A rejoin
+  // after a dropped connection resyncs both, since events may have been missed.
   useEffect(() => {
     if (!tokens?.access_token || !currentUser?.id) return;
-    return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
-      "notifications:changed": () => {
-        void queryClient.invalidateQueries({ queryKey: ["messages", "unread", selectedOrganizationSlug] });
-      },
-    });
+    const refresh = () => {
+      void queryClient.invalidateQueries({ queryKey: gymUnreadKey(selectedOrganizationSlug) });
+      void queryClient.invalidateQueries({ queryKey: PASSWORD_RESETS_KEY });
+    };
+    return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, { "notifications:changed": refresh }, { onRejoin: refresh });
   }, [tokens?.access_token, currentUser?.id, queryClient, selectedOrganizationSlug]);
 
   if (

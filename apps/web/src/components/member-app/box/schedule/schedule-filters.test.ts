@@ -69,7 +69,7 @@ describe("matchesScheduleFilters", () => {
     expect(matches(slot({ spots_remaining: 0, scheduled_at: "2026-10-19T15:00:00Z" }), { spots: "full_waitlist" })).toBe(false);
   });
 
-  it("keeps out-of-package classes unless «Στο πακέτο μου» is on", () => {
+  it("keeps out-of-package classes unless «Στο πακέτο συνδρομής μου» is on", () => {
     const outside = slot({ covered_by_package: false });
     expect(matches(outside, {})).toBe(true);
     expect(matches(outside, { packageOnly: true })).toBe(false);

@@ -22,9 +22,9 @@ defmodule PaleeWeb.AdminAssignedWorkoutController do
     summary: "Assign a published workout to one or more athletes or members",
     description:
       "ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the " <>
-        "organization (the field name is kept for compatibility). Members require a package " <>
-        "with the personal_programming channel and execute_assigned_workouts capability " <>
-        "(403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one " <>
+        "organization (the field name is kept for compatibility). Every assignee needs a " <>
+        "package with online programming or personal training, ADR-225 " <>
+        "(403 `programming_not_in_package`). `source_slot_id` makes the assignment one " <>
         "member's version of a class they booked (exactly one member; " <>
         "422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).",
     request_body: %RequestBody{

@@ -7,14 +7,12 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
 import {
   createScheduleSlot,
   createScheduleSlotsAt,
   createScheduleSeries,
-  linkScheduleSlotWorkout,
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
@@ -51,6 +49,7 @@ import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
+import { DurationLimitField } from "@/components/schedule/BookingRuleFields";
 import { fetchGymStaff } from "@/api/staff";
 import { coachOptions } from "@/components/admin/staff-home";
 import { can } from "@/lib/role-navigation";
@@ -68,13 +67,16 @@ import { defaultClassStart, earliestPickable, startsInPast, todayKey } from "@/c
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
 import { dateTimeLocalInZone, dateTimeLocalToIso, formatInZone, zoneLabel, zonedText } from "@/lib/zoned-time";
-import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/organization-slug";
-import { RETURNED_WORKOUT_PARAM, newWorkoutHref } from "@/lib/workout-return";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { ContextualWorkoutCreator } from "@/components/workouts/creation/ContextualWorkoutCreator";
 import { WodPicker } from "@/components/schedule/WodPicker";
-import { stashClassDraft, takeClassDraft } from "@/components/schedule/class-draft-handoff";
+import { DayWorkoutDialog } from "@/components/schedule/DayWorkoutDialog";
+import { coveringDayWorkout } from "@/components/schedule/day-workouts";
+import type { DayWorkout } from "@/api/day-workouts";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
+import { FRESHNESS } from "@/lib/query-policy";
 
 /** The class form's fields, as the API names them (ADR-214 errors land on these). */
 const SLOT_FIELDS = [
@@ -138,12 +140,8 @@ type SeriesEditorState = {
 /** What staff were adding when the gym turned out to have no class type yet. */
 type PendingCreate = { kind: "slot"; isoDate: string } | { kind: "series" };
 
-/** A class form left open for the WOD editor ("+ New WOD"). */
-type ClassDraft =
-  | { kind: "slot"; editor: SlotEditorState }
-  | { kind: "series"; editor: SeriesEditorState }
-  // A class without its WOD (ADR-176): the new WOD is linked to it on return.
-  | { kind: "link"; slotId: string };
+/** Which open class form «+ New WOD» writes a WOD for. */
+type NewWodTarget = "slot" | "series";
 
 const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !type.archived_at);
 
@@ -184,7 +182,7 @@ function defaultSlotValues(
     scheduled_at: date.toISOString(),
     capacity: defaults?.default_capacity ?? 12,
     auto_approve: defaults?.default_auto_approve ?? false,
-    booking_timeout_minutes: defaults?.default_booking_timeout_minutes ?? 60,
+    booking_timeout_minutes: defaults ? defaults.default_booking_timeout_minutes ?? null : 60,
   };
 }
 
@@ -199,12 +197,16 @@ export function ScheduleConsole({
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const branchT = useTranslations("BranchScope");
+  const rulesT = useTranslations("BookingRules");
   const locale = useLocale();
   const { tokens } = useSession();
   const { days, setDays, openDay, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  // ADR-230: the WOD of each day in the window (staff), and the day being edited.
+  const [dayWorkouts, setDayWorkouts] = useState<DayWorkout[]>([]);
+  const [dayWodDate, setDayWodDate] = useState<string | null>(null);
   const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null | undefined>(undefined);
   const [notice, setNotice] = useState<string | null>(null);
   // ADR-186 §8: «Ισχύει για» on a new class or series, and what it created.
@@ -229,8 +231,7 @@ export function ScheduleConsole({
   const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
   const [pendingCreate, setPendingCreate] = useState<PendingCreate | null>(null);
   const [reopenSlotId, setReopenSlotId] = useState<string | null>(null);
-  const router = useRouter();
-  const organizationSlug = useOrganizationSlug();
+  const [newWodFor, setNewWodFor] = useState<NewWodTarget | null>(null);
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   // ADR-176: series follow the gym's time zone, not the editing device's.
   const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
@@ -248,6 +249,7 @@ export function ScheduleConsole({
     queryKey: ["admin", "locations"],
     queryFn: () => listAdminLocations(tokens!.access_token),
     enabled: isAdmin && Boolean(tokens?.access_token),
+    staleTime: FRESHNESS.reference,
   });
   const adminLocations = adminLocationsQuery.data ?? [];
   const manyBranches = showsAppliesTo(adminLocations);
@@ -256,7 +258,7 @@ export function ScheduleConsole({
     queryKey: ["staff", "members"],
     queryFn: () => fetchGymStaff(tokens!.access_token),
     enabled: canManageSchedule && Boolean(tokens?.access_token),
-    staleTime: 60_000,
+    staleTime: FRESHNESS.reference,
   });
   const coaches = coachOptions(coachesQuery.data ?? []);
   const isMemberSurface = !roleLoading && !isAdmin;
@@ -283,6 +285,7 @@ export function ScheduleConsole({
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
       setLocations(Array.isArray(window.locations) ? window.locations : []);
+      setDayWorkouts(Array.isArray(window.day_workouts) ? window.day_workouts : []);
       return nextSlots;
     } catch (loadError) {
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
@@ -393,39 +396,6 @@ export function ScheduleConsole({
     }
   }, [initialOpenSlotId, schedule]);
 
-  // Back from the WOD editor: reopen the class form as the coach left it, with
-  // the WOD they just published (`?wod=`) chosen, then tidy the address.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const returnedWorkoutId = url.searchParams.get(RETURNED_WORKOUT_PARAM);
-    const draft = takeClassDraft<ClassDraft>();
-    if (returnedWorkoutId) {
-      url.searchParams.delete(RETURNED_WORKOUT_PARAM);
-      router.replace(`${url.pathname}${url.search}`, { scroll: false });
-    }
-    if (!draft) return;
-    if (draft.kind === "link") {
-      const token = tokens?.access_token;
-      if (returnedWorkoutId && token) {
-        void linkScheduleSlotWorkout(token, draft.slotId, returnedWorkoutId)
-          .catch((reason) => setError(localizeError(reason, i18n)))
-          .finally(() => setReopenSlotId(draft.slotId));
-      } else {
-        const frame = window.requestAnimationFrame(() => setReopenSlotId(draft.slotId));
-        return () => window.cancelAnimationFrame(frame);
-      }
-      return;
-    }
-    const master_workout_id = returnedWorkoutId ?? draft.editor.values.master_workout_id;
-    const frame = window.requestAnimationFrame(() => {
-      if (draft.kind === "slot") setEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
-      else setSeriesEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
-    });
-    return () => window.cancelAnimationFrame(frame);
-    // Runs once on arrival; the session token is already there by then.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
-
   // Reopen the class the coach left from once the schedule has it.
   useEffect(() => {
     if (!reopenSlotId || loading) return;
@@ -440,9 +410,22 @@ export function ScheduleConsole({
 
   const classTypeName = (id: string | null | undefined) => classTypes.find((type) => type.id === id)?.name ?? null;
 
-  function createNewWod(draft: ClassDraft) {
-    stashClassDraft(draft);
-    router.push(newWorkoutHref(adminHref("/admin/workouts/new", organizationSlug), window.location.pathname));
+  // «+ New WOD» opens the editor over the class form, which stays as it is;
+  // the published WOD becomes the form's WOD (saved with the class).
+  function assignNewWod(target: NewWodTarget, workoutId: string) {
+    if (target === "slot") {
+      setEditor((current) => (current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current));
+    } else {
+      setSeriesEditor((current) => (current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current));
+    }
+  }
+
+  function newWodTargetLabel(target: NewWodTarget) {
+    const values = target === "slot" ? editor?.values : seriesEditor?.values;
+    const name = values?.name?.trim() || classTypeName(values?.class_type_id) || null;
+    if (target === "series") return name;
+    const when = editor?.values.scheduled_at ? formatInZone(editor.values.scheduled_at, gymZone, locale, "day-time") : null;
+    return [name, when].filter(Boolean).join(" · ") || null;
   }
 
   // ADR-214: "it is 23:40 at the gym now", on the gym's clock.
@@ -811,7 +794,7 @@ export function ScheduleConsole({
 
         {isAdmin ? (
           <div className="flex justify-end">
-            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={() => openSeriesEditor()}>{i18n("featureCreateSeries")}</button>
+            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={() => openSeriesEditor()}>{i18n("featureCreateClassSeries")}</button>
           </div>
         ) : null}
 
@@ -895,9 +878,34 @@ export function ScheduleConsole({
             slots={schedule}
             startDate={startDate}
             timeZone={gymZone}
+            dayWorkouts={dayWorkouts}
+            classTypes={classTypes}
+            onOpenDayWorkout={isAdmin && canManageSchedule ? setDayWodDate : undefined}
           />
         )}
       </div>
+
+      {newWodFor ? (
+        <ContextualWorkoutCreator
+          target={newWodTargetLabel(newWodFor)}
+          onPublished={(workoutId) => assignNewWod(newWodFor, workoutId)}
+          onClose={() => setNewWodFor(null)}
+        />
+      ) : null}
+
+      {dayWodDate && tokens?.access_token ? (
+        <DayWorkoutDialog
+          token={tokens.access_token}
+          date={dayWodDate}
+          timeZone={gymZone}
+          dayWorkouts={dayWorkouts}
+          slots={schedule}
+          classTypes={classTypes}
+          locations={manyBranches ? adminLocations : []}
+          onClose={() => setDayWodDate(null)}
+          onChanged={() => void loadSchedule()}
+        />
+      ) : null}
 
       {selectedSlot ? (
         <SlotPopup
@@ -912,13 +920,13 @@ export function ScheduleConsole({
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
           canProgramVariations={can(membership, "manage_coaching")}
-          onCreateWorkout={() => createNewWod({ kind: "link", slotId: selectedSlot.id })}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
             void loadSchedule();
           }}
           onSlotChanged={() => void refreshSelectedSlot()}
+          dayWorkout={isAdmin ? coveringDayWorkout(dayWorkouts, selectedSlot, gymZone) : null}
           onClose={() => setSelectedSlot(null)}
           onClassAction={(action) => setClassAction({ slot: selectedSlot, action })}
           onEdit={() => openUpdateEditor(selectedSlot)}
@@ -1042,9 +1050,31 @@ export function ScheduleConsole({
                 { label: t("scheduledAt"), type: "datetime" as const, field: "scheduled_at" as const },
                 { label: i18n("featureDurationMinutes"), type: "number-duration" as const, field: "duration_minutes" as const },
                 { label: t("capacity"), type: "number-cap" as const, field: "capacity" as const },
-                { label: t("timeoutMinutes"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
+                { label: rulesT("approvalWaitLabel"), type: "number-timeout" as const, field: "booking_timeout_minutes" as const },
               ].map(({ label, type, field }) =>
-                type === "select" ? (
+                type === "number-timeout" ? (
+                  // ADR-226: how long a request waits for staff; only without auto-approval.
+                  <div key={label} className="md:col-span-2" style={{ color: "var(--muted)" }}>
+                    <DurationLimitField
+                      testId="slot-approval-wait"
+                      label={label}
+                      help={rulesT("approvalWaitClassHelp")}
+                      noLimitLabel={rulesT("approvalWaitNoLimit")}
+                      value={editor.values.booking_timeout_minutes}
+                      min={1}
+                      max={10080}
+                      fallback={60}
+                      inputStyle={slotInputStyle(field)}
+                      inputProps={invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
+                      onChange={(timeoutMinutes) =>
+                        setEditor((current) =>
+                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes } } : current,
+                        )
+                      }
+                    />
+                    <FieldError id={`slot-error-${field}`}>{editorFieldErrors[field]}</FieldError>
+                  </div>
+                ) : type === "select" ? (
                   <div key={label} className="md:col-span-2">
                     <WodPicker
                       label={label}
@@ -1058,7 +1088,7 @@ export function ScheduleConsole({
                           current ? { ...current, values: { ...current.values, master_workout_id: workoutId } } : current,
                         )
                       }
-                      onCreateNew={() => createNewWod({ kind: "slot", editor })}
+                      onCreateNew={() => setNewWodFor("slot")}
                     />
                     <FieldError id="slot-error-master_workout_id">{editorFieldErrors.master_workout_id}</FieldError>
                   </div>
@@ -1141,21 +1171,7 @@ export function ScheduleConsole({
                       }
                       value={editor.values.capacity}
                     />
-                  ) : (
-                    <IntegerInput
-                      className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={slotInputStyle(field)}
-                      {...invalidFieldProps(editorFieldErrors[field], `slot-error-${field}`)}
-                      min={1}
-                      emptyValue={1}
-                      onValueChange={(timeoutMinutes) =>
-                        setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes ?? 1 } } : current,
-                        )
-                      }
-                      value={editor.values.booking_timeout_minutes}
-                    />
-                  )}
+                  ) : null}
                   <FieldError id={`slot-error-${field}`}>{editorFieldErrors[field]}</FieldError>
                 </label>
                 ),
@@ -1275,7 +1291,7 @@ export function ScheduleConsole({
                   classTypeName={classTypeName(seriesEditor.values.class_type_id)}
                   value={seriesEditor.values.master_workout_id ?? null}
                   onChange={(workoutId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: workoutId } })}
-                  onCreateNew={() => createNewWod({ kind: "series", editor: seriesEditor })}
+                  onCreateNew={() => setNewWodFor("series")}
                   noneHint={i18n("classSeriesWodHint")}
                 />
                 <FieldError id="series-error-master_workout_id">{seriesFieldErrors.master_workout_id}</FieldError>
@@ -1305,7 +1321,7 @@ export function ScheduleConsole({
               <FieldError id="series-error-coach_user_id">{seriesFieldErrors.coach_user_id}</FieldError>
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /><FieldError id="series-error-timezone">{seriesFieldErrors.timezone}</FieldError></label>
             </div>
-            <details className="mt-5 rounded-2xl p-4" open={seriesFieldErrors.capacity || seriesFieldErrors.booking_timeout_minutes ? true : undefined} style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("capacity")} {...invalidFieldProps(seriesFieldErrors.capacity, "series-error-capacity")} min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /><FieldError id="series-error-capacity">{seriesFieldErrors.capacity}</FieldError></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("booking_timeout_minutes")} {...invalidFieldProps(seriesFieldErrors.booking_timeout_minutes, "series-error-booking_timeout_minutes")} min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /><FieldError id="series-error-booking_timeout_minutes">{seriesFieldErrors.booking_timeout_minutes}</FieldError></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
+            <details className="mt-5 rounded-2xl p-4" open={seriesFieldErrors.capacity || seriesFieldErrors.booking_timeout_minutes ? true : undefined} style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" style={seriesInputStyle("capacity")} {...invalidFieldProps(seriesFieldErrors.capacity, "series-error-capacity")} min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /><FieldError id="series-error-capacity">{seriesFieldErrors.capacity}</FieldError></label><div className="text-xs sm:col-span-3"><DurationLimitField testId="series-approval-wait" label={rulesT("approvalWaitLabel")} help={rulesT("approvalWaitClassHelp")} noLimitLabel={rulesT("approvalWaitNoLimit")} value={seriesEditor.values.booking_timeout_minutes} min={1} max={10080} fallback={60} inputStyle={seriesInputStyle("booking_timeout_minutes")} inputProps={invalidFieldProps(seriesFieldErrors.booking_timeout_minutes, "series-error-booking_timeout_minutes")} onChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes } })} /><FieldError id="series-error-booking_timeout_minutes">{seriesFieldErrors.booking_timeout_minutes}</FieldError></div><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
         </Dialog>
       ) : null}
     </main>

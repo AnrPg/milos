@@ -25,6 +25,8 @@ import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
 import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
+import { ClassDayWorkoutNote } from "@/components/schedule/ClassDayWorkoutNote";
+import type { DayWorkout } from "@/api/day-workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
 import {
@@ -47,6 +49,7 @@ import {
   waitlistPositionLabel,
 } from "@/components/schedule/member-booking";
 import { zonedText } from "@/lib/zoned-time";
+import { formatMinutes } from "@/lib/duration-parts";
 import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -61,23 +64,6 @@ function formatDateTime(locale: string, isoString: string, zone: string | null) 
     hour: "numeric",
     minute: "2-digit",
   });
-}
-
-function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: number, zone: string | null) {
-  const deadline = new Date(new Date(scheduledAt).getTime() - timeoutMinutes * 60 * 1000);
-  const exact = zonedText(deadline, zone, locale, {
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  return { exact };
-}
-
-function timeoutMinutesLabel(timeoutMinutes: number) {
-  return timeoutMinutes >= 60 ? `${timeoutMinutes / 60}h` : `${timeoutMinutes}m`;
 }
 
 type SlotPopupProps = {
@@ -104,9 +90,10 @@ type SlotPopupProps = {
   /** The member's package includes guest passes (ADR-097). */
   guestsIncluded?: boolean;
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
-  onCreateWorkout?: () => void;
   /** ADR-201: staff who manage coaching can give attendees a variation. */
   canProgramVariations?: boolean;
+  /** ADR-230, staff: the day WOD that covers this class, if any. */
+  dayWorkout?: DayWorkout | null;
 };
 
 export function SlotPopup({
@@ -126,12 +113,13 @@ export function SlotPopup({
   onSlotChanged,
   locations,
   guestsIncluded = false,
-  onCreateWorkout,
   canProgramVariations = false,
+  dayWorkout = null,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const spaceT = useTranslations("Spaces");
+  const rulesT = useTranslations("BookingRules");
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
@@ -264,10 +252,16 @@ export function SlotPopup({
           ? i18n("thisClassIsCurrentlyFullfc75983")
           : i18n("bookingIsUnavailableForThisSlot8a07037");
 
-  const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes, timeZone);
-  const deadlineRelative = i18n("beforeStart", {
-    duration: timeoutMinutesLabel(slot.booking_timeout_minutes),
-  });
+  // ADR-226: how long a booking request waits for staff, in words.
+  const approvalWaitValue = slot.auto_approve
+    ? rulesT("answerInstant")
+    : slot.booking_timeout_minutes === null
+      ? rulesT("untilStart")
+      : formatMinutes(slot.booking_timeout_minutes, locale);
+  const approvalWaitChip =
+    slot.booking_timeout_minutes === null
+      ? rulesT("answerByStart")
+      : rulesT("answerWithin", { duration: formatMinutes(slot.booking_timeout_minutes, locale) });
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
   // ADR-202: the space of the class; staff also see a clash with another class or a closure.
@@ -359,6 +353,16 @@ export function SlotPopup({
             </button>
           </div>
 
+          {isAdmin ? (
+            <ClassDayWorkoutNote
+              slot={slot}
+              dayWorkout={dayWorkout}
+              accessToken={accessToken}
+              isPast={isPast}
+              onChanged={onSlotChanged}
+            />
+          ) : null}
+
           <ClassStateNotice slot={slot} className="mt-4" />
 
           {/* Class actions: Edit (and Restore on a cancelled class) stay in
@@ -412,7 +416,7 @@ export function SlotPopup({
           ) : null}
 
           {isAdmin ? (
-            <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} onCreateNew={onCreateWorkout} />
+            <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} />
           ) : null}
 
           {/* Compact info strip (admin sees full detail; members get a summary) */}
@@ -445,12 +449,14 @@ export function SlotPopup({
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                  {i18n("bookByb152b3b")}
+                  {rulesT("answerTime")}
                 </p>
-                <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {deadlineRelative}
+                <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }} data-testid="slot-approval-wait">
+                  {approvalWaitValue}
                 </p>
-                <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>({deadline.exact})</p>
+                {slot.auto_approve ? null : (
+                  <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{rulesT("answerTimeHelp")}</p>
+                )}
               </div>
             </div>
           ) : (
@@ -494,18 +500,14 @@ export function SlotPopup({
                   {i18n("mbUsesVisits", { count: creditCost })}
                 </span>
               ) : null}
-              <span
-                className="rounded-full px-3 py-1 text-xs font-semibold"
-                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
-              >
-                {i18n("bookByb152b3b")} {deadlineRelative}
-              </span>
+              {/* ADR-226: bookings stay open until the start; a request waits this long for staff. */}
               {slot.auto_approve ? null : (
                 <span
+                  data-testid="slot-approval-wait"
                   className="rounded-full px-3 py-1 text-xs font-semibold"
                   style={{ background: "color-mix(in srgb, var(--warning) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)", color: "var(--warning)" }}
                 >
-                  {i18n("requiresApproval4ecb6f5")}
+                  {i18n("requiresApproval4ecb6f5")} · {approvalWaitChip}
                 </span>
               )}
             </div>

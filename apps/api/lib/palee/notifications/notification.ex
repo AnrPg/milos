@@ -31,6 +31,7 @@ defmodule Palee.Notifications.Notification do
     :form_review_completed,
     :coaching_reply_overdue,
     :nutrition_plan_updated,
+    :training_goal_updated,
     :appointment_booked,
     :appointment_cancelled,
     :class_cancelled,
@@ -108,7 +109,8 @@ defmodule Palee.Notifications.Notification do
     :password_reset_requested,
     :password_reset_completed,
     :business_demo_idle,
-    :email_key_expiring
+    :email_key_expiring,
+    :member_leaving
   ]
 
   schema "notifications" do

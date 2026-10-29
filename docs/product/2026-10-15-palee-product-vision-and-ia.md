@@ -255,6 +255,8 @@ Why swipe works for people and not for clubs: swipe makes sense when **both side
 - Injury warning (existing `InjuryWarnings`, acknowledge flow) shows above the buttons when relevant.
 - **Στόχοι** row → goals screen (§7.6).
 
+*Decision (ADR-226, 2026-10-28):* a class without automatic confirmation shows members «Απαιτεί έγκριση · απάντηση μέσα σε …» (or «έως την έναρξη» when the box set no limit). It never shows a booking deadline: bookings stay open until the class starts. Late cancellation is set in hours and minutes.
+
 ### 7.5 Check-in with QR (fewest taps) [PARTIAL]
 | Method | Taps | Web? | Notes |
 |---|---|---|---|
@@ -313,6 +315,7 @@ Show correlations only after enough data (e.g. ≥4 weeks), and always as **indi
 **ADR-194 (Πρόοδος / Ευεξία polish):**
 - Πρόοδος has no page title. The range chips come first and drive every card, including resting HR, which has no chips of its own.
 - Consistency is a single card holding the heatmap, the target and weeks on target. There is one streak only (a gym day streak, otherwise weeks).
+- **ADR-229 (ANR 2026-10-28):** the weekly target is the person's own «Εβδομαδιαίος στόχος», set in `Εγώ › Ρυθμίσεις › Πρόγραμμα προπόνησης`. Their coach (or staff who coach every client) may set it from the client's profile; the person is notified and keeps the last word. Front desk and other roles never. Box settings keep only the streak shields per renewal (0–5) and when they renew.
 - Cards with no data are hidden, never shown as placeholders.
 - PR trends show estimated 1RM (Epley, ≤12 reps) and a retest hint after 84 days. Both come from one pure lib.
 - The member can hide the macros of the coach's plan. This is stored server-side (`hide_macros`). With no plan, no card is shown.
@@ -336,6 +339,8 @@ Today the backend has admin-only referral programs, referral events and rewards 
 
 **Engineering gap:** PRs and injuries are account-scoped (`/api/prs`, `/api/wellbeing/*`), but the training log is org-scoped (`/api/org/{slug}/me/training-log`). A unified journal needs a cross-organization read model over all the athlete's memberships.
 
+*Decision (ANR 2026-10-28, ADR-230):* staff can set a **WOD ημέρας** for a date, for every class or for chosen class types. The day's classes follow it, including classes added later that day; a class's own WOD overrides it, and «Επαναφορά στο WOD ημέρας» undoes that. It is set from a strip under each day's header in the schedule's day and week views (a quiet «+ WOD ημέρας» on days with classes, from today on), shown as one line in the month grid, and from the library's «Ανάθεση → Ημέρα». Before saving, the dialog says how many classes take it, which keep their own WOD (with «Να πάρουν κι αυτά»), and which already started. Classes that follow a day WOD are not drafts and send no missing-WOD alerts. Days are the gym's own days.
+
 **Coach role in the same app:** `Box › Πελάτες μου` (reply queue, form-review queue, programming, coach notes, nutrition editor, class-timer control, check-in desk). The full admin stays in the web console (finance, users, schedule, workout library, challenges, content, metrics/reports, inventory, cleaning, settings), entered from `Εγώ › Διαχείριση`.
 
 *Decision (ADR-198, 2026-10-24) [PARTIAL]:* `Πελάτες μου` is a Box extension shown only to someone with the coach role at the selected provider (a solo coach is owner and coach). It has four parts, each hidden when empty, and the whole section is hidden when all are empty. **Περιμένουν απάντηση**: each row opens the thread. **Αξιολόγηση τεχνικής**: a sheet with the video and the console's own feedback form. **Check-in σήμερα**: today's classes and sessions the coach leads, with «Ήρθε / Δεν ήρθε» per person. The staff roster now carries each booking's attendance. **Πελάτες**: chips that open the client's console profile, which stays the client's one home. Programming, coach notes, nutrition and the class timer stay in the console for now.
@@ -348,6 +353,10 @@ Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list
 - **Κοινοποίηση & ορατότητα:** what the coach sees, leaderboards/PR celebrations/challenges/partners opt-ins, PR share grants, default visibility for new entries.
 - **Συνδεδεμένες συσκευές:** Garmin; Apple Health and Health Connect marked as coming with native; Wallet pass; ICS feed.
 - **Πληρωμές & αποδείξεις:** per provider; invoices, refund receipts, corporate plan.
+  The member owns their «Αυτόματη ανανέωση» (on by default when the package allows renewal) and can
+  leave the box («Αποχώρηση από το box»); either way they keep what they paid for, only invoices for later
+  periods or packages that never started are cancelled, and money owed for anything already used stays owed
+  (shown and reminded) until paid. Staff can do the same from the box member's profile (ADR-220).
   - *Later (owner decision, 2026-10-23):* partner perks from outside stores in Προσφορές (TD-188) and a product shop/POS whose purchases appear in Συναλλαγές (TD-189) are post-MVP; the page leaves room for both.
 - **Ρυθμίσεις:** language, theme, units, notifications, *journal sections on/off*, *show weight number or trend only*, offline sync status, account.
   *Decided 2026-10-28 (ADR-219):* «Οι ρόλοι μου» lets someone add or drop roles below their own top role at the selected box (an owner who also coaches adds «Coach» and stays owner). The top role is locked; the card is hidden for members and athletes, who have nothing below them. Others' roles change only downwards (vendor › owner › admin › staff › clients; co-owners manage each other).

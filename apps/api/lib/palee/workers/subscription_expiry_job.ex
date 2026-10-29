@@ -18,7 +18,8 @@ defmodule Palee.Workers.SubscriptionExpiryJob do
   """
   use Oban.Worker, queue: :analytics, max_attempts: 3
 
-  alias Palee.{Finance, Notifications, Organizations, Scheduling}
+  alias Palee.{Finance, Notifications, Organizations}
+  alias Palee.Application.RevokeAccess
   alias Palee.Finance.Domain.InvoiceLifecycle
 
   @impl Oban.Worker
@@ -56,42 +57,9 @@ defmodule Palee.Workers.SubscriptionExpiryJob do
 
     context
     |> Finance.refresh_entitlement_snapshots()
-    |> Enum.each(&revoke_access(context, &1))
+    |> Enum.each(&RevokeAccess.call(context, &1))
 
     :ok
-  end
-
-  defp revoke_access(context, %{user_id: user_id} = lost) do
-    cancelled =
-      case Scheduling.cancel_active_future_bookings_for_user(context, user_id) do
-        {:ok, release_facts} ->
-          Enum.each(release_facts, &release_class_visit(context, &1))
-          length(release_facts)
-
-        _error ->
-          0
-      end
-
-    Notifications.process_event("access_ended", %{
-      user_id: user_id,
-      membership_id: lost.membership_id,
-      reason: if(lost.status == "blocked", do: "overdue_payment", else: "subscription_ended"),
-      cancelled_bookings: cancelled
-    })
-  end
-
-  defp release_class_visit(context, fact) do
-    Finance.release_entitlement_source(
-      context,
-      fact.user_id,
-      "scheduling",
-      fact.scheduled_class_id,
-      :class_visits,
-      %{
-        reason: "Access ended",
-        idempotency_key: "access-ended-booking-release:#{fact.booking_id}"
-      }
-    )
   end
 
   defp notify(context, subscription, event, kind, extra) do

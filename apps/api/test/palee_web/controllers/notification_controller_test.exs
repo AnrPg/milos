@@ -76,6 +76,54 @@ defmodule PaleeWeb.NotificationControllerTest do
     assert Enum.map(response["notifications"], & &1["id"]) == [update.id]
   end
 
+  test "counts unread notifications without loading the list, leaving out chat deliveries", %{
+    conn: conn,
+    user: user
+  } do
+    for type <- [:booking_pending, :booking_approved] do
+      {:ok, _} =
+        Notifications.create_notification(%{
+          user_id: user.id,
+          type: type,
+          payload: %{url: "/schedule"}
+        })
+    end
+
+    {:ok, _read} =
+      Notifications.create_notification(%{
+        user_id: user.id,
+        type: :booking_approved,
+        payload: %{url: "/schedule"},
+        read_at: DateTime.utc_now() |> DateTime.truncate(:second)
+      })
+
+    {:ok, _chat_delivery} =
+      Notifications.create_notification(%{
+        user_id: user.id,
+        type: :chat_message,
+        payload: %{
+          thread_id: Ecto.UUID.generate(),
+          message_id: Ecto.UUID.generate(),
+          body: "Messages only"
+        }
+      })
+
+    {:ok, _someone_else} =
+      Notifications.create_notification(%{
+        user_id: user_fixture().id,
+        type: :booking_pending,
+        payload: %{url: "/schedule"}
+      })
+
+    assert conn |> get("/api/notifications/unread-count") |> json_response(200) == %{
+             "unread_count" => 2
+           }
+  end
+
+  test "refuses the unread count without a session" do
+    assert build_conn() |> get("/api/notifications/unread-count") |> json_response(401)
+  end
+
   test "marks a single notification as read", %{conn: conn, user: user} do
     {:ok, notification} =
       Notifications.create_notification(%{

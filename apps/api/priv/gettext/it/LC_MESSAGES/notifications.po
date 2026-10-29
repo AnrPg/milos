@@ -149,7 +149,7 @@ msgid "A place opened up in %{class}. Your booking is confirmed or awaiting appr
 msgstr "Si è liberato un posto in %{class}. La tua prenotazione è confermata o in attesa di approvazione."
 
 msgid "Your package ends soon"
-msgstr "Il tuo pacchetto sta per scadere"
+msgstr "Il tuo pacchetto di abbonamento sta per scadere"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} scade il %{date}."
@@ -708,3 +708,15 @@ msgstr "La chiave SMTP di Palee è scaduta il %{date}, quindi Palee non può inv
 
 msgid "The email key has expired"
 msgstr "La chiave email è scaduta"
+
+msgid "Your weekly goal changed"
+msgstr "Il tuo obiettivo settimanale è cambiato"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} ha impostato il tuo obiettivo a %{target} allenamenti a settimana. Puoi modificarlo."
+
+msgid "A box member is leaving"
+msgstr "Un membro del box se ne va"
+
+msgid "%{nickname} is leaving the box. Last day: %{date}."
+msgstr "%{nickname} lascia il box. Ultimo giorno: %{date}."

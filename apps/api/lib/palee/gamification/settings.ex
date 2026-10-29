@@ -5,8 +5,8 @@ defmodule Palee.Gamification.Settings do
     GamificationStore.get_settings()
   end
 
-  def weekly_workout_target do
-    current().weekly_workout_target
+  def streak_shields do
+    current().streak_shields
   end
 
   def streak_shield_reset_day do

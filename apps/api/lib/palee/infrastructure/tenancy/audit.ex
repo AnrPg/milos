@@ -2,7 +2,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
   alias Palee.Repo
 
   @ready_tenant_tables ~w(
-    class_types scheduling_settings class_series scheduled_classes bookings
+    class_types scheduling_settings class_series scheduled_classes bookings day_workouts
     scheduling_trial_policies scheduling_trial_requests
     season_offerings season_enrollments
     referral_codes referral_attributions
@@ -114,6 +114,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     device_connections device_activities device_imports daily_stats
     account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
     user_insights guide_progress notification_preferences
+    training_goals
   )
 
   def report do

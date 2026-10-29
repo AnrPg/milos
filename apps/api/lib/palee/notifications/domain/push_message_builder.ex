@@ -825,6 +825,17 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-220.
+  def build("member_leaving", payload, localize) do
+    bindings = %{nickname: payload["person_nickname"], date: payload["leaving_on"]}
+
+    %{
+      title: localize.("A box member is leaving", %{}),
+      body: localize.("%{nickname} is leaving the box. Last day: %{date}.", bindings),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
   # ADR-155 (board 10, Q3).
   def build("check_in_visitor", payload, localize) do
     bindings = %{
@@ -1059,6 +1070,18 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       title: localize.("Your nutrition plan was updated", %{}),
       body: localize.("Open it to see what changed.", %{}),
       url: payload["url"] || "/box/coach"
+    }
+  end
+
+  def build("training_goal_updated", payload, localize) do
+    %{
+      title: localize.("Your weekly goal changed", %{}),
+      body:
+        localize.("%{person} set your goal to %{target} workouts a week. You can change it.", %{
+          person: payload["set_by_nickname"] || "",
+          target: payload["target"] || ""
+        }),
+      url: payload["url"] || "/me/settings#training-schedule"
     }
   end
 

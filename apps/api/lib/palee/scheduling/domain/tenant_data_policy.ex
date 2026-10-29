@@ -19,6 +19,8 @@ defmodule Palee.Scheduling.Domain.TenantDataPolicy do
               %{table: "bookings"},
               %{table: "scheduled_classes"},
               %{table: "class_series"},
+              # ADR-230: day WODs (after the classes that point at them).
+              %{table: "day_workouts"},
               %{table: "class_types"},
               %{table: "scheduling_settings"}
             ]

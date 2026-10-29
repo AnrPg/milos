@@ -10,7 +10,6 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -36,8 +35,6 @@ import { useSession } from "@/components/session-provider";
 import { useDraftSaver } from "@/hooks/useDraftSaver";
 import { DraftConflictError, type DraftSaveStatus } from "@/lib/draft-saver";
 import { useUiTranslations } from "@/i18n/ui";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { workoutPublishedHref } from "@/lib/workout-return";
 import {
   COMMON_WORKOUT_WORDS,
   DEFAULT_WORKOUT_DSL_SOURCE,
@@ -72,6 +69,8 @@ type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
+  /** The workout was published: the host decides where the coach goes next. */
+  onPublished: (workoutId: string) => void;
   onSwitchToStructured: (id: string) => void;
 };
 
@@ -87,11 +86,10 @@ export function QuickTextWorkoutEditor({
   draftId,
   folderId = null,
   onDraftReady,
+  onPublished,
   onSwitchToStructured,
 }: Props) {
   const i18n = useUiTranslations();
-  const router = useRouter();
-  const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const conflictT = useTranslations("DraftConflict");
@@ -484,7 +482,7 @@ export function QuickTextWorkoutEditor({
         return true;
       });
       if (!published) return;
-      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
+      onPublished(draftId);
     } catch (error) {
       if (error instanceof DraftConflictError) return;
       if (

@@ -12,6 +12,8 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { scaleLevelVar, translucent } from "@/lib/theme";
 import { hasStructuredContent } from "@/lib/workout-execution-mode";
 import type { WorkoutAuthoringMode } from "@/api/workouts";
+import { describePreset, readTextSections, type TextSection } from "@/lib/text-sections";
+import { getFormatLabels } from "@/types/workout";
 import { ExerciseContent, WorkoutContentBlock, type WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 export type PreviewExercise = {
@@ -81,6 +83,11 @@ export type PreviewSection = {
   timer_config?: Record<string, unknown> | null;
   note?: string | null;
   content?: WorkoutContentEntry[] | null;
+  section_metadata?: Record<string, unknown> | null;
+  /** ADR-180: a text section's text, rich text and timer (sectioned workouts). */
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
+  timer_preset?: unknown;
   exercises: PreviewExercise[];
 };
 
@@ -153,6 +160,50 @@ function sectionContent(section: PreviewSection) {
   return contentWithNote(section.content, section.note, "instructions");
 }
 
+/** One text section: its title, timer and scoring, then the coach's text as written. */
+function TextSectionPreview({
+  index,
+  section,
+  document,
+  formatLabels,
+}: {
+  index: number;
+  section: TextSection;
+  document: Record<string, unknown> | null;
+  formatLabels: Record<string, string>;
+}) {
+  const i18n = useUiTranslations();
+  const richContent = renderFreeTextDocument(document);
+  const timer = section.preset ? describePreset(section.preset, formatLabels[section.preset.format] ?? section.preset.format) : null;
+
+  return (
+    <li className="rounded-[1.2rem] border p-4" style={{ background: "var(--panel)", borderColor: "var(--border)" }}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-black" style={{ color: "var(--text)" }}>
+          {section.title || i18n("textSectionNumber", { number: index + 1 })}
+        </h3>
+        {timer ? (
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ background: translucent("var(--primary)", 14), color: "var(--text)" }}>
+            ⏱ {timer}
+          </span>
+        ) : null}
+      </div>
+      {section.metrics.length > 0 ? (
+        <p className="mt-1 text-xs" style={{ color: "var(--text-soft)" }}>
+          {i18n("textSectionScoredBy", { metrics: section.metrics.map((metric) => metric.label).join(" · ") })}
+        </p>
+      ) : null}
+      <div className="mt-3">
+        {richContent ? (
+          <div className="free-text-rich-content text-sm leading-6">{richContent}</div>
+        ) : (
+          <p className="whitespace-pre-wrap text-sm leading-6" style={{ color: "var(--text)" }}>{section.body}</p>
+        )}
+      </div>
+    </li>
+  );
+}
+
 function renderFreeTextDocument(document: Record<string, unknown> | null | undefined): ReactNode | null {
   if (!document || document.type !== "doc" || !Array.isArray(document.content)) return null;
   return document.content.map((node, index) => renderFreeTextNode(node, index));
@@ -173,9 +224,10 @@ function renderFreeTextNode(rawNode: unknown, key: string | number): ReactNode {
     case "paragraph":
       return <p key={key} style={style}>{children}</p>;
     case "heading": {
-      const level = attrs.level === 1 || attrs.level === 3 ? attrs.level : 2;
+      const level = attrs.level === 1 || attrs.level === 3 || attrs.level === 4 ? attrs.level : 2;
       if (level === 1) return <h1 key={key} className="text-xl font-black" style={style}>{children}</h1>;
       if (level === 3) return <h3 key={key} className="text-base font-black" style={style}>{children}</h3>;
+      if (level === 4) return <h4 key={key} className="text-sm font-black" style={style}>{children}</h4>;
       return <h2 key={key} className="text-lg font-black" style={style}>{children}</h2>;
     }
     case "bulletList":
@@ -216,12 +268,24 @@ function applyFreeTextMarks(text: string, rawMarks: unknown, key: string | numbe
         return <u key={markKey}>{content}</u>;
       case "strike":
         return <s key={markKey}>{content}</s>;
-      case "highlight":
-        return <mark key={markKey}>{content}</mark>;
+      case "highlight": {
+        // The coach's highlight colour, blended into the theme so text stays legible.
+        const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
+        const color = freeTextMarkColor(attrs.color);
+        return (
+          <mark
+            key={markKey}
+            style={{ background: color ? `color-mix(in srgb, ${color} 35%, transparent)` : translucent("var(--warning)", 30), color: "inherit" }}
+          >
+            {content}
+          </mark>
+        );
+      }
       case "textColor": {
         const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
         const color = freeTextMarkColor(attrs.color);
-        return color ? <span key={markKey} style={{ color }}>{content}</span> : content;
+        // The coach's colour, mixed with the theme's text colour so it reads in light and dark.
+        return color ? <span key={markKey} style={{ color: `color-mix(in srgb, ${color} 80%, var(--text))` }}>{content}</span> : content;
       }
       case "link": {
         const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
@@ -469,6 +533,7 @@ export function WorkoutPreviewDetail({
   instructions,
 }: Props) {
   const i18n = useUiTranslations();
+  const formatLabels = getFormatLabels(i18n);
 
   function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefined): string | null {
     if (!timerConfig) return null;
@@ -489,21 +554,48 @@ export function WorkoutPreviewDetail({
   // Free text is how coaches write; everyone reads the structured workout. The
   // text is shown only for free-text workouts that have no structure, and for
   // workouts written in text sections (ADR-180: their text holds every section).
+  // ADR-224: text sections are shown one by one, each with its timer and
+  // what it is scored by, in the coach's own formatting.
+  const textSections = authoringMode === "sectioned_text" ? readTextSections({ authoring_mode: authoringMode, sections }) : [];
+  if (textSections.length > 0) {
+    return (
+      <div className="space-y-3">
+        <WorkoutContentBlock entries={content} lead={instructions} />
+        <ol className="space-y-3" aria-label={i18n("textSectionsPreviewLabel")}>
+          {textSections.map((section, index) => (
+            <TextSectionPreview
+              key={section.id}
+              index={index}
+              section={section}
+              document={sections[index]?.free_text_document ?? null}
+              formatLabels={formatLabels}
+            />
+          ))}
+        </ol>
+      </div>
+    );
+  }
+
   if ((authoringMode === "free_text" && !hasStructuredContent(sections)) || authoringMode === "sectioned_text") {
     const richContent = renderFreeTextDocument(freeTextDocument);
 
     return (
-      <div
-        className="rounded-[1.2rem] border p-4"
-        style={{ background: "var(--panel)", borderColor: "var(--border)" }}
-      >
-        {richContent ? (
-          <div className="free-text-rich-content text-sm leading-6">{richContent}</div>
-        ) : (
-          <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
-            {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
-          </pre>
-        )}
+      <div className="space-y-3">
+        <WorkoutContentBlock entries={content} lead={instructions} />
+        <div
+          className="rounded-[1.2rem] border p-4"
+          style={{ background: "var(--panel)", borderColor: "var(--border)" }}
+        >
+          {richContent ? (
+            <div className="free-text-rich-content text-sm leading-6">{richContent}</div>
+          ) : freeTextBody?.trim() ? (
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+              {freeTextBody}
+            </pre>
+          ) : (
+            <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("freeTextPreviewNoText")}</p>
+          )}
+        </div>
       </div>
     );
   }

@@ -68,6 +68,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         workout_assigned workout_assignment_requested workout_completed review_submitted
         form_review_submitted form_review_completed coaching_reply_overdue
         nutrition_plan_updated coach_client_assigned coach_note_viewed coach_wellness_summary
+        training_goal_updated
       )
     },
     %{
@@ -93,7 +94,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       locked: false,
       audience: "staff",
       types: ~w(
-        booking_pending booking_timeout check_in_visitor
+        booking_pending booking_timeout check_in_visitor member_leaving
         trial_requested trial_booked trial_cancelled season_requested class_workout_missing
         community_group_proposed community_report_created referral_review
         inventory_repair_needed inventory_stock_low inventory_digest

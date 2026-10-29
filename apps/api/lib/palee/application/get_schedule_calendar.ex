@@ -1,6 +1,6 @@
 defmodule Palee.Application.GetScheduleCalendar do
   alias Palee.{Community, Facility, Finance, Identity, Organizations, Scheduling, Workouts}
-  alias Palee.Application.{BookingTerms, ClassSpace}
+  alias Palee.Application.{BookingTerms, ClassSpace, DayWorkouts}
   alias Palee.Scheduling.Domain.BookingPolicy
   alias Palee.TimeZones.ZonedTime
 
@@ -28,11 +28,19 @@ defmodule Palee.Application.GetScheduleCalendar do
         |> put_friends_going(context, actor)
 
       class_types = schedule_class_types(context, slots)
+      start_date = ZonedTime.local_date(start_at, zone)
+      end_date = ZonedTime.local_date(DateTime.add(end_at, -1, :second), zone)
 
       {:ok,
        %{
-         start_date: ZonedTime.local_date(start_at, zone),
-         end_date: ZonedTime.local_date(DateTime.add(end_at, -1, :second), zone),
+         start_date: start_date,
+         end_date: end_date,
+         # ADR-230: staff see and edit the WOD of each day.
+         day_workouts:
+           if(admin_role?(context, actor),
+             do: DayWorkouts.list(context, start_date, end_date),
+             else: []
+           ),
          days: days,
          class_types: class_types,
          locations:
@@ -75,7 +83,9 @@ defmodule Palee.Application.GetScheduleCalendar do
     Enum.map(slots, fn slot ->
       Map.merge(slot, %{
         published: Scheduling.class_published?(slot),
-        workout_status: Scheduling.class_workout_status(slot, now, zone)
+        workout_status: Scheduling.class_workout_status(slot, now, zone),
+        # ADR-230: "day" (inherited from the day's WOD), "class" or nil.
+        workout_source: Scheduling.class_workout_source(slot)
       })
     end)
   end
@@ -126,6 +136,8 @@ defmodule Palee.Application.GetScheduleCalendar do
       base = %{
         id: slot.id,
         master_workout_id: slot.master_workout_id,
+        # ADR-230: set when the WOD is inherited from the day's WOD.
+        day_workout_id: Map.get(slot, :day_workout_id),
         class_series_id: slot.class_series_id,
         class_series: slot.class_series,
         name: slot.name,

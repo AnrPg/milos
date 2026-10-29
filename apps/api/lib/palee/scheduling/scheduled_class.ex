@@ -9,6 +9,9 @@ defmodule Palee.Scheduling.ScheduledClass do
   schema "scheduled_classes" do
     field :organization_id, :binary_id
     field :master_workout_id, :binary_id
+    # ADR-230: the day WOD rule the WOD came from; nil with a WOD = its own.
+    # Never cast from requests: only day-WOD inheritance writes it.
+    field :day_workout_id, :binary_id
     field :name, :string, default: "Class"
     field :duration_minutes, :integer, default: 60
     field :scheduled_at, :utc_datetime
@@ -58,20 +61,28 @@ defmodule Palee.Scheduling.ScheduledClass do
       :duration_minutes,
       :scheduled_at,
       :capacity,
-      :auto_approve,
-      :booking_timeout_minutes
+      :auto_approve
     ])
     # ADR-176: the WOD is optional; a standalone class without one is a draft.
+    |> detach_from_day_workout()
     |> validate_number(:capacity, greater_than: 0)
     |> validate_length(:name, min: 1, max: 120)
     |> validate_number(:duration_minutes, greater_than: 0, less_than_or_equal_to: 1440)
-    |> validate_number(:booking_timeout_minutes, greater_than: 0)
+    # ADR-226: nil = a request waits for approval until the class starts.
+    |> validate_number(:booking_timeout_minutes, greater_than: 0, less_than_or_equal_to: 10_080)
     |> validate_future_schedule()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)
     |> foreign_key_constraint(:location_id)
     |> foreign_key_constraint(:space_id, name: :scheduled_classes_space_fkey)
     |> foreign_key_constraint(:class_series_id)
+  end
+
+  # ADR-230: choosing a WOD for the class itself overrides the day's WOD.
+  defp detach_from_day_workout(changeset) do
+    if changed?(changeset, :master_workout_id),
+      do: put_change(changeset, :day_workout_id, nil),
+      else: changeset
   end
 
   @doc "Pausing, cancelling and their undo (ADR-200 §2); nothing else changes."
