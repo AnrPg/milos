@@ -1,7 +1,7 @@
 defmodule Palee.Application.GetAdminUserProfile do
   @moduledoc false
 
-  alias Palee.Application.TenantUserAccess
+  alias Palee.Application.{AuthorizeProgramming, TenantUserAccess}
   alias Palee.Identity.Domain.AdminProfilePolicy
   alias Palee.Organizations
 
@@ -23,6 +23,7 @@ defmodule Palee.Application.GetAdminUserProfile do
              account_status: "active",
              membership: membership(tenant_context, user.id),
              available_sections: AdminProfilePolicy.sections(roles),
+             programming: programming(tenant_context, user.id, roles),
              attention: [],
              operational_links:
                AdminProfilePolicy.operational_links(user, roles, organization_slug)
@@ -40,6 +41,17 @@ defmodule Palee.Application.GetAdminUserProfile do
 
   defp primary_role(roles, _user),
     do: roles |> Palee.Organizations.Domain.MembershipPolicy.primary_role() |> to_string()
+
+  # ADR-225: whether staff may program this client, and through which grant,
+  # so the schedule can say so before anyone tries. Nil for non-clients.
+  defp programming(tenant_context, user_id, roles) do
+    if Enum.any?(roles, &(&1 in [:member, :athlete])) do
+      case AuthorizeProgramming.grant_for(tenant_context, user_id) do
+        {:ok, grant} -> %{allowed: true, grant: to_string(grant), reason: nil}
+        {:error, reason} -> %{allowed: false, grant: nil, reason: to_string(reason)}
+      end
+    end
+  end
 
   # ADR-186: where the person works as staff, for the roles editor.
   defp membership(tenant_context, user_id) do

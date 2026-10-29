@@ -81,6 +81,7 @@ defmodule Palee.Application.WorkoutAnalyticsInstrumentationTest do
   test "assignment lifecycle and athlete opens are recorded per tenant" do
     {organization, owner, context} = organization_fixture()
     {athlete, athlete_context} = member_context(organization, :athlete)
+    TestFixtures.programming_grant_fixture(context, athlete)
     workout = TestFixtures.workout_fixture(owner, %{tenant_context: context})
 
     assert {:ok, assignment} =

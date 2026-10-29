@@ -178,7 +178,7 @@ defmodule PaleeWeb.GroupWodVariationsControllerTest do
 
     assert results[entitled.id]["status"] == "ok"
 
-    assert %{"status" => "error", "code" => "member_programming_not_entitled", "params" => params} =
+    assert %{"status" => "error", "code" => "programming_not_in_package", "params" => params} =
              results[plain.id]
 
     assert params["nickname"] == plain.nickname

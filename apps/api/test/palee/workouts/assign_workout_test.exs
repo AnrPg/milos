@@ -32,7 +32,8 @@ defmodule Palee.Workouts.AssignWorkoutTest do
         joined_at: DateTime.utc_now()
       })
 
-    athlete
+    # ADR-225: athletes are programmed through their package.
+    TestFixtures.programming_grant_fixture(context, athlete)
   end
 
   defp tenant_workout_fixture(context, admin) do

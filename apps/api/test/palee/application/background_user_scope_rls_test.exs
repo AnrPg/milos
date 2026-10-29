@@ -445,6 +445,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
           add!(gym, owner, :owner)
           add!(gym, athlete, :athlete)
           owner_ctx = tenant!(owner, gym)
+          programming_grant_fixture(owner_ctx, athlete)
           workout = workout_fixture(owner, %{tenant_context: owner_ctx})
 
           {:ok, _assignment} =

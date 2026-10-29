@@ -183,6 +183,8 @@ defmodule PaleeWeb.AdminAssignedWorkoutControllerTest do
         joined_at: DateTime.utc_now()
       })
 
+    # ADR-225: athletes are programmed through their package.
+    TestFixtures.programming_grant_fixture(organization.id, athlete)
     :ok
   end
 

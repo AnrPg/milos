@@ -82,7 +82,7 @@ const ERROR_STATUS: Record<string, number> = {
   workout_not_found: 404,
   not_your_client: 403,
   forbidden: 403,
-  member_programming_not_entitled: 403,
+  programming_not_in_package: 403,
 };
 
 /**

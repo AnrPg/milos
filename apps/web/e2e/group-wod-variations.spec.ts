@@ -117,7 +117,7 @@ test.describe("Schedule › variation for several people", () => {
             {
               user_id: "u-zoe",
               status: "error",
-              code: "member_programming_not_entitled",
+              code: "programming_not_in_package",
               params: { user_id: "u-zoe", nickname: "Zoe", reason: "finance_channel_not_included" },
             },
           ],
@@ -161,7 +161,7 @@ test.describe("Schedule › variation for several people", () => {
     const outcome = dialog.getByTestId("group-outcome");
     await expect(outcome).toContainText("Done for 1 of 2.");
     await expect(outcome.locator('[data-outcome="ok"]')).toContainText("Anna");
-    await expect(outcome.locator('[data-outcome="error"]')).toContainText("Zoe's subscription package does not include personal programming");
+    await expect(outcome.locator('[data-outcome="error"]')).toContainText("Zoe's subscription package includes neither online programming nor personal training");
   });
 
   test("select all picks every attendee", async ({ page }) => {

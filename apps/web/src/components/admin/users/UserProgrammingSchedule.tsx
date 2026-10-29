@@ -7,6 +7,7 @@ import {
   fetchAdminUserSchedule,
   programAdminUserWorkout,
   programWorkoutForUsers,
+  type AdminUserProgramming,
   type AdminUserSchedule,
   type MemberProgrammingMode,
 } from "@/api/admin-users";
@@ -25,6 +26,7 @@ import {
   MEMBER_PROGRAMMING_MODES,
   canProgramMorePeople,
   modeRequiresBookedClass,
+  modeRequiresProgrammingEntitlement,
   dayFormatter,
   programmingBlocker,
   programmingSources,
@@ -50,6 +52,13 @@ type Props = {
   /** When set, opens the assignment dialog for this day (used by the profile's quick action). */
   assignRequestDate?: string | null;
   onAssignRequestHandled?: () => void;
+  /**
+   * ADR-225: whether a WOD may be assigned to the person (their subscription
+   * package includes online programming or personal training). When it is
+   * `allowed: false`, assigning is closed up front with the reason; for a
+   * member, changing the WOD of a booked class stays open.
+   */
+  programming?: AdminUserProgramming | null;
 };
 
 // Outcome-first labels: each says who gets the change; the full explanation sits under it.
@@ -112,11 +121,12 @@ function isClassVariantItem(item: Record<string, unknown>) {
   return item.kind === "assignment" && item.assignment_kind === "class_variant";
 }
 
-export function UserProgrammingSchedule({ token, userId, role, nickname, assignRequestDate, onAssignRequestHandled }: Props) {
+export function UserProgrammingSchedule({ token, userId, role, nickname, assignRequestDate, onAssignRequestHandled, programming }: Props) {
   const i18n = useUiTranslations();
   const locale = useLocale();
   const zone = useOrganizationTimeZone();
   const isMember = role === "member";
+  const notInPackage = programming?.allowed === false;
   const [startDate, setStartDate] = useState(() => isoDate(new Date()));
   const [schedule, setSchedule] = useState<AdminUserSchedule | null>(null);
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
@@ -125,8 +135,9 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   const [selectedWorkoutId, setSelectedWorkoutId] = useState("");
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
-  const [memberMode, setMemberMode] = useState<MemberProgrammingMode>("class_variant");
-  const [source, setSource] = useState<ProgrammingSource>(() => programmingSources(role, "class_variant")[0]);
+  // Without the grant, only a booked class's own WOD can be changed.
+  const [memberMode, setMemberMode] = useState<MemberProgrammingMode>(notInPackage ? "class_workout" : "class_variant");
+  const [source, setSource] = useState<ProgrammingSource>(() => programmingSources(role, notInPackage ? "class_workout" : "class_variant")[0]);
   const [moreOpen, setMoreOpen] = useState(false);
   const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -217,7 +228,8 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   const slotId = selectedSlotId || (selectedDaySlots.length === 1 ? itemId(selectedDaySlots[0]) : "");
   const selectedSlot = selectedDaySlots.find((item) => itemId(item) === slotId);
   const classHasWorkout = typeof selectedSlot?.master_workout_id === "string";
-  const blocker = programmingBlocker({
+  const personalModeClosed = notInPackage && (!isMember || modeRequiresProgrammingEntitlement(memberMode));
+  const blocker = personalModeClosed ? "programmingNotInPackageBlocker" : programmingBlocker({
     needsClass,
     hasBookedClasses: selectedDaySlots.length > 0,
     slotId,
@@ -383,6 +395,10 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
         })}
       </div>
 
+      {notInPackage ? <p data-testid="programming-not-in-package" className="rounded-2xl px-4 py-3 text-sm leading-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}>
+        {i18n("programmingNotInPackageNotice", { name: nickname ?? "" })}
+        {isMember ? <> {i18n("programmingNotInPackageMemberHint")}</> : null}
+      </p> : null}
       {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
       {/* ADR-214: while the dialog is open, its errors show only inside it. */}
       {error && !assignmentModalOpen ? <ErrorNotice>{error}</ErrorNotice> : null}
@@ -415,8 +431,8 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
           {isMember ? <fieldset>
             <legend className="mb-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("programmingDialogWhat")}</legend>
             <div className="space-y-2">
-              {MEMBER_PROGRAMMING_MODES.map((mode) => <label key={mode} className="flex cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5" style={choiceStyle(memberMode === mode)}>
-                <input type="radio" className="mt-1" name="member-programming-mode" value={mode} checked={memberMode === mode} onChange={() => chooseMode(mode)} />
+              {MEMBER_PROGRAMMING_MODES.map((mode) => <label key={mode} className={`flex items-start gap-3 rounded-xl px-3 py-2.5 ${notInPackage && modeRequiresProgrammingEntitlement(mode) ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`} style={choiceStyle(memberMode === mode)}>
+                <input type="radio" className="mt-1" name="member-programming-mode" value={mode} checked={memberMode === mode} disabled={notInPackage && modeRequiresProgrammingEntitlement(mode)} onChange={() => chooseMode(mode)} />
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold">{i18n(MODE_LABEL_KEYS[mode])}</span>
                   <span className="block text-xs" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[mode])}</span>

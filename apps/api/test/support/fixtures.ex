@@ -55,6 +55,65 @@ defmodule Palee.TestFixtures do
     organization_id
   end
 
+  @programming_plans %{
+    online_programming: %{
+      "entitlement_version" => 1,
+      "channels" => ["in_person", "personal_programming"],
+      "capabilities" => [
+        "book_classes",
+        "execute_assigned_workouts",
+        "receive_coaching_touchpoints"
+      ],
+      "allowances" => %{
+        "coaching_touchpoints" => %{"limit" => 100, "period" => "calendar_month"}
+      }
+    },
+    personal_training: %{
+      "entitlement_version" => 1,
+      "channels" => ["in_person", "personal_training"],
+      "capabilities" => ["book_classes", "book_pt_sessions"]
+    }
+  }
+
+  @doc """
+  ADR-225: gives a person a package with online programming (default) or
+  personal training, the grant staff need before assigning them a WOD.
+  Takes a tenant context or an organization id. Returns the user.
+  """
+  def programming_grant_fixture(context_or_org, user, grant \\ :online_programming) do
+    context =
+      case context_or_org do
+        organization_id when is_binary(organization_id) ->
+          system_tenant_context(organization_id, :programming_grant_fixture)
+
+        %{organization_id: _} = context ->
+          context
+      end
+
+    {:ok, package} =
+      Palee.Finance.create_package(context, %{
+        code: "programming-#{System.unique_integer([:positive])}",
+        name: "Programming",
+        family: "hybrid",
+        billing_period: "monthly",
+        params: Map.fetch!(@programming_plans, grant)
+      })
+
+    {:ok, membership} =
+      Palee.Finance.upsert_membership(context, user.id, %{
+        user_type_snapshot: if(to_string(user.role) == "athlete", do: "athlete", else: "member"),
+        status: "active",
+        signup_source: "admin_created"
+      })
+
+    {:ok, _subscription} =
+      Palee.Finance.assign_package(context, membership.id, package.id, %{
+        starts_on: Date.add(Date.utc_today(), -1)
+      })
+
+    user
+  end
+
   def workout_fixture(admin, attrs \\ %{}) do
     context =
       Map.get(attrs, :tenant_context) || ambient_tenant_context() || legacy_tenant_context()

@@ -164,7 +164,11 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
       member =
         gym |> customer(:member, "pm_member") |> then(&give_package(gym, &1, @programming_plan))
 
-      athlete = customer(gym, :athlete, "pm_athlete")
+      athlete =
+        gym
+        |> customer(:athlete, "pm_athlete")
+        |> then(&give_package(gym, &1, @programming_plan, "athlete"))
+
       wod = workout(gym, "Personal engine")
       today = Date.utc_today() |> Date.to_iso8601()
 
@@ -228,7 +232,7 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
       assert Enum.sort(Enum.map(athletes, & &1["role"])) == ["athlete", "member"]
     end
 
-    test "a member without the personal-programming grant is refused, even in observe rollout",
+    test "a person without online programming or personal training is refused, even in observe rollout",
          %{conn: conn} do
       gym = tenant("pm_denied")
 
@@ -249,7 +253,7 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
         })
         |> json_response(403)
 
-      assert denied["code"] == "member_programming_not_entitled"
+      assert denied["code"] == "programming_not_in_package"
       assert denied["params"]["reason"] == "finance_channel_not_included"
       assert denied["params"]["nickname"] == plain.nickname
 
@@ -266,7 +270,20 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
       assert my_workouts(conn, gym, plain) == []
       assert my_workouts(conn, gym, athlete) == []
 
-      # The athlete alone keeps the rollout-governed ADR-040 behaviour.
+      # ADR-225: the athlete role does not imply the grant either.
+      assert conn
+             |> assign_workout(gym, %{
+               master_workout_id: wod.id,
+               athlete_ids: [athlete.id],
+               scheduled_for: today
+             })
+             |> json_response(403)
+             |> Map.fetch!("params")
+             |> Map.fetch!("user_id") == athlete.id
+
+      # Personal training includes the programme.
+      programming_grant_fixture(gym.context, athlete, :personal_training)
+
       assert conn
              |> assign_workout(gym, %{
                master_workout_id: wod.id,
@@ -300,7 +317,7 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
                })
              )
              |> json_response(403)
-             |> Map.fetch!("code") == "member_programming_not_entitled"
+             |> Map.fetch!("code") == "programming_not_in_package"
 
       assert workout_count(gym.context) == before
     end
@@ -660,5 +677,41 @@ defmodule PaleeWeb.PersonalizedMemberProgrammingControllerTest do
 
     assert ids.("") == [athlete.id]
     assert ids.("?include_members=true") == Enum.sort([athlete.id, member.id])
+  end
+
+  test "the profile says up front whether a WOD can be assigned, and through which grant", %{
+    conn: conn
+  } do
+    gym = tenant("pm_profile_flag")
+    plain = customer(gym, :athlete, "pm_flag_plain")
+
+    online =
+      gym
+      |> customer(:member, "pm_flag_online")
+      |> then(&give_package(gym, &1, @programming_plan))
+
+    pt =
+      gym
+      |> customer(:athlete, "pm_flag_pt")
+      |> then(&programming_grant_fixture(gym.context, &1, :personal_training))
+
+    programming = fn user ->
+      conn
+      |> api(gym.admin)
+      |> get("/api/org/#{slug(gym)}/admin/users/#{user.id}")
+      |> json_response(200)
+      |> get_in(["user", "programming"])
+    end
+
+    assert programming.(plain) == %{
+             "allowed" => false,
+             "grant" => nil,
+             "reason" => "finance_profile_missing"
+           }
+
+    assert %{"allowed" => true, "grant" => "online_programming"} = programming.(online)
+    assert %{"allowed" => true, "grant" => "personal_training"} = programming.(pt)
+    # Staff are not programmed: no flag.
+    assert programming.(gym.admin) == nil
   end
 end
