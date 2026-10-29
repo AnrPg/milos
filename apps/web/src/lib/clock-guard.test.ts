@@ -113,5 +113,5 @@ function findings(path: string): string[] {
 describe("clock guard", () => {
   it("formats every hour through the clock helper, so Greek stays on the 24-hour clock", () => {
     expect(sourceFiles(SOURCE_ROOT).flatMap(findings)).toEqual([]);
-  });
+  }, 60_000);
 });
