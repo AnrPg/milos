@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PLAN_VERSION, type PlanRow, type PlanSection } from "@/lib/structured-plan";
 import { usePlanEditorStore, type PlanEditorSection } from "@/stores/structured-plan";
@@ -8,6 +8,24 @@ import { usePlanEditorStore, type PlanEditorSection } from "@/stores/structured-
 import en from "../../../../messages/en.json";
 
 import { PlanEditor } from "./PlanEditor";
+
+// The shell is tested on its own: a bare grid of name fields stands in for agent 4's grid.
+vi.mock("./grid", async () => {
+  const { usePlanEditorStore: useStore } = await import("@/stores/structured-plan");
+  return {
+    PlanGrid: ({ sectionId }: { sectionId: string }) => {
+      const sec = useStore((s) => s.sections.find((x) => x.id === sectionId));
+      const updateRow = useStore((s) => s.updateRow);
+      return (
+        <div>
+          {sec?.plan.blocks.flat().map((r) => (
+            <input key={r.id} data-key={`r:${r.id}:name`} aria-label={r.id} value={r.name} onChange={(e) => updateRow(r.id, { name: e.target.value })} />
+          ))}
+        </div>
+      );
+    },
+  };
+});
 
 const store = () => usePlanEditorStore.getState();
 const row = (id: string, name = id): PlanRow => ({ id, kind: "ex", name, dose: "", load: "", cells: [], group: null });
@@ -156,10 +174,10 @@ describe("PlanEditor", () => {
   it("adds, groups and deletes rows from the keyboard, with undo", () => {
     renderEditor();
     act(() => store().openSection("s2"));
-    expect(active()).toHaveAttribute("data-k", "r:c:name");
+    expect(active()).toHaveAttribute("data-key", "r:c:name");
     key({ key: "Enter" });
     const added = store().sections[1].plan.blocks[0][1];
-    expect(active()).toHaveAttribute("data-k", `r:${added.id}:name`);
+    expect(active()).toHaveAttribute("data-key", `r:${added.id}:name`);
     alt("g", "KeyG");
     expect(store().sections[1].plan.blocks[0][1].group).toBeTruthy();
     alt("v", "KeyV");
