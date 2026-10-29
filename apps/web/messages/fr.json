@@ -12811,7 +12811,7 @@
     "load": "Charge",
     "logTitle": "Ce que tu as vraiment fait (facultatif)",
     "logReps": "Répétitions faites",
-    "logLoad": "Charge utilisée (kg)",
+    "logLoad": "Charge utilisée",
     "pctOfMax": "≈ {kg} kg de ton 1RM",
     "cap": "Limite {time}",
     "clock": "Chrono de la partie",

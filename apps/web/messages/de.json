@@ -12811,7 +12811,7 @@
     "load": "Last",
     "logTitle": "Was du tatsächlich gemacht hast (optional)",
     "logReps": "Geschaffte Wiederholungen",
-    "logLoad": "Verwendete Last (kg)",
+    "logLoad": "Verwendete Last",
     "pctOfMax": "≈ {kg} kg deines 1RM",
     "cap": "Limit {time}",
     "clock": "Uhr des Abschnitts",

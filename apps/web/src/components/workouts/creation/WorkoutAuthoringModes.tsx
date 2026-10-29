@@ -359,7 +359,7 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
 
 function legacyEditorFor(workout: Awaited<ReturnType<typeof fetchAdminWorkout>> | undefined): AuthoringMode {
   if (!workout) return "free-text";
-  if ((workout.authoring_mode as string | undefined) === "structured_plan") return "plan";
+  if (workout.authoring_mode === "structured_plan") return "plan";
   if (workout.authoring_mode === "quick_text") return "quick-text";
   if (workout.authoring_mode === "sectioned_text") return "sectioned";
   // New drafts default to "structured" before their first save; only drafts

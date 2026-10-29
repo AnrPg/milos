@@ -12811,7 +12811,7 @@
     "load": "Carga",
     "logTitle": "O que fizeste de facto (opcional)",
     "logReps": "Repetições feitas",
-    "logLoad": "Carga usada (kg)",
+    "logLoad": "Carga usada",
     "pctOfMax": "≈ {kg} kg do teu 1RM",
     "cap": "Limite {time}",
     "clock": "Relógio da secção",

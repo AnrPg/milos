@@ -127,7 +127,7 @@ export function StructuredPlanWorkoutEditor({ draftId, folderId = null, onDraftR
       saver.start(workout.dsl_source_revision ?? 0);
       setLoaded(true);
       // A text workout switched to structured is saved as a plan right away.
-      if ((workout.authoring_mode as string | undefined) !== "structured_plan") saver.schedule(buildPayload());
+      if (workout.authoring_mode !== "structured_plan") saver.schedule(buildPayload());
     },
     [buildPayload, saver],
   );

@@ -12811,7 +12811,7 @@
     "load": "Gewicht",
     "logTitle": "Wat je echt hebt gedaan (optioneel)",
     "logReps": "Gedane herhalingen",
-    "logLoad": "Gebruikt gewicht (kg)",
+    "logLoad": "Gebruikt gewicht",
     "pctOfMax": "≈ {kg} kg van je 1RM",
     "cap": "Limiet {time}",
     "clock": "Klok van het onderdeel",
