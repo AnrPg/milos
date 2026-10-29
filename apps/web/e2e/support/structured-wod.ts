@@ -412,6 +412,7 @@ export async function stubMember(page: Page) {
     }
     if (path === `/api/workouts/${workout.id}`) return json(route, { workout });
     if (path === `/api/workouts/${workout.id}/timer-sequence`) return json(route, { segments: [] });
+    if (path === "/api/prs") return json(route, { prs: [] });
     if (path === "/api/me/training-log/sources") return json(route, { classes: [], assignments: [], library_workouts: [] });
     if (/\/injury-warnings$/.test(path)) return json(route, { level: "none", warnings: [], warning_count: 0 });
     return json(route, {});
