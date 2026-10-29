@@ -251,7 +251,8 @@ defmodule Palee.Fiscal.EInvoicingTest do
     row = submission(context, invoice)
     assert %{status: "submitted", provider_submission_id: "rec-tx"} = row
 
-    transaction_key = FiskalyUnified.idempotency_key("einvoice:#{row.idempotency_guid}:transaction")
+    transaction_key =
+      FiskalyUnified.idempotency_key("einvoice:#{row.idempotency_guid}:transaction")
 
     assert_received {:request, "POST", "/records", [^transaction_key], body}
     operation = Jason.decode!(body)["content"]["operation"]
@@ -358,7 +359,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
     guid = submission(context, invoice).idempotency_guid
     assert {:ok, _} = EInvoicing.retry(context, invoice.id, later(10))
 
-    stub_fiskaly(fn -> {422, %{"code" => "E_IDEMPOTENCY", "message" => "Idempotency key reused"}} end)
+    stub_fiskaly(fn ->
+      {422, %{"code" => "E_IDEMPOTENCY", "message" => "Idempotency key reused"}}
+    end)
 
     assert {:ok, %{uncertain: 1}} = EInvoicing.transmit(context, :due, later(11))
     assert %{status: "uncertain", idempotency_guid: ^guid} = submission(context, invoice)
@@ -437,7 +440,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
 
     assert {:ok, %{deferred: 1}} = EInvoicing.transmit(context, :due, @now)
     assert %{status: "invalid", provider: "storecove"} = EInvoicing.connection(context)
-    assert %{status: "pending", last_error_code: "connection_invalid"} = submission(context, invoice)
+
+    assert %{status: "pending", last_error_code: "connection_invalid"} =
+             submission(context, invoice)
 
     # Reconnecting through fiskaly drops Storecove's key.
     assert %{provider: "fiskaly", status: "active", credentials_source: "own"} =

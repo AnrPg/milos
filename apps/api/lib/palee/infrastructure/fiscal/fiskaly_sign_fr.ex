@@ -43,11 +43,28 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
       prefix = "sign_fr:" <> connection.register_id
 
       with {:ok, siren} <- siren(context),
-           {:ok, taxpayer} <- create(connection, token, "/taxpayers", taxpayer(context, siren), prefix <> ":taxpayer"),
-           {:ok, _} <- commission(connection, token, "/taxpayers/", taxpayer, prefix <> ":taxpayer"),
-           {:ok, location} <- create(connection, token, "/locations", location(context, taxpayer), prefix <> ":location"),
-           {:ok, _} <- commission(connection, token, "/locations/", location, prefix <> ":location"),
-           {:ok, system} <- create(connection, token, "/systems", system(context, location), prefix <> ":system"),
+           {:ok, taxpayer} <-
+             create(
+               connection,
+               token,
+               "/taxpayers",
+               taxpayer(context, siren),
+               prefix <> ":taxpayer"
+             ),
+           {:ok, _} <-
+             commission(connection, token, "/taxpayers/", taxpayer, prefix <> ":taxpayer"),
+           {:ok, location} <-
+             create(
+               connection,
+               token,
+               "/locations",
+               location(context, taxpayer),
+               prefix <> ":location"
+             ),
+           {:ok, _} <-
+             commission(connection, token, "/locations/", location, prefix <> ":location"),
+           {:ok, system} <-
+             create(connection, token, "/systems", system(context, location), prefix <> ":system"),
            {:ok, _} <- commission(connection, token, "/systems/", system, prefix <> ":system") do
         {:ok,
          %{
@@ -62,7 +79,13 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
   end
 
   defp create(connection, token, path, body, name) do
-    case FiskalyUnified.post(connection, token, path, %{content: body}, FiskalyUnified.idempotency_key(name)) do
+    case FiskalyUnified.post(
+           connection,
+           token,
+           path,
+           %{content: body},
+           FiskalyUnified.idempotency_key(name)
+         ) do
       {:ok, %{"content" => %{"id" => id}}} when is_binary(id) -> {:ok, id}
       {:ok, _other} -> {:error, {:uncertain, :id_missing}}
       error -> error
@@ -90,7 +113,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
       do: {:ok, String.slice(digits, 0, 9)},
       else:
         {:error,
-         {:rejected, [%{code: "siren_missing", message: "A SIREN or SIRET is needed for SIGN FR"}]}}
+         {:rejected,
+          [%{code: "siren_missing", message: "A SIREN or SIRET is needed for SIGN FR"}]}}
   end
 
   defp siret(context) do
@@ -149,7 +173,10 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
       producer: %{
         type: "MPN",
         number: "PALEE",
-        details: %{name: "Palee", label: String.slice(context[:register_serial] || "Palee", 0, 64)}
+        details: %{
+          name: "Palee",
+          label: String.slice(context[:register_serial] || "Palee", 0, 64)
+        }
       },
       software: %{name: "Palee", version: software_version()}
     }
@@ -186,7 +213,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
       with {:ok, system} <- system_id(connection),
            {:ok, vat} <- FiskalyUnified.vat_table(connection, token, system),
            {:ok, operation} <- operation(schema, vat),
-           {:ok, record} <- FiskalyUnified.record(connection, token, system, operation, "sign_fr:" <> id) do
+           {:ok, record} <-
+             FiskalyUnified.record(connection, token, system, operation, "sign_fr:" <> id) do
         signature(connection, record)
       end
     end)

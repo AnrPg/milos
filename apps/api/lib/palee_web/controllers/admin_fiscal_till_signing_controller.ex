@@ -29,7 +29,8 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
   }
 
   operation(:connection,
-    summary: "The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials)",
+    summary:
+      "The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials)",
     parameters: [@device],
     responses: [ok: {"Connection", "application/json", C.till_connection_status()}]
   )

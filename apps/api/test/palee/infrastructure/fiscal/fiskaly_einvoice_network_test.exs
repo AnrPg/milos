@@ -136,6 +136,7 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
     [{token, token_body}, {system, _}, {intention, intention_body}, {tx, tx_body}] = requests()
 
     assert token.request_path == "/tokens"
+
     assert Jason.decode!(token_body)["content"] == %{
              "type" => "API_KEY",
              "key" => "fk-key",
@@ -163,14 +164,24 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
     assert operation["type"] == "INVOICE"
     assert operation["document"]["number"] == "F-2027-0001"
     assert operation["document"]["issued_at"] == "2027-02-08T10:00:00+00:00"
-    assert operation["totals"]["vat"] == %{"amount" => "6.30", "exclusive" => "30.00", "inclusive" => "36.30"}
+
+    assert operation["totals"]["vat"] == %{
+             "amount" => "6.30",
+             "exclusive" => "30.00",
+             "inclusive" => "36.30"
+           }
 
     assert [%{"type" => "VAT_RATE", "code" => "STANDARD", "percentage" => "21.00"}] =
              operation["breakdown"]
 
     [entry] = operation["entries"]
     assert entry["type"] == "SALE"
-    assert entry["data"]["unit"] == %{"quantity" => "3", "price" => %{"exclusive" => "10.00", "inclusive" => "12.10"}}
+
+    assert entry["data"]["unit"] == %{
+             "quantity" => "3",
+             "price" => %{"exclusive" => "10.00", "inclusive" => "12.10"}
+           }
+
     assert entry["data"]["vat"]["code"] == "STANDARD"
 
     [recipient] = operation["recipients"]
@@ -207,7 +218,11 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
                @submission
                | document: credit,
                  document_type: "CreditNote",
-                 original: %{number: "F-2027-0001", issue_date: ~D[2027-02-08], submission_id: "rec-1"}
+                 original: %{
+                   number: "F-2027-0001",
+                   issue_date: ~D[2027-02-08],
+                   submission_id: "rec-1"
+                 }
              })
 
     {_tx, body} = List.last(requests())
@@ -216,7 +231,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
     assert operation["record"] == %{"id" => "rec-1"}
     assert operation["data"]["type"] == "INVOICE"
     assert [%{"type" => "RETURN"}] = operation["data"]["entries"]
-    assert [%{"type" => "CASH", "details" => %{"amount" => "36.30"}}] = operation["data"]["payments"]
+
+    assert [%{"type" => "CASH", "details" => %{"amount" => "36.30"}}] =
+             operation["data"]["payments"]
 
     # Without the invoice's record at fiskaly, no record is created.
     stub(fiskaly(fn _body -> flunk("no transaction expected") end))
@@ -246,7 +263,11 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
     assert {{:error, {:rejected, [%{code: "E_BAD_REQUEST"}]}}, _} =
              FiskalyEInvoiceNetwork.submit(@connection, @submission)
 
-    stub(fiskaly(fn _body -> {422, %{"code" => "E_IDEMPOTENCY", "message" => "Idempotency key mismatch"}} end))
+    stub(
+      fiskaly(fn _body ->
+        {422, %{"code" => "E_IDEMPOTENCY", "message" => "Idempotency key mismatch"}}
+      end)
+    )
 
     assert {{:error, {:uncertain, :idempotency_key_reused}}, _} =
              FiskalyEInvoiceNetwork.submit(@connection, @submission)
@@ -257,7 +278,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
              FiskalyEInvoiceNetwork.submit(@connection, @submission)
 
     stub(fiskaly(fn _body -> :timeout end))
-    assert {{:error, {:uncertain, _}}, _} = FiskalyEInvoiceNetwork.submit(@connection, @submission)
+
+    assert {{:error, {:uncertain, _}}, _} =
+             FiskalyEInvoiceNetwork.submit(@connection, @submission)
 
     stub(fn "POST", "/tokens", _body -> {401, %{"code" => "E_UNAUTHORIZED"}} end)
 
@@ -302,11 +325,20 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
 
       "GET", "/records/rec-tx", _ ->
         {200,
-         %{"content" => record("rec-tx", "COMPLETED", %{"used_in" => %{"id" => "rec-transmission"}})}}
+         %{
+           "content" =>
+             record("rec-tx", "COMPLETED", %{"used_in" => %{"id" => "rec-transmission"}})
+         }}
 
       "GET", "/records/rec-transmission", _ ->
         {200,
-         %{"content" => %{"id" => "rec-transmission", "state" => "COMPLETED", "mode" => "FINISHED"}}}
+         %{
+           "content" => %{
+             "id" => "rec-transmission",
+             "state" => "COMPLETED",
+             "mode" => "FINISHED"
+           }
+         }}
     end)
 
     assert {{:ok, :delivered}, _} = FiskalyEInvoiceNetwork.status(@connection, "rec-tx")
@@ -317,7 +349,10 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetworkTest do
 
       "GET", "/records/rec-tx", _ ->
         {200,
-         %{"content" => record("rec-tx", "COMPLETED", %{"used_in" => %{"id" => "rec-transmission"}})}}
+         %{
+           "content" =>
+             record("rec-tx", "COMPLETED", %{"used_in" => %{"id" => "rec-transmission"}})
+         }}
 
       "GET", "/records/rec-transmission", _ ->
         {200,

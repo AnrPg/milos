@@ -289,7 +289,8 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
   def till_connection do
     %Schema{
       type: :object,
-      description: "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
+      description:
+        "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
       properties: %{
         device: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]},
         provider: %Schema{type: :string, enum: ["sandbox", "fiskaly"]},

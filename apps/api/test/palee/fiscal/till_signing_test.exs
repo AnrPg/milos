@@ -582,7 +582,10 @@ defmodule Palee.Fiscal.TillSigningTest do
       late = issue(context, owner, "k-2")
       assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(600))
       {"POST", "/records", _, late_body} = List.last(drain())
-      assert %{"offline" => %{"reason" => _}} = Jason.decode!(late_body)["content"]["operation"]["document"]
+
+      assert %{"offline" => %{"reason" => _}} =
+               Jason.decode!(late_body)["content"]["operation"]["document"]
+
       assert %{status: "signed"} = signature(context, late)
 
       # Credentials never reach the attempt log.
@@ -751,7 +754,10 @@ defmodule Palee.Fiscal.TillSigningTest do
               "id" => "rec-receipt",
               "state" => "COMPLETED",
               "mode" => "FINISHED",
-              "journal" => %{"signature" => "journal-sig", "signed_at" => "2027-02-08T10:00:05+00:00"},
+              "journal" => %{
+                "signature" => "journal-sig",
+                "signed_at" => "2027-02-08T10:00:05+00:00"
+              },
               "compliance" => %{
                 "data" => "x",
                 "sequence" => %{"number" => 42, "signature" => "sig-42", "type" => "TICKET"}

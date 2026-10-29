@@ -59,7 +59,12 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork do
         Process.put(:fiskaly_einvoice_request, Jason.encode!(operation))
 
         connection
-        |> FiskalyUnified.record(token, system_id, operation, "einvoice:" <> submission.idempotency_guid)
+        |> FiskalyUnified.record(
+          token,
+          system_id,
+          operation,
+          "einvoice:" <> submission.idempotency_guid
+        )
         |> submitted()
       end
 
@@ -86,9 +91,7 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork do
     with {:ok, number} <- number(document),
          {:ok, recipient} <- recipient(document, submission.recipient),
          {:ok, body} <-
-           FiskalyUnified.operation_body(document, vat,
-             returns: document.kind == "credit_note"
-           ) do
+           FiskalyUnified.operation_body(document, vat, returns: document.kind == "credit_note") do
       invoice =
         body
         |> Map.merge(%{

@@ -74,7 +74,8 @@ defmodule Palee.Fiscal.Domain.SignFrReceipt do
   @doc "What the receipt prints: `[{label, value}]`."
   def print_lines(%{status: "signed"} = signature) do
     [
-      {"N° séquence fiskaly", signature.transaction_number && to_string(signature.transaction_number)},
+      {"N° séquence fiskaly",
+       signature.transaction_number && to_string(signature.transaction_number)},
       {"Signature", short(signature.signature_value)}
     ]
     |> Enum.reject(fn {_label, value} -> value in [nil, ""] end)

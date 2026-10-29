@@ -503,12 +503,12 @@ defmodule Palee.Fiscal.EInvoicing do
                    environment: saved.environment,
                    peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
                    legal_entity_id: saved.legal_entity_id,
-                   key_changed:
-                     Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
+                   key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
                    webhook_token_changed: not is_nil(token)
                  }
                }) do
           EInvoiceStore.wake_waiting(context, now)
+
           {:ok,
            saved
            |> public_connection()

@@ -123,7 +123,10 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
 
       # France (ADR-266): a record id stands in for fiskaly's.
       "sign_fr" ->
-        Map.merge(base, %{receipt_number: "sandbox-" <> to_string(request.external_id), qr_code_data: nil})
+        Map.merge(base, %{
+          receipt_number: "sandbox-" <> to_string(request.external_id),
+          qr_code_data: nil
+        })
     end
   end
 

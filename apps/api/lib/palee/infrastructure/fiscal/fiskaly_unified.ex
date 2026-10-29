@@ -58,7 +58,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyUnified do
     body = %{content: %{type: "API_KEY", key: connection.api_key, secret: connection.api_secret}}
 
     case send_request(connection, nil, :post, "/tokens", body, idempotency_key("token")) do
-      {:ok, %{"content" => %{"authentication" => %{"bearer" => bearer}}}} when is_binary(bearer) ->
+      {:ok, %{"content" => %{"authentication" => %{"bearer" => bearer}}}}
+      when is_binary(bearer) ->
         {:ok, bearer}
 
       {:ok, _other} ->
@@ -223,7 +224,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyUnified do
              connection,
              token,
              "/records",
-             %{content: %{type: "TRANSACTION", record: %{id: intention_id}, operation: operation}},
+             %{
+               content: %{type: "TRANSACTION", record: %{id: intention_id}, operation: operation}
+             },
              idempotency_key(name <> ":transaction")
            ) do
       {:ok, content}
@@ -486,7 +489,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyUnified do
 
   @doc "Basis points as a percentage with two decimals (`2100` → `\"21.00\"`)."
   def percent(bp) when is_integer(bp),
-    do: Integer.to_string(div(bp, 100)) <> "." <> String.pad_leading(Integer.to_string(rem(bp, 100)), 2, "0")
+    do:
+      Integer.to_string(div(bp, 100)) <>
+        "." <> String.pad_leading(Integer.to_string(rem(bp, 100)), 2, "0")
 
   defp atom_keys(map) do
     Map.new(map, fn
