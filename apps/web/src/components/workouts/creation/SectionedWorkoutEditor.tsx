@@ -5,7 +5,6 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -28,8 +27,6 @@ import {
   parseFreeTextTimerPreset,
   QUICK_PRESETS,
 } from "@/lib/free-text-timer";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { workoutPublishedHref } from "@/lib/workout-return";
 import {
   describePreset,
   emptySection,
@@ -55,6 +52,8 @@ type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
+  /** The workout was published: the host decides where the coach goes next. */
+  onPublished: (workoutId: string) => void;
   /** Whether the gym lets coaches use the assistant (ADR-180). */
   assistantAvailable: boolean;
   /** Switch this workout to the assistant's free-text editor (the draft is saved first). */
@@ -68,13 +67,11 @@ const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aer
  * («+ Προσθήκη ενότητας»), writes each one's text and picks its own timer;
  * athletes run those timers one section at a time. Nothing is parsed.
  */
-export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady, assistantAvailable, onUseAssistant }: Props) {
+export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, assistantAvailable, onUseAssistant }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
   const conflictT = useTranslations("DraftConflict");
-  const router = useRouter();
-  const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const formatLabels = useMemo(() => getFormatLabels(i18n), [i18n]);
@@ -236,7 +233,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
           throw error;
         }
       });
-      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
+      onPublished(draftId);
     } catch (error) {
       const details = error instanceof ApiError ? (error.payload?.details as { sections?: SectionProblem[] } | undefined) : undefined;
       if (details?.sections?.length) {

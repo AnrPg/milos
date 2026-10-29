@@ -26451,6 +26451,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * FreeTextWorkoutBody
+         * @description One text written with the WOD assistant
+         */
+        FreeTextWorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** GarminConnectRequest */
         GarminConnectRequest: {
             /**
@@ -36972,6 +36990,43 @@ export interface components {
                 unmatched_exercises: number;
             };
         };
+        /** StructuredSection */
+        StructuredSection: {
+            /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+            exercises: {
+                [key: string]: unknown;
+            }[];
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            scoreable: boolean;
+            subtitle?: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * StructuredWorkoutBody
+         * @description Exercises with every parameter (structured editor, Quick Text)
+         */
+        StructuredWorkoutBody: {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
             /** Format: uuid */
@@ -37325,6 +37380,65 @@ export interface components {
                 /** Format: date-time */
                 undo_until?: string;
             };
+        };
+        /** TextSection */
+        TextSection: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            id: string | null;
+            /** @description What the section counts (SectionScoring metrics), empty when not scored */
+            scoring: {
+                [key: string]: unknown;
+            }[];
+            text: string;
+            /** SectionTimerPreset */
+            timer: {
+                duration_seconds?: number | null;
+                /** @enum {string} */
+                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                interval_seconds?: number | null;
+                rest_seconds?: number | null;
+                rounds?: number | null;
+                work_seconds?: number | null;
+            } | null;
+            /** @description Null when untitled */
+            title: string | null;
+        };
+        /**
+         * TextSectionsWorkoutBody
+         * @description ADR-180: text sections written without the assistant, a timer each
+         */
+        TextSectionsWorkoutBody: {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
         };
         /** TrainingGoal */
         TrainingGoal: {
@@ -38593,6 +38707,79 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+        };
+        /** WorkoutBody */
+        WorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        } | {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        } | {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
+        /** WorkoutBodySummary */
+        WorkoutBodySummary: {
+            excerpt?: string | null;
+            /** @enum {string} */
+            kind: "free_text" | "text_sections" | "structured";
+            sections?: {
+                [key: string]: unknown;
+            }[];
+            structured?: boolean;
+            timer?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** WorkoutChoice */
         WorkoutChoice: {
@@ -80573,9 +80760,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        workouts: {
+                        workouts: ({
+                            /** WorkoutBodySummary */
+                            body?: {
+                                excerpt?: string | null;
+                                /** @enum {string} */
+                                kind: "free_text" | "text_sections" | "structured";
+                                sections?: {
+                                    [key: string]: unknown;
+                                }[];
+                                structured?: boolean;
+                                timer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                            };
+                        } & {
                             [key: string]: unknown;
-                        }[];
+                        })[];
                     };
                 };
             };
@@ -81182,6 +81383,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -83412,6 +83673,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -99739,6 +100060,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -100374,6 +100755,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -100921,6 +101362,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {

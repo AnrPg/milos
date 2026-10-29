@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 
 import { ApiError } from "@/api/client";
 import {
@@ -13,6 +14,7 @@ import {
   createWorkoutFolder,
   deleteWorkoutFolder,
   deleteWorkout,
+  fetchAdminWorkout,
   listWorkoutFolders,
   listAdminWorkouts,
   moveWorkoutToFolder,
@@ -980,14 +982,7 @@ export function WorkoutAdminConsole() {
             description={pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
             closeLabel={i18n("closebbfa773")}
           >
-                <WorkoutPreviewDetail
-                  sections={pw.sections}
-                  content={pw.content}
-                  initiallyExpanded
-                  authoringMode={pw.authoring_mode}
-                  freeTextBody={pw.free_text_body}
-                  freeTextDocument={pw.free_text_document}
-                />
+                <LibraryWorkoutPreview workout={pw} token={tokens?.access_token ?? null} />
           </Dialog>
         );
       })() : null}
@@ -1000,5 +995,39 @@ export function WorkoutAdminConsole() {
         />
       ) : null}
     </main>
+  );
+}
+
+/**
+ * ADR-224: the library lists workouts in summary form (no text, no rich
+ * documents), so opening one loads the whole workout: its text sections with
+ * timers and scoring, or its exercises with every parameter.
+ */
+function LibraryWorkoutPreview({ workout, token }: { workout: WorkoutRecord; token: string | null }) {
+  const i18n = useUiTranslations();
+  const full = useQuery({
+    queryKey: ["admin-workout-preview", workout.id, workout.updated_at ?? null],
+    enabled: Boolean(token),
+    queryFn: () => fetchAdminWorkout(token!, workout.id),
+    staleTime: 60_000,
+  });
+
+  if (!full.data) {
+    return (
+      <p className="text-sm" role="status" style={{ color: "var(--muted)" }}>
+        {full.isError ? i18n("apiErrorRequestFailed") : i18n("workoutPreviewLoading")}
+      </p>
+    );
+  }
+
+  return (
+    <WorkoutPreviewDetail
+      sections={full.data.sections}
+      content={full.data.content}
+      initiallyExpanded
+      authoringMode={full.data.authoring_mode}
+      freeTextBody={full.data.free_text_body}
+      freeTextDocument={full.data.free_text_document}
+    />
   );
 }

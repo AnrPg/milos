@@ -41189,6 +41189,46 @@
         "title": "FreeTextWorkoutAnalysis",
         "type": "object"
       },
+      "FreeTextWorkoutBody": {
+        "additionalProperties": false,
+        "description": "One text written with the WOD assistant",
+        "properties": {
+          "document": {
+            "additionalProperties": true,
+            "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+            "nullable": true,
+            "type": "object"
+          },
+          "kind": {
+            "enum": [
+              "free_text"
+            ],
+            "type": "string"
+          },
+          "structured": {
+            "description": "The assistant also derived exercises (see `sections`)",
+            "type": "boolean"
+          },
+          "text": {
+            "nullable": true,
+            "type": "string"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "text",
+          "document",
+          "timer",
+          "structured"
+        ],
+        "title": "FreeTextWorkoutBody",
+        "type": "object"
+      },
       "GarminConnectRequest": {
         "properties": {
           "backfill_days": {
@@ -74957,6 +74997,111 @@
         "title": "StaffWorkoutGoalsResponse",
         "type": "object"
       },
+      "StructuredSection": {
+        "additionalProperties": false,
+        "properties": {
+          "exercises": {
+            "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scoreable": {
+            "type": "boolean"
+          },
+          "subtitle": {
+            "nullable": true,
+            "type": "string"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "timer",
+          "scoreable",
+          "exercises"
+        ],
+        "title": "StructuredSection",
+        "type": "object"
+      },
+      "StructuredWorkoutBody": {
+        "additionalProperties": false,
+        "description": "Exercises with every parameter (structured editor, Quick Text)",
+        "properties": {
+          "kind": {
+            "enum": [
+              "structured"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "exercises": {
+                  "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "scoreable": {
+                  "type": "boolean"
+                },
+                "subtitle": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "timer": {
+                  "additionalProperties": true,
+                  "nullable": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "timer",
+                "scoreable",
+                "exercises"
+              ],
+              "title": "StructuredSection",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "sections"
+        ],
+        "title": "StructuredWorkoutBody",
+        "type": "object"
+      },
       "SubscriptionBeneficiary": {
         "properties": {
           "id": {
@@ -76072,6 +76217,195 @@
           "support_request"
         ],
         "title": "SupportRequestResponse",
+        "type": "object"
+      },
+      "TextSection": {
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "additionalProperties": true,
+            "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+            "nullable": true,
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "scoring": {
+            "description": "What the section counts (SectionScoring metrics), empty when not scored",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          },
+          "timer": {
+            "nullable": true,
+            "properties": {
+              "duration_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "format": {
+                "enum": [
+                  "untimed",
+                  "for_time",
+                  "amrap",
+                  "emom",
+                  "tabata",
+                  "custom_hiit",
+                  "death_by"
+                ],
+                "type": "string"
+              },
+              "interval_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "rest_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "rounds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "work_seconds": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "format"
+            ],
+            "title": "SectionTimerPreset",
+            "type": "object"
+          },
+          "title": {
+            "description": "Null when untitled",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "text",
+          "document",
+          "timer",
+          "scoring"
+        ],
+        "title": "TextSection",
+        "type": "object"
+      },
+      "TextSectionsWorkoutBody": {
+        "additionalProperties": false,
+        "description": "ADR-180: text sections written without the assistant, a timer each",
+        "properties": {
+          "kind": {
+            "enum": [
+              "text_sections"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "document": {
+                  "additionalProperties": true,
+                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scoring": {
+                  "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "timer": {
+                  "nullable": true,
+                  "properties": {
+                    "duration_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "format": {
+                      "enum": [
+                        "untimed",
+                        "for_time",
+                        "amrap",
+                        "emom",
+                        "tabata",
+                        "custom_hiit",
+                        "death_by"
+                      ],
+                      "type": "string"
+                    },
+                    "interval_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "rest_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "rounds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "work_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "format"
+                  ],
+                  "title": "SectionTimerPreset",
+                  "type": "object"
+                },
+                "title": {
+                  "description": "Null when untitled",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "text",
+                "document",
+                "timer",
+                "scoring"
+              ],
+              "title": "TextSection",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "sections"
+        ],
+        "title": "TextSectionsWorkoutBody",
         "type": "object"
       },
       "TrainingGoal": {
@@ -80290,6 +80624,259 @@
           "wod_assistant_enabled"
         ],
         "title": "WorkoutAuthoringSettings",
+        "type": "object"
+      },
+      "WorkoutBody": {
+        "discriminator": {
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "One text written with the WOD assistant",
+            "properties": {
+              "document": {
+                "additionalProperties": true,
+                "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                "nullable": true,
+                "type": "object"
+              },
+              "kind": {
+                "enum": [
+                  "free_text"
+                ],
+                "type": "string"
+              },
+              "structured": {
+                "description": "The assistant also derived exercises (see `sections`)",
+                "type": "boolean"
+              },
+              "text": {
+                "nullable": true,
+                "type": "string"
+              },
+              "timer": {
+                "additionalProperties": true,
+                "nullable": true,
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "text",
+              "document",
+              "timer",
+              "structured"
+            ],
+            "title": "FreeTextWorkoutBody",
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "ADR-180: text sections written without the assistant, a timer each",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "text_sections"
+                ],
+                "type": "string"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "document": {
+                      "additionalProperties": true,
+                      "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scoring": {
+                      "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "timer": {
+                      "nullable": true,
+                      "properties": {
+                        "duration_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "format": {
+                          "enum": [
+                            "untimed",
+                            "for_time",
+                            "amrap",
+                            "emom",
+                            "tabata",
+                            "custom_hiit",
+                            "death_by"
+                          ],
+                          "type": "string"
+                        },
+                        "interval_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "rest_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "rounds": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "work_seconds": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "format"
+                      ],
+                      "title": "SectionTimerPreset",
+                      "type": "object"
+                    },
+                    "title": {
+                      "description": "Null when untitled",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "text",
+                    "document",
+                    "timer",
+                    "scoring"
+                  ],
+                  "title": "TextSection",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "sections"
+            ],
+            "title": "TextSectionsWorkoutBody",
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Exercises with every parameter (structured editor, Quick Text)",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "structured"
+                ],
+                "type": "string"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "exercises": {
+                      "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "scoreable": {
+                      "type": "boolean"
+                    },
+                    "subtitle": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "timer": {
+                      "additionalProperties": true,
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "timer",
+                    "scoreable",
+                    "exercises"
+                  ],
+                  "title": "StructuredSection",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "sections"
+            ],
+            "title": "StructuredWorkoutBody",
+            "type": "object"
+          }
+        ],
+        "title": "WorkoutBody"
+      },
+      "WorkoutBodySummary": {
+        "additionalProperties": false,
+        "properties": {
+          "excerpt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "free_text",
+              "text_sections",
+              "structured"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "structured": {
+            "type": "boolean"
+          },
+          "timer": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "WorkoutBodySummary",
         "type": "object"
       },
       "WorkoutChoice": {
@@ -190081,6 +190668,45 @@
                     "workouts": {
                       "items": {
                         "additionalProperties": true,
+                        "properties": {
+                          "body": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "excerpt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "free_text",
+                                  "text_sections",
+                                  "structured"
+                                ],
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "structured": {
+                                "type": "boolean"
+                              },
+                              "timer": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "kind"
+                            ],
+                            "title": "WorkoutBodySummary",
+                            "type": "object"
+                          }
+                        },
                         "type": "object"
                       },
                       "type": "array"
@@ -191691,6 +192317,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {
@@ -199068,6 +199910,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {
@@ -243834,6 +244892,222 @@
                           },
                           "type": "array"
                         },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
+                        },
                         "content": {
                           "items": {
                             "additionalProperties": false,
@@ -246035,6 +247309,222 @@
                             },
                             "type": "array"
                           },
+                          "body": {
+                            "discriminator": {
+                              "propertyName": "kind"
+                            },
+                            "oneOf": [
+                              {
+                                "additionalProperties": false,
+                                "description": "One text written with the WOD assistant",
+                                "properties": {
+                                  "document": {
+                                    "additionalProperties": true,
+                                    "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                    "nullable": true,
+                                    "type": "object"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "free_text"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "structured": {
+                                    "description": "The assistant also derived exercises (see `sections`)",
+                                    "type": "boolean"
+                                  },
+                                  "text": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "timer": {
+                                    "additionalProperties": true,
+                                    "nullable": true,
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "text",
+                                  "document",
+                                  "timer",
+                                  "structured"
+                                ],
+                                "title": "FreeTextWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "ADR-180: text sections written without the assistant, a timer each",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "text_sections"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "document": {
+                                          "additionalProperties": true,
+                                          "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                          "nullable": true,
+                                          "type": "object"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "scoring": {
+                                          "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "text": {
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "nullable": true,
+                                          "properties": {
+                                            "duration_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "format": {
+                                              "enum": [
+                                                "untimed",
+                                                "for_time",
+                                                "amrap",
+                                                "emom",
+                                                "tabata",
+                                                "custom_hiit",
+                                                "death_by"
+                                              ],
+                                              "type": "string"
+                                            },
+                                            "interval_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rest_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rounds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "work_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "required": [
+                                            "format"
+                                          ],
+                                          "title": "SectionTimerPreset",
+                                          "type": "object"
+                                        },
+                                        "title": {
+                                          "description": "Null when untitled",
+                                          "nullable": true,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "title",
+                                        "text",
+                                        "document",
+                                        "timer",
+                                        "scoring"
+                                      ],
+                                      "title": "TextSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "TextSectionsWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "Exercises with every parameter (structured editor, Quick Text)",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "structured"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "exercises": {
+                                          "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "scoreable": {
+                                          "type": "boolean"
+                                        },
+                                        "subtitle": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "additionalProperties": true,
+                                          "nullable": true,
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "name",
+                                        "timer",
+                                        "scoreable",
+                                        "exercises"
+                                      ],
+                                      "title": "StructuredSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "StructuredWorkoutBody",
+                                "type": "object"
+                              }
+                            ],
+                            "title": "WorkoutBody"
+                          },
                           "content": {
                             "items": {
                               "additionalProperties": false,
@@ -248040,6 +249530,222 @@
                             "type": "object"
                           },
                           "type": "array"
+                        },
+                        "body": {
+                          "discriminator": {
+                            "propertyName": "kind"
+                          },
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "One text written with the WOD assistant",
+                              "properties": {
+                                "document": {
+                                  "additionalProperties": true,
+                                  "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "free_text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "structured": {
+                                  "description": "The assistant also derived exercises (see `sections`)",
+                                  "type": "boolean"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "timer": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text",
+                                "document",
+                                "timer",
+                                "structured"
+                              ],
+                              "title": "FreeTextWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-180: text sections written without the assistant, a timer each",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "text_sections"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document": {
+                                        "additionalProperties": true,
+                                        "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "scoring": {
+                                        "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "text": {
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
+                                      },
+                                      "title": {
+                                        "description": "Null when untitled",
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "title",
+                                      "text",
+                                      "document",
+                                      "timer",
+                                      "scoring"
+                                    ],
+                                    "title": "TextSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "TextSectionsWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "Exercises with every parameter (structured editor, Quick Text)",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "structured"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercises": {
+                                        "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "type": "array"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "scoreable": {
+                                        "type": "boolean"
+                                      },
+                                      "subtitle": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "timer": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "timer",
+                                      "scoreable",
+                                      "exercises"
+                                    ],
+                                    "title": "StructuredSection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            }
+                          ],
+                          "title": "WorkoutBody"
                         },
                         "content": {
                           "items": {

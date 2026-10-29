@@ -13,7 +13,6 @@ import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -45,8 +44,6 @@ import {
   type AnalysisSuggestion,
   type ReviewState,
 } from "@/lib/free-text-analysis";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { workoutPublishedHref } from "@/lib/workout-return";
 import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
 import {
   FREE_TEXT_TIMER_METADATA_KEY,
@@ -80,6 +77,8 @@ type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
+  /** The workout was published: the host decides where the coach goes next. */
+  onPublished: (workoutId: string) => void;
   /** ADR-180: switch this workout off the assistant, to text sections (the draft is saved first). */
   onUseSections?: () => void;
 };
@@ -96,14 +95,12 @@ const WORKOUT_TYPES: WorkoutType[] = [
   "recovery",
 ];
 
-export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onUseSections }: Props) {
+export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, onUseSections }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
   const conflictT = useTranslations("DraftConflict");
   const locale = useUiLocale();
-  const router = useRouter();
-  const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const [title, setTitle] = useState("");
@@ -432,7 +429,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
           throw error;
         }
       });
-      router.push(workoutPublishedHref(new URLSearchParams(window.location.search), draftId, adminHref("/admin/workouts", organizationSlug)));
+      onPublished(draftId);
     } catch (error) {
       // A conflict is explained by the notice above the editor.
       if (!(error instanceof DraftConflictError)) setNotice(assistantT("publishFailed"));

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 
 import { linkScheduleSlotWorkout, type ScheduleSlot } from "@/api/schedule";
 import { useUiTranslations } from "@/i18n/ui";
@@ -8,6 +9,8 @@ import { localizeError } from "@/i18n/presentation";
 import { WodPicker } from "@/components/schedule/WodPicker";
 import { dateTimeLocalInZone } from "@/lib/zoned-time";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ContextualWorkoutCreator } from "@/components/workouts/creation/ContextualWorkoutCreator";
+import { formatInZone } from "@/lib/zoned-time";
 
 /** ADR-176: which notice a class without its WOD shows staff, if any. */
 export function classWorkoutNoticeKind(slot: Pick<ScheduleSlot, "published" | "workout_status">) {
@@ -19,22 +22,23 @@ export function classWorkoutNoticeKind(slot: Pick<ScheduleSlot, "published" | "w
 /**
  * ADR-176: tells staff a class has no WOD (a draft members can't see, or a
  * series class missing it today) and links one in place: picking a WOD in
- * the picker links it straight away; "+ New WOD" writes one and comes back.
+ * the picker links it straight away; "+ New WOD" opens the editor over the
+ * class and links the WOD as soon as it is published.
  */
 export function ClassWorkoutNotice({
   slot,
   accessToken,
   timeZone = null,
   onLinked,
-  onCreateNew,
 }: {
   slot: ScheduleSlot;
   accessToken: string;
   timeZone?: string | null;
   onLinked?: () => void;
-  onCreateNew?: () => void;
 }) {
   const i18n = useUiTranslations();
+  const locale = useLocale();
+  const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const kind = classWorkoutNoticeKind(slot);
@@ -75,13 +79,20 @@ export function ClassWorkoutNotice({
         token={accessToken}
         value={null}
         onChange={(workoutId) => void link(workoutId)}
-        onCreateNew={onCreateNew ?? (() => undefined)}
+        onCreateNew={() => setCreating(true)}
         date={dateTimeLocalInZone(slot.scheduled_at, timeZone).slice(0, 10) || null}
         classTypeId={slot.class_type_id}
         classTypeName={slot.class_type?.name ?? null}
       />
       {busy ? <p className="text-sm" role="status" style={{ color: "var(--muted)" }}>{i18n("classLinkWodSaving")}</p> : null}
       {error ? <ErrorNotice>{error}</ErrorNotice> : null}
+      {creating ? (
+        <ContextualWorkoutCreator
+          target={[slot.class_type?.name ?? slot.name, formatInZone(slot.scheduled_at, timeZone, locale, "day-time")].filter(Boolean).join(" · ")}
+          onPublished={link}
+          onClose={() => setCreating(false)}
+        />
+      ) : null}
     </div>
   );
 }
