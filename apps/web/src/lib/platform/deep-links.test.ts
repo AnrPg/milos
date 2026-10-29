@@ -12,7 +12,7 @@ describe("deep links", () => {
     expect(appleAppSiteAssociation({ APPLE_TEAM_ID: "ABCDE12345" })?.applinks.details[0].components).toContainEqual({
       "/": "/pay/return*",
     });
-    expect(assetLinks({ ANDROID_SHA256_CERT_FINGERPRINTS: "AA:BB" })?.[0].target.package_name).toBe("app.palee.member");
+    expect(assetLinks({ ANDROID_SHA256_CERT_FINGERPRINTS: Array.from({ length: 32 }, () => "0F").join(":") })?.[0].target.package_name).toBe("app.palee.member");
   });
 
   it("routes the provider's return to the payment return with the payment id", () => {
