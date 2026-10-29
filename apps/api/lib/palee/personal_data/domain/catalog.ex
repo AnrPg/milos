@@ -132,9 +132,7 @@ defmodule Palee.PersonalData.Domain.Catalog do
 
       # -- messages the person wrote ---------------------------------------------
       account("messages", "person_messages", {:eq, "author_id"}, drop: ~w(user_a_id user_b_id)),
-      account("messages", "buddy_messages", {:eq, "author_id"},
-        drop: ~w(user_id buddy_user_id)
-      ),
+      account("messages", "buddy_messages", {:eq, "author_id"}, drop: ~w(user_id buddy_user_id)),
       account("messages", "support_requests", @me),
       account("messages", "support_replies", @me, drop: ~w(buddy_user_id)),
       tenant("messages", "messaging_messages", {:eq, "sender_id"}),
@@ -215,8 +213,11 @@ defmodule Palee.PersonalData.Domain.Catalog do
   def strip(entry, row) when is_map(row),
     do: row |> Enum.reject(fn {column, _value} -> dropped?(entry, column) end) |> Map.new()
 
-  defp account(section, table, subject, opts \\ []), do: entry(:account, section, table, subject, opts)
-  defp tenant(section, table, subject, opts \\ []), do: entry(:tenant, section, table, subject, opts)
+  defp account(section, table, subject, opts \\ []),
+    do: entry(:account, section, table, subject, opts)
+
+  defp tenant(section, table, subject, opts \\ []),
+    do: entry(:tenant, section, table, subject, opts)
 
   defp entry(scope, section, table, subject, opts) do
     %{

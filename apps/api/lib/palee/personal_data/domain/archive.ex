@@ -23,7 +23,11 @@ defmodule Palee.PersonalData.Domain.Archive do
   when the person has nothing there, so the archive's shape never depends on
   what exists.
   """
-  def build(%{profile_id: profile_id, generated_at: %DateTime{} = generated_at, sections: sections}) do
+  def build(%{
+        profile_id: profile_id,
+        generated_at: %DateTime{} = generated_at,
+        sections: sections
+      }) do
     files =
       Enum.map(Catalog.sections(), fn section ->
         tables = Map.get(sections, section, %{})
@@ -43,7 +47,9 @@ defmodule Palee.PersonalData.Domain.Archive do
         end)
     }
 
-    documents = [{"manifest.json", manifest} | Enum.map(files, fn {name, _s, tables} -> {name, tables} end)]
+    documents = [
+      {"manifest.json", manifest} | Enum.map(files, fn {name, _s, tables} -> {name, tables} end)
+    ]
 
     with {:ok, zip} <- zip(documents) do
       {:ok, %{zip: zip, record_count: Enum.sum(Enum.map(files, fn {_n, _s, t} -> count(t) end))}}
