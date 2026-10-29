@@ -63,6 +63,8 @@ defmodule Palee.Fiscal.Domain.DocumentLabels do
     mydata_uid: "UID (myDATA)",
     mydata_auth: "Authentication code",
     mydata_pending: "Reporting to myDATA (AADE) is pending.",
+    till_tse_title: "Technical security system (TSE)",
+    till_rksv_title: "Cash register security device (RKSV)",
     bank_details: "Bank details",
     iban: "IBAN",
     fr_operation: "Category of operation: provision of services",
