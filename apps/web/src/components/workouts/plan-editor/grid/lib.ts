@@ -28,6 +28,7 @@ export {
   occurrences,
   parseClock,
   parseDose,
+  parseLoad,
   setsRange,
   structOf,
   totalRounds,

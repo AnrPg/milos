@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { FLOWS, MODS, describe, human, parseClock, parseTimes, type ParamDef } from "@/lib/structured-plan";
+import { FLOWS, MODS, describe, human, parseClock, parseTimes, readParam, type ParamDef } from "@/lib/structured-plan";
 import { focusKey, usePlanEditorStore, type PlanEditorSection } from "@/stores/structured-plan";
 
 import { useKeyText, usePlanText } from "./plan-text";
@@ -20,13 +20,20 @@ export function paramUnit(def: ParamDef, value: string): "rounds" | "times" | "s
   return def.kind === "times" || def.bare === "min" || Number(v.split(/[-,]/)[0]) <= 10 ? "min" : "sec";
 }
 
-/** How the value reads ("= 1 λεπτό 30 δευτ."), or null when it is empty; "bad" when it does not read. */
+/**
+ * How the value reads ("= 1 λεπτό 30 δευτ."), or null when it is empty; "bad"
+ * when it does not read. An ambiguous value says its other reading instead
+ * («διαβάζεται 10:00 · για την άλλη μονάδα γράψε 10″»).
+ */
 function useReading() {
   const t = useTranslations("PlanEditor");
+  const core = useTranslations("PlanCore");
   const words = usePlanText();
   return (def: ParamDef, value: string): string | "bad" | null => {
     const v = value.trim();
     if (!v) return null;
+    const read = readParam(def, v);
+    if (read.ok && "ambiguous" in read && read.ambiguous) return core(read.ambiguous.hint.key.replace(/^PlanCore\./, ""), read.ambiguous.hint.values);
     if (def.kind === "count") return /^\d+$/.test(v) ? null : "bad";
     if (def.kind === "range") return /^\d+(\s*-\s*\d+)?$/.test(v) ? null : "bad";
     if (def.kind === "time") {

@@ -104,6 +104,25 @@ describe("PlanGrid value fields", () => {
     fireEvent.focus(cell("sq", 0, "tempo"));
     expect(hint()).toContain("↓3 κατέβασμα");
   });
+
+  it("says the other reading of an ambiguous value, in place of its meaning", () => {
+    renderGrid(emptySets());
+    type(cell("a", 0, "d"), "10-12");
+    fireEvent.focus(cell("a", 0, "d"));
+    expect(screen.getByTestId("plan-hint-ambiguity")).toHaveTextContent("εύρος 10–12 · για 2 σετ γράψε 10, 12");
+    // the meaning is not said twice
+    expect(hint().match(/εύρος 10–12/g)).toHaveLength(1);
+    type(cell("a", 0, "d"), "10");
+    expect(screen.queryByTestId("plan-hint-ambiguity")).toBeNull();
+  });
+
+  it("says the other reading of a ladder in a compact dose field", () => {
+    renderGrid(SAMPLE.amrapWindows!);
+    const dose = screen.getByTestId("plan-cell-wbl-same-d");
+    type(dose, "5-10-15");
+    fireEvent.focus(dose);
+    expect(screen.getByTestId("plan-hint-ambiguity")).toHaveTextContent("γράψε");
+  });
 });
 
 describe("PlanGrid per round", () => {

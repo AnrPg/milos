@@ -7,7 +7,7 @@
  */
 import type { PlanCell, PlanMeasure, PlanRow, PlanSection } from "@/lib/structured-plan/types";
 
-import { MEASURES, measureUnit as libMeasureUnit, parseClock, parseDose, parseTempo, progress, repeatDose, repeatText, setLoads, type Dose } from "./lib";
+import { MEASURES, measureUnit as libMeasureUnit, parseClock, parseDose, parseLoad, parseTempo, progress, repeatDose, repeatText, setLoads, type Dose } from "./lib";
 
 export type Msg = { key: string; values?: Record<string, string | number> };
 export type MeasureKey = Exclude<PlanMeasure, "side">;
@@ -248,7 +248,20 @@ export function cellTestId(key: FieldKey): string | undefined {
 }
 
 export type Tip = [code: string, meaningKey: string];
-export type Hint = { meaning: Msg | null; error: boolean; tips: Tip[] };
+/**
+ * `ambiguity`: the other reading of a value («εύρος 10–12 · για 2 σετ γράψε
+ * 10, 12»), a `PlanCore` message without its namespace (`ambiguous.*`).
+ */
+export type Hint = { meaning: Msg | null; error: boolean; tips: Tip[]; ambiguity?: Msg | null };
+
+/** The other reading of a dose or load value, as a `PlanCore` message (`ambiguous.*`). */
+export function ambiguityOf(k: "d" | "l", value: string): Msg | null {
+  const v = value.trim();
+  if (!v) return null;
+  const parsed = k === "d" ? parseDose(v) : parseLoad(v);
+  const amb = parsed && parsed !== "bad" && "ambiguous" in parsed ? parsed.ambiguous : undefined;
+  return amb ? { key: amb.hint.key.replace(/^PlanCore\./, ""), values: amb.hint.values } : null;
+}
 
 const TIPS: Record<string, Tip[]> = {
   d: [["8-12", "tip.range"], ["5-10-15…", "tip.ladder"], ["max", "tip.max"]],
@@ -336,7 +349,8 @@ export function hintFor(plan: PlanSection, key: FieldKey | null, roundWord: stri
                 ? TIPS.clock!
                 : TIPS.x!;
     if (plan.flow === "amrap" && row.kind === "ex" && !MEASURES[key.k as MeasureKey]?.text) tips = [...tips.slice(0, 3), AMRAP_TIP];
-    return { meaning, error: Boolean(view?.error), tips };
+    const ambiguity = !view?.error && row.kind === "ex" && (key.k === "d" || key.k === "l") ? ambiguityOf(key.k, value) : null;
+    return { meaning, error: Boolean(view?.error), tips, ambiguity };
   }
   if (key.kind === "x") {
     const value = (row.x?.[key.k] ?? "").trim();
@@ -348,10 +362,15 @@ export function hintFor(plan: PlanSection, key: FieldKey | null, roundWord: stri
     const view = compactField(row, "d");
     if (row.kind === "rest") return { meaning: null, error: false, tips: TIPS.rest! };
     const d = parseDose(row.dose);
-    return { meaning: view.error ?? (d && d !== "bad" ? doseMeaning(d, roundWord) : null), error: Boolean(view.error), tips: TIPS.d! };
+    return {
+      meaning: view.error ?? (d && d !== "bad" ? doseMeaning(d, roundWord) : null),
+      error: Boolean(view.error),
+      tips: TIPS.d!,
+      ambiguity: view.error ? null : ambiguityOf("d", row.dose),
+    };
   }
   const view = compactField(row, "l");
-  return { meaning: view.error ?? loadMeaning(row.load), error: Boolean(view.error), tips: TIPS.l! };
+  return { meaning: view.error ?? loadMeaning(row.load), error: Boolean(view.error), tips: TIPS.l!, ambiguity: view.error ? null : ambiguityOf("l", row.load) };
 }
 
 function loadUnitText(row: PlanRow, n: number) {

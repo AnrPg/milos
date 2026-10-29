@@ -149,6 +149,16 @@ describe("PlanEditor", () => {
     expect(screen.getByTestId("plan-sentence")).toBeInTheDocument();
   });
 
+  it("says the other reading of an ambiguous time under its field", () => {
+    renderEditor();
+    act(() => store().openSection("s1", 1));
+    const rest = screen.getByTestId("plan-param-rest") as HTMLInputElement;
+    fireEvent.change(rest, { target: { value: "10" } });
+    expect(rest.closest("label")).toHaveTextContent(/for the other unit write 10″/);
+    fireEvent.change(rest, { target: { value: "1:30" } });
+    expect(rest.closest("label")).not.toHaveTextContent(/other unit/);
+  });
+
   it("adds and removes an add-on with its field", () => {
     renderEditor();
     act(() => store().openSection("s2", 1));
