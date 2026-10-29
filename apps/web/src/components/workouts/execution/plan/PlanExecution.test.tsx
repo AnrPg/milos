@@ -135,6 +135,10 @@ describe("PlanExecution", () => {
     expect(onComplete).toHaveBeenCalledWith({
       score: expect.objectContaining({ section_id: "sec-1", value: "1:15", score_type: "time" }),
       elapsedMs: 75_000,
+      actuals: [
+        expect.objectContaining({ row_id: expect.any(String), exercise_name: "Thruster", prescribed_reps: 21, actual_reps: 18, prescribed_load_kg: 43, actual_load_kg: 43, logged: true }),
+        expect.objectContaining({ exercise_name: "Pull-up", prescribed_reps: 21, actual_reps: 21, logged: false }),
+      ],
     });
   });
 });

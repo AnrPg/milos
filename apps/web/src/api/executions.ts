@@ -173,6 +173,37 @@ export async function startExecution(
   return data.execution;
 }
 
+/**
+ * ADR-270: one set / round of a structured plan exercise, prescribed next to
+ * actual, keyed by plan row id and its place in the run (block, round, part,
+ * window). Sent on completion as `plan_actuals`.
+ */
+export type PlanSetActual = {
+  section_id: string;
+  row_id: string;
+  exercise_name: string;
+  exercise_ref: string | null;
+  /** Block (kind of round) of the row; -1 for interrupt rows. */
+  block_index: number;
+  /** 1-based set / round / slot / interval number. */
+  round_index: number;
+  /** 0-based part of a cluster / drop / rest-pause set; 0 otherwise. */
+  part_index: number;
+  /** 0-based phase (AMRAP window, EMOM slot…) the set was done in. */
+  phase_index: number;
+  interrupt: boolean;
+  /** The prescription as shown ("8–12", "max", "400 m", "70%", "βαρύ"). */
+  prescribed_reps_text: string;
+  prescribed_load_text: string;
+  /** Numeric prescription: plain reps / calories, load in kg (decimal). */
+  prescribed_reps: number | null;
+  prescribed_load_kg: number | null;
+  actual_reps: number | null;
+  actual_load_kg: number | null;
+  /** The athlete typed a value for this set (otherwise actual = prescribed). */
+  logged: boolean;
+};
+
 export async function completeExecution(
   token: string,
   executionId: string,
@@ -187,6 +218,8 @@ export async function completeExecution(
     segment_cycle_counts?: Record<string, number>;
     kpi_counters?: KpiCounters;
     duration_adjustments?: Record<string, number>;
+    /** ADR-270: prescribed vs actual per set of a structured plan workout. */
+    plan_actuals?: PlanSetActual[];
   },
 ): Promise<WorkoutExecution> {
   const data = await apiRequest<{ execution: WorkoutExecution }>(

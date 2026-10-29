@@ -75,6 +75,8 @@ export type RunWork = {
   optional: boolean;
   group: RunGroup | null;
   part: RunPart | null;
+  /** Index of the block (kind of round) the row is in; -1 for interrupt rows. */
+  block: number;
   /** One of the rows done at an interruption. */
   interrupt: boolean;
 };
@@ -228,7 +230,7 @@ function makeCtx(section: PlanSection, words: ShowWords): Ctx {
   return { section, words, next: (prefix = "s") => `${prefix}${i++}` };
 }
 
-type Column = { round: number; rounds: number | null; col: number; n: number; optional?: boolean; interrupt?: boolean };
+type Column = { round: number; rounds: number | null; col: number; n: number; block: number; optional?: boolean; interrupt?: boolean };
 
 function restRowStep(ctx: Ctx, row: PlanRow, c: Column, usesCells: boolean): RunRest {
   const text = rowValues(row, c.col, c.n, usesCells, ctx.words).dose || row.dose;
@@ -261,6 +263,7 @@ function workStep(
     values: rowValues(row, c.col, c.n, usesCells, ctx.words),
     round: c.round,
     rounds: c.rounds,
+    block: c.block,
     optional: Boolean(c.optional),
     group,
     part,
@@ -327,7 +330,7 @@ function columnOf(round: number, k: number, total: number): { block: number; col
 function roundSteps(ctx: Ctx, round: number, total: number, rounds: number | null, extra: Partial<Column> = {}): RunStep[] {
   const blocks = ctx.section.blocks.length ? ctx.section.blocks : [[]];
   const { block, col, n } = columnOf(round, blocks.length, total);
-  const c: Column = { round, rounds, col, n, ...extra };
+  const c: Column = { round, rounds, col, n, block, ...extra };
   return unitsOf(blocks[block] ?? []).flatMap((u) => unitSteps(ctx, u, c));
 }
 
@@ -354,11 +357,11 @@ function setsPhases(ctx: Ctx): RunPhase[] {
       if (u.rows.every((r) => r.kind === "rest")) {
         // A rest row between exercises happens once, in place of the rest between sets.
         dropTrailingRest();
-        steps.push(...unitSteps(ctx, u, { round: 1, rounds: max, col: 0, n: 1 }));
+        steps.push(...unitSteps(ctx, u, { round: 1, rounds: max, col: 0, n: 1, block: 0 }));
         continue;
       }
       for (let set = 1; set <= max; set++) {
-        steps.push(...unitSteps(ctx, u, { round: set, rounds: max, col: set - 1, n: max, optional: set > min }));
+        steps.push(...unitSteps(ctx, u, { round: set, rounds: max, col: set - 1, n: max, block: 0, optional: set > min }));
         push(betweenSets(ctx, set));
       }
     }
@@ -450,7 +453,7 @@ function interruptOf(ctx: Ctx): RunSequence["interrupt"] {
   const everySecs = secsOf(section.params.intEvery, "smart");
   const rows = section.interrupt ?? [];
   if (!everySecs || !rows.some((r) => r.kind === "ex" && r.name.trim())) return null;
-  const c: Column = { round: 1, rounds: null, col: 0, n: 1, interrupt: true };
+  const c: Column = { round: 1, rounds: null, col: 0, n: 1, block: -1, interrupt: true };
   return { everySecs, steps: unitsOf(rows).flatMap((u) => unitSteps(ctx, u, c)) };
 }
 
