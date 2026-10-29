@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Your data is ready to download"
+msgstr "Τα δεδομένα σου είναι έτοιμα για λήψη"
+
+msgid "The copy of your data you asked for is ready: one ZIP file with your profile, bookings, journal, wellness, devices, the messages you wrote, payments, receipts and signed documents."
+msgstr "Το αντίγραφο των δεδομένων σου που ζήτησες είναι έτοιμο: ένα αρχείο ZIP με το προφίλ σου, τις κρατήσεις, το Ημερολόγιο, την ευεξία, τις συσκευές, τα μηνύματα που έγραψες, τις πληρωμές, τα παραστατικά και τα έγγραφα που υπέγραψες."
+
+msgid "Download it from Settings while you are signed in. It is kept for %{days} days."
+msgstr "Κατέβασέ το από τις Ρυθμίσεις, αφού συνδεθείς. Θα είναι διαθέσιμο για %{days} ημέρες."
+
+msgid "Open Settings"
+msgstr "Άνοιγμα Ρυθμίσεων"
+
+msgid "If you didn't ask for this, change your password: someone else may know it."
+msgstr "Αν δεν το ζήτησες εσύ, άλλαξε τον κωδικό σου: μπορεί να τον ξέρει κάποιος άλλος."
