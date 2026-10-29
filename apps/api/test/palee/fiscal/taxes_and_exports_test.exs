@@ -14,7 +14,7 @@ defmodule Palee.FiscalTaxesAndExportsTest do
 
   alias Palee.Application.Fiscal.{FiscalDocumentRendering, FiscalTaxSettings}
   alias Palee.Fiscal
-  alias Palee.Fiscal.{Exports, Taxes}
+  alias Palee.Fiscal.{Exports, FiscalStore, Taxes}
 
   @now ~U[2027-02-03 10:00:00.000000Z]
 
@@ -36,7 +36,10 @@ defmodule Palee.FiscalTaxesAndExportsTest do
     building_number: "100",
     postal_code: "11201",
     city: "Brooklyn",
-    region: "NY"
+    region: "NY",
+    # A Swiss QR-IBAN saved earlier must be cleared when moving to the US.
+    iban: nil,
+    qr_iban: nil
   }
 
   setup do
@@ -46,10 +49,8 @@ defmodule Palee.FiscalTaxesAndExportsTest do
 
   defp journal_events(context) do
     context
-    |> Fiscal.list_journal_entries(%{limit: 100})
+    |> FiscalStore.list_journal_entries(%{after_position: 0, limit: 100})
     |> Enum.map(& &1.event_type)
-  rescue
-    UndefinedFunctionError -> []
   end
 
   test "bank details are validated on the identity", %{context: context, owner: owner} do
@@ -119,7 +120,15 @@ defmodule Palee.FiscalTaxesAndExportsTest do
           issue_date: ~D[2027-02-03],
           idempotency_key: "us-1",
           payment_method: "card",
-          lines: [%{description: "Membership", unit_price_cents: 10_887, tax_category: "sales_tax", rate_bp: 887}]
+          lines: [
+            %{
+              description: "Membership",
+              quantity: 1,
+              unit_price_cents: 10_887,
+              tax_category: "sales_tax",
+              rate_bp: 887
+            }
+          ]
         },
         owner.id,
         @now
@@ -151,7 +160,7 @@ defmodule Palee.FiscalTaxesAndExportsTest do
               country_code: "CH"
             },
             lines: [
-              %{description: "Unlimited Februar", unit_price_cents: 20_000},
+              %{description: "Unlimited Februar", quantity: 1, unit_price_cents: 20_000},
               %{description: "Shake", quantity: 2, unit_price_cents: 500, tax_category: "reduced"}
             ]
           },
@@ -201,11 +210,13 @@ defmodule Palee.FiscalTaxesAndExportsTest do
       assert length(settings) == 7
       assert %{saved: false} = Enum.find(settings, &(&1.format == "xero"))
 
-      {:ok, credit, _mode} =
+      {:ok, credit, :issued} =
         Fiscal.credit(
           context,
           invoice.id,
-          %{idempotency_key: "ch-credit", lines: [%{position: 2, quantity: 1}]},
+          [%{position: 2, quantity: 1}],
+          ~D[2027-02-04],
+          "ch-credit",
           owner.id,
           @now
         )
@@ -228,11 +239,9 @@ defmodule Palee.FiscalTaxesAndExportsTest do
       assert number == invoice.number
 
       events = journal_events(context)
-
-      if events != [] do
-        assert "export_settings_saved" in events
-        assert "accounting_exported" in events
-      end
+      assert "export_settings_saved" in events
+      assert "accounting_exported" in events
+      assert Fiscal.verify_journal(context, owner.id, @now) |> elem(0) == :ok
     end
 
     test "the use case exports Finance payments of the period too", %{context: context} do
