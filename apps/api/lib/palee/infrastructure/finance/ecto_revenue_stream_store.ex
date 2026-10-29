@@ -29,41 +29,111 @@ defmodule Palee.Infrastructure.Finance.EctoRevenueStreamStore do
 
   @impl true
   def record_invoice(_context, attrs) do
-    attrs = string_keys(attrs)
+    Repo.transaction(fn -> insert_invoice(string_keys(attrs)) end)
+  end
+
+  defp insert_invoice(attrs) do
     lines = Map.get(attrs, "lines", [])
 
-    Repo.transaction(fn ->
-      subtotal = Enum.sum(Enum.map(lines, &(&1["quantity"] * &1["unit_amount_cents"])))
-      discount = Enum.sum(Enum.map(lines, &(&1["discount_cents"] || 0)))
+    subtotal = Enum.sum(Enum.map(lines, &(&1["quantity"] * &1["unit_amount_cents"])))
+    discount = Enum.sum(Enum.map(lines, &(&1["discount_cents"] || 0)))
 
-      invoice =
-        %FinanceInvoice{}
-        |> FinanceInvoice.stream_changeset(
-          attrs
-          |> Map.drop(["lines"])
-          |> Map.put("invoice_number", invoice_number(attrs["revenue_stream"]))
-          |> Map.put_new("status", "issued")
-          |> Map.put("subtotal_cents", subtotal)
-          |> Map.put("discount_cents", discount)
-          |> Map.put("total_cents", subtotal - discount)
+    invoice =
+      %FinanceInvoice{}
+      |> FinanceInvoice.stream_changeset(
+        attrs
+        |> Map.drop(["lines"])
+        |> Map.put("invoice_number", invoice_number(attrs["revenue_stream"]))
+        |> Map.put_new("status", "issued")
+        |> Map.put("subtotal_cents", subtotal)
+        |> Map.put("discount_cents", discount)
+        |> Map.put("total_cents", subtotal - discount)
+      )
+      |> Repo.insert()
+      |> ok_or_rollback()
+
+    saved_lines =
+      Enum.map(lines, fn line ->
+        %FinanceInvoiceLine{}
+        |> FinanceInvoiceLine.stream_changeset(
+          line
+          |> Map.put("finance_invoice_id", invoice.id)
+          |> Map.put_new("revenue_stream", invoice.revenue_stream)
         )
         |> Repo.insert()
         |> ok_or_rollback()
+      end)
 
-      saved_lines =
-        Enum.map(lines, fn line ->
-          %FinanceInvoiceLine{}
-          |> FinanceInvoiceLine.stream_changeset(
-            line
-            |> Map.put("finance_invoice_id", invoice.id)
-            |> Map.put_new("revenue_stream", invoice.revenue_stream)
-          )
-          |> Repo.insert()
-          |> ok_or_rollback()
-        end)
+    invoice |> invoice_map() |> Map.put(:lines, Enum.map(saved_lines, &line_map/1))
+  end
 
-      invoice |> invoice_map() |> Map.put(:lines, Enum.map(saved_lines, &line_map/1))
-    end)
+  @impl true
+  def record_sale(_context, attrs) do
+    attrs = string_keys(attrs)
+    payment_attrs = string_keys(attrs["payment"] || %{})
+    source = {payment_attrs["source_type"], payment_attrs["source_id"]}
+
+    result =
+      Repo.transaction(fn ->
+        case existing_sale(source) do
+          %{} = sale ->
+            sale
+
+          nil ->
+            invoice = insert_invoice(string_keys(attrs["invoice"] || %{}))
+
+            payment =
+              %MembershipPayment{}
+              |> MembershipPayment.stream_changeset(
+                Map.put(payment_attrs, "finance_invoice_id", invoice.id)
+              )
+              |> Repo.insert()
+              |> ok_or_rollback()
+
+            invoice.id |> locked_invoice() |> refresh_status()
+
+            %{
+              invoice: Map.merge(invoice, invoice_map(Repo.get!(FinanceInvoice, invoice.id))),
+              payment: payment_map(payment),
+              replayed: false
+            }
+        end
+      end)
+
+    case result do
+      # A concurrent call recorded the same source first: its sale stands.
+      {:error, %Ecto.Changeset{}} = error ->
+        case Repo.transaction(fn -> existing_sale(source) end) do
+          {:ok, %{} = sale} -> {:ok, sale}
+          _none -> error
+        end
+
+      other ->
+        other
+    end
+  end
+
+  defp existing_sale({source_type, source_id}) do
+    case existing_payment(source_type, source_id) do
+      nil ->
+        nil
+
+      payment ->
+        invoice = FinanceInvoice |> tenant_scope() |> Repo.get(payment.finance_invoice_id)
+
+        lines =
+          FinanceInvoiceLine
+          |> tenant_scope()
+          |> where([line], line.finance_invoice_id == ^payment.finance_invoice_id)
+          |> order_by([line], asc: line.inserted_at, asc: line.id)
+          |> Repo.all()
+
+        %{
+          invoice: invoice |> invoice_map() |> Map.put(:lines, Enum.map(lines, &line_map/1)),
+          payment: payment_map(payment),
+          replayed: true
+        }
+    end
   end
 
   @impl true
