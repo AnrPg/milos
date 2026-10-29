@@ -23,7 +23,9 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
       environment: param(params, :environment),
       peppol_id: param(params, :peppol_id),
       legal_entity_id: param(params, :legal_entity_id),
+      provider: param(params, :provider),
       api_key: param(params, :api_key),
+      api_secret: param(params, :api_secret),
       rotate_webhook_token: param(params, :rotate_webhook_token) == true
     }
 
