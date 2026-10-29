@@ -9,6 +9,22 @@ describe("apiRequest tenant headers", () => {
     window.history.replaceState(null, "", "/");
   });
 
+  it("sends a FormData body as multipart, without a JSON content type (ADR-254)", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/admin");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 201 }),
+    );
+    const form = new FormData();
+    form.append("file", new Blob(["a,b\n1,2"], { type: "text/csv" }), "people.csv");
+
+    await apiRequest<{ ok: boolean }>("/admin/imports", { token: "token", method: "POST", body: form });
+
+    const init = fetchMock.mock.calls[0]![1] as RequestInit;
+    expect(init.body).toBe(form);
+    expect(init.headers).not.toHaveProperty("Content-Type");
+    expect(init.headers).toHaveProperty("Authorization", "Bearer token");
+  });
+
   it("uses the organization slug from /org paths", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/admin");
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "stored-gym");

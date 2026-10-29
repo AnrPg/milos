@@ -297,10 +297,33 @@ function ClassTypeRules({
   const t = useTranslations("BoxSchedule");
   const cost = type.credit_cost ?? 1;
   const audiences = type.audiences ?? [];
+  const adv = useTranslations("AdvancedSettings");
+  const [open, setOpen] = useState(false);
   const stepStyle = { background: "var(--border)", color: "var(--text-soft)" };
 
   return (
     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs" style={{ color: "var(--muted)" }}>
+      <label className="flex items-center gap-2">
+        <input
+          checked={type.kind === "event"}
+          disabled={disabled}
+          onChange={(event) => onChange({ kind: event.target.checked ? "event" : "class" })}
+          type="checkbox"
+        />
+        {i18n("admClassTypeEvent")}
+      </label>
+      {/* ADR-255: visits per booking, level and audience have a good default, so they sit under «Προχωρημένα». */}
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className="font-semibold"
+        style={{ color: "var(--primary-strong)" }}
+      >
+        {adv("title")} {open ? "▴" : "▾"}
+      </button>
+      {open ? (
+      <>
       <span className="flex items-center gap-2">
         {i18n("admVisitsPerBooking")}
         <button
@@ -325,15 +348,6 @@ function ClassTypeRules({
           +
         </button>
       </span>
-      <label className="flex items-center gap-2">
-        <input
-          checked={type.kind === "event"}
-          disabled={disabled}
-          onChange={(event) => onChange({ kind: event.target.checked ? "event" : "class" })}
-          type="checkbox"
-        />
-        {i18n("admClassTypeEvent")}
-      </label>
       {/* Plan §5a decision 2: members filter Πρόγραμμα by these two tags. */}
       <label className="flex items-center gap-2">
         {t("chipLevel")}
@@ -382,6 +396,8 @@ function ClassTypeRules({
           );
         })}
       </span>
+      </>
+      ) : null}
     </div>
   );
 }

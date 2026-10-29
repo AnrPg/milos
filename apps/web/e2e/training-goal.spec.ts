@@ -186,16 +186,20 @@ test.describe("personal weekly goal (ADR-229)", () => {
     await expect(section.getByTestId("weekly-goal-is-personal")).toContainText("The weekly workout goal is personal", { timeout: 60_000 });
     await expect(section).not.toContainText("Weekly workout target");
 
-    const shields = section.getByRole("spinbutton", { name: /Streak shields per renewal/ });
+    // ADR-255: streak shields have a good default, so they sit under «Advanced» › Motivation.
+    await expect(section.getByRole("spinbutton", { name: /Streak shields per renewal/ })).toHaveCount(0);
+    await page.getByTestId("advanced-settings").getByRole("button", { name: /Advanced/ }).click();
+    const motivation = page.getByTestId("advanced-group-motivation");
+    const shields = motivation.getByRole("spinbutton", { name: /Streak shields per renewal/ });
     await expect(shields).toHaveValue("1");
-    await expect(section).toContainText("Empty: each client's shields renew every month on the day they signed up.");
+    await expect(motivation).toContainText("Empty: each client's shields renew every month on the day they signed up.");
 
     await shields.fill("2");
-    await section.getByRole("spinbutton", { name: /Shield renewal day/ }).fill("5");
-    await expect(section).toContainText("Shields renew for everyone on day 5 of every month.");
-    await section.getByRole("button", { name: "Save", exact: true }).click();
+    await motivation.getByRole("spinbutton", { name: /Shield renewal day/ }).fill("5");
+    await expect(motivation).toContainText("Shields renew for everyone on day 5 of every month.");
+    await motivation.getByRole("button", { name: "Save", exact: true }).first().click();
 
     await expect.poll(() => patches.length).toBe(1);
-    expect(patches[0]).toEqual({ gamification: { streak_shields: 2, streak_shield_reset_day: 5, leaderboard_enabled: true } });
+    expect(patches[0]).toEqual({ gamification: { streak_shields: 2, streak_shield_reset_day: 5 } });
   });
 });

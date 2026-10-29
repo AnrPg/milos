@@ -29,12 +29,41 @@ defmodule Palee.Setup.Domain.RecipePlan do
 
   Each change is a JSON-friendly map: `area`, `key`, `action` (`set`,
   `create`, `add`, `manual`), `from`, `to`, `name` and, for creations, the
-  `attrs` to create with.
+  `attrs` to create with. A setting (or the provider kind) whose value is no
+  longer the catalog default says `owner_changed: true`: the owner chose it.
+
+  Modes (product decision 2026-10-29, ADR-255 §10): `:all` applies every
+  change; `:defaults_only` keeps what the owner changed, moving those changes
+  to `kept` (see `keep_owner_values/1`).
   """
 
   alias Palee.Setup.Domain.{Recipe, SettingsCatalog}
 
   @conversion_key "trials.conversion_package_id"
+  @modes %{"all" => :all, "defaults_only" => :defaults_only}
+
+  @doc "The apply mode from its name; nil means `:all`."
+  def mode(nil), do: {:ok, :all}
+  def mode(mode) when mode in [:all, :defaults_only], do: {:ok, mode}
+
+  def mode(name) when is_binary(name) do
+    case Map.fetch(@modes, name) do
+      {:ok, mode} -> {:ok, mode}
+      :error -> {:error, :invalid_recipe_mode}
+    end
+  end
+
+  def mode(_other), do: {:error, :invalid_recipe_mode}
+
+  @doc "The plan for `mode`: `:defaults_only` moves the owner's own values to `kept`."
+  def for_mode(plan, :all), do: plan
+  def for_mode(plan, :defaults_only), do: keep_owner_values(plan)
+
+  @doc "Moves every change that would replace an owner's choice to `kept` (keys, sorted)."
+  def keep_owner_values(%{changes: changes} = plan) do
+    {kept, changes} = Enum.split_with(changes, &Map.get(&1, :owner_changed, false))
+    %{plan | changes: changes, kept: (plan.kept ++ Enum.map(kept, & &1.key)) |> Enum.sort()}
+  end
 
   @doc "`%{recipe, version, changes, manual, unchanged}` for `recipe` over `snapshot`."
   def build(%Recipe{} = recipe, %{} = snapshot) do
@@ -56,7 +85,8 @@ defmodule Palee.Setup.Domain.RecipePlan do
       version: recipe.version,
       changes: changes,
       manual: manual,
-      unchanged: unchanged |> Enum.map(&elem(&1, 1)) |> Enum.sort()
+      unchanged: unchanged |> Enum.map(&elem(&1, 1)) |> Enum.sort(),
+      kept: []
     }
   end
 
@@ -78,7 +108,8 @@ defmodule Palee.Setup.Domain.RecipePlan do
         from: current,
         to: kind,
         name: nil,
-        advanced: SettingsCatalog.advanced?("provider.kind")
+        advanced: SettingsCatalog.advanced?("provider.kind"),
+        owner_changed: owner_changed?("provider.kind", current, not is_nil(current))
       }
   end
 
@@ -134,20 +165,25 @@ defmodule Palee.Setup.Domain.RecipePlan do
 
     settings
     |> Enum.sort_by(&elem(&1, 0))
-    |> Enum.map(fn {key, target} -> setting(key, target, Map.get(current, key)) end)
+    |> Enum.map(fn {key, target} ->
+      setting(key, target, Map.get(current, key), Map.has_key?(current, key))
+    end)
   end
 
-  defp setting(@conversion_key = key, code, current) do
+  # Only set while the box has none, so it never replaces the owner's choice.
+  defp setting(@conversion_key = key, code, current, _known) do
     if is_nil(code) or not is_nil(current),
       do: {:unchanged, key},
-      else: setting_change(key, current, code)
+      else: setting_change(key, current, code, false)
   end
 
-  defp setting(key, target, current) do
-    if same?(current, target), do: {:unchanged, key}, else: setting_change(key, current, target)
+  defp setting(key, target, current, known) do
+    if same?(current, target),
+      do: {:unchanged, key},
+      else: setting_change(key, current, target, owner_changed?(key, current, known))
   end
 
-  defp setting_change(key, from, to) do
+  defp setting_change(key, from, to, owner_changed) do
     %{
       area: "setting",
       key: key,
@@ -155,8 +191,19 @@ defmodule Palee.Setup.Domain.RecipePlan do
       from: from,
       to: to,
       name: nil,
-      advanced: SettingsCatalog.advanced?(key)
+      advanced: SettingsCatalog.advanced?(key),
+      owner_changed: owner_changed
     }
+  end
+
+  # The owner changed a setting when its value is known and is not the catalog default.
+  defp owner_changed?(_key, _current, false), do: false
+
+  defp owner_changed?(key, current, true) do
+    case SettingsCatalog.default(key) do
+      {:ok, default} -> not same?(current, default)
+      :error -> false
+    end
   end
 
   defp role_grants(%Recipe{role_grants: grants}, snapshot) do

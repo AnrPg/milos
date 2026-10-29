@@ -114,6 +114,14 @@ defmodule Palee.Setup.Domain.SettingsCatalog do
     end
   end
 
+  @doc "`{:ok, default}` for the setting under `key`, or `:error`."
+  def default(key) do
+    case Map.fetch(@by_key, key) do
+      {:ok, {_key, _verdict, default, _recipe}} -> {:ok, default}
+      :error -> :error
+    end
+  end
+
   @doc "Whether the web hides the setting until «Προχωρημένα» is opened."
   def advanced?(key) do
     case Map.fetch(@by_key, key) do

@@ -90,7 +90,9 @@ test("difficulty levels ask only for a name and explain the fixed code", async (
   await page.goto("/admin/settings");
 
   // ADR-218: no push keys on a box's settings page any more.
-  await expect(page.getByRole("button", { name: /Difficulty levels/ })).toBeVisible();
+  // ADR-255: difficulty levels sit under «Advanced» › Motivation.
+  await page.getByTestId("advanced-settings").getByRole("button", { name: /Advanced/ }).click();
+  await expect(page.locator("#level-taxonomy")).toContainText("Difficulty levels");
   await expect(page.getByText("Public key")).toHaveCount(0);
   await expect(page.locator("#notifications")).toHaveCount(0);
 

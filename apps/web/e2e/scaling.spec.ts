@@ -121,7 +121,8 @@ test("the owner switches suggestions on with the gym's key", async ({ page }) =>
   const puts: Array<Record<string, unknown>> = [];
   await stubOwner(page, puts, []);
   await page.goto("/admin/settings");
-  await page.getByRole("button", { name: /AI assistant/ }).click();
+  // ADR-255: the AI settings sit under «Advanced» › Training.
+  await page.getByTestId("advanced-settings").getByRole("button", { name: /Advanced/ }).click();
   const panel = page.getByTestId("ai-scaling-settings");
   await expect(panel.getByText("No key set.")).toBeVisible();
   const toggle = panel.getByRole("switch", { name: "Scaling suggestions" });
