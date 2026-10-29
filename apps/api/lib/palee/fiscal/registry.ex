@@ -99,13 +99,14 @@ defmodule Palee.Fiscal.Registry do
                  subject_id: saved.id,
                  actor_id: actor_id,
                  occurred_at: now,
-                 payload: %{
-                   authority: @authority,
-                   environment: saved.environment,
-                   user_id: saved.user_id,
-                   password_changed: Map.has_key?(attrs, :subscription_key)
-                 }
-                 |> Connections.platform_mark(params)
+                 payload:
+                   %{
+                     authority: @authority,
+                     environment: saved.environment,
+                     user_id: saved.user_id,
+                     password_changed: Map.has_key?(attrs, :subscription_key)
+                   }
+                   |> Connections.platform_mark(params)
                }) do
           {:ok, public_connection(saved)}
         end

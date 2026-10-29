@@ -81,10 +81,17 @@ defmodule Palee.Infrastructure.Fiscal.MyDataGateway do
       |> Keyword.merge(Keyword.get(config, :req_options, []))
       |> Req.get()
       |> case do
-        {:ok, %Req.Response{status: 200}} -> {:ok, %{}}
-        {:ok, %Req.Response{status: status}} when status in [401, 403] -> {:error, {:unauthorized, {:http, status}}}
-        {:ok, %Req.Response{status: status}} -> {:error, {:http, status}}
-        {:error, exception} -> {:error, {:network, Exception.message(exception)}}
+        {:ok, %Req.Response{status: 200}} ->
+          {:ok, %{}}
+
+        {:ok, %Req.Response{status: status}} when status in [401, 403] ->
+          {:error, {:unauthorized, {:http, status}}}
+
+        {:ok, %Req.Response{status: status}} ->
+          {:error, {:http, status}}
+
+        {:error, exception} ->
+          {:error, {:network, Exception.message(exception)}}
       end
     end
   end

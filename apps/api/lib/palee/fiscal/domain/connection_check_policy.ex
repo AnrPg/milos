@@ -144,7 +144,10 @@ defmodule Palee.Fiscal.Domain.ConnectionCheckPolicy do
 
   @doc "True when the connection is due for a scheduled check."
   def due?(%{next_check_at: nil}, _now), do: true
-  def due?(%{next_check_at: %DateTime{} = at}, %DateTime{} = now), do: DateTime.compare(at, now) != :gt
+
+  def due?(%{next_check_at: %DateTime{} = at}, %DateTime{} = now),
+    do: DateTime.compare(at, now) != :gt
+
   def due?(_connection, _now), do: false
 
   @doc """

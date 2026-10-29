@@ -495,17 +495,18 @@ defmodule Palee.Fiscal.TillSigning do
                subject_id: saved.id,
                actor_id: actor_id,
                occurred_at: now,
-               payload: %{
-                 device: device,
-                 provider: saved.provider,
-                 environment: saved.environment,
-                 unit_id: saved.unit_id,
-                 register_id: saved.register_id,
-                 unit_serial: saved.unit_serial,
-                 register_serial: saved.register_serial,
-                 key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret)
-               }
-               |> Connections.platform_mark(attrs)
+               payload:
+                 %{
+                   device: device,
+                   provider: saved.provider,
+                   environment: saved.environment,
+                   unit_id: saved.unit_id,
+                   register_id: saved.register_id,
+                   unit_serial: saved.unit_serial,
+                   register_serial: saved.register_serial,
+                   key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret)
+                 }
+                 |> Connections.platform_mark(attrs)
              }) do
         TillSignatureStore.wake_waiting(context, now)
         {:ok, public_connection(saved)}

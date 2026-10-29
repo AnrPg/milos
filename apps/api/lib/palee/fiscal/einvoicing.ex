@@ -519,16 +519,18 @@ defmodule Palee.Fiscal.EInvoicing do
                  subject_id: saved.id,
                  actor_id: actor_id,
                  occurred_at: now,
-                 payload: %{
-                   network: @network,
-                   provider: saved.provider,
-                   environment: saved.environment,
-                   peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
-                   legal_entity_id: saved.legal_entity_id,
-                   key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
-                   webhook_token_changed: not is_nil(token)
-                 }
-                 |> Connections.platform_mark(params)
+                 payload:
+                   %{
+                     network: @network,
+                     provider: saved.provider,
+                     environment: saved.environment,
+                     peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
+                     legal_entity_id: saved.legal_entity_id,
+                     key_changed:
+                       Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
+                     webhook_token_changed: not is_nil(token)
+                   }
+                   |> Connections.platform_mark(params)
                }) do
           EInvoiceStore.wake_waiting(context, now)
 
