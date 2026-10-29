@@ -48,6 +48,17 @@ group("timeline", () => {
       segments: [0, 1, 0, 1].map((slot) => ({ secs: 60, kind: "slot", slot })),
       interrupts: [],
       total: 240,
+      open: false,
+    });
+  });
+
+  it("draws an EMOM without times as an open clock: one cycle of slots, no total", () => {
+    const s = section("emom", { every: "1:00", times: "" }, { blocks: [[newRow()], [newRow()]] });
+    expect(timeline(s)).toEqual({
+      segments: [0, 1].map((slot) => ({ secs: 60, kind: "slot", slot })),
+      interrupts: [],
+      total: null,
+      open: true,
     });
   });
 
