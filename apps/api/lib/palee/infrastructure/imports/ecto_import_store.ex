@@ -201,14 +201,23 @@ defmodule Palee.Infrastructure.Imports.EctoImportStore do
   end
 
   @impl true
-  def applied_fingerprint?(%{organization_id: organization_id}, fingerprint) do
-    ImportRow
-    |> where(
-      [r],
-      r.organization_id == ^organization_id and r.fingerprint == ^fingerprint and
-        r.status == "applied"
-    )
-    |> Repo.exists?()
+  def applied_fingerprints(_context, []), do: MapSet.new()
+
+  def applied_fingerprints(%{organization_id: organization_id}, fingerprints) do
+    fingerprints
+    |> Enum.uniq()
+    |> Enum.chunk_every(5_000)
+    |> Enum.flat_map(fn chunk ->
+      ImportRow
+      |> where(
+        [r],
+        r.organization_id == ^organization_id and r.fingerprint in ^chunk and
+          r.status == "applied"
+      )
+      |> select([r], r.fingerprint)
+      |> Repo.all()
+    end)
+    |> MapSet.new()
   end
 
   @impl true

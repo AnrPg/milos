@@ -97,7 +97,7 @@ defmodule Palee.Imports.Domain.ImportPolicy do
 
     cond do
       date_order not in DateParser.orders() -> {:error, :invalid_date_order}
-      default_role not in @roles -> {:error, :invalid_role}
+      default_role not in @roles -> {:error, :invalid_default_role}
       true -> {:ok, %{date_order: date_order, default_role: default_role}}
     end
   end

@@ -1157,6 +1157,44 @@ defmodule Palee.Organizations do
   end
 
   @doc """
+  ADR-254: the membership of a person an import brought in. Like
+  `add_demo_membership/2` it announces nothing: `:membership_activated`
+  starts the welcome, referral, trial and event reactions, and an import
+  sends nothing to anyone until staff choose to invite. An existing
+  membership is left as it is (its roles and status are the business's
+  current truth); a revoked one is reactivated with `params`.
+  """
+  def add_imported_membership(%{organization_id: organization_id} = context, params)
+      when is_binary(organization_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, params.user_id) do
+        %{status: :active} = membership ->
+          {:ok, membership}
+
+        _missing_or_inactive ->
+          params |> Map.put(:organization_id, organization_id) |> AddMembership.call()
+      end
+    end)
+  end
+
+  @doc """
+  ADR-254: undoing an import revokes the membership it added (the person
+  keeps their profile; their history is kept or reversed by Finance).
+  """
+  def remove_imported_membership(%{organization_id: organization_id} = context, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        nil ->
+          {:ok, nil}
+
+        membership ->
+          OrganizationStore.update_membership_status(organization_id, membership.id, :revoked)
+      end
+    end)
+  end
+
+  @doc """
   ADR-184: on activation the account the link names holds `roles` in the
   business (added to the roles it already has). Runs as that account: a
   person may write their own membership row.

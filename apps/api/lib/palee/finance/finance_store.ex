@@ -180,6 +180,10 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().extend_current_subscription(membership_id, days)
 
   @impl true
+  def cancel_subscription(membership_id, subscription_id),
+    do: adapter().cancel_subscription(membership_id, subscription_id)
+
+  @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)
   @impl true
   def update_referral_status(id, status), do: adapter().update_referral_status(id, status)

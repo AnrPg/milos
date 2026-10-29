@@ -222,6 +222,39 @@ defmodule PaleeWeb.FallbackController do
       {:conflict, "Only a refused or failed report can be sent again; this one is on its way"}
   }
 
+  # ADR-254: CSV imports.
+  @import_errors %{
+    import_file_missing: {:unprocessable_entity, "Attach a CSV file"},
+    file_too_large: {413, "The file is larger than 5 MB"},
+    empty_file: {:unprocessable_entity, "The file is empty"},
+    no_rows: {:unprocessable_entity, "The file has a header row but no people"},
+    too_many_rows: {:unprocessable_entity, "At most 20,000 rows per import; split the file"},
+    unbalanced_quotes:
+      {:unprocessable_entity, "A quote in the file is never closed; save it again as CSV"},
+    invalid_source: {:unprocessable_entity, "Choose one of the systems in the list"},
+    invalid_mapping:
+      {:unprocessable_entity,
+       "Map each field to one column at most, and at least a name, email or phone"},
+    invalid_date_order: {:unprocessable_entity, "Choose how dates are written: dmy, mdy or ymd"},
+    invalid_default_role: {:unprocessable_entity, "Choose member or athlete"},
+    import_not_editable: {:conflict, "This import was applied; its mapping can no longer change"},
+    import_not_applicable: {:conflict, "This import is being applied or was undone"},
+    import_already_applied: {:conflict, "Only an import that was never applied can be deleted"},
+    import_not_applied: {:conflict, "This import has not been applied"},
+    import_already_undone: {:conflict, "This import was already undone"},
+    undo_window_closed: {:conflict, "An import can be undone for 7 days after it finished"},
+    undo_incomplete:
+      {:conflict, "Some rows could not be undone; their changes were kept. Try again"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@import_errors, reason) do
+    {status, message} = Map.fetch!(@import_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do
     {status, message} = Map.fetch!(@fiscal_errors, reason)
 

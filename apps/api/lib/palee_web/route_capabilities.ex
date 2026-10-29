@@ -54,7 +54,9 @@ defmodule PaleeWeb.RouteCapabilities do
     # ADR-184: demo data and the activation request (owners and admins).
     W.AdminBusinessController => [:manage_settings],
     # ADR-191: partner perks.
-    W.AdminPerkController => [:manage_perks]
+    W.AdminPerkController => [:manage_perks],
+    # ADR-254: CSV imports (owners and admins hold manage_settings).
+    W.AdminImportController => [:manage_settings]
   }
 
   @actions %{

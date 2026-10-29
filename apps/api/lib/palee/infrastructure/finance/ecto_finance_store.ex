@@ -3636,6 +3636,30 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   def extend_current_subscription(_membership_id, _days), do: {:error, :invalid_days}
 
+  # ADR-254: undoing an import cancels the subscription it assigned.
+  @impl true
+  def cancel_subscription(membership_id, subscription_id) do
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership(membership_id),
+           %MembershipPackageSubscription{} = subscription <-
+             MembershipPackageSubscription
+             |> tenant_scope()
+             |> where([s], s.id == ^subscription_id and s.membership_id == ^membership.id)
+             |> lock("FOR UPDATE")
+             |> Repo.one(),
+           {:ok, cancelled} <-
+             subscription
+             |> MembershipPackageSubscription.changeset(%{"status" => "cancelled"})
+             |> Repo.update() do
+        refresh_entitlement_snapshot(membership.id)
+        normalize_subscription(cancelled)
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
   defp current_subscription(membership_id) do
     MembershipPackageSubscription
     |> tenant_scope()

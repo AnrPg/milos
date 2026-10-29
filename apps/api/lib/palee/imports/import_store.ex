@@ -38,8 +38,8 @@ defmodule Palee.Imports.ImportStore do
   def update_row(context, id, changes), do: tenant_call(context, :update_row, [id, changes])
 
   @impl true
-  def applied_fingerprint?(context, fingerprint),
-    do: tenant_call(context, :applied_fingerprint?, [fingerprint])
+  def applied_fingerprints(context, fingerprints),
+    do: tenant_call(context, :applied_fingerprints, [fingerprints])
 
   @impl true
   def row_counts(context, import_id), do: tenant_call(context, :row_counts, [import_id])

@@ -73,6 +73,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback open_attributed_referral(map()) :: {:ok, map()} | {:error, term()}
   @callback count_referral_events_since(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
   @callback referral_outcomes([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => map()}
+  @callback cancel_subscription(Ecto.UUID.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback extend_current_subscription(Ecto.UUID.t(), pos_integer()) ::
               {:ok, map()} | {:error, term()}
   @callback create_referral_event(map()) :: {:ok, map()} | {:error, term()}

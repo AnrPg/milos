@@ -12,6 +12,13 @@ defmodule Palee.Identity.UserStore do
 
   @impl true
   def demo_user_ids(organization_id), do: impl().demo_user_ids(organization_id)
+
+  @impl true
+  def create_held_person(organization_id, params),
+    do: impl().create_held_person(organization_id, params)
+
+  @impl true
+  def profiles_by_emails(emails), do: impl().profiles_by_emails(emails)
   @impl true
   def visible_user_ids(user_ids, viewer_id), do: impl().visible_user_ids(user_ids, viewer_id)
   @impl true

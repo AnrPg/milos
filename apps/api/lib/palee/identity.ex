@@ -15,6 +15,30 @@ defmodule Palee.Identity do
     to: UserStore,
     as: :create_demo_person
 
+  @doc """
+  ADR-254: registers a profile an import of `organization_id` brought in.
+  It is *held*: hidden like a mock person (only itself and the business's
+  staff see it) until the person proves the inbox, by verifying the email
+  or resetting the password, which releases it. The password is random and
+  never shown.
+  """
+  defdelegate register_held_person(organization_id, params),
+    to: UserStore,
+    as: :create_held_person
+
+  @doc "ADR-254: the profiles of each login email (normalized), for matching imported people."
+  defdelegate profiles_by_emails(emails), to: UserStore
+
+  @doc "ADR-187: a handle suggested from a name (nil when it has no Latin form)."
+  defdelegate suggest_handle(name), to: Palee.Identity.Domain.Handle, as: :suggest
+
+  @doc "ADR-187: the longest display name."
+  defdelegate display_name_max_length(), to: Palee.Identity.Domain.DisplayName, as: :max_length
+
+  @doc "ADR-254: whether a profile is held by an import and not yet claimed."
+  def held_user?(%{held_by_organization_id: organization_id}), do: not is_nil(organization_id)
+  def held_user?(_user), do: false
+
   @doc "Whether an account (or account id) is a mock person of some demo business."
   def demo_user?(%{demo_organization_id: organization_id}), do: not is_nil(organization_id)
 

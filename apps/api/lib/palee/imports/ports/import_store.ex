@@ -31,8 +31,8 @@ defmodule Palee.Imports.Ports.ImportStore do
   @callback save_plans(context(), id(), [map()]) :: :ok
   @callback lock_row(context(), id()) :: map() | nil
   @callback update_row(context(), id(), map()) :: {:ok, map()} | {:error, term()}
-  @doc "Whether a row with this fingerprint is applied in the business."
-  @callback applied_fingerprint?(context(), String.t()) :: boolean()
+  @doc "The fingerprints among the given ones that a row of the business has applied."
+  @callback applied_fingerprints(context(), [String.t()]) :: MapSet.t()
   @doc "`%{statuses: %{status => n}, outcomes: %{outcome => n}}` of an import's rows."
   @callback row_counts(context(), id()) :: map()
 

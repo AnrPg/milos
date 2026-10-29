@@ -364,6 +364,13 @@ defmodule Palee.Finance do
   def extend_current_subscription(context, membership_id, days),
     do: scoped(context, fn -> FinanceStore.extend_current_subscription(membership_id, days) end)
 
+  @doc """
+  ADR-254: cancels one subscription of `membership_id` (undoing an import
+  that assigned it) and refreshes the member's entitlement.
+  """
+  def cancel_subscription(context, membership_id, subscription_id),
+    do: scoped(context, fn -> FinanceStore.cancel_subscription(membership_id, subscription_id) end)
+
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
 
   def create_referral_event(context, params),

@@ -1168,6 +1168,18 @@ defmodule PaleeWeb.Router do
       :retry
     )
 
+    # ADR-254: CSV imports.
+    get("/imports/catalog", AdminImportController, :catalog)
+    get("/imports", AdminImportController, :index)
+    post("/imports", AdminImportController, :create)
+    get("/imports/:id", AdminImportController, :show)
+    get("/imports/:id/rows", AdminImportController, :rows)
+    post("/imports/:id/preview", AdminImportController, :preview)
+    post("/imports/:id/apply", AdminImportController, :apply)
+    post("/imports/:id/invitations", AdminImportController, :invitations)
+    post("/imports/:id/undo", AdminImportController, :undo)
+    delete("/imports/:id", AdminImportController, :delete)
+
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
     get("/shop/reports/sales", AdminShopReportController, :sales)

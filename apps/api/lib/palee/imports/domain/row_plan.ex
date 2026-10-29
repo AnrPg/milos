@@ -108,6 +108,50 @@ defmodule Palee.Imports.Domain.RowPlan do
   defp canonical(value), do: to_string(value)
 
   @doc """
+  Who the row's person is, from `index` (what the caller knows of the
+  business, all keys optional):
+
+    * `members` – `%{user_id => client?}` of the active members;
+    * `profiles_by_email` – `%{email => [user_id]}` of every login;
+    * `people_by_email`, `people_by_phone` – `%{key => user_id}` of the
+      people imports brought in before;
+    * `planned_by_email`, `planned_by_phone` – `%{key => row_number}` of
+      people earlier rows of this file will create.
+
+  Email first, then phone: a member of the business with that email; a
+  person imported before with that email; then with that phone (last 10
+  digits); then a person an earlier row creates. An email of a Palee
+  account that is not in the business matches nobody: the import never
+  tells staff which addresses have an account (ADR-211), and never adds
+  someone's own account to a business without them.
+  """
+  def match(values, index) do
+    email = values["email"]
+    phone = values["phone"] && Values.phone_key(values["phone"])
+    members = index[:members] || %{}
+
+    member =
+      email &&
+        Enum.find(Map.get(index[:profiles_by_email] || %{}, email, []), &Map.has_key?(members, &1))
+
+    imported =
+      (email && get_in(index, [:people_by_email, email])) ||
+        (phone && get_in(index, [:people_by_phone, phone]))
+
+    planned =
+      (email && get_in(index, [:planned_by_email, email])) ||
+        (phone && get_in(index, [:planned_by_phone, phone]))
+
+    cond do
+      member -> {:member, member, Map.fetch!(members, member)}
+      imported && Map.has_key?(members, imported) -> {:member, imported, members[imported]}
+      imported -> {:imported, imported}
+      planned -> {:planned, planned}
+      true -> :new
+    end
+  end
+
+  @doc """
   The plan of one row. `facts`:
 
     * `:person` – `{:member, user_id, client?}` (already in the business),
@@ -140,11 +184,13 @@ defmodule Palee.Imports.Domain.RowPlan do
       Enum.any?(~w(email phone name), &(not is_nil(values[&1]))) or
         not is_nil(values["external_id"])
 
+    named? = not is_nil(values["name"])
+
     case facts[:person] || :new do
       _any when not identified? ->
         result("invalid", [], warnings, [warning("missing_person")])
 
-      :new when is_nil(values["name"]) ->
+      :new when not named? ->
         result("invalid", [], warnings, [warning("missing_name", "full_name")])
 
       :new ->
