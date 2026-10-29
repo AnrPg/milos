@@ -137,6 +137,8 @@ defmodule Palee.Application.Payments.TerminalPayments do
     end
   end
 
+  defp resolve(_context, _purpose, _params), do: {:error, :invalid_payment_purpose}
+
   # ADR-264: a walk-in (no member) may pay a free sale too.
   defp free_sale_payer(_context, nil), do: {:ok, nil}
   defp free_sale_payer(context, user_id), do: member(context, user_id)
@@ -146,8 +148,6 @@ defmodule Palee.Application.Payments.TerminalPayments do
     |> then(&if(category, do: Map.put(&1, "charge_category", category), else: &1))
     |> then(&if(is_nil(user_id), do: Map.put(&1, "walk_in", true), else: &1))
   end
-
-  defp resolve(_context, _purpose, _params), do: {:error, :invalid_payment_purpose}
 
   defp member(_context, nil), do: {:error, :terminal_member_required}
 
