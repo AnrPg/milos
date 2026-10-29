@@ -429,7 +429,7 @@ defmodule Palee.Community do
 
   defdelegate list_profile_comments(context, post_id), to: SocialStore
   defdelegate list_profile_posts(context, filter), to: SocialStore
-  defdelegate count_profile_posts(context, author_id), to: SocialStore
+  defdelegate count_profile_posts(context, author_id, filter \\ %{}), to: SocialStore
 
   # Audiences (ADR-142).
   def audiences, do: AudiencePolicy.audiences()

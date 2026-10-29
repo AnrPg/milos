@@ -92,6 +92,11 @@ defmodule Palee.Finance.FinanceStore do
   def get_effective_entitlement(user_id), do: adapter().get_effective_entitlement(user_id)
   @impl true
   def package_coverage(user_id, requests), do: adapter().package_coverage(user_id, requests)
+
+  @impl true
+  def check_entitlements(user_id, requests),
+    do: adapter().check_entitlements(user_id, requests)
+
   @impl true
   def reserve_entitlement(user_id, request), do: adapter().reserve_entitlement(user_id, request)
   @impl true

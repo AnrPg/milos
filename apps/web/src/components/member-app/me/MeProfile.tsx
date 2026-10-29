@@ -10,9 +10,10 @@ import { listPRs, type PRRecord } from "@/api/gamification";
 import { clubInitials, withoutPinned } from "@/components/community/community";
 import { useFeed, useMyClubs } from "@/components/community/use-community";
 import { useSession } from "@/components/session-provider";
+import { MediaGrid } from "@/components/social/MediaGrid";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-const TABS = ["posts", "prs", "clubs"] as const;
+const TABS = ["posts", "media", "prs", "clubs"] as const;
 type Tab = (typeof TABS)[number];
 
 const MY_POSTS = { mine: true };
@@ -20,25 +21,28 @@ const SHOWN_PRS = 6;
 
 /**
  * Εγώ's profile half (vision §7.11, mockup «me/mePRs/meClubs»): counts, then
- * «Αναρτήσεις · PRs · Clubs» as tabs: a grid of my posts, my latest PRs and
- * my clubs, as the people who follow me see them. The fixed list follows.
+ * «Αναρτήσεις · Πολυμέσα · PRs · Clubs» as tabs: a grid of my posts, my
+ * photos and videos (ADR-231), my latest PRs and my clubs, as the people who
+ * follow me see them. The fixed list follows.
  */
-export function MeProfile({ postsCount }: { postsCount: number }) {
+export function MeProfile({ postsCount, mediaCount }: { postsCount: number; mediaCount: number }) {
   const t = useTranslations("Social");
   const tMe = useTranslations("MemberApp");
   const [tab, setTab] = useState<Tab>("posts");
+  const { currentUser } = useSession();
   const clubs = useMyClubs();
   const prs = useMyPrs();
   const shown = profilePrs(prs.data);
   const counts: Record<Tab, number> = {
     posts: postsCount,
+    media: mediaCount,
     prs: shown.length,
     clubs: clubs.data?.length ?? 0,
   };
 
   return (
     <section aria-label={tMe("meProfileTabs")} className="flex flex-col gap-3">
-      <div role="tablist" aria-label={tMe("meProfileTabs")} className="grid grid-cols-3 rounded-3xl p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div role="tablist" aria-label={tMe("meProfileTabs")} className="grid grid-cols-4 rounded-3xl p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {TABS.map((value) => (
           <button
             key={value}
@@ -61,6 +65,7 @@ export function MeProfile({ postsCount }: { postsCount: number }) {
       </div>
       <div role="tabpanel" id="me-tabpanel" aria-labelledby={`me-tab-${tab}`}>
         {tab === "posts" ? <PostsGrid /> : null}
+        {tab === "media" && currentUser ? <MediaGrid personId={currentUser.id} lock={null} mine /> : null}
         {tab === "prs" ? <PrList shown={shown} hidden={(prs.data?.length ?? 0) - shown.length} pending={prs.isPending} /> : null}
         {tab === "clubs" ? <ClubList /> : null}
       </div>

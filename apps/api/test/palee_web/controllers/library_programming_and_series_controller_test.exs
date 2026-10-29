@@ -272,6 +272,22 @@ defmodule PaleeWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(201)
       |> Map.fetch!("booking")
 
+    options =
+      admin_conn
+      |> recycle()
+      |> get("/api/org/#{organization.slug}/admin/users/#{member.id}/class-placement")
+      |> json_response(200)
+
+    assert options["timezone"] == Organizations.organization_timezone(organization.id)
+    assert [%{"booking_id" => booked_id, "slot_id" => booked_slot_id}] = options["bookings"]
+    assert {booked_id, booked_slot_id} == {booking["id"], morning["id"]}
+
+    assert [%{"slot_id" => evening_id, "blocked_reason" => nil}] =
+             Enum.filter(options["classes"], &(&1["slot_id"] == evening["id"]))
+
+    assert evening_id == evening["id"]
+    refute Enum.any?(options["classes"], &(&1["slot_id"] == morning["id"]))
+
     placement =
       admin_conn
       |> recycle()
@@ -311,6 +327,12 @@ defmodule PaleeWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(422)
 
     assert rejected["code"] == "class_placement_requires_member"
+
+    assert admin_conn
+           |> recycle()
+           |> get("/api/org/#{organization.slug}/admin/users/#{athlete.id}/class-placement")
+           |> json_response(422)
+           |> Map.fetch!("code") == "class_placement_requires_member"
   end
 
   test "athlete profile can save a newly-created WOD in a folder and assign that same copy",

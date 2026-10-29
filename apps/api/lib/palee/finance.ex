@@ -229,6 +229,13 @@ defmodule Palee.Finance do
   def package_coverage(context, user_id, requests),
     do: scoped(context, fn -> FinanceStore.package_coverage(user_id, requests) end)
 
+  @doc """
+  Per booking request, whether `reserve_entitlement/3` would take it now
+  (`:ok`) or refuse it (`{:error, reason}`), without reserving anything.
+  """
+  def check_entitlements(context, user_id, requests),
+    do: scoped(context, fn -> FinanceStore.check_entitlements(user_id, requests) end)
+
   def reserve_entitlement(context, user_id, request),
     do: scoped(context, fn -> reserve_entitlement(user_id, request) end)
 

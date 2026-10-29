@@ -37,6 +37,7 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback get_effective_entitlement(Ecto.UUID.t()) :: map() | nil
   @callback package_coverage(Ecto.UUID.t(), [map()]) :: [boolean()]
   @callback reserve_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback check_entitlements(Ecto.UUID.t(), [map()]) :: [:ok | {:error, atom()}]
   @callback finalize_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback release_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback grant_allowance(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::

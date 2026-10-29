@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { fetchAdminUserSchedule, placeAdminUserInClass } from "@/api/admin-users";
-import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
+import { fetchClassPlacementOptions, placeAdminUserInClass, type ClassPlacementOptions } from "@/api/admin-users";
+import { ApiError } from "@/api/client";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { useUiLocale } from "@/i18n/use-ui-locale";
+import { zonedText } from "@/lib/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { placementBlocked, placementReasonKey } from "@/components/admin/users/class-placement";
 
 type Props = {
   token: string;
@@ -18,73 +21,49 @@ type Props = {
   onPlaced: () => void;
 };
 
-type MemberBooking = { bookingId: string; slotId: string; label: string };
-
-const LOOKAHEAD_DAYS = 30;
-
-function isoDate(date: Date) {
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-  return local.toISOString().slice(0, 10);
-}
-
-function slotLabel(name: string, scheduledAt: string) {
-  const when = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(scheduledAt));
-  return `${when} · ${name}`;
-}
-
+/**
+ * ADR-232: staff book a member into a class, or move one of their upcoming
+ * bookings to another class. The API lists what can be chosen and why a
+ * class cannot take the member; times read on the box's clock (ADR-179).
+ */
 export function MemberClassPlacementModal({ token, userId, nickname, onClose, onPlaced }: Props) {
   const i18n = useUiTranslations();
-  const [bookings, setBookings] = useState<MemberBooking[]>([]);
-  const [slots, setSlots] = useState<ScheduleSlot[]>([]);
+  const locale = useUiLocale();
+  const [options, setOptions] = useState<ClassPlacementOptions | null>(null);
   const [fromBookingId, setFromBookingId] = useState("");
   const [targetSlotId, setTargetSlotId] = useState("");
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loading = options === null && error === null;
+  const moving = fromBookingId !== "";
 
   useEffect(() => {
     let cancelled = false;
-    const start = new Date();
-    const end = new Date();
-    end.setDate(end.getDate() + LOOKAHEAD_DAYS);
-
-    void Promise.all([
-      fetchAdminUserSchedule(token, userId, isoDate(start), isoDate(end)),
-      fetchSchedule(token, { startAt: start.toISOString(), endAt: end.toISOString(), days: LOOKAHEAD_DAYS, classTypeIds: [] }),
-    ])
-      .then(([memberSchedule, window]) => {
-        if (cancelled) return;
-        const now = Date.now();
-        setBookings(memberSchedule.items.flatMap((item) => {
-          const booking = item.user_booking as { id?: unknown } | undefined;
-          const scheduledAt = typeof item.scheduled_at === "string" ? item.scheduled_at : "";
-          if (typeof booking?.id !== "string" || typeof item.id !== "string" || !scheduledAt || new Date(scheduledAt).getTime() <= now) return [];
-          return [{ bookingId: booking.id, slotId: item.id, label: slotLabel(String(item.name ?? ""), scheduledAt) }];
-        }));
-        setSlots((window.slots ?? []).filter((slot) => new Date(slot.scheduled_at).getTime() > now));
+    fetchClassPlacementOptions(token, userId)
+      .then((result) => {
+        if (!cancelled) setOptions(result);
       })
       .catch((reason) => {
         if (!cancelled) setError(localizeAdminAssignmentError(reason, i18n));
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
       });
-
     return () => {
       cancelled = true;
     };
   }, [i18n, token, userId]);
 
-  useEffect(() => {
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
+  const when = (at: string) => zonedText(at, options?.timezone, locale, "day-time");
+  const reason = (code: string | null | undefined) => {
+    const key = placementReasonKey(code);
+    return key ? i18n(key) : null;
+  };
+  const classes = options?.classes ?? [];
+  const target = classes.find((option) => option.slot_id === targetSlotId) ?? null;
 
-  const bookedSlotIds = useMemo(() => new Set(bookings.map((booking) => booking.slotId)), [bookings]);
-  const targetSlots = slots.filter((slot) => !bookedSlotIds.has(slot.id));
+  function chooseFrom(bookingId: string) {
+    setFromBookingId(bookingId);
+    // A class that a move could take may not take a new booking.
+    if (target && placementBlocked(target, bookingId !== "")) setTargetSlotId("");
+  }
 
   async function submit() {
     if (!targetSlotId) return;
@@ -94,8 +73,9 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
       await placeAdminUserInClass(token, userId, { slot_id: targetSlotId, from_booking_id: fromBookingId || null });
       onPlaced();
       onClose();
-    } catch (reason) {
-      setError(localizeAdminAssignmentError(reason, i18n));
+    } catch (failure) {
+      const key = placementReasonKey(failure instanceof ApiError ? failure.payload.code : null);
+      setError(key && key !== "placementReasonOther" ? i18n("placementRefused", { reason: i18n(key) }) : localizeAdminAssignmentError(failure, i18n));
     } finally {
       setSaving(false);
     }
@@ -121,33 +101,45 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
             {i18n("cancel77dfd21")}
           </button>
           <button type="submit" disabled={!targetSlotId || saving || loading} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-            {saving ? i18n("featureMovePlacing") : i18n("featureConfirmMove")}
+            {saving ? i18n("featureMovePlacing") : moving ? i18n("placementConfirmMove") : i18n("featureConfirmMove")}
           </button>
         </>
       }
     >
         <label className="block text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {i18n("featureMoveFromBooking")}
-          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={fromBookingId} disabled={loading} onValueChange={(value) => setFromBookingId(value)}>
+          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={fromBookingId} disabled={loading} onValueChange={chooseFrom} data-testid="placement-from">
             <option value="">{i18n("featureNoCurrentBooking")}</option>
-            {bookings.map((booking) => <option key={booking.bookingId} value={booking.bookingId}>{booking.label}</option>)}
-          </Select>
-        </label>
-
-        <label className="mt-4 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
-          {i18n("featureTargetClass")}
-          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={targetSlotId} disabled={loading} onValueChange={(value) => setTargetSlotId(value)}>
-            <option value="">{i18n("featureChooseClass")}</option>
-            {targetSlots.map((slot) => (
-              <option key={slot.id} value={slot.id} disabled={slot.spots_remaining <= 0}>
-                {slotLabel(slot.name, slot.scheduled_at)} · {i18n("featureSpotsLeft", { count: Math.max(slot.spots_remaining, 0) })}
+            {(options?.bookings ?? []).map((booking) => (
+              <option key={booking.booking_id} value={booking.booking_id}>
+                {when(booking.scheduled_at)} · {booking.name}
+                {booking.status === "pending" ? ` · ${i18n("placementPendingBooking")}` : ""}
               </option>
             ))}
           </Select>
         </label>
 
-        {!loading && targetSlots.length === 0 ? (
-          <p className="mt-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("featureNoUpcomingClasses")}</p>
+        <label className="mt-4 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
+          {i18n("featureTargetClass")}
+          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={targetSlotId} disabled={loading} onValueChange={(value) => setTargetSlotId(value)} data-testid="placement-target">
+            <option value="">{i18n("placementChooseClass")}</option>
+            {classes.map((option) => {
+              const blocked = placementBlocked(option, moving);
+              const detail = blocked ? reason(option.blocked_reason) : i18n("featureSpotsLeft", { count: option.spots_remaining });
+              return (
+                <option key={option.slot_id} value={option.slot_id} disabled={blocked}>
+                  {when(option.scheduled_at)} · {option.name} · {detail}
+                </option>
+              );
+            })}
+          </Select>
+        </label>
+
+        {moving ? (
+          <p className="mt-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("placementMoveNote")}</p>
+        ) : null}
+        {!loading && options && classes.length === 0 ? (
+          <p className="mt-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("featureNoUpcomingClasses", { days: options.lookahead_days })}</p>
         ) : null}
         {error ? <ErrorNotice className="mt-3">{error}</ErrorNotice> : null}
 

@@ -902,6 +902,7 @@ defmodule PaleeWeb.Router do
     get("/users/:id/history", TrainingHistoryController, :for_user)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
+    get("/users/:id/class-placement", AdminUserController, :class_placement_options)
     post("/users/:id/class-placement", AdminUserController, :place_in_class)
     get("/users/:id/incidents", AdminUserController, :incidents)
     get("/users/:id/messages", AdminUserController, :messages)
@@ -1688,6 +1689,7 @@ defmodule PaleeWeb.Router do
     delete("/profile-post-comments/:id", ProfilePostController, :delete_comment)
     get("/people/:id", PeopleController, :show)
     get("/people/:id/posts", PeopleController, :posts)
+    get("/people/:id/media", PeopleController, :media)
     # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
     get("/boxes/:slug/schedule", PublicBoxController, :schedule)
     get("/boxes/:slug/posts", PublicBoxController, :posts)

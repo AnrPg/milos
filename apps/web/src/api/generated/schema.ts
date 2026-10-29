@@ -7995,9 +7995,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** What staff can choose when booking a member into a class or moving them (ADR-232) */
+        get: operations["PaleeWeb.AdminUserController.class_placement_options"];
         put?: never;
-        /** Book a member into a class, optionally moving them out of an existing booking */
+        /** Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232) */
         post: operations["PaleeWeb.AdminUserController.place_in_class"];
         delete?: never;
         options?: never;
@@ -12377,6 +12378,23 @@ export interface paths {
         };
         /** A person: name, avatar, counts and both follow relationships */
         get: operations["PaleeWeb.PeopleController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/{id}/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ADR-231: the «Πολυμέσα» grid, a person's posts with photos or a video you may read */
+        get: operations["PaleeWeb.PeopleController.media"];
         put?: never;
         post?: never;
         delete?: never;
@@ -34855,6 +34873,8 @@ export interface components {
             };
             followers_count: number;
             following_count: number;
+            /** @description ADR-231: your posts with photos or a video */
+            media_count: number;
             /**
              * MemberVisibility
              * @description Whether you keep out of your clubs' «Μέλη» lists
@@ -58107,6 +58127,8 @@ export interface operations {
                         };
                         followers_count: number;
                         following_count: number;
+                        /** @description ADR-231: your posts with photos or a video */
+                        media_count: number;
                         /**
                          * MemberVisibility
                          * @description Whether you keep out of your clubs' «Μέλη» lists
@@ -79244,6 +79266,55 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminUserController.class_placement_options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class placement options */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bookings: {
+                            /** Format: uuid */
+                            booking_id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            slot_id: string;
+                            /** @enum {string} */
+                            status: "pending" | "approved";
+                        }[];
+                        classes: {
+                            /** @description Why the class cannot take the member now, as the booking error code (slot_full, class_paused, class_not_published, already_booked, finance_*), or null. */
+                            blocked_reason: string | null;
+                            capacity: number | null;
+                            duration_minutes: number | null;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            slot_id: string;
+                            spots_remaining: number;
+                        }[];
+                        lookahead_days: number;
+                        /** @description The box's IANA time zone (ADR-179). */
+                        timezone: string;
                     };
                 };
             };
@@ -102787,6 +102858,312 @@ export interface operations {
                         nickname?: string | null;
                         /** @description ADR-193: following them is a request */
                         private: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PeopleController.media": {
+        parameters: {
+            query?: {
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Posts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        posts: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
+                        }[];
                     };
                 };
             };

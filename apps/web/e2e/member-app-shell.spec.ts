@@ -107,11 +107,36 @@ async function stubMemberApi(page: Page) {
   await page.route("**/api/me/social", (route) =>
     route.fulfill(
       json({
-        posts_count: 0,
+        posts_count: 1,
+        media_count: 1,
         followers_count: 0,
         following_count: 0,
         requests_count: 0,
         booking_sharing: { enabled: false, offered: false },
+      }),
+    ),
+  );
+  // ADR-231: Me's «Media» tab reads the same grid as the public profile.
+  await page.route("**/api/people/member-1/media**", (route) =>
+    route.fulfill(
+      json({
+        posts: [
+          {
+            id: "post-media-1",
+            origin: "profile",
+            audience: "public",
+            author: { id: "member-1", nickname: "Maria L", avatar_url: null },
+            body: "Morning lifts",
+            media: [{ id: "m-1", kind: "image", status: "ready", thumb_url: "/icon.svg", feed_url: "/icon.svg", alt_text: "Barbell on the floor", width: 1080, height: 1080 }],
+            media_status: "ready",
+            kudos_count: 0,
+            comment_count: 0,
+            kudos_by_me: false,
+            can_delete: true,
+            inserted_at: new Date().toISOString(),
+          },
+        ],
+        next_cursor: null,
       }),
     ),
   );
@@ -518,6 +543,12 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("link", { name: /Payments & receipts/ })).toHaveAttribute("href", "/me/payments");
     // ADR-196: the fixed §7.11 list; tour and first steps live in Help & tour.
     await expect(page.getByRole("button", { name: "Take the tour" })).toHaveCount(0);
+    // ADR-231: «Posts · Media · PRs · Clubs»; Media is my photos and videos only.
+    const mediaTab = page.getByRole("tab", { name: /Media/ });
+    await expect(mediaTab).toContainText("1");
+    await mediaTab.click();
+    await expect(page.getByTestId("media-grid").getByRole("button", { name: "Photo: Barbell on the floor" })).toBeVisible();
+    await page.getByRole("tab", { name: /Posts/ }).click();
     await page.screenshot({ path: "test-results/member-app/me.png", fullPage: true });
     await page.getByRole("link", { name: /Help & tour/ }).click();
     await expect(page).toHaveURL(/\/me\/help$/);
