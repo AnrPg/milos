@@ -23,7 +23,8 @@ export function SectionCard({ section, index }: { section: PlanEditorSection; in
   const sum = summary(plan);
   const what = sum.names.map((block) => block.map((n) => (n.perSide ? `${n.name} (${t("perSide")})` : n.name)).join(" + ")).join(" / ");
   const params = sum.params.map(words).join(" · ");
-  const presetKey = plan.preset ? `PlanCore.preset.${plan.preset}` : null;
+  const core = useTranslations("PlanCore");
+  const preset = plan.preset ? core(`preset.${plan.preset}`) : null;
 
   return (
     <button
@@ -38,9 +39,9 @@ export function SectionCard({ section, index }: { section: PlanEditorSection; in
         {sectionLetter(index)}
       </span>
       <span className="font-bold" style={{ color: "var(--primary)" }}>{k(FLOWS[plan.flow].labelKey)}</span>
-      {presetKey ? (
+      {preset ? (
         <span className="rounded-full border border-dashed px-2 text-xs" title={t("presetChip")} style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}>
-          {k(presetKey)}
+          {preset}
         </span>
       ) : null}
       {section.name ? <b className="min-w-0 break-words text-sm">{section.name}</b> : null}

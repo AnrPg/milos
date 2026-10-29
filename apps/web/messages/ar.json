@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "مع مقاطعات"
+      "interrupt": "مع مقاطعات",
+      "kcal_target": "هدف السعرات",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} مجموعات",
@@ -12181,7 +12184,8 @@
       "done": "مكتمل",
       "total_reps": "التكرارات (المجموع)",
       "lowest_round": "أضعف جولة",
-      "distance": "المسافة"
+      "distance": "المسافة",
+      "load": "الحمل (أفضل مجموعة)"
     },
     "levelNotes": "ملاحظات حسب المستوى",
     "sectionNote": "ملاحظة القسم",
@@ -12820,7 +12824,7 @@
     "load": "الوزن",
     "logTitle": "ما قمت به فعلًا (اختياري)",
     "logReps": "التكرارات المنجزة",
-    "logLoad": "الوزن المستخدم",
+    "logLoad": "الوزن المستخدم (كغ)",
     "pctOfMax": "≈ {kg} كغ من أقصى وزن لك (1RM)",
     "cap": "الحد {time}",
     "clock": "ساعة القسم",

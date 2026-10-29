@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 
 import type { PlanWizardStep } from "@/stores/structured-plan";
 
-import { keyLabel } from "./keymap";
+import { KEYS, keyLabel } from "./keymap";
 
 type HintKey = "section" | "open" | "newSection" | "all" | "search" | "choose" | "continue" | "close" | "nextField" | "nextStep" | "back" | "newExercise" | "actions" | "differentRound" | "score";
 
@@ -15,12 +15,12 @@ type HintKey = "section" | "open" | "newSection" | "all" | "search" | "choose" |
 export function HintBar({ open, step, mac, status }: { open: boolean; step: PlanWizardStep; mac: boolean; status: string | null }) {
   const t = useTranslations("PlanEditor");
   const items: [string, HintKey][] = !open
-    ? [["↑ ↓", "section"], ["Enter", "open"], ["Shift+Enter", "newSection"], ["?", "all"]]
+    ? [[KEYS.arrows, "section"], [KEYS.enter, "open"], [KEYS.newSection, "newSection"], [KEYS.sheet, "all"]]
     : step === 0
-      ? [["↑ ↓", "choose"], ["Enter", "continue"], ["Esc", "close"]]
+      ? [[KEYS.arrows, "choose"], [KEYS.enter, "continue"], [KEYS.esc, "close"]]
       : step !== 2
-        ? [["Tab", "nextField"], ["Enter", "nextStep"], ["Alt+←", "back"], ["Esc", "close"]]
-        : [["Enter", "newExercise"], ["Alt+M", "actions"], ["Alt+S", "differentRound"], ["?", "all"]];
+        ? [[KEYS.tab, "nextField"], [KEYS.enter, "nextStep"], [KEYS.back, "back"], [KEYS.esc, "close"]]
+        : [[KEYS.enter, "newExercise"], [KEYS.actions, "actions"], [KEYS.differentRound, "differentRound"], [KEYS.sheet, "all"]];
   return (
     <div
       data-testid="plan-hint-bar"

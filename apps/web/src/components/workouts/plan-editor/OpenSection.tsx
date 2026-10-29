@@ -6,6 +6,7 @@ import { FLOWS } from "@/lib/structured-plan";
 import { stepAvailable, usePlanEditorStore, type PlanEditorSection, type PlanWizardStep } from "@/stores/structured-plan";
 
 import { PlanGrid } from "./grid";
+import { KEYS, stepKey } from "./keymap";
 import { useKeyText } from "./plan-text";
 import { sectionLetter } from "./SectionCard";
 import { StepFlow } from "./StepFlow";
@@ -71,7 +72,7 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
                 data-testid={`plan-step-${id}`}
                 aria-current={current ? "step" : undefined}
                 disabled={!stepAvailable(plan.flow, s)}
-                title={`Alt+${n + 1}`}
+                title={stepKey(n + 1)}
                 onClick={() => setStep(s)}
                 className="rounded-full px-2.5 py-1 text-sm font-semibold disabled:opacity-40 max-sm:min-h-10"
                 style={current ? { background: "var(--selection)", color: "var(--primary)" } : { color: "var(--muted)" }}
@@ -95,8 +96,8 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
               {t("back")}
             </button>
           ) : null}
-          <Kbd>Alt+←</Kbd>
-          <Kbd>Alt+→</Kbd>
+          <Kbd>{KEYS.back}</Kbd>
+          <Kbd>{KEYS.next}</Kbd>
           {!fresh ? (
             <button
               type="button"
@@ -111,7 +112,7 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
         </span>
         {step === 0 ? (
           <span className="flex items-center gap-1.5 text-xs max-sm:hidden" style={{ color: "var(--muted)" }}>
-            {t("pickHelp")} <Kbd>↑ ↓</Kbd> <Kbd>Enter</Kbd>
+            {t("pickHelp")} <Kbd>{KEYS.arrows}</Kbd> <Kbd>{KEYS.enter}</Kbd>
           </span>
         ) : (
           <button

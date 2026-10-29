@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Mit Unterbrechung"
+      "interrupt": "Mit Unterbrechung",
+      "kcal_target": "Kalorienziel",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} Sätze",
@@ -12181,7 +12184,8 @@
       "done": "Geschafft",
       "total_reps": "Wiederholungen (gesamt)",
       "lowest_round": "Schwächste Runde",
-      "distance": "Distanz"
+      "distance": "Distanz",
+      "load": "Gewicht (bester Satz)"
     },
     "levelNotes": "Hinweise pro Stufe",
     "sectionNote": "Hinweis zum Abschnitt",
@@ -12820,7 +12824,7 @@
     "load": "Last",
     "logTitle": "Was du tatsächlich gemacht hast (optional)",
     "logReps": "Geschaffte Wiederholungen",
-    "logLoad": "Verwendete Last",
+    "logLoad": "Verwendete Last (kg)",
     "pctOfMax": "≈ {kg} kg deines 1RM",
     "cap": "Limit {time}",
     "clock": "Uhr des Abschnitts",

@@ -73,6 +73,23 @@ export function matchPlanShortcut(e: KeyEventLike, { mac, inText }: { mac: boole
   return null;
 }
 
+/** The key combinations the editor shows (hint bar, step tabs, footer), before `keyLabel`. */
+export const KEYS = {
+  arrows: "↑ ↓",
+  enter: "Enter",
+  tab: "Tab",
+  esc: "Esc",
+  sheet: "?",
+  newSection: "Shift+Enter",
+  back: "Alt+←",
+  next: "Alt+→",
+  actions: "Alt+M",
+  differentRound: "Alt+S",
+} as const;
+
+/** Alt+1 … Alt+4: jump to a wizard step. */
+export const stepKey = (n: number) => `Alt+${n}`;
+
 /** Key labels as the coach's keyboard shows them. */
 export function keyLabel(keys: string, mac: boolean): string {
   return keys

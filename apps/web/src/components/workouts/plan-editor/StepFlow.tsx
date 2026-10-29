@@ -168,7 +168,7 @@ export function StepFlow({ section }: { section: PlanEditorSection }) {
                       ? option(
                           r,
                           <Marked text={k(r.item.preset.labelKey)} marks={r.onLabel ? r.marks : []} />,
-                          "rounded-full border border-dashed px-3 py-1 text-sm font-semibold max-sm:inline-flex max-sm:min-h-10 max-sm:items-center",
+                          "flex min-h-10 items-center rounded-full border border-dashed px-3 py-1 text-sm font-semibold sm:min-h-0",
                           { background: "var(--panel)", borderColor: "var(--border-strong)" },
                         )
                       : null,

@@ -12717,7 +12717,7 @@
     "load": "Load",
     "logTitle": "What you actually did (optional)",
     "logReps": "Reps done",
-    "logLoad": "Load used",
+    "logLoad": "Load used (kg)",
     "pctOfMax": "≈ {kg} kg of your 1RM",
     "cap": "Cap {time}",
     "clock": "Section clock",
