@@ -335,4 +335,87 @@ defmodule PaleeWeb.Schemas.StructuredPlan do
       additionalProperties: false
     }
   end
+
+  @actual_numbers ~w(prescribed_reps prescribed_load_kg prescribed_load_pct one_rep_max_kg actual_reps actual_load_kg)a
+
+  defp actual_properties do
+    numbers =
+      Map.new(@actual_numbers, &{&1, %Schema{type: :number, minimum: 0, nullable: true}})
+
+    Map.merge(numbers, %{
+      section_id: %Schema{type: :string, format: :uuid},
+      row_id: %Schema{type: :string, maxLength: 200},
+      exercise_name: %Schema{type: :string, maxLength: 200},
+      exercise_ref: %Schema{type: :string, maxLength: 200, nullable: true},
+      block_index: %Schema{
+        type: :integer,
+        minimum: -1,
+        maximum: 11,
+        description: "The row's block; -1 for an interruption row"
+      },
+      round_index: %Schema{
+        type: :integer,
+        minimum: 1,
+        description: "1-based set / round / slot / interval; for an interruption, which one"
+      },
+      part_index: %Schema{type: :integer, minimum: 0, description: "Cluster / drop part"},
+      phase_index: %Schema{type: :integer, minimum: 0, description: "AMRAP window, EMOM slot"},
+      interrupt: %Schema{type: :boolean},
+      prescribed_reps_text: %Schema{type: :string, maxLength: 200},
+      prescribed_load_text: %Schema{type: :string, maxLength: 200},
+      logged: %Schema{
+        type: :boolean,
+        description: "The athlete typed a value (otherwise actual = prescribed)"
+      }
+    })
+  end
+
+  @doc "ADR-270: one set / round of a plan row as done, sent with the completion."
+  def plan_actual_schema do
+    %Schema{
+      title: "PlanSetActual",
+      type: :object,
+      description:
+        "ADR-270: one set / round of a structured plan row, prescribed next to actual " <>
+          "(checked by Palee.Execution.Domain.PlanActuals)",
+      properties: actual_properties(),
+      required: [:block_index, :round_index, :row_id, :section_id]
+    }
+  end
+
+  @doc "ADR-270: a stored plan actual, as execution reads show it."
+  def plan_set_schema do
+    properties = actual_properties()
+
+    %Schema{
+      title: "ExecutionPlanSet",
+      type: :object,
+      properties: properties,
+      required: properties |> Map.keys() |> Enum.sort(),
+      additionalProperties: false
+    }
+  end
+
+  @doc "An execution read with its plan actuals typed; the rest stays open."
+  def execution_response_schema do
+    %Schema{
+      title: "ExecutionResponse",
+      type: :object,
+      properties: %{
+        execution: %Schema{
+          type: :object,
+          properties: %{
+            plan_sets: %Schema{
+              type: :array,
+              items: plan_set_schema(),
+              description:
+                "ADR-270: plan actuals of a completed structured_plan execution, in run order"
+            }
+          },
+          additionalProperties: true
+        }
+      },
+      required: [:execution]
+    }
+  end
 end

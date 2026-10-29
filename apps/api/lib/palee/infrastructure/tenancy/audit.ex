@@ -98,7 +98,8 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
   )
 
   @ready_personal_tables ~w(
-    workout_executions execution_progress_operations notifications push_subscriptions
+    workout_executions execution_progress_operations execution_plan_sets
+    notifications push_subscriptions
     native_push_tokens widget_tokens
     community_follows community_profile_posts community_profile_post_reactions
     community_profile_post_comments community_social_settings community_user_blocks
