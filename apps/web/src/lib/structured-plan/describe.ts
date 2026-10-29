@@ -69,14 +69,19 @@ export function describe(section: PlanSection): PlanText[] {
 
 /** One stretch of the clock. `slot` = which block (alternating EMOM minutes, interval rounds). */
 export type TimelineSegment = { secs: number; kind: "work" | "rest" | "slot"; slot?: number };
-/** Segments in order, interruption marks (seconds from the start) and the total length. */
-export type Timeline = { segments: TimelineSegment[]; interrupts: number[]; total: number };
+/**
+ * Segments in order, interruption marks (seconds from the start) and the
+ * total length. `open`: the clock has no end (EMOM without times): the
+ * segments are one cycle of its slots that repeats, and `total` is null.
+ */
+export type Timeline = { segments: TimelineSegment[]; interrupts: number[]; total: number | null; open: boolean };
 
 /** Length shown for an uncapped For Time with interruptions (display only, as in the mockup). */
 const UNCAPPED_DISPLAY_SECS = 12 * 60;
 
 /**
- * The shape of the clock: EMOM slots (alternating blocks), AMRAP windows with
+ * The shape of the clock: EMOM slots (alternating blocks; open-ended without
+ * times), AMRAP windows with
  * rest between, intervals work/rest (HR rest drawn as 60 s), For Time with
  * interruptions as one stretch (its cap). Interruption marks every
  * `intEvery`. Flows without a clock give no segments.
@@ -86,8 +91,11 @@ export function timeline(section: PlanSection): Timeline {
   const k = Math.max(1, section.blocks.length);
   if (section.flow === "emom") {
     const e = paramSecs(section, "every");
-    const n = paramCount(section, "times") || 10;
-    if (e) for (let i = 0; i < n; i++) segs.push({ secs: e, kind: "slot", slot: i % k });
+    const n = paramCount(section, "times");
+    if (e) {
+      for (let i = 0; i < (n ?? k); i++) segs.push({ secs: e, kind: "slot", slot: i % k });
+      if (!n) return { segments: segs, interrupts: [], total: null, open: true };
+    }
   } else if (section.flow === "amrap") {
     const w = parseTimes(section.params.dur || "", "min");
     const r = section.params.rest ? parseClock(section.params.rest, "smart") : null;
@@ -114,10 +122,10 @@ export function timeline(section: PlanSection): Timeline {
   const interrupts: number[] = [];
   const ie = section.mods?.interrupt ? paramSecs(section, "intEvery") : null;
   if (ie && total) for (let t = ie; t < total; t += ie) interrupts.push(t);
-  return { segments: segs, interrupts, total };
+  return { segments: segs, interrupts, total, open: false };
 }
 
-/** An exercise name in a summary; `perSide` shows "(per side)". */
+/** An exercise name in a summary; `perSide` shows "(per side)" (`PlanCore.summary.perSide`). */
 export type SummaryName = { name: string; perSide: boolean };
 
 /** Rows marked "per side" (the `side` measure). */

@@ -61,12 +61,12 @@ export function setsRange(section: Pick<PlanSection, "params">): { min: number; 
 
 /**
  * How many rounds (sets, intervals) the section runs: sets → the most sets,
- * EMOM → its times (10 when empty, as the mockup shows), AMRAP → Infinity,
- * others → rounds (1 when empty).
+ * EMOM → its times (Infinity when empty: Death by runs until you cannot
+ * finish in time), AMRAP → Infinity, others → rounds (1 when empty).
  */
 export function totalRounds(section: Pick<PlanSection, "flow" | "params">): number {
   if (section.flow === "sets") return setsRange(section).max;
-  if (section.flow === "emom") return paramCount(section, "times") || 10;
+  if (section.flow === "emom") return paramCount(section, "times") || Infinity;
   if (section.flow === "amrap") return Infinity;
   return paramCount(section, "rounds") || 1;
 }
@@ -86,9 +86,9 @@ function writtenColumns(section: Pick<PlanSection, "flow">, list: PlanRow[]): nu
 
 /**
  * The rounds (1-based) block `blockIndex` is done in, one column each, at
- * most 12. AMRAP is open (no last round): its list is the rounds the coach
- * wrote in that block plus one empty column, at least 2; after the last
- * written round the coach's own value applies.
+ * most 12. AMRAP and an EMOM without times are open (no last round): the
+ * list is the rounds the coach wrote in that block plus one empty column,
+ * at least 2; after the last written round the coach's own value applies.
  */
 export function occurrences(
   section: Pick<PlanSection, "flow" | "params" | "blocks">,
