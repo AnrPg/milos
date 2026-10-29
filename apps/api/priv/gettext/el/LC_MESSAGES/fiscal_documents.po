@@ -1,0 +1,191 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Απόδειξη"
+
+msgid "Invoice"
+msgstr "Τιμολόγιο"
+
+msgid "Credit note"
+msgstr "Πιστωτικό"
+
+msgid "Retail sales receipt"
+msgstr "Απόδειξη Λιανικής Πώλησης"
+
+msgid "Service receipt"
+msgstr "Απόδειξη Παροχής Υπηρεσιών"
+
+msgid "Retail credit note"
+msgstr "Πιστωτικό Στοιχείο Λιανικής"
+
+msgid "Sales invoice"
+msgstr "Τιμολόγιο Πώλησης"
+
+msgid "Service invoice"
+msgstr "Τιμολόγιο Παροχής Υπηρεσιών"
+
+msgid "Credit invoice"
+msgstr "Πιστωτικό Τιμολόγιο"
+
+msgid "Number"
+msgstr "Αριθμός"
+
+msgid "Date of issue"
+msgstr "Ημερομηνία έκδοσης"
+
+msgid "Seller"
+msgstr "Εκδότης"
+
+msgid "Customer"
+msgstr "Πελάτης"
+
+msgid "Payment method"
+msgstr "Τρόπος πληρωμής"
+
+msgid "Cash"
+msgstr "Μετρητά"
+
+msgid "Card"
+msgstr "Κάρτα"
+
+msgid "Bank transfer"
+msgstr "Τραπεζική μεταφορά"
+
+msgid "Online payment"
+msgstr "Ηλεκτρονική πληρωμή"
+
+msgid "Other"
+msgstr "Άλλο"
+
+msgid "Corrects document"
+msgstr "Διορθώνει το παραστατικό"
+
+msgid "Description"
+msgstr "Περιγραφή"
+
+msgid "Qty"
+msgstr "Ποσ."
+
+msgid "Unit price"
+msgstr "Τιμή μονάδας"
+
+msgid "Discount"
+msgstr "Έκπτωση"
+
+msgid "VAT"
+msgstr "ΦΠΑ"
+
+msgid "Amount"
+msgstr "Ποσό"
+
+msgid "VAT breakdown"
+msgstr "Ανάλυση ΦΠΑ"
+
+msgid "Rate"
+msgstr "Συντελεστής"
+
+msgid "Net"
+msgstr "Καθαρή αξία"
+
+msgid "Gross"
+msgstr "Συνολική αξία"
+
+msgid "Total excluding VAT"
+msgstr "Σύνολο καθαρής αξίας"
+
+msgid "Total VAT"
+msgstr "Σύνολο ΦΠΑ"
+
+msgid "Total"
+msgstr "Σύνολο"
+
+msgid "Sales tax"
+msgstr "Φόρος πωλήσεων"
+
+msgid "Total sales tax"
+msgstr "Σύνολο φόρου πωλήσεων"
+
+msgid "Subtotal"
+msgstr "Υποσύνολο"
+
+msgid "Prices include VAT."
+msgstr "Οι τιμές περιλαμβάνουν ΦΠΑ."
+
+msgid "Exempt"
+msgstr "Απαλλάσσεται"
+
+msgid "Zero-rated"
+msgstr "Μηδενικός συντελεστής"
+
+msgid "Tax ID (AFM)"
+msgstr "ΑΦΜ"
+
+msgid "Tax office (DOY)"
+msgstr "ΔΟΥ"
+
+msgid "Tax number"
+msgstr "Αριθμός φορολογικού μητρώου"
+
+msgid "VAT number"
+msgstr "ΑΦΜ ΦΠΑ"
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "Αριθμός ΓΕΜΗ"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Αριθμός επιχείρησης"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "UID"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone"
+msgstr "Τηλέφωνο"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (ΑΑΔΕ)"
+
+msgid "MARK"
+msgstr "ΜΑΡΚ"
+
+msgid "Authentication code"
+msgstr "Κωδικός αυθεντικοποίησης"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "Η διαβίβαση στο myDATA (ΑΑΔΕ) εκκρεμεί."
+
+msgid "Bank details"
+msgstr "Τραπεζικά στοιχεία"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Κατηγορία πράξης: παροχή υπηρεσιών"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "Καθυστέρηση πληρωμής: ποινή ίση με το τριπλάσιο του νόμιμου επιτοκίου και κατ' αποκοπή αποζημίωση εξόδων είσπραξης 40 ευρώ (Γαλλικός Εμπορικός Κώδικας, άρθρα L441-10 και D441-5). Καμία έκπτωση για πρόωρη πληρωμή."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Το παραστατικό είναι καταχωρισμένο στο απαραβίαστο φορολογικό ημερολόγιο της επιχείρησης."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Αποτύπωμα παραστατικού (SHA-256)"
+
+msgid "Page"
+msgstr "Σελίδα"
