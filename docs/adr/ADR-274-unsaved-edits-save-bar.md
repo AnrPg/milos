@@ -1,6 +1,6 @@
 # ADR-274: Unsaved edits, the save bar and undo/redo on staff forms
 Date: 2026-10-29
-Status: Proposed (option A of the save-bar mockups; awaiting ANR's pick)
+Status: Accepted (ANR picked option A of the save-bar mockups, 2026-10-29)
 
 ## Context
 On a person's profile (admin/users/[id]), the Finance tab saved fields one by
