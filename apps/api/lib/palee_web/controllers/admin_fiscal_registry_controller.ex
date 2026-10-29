@@ -12,6 +12,7 @@ defmodule PaleeWeb.AdminFiscalRegistryController do
   alias OpenApiSpex.Schema
   alias Palee.Application.Fiscal.FiscalRegistry
   alias PaleeWeb.Schemas.Fiscal, as: F
+  alias PaleeWeb.Schemas.FiscalConnections, as: FC
   alias PaleeWeb.Schemas.FiscalRegistry, as: R
 
   action_fallback PaleeWeb.FallbackController
@@ -37,9 +38,11 @@ defmodule PaleeWeb.AdminFiscalRegistryController do
     description:
       "`production` needs the special credentials AADE issued to the business for this " <>
         "service; a saved password is kept when none is sent. `sandbox` answers with made-up " <>
-        "details and needs none.",
+        "details and needs none. The connection is then checked by looking up the business's " <>
+        "own ΑΦΜ (one call of its AADE quota; ADR-273, `check`). Refused with " <>
+        "`fiscal_connections_managed_by_palee` while the Palee team manages the connections.",
     request_body: F.body(R.connection_body()),
-    responses: [ok: {"Connection", "application/json", R.connection_status()}]
+    responses: [ok: {"Connection", "application/json", FC.result(R.connection())}]
   )
 
   def save_connection(conn, _params) do

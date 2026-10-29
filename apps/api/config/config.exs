@@ -72,6 +72,8 @@ config :palee, Oban,
        # ADR-250/251: Peppol sends and delivery polls; TSE/RKSV signatures.
        {"*/5 * * * *", Palee.Workers.SendEInvoicesJob},
        {"*/2 * * * *", Palee.Workers.SignTillReceiptsJob},
+       # ADR-273: «Δοκιμή σύνδεσης» of fiscal connections that are due (every 3 months, sooner after a failure).
+       {"43 * * * *", Palee.Workers.CheckFiscalConnectionsJob},
        # ADR-246/247: settle online payments; hourly autopay of due invoices.
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
        {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},

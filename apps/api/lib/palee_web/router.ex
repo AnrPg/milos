@@ -1323,6 +1323,9 @@ defmodule PaleeWeb.Router do
     get("/fiscal/registry-connection", AdminFiscalRegistryController, :connection)
     put("/fiscal/registry-connection", AdminFiscalRegistryController, :save_connection)
     get("/fiscal/registry/businesses/:tax_id", AdminFiscalRegistryController, :lookup)
+    # ADR-273: the box's fiscal connections as one set and «Δοκιμή σύνδεσης».
+    get("/fiscal/connections", AdminFiscalConnectionsController, :index)
+    post("/fiscal/connections/:kind/check", AdminFiscalConnectionsController, :check)
     get("/fiscal/exports/formats", AdminFiscalTaxController, :export_formats)
     put("/fiscal/exports/settings/:format", AdminFiscalTaxController, :save_export_settings)
     get("/fiscal/exports/:format", AdminFiscalTaxController, :export)
@@ -1693,6 +1696,26 @@ defmodule PaleeWeb.Router do
     get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
     patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
+    # ADR-273: a box's fiscal connections, filled by the Palee team when it manages them.
+    get("/organizations/:id/fiscal-connections", PlatformFiscalConnectionsController, :show)
+
+    put(
+      "/organizations/:id/fiscal-connections/managed-by",
+      PlatformFiscalConnectionsController,
+      :managed_by
+    )
+
+    put(
+      "/organizations/:id/fiscal-connections/:kind",
+      PlatformFiscalConnectionsController,
+      :save
+    )
+
+    post(
+      "/organizations/:id/fiscal-connections/:kind/check",
+      PlatformFiscalConnectionsController,
+      :check
+    )
 
     post(
       "/organizations/:id/branding/logo/upload-url",

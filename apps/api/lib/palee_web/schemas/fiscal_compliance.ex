@@ -98,12 +98,12 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
   end
 
   def peppol_connection do
-    %Schema{
+    PaleeWeb.Schemas.FiscalConnections.with_check(%Schema{
       type: :object,
       description:
-        "The Peppol connection; the API key, secret and webhook token are never returned " <>
-          "(`webhook_url` appears once, when a new token is made). `storecove` is a " <>
-          "retired provider of old connections: they show as invalid until reconnected.",
+        "The Peppol connection; the API key, secret and webhook token are never returned. " <>
+          "`storecove` is a retired provider of old connections: they show as invalid " <>
+          "(`provider_retired`) until reconnected.",
       properties: %{
         network: %Schema{type: :string, enum: ["peppol"]},
         provider: %Schema{type: :string, enum: ["sandbox", "fiskaly", "storecove"]},
@@ -123,9 +123,7 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
             "`till_connection`: no key of its own, the fiskaly till connection's is used."
         },
         has_webhook_token: %Schema{type: :boolean},
-        webhook_url: %Schema{type: :string, nullable: true},
         status: %Schema{type: :string, enum: ["active", "invalid"]},
-        last_error: %Schema{type: :string, nullable: true},
         updated_at: @time
       },
       required: [
@@ -137,9 +135,10 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         :network,
         :peppol_id,
         :provider,
-        :status
+        :status,
+        :updated_by_platform
       ]
-    }
+    })
   end
 
   def peppol_connection_status do
@@ -287,10 +286,11 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
   end
 
   def till_connection do
-    %Schema{
+    PaleeWeb.Schemas.FiscalConnections.with_check(%Schema{
       type: :object,
       description:
-        "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
+        "The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are " <>
+          "never returned.",
       properties: %{
         device: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]},
         provider: %Schema{type: :string, enum: ["sandbox", "fiskaly"]},
@@ -304,7 +304,6 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         has_api_key: %Schema{type: :boolean},
         has_api_secret: %Schema{type: :boolean},
         status: %Schema{type: :string, enum: ["provisioning", "active", "invalid"]},
-        last_error: %Schema{type: :string, nullable: true},
         updated_at: @time
       },
       required: [
@@ -315,9 +314,10 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         :provider,
         :register_id,
         :status,
-        :unit_id
+        :unit_id,
+        :updated_by_platform
       ]
-    }
+    })
   end
 
   def till_connection_status do
@@ -341,7 +341,9 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         api_secret: %Schema{type: :string, nullable: true, maxLength: 200},
         reprovision: %Schema{
           type: :boolean,
-          description: "Create a new TSS/client (DE) or signature unit/cash register (AT)."
+          description:
+            "Create a new TSS/client (DE), signature unit/cash register (AT) or " <>
+              "taxpayer/location/System (SIGN FR)."
         }
       },
       required: [:environment]

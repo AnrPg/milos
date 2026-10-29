@@ -6,20 +6,21 @@ defmodule PaleeWeb.Schemas.FiscalRegistry do
   @nullable_text %Schema{type: :string, nullable: true}
 
   def connection do
-    %Schema{
+    PaleeWeb.Schemas.FiscalConnections.with_check(%Schema{
       type: :object,
       nullable: true,
-      description: "The AADE registry connection; the password is never returned.",
+      description:
+        "The AADE registry connection; the password is never returned. `username` is the " <>
+          "same field the save takes (ADR-273).",
       properties: %{
         environment: %Schema{type: :string, enum: ["sandbox", "production"]},
-        user_id: @nullable_text,
+        username: @nullable_text,
         status: %Schema{type: :string, enum: ["active", "invalid"]},
-        last_error: @nullable_text,
         has_password: %Schema{type: :boolean},
         updated_at: %Schema{type: :string, format: :"date-time"}
       },
-      required: [:environment, :has_password, :status]
-    }
+      required: [:environment, :has_password, :status, :updated_by_platform]
+    })
   end
 
   def connection_status do

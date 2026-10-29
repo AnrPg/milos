@@ -392,20 +392,21 @@ defmodule PaleeWeb.Schemas.Fiscal do
   @environments ["sandbox", "test", "production"]
 
   def connection do
-    %Schema{
+    PaleeWeb.Schemas.FiscalConnections.with_check(%Schema{
       type: :object,
-      description: "The myDATA connection; the subscription key is never returned.",
+      description:
+        "The myDATA connection; the subscription key is never returned. `error_code` says " <>
+          "why it needs a check (ADR-273).",
       properties: %{
         authority: %Schema{type: :string, enum: ["mydata"]},
         environment: %Schema{type: :string, enum: @environments},
         user_id: %Schema{type: :string, nullable: true},
         has_subscription_key: %Schema{type: :boolean},
         status: %Schema{type: :string, enum: ["active", "invalid"]},
-        last_error: %Schema{type: :string, nullable: true},
         updated_at: @time
       },
-      required: [:authority, :environment, :has_subscription_key, :status]
-    }
+      required: [:authority, :environment, :has_subscription_key, :status, :updated_by_platform]
+    })
   end
 
   def connection_status do
