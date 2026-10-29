@@ -14,7 +14,8 @@ defmodule Palee.Email.Commands.EnqueueEmail do
     5. the kind's per-recipient throttle (`:throttled`);
     6. the daily budget: queued now, deferred to the next UTC day, or, for
        security mail past the hard cap, refused (`:over_budget`);
-    7. the template renders; the body is encrypted and the row and its job
+    7. the template renders (with its `:attachments`, ADR-265, at most
+       5 MB of PDF in all); the body is encrypted and the row and its job
        are inserted in one transaction. Transactional mail gets a one-click
        unsubscribe link (ADR-212): `List-Unsubscribe` and
        `List-Unsubscribe-Post` headers (RFC 8058) and a footer link.
@@ -29,6 +30,9 @@ defmodule Palee.Email.Commands.EnqueueEmail do
   alias Palee.Workers.DeliverEmailJob
 
   @day_seconds 86_400
+  # ADR-265: what may be attached (a fiscal document's PDF), and how much.
+  @attachment_types ~w(application/pdf)
+  @max_attachment_bytes 5_000_000
 
   def call(kind, to, assigns, opts) do
     now = Keyword.get_lazy(opts, :now, &DateTime.utc_now/0)
@@ -43,7 +47,8 @@ defmodule Palee.Email.Commands.EnqueueEmail do
           {:ok, message}
 
         nil ->
-          with :ok <- not_suppressed(store, address),
+          with :ok <- attachments_fit(Keyword.get(opts, :attachments, [])),
+               :ok <- not_suppressed(store, address),
                :ok <- not_opted_out(store, address, kind, category),
                :ok <- throttle(store, template, kind, address, category, now),
                {:ok, schedule} <- budget(store, category, now) do
@@ -123,6 +128,7 @@ defmodule Palee.Email.Commands.EnqueueEmail do
     body =
       %{"text" => template.text(assigns, locale), "html" => template.html(assigns, locale)}
       |> with_unsubscribe(category, address, kind, locale)
+      |> with_attachments(Keyword.get(opts, :attachments, []))
       |> Jason.encode!()
 
     {status, scheduled_at} =
@@ -176,6 +182,45 @@ defmodule Palee.Email.Commands.EnqueueEmail do
 
   defp with_unsubscribe(body, _category, _address, _kind, locale),
     do: %{body | "html" => Layout.put_unsubscribe_html(body["html"], locale, nil)}
+
+  # ADR-265: files travel inside the encrypted body (base64), so they are
+  # cleared with it once the email is sent or given up on.
+  defp with_attachments(body, []), do: body
+
+  defp with_attachments(body, attachments) do
+    Map.put(
+      body,
+      "attachments",
+      Enum.map(attachments, fn attachment ->
+        %{
+          "filename" => attachment.filename,
+          "content_type" => attachment.content_type,
+          "data" => Base.encode64(attachment.data)
+        }
+      end)
+    )
+  end
+
+  defp attachments_fit(attachments) when is_list(attachments) do
+    valid? =
+      Enum.all?(attachments, fn
+        %{filename: name, content_type: type, data: data}
+        when is_binary(name) and is_binary(type) and is_binary(data) ->
+          type in @attachment_types and name != "" and not String.contains?(name, ["/", "\\"])
+
+        _other ->
+          false
+      end)
+
+    cond do
+      not valid? -> {:error, :invalid_attachment}
+      Enum.sum(Enum.map(attachments, &byte_size(&1.data))) > @max_attachment_bytes ->
+        {:error, :attachment_too_large}
+      true -> :ok
+    end
+  end
+
+  defp attachments_fit(_attachments), do: {:error, :invalid_attachment}
 
   defp kind_name(kind) when is_atom(kind), do: Atom.to_string(kind)
   defp kind_name(kind) when is_binary(kind), do: kind

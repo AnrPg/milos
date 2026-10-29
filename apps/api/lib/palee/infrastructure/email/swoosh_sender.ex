@@ -28,7 +28,20 @@ defmodule Palee.Infrastructure.Email.SwooshSender do
     |> html_body(html)
     |> header("Message-ID", message_id)
     |> extra_headers(Map.get(email, :headers) || %{})
+    |> attachments(Map.get(email, :attachments) || [])
     |> safe_deliver()
+  end
+
+  defp attachments(email, files) do
+    Enum.reduce(files, email, fn file, email ->
+      attachment(
+        email,
+        Swoosh.Attachment.new({:data, file.data},
+          filename: file.filename,
+          content_type: file.content_type
+        )
+      )
+    end)
   end
 
   defp extra_headers(email, headers) do
