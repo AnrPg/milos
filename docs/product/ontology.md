@@ -223,6 +223,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Client | Πελάτης | member or athlete role | Someone who trains with the business. Umbrella word for the two below. |
 | Box member | Μέλος box | `member` | Client of a box with a membership or package. Where the box is known, name it: "Member of Box Kypseli" / «Μέλος στο Box Kypseli». Never a bare "Member" / «Μέλος». |
 | Athlete | Αθλητής | `athlete` | Client who gets **personal programming** from a coach. |
+| Guest | Επισκέπτης | `guest` | Someone with a Palee account whom staff made a guest of the box at the desk, so they can buy a membership package, a free sale or a shop order there. The lowest client tier; one person can be a guest of many boxes. Sees no member app of the box, only the public box page with «Γίνε μέλος box». Never self-chosen. (ADR-272) |
 | Personal link | Προσωπικός σύνδεσμος | `registration_invitations` | One-time invitation for one person, any role including staff. |
 | Join links | Σύνδεσμοι εγγραφής | `organization_settings.join_link` | Public links, one per client role, each on or off on its own: «Σύνδεσμος για μέλη box» (`/join/<slug>`) and «Σύνδεσμος για αθλητές» (`/join/<slug>/athlete/<key>`). The link sets the role, never the visitor. (ADR-216) |
 
@@ -403,8 +404,11 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Card (Tap to Pay) | Κάρτα (Tap to Pay) | payment method `card_terminal` | A card payment Palee confirmed with the provider; never chosen by hand. | Card at the terminal (`card_manual`): staff's word that a standalone card machine took it. |
 | Card at the terminal | Κάρτα στο τερματικό | payment method `card_manual` | A card payment on the box's own card machine, recorded by staff. | Card (Tap to Pay). |
 | Free sale | Ελεύθερη πώληση | purpose `free_sale` | Money for something with no invoice, package or order: a description and a category, for a member or a walk-in. A walk-in's free sale is recorded with no member (`source_type = walk_in_sale`) and gets its receipt. | Shop order. |
-| Walk-in | Επισκέπτης χωρίς λογαριασμό | `shop_orders.customer_name`; no `user_id` on a payment | Someone who pays at the desk without a profile in the business. Tap to Pay takes a walk-in's money for a shop order or a free sale. | Member, mock person, trial visitor. |
+| Customer without an account (walk-in) | Πελάτης χωρίς λογαριασμό | `shop_orders.customer_name`; no `user_id` on a payment | Someone who pays at the desk without a profile in the business. Tap to Pay takes their money for a shop order or a free sale; their receipt shows as a QR on the staff phone or goes by email. Formerly «Επισκέπτης χωρίς λογαριασμό». (ADR-264, ADR-272) | Guest (`guest` role, has an account); member, mock person, trial visitor. |
 | Tip | Φιλοδώρημα | `payment_intents.tip_cents` | Money the payer adds for the staff on the card terminal. The staff's, not the box's revenue: no VAT, not on the receipt, kept apart for payroll. | Card surcharge. |
+| Tip owner | Για ποιον είναι το φιλοδώρημα | `payment_intents.tip_attribution`, `tip_recipient_user_id`, `tip_recipient_role` | Whose a tip is, written once when the payment succeeds: the staff member who started it on their phone, else the box's only front desk person, else the front desk role unpersonalised. Owners and admins never. Shown on «Αποτέλεσμα» («για σένα», «για την υποδοχή») and in Finance › Accounting. (ADR-272) | Revenue. |
+| Collect | Είσπραξη | `/admin/collect` | Taking a payment with Tap to Pay on the staff phone, step by step: Ποιος › Τι › Έλεγχος › Viva.com Terminal › Αποτέλεσμα. (ADR-272) | Desk payment recorded by hand («Πληρωμή στην υποδοχή»). |
+| Receipt QR | QR απόδειξης | `document.receipt_url`, `/api/public/receipts/:token` | A walk-in's receipt as a signed link (90 days) shown as a QR on the staff phone; the customer scans it and keeps the receipt. | Check-in QR. |
 | Card surcharge | Επιβάρυνση κάρτας | `payment_intents.surcharge_cents`, `source_type = card_surcharge` | A fee the card provider adds for some cards (business or non-EU cards). Part of the sale's price: revenue, on the same receipt as the sale. | Tip; Palee's own fees. |
 
 ### 4.16 E-invoicing and till security (ADR-250, ADR-251, ADR-266)
@@ -495,6 +499,13 @@ Each needs ANR's choice before the UI changes. The recommended option is first.
    "Competitive athletes".
    - **Proposal:** keep the role, but show it as "Athlete (personal programming)" /
      «Αθλητής (προσωπικό πρόγραμμα)» wherever roles are picked.
+
+10. **"Guest" names two things in English** (ADR-272): the box role `guest` («Επισκέπτης») and
+    someone a member brings to an event («Καλεσμένος», §4.7). Greek also uses «επισκέπτης» for package
+    guest passes («προσκλήσεις επισκεπτών»), the door's visitors («Επισκέπτες») and the shop's
+    «Και επισκέπτες».
+    - **Proposal:** keep "Guest" / «Επισκέπτης» for the box role; the event's person becomes
+      "Invited guest" in English; the others keep their wording until the product owner chooses.
 
 ## 6. Rules for new terms
 
