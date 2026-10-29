@@ -165,6 +165,18 @@ config :palee, :fiscal_authority_gateways, %{
   "production" => Palee.Infrastructure.Fiscal.MyDataGateway
 }
 
+# ADR-252: documents and signatures. The evidence store is where an advanced
+# e-signature provider plugs in later.
+config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
+
+config :palee,
+       :documents_evidence_store,
+       Palee.Infrastructure.Documents.StorageSignatureEvidenceStore
+
+config :palee,
+       :documents_certificate_renderer,
+       Palee.Infrastructure.Documents.PdfCertificateRenderer
+
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
 config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier

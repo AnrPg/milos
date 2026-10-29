@@ -68,6 +68,8 @@ defmodule Palee.Repo.Migrations.CreateDocuments do
       add :status, :string, null: false, default: "active"
       add :current_version_id, :binary_id
       add :current_version_number, :integer, null: false, default: 0
+      # The latest `major` version: signatures of older versions no longer count.
+      add :required_version_number, :integer, null: false, default: 0
       add :created_by_id, references(:users, type: :binary_id, on_delete: :nilify_all)
       add :archived_at, :utc_datetime_usec
       timestamps(type: :utc_datetime_usec)
@@ -85,6 +87,7 @@ defmodule Palee.Repo.Migrations.CreateDocuments do
              AND requirement IN ('mandatory', 'optional')
              AND status IN ('active', 'archived')
              AND current_version_number >= 0
+             AND required_version_number BETWEEN 0 AND current_version_number
              """
            )
 
