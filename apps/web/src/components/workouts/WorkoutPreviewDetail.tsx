@@ -15,6 +15,8 @@ import type { WorkoutAuthoringMode } from "@/api/workouts";
 import { describePreset, readTextSections, type TextSection } from "@/lib/text-sections";
 import { getFormatLabels } from "@/types/workout";
 import { ExerciseContent, WorkoutContentBlock, type WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
+import { PlanView } from "@/components/workouts/plan-view/PlanView";
+import { readPlanSections, STRUCTURED_PLAN_MODE } from "@/components/workouts/plan-view/read";
 
 export type PreviewExercise = {
   id?: string;
@@ -88,6 +90,8 @@ export type PreviewSection = {
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
   timer_preset?: unknown;
+  /** ADR-270: the section as written in the structured plan editor. */
+  plan?: unknown;
   exercises: PreviewExercise[];
 };
 
@@ -100,7 +104,7 @@ type Props = {
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
-  authoringMode?: WorkoutAuthoringMode;
+  authoringMode?: WorkoutAuthoringMode | typeof STRUCTURED_PLAN_MODE;
   freeTextBody?: string | null;
   freeTextDocument?: Record<string, unknown> | null;
 };
@@ -521,6 +525,20 @@ function presentationGroupColor(id: string) {
   return colors[hash % colors.length];
 }
 
+/** The labels of the scale levels the exercises' variations name, by slug. */
+function scaleLevelLabels(sections: PreviewSection[]): Record<string, string> {
+  const labels: Record<string, string> = {};
+  for (const section of sections) {
+    for (const exercise of section.exercises) {
+      for (const variation of exercise.variations ?? []) {
+        const level = variation.scale_level;
+        if (level?.slug && level.label) labels[level.slug] = level.label;
+      }
+    }
+  }
+  return labels;
+}
+
 export function WorkoutPreviewDetail({
   sections,
   initiallyExpanded = true,
@@ -556,6 +574,18 @@ export function WorkoutPreviewDetail({
   // workouts written in text sections (ADR-180: their text holds every section).
   // ADR-224: text sections are shown one by one, each with its timer and
   // what it is scored by, in the coach's own formatting.
+  // ADR-270: a workout written as a structured plan reads as the plan, in
+  // compact WOD notation; its derived exercises only serve history.
+  const planSections = readPlanSections({ authoring_mode: authoringMode, sections });
+  if (planSections.length > 0) {
+    return (
+      <div className="space-y-3">
+        <WorkoutContentBlock entries={content} lead={instructions} />
+        <PlanView sections={planSections} levelLabels={scaleLevelLabels(sections)} />
+      </div>
+    );
+  }
+
   const textSections = authoringMode === "sectioned_text" ? readTextSections({ authoring_mode: authoringMode, sections }) : [];
   if (textSections.length > 0) {
     return (
