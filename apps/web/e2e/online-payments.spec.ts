@@ -127,6 +127,8 @@ async function stub(page: Page, options: Stub, writes: Write[]) {
       return json(route, { payment: { ...charge, status: action[2] === "retry-charge" ? "succeeded" : charge?.status } });
     }
     if (path === "/api/admin/finance/queues") return json(route, { queues: {} });
+    if (path === "/api/admin/finance/package-catalog") return json(route, { types: [], modules: [] });
+    if (path.startsWith("/api/admin/finance/members")) return json(route, { members: [], meta: {} });
     return json(route, {});
   });
 }
@@ -172,7 +174,7 @@ test("a box without one-button connect pastes its Viva keys, then sees one sente
   await expect.poll(() => writes.find((w) => w.path === "/api/admin/settings")?.body).toEqual({ finance: { subscription_grace_days: 14 } });
 
   // «Αποσύνδεση» asks first.
-  await card.getByRole("button", { name: "Αποσύνδεση" }).click();
+  await card.getByRole("button", { name: "Αποσύνδεση", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Αποσύνδεση από Viva;" });
   await expect(dialog.getByText("Οι αποθηκευμένες κάρτες σταματούν να χρεώνονται.")).toBeVisible();
   await dialog.getByRole("button", { name: "Αποσύνδεση" }).click();
