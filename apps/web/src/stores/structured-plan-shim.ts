@@ -28,7 +28,7 @@ export type FlowRule = {
 };
 
 export const FLOW_RULES: Record<PlanFlow, FlowRule> = {
-  sets: { layout: "grid", fields: [{ key: "sets", kind: "range", dflt: "4" }, { key: "rest", kind: "time", dflt: "90″" }], scores: ["none", "load", "reps"], structs: ["single", "superset", "complex", "cluster", "drop", "restpause"], mods: ["interrupt"] },
+  sets: { layout: "grid", fields: [{ key: "sets", kind: "range", dflt: "4" }, { key: "rest", kind: "time", dflt: "90″" }], scores: ["none", "best_load", "reps"], structs: ["single", "superset", "complex", "cluster", "drop", "restpause"], mods: ["interrupt"] },
   for_time: { layout: "loop", fields: [{ key: "rounds", kind: "count", dflt: "1" }, { key: "cap", kind: "time", dflt: "" }], scores: ["time", "rounds_reps"], structs: ["single", "superset", "complex"], mods: ["interrupt"] },
   amrap: { layout: "loop", fields: [{ key: "dur", kind: "times", dflt: "12" }, { key: "rest", kind: "time", dflt: "" }], scores: ["rounds_reps", "reps"], structs: ["single", "superset", "complex"], mods: ["interrupt"] },
   emom: { layout: "slots", fields: [{ key: "every", kind: "time", dflt: "1:00" }, { key: "times", kind: "count", dflt: "10" }], scores: ["none", "done", "reps"], structs: ["single", "superset", "complex", "cluster"], mods: [] },
