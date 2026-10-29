@@ -115,6 +115,18 @@ defmodule Palee.Workouts.StructuredPlanWorkoutStoreTest do
     assert plan == hd(updated.sections).plan
   end
 
+  test "a scale level keeps the plan, its prescription and its plan timer" do
+    admin = create_admin!("plan_scaler")
+    {:ok, workout} = Workouts.create_workout(admin, params(plan_sections()))
+
+    scaled = Workouts.materialize_for_scale(workout, "scaled")
+    assert Enum.map(scaled.sections, & &1.plan) == Enum.map(workout.sections, & &1.plan)
+    assert Enum.all?(scaled.sections, &match?(%{clock: %{}}, &1.prescription))
+
+    assert ["plan:" <> _, "plan:" <> _, "plan:" <> _] =
+             scaled |> Palee.Execution.build_timer_sequence() |> Enum.map(& &1.segment_key)
+  end
+
   defp create_admin!(nickname) do
     {:ok, user} =
       Identity.register(%{
