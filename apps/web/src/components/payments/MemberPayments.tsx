@@ -80,7 +80,9 @@ function PaymentCard({ slug, payment, onChanged }: { slug: string; payment: Onli
         {payment.status === "succeeded" ? (
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>
             {payment.succeeded_at
-              ? t("paidOn", { date: formatDate(locale, payment.succeeded_at.slice(0, 10)), card: card ?? "" })
+              ? card
+                ? t("paidOnCard", { date: formatDate(locale, payment.succeeded_at.slice(0, 10)), card })
+                : t("paidOn", { date: formatDate(locale, payment.succeeded_at.slice(0, 10)) })
               : t("paid")}
           </p>
         ) : declined ? (
