@@ -84,7 +84,7 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
 
       {step === 0 ? <StepFlow section={section} /> : null}
       {step === 1 ? <StepTime section={section} /> : null}
-      {step === 2 ? <PlanGrid section={section} /> : null}
+      {step === 2 ? <PlanGrid sectionId={section.id} /> : null}
       {step === 3 ? <StepScore section={section} levels={levels} /> : null}
 
       <footer className="flex flex-wrap items-center justify-between gap-2">
