@@ -41,4 +41,20 @@ defmodule Palee.Finance.Domain.CreditLedgerTest do
     assert {:error, :credit_entry_not_reversible} =
              CreditLedger.validate_reversal(%{amount_cents: 1200, entry_type: "grant"}, 0, 100)
   end
+
+  test "ADR-254: a manual grant is taken back within what is left of it and of the balance" do
+    grant = %{amount_cents: 2000, source_type: "manual_credit", entry_type: "grant"}
+
+    assert :ok = CreditLedger.validate_grant_reversal(grant, 0, 2000, 2000)
+    assert {:error, :invalid_credit_amount} = CreditLedger.validate_grant_reversal(grant, 0, 0, 2000)
+
+    assert {:error, :credit_reversal_exceeds_application} =
+             CreditLedger.validate_grant_reversal(grant, 500, 2000, 5000)
+
+    assert {:error, :insufficient_credit_balance} =
+             CreditLedger.validate_grant_reversal(grant, 0, 2000, 1500)
+
+    assert {:error, :credit_entry_not_reversible} =
+             CreditLedger.validate_grant_reversal(%{grant | source_type: "promo_credit"}, 0, 100, 2000)
+  end
 end

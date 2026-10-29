@@ -229,3 +229,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
 | ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
 | ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
+| ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
