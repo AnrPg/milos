@@ -9,6 +9,7 @@ const fetchDataExports = vi.fn();
 const requestDataExport = vi.fn();
 
 vi.mock("next-intl", () => ({
+  useLocale: () => "en",
   useTranslations: () => (key: string, values?: Record<string, unknown>) =>
     values ? `${key}:${JSON.stringify(values)}` : key,
   useFormatter: () => ({

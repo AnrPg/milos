@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import {
   dataExportRefusal,
@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { withClock } from "@/lib/clock";
 
 const EXPORTS_QUERY_KEY = ["account", "data-exports"] as const;
 const PENDING_POLL_MS = 5000;
@@ -34,6 +35,7 @@ export function YourDataSection() {
   const t = useTranslations("legal");
   const i18n = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const { tokens, currentUser } = useSession();
   const queryClient = useQueryClient();
   const [requesting, setRequesting] = useState(false);
@@ -50,7 +52,7 @@ export function YourDataSection() {
   });
   const latest = latestDataExport(exportsQuery.data);
   const date = (at: string | null | undefined) =>
-    at ? format.dateTime(new Date(at), { dateStyle: "medium", timeStyle: "short" }) : "";
+    at ? format.dateTime(new Date(at), withClock(locale, { dateStyle: "medium", timeStyle: "short" })) : "";
   const size = (bytes: number) =>
     bytes < 1_000_000
       ? format.number(Math.max(bytes / 1000, 1), { style: "unit", unit: "kilobyte", maximumFractionDigits: 0 })
