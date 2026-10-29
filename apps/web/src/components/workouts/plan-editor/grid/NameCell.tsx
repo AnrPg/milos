@@ -6,7 +6,7 @@ import { Popover } from "@/components/ui/Popover";
 import type { PlanRow } from "@/lib/structured-plan/types";
 
 import { useGrid, useGridT } from "./context";
-import { fold, fuzzy, type FuzzyMatch } from "./lib-shim";
+import { fold, fuzzy, type FuzzyMatch } from "./lib";
 import { fieldKey, flagMeasures } from "./model";
 import { setRowFields } from "./mutations";
 import s from "./grid.module.css";

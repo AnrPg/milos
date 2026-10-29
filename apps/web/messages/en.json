@@ -12341,7 +12341,8 @@
       "delete": "Delete",
       "deleteHint": "⌫ on an empty name",
       "structTitle": "Set structure",
-      "measureTitle": "Parameter"
+      "measureTitle": "Parameter",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Exercise",
@@ -12403,7 +12404,8 @@
       "kg": "{value} kg",
       "pct": "{value}% of 1RM",
       "words": "as text for the athlete",
-      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)"
+      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "set",
@@ -12716,7 +12718,7 @@
     },
     "describe": {
       "emom": "Every {every}, {times} times: {total} in total.",
-      "emomOpen": "Every {every}, until you can't finish in time.",
+      "emomOpen": "Every {every}, until you can no longer keep up.",
       "amrapWindows": "{count} AMRAP windows ({list}).",
       "amrapWindowsRest": "{count} AMRAP windows ({list}), {rest} rest between.",
       "amrap": "As many rounds as you can in {dur}.",

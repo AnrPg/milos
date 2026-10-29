@@ -5,8 +5,9 @@ import type { CSSProperties } from "react";
 import type { PlanRow, PlanSection, PlanUnit } from "@/lib/structured-plan/types";
 
 import { useGrid, useGridT } from "./context";
-import { setsRange, structOf, unitsOf } from "./lib-shim";
+import { setsRange, structOf, unitsOf } from "./lib";
 import {
+  attr,
   cellTestId,
   compactField,
   fieldKey,
@@ -27,10 +28,10 @@ import s from "./grid.module.css";
 
 /** Column / line labels with their unit: "Επαν.", "Φορτίο kg", "RPE /10", "Κράτημα (δευτ.)". */
 export function useLabels() {
-  const { t, unit } = useGridT();
+  const { t, core, unit } = useGridT();
   const measureHead = (k: MeasureKey) => {
     const u = unit(measureUnit(k));
-    const label = t(`measure.${k}`);
+    const label = core(`measure.${k}`);
     return !u ? label : /^\p{L}/u.test(u) ? `${label} (${u})` : `${label} ${u}`;
   };
   const line = (row: PlanRow, k: ColKey, loadUnit: string | null) =>
@@ -303,7 +304,7 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
         <span key={k} className={s.xv} data-label={t("line.rest")}>
           <ValueField
             fieldKey={fieldKey.dose(row.id)}
-            testId={`plan-cell-${row.id}-same-d`}
+            testId={cellTestId({ kind: "row", rowId: row.id, field: "dose" })}
             value={row.dose}
             view={view}
             suffix={unit(view.suffix)}
@@ -330,7 +331,7 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
       <span key={k} className={s.xv} data-label={label}>
         <ValueField
           fieldKey={fk}
-          testId={`plan-cell-${row.id}-same-${k}`}
+          testId={cellTestId(k === "d" ? { kind: "row", rowId: row.id, field: "dose" } : k === "l" ? { kind: "row", rowId: row.id, field: "load" } : { kind: "x", rowId: row.id, k })}
           value={value}
           view={view}
           errorText={msg(view.error)}
@@ -372,6 +373,6 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
 }
 
 function focusFirst(rowId: string, k: ColKey) {
-  document.querySelector<HTMLInputElement>(`[data-key="${CSS.escape(fieldKey.cell(rowId, 0, k))}"]`)?.focus();
+  document.querySelector<HTMLInputElement>(`[data-key="${attr(fieldKey.cell(rowId, 0, k))}"]`)?.focus();
 }
 

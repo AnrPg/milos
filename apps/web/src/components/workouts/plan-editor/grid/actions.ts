@@ -3,8 +3,8 @@
 import type { PlanMeasure, PlanRow, PlanStructureKind } from "@/lib/structured-plan/types";
 
 import { useGrid, type PickerState } from "./context";
-import { MEASURES } from "./lib-shim";
-import { fieldKey, type MeasureKey } from "./model";
+import { MEASURES } from "./lib";
+import { attr, fieldKey, type MeasureKey } from "./model";
 import * as M from "./mutations";
 
 /**
@@ -70,7 +70,7 @@ export function useGridActions() {
       });
       const fields = kind === "cluster" ? "clusters" : kind === "drop" ? "drops" : kind === "restpause" ? "minis" : null;
       if (focusRow) focusKey(fieldKey.name(focusRow));
-      else if (fields && unitKey) focusKey(`s:${unitKey}:${fields}`);
+      else if (fields && unitKey) focusKey(fieldKey.struct(unitKey, fields));
       else focusKey(fieldKey.name(rowId));
     },
     addMeasure(rowId: string, k: PlanMeasure) {
@@ -85,7 +85,7 @@ export function useGridActions() {
       focusKey(fieldKey.name(rowId));
     },
     open(rowId: string, mode: PickerState["mode"], anchor: HTMLElement | null, returnKey: string | null) {
-      const target = anchor ?? document.querySelector<HTMLElement>(`[data-more="${CSS.escape(rowId)}"]`);
+      const target = anchor ?? document.querySelector<HTMLElement>(`[data-more="${attr(rowId)}"]`);
       if (target) openPicker({ rowId, mode, anchor: target, returnKey });
     },
   };
