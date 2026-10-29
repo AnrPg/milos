@@ -15,7 +15,8 @@ type Json<Op extends keyof operations, Code extends number = 200> = operations[O
   ? Body
   : never;
 
-type Body<Op extends keyof operations> = NonNullable<operations[Op]["requestBody"]>["content"]["application/json"];
+type Body<Op extends keyof operations> =
+  NonNullable<operations[Op]["requestBody"]> extends { content: { "application/json": infer Payload } } ? Payload : never;
 
 export type TerminalAvailability = Json<"PaleeWeb.AdminTerminalPaymentsController.availability">;
 export type TerminalPayment = Json<"PaleeWeb.AdminTerminalPaymentsController.show">["payment"];

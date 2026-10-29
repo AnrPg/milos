@@ -6,8 +6,8 @@
 // `vivapayclient://pay/v1`) and brings its answer back on
 // `palee-terminal://result`. The answer is only passed on to the API
 // (`POST /admin/payments/terminal/result`), which confirms it with Viva
-// before any money is recorded. No screens yet: they wait for the approved
-// mockups.
+// before any money is recorded. The «Είσπραξη» screens (ADR-272) live in
+// components/admin/collect.
 import { hasCapability } from "./index";
 
 /** The callback the terminal app answers on (the API's `payment_terminal_app` callback). */
@@ -118,7 +118,17 @@ export function parseTerminalCallback(url: string, callback: string = TERMINAL_C
 
 let pluginPromise: Promise<PaleeVivaTerminalPlugin> | null = null;
 
+/** The plugin the native shell already put on its bridge, if any. */
+function bridgedPlugin(): PaleeVivaTerminalPlugin | null {
+  if (typeof window === "undefined") return null;
+  const bridge = (window as unknown as { Capacitor?: { Plugins?: Record<string, unknown> } }).Capacitor;
+  const plugin = bridge?.Plugins?.PaleeVivaTerminal;
+  return plugin && typeof plugin === "object" ? (plugin as PaleeVivaTerminalPlugin) : null;
+}
+
 export function vivaTerminalPlugin(): Promise<PaleeVivaTerminalPlugin> {
+  const bridged = bridgedPlugin();
+  if (bridged) return Promise.resolve(bridged);
   pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => registerPlugin<PaleeVivaTerminalPlugin>("PaleeVivaTerminal"));
   return pluginPromise;
 }
