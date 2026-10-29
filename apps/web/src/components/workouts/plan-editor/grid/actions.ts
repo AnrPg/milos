@@ -4,7 +4,7 @@ import type { PlanMeasure, PlanRow, PlanStructureKind } from "@/lib/structured-p
 
 import { useGrid, type PickerState } from "./context";
 import { MEASURES } from "./lib-shim";
-import { fieldKey, type MeasureKey } from "./model";
+import { attr, fieldKey, type MeasureKey } from "./model";
 import * as M from "./mutations";
 
 /**
@@ -85,7 +85,7 @@ export function useGridActions() {
       focusKey(fieldKey.name(rowId));
     },
     open(rowId: string, mode: PickerState["mode"], anchor: HTMLElement | null, returnKey: string | null) {
-      const target = anchor ?? document.querySelector<HTMLElement>(`[data-more="${CSS.escape(rowId)}"]`);
+      const target = anchor ?? document.querySelector<HTMLElement>(`[data-more="${attr(rowId)}"]`);
       if (target) openPicker({ rowId, mode, anchor: target, returnKey });
     },
   };

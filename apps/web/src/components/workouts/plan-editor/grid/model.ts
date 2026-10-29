@@ -374,3 +374,6 @@ export function fieldValue(row: PlanRow, key: FieldKey): string {
   if (key.kind === "x") return row.x?.[key.k] ?? "";
   return (row[key.field] as string | undefined) ?? "";
 }
+
+/** A value for a quoted CSS attribute selector (jsdom has no CSS.escape). */
+export const attr = (value: string) => value.replace(/["\\]/g, "\\$&");

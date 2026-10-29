@@ -8,7 +8,7 @@ import { useGridActions } from "./actions";
 import { GridContext, useGrid, useGridT, type GridContextValue, type PickerState } from "./context";
 import { HintLine } from "./HintLine";
 import { occurrences, setsRange, totalRounds } from "./lib-shim";
-import { blockTitle, parseFieldKey, roundWordKey } from "./model";
+import { attr, blockTitle, parseFieldKey, roundWordKey } from "./model";
 import { findRow } from "./mutations";
 import { RowMenu } from "./RowMenu";
 import { usePlanSection, usePlanWriter, useWodExerciseNames } from "./store-adapter";
@@ -40,7 +40,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
   // A field asked for (a new row's name, a new measure) gets the caret once it is on screen.
   useEffect(() => {
     if (!pending) return;
-    const el = rootRef.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(pending)}"]`);
+    const el = rootRef.current?.querySelector<HTMLElement>(`[data-key="${attr(pending)}"]`);
     if (!el) return;
     el.focus();
     if (el instanceof HTMLInputElement) el.select();

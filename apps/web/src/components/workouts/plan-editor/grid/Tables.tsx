@@ -7,6 +7,7 @@ import type { PlanRow, PlanSection, PlanUnit } from "@/lib/structured-plan/types
 import { useGrid, useGridT } from "./context";
 import { setsRange, structOf, unitsOf } from "./lib-shim";
 import {
+  attr,
   cellTestId,
   compactField,
   fieldKey,
@@ -372,6 +373,6 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
 }
 
 function focusFirst(rowId: string, k: ColKey) {
-  document.querySelector<HTMLInputElement>(`[data-key="${CSS.escape(fieldKey.cell(rowId, 0, k))}"]`)?.focus();
+  document.querySelector<HTMLInputElement>(`[data-key="${attr(fieldKey.cell(rowId, 0, k))}"]`)?.focus();
 }
 
