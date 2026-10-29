@@ -24,8 +24,9 @@ import { useOrganizationSlug } from "@/lib/organization-slug";
 
 import { documentError } from "../document-errors";
 import { blocksBookingOnPublish, requestedAtByUser, shortDate } from "../documents-model";
-import { documentKeys, openLink, useToken } from "../use-documents";
+import { documentKeys, openLink, useDocumentsAccess, useToken } from "../use-documents";
 import { RequirementPicker } from "./NewDocumentDialog";
+import { PublishConfirm } from "./PublishConfirm";
 import { RequestDialog } from "./RequestDialog";
 import { BookingBlockWarning, Card, Hint, linkButtonClass, PersonRow, Toast } from "./staff-parts";
 import { VersionDialog } from "./VersionDialog";
@@ -41,6 +42,7 @@ const SHOWN_SIGNATURES = 10;
 export function DocumentPanel({
   template,
   outstanding,
+  clients,
   settings,
   canManage,
   onClose,
@@ -48,6 +50,8 @@ export function DocumentPanel({
 }: {
   template: DocumentTemplate;
   outstanding: OutstandingRow | undefined;
+  /** Clients of the box, for the confirm before a major version. */
+  clients: number | null;
   settings: DocumentSettings | null | undefined;
   canManage: boolean;
   onClose: () => void;
@@ -64,6 +68,9 @@ export function DocumentPanel({
   const [error, setError] = useState<string | null>(null);
   const [requirement, setRequirement] = useState<DocumentRequirement>(template.requirement);
   const [justMandatory, setJustMandatory] = useState(false);
+  const [confirmMandatory, setConfirmMandatory] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const access = useDocumentsAccess();
   const [versionOpen, setVersionOpen] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
   const [allSignatures, setAllSignatures] = useState(false);
@@ -115,10 +122,17 @@ export function DocumentPanel({
     }
   }
 
-  async function changeRequirement(next: DocumentRequirement) {
+  async function changeRequirement(next: DocumentRequirement, confirmed = false) {
     if (!token || next === requirement) return;
+    // Mandatory blocks the clients who have not signed at once: confirm first.
+    if (next === "mandatory" && !confirmed && blocksBookingOnPublish("mandatory", settings)) {
+      setConfirmMandatory(true);
+      return;
+    }
     const previous = requirement;
     setRequirement(next);
+    setConfirmMandatory(false);
+    setSaving(true);
     setError(null);
     try {
       await setDocumentRequirement(token, template.id, next);
@@ -127,6 +141,8 @@ export function DocumentPanel({
     } catch (err) {
       setRequirement(previous);
       setError(documentError(err, t, i18n).message);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -208,6 +224,16 @@ export function DocumentPanel({
         {canManage ? (
           <Card className="flex flex-col gap-2 py-3">
             <RequirementPicker value={requirement} onChange={(next) => void changeRequirement(next)} />
+            {confirmMandatory ? (
+              <PublishConfirm
+                count={outstanding ? outstanding.outstanding : null}
+                confirmLabel={t("confirmMandatory")}
+                busyLabel={t("saving")}
+                busy={saving}
+                onBack={() => setConfirmMandatory(false)}
+                onConfirm={() => void changeRequirement("mandatory", true)}
+              />
+            ) : null}
             {justMandatory && blocksBookingOnPublish("mandatory", settings) ? <BookingBlockWarning>{t("mandatoryBlocksBooking")}</BookingBlockWarning> : null}
             {mandatory && settings && !settings.block_booking_on_unsigned ? <Hint>{t("gateOffHint")}</Hint> : null}
           </Card>
@@ -234,9 +260,11 @@ export function DocumentPanel({
                   name={String(signature.account?.nickname ?? signature.account?.display_name ?? signature.typed_name ?? t("clientFallback"))}
                   detail={t("signedVersionOn", { number: signature.version_number, date: shortDate(signature.signed_at, locale) })}
                   action={
-                    <button type="button" onClick={() => void openCertificate(signature.id)} className={secondaryButtonClass} style={secondaryButtonStyle}>
-                      {t("certificatePdf")}
-                    </button>
+                    access.evidence ? (
+                      <button type="button" onClick={() => void openCertificate(signature.id)} className={secondaryButtonClass} style={secondaryButtonStyle}>
+                        {t("certificatePdf")}
+                      </button>
+                    ) : null
                   }
                 />
               ))}
@@ -254,6 +282,7 @@ export function DocumentPanel({
         <VersionDialog
           template={template}
           settings={settings}
+          clients={clients}
           onClose={() => setVersionOpen(false)}
           onPublished={() => {
             setVersionOpen(false);

@@ -137,9 +137,11 @@ export function MemberDocumentsPanel({ userId, name }: { userId: string; name: s
                 name={titles.get(signature.template_id) ?? t("documentFallback")}
                 detail={t("signedVersionOn", { number: signature.version_number, date: shortDate(signature.signed_at, locale) })}
                 action={
-                  <button type="button" onClick={() => void openCertificate(signature.id)} className={secondaryButtonClass} style={secondaryButtonStyle}>
-                    {t("certificatePdf")}
-                  </button>
+                  access.evidence ? (
+                    <button type="button" onClick={() => void openCertificate(signature.id)} className={secondaryButtonClass} style={secondaryButtonStyle}>
+                      {t("certificatePdf")}
+                    </button>
+                  ) : null
                 }
               />
             ))}

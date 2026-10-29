@@ -12238,6 +12238,12 @@
     "gateResign": "Neue Version · Unterschrift, 1 Minute",
     "gateHealthExpired": "Abgelaufen · Foto des neuen",
     "gateHealthMissing": "Foto des Zeugnisses",
-    "gateDone": "Erledigt"
+    "gateDone": "Erledigt",
+    "confirmBlockTitle": "Buchungen werden gesperrt",
+    "confirmBlockCount": "{count, plural, =0 {Gerade ist kein Kunde gesperrt: Alle haben unterschrieben.} one {# Kunde kann erst nach der Unterschrift buchen.} other {# Kunden können erst nach der Unterschrift buchen.}}",
+    "confirmBlockUnknown": "Kunden, die nicht unterschrieben haben, können erst nach der Unterschrift buchen.",
+    "confirmBack": "Zurück",
+    "confirmPublish": "Ja, veröffentlichen",
+    "confirmMandatory": "Ja, zur Pflicht machen"
   }
 }

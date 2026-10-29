@@ -38,17 +38,24 @@ export function useToken() {
 
 /**
  * Who sees what (ADR-252 §7): documents, requests and signatures need
- * `manage_settings` or `manage_memberships`; writing documents and the
- * booking gate need `manage_settings`; certificate dates and files need
- * `manage_health_certificates`; `view_health` (coaches) sees status only.
+ * `manage_settings`, `manage_memberships` or `request_signatures` (front
+ * desk); the evidence PDF the first two; writing documents and the booking
+ * gate need `manage_settings`; certificate dates and files need
+ * `manage_health_certificates` or `view_health_certificates` (front desk),
+ * uploads the former; `view_health` (coaches) sees status only.
  */
 export function useDocumentsAccess() {
   const { membership, isLoading } = useSelectedMembershipRole();
   const manage = can(membership, "manage_settings");
-  const documents = manage || can(membership, "manage_memberships");
-  const healthFull = can(membership, "manage_health_certificates");
+  // The evidence PDF stays with settings and memberships staff.
+  const evidence = manage || can(membership, "manage_memberships");
+  // Front desk asks clients to sign and sees who has not (product owner, 2026-10-29).
+  const documents = evidence || can(membership, "request_signatures");
+  // ...and sees certificate dates and files; uploading and deleting need manage_health_certificates.
+  const healthWrite = can(membership, "manage_health_certificates");
+  const healthFull = healthWrite || can(membership, "view_health_certificates");
   const health = healthFull || can(membership, "view_health");
-  return { isLoading, manage, documents, health, healthFull, any: documents || health };
+  return { isLoading, manage, documents, evidence, health, healthFull, healthWrite, any: documents || health };
 }
 
 export function useStaffDocuments() {

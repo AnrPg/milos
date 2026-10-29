@@ -14,6 +14,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { documentError } from "../document-errors";
 import { blocksBookingOnPublish } from "../documents-model";
 import { useToken } from "../use-documents";
+import { PublishConfirm } from "./PublishConfirm";
 import { BookingBlockWarning, Hint } from "./staff-parts";
 
 /**
@@ -24,11 +25,14 @@ import { BookingBlockWarning, Hint } from "./staff-parts";
 export function VersionDialog({
   template,
   settings,
+  clients,
   onClose,
   onPublished,
 }: {
   template: DocumentTemplate;
   settings: DocumentSettings | null | undefined;
+  /** Clients of the box: a major change of a mandatory document blocks all of them until they sign again. */
+  clients: number | null;
   onClose: () => void;
   onPublished: () => void;
 }) {
@@ -39,6 +43,7 @@ export function VersionDialog({
   const [editedBody, setBody] = useState<string | null>(null);
   const [changeKind, setChangeKind] = useState<ChangeKind>("major");
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<{ message: string; fields: Record<string, string | undefined> } | null>(null);
 
   const current = useQuery({
@@ -57,6 +62,10 @@ export function VersionDialog({
     if (!token || body === null) return;
     if (!body.trim()) {
       setError({ message: t("errorBodyRequired"), fields: { body: t("errorBodyRequired") } });
+      return;
+    }
+    if (blocksBookingOnPublish(template.requirement, settings, changeKind) && !confirming) {
+      setConfirming(true);
       return;
     }
     setBusy(true);
@@ -83,16 +92,23 @@ export function VersionDialog({
       onSubmit={(event) => void submit(event)}
       error={error && !error.fields.body ? <ErrorNotice>{error.message}</ErrorNotice> : null}
       footer={
-        <button type="submit" disabled={busy || body === null} className={primaryButtonClass} style={primaryButtonStyle}>
-          {busy ? t("publishing") : t("publish")}
-        </button>
+        confirming ? (
+          <PublishConfirm count={clients} confirmLabel={t("confirmPublish")} busy={busy} onBack={() => setConfirming(false)} />
+        ) : (
+          <button type="submit" disabled={busy || body === null} className={primaryButtonClass} style={primaryButtonStyle}>
+            {busy ? t("publishing") : t("publish")}
+          </button>
+        )
       }
     >
       <div className="flex flex-col gap-3">
         {current.isError ? <ErrorNotice>{documentError(current.error, t, i18n).message}</ErrorNotice> : null}
         <label className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
           {t("fieldTitle")}
-          <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} className={inputClass} style={inputStyle} />
+          <input value={title} onChange={(event) => {
+              setTitle(event.target.value);
+              setConfirming(false);
+            }} maxLength={200} className={inputClass} style={inputStyle} />
         </label>
         <label className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
           {t("fieldBody")}
@@ -102,6 +118,7 @@ export function VersionDialog({
             onChange={(event) => {
               setBody(event.target.value);
               setError(null);
+              setConfirming(false);
             }}
             rows={12}
             maxLength={100_000}
@@ -114,7 +131,10 @@ export function VersionDialog({
         <Segmented
           label={t("changeKindLabel")}
           value={changeKind}
-          onChange={setChangeKind}
+          onChange={(next) => {
+            setChangeKind(next);
+            setConfirming(false);
+          }}
           options={[
             { value: "major", label: t("changeMajor") },
             { value: "minor", label: t("changeMinor") },

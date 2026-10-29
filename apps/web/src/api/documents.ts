@@ -74,6 +74,8 @@ export type OutstandingRow = {
   clients: OutstandingClient[];
 };
 
+export type Outstanding = { clients: number; templates: OutstandingRow[] };
+
 export type SignatureRequest = {
   id: string;
   template_id: string;
@@ -238,8 +240,9 @@ export async function fetchStarterDocuments(token: string, language: "el" | "en"
   return (await apiRequest<{ starters: StarterDocument[] }>(`${ADMIN}/starters?language=${language}`, { token })).starters;
 }
 
+/** Who has not signed each document, and `clients`: how many a new mandatory document would block. */
 export async function fetchOutstanding(token: string) {
-  return (await apiRequest<{ templates: OutstandingRow[] }>(`${ADMIN}/outstanding`, { token })).templates;
+  return apiRequest<Outstanding>(`${ADMIN}/outstanding`, { token });
 }
 
 export type NewDocumentInput = {
@@ -373,8 +376,14 @@ export async function recordClientHealthCertificate(
 
 // ── Client (Box › Έγγραφα) ─────────────────────────────────────────────────
 
-export async function fetchMyDocuments(token: string) {
-  return apiRequest<MyDocumentsOverview>(ME, { token });
+export async function fetchMyDocuments(token: string): Promise<MyDocumentsOverview> {
+  // Box renders this on every visit: a partial answer must not break the page.
+  const overview = await apiRequest<Partial<MyDocumentsOverview> | null>(ME, { token });
+  return {
+    documents: Array.isArray(overview?.documents) ? overview.documents : [],
+    outstanding: typeof overview?.outstanding === "number" ? overview.outstanding : 0,
+    health_certificate: overview?.health_certificate ?? { required: false, status: "missing", certificate: null },
+  };
 }
 
 export async function fetchMyDocument(token: string, templateId: string) {

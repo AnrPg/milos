@@ -12238,6 +12238,12 @@
     "gateResign": "Nuova versione · firma, 1 minuto",
     "gateHealthExpired": "Scaduto · foto del nuovo",
     "gateHealthMissing": "Foto del certificato",
-    "gateDone": "Fatto"
+    "gateDone": "Fatto",
+    "confirmBlockTitle": "Alcune prenotazioni saranno bloccate",
+    "confirmBlockCount": "{count, plural, =0 {Al momento nessun cliente è bloccato: hanno firmato tutti.} one {# cliente non potrà prenotare finché non firma.} other {# clienti non potranno prenotare finché non firmano.}}",
+    "confirmBlockUnknown": "I clienti che non hanno firmato non potranno prenotare finché non firmano.",
+    "confirmBack": "Indietro",
+    "confirmPublish": "Sì, pubblica",
+    "confirmMandatory": "Sì, rendilo obbligatorio"
   }
 }

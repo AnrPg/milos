@@ -24,7 +24,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { documentError } from "../document-errors";
 import { healthOutstanding, shortDate } from "../documents-model";
 import { HealthUpload, validUntilText } from "../HealthUpload";
-import { openLink, useToken } from "../use-documents";
+import { openLink, useDocumentsAccess, useToken } from "../use-documents";
 import { Card, Hint, PersonRow, Pill, SettingRow } from "./staff-parts";
 
 function healthTone(status: HealthRow["status"]) {
@@ -192,6 +192,7 @@ export function ClientHealthDialog({
   const token = useToken();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const canUpload = useDocumentsAccess().healthWrite;
   const certificates = useQuery({
     queryKey: ["documents", "client-health", person.user_id],
     enabled: Boolean(token),
@@ -244,9 +245,11 @@ export function ClientHealthDialog({
             ))}
           </ul>
           {error ? <ErrorNotice>{error}</ErrorNotice> : null}
-          <button type="button" onClick={() => setUploading(true)} className="self-start text-sm font-semibold" style={{ color: "var(--primary)" }}>
-            {t("healthUploadNew")} ›
-          </button>
+          {canUpload ? (
+            <button type="button" onClick={() => setUploading(true)} className="self-start text-sm font-semibold" style={{ color: "var(--primary)" }}>
+              {t("healthUploadNew")} ›
+            </button>
+          ) : null}
         </div>
       )}
     </Dialog>

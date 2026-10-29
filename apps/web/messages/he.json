@@ -12238,6 +12238,12 @@
     "gateResign": "גרסה חדשה · חתימה, דקה אחת",
     "gateHealthExpired": "פג תוקף · צילום של החדש",
     "gateHealthMissing": "צילום האישור",
-    "gateDone": "מוכן"
+    "gateDone": "מוכן",
+    "confirmBlockTitle": "הזמנות ייחסמו",
+    "confirmBlockCount": "{count, plural, =0 {אף לקוח לא נחסם כרגע: כולם חתמו.} one {לקוח אחד לא יוכל להזמין עד שיחתום.} two {שני לקוחות לא יוכלו להזמין עד שיחתמו.} other {# לקוחות לא יוכלו להזמין עד שיחתמו.}}",
+    "confirmBlockUnknown": "לקוחות שלא חתמו לא יוכלו להזמין עד שיחתמו.",
+    "confirmBack": "חזרה",
+    "confirmPublish": "כן, לפרסם",
+    "confirmMandatory": "כן, להפוך לחובה"
   }
 }

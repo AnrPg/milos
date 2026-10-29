@@ -62,7 +62,7 @@ export function DocumentsConsole() {
 
   const rows = staffRows(
     templates.data ?? [],
-    outstanding.data,
+    outstanding.data?.templates,
     health.data ? { required: health.data.required, rows: health.data.health_certificates } : null,
   );
   const gateOn = settings.data?.block_booking_on_unsigned ?? true;
@@ -169,7 +169,8 @@ export function DocumentsConsole() {
         <DocumentPanel
           key={selectedTemplate.id}
           template={selectedTemplate}
-          outstanding={outstanding.data?.find((row) => row.template_id === selectedTemplate.id)}
+          outstanding={outstanding.data?.templates.find((row) => row.template_id === selectedTemplate.id)}
+          clients={outstanding.data?.clients ?? null}
           settings={settings.data}
           canManage={access.manage}
           onClose={() => setSelected(null)}
@@ -182,6 +183,7 @@ export function DocumentsConsole() {
       {newOpen ? (
         <NewDocumentDialog
           settings={settings.data}
+          clients={outstanding.data?.clients ?? null}
           onClose={() => setNewOpen(false)}
           onCreated={(id) => {
             setNewOpen(false);

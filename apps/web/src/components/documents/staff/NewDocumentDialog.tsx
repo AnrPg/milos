@@ -22,6 +22,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { documentError } from "../document-errors";
 import { blocksBookingOnPublish, DOCUMENT_KINDS } from "../documents-model";
 import { useToken } from "../use-documents";
+import { PublishConfirm } from "./PublishConfirm";
 import { BookingBlockWarning, Hint, Notice, Pill } from "./staff-parts";
 
 const LANGUAGES = ["el", "en", "de", "fr", "es", "it", "ru", "pt-PT", "nl", "bg", "ar", "he"];
@@ -35,10 +36,13 @@ type Draft = { kind: DocumentKind; title: string; body: string; requirement: Doc
  */
 export function NewDocumentDialog({
   settings,
+  clients,
   onClose,
   onCreated,
 }: {
   settings: DocumentSettings | null | undefined;
+  /** Clients of the box: a new mandatory document blocks all of them until they sign. */
+  clients: number | null;
   onClose: () => void;
   onCreated: (templateId: string) => void;
 }) {
@@ -49,6 +53,7 @@ export function NewDocumentDialog({
   const starterLanguage = locale === "el" ? "el" : "en";
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<{ message: string; fields: Record<string, string | undefined> } | null>(null);
 
   const starters = useQuery({
@@ -74,6 +79,11 @@ export function NewDocumentDialog({
     if (!draft.body.trim()) fields.body = t("errorBodyRequired");
     if (Object.keys(fields).length > 0) {
       setError({ message: Object.values(fields)[0], fields });
+      return;
+    }
+    // A mandatory document blocks bookings at once: say how many first.
+    if (blocksBookingOnPublish(draft.requirement, settings) && !confirming) {
+      setConfirming(true);
       return;
     }
     setBusy(true);
@@ -135,6 +145,7 @@ export function NewDocumentDialog({
   const set = (change: Partial<Draft>) => {
     setDraft({ ...draft, ...change });
     setError(null);
+    setConfirming(false);
   };
 
   return (
@@ -148,9 +159,13 @@ export function NewDocumentDialog({
       onSubmit={(event) => void submit(event)}
       error={error && !error.fields.title && !error.fields.body ? <ErrorNotice>{error.message}</ErrorNotice> : null}
       footer={
-        <button type="submit" disabled={busy} className={primaryButtonClass} style={primaryButtonStyle}>
-          {busy ? t("publishing") : t("publish")}
-        </button>
+        confirming ? (
+          <PublishConfirm count={clients} confirmLabel={t("confirmPublish")} busy={busy} onBack={() => setConfirming(false)} />
+        ) : (
+          <button type="submit" disabled={busy} className={primaryButtonClass} style={primaryButtonStyle}>
+            {busy ? t("publishing") : t("publish")}
+          </button>
+        )
       }
     >
       <div className="flex flex-col gap-3">

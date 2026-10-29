@@ -105,11 +105,17 @@ test.describe("signed documents (ADR-252)", () => {
   test("staff see who is missing per document and are warned before a mandatory document blocks booking", async ({ page }) => {
     await signIn(page, "owner-1", "owner", { manage_settings: "all", manage_memberships: "all", manage_health_certificates: "all" });
     const requests: unknown[] = [];
+    const created: unknown[] = [];
     await documentsApi(page, (method, path, route) => {
+      if (path === "/admin/documents/templates" && method === "POST") {
+        created.push(route.request().postDataJSON());
+        return { template: template("waiver", "Waiver", "mandatory"), version: termsVersion };
+      }
       if (path === "/admin/documents/templates" && method === "GET")
         return { templates: [template("terms", "Terms of participation", "mandatory"), template("privacy", "Privacy notice", "optional")] };
       if (path === "/admin/documents/outstanding")
         return {
+          clients: 8,
           templates: [
             {
               template_id: "terms",
@@ -161,6 +167,14 @@ test.describe("signed documents (ADR-252)", () => {
     await expect(page.getByTestId("booking-block-warning")).toBeVisible();
     await page.getByRole("radio", { name: "Optional" }).click();
     await expect(page.getByTestId("booking-block-warning")).toHaveCount(0);
+
+    // Mandatory again: publishing asks first and says how many clients it blocks now.
+    await page.getByRole("radio", { name: "Mandatory" }).click();
+    await page.getByRole("button", { name: "Publish", exact: true }).click();
+    const confirm = page.getByRole("alertdialog", { name: /Bookings will be blocked/ });
+    await expect(confirm).toContainText("8 clients will not be able to book until they sign.");
+    await confirm.getByRole("button", { name: "Yes, publish" }).click();
+    await expect.poll(() => created).toEqual([expect.objectContaining({ kind: "waiver", requirement: "mandatory" })]);
   });
 
   test("a client signs what is missing from Box › Documents", async ({ page }) => {

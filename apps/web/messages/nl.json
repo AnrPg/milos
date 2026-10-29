@@ -12238,6 +12238,12 @@
     "gateResign": "Nieuwe versie · handtekening, 1 minuut",
     "gateHealthExpired": "Verlopen · foto van de nieuwe",
     "gateHealthMissing": "Foto van de verklaring",
-    "gateDone": "Klaar"
+    "gateDone": "Klaar",
+    "confirmBlockTitle": "Boekingen worden geblokkeerd",
+    "confirmBlockCount": "{count, plural, =0 {Er is nu geen klant geblokkeerd: iedereen heeft ondertekend.} one {# klant kan pas boeken na ondertekening.} other {# klanten kunnen pas boeken na ondertekening.}}",
+    "confirmBlockUnknown": "Klanten die niet ondertekend hebben, kunnen pas boeken na ondertekening.",
+    "confirmBack": "Terug",
+    "confirmPublish": "Ja, publiceren",
+    "confirmMandatory": "Ja, verplicht maken"
   }
 }

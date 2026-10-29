@@ -70,18 +70,21 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.capabilities = { manage_settings: "all", manage_health_certificates: "all" };
   vi.mocked(api.fetchDocumentTemplates).mockResolvedValue([template("terms", "Terms of participation", "mandatory"), template("privacy", "Privacy notice", "optional")]);
-  vi.mocked(api.fetchOutstanding).mockResolvedValue([
-    {
-      template_id: "terms",
-      signed: 6,
-      outstanding: 2,
-      clients: [
-        { user_id: "maria", display_name: "Maria K.", handle: null, status: "resign_required" },
-        { user_id: "anna", display_name: "Anna Z.", handle: null, status: "unsigned" },
-      ],
-    },
-    { template_id: "privacy", signed: 8, outstanding: 0, clients: [] },
-  ]);
+  vi.mocked(api.fetchOutstanding).mockResolvedValue({
+    clients: 8,
+    templates: [
+      {
+        template_id: "terms",
+        signed: 6,
+        outstanding: 2,
+        clients: [
+          { user_id: "maria", display_name: "Maria K.", handle: null, status: "resign_required" },
+          { user_id: "anna", display_name: "Anna Z.", handle: null, status: "unsigned" },
+        ],
+      },
+      { template_id: "privacy", signed: 7, outstanding: 1, clients: [{ user_id: "anna", display_name: "Anna Z.", handle: null, status: "unsigned" }] },
+    ],
+  });
   vi.mocked(api.fetchDocumentSettings).mockResolvedValue(settings);
   vi.mocked(api.fetchHealthCertificates).mockResolvedValue({
     required: true,
@@ -136,12 +139,21 @@ describe("Χρήστες › Έγγραφα (s7 option B)", () => {
     expect(await screen.findByText(/Signature request sent to 1 person/)).toBeInTheDocument();
   });
 
-  it("warns when a document becomes mandatory while the booking gate is on", async () => {
+  it("asks before a document becomes mandatory, saying how many clients it blocks now", async () => {
     vi.mocked(api.setDocumentRequirement).mockResolvedValue(template("privacy", "Privacy notice", "mandatory"));
     renderConsole();
     fireEvent.click(await screen.findByTestId("documents-row-privacy"));
 
     fireEvent.click(await screen.findByRole("radio", { name: "Mandatory" }));
+    const confirm = await screen.findByRole("alertdialog", { name: /Bookings will be blocked/ });
+    expect(confirm).toHaveTextContent("1 client will not be able to book until they sign.");
+    expect(api.setDocumentRequirement).not.toHaveBeenCalled();
+
+    fireEvent.click(within(confirm).getByRole("button", { name: "Back" }));
+    expect(screen.queryByTestId("publish-confirm")).toBeNull();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Mandatory" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Yes, make it mandatory" }));
     await waitFor(() => expect(api.setDocumentRequirement).toHaveBeenCalledWith("access", "privacy", "mandatory"));
     expect(await screen.findByTestId("booking-block-warning")).toHaveTextContent(en.Documents.mandatoryBlocksBooking);
   });
@@ -161,9 +173,33 @@ describe("Χρήστες › Έγγραφα (s7 option B)", () => {
     expect(await screen.findByTestId("draft-banner")).toBeInTheDocument();
     expect(screen.getByTestId("booking-block-warning")).toHaveTextContent(en.Documents.publishBlocksBooking);
     fireEvent.click(screen.getByRole("button", { name: "Publish" }));
+    // A new mandatory document blocks every client of the box until they sign.
+    expect(await screen.findByTestId("publish-confirm")).toHaveTextContent("8 clients will not be able to book until they sign.");
+    expect(api.createDocumentTemplate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Yes, publish" }));
     await waitFor(() =>
       expect(api.createDocumentTemplate).toHaveBeenCalledWith("access", expect.objectContaining({ kind: "waiver", requirement: "mandatory", language: "en" })),
     );
+  });
+
+  it("lets front desk ask for signatures and see certificates, but not write documents, open the evidence or upload", async () => {
+    state.capabilities = { request_signatures: "all", view_health_certificates: "all" };
+    vi.mocked(api.fetchSignatures).mockResolvedValue([
+      { id: "s1", template_id: "terms", version_number: 3, signed_at: "2026-10-20T10:00:00Z", typed_name: "Eleni N.", account: null } as unknown as api.Signature,
+    ]);
+    vi.mocked(api.requestSignatures).mockResolvedValue({ batch_id: "b", audience: "person", recipients: 1, created: 1, skipped: 0, requests: [] });
+    renderConsole();
+
+    expect(screen.queryByRole("button", { name: "New document" })).toBeNull();
+    fireEvent.click(await screen.findByTestId("documents-row-terms"));
+    const missing = await screen.findByTestId("missing-list");
+    fireEvent.click(within(missing).getAllByRole("button", { name: "Ask" })[0]);
+    await waitFor(() => expect(api.requestSignatures).toHaveBeenCalledWith("access", "terms", { audience: "person", user_id: "maria" }));
+
+    const signed = await screen.findByTestId("signed-list");
+    expect(within(signed).getByText("Eleni N.")).toBeInTheDocument();
+    expect(within(signed).queryByRole("button", { name: "Certificate (PDF)" })).toBeNull();
+    expect(screen.queryByRole("radio", { name: "Mandatory" })).toBeNull();
   });
 
   it("shows coaches only whether their clients' certificates are valid", async () => {
