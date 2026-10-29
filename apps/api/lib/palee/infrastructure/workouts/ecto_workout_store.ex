@@ -15,6 +15,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.AssignedWorkoutAthlete,
     Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.SectionedText,
+    Workouts.Domain.StructuredPlanWorkout,
     Workouts.Domain.WorkoutAuthoring,
     Workouts.Domain.WorkoutBody,
     Workouts.Domain.WorkoutContent,
@@ -31,7 +32,8 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def create_workout(admin_id, params) do
-    with {:ok, normalized_params} <- prepare_workout_structure(params),
+    with {:ok, params} <- prepare_plan(params),
+         {:ok, normalized_params} <- prepare_workout_structure(params),
          {:ok, params_with_levels} <- attach_scale_level_ids(normalized_params) do
       params_with_levels
       |> Map.put(:created_by_id, admin_id)
@@ -1543,6 +1545,14 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
   defp prepare_authoring_mode(params) do
     if SectionedText.sectioned?(params),
       do: SectionedText.prepare_publish(params),
+      else: prepare_plan(params)
+  end
+
+  # ADR-270: a structured plan workout's sections are validated and their
+  # exercises materialised from their plans.
+  defp prepare_plan(params) do
+    if StructuredPlanWorkout.plan?(params),
+      do: StructuredPlanWorkout.prepare(params),
       else: {:ok, params}
   end
 
@@ -1653,6 +1663,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         free_text_body: section.free_text_body,
         free_text_document: section.free_text_document,
         timer_preset: section.timer_preset,
+        plan: section.plan,
         exercises:
           section.exercises
           |> Enum.sort_by(& &1.order)
@@ -2022,6 +2033,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         "free_text_body" => section.free_text_body,
         "free_text_document" => section.free_text_document,
         "timer_preset" => section.timer_preset,
+        "plan" => section.plan,
         "exercises" =>
           section.exercises
           |> Enum.sort_by(& &1.order)
