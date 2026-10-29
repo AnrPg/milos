@@ -94,6 +94,9 @@ export const PROVIDER_CREDENTIALS: Record<PaymentProvider, CredentialKey[]> = {
 /** The order of the switches under «Αλλαγή» (the mockup's ONLINE list). */
 export const PURPOSE_KEYS: Array<keyof PaymentPurposes> = ["packages", "autopay", "drop_in", "shop", "personal_training"];
 
+/** Recommended in Europe; the first one offered. */
+export const DEFAULT_PROVIDER: PaymentProvider = "viva";
+
 export const DEFAULT_OPTIONS: PaymentOptions = {
   purposes: { packages: true, autopay: true, drop_in: true, shop: true, personal_training: true },
   notify_member: true,

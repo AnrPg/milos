@@ -15,6 +15,7 @@ import {
   providerName,
   PURPOSE_KEYS,
   DEFAULT_OPTIONS,
+  DEFAULT_PROVIDER,
   savePaymentOptions,
   startPaymentConnect,
   type ConnectOutcome,
@@ -140,7 +141,7 @@ export function OnlinePaymentsSettings({ token }: { token: string }) {
         )}
         {connectMutation.isError ? <ErrorNotice>{paymentErrorText(connectMutation.error, t, ui)}</ErrorNotice> : null}
         <Advanced hint={t("advancedHintKeys")}>
-          <PaymentKeysForm token={token} status={status} provider={providers[0] ?? "viva"} />
+          <PaymentKeysForm token={token} status={status} provider={providers[0] ?? DEFAULT_PROVIDER} />
         </Advanced>
       </div>
     );

@@ -12142,7 +12142,7 @@
     "cred_merchant_id": "Merchant ID",
     "cred_api_key": "API key",
     "cred_secret_key": "Secret key",
-    "cred_webhook_secret": "Webhook signing secret",
+    "cred_webhook_secret": "Μυστικό υπογραφής webhook",
     "sourceCode": "Κωδικός πηγής πληρωμών (source code)",
     "savedPlaceholder": "Αποθηκευμένο · άφησέ το κενό για να μείνει",
     "webhookUrl": "Διεύθυνση webhook",
