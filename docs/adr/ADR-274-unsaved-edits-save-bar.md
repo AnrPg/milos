@@ -15,18 +15,28 @@ collapsing a panel dropped anything typed.
   whole-draft undo/redo steps (capped at 100), discard, commit, and rebase
   when the server copy changes (untouched fields follow the server, edited
   ones keep their edit).
+- Every field staff edit on a person's profile is a draft (`ui/DraftForms`,
+  `useDraftForm`): Finance (status, dates, automatic renewal), Account
+  (roles, branches, head coach, account role) and Training (weekly goal).
+  The page shows ONE bar for all of them (`PageSaveBar`): the count adds up,
+  undo/redo walk the edits in the order they were made across forms,
+  «Ακύρωση» drops every draft, «Αποθήκευση» saves the changed forms in turn
+  and stops at the first failure. A form outside such a page shows its own.
 - `ui/SaveBar` appears only while something changed: «N αλλαγές χωρίς
   αποθήκευση», Αναίρεση, Επανάληψη, «Ακύρωση», «Αποθήκευση». It sticks to
   the bottom of its panel, says «Οι αλλαγές αποθηκεύτηκαν.» once after a
   save and shows errors in place. Ctrl/⌘+S saves; Ctrl/⌘+Z and
   Ctrl/⌘+Shift+Z (Ctrl+Y) undo/redo outside text fields.
-- `ui/UnsavedChanges`: forms register; the page calls `guard(action)` before
+- The page calls `guard(action)` before
   anything that unmounts them (tab switch, section links) and asks «Μένω
   εδώ» / «Απόρριψη» / «Αποθήκευση». Closing or reloading the browser tab
   gets the browser's warning.
 - Edited fields show «● Αλλαγμένο». Saves send only the changed fields.
-- Actions with their own confirmed step (freezes, leaving the box,
-  allowance extensions and revocations) stay outside the bar.
+- Actions and records with their own confirmed step stay outside the bar:
+  freezes, leaving the box, allowance extensions and revocations, coach
+  assignments, coach notes, box messages, workout assignments, deleting the
+  person. A coach's own note-privacy switch is the coach's setting, not the
+  person's, and also stays immediate.
 - Profile panels hide their content instead of unmounting it.
 
 ## Rationale

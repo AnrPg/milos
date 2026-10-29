@@ -135,11 +135,11 @@ test.describe("member leaving (staff)", () => {
 
     await renewal.click();
     await expect(renewal).not.toBeChecked();
-    await expect(page.getByTestId("finance-save-bar-count")).toHaveText("1 unsaved change");
+    await expect(page.getByTestId("profile-save-bar-count")).toHaveText("1 unsaved change");
     expect(calls).toHaveLength(0);
-    await page.getByTestId("finance-save-bar-save").click();
+    await page.getByTestId("profile-save-bar-save").click();
     await expect(card.getByText("Last changed by staff", { exact: false })).toBeVisible();
-    await expect(page.getByTestId("finance-save-bar")).toContainText("Changes saved.");
+    await expect(page.getByTestId("profile-save-bar")).toContainText("Changes saved.");
     expect(calls[0]).toMatchObject({ method: "PUT", path: "/api/org/box1/admin/finance/members/u-2/subscriptions/sub-1/auto-renew", body: { auto_renew: false } });
 
     await card.getByTestId("admin-leave-open").click();

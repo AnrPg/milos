@@ -26,6 +26,7 @@ export function SaveBar({
   saving = false,
   saved = false,
   error,
+  placement = "panel",
   testId = "save-bar",
 }: {
   changes: number;
@@ -39,6 +40,8 @@ export function SaveBar({
   /** True right after a save, until the next edit. */
   saved?: boolean;
   error?: ReactNode;
+  /** "panel": the bottom edge of a padded panel; "page": a floating card at the bottom of the page. */
+  placement?: "panel" | "page";
   testId?: string;
 }) {
   const t = useTranslations("SaveBar");
@@ -82,7 +85,11 @@ export function SaveBar({
 
   return (
     <div
-      className="sticky bottom-0 z-(--z-sticky) -mx-6 -mb-6 mt-4 border-t px-6 pb-[max(0.875rem,env(safe-area-inset-bottom))] pt-3.5"
+      className={
+        placement === "page"
+          ? "sticky bottom-[max(1rem,env(safe-area-inset-bottom))] z-(--z-sticky) rounded-[1.5rem] border px-5 py-3.5"
+          : "sticky bottom-0 z-(--z-sticky) -mx-6 -mb-6 mt-4 border-t px-6 pb-[max(0.875rem,env(safe-area-inset-bottom))] pt-3.5"
+      }
       style={{ background: "var(--panel)", borderColor: "var(--border)", boxShadow: "var(--shadow-md)" }}
       data-testid={testId}
     >

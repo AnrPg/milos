@@ -37,19 +37,8 @@ import {
   statusOptions,
   type MembershipDraft,
 } from "@/components/admin/users/membership-draft";
-import {
-  changedKeys,
-  commitDraft,
-  createDraftHistory,
-  discardDraft,
-  editDraft,
-  rebaseDraft,
-  redoDraft,
-  undoDraft,
-} from "@/lib/draft-history";
 import { ChangedMark } from "@/components/ui/ChangedMark";
-import { SaveBar } from "@/components/ui/SaveBar";
-import { UnsavedChangesDialog, UnsavedChangesProvider, useRegisterUnsaved, useUnsavedChanges } from "@/components/ui/UnsavedChanges";
+import { DraftFormsProvider, PageSaveBar, UnsavedChangesDialog, useDraftForm, useDraftForms } from "@/components/ui/DraftForms";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
@@ -326,60 +315,32 @@ function FinanceDetails({
   const claims = finance.details.referral_claims;
   const referredMembers = finance.details.referred_members;
   const rewards = finance.details.referral_rewards;
-  // ADR-274: edits stay a draft until «Αποθήκευση»; the server copy follows
-  // refetches (leaving the box changes status and expiry) without eating
-  // fields staff are still editing.
-  const serverDraft = membershipDraftFrom(membership, subscriptions);
-  const serverKey = JSON.stringify(serverDraft);
-  const [syncedKey, setSyncedKey] = useState(serverKey);
-  const [history, setHistory] = useState(() => createDraftHistory(serverDraft));
-  if (syncedKey !== serverKey) {
-    setSyncedKey(serverKey);
-    setHistory((current) => rebaseDraft(current, serverDraft));
-  }
-  const draft = history.draft;
-  const changed = new Set<string>(changedKeys(history));
-  const renewalChanges = changedRenewals(history);
-  const changes = membershipChangeCount(history);
-  const [justSaved, setJustSaved] = useState(false);
+  // ADR-274: edits stay a draft until «Αποθήκευση» in the page's bar.
   const [commitment, setCommitment] = useState<{ endsOn: string | null } | null>(null);
-  const edit = (patch: Partial<MembershipDraft>) => {
-    setJustSaved(false);
-    setHistory((current) => editDraft(current, patch));
-  };
-  const saveMembership = useMutation({
-    mutationFn: async (overrideReason: string | null) => {
+  const form = useDraftForm<MembershipDraft, string>({
+    server: membershipDraftFrom(membership, subscriptions),
+    count: membershipChangeCount,
+    testId: "finance-save-bar",
+    save: async (_draft, history, overrideReason) => {
       const { patch, renewals } = membershipSaveRequests(history);
-      if (patch) await updateFinanceMember(token, userId, overrideReason ? { ...patch, commitment_override_reason: overrideReason } : patch);
+      try {
+        if (patch) await updateFinanceMember(token, userId, overrideReason ? { ...patch, commitment_override_reason: overrideReason } : patch);
+      } catch (error) {
+        // ADR-097: ending a membership inside its minimum commitment needs a reason.
+        const conflict = commitmentConflict(error);
+        if (conflict) setCommitment({ endsOn: conflict.endsOn });
+        throw error;
+      }
       for (const renewal of renewals) await setFinanceMemberAutoRenew(token, userId, renewal.id, renewal.autoRenew);
-      return history.draft;
-    },
-    onSuccess: async (sent) => {
-      setHistory((current) => commitDraft(current, sent));
       setCommitment(null);
-      setJustSaved(true);
-      await onRefresh();
     },
-    // ADR-097: ending a membership inside its minimum commitment needs a reason.
-    onError: (error) => {
-      const conflict = commitmentConflict(error);
-      if (conflict) setCommitment({ endsOn: conflict.endsOn });
-    },
+    describeError: (error) => (commitmentConflict(error) ? null : localizeError(error, i18n)),
+    onSaved: onRefresh,
   });
-  const save = async (overrideReason: string | null = null) => {
-    try {
-      await saveMembership.mutateAsync(overrideReason);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-  const discard = () => {
-    setCommitment(null);
-    saveMembership.reset();
-    setHistory((current) => discardDraft(current));
-  };
-  useRegisterUnsaved({ dirty: () => changes > 0, save: () => save(), discard });
+  const draft = form.draft;
+  const changed = form.changed;
+  const renewalChanges = changedRenewals(form.history);
+  const edit = form.edit;
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
   const packageContent = subscriptions
     .map((subscription) => {
@@ -399,26 +360,23 @@ function FinanceDetails({
           <div className="space-y-2">
             <div className="grid gap-2 sm:grid-cols-2">
               <EditableFinanceCard label={i18n("statusbae7d5b")} changed={changed.has("status")}>
-                <Select aria-label={i18n("statusbae7d5b")} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} disabled={saveMembership.isPending} onValueChange={(status) => edit({ status })} data-testid="membership-status">
+                <Select aria-label={i18n("statusbae7d5b")} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} disabled={form.saving} onValueChange={(status) => edit({ status })} data-testid="membership-status">
                   {statusOptions(draft.status).map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
                 </Select>
               </EditableFinanceCard>
               <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || "—"} />
               {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
                 <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
-                  <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={saveMembership.isPending} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
+                  <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
                 </EditableFinanceCard>
               ))}
             </div>
             {commitment ? (
               <CommitmentOverridePrompt
                 endsOn={commitment.endsOn}
-                pending={saveMembership.isPending}
-                onConfirm={(reason) => void save(reason)}
-                onCancel={() => {
-                  setCommitment(null);
-                  saveMembership.reset();
-                }}
+                pending={form.saving}
+                onConfirm={(reason) => void form.save(reason)}
+                onCancel={() => setCommitment(null)}
               />
             ) : null}
             <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
@@ -429,7 +387,7 @@ function FinanceDetails({
               subscriptions={subscriptions}
               autoRenew={draft.auto_renew}
               changedRenewals={renewalChanges}
-              renewDisabled={saveMembership.isPending}
+              renewDisabled={form.saving}
               onAutoRenewChange={(id, next) => edit({ auto_renew: { ...draft.auto_renew, [id]: next } })}
               onRefresh={onRefresh}
             />
@@ -448,21 +406,7 @@ function FinanceDetails({
         </div>
       </details>
 
-      {membership ? (
-        <SaveBar
-          testId="finance-save-bar"
-          changes={changes}
-          canUndo={history.past.length > 0}
-          canRedo={history.future.length > 0}
-          onUndo={() => setHistory((current) => undoDraft(current))}
-          onRedo={() => setHistory((current) => redoDraft(current))}
-          onCancel={discard}
-          onSave={() => void save()}
-          saving={saveMembership.isPending}
-          saved={justSaved}
-          error={saveMembership.isError && !commitment ? localizeError(saveMembership.error, i18n) : null}
-        />
-      ) : null}
+      {form.bar}
     </div>
   );
 }
@@ -624,10 +568,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const { membership: actor } = useSelectedMembershipRole();
   const [hashSection, setHashSection] = useState<string | null>(null);
   // ADR-274: a tab with unsaved edits asks before it is left.
-  const unsaved = useUnsavedChanges();
-  const guardRef = useRef(unsaved.guard);
+  const drafts = useDraftForms();
+  const guardRef = useRef(drafts.guard);
   useEffect(() => {
-    guardRef.current = unsaved.guard;
+    guardRef.current = drafts.guard;
   });
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
@@ -640,13 +584,6 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const incidents = useDossierQuery(token, userId, "incidents", fetchAdminUserIncidents, Boolean(profile?.available_sections.includes("health_incidents")));
   const messages = useDossierQuery(token, userId, "messages", fetchAdminUserMessages, Boolean(profile?.available_sections.includes("messages")));
   const coaching = useDossierQuery(token, userId, "coaching", fetchAdminUserCoachingContext, Boolean(profile?.available_sections.includes("coaching_context")));
-  const roleMutation = useMutation({
-    mutationFn: (role: AdminUserDirectoryEntry["role"]) => updateAdminUserRole(token!, userId, role),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "users", userId] });
-    },
-  });
   const [assignRequestDate, setAssignRequestDate] = useState<string | null>(null);
   const clearAssignRequest = useCallback(() => setAssignRequestDate(null), []);
   const [placementOpen, setPlacementOpen] = useState(false);
@@ -749,7 +686,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const inTab = (section: string) => SECTION_TAB[section] === tab && tabSections.has(section);
   const selectTab = (next: ProfileTab) => {
     if (next === tab) return;
-    unsaved.guard(() => {
+    drafts.guard(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", next);
       setHashSection(null);
@@ -790,9 +727,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   if (incidents.data?.incidents.length) overviewItems.push([i18n("activeInjuriesdaecfa6"), incidents.data.summary.active]);
 
   return (
-    <UnsavedChangesProvider registry={unsaved.registry}>
+    <DraftFormsProvider value={drafts.context}>
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
-      <UnsavedChangesDialog prompt={unsaved.prompt} />
+      <UnsavedChangesDialog prompt={drafts.prompt} />
       <div className="mx-auto max-w-6xl space-y-6">
         <BackLink href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("users206fc04")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -940,27 +877,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                 {profile.membership && token ? (
                   <MemberRolesEditor token={token} userId={userId} membership={profile.membership} />
                 ) : (
-                <div>
-                  <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {(["member", "athlete", "admin"] as const).map((role) => {
-                      const selected = profile.identity.role === role;
-                      return (
-                        <button
-                          key={role}
-                          type="button"
-                          disabled={roleMutation.isPending || selected}
-                          onClick={() => roleMutation.mutate(role)}
-                          className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
-                          style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}
-                        >
-                          <RoleLabel role={role} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {roleMutation.isError ? <ErrorNotice className="mt-2">{i18n("roleUpdateFailed493da52")}</ErrorNotice> : null}
-                </div>
+                  token ? <AccountRoleEditor token={token} userId={userId} role={profile.identity.role} /> : null
                 )}
                 <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                   <button
@@ -984,9 +901,53 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
         </section>
+        <PageSaveBar bar={drafts.bar} />
       </div>
     </main>
-    </UnsavedChangesProvider>
+    </DraftFormsProvider>
+  );
+}
+
+/**
+ * The account-wide role, for someone with no membership in this box. A
+ * draft like every profile field (ADR-274), saved with the page's bar.
+ */
+function AccountRoleEditor({ token, userId, role }: { token: string; userId: string; role: AdminUserDirectoryEntry["role"] }) {
+  const i18n = useUiTranslations();
+  const queryClient = useQueryClient();
+  const form = useDraftForm<{ role: AdminUserDirectoryEntry["role"] }>({
+    server: { role },
+    testId: "account-role-save-bar",
+    save: (draft) => updateAdminUserRole(token, userId, draft.role),
+    describeError: () => i18n("roleUpdateFailed493da52"),
+    onSaved: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+  });
+  return (
+    <div>
+      <span className="flex items-center gap-2 text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+        {i18n("accountRole39514a0")}
+        {form.changed.has("role") ? <ChangedMark /> : null}
+      </span>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {(["member", "athlete", "admin"] as const).map((option) => {
+          const selected = form.draft.role === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={selected}
+              disabled={form.saving}
+              onClick={() => form.edit({ role: option })}
+              className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
+              style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}
+            >
+              <RoleLabel role={option} />
+            </button>
+          );
+        })}
+      </div>
+      {form.bar}
+    </div>
   );
 }
 

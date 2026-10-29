@@ -99,8 +99,8 @@ test.describe("admin profile save bar", () => {
     await page.goto("/admin/users/u-2?tab=finance");
     const status = page.getByTestId("membership-status");
     const expires = page.getByTestId("membership-expires_on");
-    const bar = page.getByTestId("finance-save-bar");
-    const count = page.getByTestId("finance-save-bar-count");
+    const bar = page.getByTestId("profile-save-bar");
+    const count = page.getByTestId("profile-save-bar-count");
     await expect(status).toHaveAttribute("data-value", "trial");
     await expect(bar).toHaveCount(0);
 
@@ -125,7 +125,7 @@ test.describe("admin profile save bar", () => {
     await expect(dialog).toHaveCount(0);
     await expect(count).toHaveText("2 unsaved changes");
 
-    await page.getByTestId("finance-save-bar-save").click();
+    await page.getByTestId("profile-save-bar-save").click();
     await expect(bar).toContainText("Changes saved.");
     expect(patches).toEqual([{ status: "active", expires_on: isoDay(30) }]);
     await expect(status).toHaveAttribute("data-value", "active");
@@ -142,5 +142,47 @@ test.describe("admin profile save bar", () => {
     await page.getByTestId("unsaved-changes-dialog").getByRole("button", { name: "Discard" }).click();
     await expect(page).toHaveURL(/tab=overview/);
     expect(patches).toHaveLength(1);
+  });
+
+  test("roles on the Account tab are a draft saved with the same bar", async ({ page }) => {
+    let roles = ["member"];
+    const puts: unknown[] = [];
+    await asOwner(page);
+    await page.route("**/api/org/box1/admin/users/u-3", (route) =>
+      route.fulfill(
+        json({
+          user: {
+            identity: { id: "u-3", nickname: "Nikos", avatar_url: null, role: "member", joined_at: "2026-01-10T00:00:00Z" },
+            account_status: "active",
+            membership: { roles, coach_scope: "own", location_scope: { all_locations: true, location_ids: [] } },
+            available_sections: ["overview", "admin_actions"],
+            attention: [],
+            operational_links: {},
+          },
+        }),
+      ),
+    );
+    await page.route("**/api/org/box1/admin/users/u-3/roles", (route) => {
+      const body = bodyOf(route.request());
+      puts.push(body);
+      roles = body.roles;
+      return route.fulfill(json({ membership: { roles, coach_scope: "own" } }));
+    });
+
+    await page.goto("/admin/users/u-3?tab=account");
+    const count = page.getByTestId("profile-save-bar-count");
+    const coach = page.getByRole("button", { name: "Coach", exact: true });
+    await coach.click();
+    await expect(coach).toHaveAttribute("aria-pressed", "true");
+    await expect(count).toHaveText("1 unsaved change");
+    await page.getByTestId("profile-save-bar").getByRole("button", { name: "Undo" }).click();
+    await expect(coach).toHaveAttribute("aria-pressed", "false");
+    await page.getByTestId("profile-save-bar").getByRole("button", { name: "Redo" }).click();
+    await expect(coach).toHaveAttribute("aria-pressed", "true");
+    expect(puts).toEqual([]);
+
+    await page.keyboard.press("Control+s");
+    await expect.poll(() => puts).toEqual([{ roles: ["coach", "member"] }]);
+    await expect(page.getByTestId("profile-save-bar")).toContainText("Changes saved.");
   });
 });
