@@ -5,6 +5,8 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { privacyManifest } from "./configure.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
@@ -50,6 +52,52 @@ test("the Greek and English permission texts are part of the app target", () => 
   assert.match(pbxproj, /path = el\.lproj\/InfoPlist\.strings;/);
   assert.match(pbxproj, /path = en\.lproj\/InfoPlist\.strings;/);
   assert.match(pbxproj, /knownRegions = \(\n(?:\s+\w+,\n)*\s+el,/);
+});
+
+test("the privacy manifests are the ones generated from config/data-collection.json", () => {
+  const collection = JSON.parse(read("config/data-collection.json"));
+  assert.equal(read("ios/App/App/PrivacyInfo.xcprivacy"), privacyManifest(collection, "app"));
+  assert.equal(read("ios/App/PaleeWidgets/PrivacyInfo.xcprivacy"), privacyManifest(collection, "widgets"));
+  assert.match(pbxproj, /PrivacyInfo\.xcprivacy in Resources/);
+});
+
+test("the privacy manifest declares no tracking and every collected type once", () => {
+  const collection = JSON.parse(read("config/data-collection.json"));
+  const manifest = privacyManifest(collection, "app");
+  assert.equal(collection.tracking, false);
+  assert.doesNotMatch(manifest, /<key>NSPrivacyCollectedDataTypeTracking<\/key>\n\t+<true\/>/);
+  const declared = [...manifest.matchAll(/<string>(NSPrivacyCollectedDataType(?!Purpose)\w+)<\/string>/g)].map((match) => match[1]);
+  assert.deepEqual([...declared].sort(), [...new Set(collection.items.map((item) => item.apple))].sort());
+  for (const type of ["NSPrivacyCollectedDataTypeHealth", "NSPrivacyCollectedDataTypeEmailAddress", "NSPrivacyCollectedDataTypePurchaseHistory"]) {
+    assert.ok(declared.includes(type), `${type} is not declared`);
+  }
+  assert.match(manifest, /NSPrivacyAccessedAPICategoryUserDefaults/);
+  assert.match(manifest, /<string>CA92\.1<\/string>/);
+  assert.throws(() => privacyManifest({ tracking: false, items: [{ id: "x", apple: "T", purposes: ["ads"] }] }), /Unknown purpose/);
+});
+
+test("every collected item maps to a Google Play Data safety category and type", () => {
+  const categories = new Set([
+    "Location",
+    "Personal info",
+    "Financial info",
+    "Health and fitness",
+    "Messages",
+    "Photos and videos",
+    "Audio",
+    "Files and docs",
+    "Calendar",
+    "Contacts",
+    "App activity",
+    "Web browsing",
+    "App info and performance",
+    "Device or other IDs",
+  ]);
+  for (const item of JSON.parse(read("config/data-collection.json")).items) {
+    assert.ok(categories.has(item.google?.[0]), `${item.id}: unknown Data safety category ${item.google?.[0]}`);
+    assert.ok(item.google[1], `${item.id}: no Data safety type`);
+    assert.equal(typeof item.required, "boolean", `${item.id}: required or optional?`);
+  }
 });
 
 test("Android declares the camera the web view uses, without requiring a camera", () => {
