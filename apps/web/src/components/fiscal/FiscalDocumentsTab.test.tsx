@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import en from "../../../messages/en.json";
+import { ApiError } from "@/api/client";
 import { chooseValue } from "@/components/ui/select-test-utils";
 
 import { localToday } from "./documents-model";
@@ -53,6 +54,7 @@ const api = vi.hoisted(() => ({
   listClosings: vi.fn(),
   fetchFiscalDocument: vi.fn(),
   issueCreditNote: vi.fn(),
+  emailFiscalDocument: vi.fn(),
   retryTransmission: vi.fn(),
   fetchDocumentHtml: vi.fn(),
   fetchDocumentPdf: vi.fn(),
@@ -148,10 +150,133 @@ describe("FiscalDocumentsTab", () => {
     expect(within(credit).getByTestId("fiscal-credit-issue")).toBeDisabled();
     fireEvent.click(within(credit).getByTestId("fiscal-credit-line-2"));
     expect(within(credit).getByTestId("fiscal-credit-amount")).toHaveTextContent("-€34.00");
+    // ADR-265: no reason chosen yet, so nothing is issued.
+    expect(within(credit).getByTestId("fiscal-credit-issue")).toBeDisabled();
+    expect(credit).toHaveTextContent(en.FiscalDocuments.pickReason);
+    // No card payment behind this receipt: no refund switch.
+    expect(within(credit).queryByTestId("fiscal-credit-refund")).not.toBeInTheDocument();
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-reason-product_return"));
+    expect(within(credit).getByTestId("fiscal-credit-reason-product_return")).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(within(credit).getByTestId("fiscal-credit-issue"));
 
-    await waitFor(() => expect(api.issueCreditNote).toHaveBeenCalledWith("token", "d1", expect.any(String), [{ position: 2, quantity: 1 }]));
+    await waitFor(() =>
+      expect(api.issueCreditNote).toHaveBeenCalledWith("token", "d1", {
+        idempotencyKey: expect.any(String),
+        reason: "product_return",
+        lines: [{ position: 2, quantity: 1 }],
+        refund: false,
+      }),
+    );
     await screen.findByTestId("fiscal-document-panel");
+  });
+
+  it("refunds a card payment with the credit note, the switch on by default (ADR-265)", async () => {
+    api.fetchFiscalDocument.mockResolvedValue({
+      document: { ...detail, refund_option: { provider: "viva", card_brand: "visa", card_last4: "4242", refundable_cents: 12400 } },
+    });
+    api.issueCreditNote.mockResolvedValue({
+      document: { ...r418, id: "c9", kind: "credit_note", number: "C-000010", credit_reason: "billing_error" },
+      refund: { id: "rf1", status: "succeeded" },
+    });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-doc-R-000418"));
+    fireEvent.click(await screen.findByTestId("fiscal-doc-credit"));
+    const credit = await screen.findByTestId("fiscal-credit-panel");
+    const toggle = within(credit).getByTestId("fiscal-credit-refund");
+    expect(toggle).toHaveAttribute("role", "switch");
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+    expect(credit).toHaveTextContent("Refund to the card ••4242");
+    expect(credit).toHaveTextContent("Through Viva, together with the credit note.");
+
+    // The document as it reads once the refund has issued its note.
+    api.fetchFiscalDocument.mockResolvedValue({
+      document: {
+        ...detail,
+        credit_notes: [{ ...r418, id: "c9", kind: "credit_note", number: "C-000010", gross_cents: 12400, credit_reason: "billing_error" }],
+      },
+    });
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-reason-billing_error"));
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-issue"));
+    await waitFor(() =>
+      expect(api.issueCreditNote).toHaveBeenCalledWith("token", "d1", {
+        idempotencyKey: expect.any(String),
+        reason: "billing_error",
+        lines: undefined,
+        refund: true,
+      }),
+    );
+
+    const panel = await screen.findByTestId("fiscal-document-panel");
+    await waitFor(() => expect(panel).toHaveTextContent("The money is going back to the card ••4242 (2–5 working days)."));
+    expect(panel).toHaveTextContent("Billing error");
+  });
+
+  it("does not refund when the switch is off", async () => {
+    api.fetchFiscalDocument.mockResolvedValue({
+      document: { ...detail, refund_option: { provider: "stripe", card_brand: null, card_last4: "0005", refundable_cents: 12400 } },
+    });
+    api.issueCreditNote.mockResolvedValue({ document: { ...r418, id: "c9", kind: "credit_note", number: "C-000010" }, refund: null });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-doc-R-000418"));
+    fireEvent.click(await screen.findByTestId("fiscal-doc-credit"));
+    const credit = await screen.findByTestId("fiscal-credit-panel");
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-refund"));
+    expect(within(credit).getByTestId("fiscal-credit-refund")).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-reason-other"));
+    fireEvent.click(within(credit).getByTestId("fiscal-credit-issue"));
+    await waitFor(() => expect(api.issueCreditNote).toHaveBeenCalledWith("token", "d1", expect.objectContaining({ reason: "other", refund: false })));
+  });
+
+  it("prints a credit note's reason", async () => {
+    api.fetchFiscalDocument.mockResolvedValue({
+      document: { ...detail, kind: "credit_note", number: "C-000010", credit_reason: "subscription_cancelled", corrects_document_id: "d1" },
+    });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-doc-R-000418"));
+    expect(await screen.findByTestId("fiscal-doc-reason")).toHaveTextContent("Subscription cancelled");
+  });
+
+  it("emails the PDF to the buyer printed on it, and says plainly why not", async () => {
+    api.fetchFiscalDocument.mockResolvedValue({ document: { ...detail, buyer: { name: "Maria", email: "maria@example.com" } } });
+    api.emailFiscalDocument
+      .mockRejectedValueOnce(new ApiError(429, "throttled", { code: "throttled" }))
+      .mockResolvedValueOnce({ email: { id: "e1", status: "queued", to: "maria@example.com", recipient: "buyer" } });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-doc-R-000418"));
+    fireEvent.click(await screen.findByTestId("fiscal-doc-email"));
+    const dialog = await screen.findByTestId("fiscal-email-dialog");
+    expect(within(dialog).getByTestId("fiscal-email-to")).toHaveValue("maria@example.com");
+
+    fireEvent.click(within(dialog).getByTestId("fiscal-email-send"));
+    expect(await within(dialog).findByText(en.FiscalDocuments.emailError.throttled)).toBeInTheDocument();
+    const firstKey = api.emailFiscalDocument.mock.calls[0][2];
+
+    fireEvent.click(within(dialog).getByTestId("fiscal-email-send"));
+    expect(await screen.findByTestId("fiscal-doc-email-sent")).toHaveTextContent("Sent to maria@example.com.");
+    // A retry of the same address keeps its key, so it is never sent twice.
+    expect(api.emailFiscalDocument).toHaveBeenLastCalledWith("token", "d1", firstKey, "maria@example.com");
+  });
+
+  it("asks for an address when the document has no buyer email", async () => {
+    api.emailFiscalDocument.mockRejectedValue(new ApiError(422, "invalid_address", { code: "invalid_address" }));
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-doc-R-000418"));
+    fireEvent.click(await screen.findByTestId("fiscal-doc-email"));
+    const dialog = await screen.findByTestId("fiscal-email-dialog");
+    expect(within(dialog).getByTestId("fiscal-email-to")).toHaveValue("");
+    fireEvent.click(within(dialog).getByTestId("fiscal-email-send"));
+    expect(await within(dialog).findByText(en.FiscalDocuments.emailError.no_recipient)).toBeInTheDocument();
+    expect(api.emailFiscalDocument).not.toHaveBeenCalled();
+
+    fireEvent.change(within(dialog).getByTestId("fiscal-email-to"), { target: { value: "x@y" } });
+    fireEvent.click(within(dialog).getByTestId("fiscal-email-send"));
+    expect(await within(dialog).findByText(en.FiscalDocuments.emailError.invalid_address)).toBeInTheDocument();
+    expect(within(dialog).getByTestId("fiscal-email-to")).toHaveAttribute("aria-invalid", "true");
   });
 
   it("shows a pending transmission and retries a failed one", async () => {
