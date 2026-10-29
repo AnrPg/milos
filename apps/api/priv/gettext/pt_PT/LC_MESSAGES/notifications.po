@@ -720,3 +720,15 @@ msgstr "Um membro da box vai sair"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} vai sair da box. Último dia: %{date}."
+
+msgid "A document to sign"
+msgstr "Um documento para assinar"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} pede-te que leias e assines «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "O teu atestado médico expira em breve"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Carrega um novo atestado médico antes de %{date}."

@@ -113,6 +113,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         email_key_expiring
         journal_export_ready
         shop_order_ready shop_order_reminder shop_order_cancelled shop_back_in_stock
+        document_signature_requested health_certificate_expiring
       )
     }
   ]

@@ -110,7 +110,10 @@ defmodule Palee.Notifications.Notification do
     :password_reset_completed,
     :business_demo_idle,
     :email_key_expiring,
-    :member_leaving
+    :member_leaving,
+    # ADR-252: documents to sign and health certificates.
+    :document_signature_requested,
+    :health_certificate_expiring
   ]
 
   schema "notifications" do

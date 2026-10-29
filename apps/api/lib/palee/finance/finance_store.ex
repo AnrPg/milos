@@ -136,6 +136,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_expiring_memberships(days), do: adapter().list_expiring_memberships(days)
   @impl true
+  def package_holder_user_ids(package_id, date),
+    do: adapter().package_holder_user_ids(package_id, date)
+
+  @impl true
   def operational_queues(params), do: adapter().operational_queues(params)
   @impl true
   def financial_summary(params), do: adapter().financial_summary(params)

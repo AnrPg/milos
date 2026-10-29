@@ -23,6 +23,7 @@ defmodule Palee.Documents do
     MemberDocuments,
     SettingsPolicy,
     SignaturePolicy,
+    StarterTemplates,
     TemplatePolicy,
     TenantDataPolicy
   }
@@ -42,6 +43,24 @@ defmodule Palee.Documents do
   defdelegate languages(), to: TemplatePolicy
   defdelegate change_kinds(), to: TemplatePolicy
   defdelegate health_content_types(), to: HealthCertificatePolicy, as: :content_types
+  defdelegate health_max_bytes(), to: HealthCertificatePolicy, as: :max_bytes
+
+  defdelegate validate_health_upload(content_type),
+    to: HealthCertificatePolicy,
+    as: :validate_upload
+
+  defdelegate validate_health_file(content_type, head, byte_size),
+    to: HealthCertificatePolicy,
+    as: :validate_file
+
+  defdelegate health_relative_key(user_id, extension),
+    to: HealthCertificatePolicy,
+    as: :relative_key
+
+  defdelegate health_key_of?(key, prefix, user_id), to: HealthCertificatePolicy, as: :key_of?
+
+  @doc "Draft documents a box can start from (always marked for legal review)."
+  def starter_templates(language \\ nil), do: StarterTemplates.list(language)
 
   # ── Settings ────────────────────────────────────────────────────────────
 
@@ -366,6 +385,8 @@ defmodule Palee.Documents do
        end)}
     end)
   end
+
+  defdelegate health_outstanding(settings, status), to: MemberDocuments
 
   @doc """
   The booking gate (ADR-252): `:ok` or `{:error, :documents_required,

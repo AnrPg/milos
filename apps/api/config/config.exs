@@ -68,7 +68,9 @@ config :palee, Oban,
        # ADR-242: fiscal day/month/year closings on each gym's own clock.
        {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
        # ADR-243: retries and deferred reports to the tax authority.
-       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob}
+       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
+       # ADR-252: reminders before a client's health certificate expires.
+       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob}
      ]}
   ],
   queues: [

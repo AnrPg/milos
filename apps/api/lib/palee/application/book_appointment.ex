@@ -6,6 +6,7 @@ defmodule Palee.Application.BookAppointment do
   """
 
   alias Palee.Application.{AppointmentLedger, GoLive, NotifyAppointment}
+  alias Palee.Application.Documents.BookingGate
   alias Palee.{Appointments, Finance, Identity, Organizations}
   alias Palee.Appointments.Domain.AppointmentPolicy
 
@@ -15,6 +16,8 @@ defmodule Palee.Application.BookAppointment do
     with {:ok, client} <- client(context, actor, for_user_id),
          # ADR-184: a business in demo mode takes no bookings from real people.
          :ok <- GoLive.check_booking(context, client.id),
+         # ADR-252: a client booking for themselves signs mandatory documents first.
+         :ok <- documents_gate(context, client.id, for_user_id),
          %{} = slot <- Appointments.get_slot(context, slot_id) || {:error, :not_found},
          :ok <- AppointmentPolicy.can_book?(slot, slot.bookings, client.id, now),
          :ok <- terms_allow(context, client, slot),
@@ -97,4 +100,7 @@ defmodule Palee.Application.BookAppointment do
 
     Finance.reserve_entitlement(context, client.id, request)
   end
+
+  defp documents_gate(context, client_id, nil), do: BookingGate.check(context, client_id)
+  defp documents_gate(_context, _client_id, _staff_booking), do: :ok
 end

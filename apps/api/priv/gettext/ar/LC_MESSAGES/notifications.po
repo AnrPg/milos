@@ -720,3 +720,15 @@ msgstr "أحد أعضاء الصالة يغادر"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} يغادر الصالة. آخر يوم: %{date}."
+
+msgid "A document to sign"
+msgstr "مستند للتوقيع"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "يطلب منك %{business} قراءة «%{title}» وتوقيعه."
+
+msgid "Your health certificate expires soon"
+msgstr "تنتهي شهادتك الصحية قريبًا"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "ارفع شهادة صحية جديدة قبل %{date}."

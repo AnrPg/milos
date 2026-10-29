@@ -914,6 +914,31 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-252: neutral wording; the document's title, never its text.
+  def build("document_signature_requested", payload, localize) do
+    %{
+      title: localize.("A document to sign", %{}),
+      body:
+        localize.("%{business} asks you to read and sign «%{title}».", %{
+          business: payload["business_name"] || "",
+          title: payload["title"] || ""
+        }),
+      url: payload["url"] || "/me/documents"
+    }
+  end
+
+  # ADR-252: only the date, never anything about the person's health.
+  def build("health_certificate_expiring", payload, localize) do
+    %{
+      title: localize.("Your health certificate expires soon", %{}),
+      body:
+        localize.("Upload a new health certificate before %{date}.", %{
+          date: payload["expires_on"] || ""
+        }),
+      url: payload["url"] || "/me/documents"
+    }
+  end
+
   def build("package_expiring", payload, localize) do
     %{
       title: localize.("Your package ends soon", %{}),

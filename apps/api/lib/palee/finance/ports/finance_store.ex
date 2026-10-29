@@ -54,6 +54,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
               map()
             ) :: {:ok, map()} | {:error, term()}
   @callback list_expiring_memberships(non_neg_integer()) :: [map()]
+  @doc "ADR-252: people whose subscription to `package_id` covers `date`."
+  @callback package_holder_user_ids(Ecto.UUID.t(), Date.t()) :: [Ecto.UUID.t()]
   @callback operational_queues(map()) :: map()
   @callback financial_summary(map()) :: map()
   @callback package_location_scopes() :: %{optional(String.t()) => :all | [String.t()]}

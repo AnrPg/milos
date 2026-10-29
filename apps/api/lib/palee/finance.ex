@@ -286,6 +286,10 @@ defmodule Palee.Finance do
   def list_expiring_memberships(context, days),
     do: scoped(context, fn -> list_expiring_memberships(days) end)
 
+  @doc "ADR-252: people whose subscription to `package_id` covers `date` (bulk document requests)."
+  def package_holder_user_ids(context, package_id, %Date{} = date),
+    do: scoped(context, fn -> FinanceStore.package_holder_user_ids(package_id, date) end)
+
   defdelegate operational_queues(params \\ %{}), to: OperationalQueues, as: :call
 
   def operational_queues(context, params),

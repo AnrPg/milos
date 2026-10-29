@@ -3168,6 +3168,22 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def list_expiring_memberships(days), do: list_expiring_memberships(days, nil)
 
+  @impl true
+  def package_holder_user_ids(package_id, %Date{} = date) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> join(:inner, [subscription], membership in Membership,
+      on: membership.id == subscription.membership_id
+    )
+    |> where([subscription], subscription.membership_package_id == ^package_id)
+    |> where([subscription], subscription.status in ["active", "paused"])
+    |> where([subscription], is_nil(subscription.starts_on) or subscription.starts_on <= ^date)
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^date)
+    |> select([_subscription, membership], membership.user_id)
+    |> distinct(true)
+    |> Repo.all()
+  end
+
   defp list_expiring_memberships(days, users) do
     today = GymClock.today()
     cutoff = Date.add(GymClock.today(), parse_integer(days, 30))

@@ -22,7 +22,9 @@ defmodule Palee.Application.PlaceMemberInClass do
          :ok <- Palee.Application.ClassLocation.authorize_class(context, slot_id),
          :ok <- require_member(context, user.id),
          {:ok, previous} <- previous_booking(context, user.id, from_booking_id),
-         {:ok, booking} <- SubmitBooking.call(context, user, slot_id),
+         # ADR-252: staff decide; the documents gate is for clients booking themselves.
+         {:ok, booking, _outcome} <-
+           SubmitBooking.call(context, user, slot_id, documents_gate: false),
          {:ok, booking} <- approve(context, booking),
          {:ok, _withdrawn} <- withdraw_previous(context, user.id, previous) do
       {:ok, %{booking: booking, previous_booking_id: previous && previous.id}}
