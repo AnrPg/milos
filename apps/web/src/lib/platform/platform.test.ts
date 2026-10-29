@@ -28,7 +28,7 @@ describe("platform capability layer", () => {
     expect(nativePushProvider()).toBeNull();
     expect(Object.values(getCapabilities()).every((value) => value === false)).toBe(true);
     expect(Object.keys(getCapabilities()).sort()).toEqual(
-      ["geofence", "healthConnect", "healthKit", "nativePush", "nfc", "widgets"].sort(),
+      ["geofence", "healthConnect", "healthKit", "nativePush", "nfc", "tapToPay", "widgets"].sort(),
     );
   });
 
@@ -70,7 +70,7 @@ describe("phone-health rows", () => {
     { provider: "apple_health", status: "native_only" },
     { provider: "health_connect", status: "native_only" },
   ];
-  const off = { nativePush: true, healthKit: false, healthConnect: false, widgets: false, geofence: false, nfc: false };
+  const off = { nativePush: true, healthKit: false, healthConnect: false, widgets: false, geofence: false, nfc: false, tapToPay: false };
 
   it("keeps both rows and their status on the web", () => {
     expect(visibleIntegrations(rows, null)).toHaveLength(3);
