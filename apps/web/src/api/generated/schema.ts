@@ -31928,6 +31928,81 @@ export interface components {
             /** @enum {string} */
             rule: "repeat" | "step";
         } | null;
+        /** PlanWorkload */
+        PlanWorkload: {
+            exercises?: {
+                calories?: number;
+                distance_m?: number;
+                estimated?: boolean;
+                exercise_ref?: string | null;
+                logged_sets?: number;
+                name?: string | null;
+                reps?: number;
+                sets?: number;
+                top_set?: {
+                    load_kg?: number;
+                    reps?: number | null;
+                } | null;
+                volume_kg?: number;
+                work_secs?: number;
+            }[];
+            sections?: {
+                exercises?: {
+                    block_index?: number;
+                    calories?: number;
+                    distance_m?: number;
+                    estimated?: boolean;
+                    exercise_ref?: string | null;
+                    group_id?: string | null;
+                    interrupt?: boolean;
+                    logged_sets?: number;
+                    name?: string | null;
+                    per_side?: boolean;
+                    reps?: number;
+                    row_id?: string;
+                    sets?: number;
+                    top_set?: {
+                        load_kg?: number;
+                        reps?: number | null;
+                    } | null;
+                    volume_kg?: number;
+                    work_secs?: number;
+                }[];
+                flow?: string;
+                name?: string | null;
+                open_ended?: boolean;
+                preset?: string | null;
+                score?: string | null;
+                section_id?: string;
+                /** @enum {string} */
+                source?: "actuals" | "prescription";
+                time_domain?: {
+                    cap_secs?: number | null;
+                    open_ended?: boolean;
+                    planned_secs?: number | null;
+                };
+                totals?: {
+                    calories?: number;
+                    distance_m?: number;
+                    estimated?: boolean;
+                    logged_sets?: number;
+                    reps?: number;
+                    sets?: number;
+                    volume_kg?: number;
+                    work_secs?: number;
+                };
+            }[];
+            totals?: {
+                calories?: number;
+                distance_m?: number;
+                estimated?: boolean;
+                logged_sets?: number;
+                reps?: number;
+                sets?: number;
+                volume_kg?: number;
+                work_secs?: number;
+            };
+        } | null;
         /**
          * PlanWorkoutBody
          * @description ADR-270: written in the structured WOD editor, one plan per section
@@ -32318,6 +32393,19 @@ export interface components {
                 date: string;
                 sessions: number;
             }[];
+            /** @description ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session */
+            exercise_loads?: {
+                exercise_ref?: string | null;
+                name?: string | null;
+                points: {
+                    /** Format: date */
+                    completed_on: string;
+                    /** Format: uuid */
+                    execution_id: string;
+                    load_kg: number;
+                    reps?: number | null;
+                }[];
+            }[];
             pr_timeline: {
                 /** Format: date */
                 beaten_on: string;
@@ -32353,11 +32441,14 @@ export interface components {
             totals: {
                 minutes: number;
                 sessions: number;
+                volume_kg?: number;
                 workouts: number;
             };
             weekly: {
                 minutes: number;
                 sessions: number;
+                /** @description ADR-270: kg × reps lifted in structured plan workouts */
+                volume_kg?: number;
                 /** Format: date */
                 week_start: string;
             }[];
@@ -38690,6 +38781,81 @@ export interface components {
                     }[];
                     started_at?: string | null;
                     status: string;
+                    /** PlanWorkload */
+                    workload?: {
+                        exercises?: {
+                            calories?: number;
+                            distance_m?: number;
+                            estimated?: boolean;
+                            exercise_ref?: string | null;
+                            logged_sets?: number;
+                            name?: string | null;
+                            reps?: number;
+                            sets?: number;
+                            top_set?: {
+                                load_kg?: number;
+                                reps?: number | null;
+                            } | null;
+                            volume_kg?: number;
+                            work_secs?: number;
+                        }[];
+                        sections?: {
+                            exercises?: {
+                                block_index?: number;
+                                calories?: number;
+                                distance_m?: number;
+                                estimated?: boolean;
+                                exercise_ref?: string | null;
+                                group_id?: string | null;
+                                interrupt?: boolean;
+                                logged_sets?: number;
+                                name?: string | null;
+                                per_side?: boolean;
+                                reps?: number;
+                                row_id?: string;
+                                sets?: number;
+                                top_set?: {
+                                    load_kg?: number;
+                                    reps?: number | null;
+                                } | null;
+                                volume_kg?: number;
+                                work_secs?: number;
+                            }[];
+                            flow?: string;
+                            name?: string | null;
+                            open_ended?: boolean;
+                            preset?: string | null;
+                            score?: string | null;
+                            section_id?: string;
+                            /** @enum {string} */
+                            source?: "actuals" | "prescription";
+                            time_domain?: {
+                                cap_secs?: number | null;
+                                open_ended?: boolean;
+                                planned_secs?: number | null;
+                            };
+                            totals?: {
+                                calories?: number;
+                                distance_m?: number;
+                                estimated?: boolean;
+                                logged_sets?: number;
+                                reps?: number;
+                                sets?: number;
+                                volume_kg?: number;
+                                work_secs?: number;
+                            };
+                        }[];
+                        totals?: {
+                            calories?: number;
+                            distance_m?: number;
+                            estimated?: boolean;
+                            logged_sets?: number;
+                            reps?: number;
+                            sets?: number;
+                            volume_kg?: number;
+                            work_secs?: number;
+                        };
+                    } | null;
                 } | null;
                 source?: string | null;
                 workout: {
@@ -38698,6 +38864,8 @@ export interface components {
                         exercises?: {
                             [key: string]: unknown;
                         }[];
+                        /** @description ADR-270: the flow of a structured plan section */
+                        flow?: string | null;
                         format?: string;
                         id?: string;
                         name?: string | null;
@@ -81152,6 +81320,81 @@ export interface operations {
                                 }[];
                                 started_at?: string | null;
                                 status: string;
+                                /** PlanWorkload */
+                                workload?: {
+                                    exercises?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        exercise_ref?: string | null;
+                                        logged_sets?: number;
+                                        name?: string | null;
+                                        reps?: number;
+                                        sets?: number;
+                                        top_set?: {
+                                            load_kg?: number;
+                                            reps?: number | null;
+                                        } | null;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    }[];
+                                    sections?: {
+                                        exercises?: {
+                                            block_index?: number;
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            exercise_ref?: string | null;
+                                            group_id?: string | null;
+                                            interrupt?: boolean;
+                                            logged_sets?: number;
+                                            name?: string | null;
+                                            per_side?: boolean;
+                                            reps?: number;
+                                            row_id?: string;
+                                            sets?: number;
+                                            top_set?: {
+                                                load_kg?: number;
+                                                reps?: number | null;
+                                            } | null;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        }[];
+                                        flow?: string;
+                                        name?: string | null;
+                                        open_ended?: boolean;
+                                        preset?: string | null;
+                                        score?: string | null;
+                                        section_id?: string;
+                                        /** @enum {string} */
+                                        source?: "actuals" | "prescription";
+                                        time_domain?: {
+                                            cap_secs?: number | null;
+                                            open_ended?: boolean;
+                                            planned_secs?: number | null;
+                                        };
+                                        totals?: {
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            logged_sets?: number;
+                                            reps?: number;
+                                            sets?: number;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        };
+                                    }[];
+                                    totals?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        logged_sets?: number;
+                                        reps?: number;
+                                        sets?: number;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    };
+                                } | null;
                             } | null;
                             source?: string | null;
                             workout: {
@@ -81160,6 +81403,8 @@ export interface operations {
                                     exercises?: {
                                         [key: string]: unknown;
                                     }[];
+                                    /** @description ADR-270: the flow of a structured plan section */
+                                    flow?: string | null;
                                     format?: string;
                                     id?: string;
                                     name?: string | null;
@@ -93478,6 +93723,81 @@ export interface operations {
                                 }[];
                                 started_at?: string | null;
                                 status: string;
+                                /** PlanWorkload */
+                                workload?: {
+                                    exercises?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        exercise_ref?: string | null;
+                                        logged_sets?: number;
+                                        name?: string | null;
+                                        reps?: number;
+                                        sets?: number;
+                                        top_set?: {
+                                            load_kg?: number;
+                                            reps?: number | null;
+                                        } | null;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    }[];
+                                    sections?: {
+                                        exercises?: {
+                                            block_index?: number;
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            exercise_ref?: string | null;
+                                            group_id?: string | null;
+                                            interrupt?: boolean;
+                                            logged_sets?: number;
+                                            name?: string | null;
+                                            per_side?: boolean;
+                                            reps?: number;
+                                            row_id?: string;
+                                            sets?: number;
+                                            top_set?: {
+                                                load_kg?: number;
+                                                reps?: number | null;
+                                            } | null;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        }[];
+                                        flow?: string;
+                                        name?: string | null;
+                                        open_ended?: boolean;
+                                        preset?: string | null;
+                                        score?: string | null;
+                                        section_id?: string;
+                                        /** @enum {string} */
+                                        source?: "actuals" | "prescription";
+                                        time_domain?: {
+                                            cap_secs?: number | null;
+                                            open_ended?: boolean;
+                                            planned_secs?: number | null;
+                                        };
+                                        totals?: {
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            logged_sets?: number;
+                                            reps?: number;
+                                            sets?: number;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        };
+                                    }[];
+                                    totals?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        logged_sets?: number;
+                                        reps?: number;
+                                        sets?: number;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    };
+                                } | null;
                             } | null;
                             source?: string | null;
                             workout: {
@@ -93486,6 +93806,8 @@ export interface operations {
                                     exercises?: {
                                         [key: string]: unknown;
                                     }[];
+                                    /** @description ADR-270: the flow of a structured plan section */
+                                    flow?: string | null;
                                     format?: string;
                                     id?: string;
                                     name?: string | null;
@@ -93807,6 +94129,19 @@ export interface operations {
                                 date: string;
                                 sessions: number;
                             }[];
+                            /** @description ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session */
+                            exercise_loads?: {
+                                exercise_ref?: string | null;
+                                name?: string | null;
+                                points: {
+                                    /** Format: date */
+                                    completed_on: string;
+                                    /** Format: uuid */
+                                    execution_id: string;
+                                    load_kg: number;
+                                    reps?: number | null;
+                                }[];
+                            }[];
                             pr_timeline: {
                                 /** Format: date */
                                 beaten_on: string;
@@ -93842,11 +94177,14 @@ export interface operations {
                             totals: {
                                 minutes: number;
                                 sessions: number;
+                                volume_kg?: number;
                                 workouts: number;
                             };
                             weekly: {
                                 minutes: number;
                                 sessions: number;
+                                /** @description ADR-270: kg × reps lifted in structured plan workouts */
+                                volume_kg?: number;
                                 /** Format: date */
                                 week_start: string;
                             }[];

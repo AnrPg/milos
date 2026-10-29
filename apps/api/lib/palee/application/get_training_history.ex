@@ -5,7 +5,9 @@ defmodule Palee.Application.GetTrainingHistory do
 
     * `"workouts"` – every workout they did or started (any source), newest
       first, each with the workout itself (sections, formats, exercises) and
-      their performance on it (status, time, scale, section scores);
+      their performance on it (status, time, scale, section scores; for a
+      structured plan workout, ADR-270, its `workload`: sets, reps, volume
+      and time domain, per section and exercise);
     * `"classes"` – the classes they booked and that already took place,
       newest first, each with the class's workout, their attendance and their
       performance on that class's workout, when they logged it.
@@ -17,10 +19,11 @@ defmodule Palee.Application.GetTrainingHistory do
   the performance; the gym keeps its bookings and attendance.
   """
 
-  alias Palee.Application.StaffJournalAccess
+  alias Palee.Application.{AthleteOneRepMax, StaffJournalAccess}
   alias Palee.Execution
   alias Palee.Execution.ExecutionStore
   alias Palee.{Scheduling, Workouts}
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   @default_limit 10
   @max_limit 50
@@ -50,6 +53,7 @@ defmodule Palee.Application.GetTrainingHistory do
       executions = Execution.list_executions_for_user(user_id)
       page = executions |> Enum.drop(offset) |> Enum.take(limit)
       workouts = load_workouts(context, Enum.map(page, & &1.master_workout_id))
+      plan_sets = {plan_sets(page), AthleteOneRepMax.lookup(context, user_id)}
 
       %{
         kind: "workouts",
@@ -65,7 +69,7 @@ defmodule Palee.Application.GetTrainingHistory do
               occurred_at: execution.started_at_utc,
               source: to_string(execution.source),
               workout: workout_summary(workout),
-              performance: performance(execution, workout)
+              performance: performance(execution, workout, plan_sets)
             }
           end)
       }
@@ -80,8 +84,10 @@ defmodule Palee.Application.GetTrainingHistory do
 
     booking_ids = MapSet.new(bookings, & &1.booking_id)
 
-    executions =
-      if readable?, do: class_executions(context, user_id, booking_ids), else: %{}
+    {executions, plan_sets} =
+      if readable?,
+        do: class_executions(context, user_id, booking_ids),
+        else: {%{}, {%{}, nil}}
 
     workouts = load_workouts(context, Enum.map(bookings, & &1.master_workout_id))
 
@@ -105,7 +111,7 @@ defmodule Palee.Application.GetTrainingHistory do
               attendance: booking.attendance_status
             },
             workout: workout_summary(workout),
-            performance: execution && performance(execution, workout)
+            performance: execution && performance(execution, workout, plan_sets)
           }
         end)
     }
@@ -113,15 +119,28 @@ defmodule Palee.Application.GetTrainingHistory do
 
   defp class_executions(context, user_id, booking_ids) do
     ExecutionStore.with_user_context(context, fn ->
-      user_id
-      |> Execution.list_executions_for_user()
-      |> Enum.filter(&(to_string(&1.source) == "class_booking"))
-      |> Enum.filter(&MapSet.member?(booking_ids, &1.source_reference_id))
-      # Newest first: keep the latest attempt per booking.
-      |> Enum.reduce(%{}, fn execution, acc ->
-        Map.put_new(acc, execution.source_reference_id, execution)
-      end)
+      executions =
+        user_id
+        |> Execution.list_executions_for_user()
+        |> Enum.filter(&(to_string(&1.source) == "class_booking"))
+        |> Enum.filter(&MapSet.member?(booking_ids, &1.source_reference_id))
+        # Newest first: keep the latest attempt per booking.
+        |> Enum.reduce(%{}, fn execution, acc ->
+          Map.put_new(acc, execution.source_reference_id, execution)
+        end)
+
+      {executions,
+       {executions |> Map.values() |> plan_sets(), AthleteOneRepMax.lookup(context, user_id)}}
     end)
+  end
+
+  # ADR-270: the plan actuals of these executions, by execution.
+  defp plan_sets(executions) do
+    executions
+    |> Enum.filter(&(to_string(&1.status) == "completed"))
+    |> Enum.map(& &1.id)
+    |> Execution.list_plan_sets()
+    |> Enum.group_by(& &1.execution_id)
   end
 
   ## Shared
@@ -146,7 +165,8 @@ defmodule Palee.Application.GetTrainingHistory do
             id: section.id,
             name: section.name,
             nested: not is_nil(section.parent_section_id),
-            format: format(section.timer_config),
+            format: section_format(section),
+            flow: plan_flow(section),
             timer_config: section.timer_config,
             score_type: score_type(section),
             exercises:
@@ -167,7 +187,7 @@ defmodule Palee.Application.GetTrainingHistory do
     }
   end
 
-  defp performance(execution, workout) do
+  defp performance(execution, workout, plan_sets) do
     sections = if workout, do: Map.new(workout.sections || [], &{&1.id, &1}), else: %{}
 
     %{
@@ -189,8 +209,38 @@ defmodule Palee.Application.GetTrainingHistory do
             value: field(score, :value),
             unit: field(score, :unit)
           }
-        end)
+        end),
+      workload: workload(execution, workout, plan_sets)
     }
+  end
+
+  # ADR-270: what was done in a structured plan workout: sets, reps, volume
+  # and the time domain, from the plan actuals (else the prescription).
+  defp workload(%{status: status} = execution, %{} = workout, {plan_sets, one_rep_max}) do
+    if to_string(status) == "completed" and PlanPrescriptions.plan_workout?(workout) do
+      PlanPrescriptions.workload(workout, Map.get(plan_sets, execution.id, []),
+        section_scores: execution.section_scores,
+        section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+        one_rep_max: one_rep_max
+      )
+    end
+  end
+
+  defp workload(_execution, _workout, _plan_sets), do: nil
+
+  # A structured plan section (ADR-270) shows its flow.
+  defp section_format(section) do
+    case plan_flow(section) do
+      nil -> format(section.timer_config)
+      flow -> flow
+    end
+  end
+
+  defp plan_flow(section) do
+    case Map.get(section, :plan) do
+      %{"flow" => flow} when is_binary(flow) -> flow
+      _none -> nil
+    end
   end
 
   defp format(%{} = config), do: to_string(config[:type] || config["type"] || "untimed")

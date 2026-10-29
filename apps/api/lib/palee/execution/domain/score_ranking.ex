@@ -92,6 +92,7 @@ defmodule Palee.Execution.Domain.ScoreRanking do
   # ADR-270: a plan section records rounds + reps as `rounds_reps`.
   defp parse(value, type) when type in ["rounds+reps", "rounds_reps"] and is_binary(value),
     do: rounds_reps(value)
+
   defp parse(value, _type) when is_number(value), do: value * 1.0
 
   defp parse(value, _type) when is_binary(value) do

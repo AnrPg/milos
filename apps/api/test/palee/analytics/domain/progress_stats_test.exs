@@ -103,4 +103,35 @@ defmodule Palee.Analytics.Domain.ProgressStatsTest do
     assert weeks.("all", ~D[2026-01-05]) == 42
     assert weeks.("all", ~D[2020-01-01]) == 156
   end
+
+  test "plan workouts add their lifted volume and the heaviest set of each exercise per session" do
+    lift = fn id, at, kg, top_sets ->
+      id
+      |> session(at)
+      |> Map.put(:plan_workload, %{volume_kg: kg, top_sets: top_sets})
+    end
+
+    squat = fn kg -> %{name: "Back Squat", exercise_ref: "back_squat", load_kg: kg, reps: 5} end
+    snatch = %{name: "Power Snatch", exercise_ref: nil, load_kg: 50, reps: 3}
+
+    stats =
+      ProgressStats.build(
+        [
+          lift.("a", ~U[2026-10-20 10:00:00Z], 2530, [squat.(100)]),
+          lift.("b", ~U[2026-10-27 10:00:00Z], 1200.5, [squat.(105), snatch]),
+          session("c", ~U[2026-10-28 10:00:00Z])
+        ],
+        ~D[2026-10-29],
+        2
+      )
+
+    assert stats.totals.volume_kg == 3730.5
+    assert Enum.map(stats.weekly, & &1.volume_kg) == [2530, 1200.5]
+
+    # The snatch was lifted once: no history yet.
+    assert [%{name: "Back Squat", exercise_ref: "back_squat", points: points}] =
+             stats.exercise_loads
+
+    assert Enum.map(points, &{&1.execution_id, &1.load_kg}) == [{"a", 100}, {"b", 105}]
+  end
 end

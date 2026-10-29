@@ -90,9 +90,30 @@ defmodule Palee.Execution.Domain.ExecutionAnalyticsTest do
 
   test "ADR-270: a plan execution adds what it recorded set by set" do
     sets = [
-      %{section_id: "s", row_id: "r1", actual_reps: 5, actual_load_kg: 100, logged: true, interrupt: false},
-      %{section_id: "s", row_id: "r1", actual_reps: 5, actual_load_kg: 102.5, logged: false, interrupt: false},
-      %{"section_id" => "s", "row_id" => "i", "actual_reps" => 10, "actual_load_kg" => nil, "logged" => false, "interrupt" => true}
+      %{
+        section_id: "s",
+        row_id: "r1",
+        actual_reps: 5,
+        actual_load_kg: 100,
+        logged: true,
+        interrupt: false
+      },
+      %{
+        section_id: "s",
+        row_id: "r1",
+        actual_reps: 5,
+        actual_load_kg: 102.5,
+        logged: false,
+        interrupt: false
+      },
+      %{
+        "section_id" => "s",
+        "row_id" => "i",
+        "actual_reps" => 10,
+        "actual_load_kg" => nil,
+        "logged" => false,
+        "interrupt" => true
+      }
     ]
 
     facts =
@@ -109,6 +130,9 @@ defmodule Palee.Execution.Domain.ExecutionAnalyticsTest do
              plan_tonnage_kg: 1012.5
            } = facts
 
-    refute Map.has_key?(ExecutionAnalytics.completion_facts(%{plan_sets: []}, []), :plan_set_count)
+    refute Map.has_key?(
+             ExecutionAnalytics.completion_facts(%{plan_sets: []}, []),
+             :plan_set_count
+           )
   end
 end

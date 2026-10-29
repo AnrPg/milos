@@ -121,9 +121,26 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
     end
   end
 
-  # Only the materialiser's own fixed keys are turned into atoms.
+  # The materialiser's own top-level keys, as atoms (an explicit list: the
+  # atoms need not exist yet when this runs).
+  @exercise_atom_keys %{
+    "item_type" => :item_type,
+    "name" => :name,
+    "exercise_ref" => :exercise_ref,
+    "note" => :note,
+    "tempo" => :tempo,
+    "superset_group_id" => :superset_group_id,
+    "sets" => :sets,
+    "set_prescriptions" => :set_prescriptions,
+    "prescription_metadata" => :prescription_metadata,
+    "load_mode" => :load_mode,
+    "load_value" => :load_value,
+    "prescription_unit" => :prescription_unit,
+    "prescription_value" => :prescription_value
+  }
+
   defp atom_keys(exercise),
-    do: Map.new(exercise, fn {key, item} -> {String.to_existing_atom(key), item} end)
+    do: Map.new(exercise, fn {key, item} -> {Map.fetch!(@exercise_atom_keys, key), item} end)
 
   @doc "The legacy exercise rows of a (valid) plan, as `workout_exercises` params."
   @spec exercises(map()) :: [map()]

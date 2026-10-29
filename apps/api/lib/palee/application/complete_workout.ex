@@ -1,5 +1,6 @@
 defmodule Palee.Application.CompleteWorkout do
   alias Palee.Application.{
+    AthleteOneRepMax,
     BroadcastUserSync,
     InjuryWarningEvaluation,
     InvalidateLandingPages,
@@ -9,6 +10,7 @@ defmodule Palee.Application.CompleteWorkout do
 
   alias Palee.{Execution, Gamification, Identity, Journal, Notifications, Workouts}
   alias Palee.Execution.ExecutionStore
+  alias Palee.Workouts.Queries.PlanPrescriptions
   alias Palee.Workers.ProcessWorkoutCompletionJob
   alias Palee.Workers.RefreshLeaderboardJob
 
@@ -42,6 +44,7 @@ defmodule Palee.Application.CompleteWorkout do
           execution
           |> Execution.completion_analytics_facts(segments)
           |> Map.merge(InjuryWarningEvaluation.completion_facts(execution, workout))
+          |> Map.merge(plan_completion_facts(execution, workout))
       })
 
       {:ok, execution}
@@ -222,6 +225,36 @@ defmodule Palee.Application.CompleteWorkout do
       )
 
   defp text_section_scores(_workout, _params), do: {:ok, []}
+
+  # ADR-270: the volume of a structured plan workout for analytics, next to
+  # the set counts and tonnage of its actuals (`ExecutionAnalytics`): kg ×
+  # reps with what the actuals lack read from the plan (% loads through the
+  # 1RM, ranges at their midpoint, scored rounds of an AMRAP done without
+  # actuals), and whether any of it is an estimate.
+  defp plan_completion_facts(execution, %{} = workout) do
+    if PlanPrescriptions.plan_workout?(workout) do
+      case PlanPrescriptions.workload(workout, Map.get(execution, :plan_sets) || [],
+             section_scores: execution.section_scores,
+             section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+             one_rep_max:
+               AthleteOneRepMax.lookup(%{user_id: execution.user_id}, execution.user_id)
+           ) do
+        %{totals: totals} ->
+          %{
+            authoring_mode: "structured_plan",
+            plan_volume_kg: totals.volume_kg,
+            plan_volume_estimated: totals.estimated
+          }
+
+        nil ->
+          %{authoring_mode: "structured_plan"}
+      end
+    else
+      %{}
+    end
+  end
+
+  defp plan_completion_facts(_execution, _workout), do: %{}
 
   # ADR-270: what the athlete did in each set / round of a structured plan,
   # checked against the plan rows of the workout's sections. Other workouts

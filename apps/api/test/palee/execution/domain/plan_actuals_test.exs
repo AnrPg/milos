@@ -76,7 +76,14 @@ defmodule Palee.Execution.Domain.PlanActualsTest do
   test "interruption records: block -1, interrupt true, round = which interruption" do
     assert {:ok, [%{interrupt: true, block_index: -1, round_index: 3}]} =
              PlanActuals.normalize(
-               [entry(%{"row_id" => "i1", "block_index" => -1, "interrupt" => true, "round_index" => 3})],
+               [
+                 entry(%{
+                   "row_id" => "i1",
+                   "block_index" => -1,
+                   "interrupt" => true,
+                   "round_index" => 3
+                 })
+               ],
                @rows
              )
 

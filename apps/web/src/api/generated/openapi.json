@@ -59642,6 +59642,245 @@
         "title": "PlanThenRule",
         "type": "object"
       },
+      "PlanWorkload": {
+        "nullable": true,
+        "properties": {
+          "exercises": {
+            "items": {
+              "properties": {
+                "calories": {
+                  "type": "number"
+                },
+                "distance_m": {
+                  "type": "number"
+                },
+                "estimated": {
+                  "type": "boolean"
+                },
+                "exercise_ref": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "logged_sets": {
+                  "type": "integer"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reps": {
+                  "type": "number"
+                },
+                "sets": {
+                  "type": "number"
+                },
+                "top_set": {
+                  "nullable": true,
+                  "properties": {
+                    "load_kg": {
+                      "type": "number"
+                    },
+                    "reps": {
+                      "nullable": true,
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "volume_kg": {
+                  "type": "number"
+                },
+                "work_secs": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sections": {
+            "items": {
+              "properties": {
+                "exercises": {
+                  "items": {
+                    "properties": {
+                      "block_index": {
+                        "type": "integer"
+                      },
+                      "calories": {
+                        "type": "number"
+                      },
+                      "distance_m": {
+                        "type": "number"
+                      },
+                      "estimated": {
+                        "type": "boolean"
+                      },
+                      "exercise_ref": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "group_id": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "interrupt": {
+                        "type": "boolean"
+                      },
+                      "logged_sets": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "per_side": {
+                        "type": "boolean"
+                      },
+                      "reps": {
+                        "type": "number"
+                      },
+                      "row_id": {
+                        "type": "string"
+                      },
+                      "sets": {
+                        "type": "number"
+                      },
+                      "top_set": {
+                        "nullable": true,
+                        "properties": {
+                          "load_kg": {
+                            "type": "number"
+                          },
+                          "reps": {
+                            "nullable": true,
+                            "type": "number"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "volume_kg": {
+                        "type": "number"
+                      },
+                      "work_secs": {
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "flow": {
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "open_ended": {
+                  "type": "boolean"
+                },
+                "preset": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "score": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "section_id": {
+                  "type": "string"
+                },
+                "source": {
+                  "enum": [
+                    "actuals",
+                    "prescription"
+                  ],
+                  "type": "string"
+                },
+                "time_domain": {
+                  "properties": {
+                    "cap_secs": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "open_ended": {
+                      "type": "boolean"
+                    },
+                    "planned_secs": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "totals": {
+                  "properties": {
+                    "calories": {
+                      "type": "number"
+                    },
+                    "distance_m": {
+                      "type": "number"
+                    },
+                    "estimated": {
+                      "type": "boolean"
+                    },
+                    "logged_sets": {
+                      "type": "integer"
+                    },
+                    "reps": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "type": "number"
+                    },
+                    "volume_kg": {
+                      "type": "number"
+                    },
+                    "work_secs": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "totals": {
+            "properties": {
+              "calories": {
+                "type": "number"
+              },
+              "distance_m": {
+                "type": "number"
+              },
+              "estimated": {
+                "type": "boolean"
+              },
+              "logged_sets": {
+                "type": "integer"
+              },
+              "reps": {
+                "type": "number"
+              },
+              "sets": {
+                "type": "number"
+              },
+              "volume_kg": {
+                "type": "number"
+              },
+              "work_secs": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "title": "PlanWorkload",
+        "type": "object"
+      },
       "PlanWorkoutBody": {
         "additionalProperties": false,
         "description": "ADR-270: written in the structured WOD editor, one plan per section",
@@ -61130,6 +61369,54 @@
             },
             "type": "array"
           },
+          "exercise_loads": {
+            "description": "ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session",
+            "items": {
+              "properties": {
+                "exercise_ref": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "points": {
+                  "items": {
+                    "properties": {
+                      "completed_on": {
+                        "format": "date",
+                        "type": "string"
+                      },
+                      "execution_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "load_kg": {
+                        "type": "number"
+                      },
+                      "reps": {
+                        "nullable": true,
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "execution_id",
+                      "completed_on",
+                      "load_kg"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "points"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "pr_timeline": {
             "items": {
               "properties": {
@@ -61256,6 +61543,9 @@
               "sessions": {
                 "type": "integer"
               },
+              "volume_kg": {
+                "type": "number"
+              },
               "workouts": {
                 "type": "integer"
               }
@@ -61275,6 +61565,10 @@
                 },
                 "sessions": {
                   "type": "integer"
+                },
+                "volume_kg": {
+                  "description": "ADR-270: kg × reps lifted in structured plan workouts",
+                  "type": "number"
                 },
                 "week_start": {
                   "format": "date",
@@ -81174,6 +81468,245 @@
                     },
                     "status": {
                       "type": "string"
+                    },
+                    "workload": {
+                      "nullable": true,
+                      "properties": {
+                        "exercises": {
+                          "items": {
+                            "properties": {
+                              "calories": {
+                                "type": "number"
+                              },
+                              "distance_m": {
+                                "type": "number"
+                              },
+                              "estimated": {
+                                "type": "boolean"
+                              },
+                              "exercise_ref": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "logged_sets": {
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reps": {
+                                "type": "number"
+                              },
+                              "sets": {
+                                "type": "number"
+                              },
+                              "top_set": {
+                                "nullable": true,
+                                "properties": {
+                                  "load_kg": {
+                                    "type": "number"
+                                  },
+                                  "reps": {
+                                    "nullable": true,
+                                    "type": "number"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "volume_kg": {
+                                "type": "number"
+                              },
+                              "work_secs": {
+                                "type": "number"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sections": {
+                          "items": {
+                            "properties": {
+                              "exercises": {
+                                "items": {
+                                  "properties": {
+                                    "block_index": {
+                                      "type": "integer"
+                                    },
+                                    "calories": {
+                                      "type": "number"
+                                    },
+                                    "distance_m": {
+                                      "type": "number"
+                                    },
+                                    "estimated": {
+                                      "type": "boolean"
+                                    },
+                                    "exercise_ref": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "group_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "interrupt": {
+                                      "type": "boolean"
+                                    },
+                                    "logged_sets": {
+                                      "type": "integer"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "per_side": {
+                                      "type": "boolean"
+                                    },
+                                    "reps": {
+                                      "type": "number"
+                                    },
+                                    "row_id": {
+                                      "type": "string"
+                                    },
+                                    "sets": {
+                                      "type": "number"
+                                    },
+                                    "top_set": {
+                                      "nullable": true,
+                                      "properties": {
+                                        "load_kg": {
+                                          "type": "number"
+                                        },
+                                        "reps": {
+                                          "nullable": true,
+                                          "type": "number"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "volume_kg": {
+                                      "type": "number"
+                                    },
+                                    "work_secs": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "flow": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "open_ended": {
+                                "type": "boolean"
+                              },
+                              "preset": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "score": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_id": {
+                                "type": "string"
+                              },
+                              "source": {
+                                "enum": [
+                                  "actuals",
+                                  "prescription"
+                                ],
+                                "type": "string"
+                              },
+                              "time_domain": {
+                                "properties": {
+                                  "cap_secs": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "open_ended": {
+                                    "type": "boolean"
+                                  },
+                                  "planned_secs": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "totals": {
+                                "properties": {
+                                  "calories": {
+                                    "type": "number"
+                                  },
+                                  "distance_m": {
+                                    "type": "number"
+                                  },
+                                  "estimated": {
+                                    "type": "boolean"
+                                  },
+                                  "logged_sets": {
+                                    "type": "integer"
+                                  },
+                                  "reps": {
+                                    "type": "number"
+                                  },
+                                  "sets": {
+                                    "type": "number"
+                                  },
+                                  "volume_kg": {
+                                    "type": "number"
+                                  },
+                                  "work_secs": {
+                                    "type": "number"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "totals": {
+                          "properties": {
+                            "calories": {
+                              "type": "number"
+                            },
+                            "distance_m": {
+                              "type": "number"
+                            },
+                            "estimated": {
+                              "type": "boolean"
+                            },
+                            "logged_sets": {
+                              "type": "integer"
+                            },
+                            "reps": {
+                              "type": "number"
+                            },
+                            "sets": {
+                              "type": "number"
+                            },
+                            "volume_kg": {
+                              "type": "number"
+                            },
+                            "work_secs": {
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "title": "PlanWorkload",
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -81202,6 +81735,11 @@
                               "type": "object"
                             },
                             "type": "array"
+                          },
+                          "flow": {
+                            "description": "ADR-270: the flow of a structured plan section",
+                            "nullable": true,
+                            "type": "string"
                           },
                           "format": {
                             "type": "string"
@@ -193705,6 +194243,245 @@
                               },
                               "status": {
                                 "type": "string"
+                              },
+                              "workload": {
+                                "nullable": true,
+                                "properties": {
+                                  "exercises": {
+                                    "items": {
+                                      "properties": {
+                                        "calories": {
+                                          "type": "number"
+                                        },
+                                        "distance_m": {
+                                          "type": "number"
+                                        },
+                                        "estimated": {
+                                          "type": "boolean"
+                                        },
+                                        "exercise_ref": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "logged_sets": {
+                                          "type": "integer"
+                                        },
+                                        "name": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "reps": {
+                                          "type": "number"
+                                        },
+                                        "sets": {
+                                          "type": "number"
+                                        },
+                                        "top_set": {
+                                          "nullable": true,
+                                          "properties": {
+                                            "load_kg": {
+                                              "type": "number"
+                                            },
+                                            "reps": {
+                                              "nullable": true,
+                                              "type": "number"
+                                            }
+                                          },
+                                          "type": "object"
+                                        },
+                                        "volume_kg": {
+                                          "type": "number"
+                                        },
+                                        "work_secs": {
+                                          "type": "number"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "properties": {
+                                        "exercises": {
+                                          "items": {
+                                            "properties": {
+                                              "block_index": {
+                                                "type": "integer"
+                                              },
+                                              "calories": {
+                                                "type": "number"
+                                              },
+                                              "distance_m": {
+                                                "type": "number"
+                                              },
+                                              "estimated": {
+                                                "type": "boolean"
+                                              },
+                                              "exercise_ref": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "group_id": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "interrupt": {
+                                                "type": "boolean"
+                                              },
+                                              "logged_sets": {
+                                                "type": "integer"
+                                              },
+                                              "name": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "per_side": {
+                                                "type": "boolean"
+                                              },
+                                              "reps": {
+                                                "type": "number"
+                                              },
+                                              "row_id": {
+                                                "type": "string"
+                                              },
+                                              "sets": {
+                                                "type": "number"
+                                              },
+                                              "top_set": {
+                                                "nullable": true,
+                                                "properties": {
+                                                  "load_kg": {
+                                                    "type": "number"
+                                                  },
+                                                  "reps": {
+                                                    "nullable": true,
+                                                    "type": "number"
+                                                  }
+                                                },
+                                                "type": "object"
+                                              },
+                                              "volume_kg": {
+                                                "type": "number"
+                                              },
+                                              "work_secs": {
+                                                "type": "number"
+                                              }
+                                            },
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "open_ended": {
+                                          "type": "boolean"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "section_id": {
+                                          "type": "string"
+                                        },
+                                        "source": {
+                                          "enum": [
+                                            "actuals",
+                                            "prescription"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "time_domain": {
+                                          "properties": {
+                                            "cap_secs": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "open_ended": {
+                                              "type": "boolean"
+                                            },
+                                            "planned_secs": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "type": "object"
+                                        },
+                                        "totals": {
+                                          "properties": {
+                                            "calories": {
+                                              "type": "number"
+                                            },
+                                            "distance_m": {
+                                              "type": "number"
+                                            },
+                                            "estimated": {
+                                              "type": "boolean"
+                                            },
+                                            "logged_sets": {
+                                              "type": "integer"
+                                            },
+                                            "reps": {
+                                              "type": "number"
+                                            },
+                                            "sets": {
+                                              "type": "number"
+                                            },
+                                            "volume_kg": {
+                                              "type": "number"
+                                            },
+                                            "work_secs": {
+                                              "type": "number"
+                                            }
+                                          },
+                                          "type": "object"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "totals": {
+                                    "properties": {
+                                      "calories": {
+                                        "type": "number"
+                                      },
+                                      "distance_m": {
+                                        "type": "number"
+                                      },
+                                      "estimated": {
+                                        "type": "boolean"
+                                      },
+                                      "logged_sets": {
+                                        "type": "integer"
+                                      },
+                                      "reps": {
+                                        "type": "number"
+                                      },
+                                      "sets": {
+                                        "type": "number"
+                                      },
+                                      "volume_kg": {
+                                        "type": "number"
+                                      },
+                                      "work_secs": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "title": "PlanWorkload",
+                                "type": "object"
                               }
                             },
                             "required": [
@@ -193733,6 +194510,11 @@
                                         "type": "object"
                                       },
                                       "type": "array"
+                                    },
+                                    "flow": {
+                                      "description": "ADR-270: the flow of a structured plan section",
+                                      "nullable": true,
+                                      "type": "string"
                                     },
                                     "format": {
                                       "type": "string"
@@ -231574,6 +232356,245 @@
                               },
                               "status": {
                                 "type": "string"
+                              },
+                              "workload": {
+                                "nullable": true,
+                                "properties": {
+                                  "exercises": {
+                                    "items": {
+                                      "properties": {
+                                        "calories": {
+                                          "type": "number"
+                                        },
+                                        "distance_m": {
+                                          "type": "number"
+                                        },
+                                        "estimated": {
+                                          "type": "boolean"
+                                        },
+                                        "exercise_ref": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "logged_sets": {
+                                          "type": "integer"
+                                        },
+                                        "name": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "reps": {
+                                          "type": "number"
+                                        },
+                                        "sets": {
+                                          "type": "number"
+                                        },
+                                        "top_set": {
+                                          "nullable": true,
+                                          "properties": {
+                                            "load_kg": {
+                                              "type": "number"
+                                            },
+                                            "reps": {
+                                              "nullable": true,
+                                              "type": "number"
+                                            }
+                                          },
+                                          "type": "object"
+                                        },
+                                        "volume_kg": {
+                                          "type": "number"
+                                        },
+                                        "work_secs": {
+                                          "type": "number"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "properties": {
+                                        "exercises": {
+                                          "items": {
+                                            "properties": {
+                                              "block_index": {
+                                                "type": "integer"
+                                              },
+                                              "calories": {
+                                                "type": "number"
+                                              },
+                                              "distance_m": {
+                                                "type": "number"
+                                              },
+                                              "estimated": {
+                                                "type": "boolean"
+                                              },
+                                              "exercise_ref": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "group_id": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "interrupt": {
+                                                "type": "boolean"
+                                              },
+                                              "logged_sets": {
+                                                "type": "integer"
+                                              },
+                                              "name": {
+                                                "nullable": true,
+                                                "type": "string"
+                                              },
+                                              "per_side": {
+                                                "type": "boolean"
+                                              },
+                                              "reps": {
+                                                "type": "number"
+                                              },
+                                              "row_id": {
+                                                "type": "string"
+                                              },
+                                              "sets": {
+                                                "type": "number"
+                                              },
+                                              "top_set": {
+                                                "nullable": true,
+                                                "properties": {
+                                                  "load_kg": {
+                                                    "type": "number"
+                                                  },
+                                                  "reps": {
+                                                    "nullable": true,
+                                                    "type": "number"
+                                                  }
+                                                },
+                                                "type": "object"
+                                              },
+                                              "volume_kg": {
+                                                "type": "number"
+                                              },
+                                              "work_secs": {
+                                                "type": "number"
+                                              }
+                                            },
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "open_ended": {
+                                          "type": "boolean"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "section_id": {
+                                          "type": "string"
+                                        },
+                                        "source": {
+                                          "enum": [
+                                            "actuals",
+                                            "prescription"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "time_domain": {
+                                          "properties": {
+                                            "cap_secs": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "open_ended": {
+                                              "type": "boolean"
+                                            },
+                                            "planned_secs": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "type": "object"
+                                        },
+                                        "totals": {
+                                          "properties": {
+                                            "calories": {
+                                              "type": "number"
+                                            },
+                                            "distance_m": {
+                                              "type": "number"
+                                            },
+                                            "estimated": {
+                                              "type": "boolean"
+                                            },
+                                            "logged_sets": {
+                                              "type": "integer"
+                                            },
+                                            "reps": {
+                                              "type": "number"
+                                            },
+                                            "sets": {
+                                              "type": "number"
+                                            },
+                                            "volume_kg": {
+                                              "type": "number"
+                                            },
+                                            "work_secs": {
+                                              "type": "number"
+                                            }
+                                          },
+                                          "type": "object"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "totals": {
+                                    "properties": {
+                                      "calories": {
+                                        "type": "number"
+                                      },
+                                      "distance_m": {
+                                        "type": "number"
+                                      },
+                                      "estimated": {
+                                        "type": "boolean"
+                                      },
+                                      "logged_sets": {
+                                        "type": "integer"
+                                      },
+                                      "reps": {
+                                        "type": "number"
+                                      },
+                                      "sets": {
+                                        "type": "number"
+                                      },
+                                      "volume_kg": {
+                                        "type": "number"
+                                      },
+                                      "work_secs": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "title": "PlanWorkload",
+                                "type": "object"
                               }
                             },
                             "required": [
@@ -231602,6 +232623,11 @@
                                         "type": "object"
                                       },
                                       "type": "array"
+                                    },
+                                    "flow": {
+                                      "description": "ADR-270: the flow of a structured plan section",
+                                      "nullable": true,
+                                      "type": "string"
                                     },
                                     "format": {
                                       "type": "string"
@@ -232232,6 +233258,54 @@
                           },
                           "type": "array"
                         },
+                        "exercise_loads": {
+                          "description": "ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session",
+                          "items": {
+                            "properties": {
+                              "exercise_ref": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "points": {
+                                "items": {
+                                  "properties": {
+                                    "completed_on": {
+                                      "format": "date",
+                                      "type": "string"
+                                    },
+                                    "execution_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "load_kg": {
+                                      "type": "number"
+                                    },
+                                    "reps": {
+                                      "nullable": true,
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "execution_id",
+                                    "completed_on",
+                                    "load_kg"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "points"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "pr_timeline": {
                           "items": {
                             "properties": {
@@ -232358,6 +233432,9 @@
                             "sessions": {
                               "type": "integer"
                             },
+                            "volume_kg": {
+                              "type": "number"
+                            },
                             "workouts": {
                               "type": "integer"
                             }
@@ -232377,6 +233454,10 @@
                               },
                               "sessions": {
                                 "type": "integer"
+                              },
+                              "volume_kg": {
+                                "description": "ADR-270: kg × reps lifted in structured plan workouts",
+                                "type": "number"
                               },
                               "week_start": {
                                 "format": "date",

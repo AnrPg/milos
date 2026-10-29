@@ -61,7 +61,11 @@ defmodule Palee.Execution.Domain.PlanTimerTest do
 
     assert %{kind: :countdown, phase: "rest", duration_seconds: 120, scoreable: false} = r
 
-    assert %{kind: :interval_cycle, total_rounds: 10, timer_config: %{interval_pattern_seconds: [40, 20]}} =
+    assert %{
+             kind: :interval_cycle,
+             total_rounds: 10,
+             timer_config: %{interval_pattern_seconds: [40, 20]}
+           } =
              i
 
     assert ClassTimerMachine.segment_limit_ms(i) == 300_000
@@ -69,6 +73,7 @@ defmodule Palee.Execution.Domain.PlanTimerTest do
 
   test "an open-ended EMOM has no last window" do
     open = section("emom", %{"every" => "1:00", "times" => ""}, [[ex("d", "Burpee", "1-2-3…")]])
+
     assert [%{kind: :interval_cycle, total_rounds: nil, timer_config: %{open_ended: true}}] =
              PlanTimer.build([%{id: "d", plan: open}])
   end

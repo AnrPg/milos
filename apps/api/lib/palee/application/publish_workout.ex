@@ -9,6 +9,7 @@ defmodule Palee.Application.PublishWorkout do
   }
 
   alias Palee.{Notifications, Scheduling, Workouts}
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   def call(%{organization_id: _} = context, id, params) do
     substitute_for = parse_substitute_for(params)
@@ -19,7 +20,8 @@ defmodule Palee.Application.PublishWorkout do
     slot_ids = Scheduling.list_slot_ids_for_workout(context, id)
     is_republish = assignment_targets != [] or booking_targets != []
 
-    with {:ok, workout} <- Workouts.publish_workout(context, id, params),
+    with :ok <- keep_plan(context, id, params),
+         {:ok, workout} <- Workouts.publish_workout(context, id, params),
          :ok <- apply_substitution(context, substitute_for, workout.id) do
       Workouts.delete_superseded_drafts(context, id, workout.created_by_id)
       SuggestWorkoutIcon.enqueue(context, workout.id)
@@ -49,6 +51,10 @@ defmodule Palee.Application.PublishWorkout do
   end
 
   def call(_context, _id, _params), do: {:error, :organization_context_required}
+
+  # ADR-270: a legacy editor's save never silently drops a structured plan.
+  defp keep_plan(context, id, params),
+    do: context |> Workouts.get_workout_for_admin(id) |> PlanPrescriptions.check_save(params)
 
   defp parse_substitute_for(params) do
     case Map.get(params, "substitute_for") do

@@ -35,7 +35,10 @@ defmodule Palee.Workouts.StructuredPlanWorkoutStoreTest do
 
     [strength, accessory, engine] = workout.sections
     assert strength.plan["flow"] == "sets"
-    assert [%{name: "Back Squat", sets: 4, prescription_value: 12, tempo: "31X1"}] = strength.exercises
+
+    assert [%{name: "Back Squat", sets: 4, prescription_value: 12, tempo: "31X1"}] =
+             strength.exercises
+
     assert %{load_value: 60, load_mode: "pct_1rm"} = hd(strength.exercises)
 
     assert Enum.map(accessory.exercises, & &1.name) ==
@@ -58,9 +61,15 @@ defmodule Palee.Workouts.StructuredPlanWorkoutStoreTest do
 
   test "a plan that does not read is refused with its section and path" do
     admin = create_admin!("plan_refused")
-    bad = put_in(Enum.at(program(), 0), ["blocks", Access.at(0), Access.at(0), "cells"], [%{"l" => "60"}])
 
-    assert {:error, {:invalid_plan_sections, [%{section: 1, path: "blocks.0.0.cells.0.l", code: "missing_unit"}]}} =
+    bad =
+      put_in(Enum.at(program(), 0), ["blocks", Access.at(0), Access.at(0), "cells"], [
+        %{"l" => "60"}
+      ])
+
+    assert {:error,
+            {:invalid_plan_sections,
+             [%{section: 1, path: "blocks.0.0.cells.0.l", code: "missing_unit"}]}} =
              Workouts.create_workout(admin, params([%{name: "A", order: 1, plan: bad}]))
 
     assert {:error, {:invalid_plan_sections, [%{section: 1, code: "plan_required"}]}} =
@@ -86,10 +95,15 @@ defmodule Palee.Workouts.StructuredPlanWorkoutStoreTest do
     {:ok, draft} = Workouts.create_draft(admin)
 
     {:ok, saved} =
-      Workouts.update_draft(draft.id, %{draft_data: params(plan_sections()), expected_source_revision: 0})
+      Workouts.update_draft(draft.id, %{
+        draft_data: params(plan_sections()),
+        expected_source_revision: 0
+      })
 
     assert {:ok, published} =
-             Workouts.publish_workout(draft.id, %{expected_source_revision: saved.dsl_source_revision})
+             Workouts.publish_workout(draft.id, %{
+               expected_source_revision: saved.dsl_source_revision
+             })
 
     assert Enum.map(published.sections, & &1.plan["flow"]) == ["sets", "sets", "for_time"]
     assert length(hd(published.sections).exercises) == 1

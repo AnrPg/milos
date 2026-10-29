@@ -329,6 +329,8 @@ defmodule Palee.Application.GetScheduleCalendar do
       id: workout.id,
       title: workout.title,
       type: workout.type,
+      # ADR-270: a structured plan workout previews as its plan (`plan-view`).
+      authoring_mode: Map.get(workout, :authoring_mode),
       focus: Workouts.workout_focus(workout),
       sections:
         Enum.map(workout.sections || [], fn section ->
@@ -339,6 +341,8 @@ defmodule Palee.Application.GetScheduleCalendar do
             scoreable: section.scoreable,
             score_config: section.score_config,
             timer_config: section.timer_config,
+            plan: Map.get(section, :plan),
+            prescription: Map.get(section, :prescription),
             exercises:
               Enum.map(section.exercises || [], fn exercise ->
                 %{
