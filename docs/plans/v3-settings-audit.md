@@ -33,10 +33,10 @@ The setup recipes (CP-H2, same ADR) set most of the «Derive» rows in one step 
 | Verdict | Count | What it means for the screen |
 |---|---|---|
 | Basic | 17 | The main settings screen |
-| Advanced | 36 | One «Προχωρημένα» section per area, closed by default |
+| Advanced | 37 | One «Προχωρημένα» section per area, closed by default |
 | Derive | 10 | Set by the app or by a setup recipe |
 | Remove (UI) | 4 | Hidden from owners; kept for the Palee team or internal use |
-| **Total business settings** | **67** | including the 5 class-type fields (§J); plus ≈50 per-package fields (§K) |
+| **Total business settings** | **68** | including the 5 class-type fields (§J); plus ≈50 per-package fields (§K) |
 
 The counts are checked by `test/palee/setup/domain/settings_catalog_test.exs` against the catalog in
 code, so this table and the code cannot drift apart.

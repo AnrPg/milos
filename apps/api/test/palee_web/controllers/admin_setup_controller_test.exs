@@ -7,7 +7,6 @@ defmodule PaleeWeb.AdminSetupControllerTest do
   use PaleeWeb.ConnCase, async: false
 
   import Palee.AnalyticsHelpers, only: [organization_fixture: 0, member_context: 2]
-  import Palee.TestFixtures
 
   setup %{conn: conn} do
     {organization, owner, _context} = organization_fixture()
