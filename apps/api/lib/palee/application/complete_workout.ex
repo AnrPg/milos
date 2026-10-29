@@ -9,6 +9,7 @@ defmodule Palee.Application.CompleteWorkout do
 
   alias Palee.{Execution, Gamification, Identity, Journal, Notifications, Workouts}
   alias Palee.Execution.ExecutionStore
+  alias Palee.Workouts.Queries.PlanPrescriptions
   alias Palee.Workers.ProcessWorkoutCompletionJob
   alias Palee.Workers.RefreshLeaderboardJob
 
@@ -42,6 +43,7 @@ defmodule Palee.Application.CompleteWorkout do
           execution
           |> Execution.completion_analytics_facts(segments)
           |> Map.merge(InjuryWarningEvaluation.completion_facts(execution, workout))
+          |> Map.merge(plan_completion_facts(execution, workout))
       })
 
       {:ok, execution}
@@ -222,6 +224,34 @@ defmodule Palee.Application.CompleteWorkout do
       )
 
   defp text_section_scores(_workout, _params), do: {:ok, []}
+
+  # ADR-270: how much of a structured plan workout was done, for analytics:
+  # sets (and how many the athlete logged), volume and whether any number is
+  # an estimate. Counts only; nothing the athlete typed.
+  defp plan_completion_facts(execution, %{} = workout) do
+    if PlanPrescriptions.plan_workout?(workout) do
+      case PlanPrescriptions.workload(workout, Map.get(execution, :plan_sets) || [],
+             section_scores: execution.section_scores,
+             section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+           ) do
+        %{totals: totals} ->
+          %{
+            authoring_mode: "structured_plan",
+            plan_set_count: totals.sets,
+            plan_logged_set_count: totals.logged_sets,
+            plan_volume_kg: totals.volume_kg,
+            plan_estimated: totals.estimated
+          }
+
+        nil ->
+          %{authoring_mode: "structured_plan"}
+      end
+    else
+      %{}
+    end
+  end
+
+  defp plan_completion_facts(_execution, _workout), do: %{}
 
   # ADR-270: what the athlete did in each set / round of a structured plan,
   # checked against the plan rows of the workout's sections. Other workouts
