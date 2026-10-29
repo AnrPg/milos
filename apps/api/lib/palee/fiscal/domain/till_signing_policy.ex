@@ -16,10 +16,10 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
       have it;
     * `device_failed` – the device could not sign it. Germany: a receipt
       not signed within `outage_seconds/0` of its issue is recorded as a TSE
-      failure and printed as such (AEAO zu §146a, Nr. 7); a signature hours
+      failure and printed as such (AEAO zu §146a); a signature hours
       later would misstate when the sale happened. Austria: fiskaly
       reported a signature creation unit outage and the receipt carries
-      "Sicherheitseinrichtung ausgefallen" (RKSV §17 (4)); fiskaly clears the
+      "Sicherheitseinrichtung ausgefallen" (RKSV §17); fiskaly clears the
       fault with its own receipt;
     * `rejected` – the device refused the content;
     * `failed` – transient errors for `max_attempts/0` attempts in a row.
