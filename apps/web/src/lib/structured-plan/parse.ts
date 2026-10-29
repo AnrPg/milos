@@ -16,33 +16,35 @@ export type PlanText = { key: string; values?: Record<string, string | number> }
 /** The word for one column of a section: a set (Σετ), a round (Γύρος) or an interval (Διάστημα). */
 export type RoundWord = "set" | "round" | "interval";
 
-/** Error codes shared with the API. */
-export type PlanErrorCode =
-  | "bad_dose"
-  | "missing_unit"
-  | "mixed_unit"
-  | "bad_tempo"
-  | "bad_measure_value"
-  | "rpe_over_max"
-  | "bad_param"
-  | "unknown_param"
-  | "unknown_flow"
-  | "unknown_measure"
-  | "duplicate_measure"
-  | "unknown_struct"
-  | "struct_not_allowed"
-  | "bad_struct_param"
-  | "mod_not_allowed"
-  | "unknown_score"
-  | "bad_version"
-  | "bad_row_kind"
-  | "duplicate_id"
-  | "blocks_not_allowed"
-  | "too_many_blocks"
-  | "too_many_rows"
-  | "too_many_cells"
-  | "too_long"
-  | "note_too_long";
+/** Error codes shared with the API (messages: `PlanCore.error.<code>`). */
+export const PLAN_ERROR_CODES = [
+  "bad_dose",
+  "missing_unit",
+  "mixed_unit",
+  "bad_tempo",
+  "bad_measure_value",
+  "rpe_over_max",
+  "bad_param",
+  "unknown_param",
+  "unknown_flow",
+  "unknown_measure",
+  "duplicate_measure",
+  "unknown_struct",
+  "struct_not_allowed",
+  "bad_struct_param",
+  "mod_not_allowed",
+  "unknown_score",
+  "bad_version",
+  "bad_row_kind",
+  "duplicate_id",
+  "blocks_not_allowed",
+  "too_many_blocks",
+  "too_many_rows",
+  "too_many_cells",
+  "too_long",
+  "note_too_long",
+] as const;
+export type PlanErrorCode = (typeof PLAN_ERROR_CODES)[number];
 
 // ── clock formatting ───────────────────────────────────────────────────────
 
@@ -57,13 +59,15 @@ export const mmss = (secs: number): string => `${Math.floor(secs / 60)}:${String
 export const numStr = (n: number): string => String(Math.round(n * 100) / 100);
 
 /**
- * Seconds as minutes and seconds for a human sentence ("2 λεπτά 30 δευτ."):
- * the UI words it with `PlanCore.human` (`{min} min {sec} s`).
+ * Seconds in words for a sentence ("2 λεπτά 30 δευτ."): `PlanCore.human.min`
+ * {min}, `.sec` {sec} or `.minSec` {min, sec}.
  */
 export function human(secs: number): PlanText {
   const min = Math.floor(secs / 60);
   const sec = secs % 60;
-  return { key: "PlanCore.human", values: { min, sec } };
+  if (!min) return { key: "PlanCore.human.sec", values: { sec } };
+  if (!sec) return { key: "PlanCore.human.min", values: { min } };
+  return { key: "PlanCore.human.minSec", values: { min, sec } };
 }
 
 // ── time fields ────────────────────────────────────────────────────────────
@@ -444,7 +448,7 @@ export type SetLoads = {
   /** Shown value per column ("65 kg", "70%", the coach's words, or "" when unknown). */
   values: string[];
   /** Error code per column (`missing_unit`, `mixed_unit`) or null. */
-  errors: (string | null)[];
+  errors: (PlanErrorCode | null)[];
   /** The row's unit, written once in any column. */
   unit: LoadUnit | null;
 };
@@ -462,7 +466,7 @@ const normLoad = (t: string) =>
  */
 export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
   const values: string[] = [];
-  const errors: (string | null)[] = [];
+  const errors: (PlanErrorCode | null)[] = [];
   let prev: number | null = null;
   let delta: number | null = null;
   let spread: { a: number; b: number; i: number } | null = null;

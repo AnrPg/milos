@@ -117,7 +117,7 @@ export function timeline(section: PlanSection): Timeline {
   return { segments: segs, interrupts, total };
 }
 
-/** An exercise name in a summary; `perSide` shows "(per side)". */
+/** An exercise name in a summary; `perSide` shows "(per side)" (`PlanCore.summary.perSide`). */
 export type SummaryName = { name: string; perSide: boolean };
 
 /** Rows marked "per side" (the `side` measure). */
