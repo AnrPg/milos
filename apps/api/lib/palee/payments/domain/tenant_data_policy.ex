@@ -15,6 +15,8 @@ defmodule Palee.Payments.Domain.TenantDataPolicy do
             purge_order: 83,
             disposition: :retain,
             retain_years: 10,
+            # Provider credentials and saved-card tokens never leave the database.
+            excluded_columns: ["credentials", "token"],
             basis:
               "Online payments, refunds and the provider's notifications are accounting records with a statutory retention period; saved-card tokens and the business's provider credentials are secrets, encrypted at rest and purged with the tenant.",
             tables: [

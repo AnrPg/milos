@@ -833,6 +833,18 @@ defmodule Palee.Payments do
     end
   end
 
+  @doc "Whether any payment for this purpose was (partly) given back."
+  def refunded?(context, purpose_type, purpose_id) do
+    %{intents: intents} =
+      PaymentStore.list_intents(context, %{
+        purpose_type: purpose_type,
+        purpose_id: purpose_id,
+        limit: 200
+      })
+
+    Enum.any?(intents, &(&1.refunded_cents > 0))
+  end
+
   def list(context, filters) do
     %{intents: intents, total: total} = PaymentStore.list_intents(context, filters)
     %{payments: Enum.map(intents, &public_intent/1), total: total}

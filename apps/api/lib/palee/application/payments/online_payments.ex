@@ -226,7 +226,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
 
   @doc """
   Pays due open invoices with the card each member chose for automatic
-  payment, within the card's consent.
+  payment, within the card's consent. Returns how many charges went
+  through or are being retried.
   """
   def autopay(context, now \\ DateTime.utc_now()) do
     if Payments.available?(context) do
@@ -239,6 +240,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
 
         member
         |> due_invoices(today)
+        # Money given back on an invoice is a staff decision; never take it again by itself.
+        |> Enum.reject(&Payments.refunded?(context, "finance_invoice", &1.id))
         |> Enum.map(fn invoice ->
           Payments.charge_saved(
             member,
@@ -255,7 +258,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
           )
         end)
       end)
-      |> length()
+      |> Enum.count(&match?({:ok, %{status: status}} when status != "failed", &1))
     else
       0
     end
