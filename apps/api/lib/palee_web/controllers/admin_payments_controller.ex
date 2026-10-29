@@ -132,8 +132,8 @@ defmodule PaleeWeb.AdminPaymentsController do
     summary: "Saved-card charges that need a person (Ουρές)",
     description:
       "Declined and waiting for a retry, or failed for good, until staff close them or " <>
-        "the purpose is paid.",
-    responses: [ok: {"Payments", "application/json", P.intent_page()}]
+        "the purpose is paid. Each names the member (`member_name`).",
+    responses: [ok: {"Payments", "application/json", P.attention_page()}]
   )
 
   def attention(conn, _params),

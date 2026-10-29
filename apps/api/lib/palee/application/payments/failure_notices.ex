@@ -37,7 +37,7 @@ defmodule Palee.Application.Payments.FailureNotices do
       |> Organizations.list_user_ids_with_capability(:manage_billing)
       |> Enum.each(fn user_id ->
         deliver("payment_needs_attention", user_id, payload, %{
-          url: "/admin/finance?tab=queues",
+          url: "/admin/finance?tab=queues&queue=failed_charges",
           dedupe_key: "payment_needs_attention:#{intent.id}:#{user_id}"
         })
       end)

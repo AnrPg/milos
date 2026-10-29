@@ -187629,7 +187629,7 @@
     "/api/org/{organization_slug}/admin/payments/attention": {
       "get": {
         "callbacks": {},
-        "description": "Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid.",
+        "description": "Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid. Each names the member (`member_name`).",
         "operationId": "PaleeWeb.AdminPaymentsController.attention",
         "parameters": [],
         "responses": {
@@ -187640,146 +187640,162 @@
                   "properties": {
                     "payments": {
                       "items": {
-                        "properties": {
-                          "amount_cents": {
-                            "type": "integer"
-                          },
-                          "attention_resolution": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "attention_resolved_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "card_brand": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "card_last4": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "currency": {
-                            "type": "string"
-                          },
-                          "declines": {
-                            "type": "integer"
-                          },
-                          "description": {
-                            "type": "string"
-                          },
-                          "environment": {
-                            "type": "string"
-                          },
-                          "expires_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "failure_code": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "finance_payment_id": {
-                            "format": "uuid",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "fulfilment_status": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "initiation": {
-                            "enum": [
-                              "payer",
-                              "merchant",
-                              "terminal"
+                        "allOf": [
+                          {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "attention_resolution": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "attention_resolved_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "card_brand": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "card_last4": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "declines": {
+                                "type": "integer"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "environment": {
+                                "type": "string"
+                              },
+                              "expires_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "failure_code": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "finance_payment_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "fulfilment_status": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "initiation": {
+                                "enum": [
+                                  "payer",
+                                  "merchant",
+                                  "terminal"
+                                ],
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "metadata": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "next_attempt_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "provider": {
+                                "type": "string"
+                              },
+                              "provider_transaction_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "purpose_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "purpose_type": {
+                                "type": "string"
+                              },
+                              "redirect_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "refunded_cents": {
+                                "type": "integer"
+                              },
+                              "retries": {
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "scheduled",
+                                  "awaiting_payer",
+                                  "processing",
+                                  "succeeded",
+                                  "failed",
+                                  "cancelled",
+                                  "expired"
+                                ],
+                                "type": "string"
+                              },
+                              "succeeded_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "amount_cents",
+                              "currency",
+                              "declines",
+                              "description",
+                              "environment",
+                              "fulfilment_status",
+                              "id",
+                              "initiation",
+                              "provider",
+                              "purpose_id",
+                              "purpose_type",
+                              "refunded_cents",
+                              "retries",
+                              "status"
                             ],
-                            "type": "string"
-                          },
-                          "inserted_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "metadata": {
-                            "additionalProperties": true,
                             "type": "object"
                           },
-                          "next_attempt_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "provider": {
-                            "type": "string"
-                          },
-                          "provider_transaction_id": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "purpose_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "purpose_type": {
-                            "type": "string"
-                          },
-                          "redirect_url": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "refunded_cents": {
-                            "type": "integer"
-                          },
-                          "retries": {
-                            "type": "integer"
-                          },
-                          "status": {
-                            "enum": [
-                              "scheduled",
-                              "awaiting_payer",
-                              "processing",
-                              "succeeded",
-                              "failed",
-                              "cancelled",
-                              "expired"
+                          {
+                            "properties": {
+                              "member_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "member_name"
                             ],
-                            "type": "string"
-                          },
-                          "succeeded_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "nullable": true,
-                            "type": "string"
+                            "type": "object"
                           }
-                        },
-                        "required": [
-                          "amount_cents",
-                          "currency",
-                          "declines",
-                          "description",
-                          "environment",
-                          "fulfilment_status",
-                          "id",
-                          "initiation",
-                          "provider",
-                          "purpose_id",
-                          "purpose_type",
-                          "refunded_cents",
-                          "retries",
-                          "status"
-                        ],
-                        "type": "object"
+                        ]
                       },
                       "type": "array"
                     },

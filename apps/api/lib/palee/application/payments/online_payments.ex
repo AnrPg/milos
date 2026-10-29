@@ -172,7 +172,18 @@ defmodule Palee.Application.Payments.OnlinePayments do
           Map.get(balances, payment.purpose_id, 1) <= 0
       end)
 
+    names = member_names(payments)
+    payments = Enum.map(payments, &Map.put(&1, :member_name, Map.get(names, &1.user_id)))
+
     %{payments: payments, total: length(payments)}
+  end
+
+  # The queue names the person, not an id.
+  defp member_names(payments) do
+    case for(%{user_id: id} when is_binary(id) <- payments, uniq: true, do: id) do
+      [] -> %{}
+      ids -> ids |> Identity.list_by_ids() |> Map.new(&{&1.id, &1.nickname})
+    end
   end
 
   def retry_charge(context, id), do: Payments.retry_charge(context, id, now())

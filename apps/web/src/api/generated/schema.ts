@@ -7964,7 +7964,7 @@ export interface paths {
         };
         /**
          * Saved-card charges that need a person (Ουρές)
-         * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid.
+         * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid. Each names the member (`member_name`).
          */
         get: operations["PaleeWeb.AdminPaymentsController.attention"];
         put?: never;
@@ -80719,7 +80719,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        payments: {
+                        payments: ({
                             amount_cents: number;
                             attention_resolution?: string | null;
                             /** Format: date-time */
@@ -80761,7 +80761,9 @@ export interface operations {
                             succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
-                        }[];
+                        } & {
+                            member_name: string | null;
+                        })[];
                         total: number;
                     };
                 };
