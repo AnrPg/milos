@@ -195,6 +195,7 @@ defmodule PaleeWeb.PaymentOptionsControllerTest do
 
     assert queued["id"] == charge.id
     assert queued["retries"] == 3
+    assert queued["member_name"] == ctx.member.nickname
 
     # The card link goes out again.
     conn

@@ -236,6 +236,26 @@ defmodule PaleeWeb.Schemas.Payments do
     }
   end
 
+  @doc "ADR-260: the Ουρές queue names the person each charge is for."
+  def attention_page do
+    item = %Schema{
+      allOf: [
+        intent(),
+        %Schema{
+          type: :object,
+          properties: %{member_name: @text},
+          required: [:member_name]
+        }
+      ]
+    }
+
+    %Schema{
+      type: :object,
+      properties: %{payments: %Schema{type: :array, items: item}, total: @int},
+      required: [:payments, :total]
+    }
+  end
+
   def intent_page do
     %Schema{
       type: :object,
