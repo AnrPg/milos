@@ -47,6 +47,7 @@ import { ALL_ROLES } from "@/api/roles";
 import { RoleChipsEditor } from "@/components/roles/RoleChipsEditor";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { LOCALE_NAMES, SUPPORTED_LOCALES, isAppLocale } from "@/i18n/locales";
+import { formatClock } from "@/lib/clock";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -353,7 +354,7 @@ export function PlatformOrganizationsPage() {
             {invitation.initial_owner_invitation.token}
           </code>
           <p className="mt-2 text-xs">
-            {copy.expires}: {new Date(invitation.initial_owner_invitation.expires_at).toLocaleString(locale)}
+            {copy.expires}: {formatClock(new Date(invitation.initial_owner_invitation.expires_at), locale, { dateStyle: "medium", timeStyle: "short" })}
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
@@ -416,7 +417,7 @@ export function PlatformOrganizationsPage() {
                   <span className="font-semibold">{copy.deliveryStatus}:</span>
                   <span>{deliveryStatusText(latestDelivery, copy)}</span>
                   <span className="text-xs text-[var(--text-soft)]">
-                    {invitationEmail} · {new Date(latestDelivery.sent_at ?? latestDelivery.inserted_at).toLocaleString(locale)}
+                    {invitationEmail} · {formatClock(new Date(latestDelivery.sent_at ?? latestDelivery.inserted_at), locale, { dateStyle: "medium", timeStyle: "short" })}
                   </span>
                   <button type="button" className="text-xs font-semibold underline" onClick={() => void deliveriesQuery.refetch()}>
                     {copy.refreshDelivery}
@@ -756,6 +757,7 @@ function AccessDialog({
   const [invitation, setInvitation] = useState<PlatformInvitationResult["invitation"] | null>(null);
   const [copied, setCopied] = useState<"token" | "link" | null>(null);
   const [historyExpanded, setHistoryExpanded] = useState(false);
+  const locale = useUiLocale();
 
   const accessQuery = useQuery({
     queryKey: ["platform-organization-access", organization.organization.id],
@@ -849,7 +851,7 @@ function AccessDialog({
             <p className="text-sm font-semibold">{copy.ownerSetupLink}</p>
             <code className="mt-2 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-2 text-sm">{invitationSetupUrl(invitation)}</code>
             <code className="mt-3 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-2 text-sm">{invitation.token}</code>
-            <p className="mt-2 text-xs">{copy.expires}: {new Date(invitation.expires_at).toLocaleString()}</p>
+            <p className="mt-2 text-xs">{copy.expires}: {formatClock(new Date(invitation.expires_at), locale, { dateStyle: "medium", timeStyle: "short" })}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitation.token); setCopied("token"); }} className="border border-[var(--warning)] px-3 py-2 text-sm font-semibold">{copied === "token" ? copy.copied : copy.copyToken}</button>
               <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitationSetupUrl(invitation)); setCopied("link"); }} className="border border-[var(--warning)] px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
@@ -929,8 +931,8 @@ function GeneratedInvitationsList({
               <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
                 <Detail label={copy.role} value={invitation.role} />
                 <Detail label={copy.intendedEmail} value={invitation.intended_email ?? "-"} />
-                <Detail label={copy.issued} value={new Date(invitation.issued_at).toLocaleString(locale)} />
-                <Detail label={copy.expires} value={new Date(invitation.expires_at).toLocaleString(locale)} />
+                <Detail label={copy.issued} value={formatClock(new Date(invitation.issued_at), locale, { dateStyle: "medium", timeStyle: "short" })} />
+                <Detail label={copy.expires} value={formatClock(new Date(invitation.expires_at), locale, { dateStyle: "medium", timeStyle: "short" })} />
               </dl>
               <p className="mt-3 text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.setupLink}</p>
               <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--panel-muted)] px-3 py-2 text-xs">

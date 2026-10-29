@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
  * object that shows hours (`hour` or `timeStyle`) must go through the clock
  * helper in lib/clock (`withClock`, `clockFormat`, `formatClock`) or a helper
  * that applies it (`formatInZone`, `zonedText`, `readZoned`), and
- * `toLocaleTimeString` is not used at all.
+ * neither `toLocaleTimeString` nor an option-less date `toLocaleString` is used.
  *
  * An options object that sets `hourCycle` itself (a machine-readable value
  * such as an <input> value) is deliberate and allowed.
@@ -87,6 +87,17 @@ function findings(path: string): string[] {
   const visit = (node: ts.Node) => {
     if (ts.isPropertyAccessExpression(node) && node.name.text === "toLocaleTimeString") {
       found.push(`${where(node)} toLocaleTimeString (use formatClock from lib/clock)`);
+    }
+    // `new Date(…).toLocaleString(locale)` without options shows the time on Intl's default clock.
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.name.text === "toLocaleString" &&
+      ts.isNewExpression(node.expression.expression) &&
+      node.expression.expression.expression.getText(file) === "Date" &&
+      node.arguments.length < 2
+    ) {
+      found.push(`${where(node)} date toLocaleString without options (use formatClock from lib/clock)`);
     }
     if (ts.isObjectLiteralExpression(node) && !(relativePath in ALLOWED_FILES)) {
       const names = node.properties.map(propertyName);
