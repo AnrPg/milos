@@ -156,8 +156,9 @@ test.describe("Settings › Box screens", () => {
 
     await page.route("**/api/org/box1/admin/box-screens", (route) => {
       if (route.request().method() === "POST") {
-        created = bodyOf(route.request());
-        const screen = screenRow({ name: created.name, paired: false, paired_at: null, pairing_expires_at: inMinutes(15) });
+        const body = bodyOf(route.request());
+        created = body;
+        const screen = screenRow({ name: body.name, paired: false, paired_at: null, pairing_expires_at: inMinutes(15) });
         screens = [screen];
         return route.fulfill(json({ screen, pairing_code: { code: "ACEF-3467", expires_at: inMinutes(15) } }, 201));
       }
@@ -165,8 +166,9 @@ test.describe("Settings › Box screens", () => {
     });
     await page.route("**/api/org/box1/admin/box-screens/s1/override", (route) => {
       if (route.request().method() === "PUT") {
-        pinned = bodyOf(route.request());
-        screens = [screenRow({ override: { view: pinned.view, slot_id: null, until: null }, focus_changed: { at: new Date().toISOString(), by: { id: "user-1", name: "Olga" } } })];
+        const body = bodyOf(route.request());
+        pinned = body;
+        screens = [screenRow({ override: { view: body.view, slot_id: null, until: null }, focus_changed: { at: new Date().toISOString(), by: { id: "user-1", name: "Olga" } } })];
       } else {
         unpinned = true;
         screens = [screenRow()];
