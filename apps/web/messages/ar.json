@@ -12505,7 +12505,15 @@
     "tvDayDone": "انتهت حصص اليوم.",
     "tvNoClasses": "لا حصص اليوم.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "على الشاشة",
+    "onScreenTitle": "اعرض هذه الحصة على شاشة",
+    "onScreenHint": "اليوم فقط، على شاشات حصتك. تعود الشاشة إلى الوضع التلقائي عند انتهاء يوم الحصة.",
+    "classView": {
+      "timer": "مؤقّت الحصة",
+      "leaderboard": "لوحة ترتيب الحصة",
+      "wod": "تمرين الحصة"
+    }
   },
   "Pay": {
     "loading": "جارٍ التحميل…",

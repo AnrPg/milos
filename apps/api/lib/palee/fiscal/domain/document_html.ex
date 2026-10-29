@@ -32,6 +32,7 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       totals(view),
       mentions(view),
       authority(view.authority),
+      authority(Map.get(view, :till)),
       bank(view.bank),
       footer(view),
       "</main>\n",
@@ -360,7 +361,7 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       "dl.totals dd{margin:0;text-align:right}.grand{font-weight:700;font-size:12pt}" <>
       ".mentions,.bank,.authority{margin-top:6mm;font-size:9pt}.mentions p,.bank p,.authority p{margin:0}" <>
       ".authority{display:flex;justify-content:space-between;gap:6mm;border:.5pt solid #000;padding:3mm}" <>
-      ".authority .url{font-size:7pt;overflow-wrap:anywhere}footer{margin-top:8mm;font-size:7.5pt;" <>
+      ".authority p{overflow-wrap:anywhere}.authority .url{font-size:7pt}footer{margin-top:8mm;font-size:7.5pt;" <>
       "color:#444}footer p{margin:0}code{font-size:7pt;overflow-wrap:anywhere}" <>
       ".qr-bill{box-sizing:border-box;width:210mm;height:297mm;margin:0 auto;position:relative;" <>
       "background:#fff;page-break-before:always;break-before:page}.separate{position:absolute;" <>

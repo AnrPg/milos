@@ -189,3 +189,9 @@ msgstr "Αποτύπωμα παραστατικού (SHA-256)"
 
 msgid "Page"
 msgstr "Σελίδα"
+
+msgid "Technical security system (TSE)"
+msgstr "Τεχνικό σύστημα ασφαλείας (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Μηχανισμός ασφαλείας ταμειακής μηχανής (RKSV)"

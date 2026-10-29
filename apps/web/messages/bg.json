@@ -12505,7 +12505,15 @@
     "tvDayDone": "Днешните часове приключиха.",
     "tvNoClasses": "Днес няма часове.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "На екрана",
+    "onScreenTitle": "Покажи този клас на екран",
+    "onScreenHint": "Само днес, на екраните на твоя клас. Екранът се връща на автоматичен режим, когато денят на класа свърши.",
+    "classView": {
+      "timer": "Таймер на класа",
+      "leaderboard": "Класиране на класа",
+      "wod": "WOD на класа"
+    }
   },
   "Pay": {
     "loading": "Зареждане…",

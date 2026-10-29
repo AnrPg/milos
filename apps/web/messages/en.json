@@ -12505,7 +12505,15 @@
     "tvDayDone": "Today's classes are over.",
     "tvNoClasses": "No classes today.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "On screen",
+    "onScreenTitle": "Show this class on a screen",
+    "onScreenHint": "Only today, on your class's screens. The screen goes back to automatic when the class's day ends.",
+    "classView": {
+      "timer": "Class timer",
+      "leaderboard": "Class leaderboard",
+      "wod": "Class WOD"
+    }
   },
   "Pay": {
     "loading": "Loading…",

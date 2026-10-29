@@ -12505,7 +12505,15 @@
     "tvDayDone": "De lessen van vandaag zijn voorbij.",
     "tvNoClasses": "Vandaag geen lessen.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "Op het scherm",
+    "onScreenTitle": "Deze les op een scherm tonen",
+    "onScreenHint": "Alleen vandaag, op de schermen van je les. Het scherm gaat terug naar automatisch als de dag van de les voorbij is.",
+    "classView": {
+      "timer": "Lestimer",
+      "leaderboard": "Klassement van de les",
+      "wod": "WOD van de les"
+    }
   },
   "Pay": {
     "loading": "Laden…",

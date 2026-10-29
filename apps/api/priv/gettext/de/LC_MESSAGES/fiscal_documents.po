@@ -189,3 +189,9 @@ msgstr "Fingerabdruck des Belegs (SHA-256)"
 
 msgid "Page"
 msgstr "Seite"
+
+msgid "Technical security system (TSE)"
+msgstr "Technische Sicherheitseinrichtung (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Sicherheitseinrichtung der Registrierkasse (RKSV)"

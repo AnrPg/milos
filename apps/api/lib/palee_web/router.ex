@@ -778,6 +778,22 @@ defmodule PaleeWeb.Router do
 
     get("/class-timers/:slot_id", ClassTimerController, :show)
     post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+
+    # ADR-253 update 2026-10-29: «Στην οθόνη», the class's coach pins it on a box screen.
+    get("/class-timers/:slot_id/screens", ClassScreenController, :index)
+
+    put(
+      "/class-timers/:slot_id/screens/:screen_id/override",
+      ClassScreenController,
+      :put_override
+    )
+
+    delete(
+      "/class-timers/:slot_id/screens/:screen_id/override",
+      ClassScreenController,
+      :delete_override
+    )
+
     # TD-092: challenges are tenant rows; these run in the gym's scope.
     get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
