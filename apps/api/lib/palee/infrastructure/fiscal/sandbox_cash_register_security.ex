@@ -1,6 +1,7 @@
 defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
   @moduledoc """
-  A TSE and an RKSV signature creation unit that are not there (ADR-251):
+  A TSE, an RKSV signature creation unit and fiskaly SIGN FR that are not
+  there (ADR-251, ADR-266):
   every receipt is "signed" without the network. Used by the `sandbox`
   environment (pilots before a business has a fiskaly account, demos,
   development) and by tests.
@@ -118,6 +119,13 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
                 amounts ++ [Base.encode64("sandbox"), "SANDBOX", Base.encode64("previous"), value],
               "_"
             )
+        })
+
+      # France (ADR-266): a record id stands in for fiskaly's.
+      "sign_fr" ->
+        Map.merge(base, %{
+          receipt_number: "sandbox-" <> to_string(request.external_id),
+          qr_code_data: nil
         })
     end
   end

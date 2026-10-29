@@ -14,7 +14,9 @@ defmodule Palee.Fiscal.Domain.CountryProfile do
       inalterable register) or `:standard`; Palee keeps the inalterable
       journal everywhere (ADR-242), the profile says which rules are law;
     * `till_device` – signing device for money taken at a till: `:tse`
-      (Germany, KassenSichV), `:rksv` (Austria) or `:none`;
+      (Germany, KassenSichV), `:rksv` (Austria), `:sign_fr` (France:
+      fiskaly SIGN FR next to Palee's own NF525-style journal, ADR-266;
+      not Monaco, which fiskaly SIGN FR does not cover) or `:none`;
     * `einvoicing` – B2B e-invoicing obligations: `:peppol` (Belgium 2026),
       `:en16931` (Germany: receive since 2025, issue from 2027),
       `:fr_einvoicing` (France: receive from Sept 2026, issue from 2027);
@@ -119,7 +121,7 @@ defmodule Palee.Fiscal.Domain.CountryProfile do
       tax_system: :vat,
       authority: :none,
       register: :nf525,
-      till_device: :none,
+      till_device: :sign_fr,
       einvoicing: [:fr_einvoicing],
       required: [:registration_number],
       tax_office: false,

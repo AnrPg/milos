@@ -235,8 +235,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
 | ADR-249 | Tap to Pay at the desk through the Viva.com Terminal app: signed app-to-app request, result confirmed with Viva, `card_terminal` money with its document | Accepted |
-| ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, Storecove) | Accepted |
-| ADR-251 | Till security devices: cloud TSE (DE) and RKSV (AT) through fiskaly, signatures on a side table, outages recorded; invoices paid at the till signed too (update 2026-10-29) | Accepted |
+| ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, fiskaly E-INVOICE since 2026-10-29; Storecove retired) | Accepted |
+| ADR-251 | Till security devices: cloud TSE (DE), RKSV (AT) and SIGN FR (FR, ADR-266) through fiskaly, signatures on a side table, outages recorded; invoices paid at the till signed too (update 2026-10-29) | Accepted |
 | ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
 | ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override; the class's coach pins their own class (update 2026-10-29) | Accepted |
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
@@ -247,3 +247,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |
 | ADR-263 | Member payment screens: buy a subscription package, pay an invoice, saved cards and autopay, withdrawal, /pay/return with the sandbox page, the box's sales page; API adds provider, services, autopay at checkout, dated visits without withdrawal | Accepted |
 | ADR-264 | Tap to Pay for walk-ins' free sales (memberless Finance stream sale with its receipt, idempotent per intent); tips (staff's, not revenue) and card surcharges (revenue on the sale's receipt) Viva confirms on top of the amount | Accepted |
+| ADR-266 | French till receipts signed through fiskaly SIGN FR next to Palee's own journal (ADR-241/242); fiskaly must confirm certification coverage in writing; Monaco not covered | Accepted |

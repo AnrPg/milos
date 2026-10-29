@@ -104,24 +104,29 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
                |> send_json(:put, path, %{"environment" => "production"})
                |> json_response(422)
 
-      assert Map.keys(errors) |> Enum.sort() == ["api_key", "legal_entity_id"]
+      assert Map.keys(errors) |> Enum.sort() == ["api_key", "api_secret", "legal_entity_id"]
 
       assert %{"connection" => connection} =
                ctx.owner
                |> send_json(:put, path, %{
                  "environment" => "test",
                  "legal_entity_id" => "12345",
-                 "api_key" => "sc-secret-key"
+                 "api_key" => "fk-secret-key",
+                 "api_secret" => "fk-secret-value"
                })
                |> json_response(200)
 
-      assert %{"peppol_id" => "0208:0403170701", "has_api_key" => true, "webhook_url" => url} =
-               connection
+      assert %{
+               "peppol_id" => "0208:0403170701",
+               "provider" => "fiskaly",
+               "has_api_key" => true,
+               "has_api_secret" => true,
+               "credentials_source" => "own",
+               "webhook_url" => url
+             } = connection
 
-      refute inspect(connection) =~ "sc-secret-key"
-
-      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~
-               "sc-secret-key"
+      refute inspect(connection) =~ "fk-secret"
+      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~ "fk-secret"
 
       refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~
                "/api/webhooks"

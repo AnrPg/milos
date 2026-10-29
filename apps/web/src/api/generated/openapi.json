@@ -176289,6 +176289,7 @@
                             "enum": [
                               "tse",
                               "rksv",
+                              "sign_fr",
                               "none"
                             ],
                             "type": "string"
@@ -176693,7 +176694,8 @@
                               "device": {
                                 "enum": [
                                   "tse",
-                                  "rksv"
+                                  "rksv",
+                                  "sign_fr"
                                 ],
                                 "type": "string"
                               },
@@ -177302,7 +177304,8 @@
                                   "device": {
                                     "enum": [
                                       "tse",
-                                      "rksv"
+                                      "rksv",
+                                      "sign_fr"
                                     ],
                                     "type": "string"
                                   },
@@ -177827,7 +177830,8 @@
                             "device": {
                               "enum": [
                                 "tse",
-                                "rksv"
+                                "rksv",
+                                "sign_fr"
                               ],
                               "type": "string"
                             },
@@ -178454,7 +178458,8 @@
                             "device": {
                               "enum": [
                                 "tse",
-                                "rksv"
+                                "rksv",
+                                "sign_fr"
                               ],
                               "type": "string"
                             },
@@ -179010,7 +179015,8 @@
                             "device": {
                               "enum": [
                                 "tse",
-                                "rksv"
+                                "rksv",
+                                "sign_fr"
                               ],
                               "type": "string"
                             },
@@ -180536,6 +180542,7 @@
                           "enum": [
                             "tse",
                             "rksv",
+                            "sign_fr",
                             "none"
                           ],
                           "type": "string"
@@ -180915,6 +180922,7 @@
                           "enum": [
                             "tse",
                             "rksv",
+                            "sign_fr",
                             "none"
                           ],
                           "type": "string"
@@ -181030,9 +181038,18 @@
                 "schema": {
                   "properties": {
                     "connection": {
-                      "description": "The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made).",
+                      "description": "The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected.",
                       "nullable": true,
                       "properties": {
+                        "credentials_source": {
+                          "description": "`till_connection`: no key of its own, the fiskaly till connection's is used.",
+                          "enum": [
+                            "own",
+                            "till_connection",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
                         "environment": {
                           "enum": [
                             "sandbox",
@@ -181044,6 +181061,9 @@
                         "has_api_key": {
                           "type": "boolean"
                         },
+                        "has_api_secret": {
+                          "type": "boolean"
+                        },
                         "has_webhook_token": {
                           "type": "boolean"
                         },
@@ -181052,6 +181072,7 @@
                           "type": "string"
                         },
                         "legal_entity_id": {
+                          "description": "fiskaly: the business's E-INVOICE System id.",
                           "nullable": true,
                           "type": "string"
                         },
@@ -181068,6 +181089,7 @@
                         "provider": {
                           "enum": [
                             "sandbox",
+                            "fiskaly",
                             "storecove"
                           ],
                           "type": "string"
@@ -181089,8 +181111,10 @@
                         }
                       },
                       "required": [
+                        "credentials_source",
                         "environment",
                         "has_api_key",
+                        "has_api_secret",
                         "has_webhook_token",
                         "network",
                         "peppol_id",
@@ -181134,7 +181158,7 @@
       },
       "put": {
         "callbacks": {},
-        "description": "`test` and `production` send through Storecove and need the business's legal entity id and API key; a saved key is kept when none is sent. The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.",
+        "description": "`test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.",
         "operationId": "PaleeWeb.AdminFiscalEInvoicingController.save_connection",
         "parameters": [],
         "requestBody": {
@@ -181144,7 +181168,13 @@
                 "additionalProperties": false,
                 "properties": {
                   "api_key": {
-                    "description": "Leave out to keep the saved key.",
+                    "description": "Leave out to keep the saved key, or (fiskaly) to use the fiskaly till connection's key and secret.",
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "api_secret": {
+                    "description": "Leave out to keep the saved secret.",
                     "maxLength": 500,
                     "nullable": true,
                     "type": "string"
@@ -181158,6 +181188,7 @@
                     "type": "string"
                   },
                   "legal_entity_id": {
+                    "description": "fiskaly: the business's E-INVOICE System id.",
                     "maxLength": 40,
                     "nullable": true,
                     "type": "string"
@@ -181166,6 +181197,13 @@
                     "description": "`scheme:identifier`; defaults to `0208:` + the enterprise number.",
                     "maxLength": 60,
                     "nullable": true,
+                    "type": "string"
+                  },
+                  "provider": {
+                    "description": "Access point outside the sandbox; defaults to `fiskaly`.",
+                    "enum": [
+                      "fiskaly"
+                    ],
                     "type": "string"
                   },
                   "rotate_webhook_token": {
@@ -181188,8 +181226,17 @@
                 "schema": {
                   "properties": {
                     "connection": {
-                      "description": "The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made).",
+                      "description": "The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected.",
                       "properties": {
+                        "credentials_source": {
+                          "description": "`till_connection`: no key of its own, the fiskaly till connection's is used.",
+                          "enum": [
+                            "own",
+                            "till_connection",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
                         "environment": {
                           "enum": [
                             "sandbox",
@@ -181201,6 +181248,9 @@
                         "has_api_key": {
                           "type": "boolean"
                         },
+                        "has_api_secret": {
+                          "type": "boolean"
+                        },
                         "has_webhook_token": {
                           "type": "boolean"
                         },
@@ -181209,6 +181259,7 @@
                           "type": "string"
                         },
                         "legal_entity_id": {
+                          "description": "fiskaly: the business's E-INVOICE System id.",
                           "nullable": true,
                           "type": "string"
                         },
@@ -181225,6 +181276,7 @@
                         "provider": {
                           "enum": [
                             "sandbox",
+                            "fiskaly",
                             "storecove"
                           ],
                           "type": "string"
@@ -181246,8 +181298,10 @@
                         }
                       },
                       "required": [
+                        "credentials_source",
                         "environment",
                         "has_api_key",
+                        "has_api_secret",
                         "has_webhook_token",
                         "network",
                         "peppol_id",
@@ -181272,7 +181326,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Connect to Peppol: sandbox, or Storecove (test or production)",
+        "summary": "Connect to Peppol: sandbox, or fiskaly E-INVOICE (test or production)",
         "tags": [
           "Fiscal"
         ]
@@ -181560,7 +181614,8 @@
             "schema": {
               "enum": [
                 "tse",
-                "rksv"
+                "rksv",
+                "sign_fr"
               ],
               "type": "string"
             }
@@ -181573,13 +181628,14 @@
                 "schema": {
                   "properties": {
                     "connection": {
-                      "description": "The TSE or RKSV connection; key, secret and admin PIN are never returned.",
+                      "description": "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
                       "nullable": true,
                       "properties": {
                         "device": {
                           "enum": [
                             "tse",
-                            "rksv"
+                            "rksv",
+                            "sign_fr"
                           ],
                           "type": "string"
                         },
@@ -181686,7 +181742,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "The TSE or RKSV connection (provider, environment, unit; never the credentials)",
+        "summary": "The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials)",
         "tags": [
           "Fiscal"
         ]
@@ -181703,7 +181759,8 @@
             "schema": {
               "enum": [
                 "tse",
-                "rksv"
+                "rksv",
+                "sign_fr"
               ],
               "type": "string"
             }
@@ -181754,12 +181811,13 @@
                 "schema": {
                   "properties": {
                     "connection": {
-                      "description": "The TSE or RKSV connection; key, secret and admin PIN are never returned.",
+                      "description": "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
                       "properties": {
                         "device": {
                           "enum": [
                             "tse",
-                            "rksv"
+                            "rksv",
+                            "sign_fr"
                           ],
                           "type": "string"
                         },
@@ -181854,7 +181912,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Connect the till to a TSE (DE) or RKSV unit (AT): sandbox or fiskaly",
+        "summary": "Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly",
         "tags": [
           "Fiscal"
         ]
@@ -181889,7 +181947,8 @@
             "schema": {
               "enum": [
                 "tse",
-                "rksv"
+                "rksv",
+                "sign_fr"
               ],
               "type": "string"
             }
@@ -181936,7 +181995,8 @@
                           "device": {
                             "enum": [
                               "tse",
-                              "rksv"
+                              "rksv",
+                              "sign_fr"
                             ],
                             "type": "string"
                           },
@@ -182136,7 +182196,8 @@
                         "device": {
                           "enum": [
                             "tse",
-                            "rksv"
+                            "rksv",
+                            "sign_fr"
                           ],
                           "type": "string"
                         },
@@ -182387,7 +182448,8 @@
                         "device": {
                           "enum": [
                             "tse",
-                            "rksv"
+                            "rksv",
+                            "sign_fr"
                           ],
                           "type": "string"
                         },
@@ -182592,7 +182654,8 @@
                         "device": {
                           "enum": [
                             "tse",
-                            "rksv"
+                            "rksv",
+                            "sign_fr"
                           ],
                           "type": "string"
                         },

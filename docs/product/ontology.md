@@ -401,18 +401,19 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Tip | Φιλοδώρημα | `payment_intents.tip_cents` | Money the payer adds for the staff on the card terminal. The staff's, not the box's revenue: no VAT, not on the receipt, kept apart for payroll. | Card surcharge. |
 | Card surcharge | Επιβάρυνση κάρτας | `payment_intents.surcharge_cents`, `source_type = card_surcharge` | A fee the card provider adds for some cards (business or non-EU cards). Part of the sale's price: revenue, on the same receipt as the sale. | Tip; Palee's own fees. |
 
-### 4.16 E-invoicing and till security (ADR-250, ADR-251)
+### 4.16 E-invoicing and till security (ADR-250, ADR-251, ADR-266)
 
-Staff screens only (Fiscal). The German and Austrian texts a receipt prints are fixed by law and stay in German.
+Staff screens only (Fiscal). The German and Austrian texts a receipt prints are fixed by law and stay in German; the French ones stay in French. fiskaly is the one vendor for e-invoicing and till security outside Greece (decision 2026-10-29).
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
 |---|---|---|---|---|
 | Peppol | Peppol | `fiscal_network_connections` | The European network that carries B2B e-invoices between businesses' access points. Required in Belgium from 2026. | myDATA (the Greek tax authority's reporting). |
 | Peppol address | Διεύθυνση Peppol | `peppol_id` (`scheme:identifier`, e.g. `0208:0123456749`) | Where a business receives e-invoices. For a Belgian business it is its enterprise number. | Email address, VAT number (one can be derived from the other, they are not the same). |
-| Access point | Σημείο πρόσβασης | `provider` (`sandbox`, `storecove`) | The certified service that sends the box's e-invoices over Peppol. | Payment provider. |
-| E-invoice | Ηλεκτρονικό τιμολόγιο | `fiscal_einvoice_submissions` | An invoice or credit note sent over Peppol as structured data (UBL). Its states: waiting, sending, sent, delivered, refused, failed, unclear. | A PDF invoice sent by email. |
+| Access point | Σημείο πρόσβασης | `provider` (`sandbox`, `fiskaly`; old `storecove` rows show as needing a new connection) | The certified service that sends the box's e-invoices over Peppol: fiskaly E-INVOICE. The brand name stays as is in both languages. | Payment provider. |
+| E-invoice | Ηλεκτρονικό τιμολόγιο | `fiscal_einvoice_submissions` | An invoice or credit note sent over Peppol as structured data (UBL; fiskaly builds it from the invoice's data). Its states: waiting, sending, sent, delivered, refused, failed, unclear. | A PDF invoice sent by email. |
 | Unclear (sending) | Αβέβαιη αποστολή | status `uncertain` | No answer came, so it may or may not have arrived. Palee never sends it again by itself; staff check the access point first. | Failed. |
-| Till security device | Συσκευή ασφαλείας ταμείου | `fiscal_till_connections`, device `tse` / `rksv` | The certified device that signs each sale at the till: TSE in Germany, signature creation unit (RKSV) in Austria. Palee uses fiskaly's cloud devices. | Card terminal. |
+| Till security device | Συσκευή ασφαλείας ταμείου | `fiscal_till_connections`, device `tse` / `rksv` / `sign_fr` | The certified device that signs each sale at the till: TSE in Germany, signature creation unit (RKSV) in Austria, fiskaly SIGN FR in France. Palee uses fiskaly's cloud devices. | Card terminal. |
+| fiskaly SIGN FR | fiskaly SIGN FR | device `sign_fr` | fiskaly's service that signs, journals and archives each French till receipt and credit note. The brand name stays as is in both languages. | Audit archive (Palee's own signed NF525-style journal, ADR-241/242), which stays as the internal audit chain. |
 | Till signature | Υπογραφή ταμείου | `fiscal_till_signatures` | The security device's signature of one receipt, with the data the receipt prints. | Digital signature of the fiscal journal (ADR-242). |
 | Device outage | Βλάβη συσκευής ασφαλείας | status `device_failed` | The device could not sign the receipt; the receipt says so ("TSE ausgefallen" / "Sicherheitseinrichtung ausgefallen"). | Failed (a technical error Palee keeps retrying). |
 | Null receipt | Μηδενική απόδειξη | kind `null` | An Austrian receipt with zero amounts, signed to check the device or after an outage (Nullbeleg). | Credit note. |

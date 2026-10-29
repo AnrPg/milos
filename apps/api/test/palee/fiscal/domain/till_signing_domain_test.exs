@@ -165,6 +165,17 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
              })
     end
 
+    test "France (SIGN FR) signs receipts and their credit notes only" do
+      fr = %{till_device: :sign_fr}
+      invoice = %{kind: "invoice", payment_method: "cash"}
+      assert TillSigningPolicy.device(fr) == "sign_fr"
+      assert TillSigningPolicy.required?(fr, %{kind: "receipt"})
+      assert TillSigningPolicy.required?(fr, %{kind: "credit_note"}, "receipt")
+      assert TillSigningPolicy.required?(fr, %{kind: "credit_note"}, %{kind: "receipt"})
+      refute TillSigningPolicy.required?(fr, invoice)
+      refute TillSigningPolicy.required?(fr, %{invoice | kind: "credit_note"}, invoice)
+    end
+
     test "uncertain is read back, late German receipts fail, the rest is signed" do
       assert TillSigningPolicy.operation(%{@row | status: "uncertain"}, @now, nil) == :lookup
       assert TillSigningPolicy.operation(@row, @now, DateTime.add(@now, -299)) == :sign

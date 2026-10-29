@@ -12092,6 +12092,7 @@
     "back": "Zurück",
     "connected": "Verbunden mit {provider}",
     "connectedHint": "Zahlungen gehen direkt auf dein eigenes {provider}-Konto",
+    "methodsHint": "PayPal, Klarna, Apple Pay und Google Pay erscheinen von selbst beim Bezahlen, sobald du sie in deinem {provider}-Dashboard einschaltest, wo {provider} sie anbietet.",
     "testMode": "nur Testzahlungen",
     "statusActive": "Aktiv",
     "whatTitle": "Was online bezahlt wird",
@@ -12279,6 +12280,8 @@
       "tseHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt mit fiskaly.",
       "rksvTitle": "Sicherheitseinrichtung (RKSV)",
       "rksvHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt.",
+      "signFrTitle": "Sicherheitseinrichtung der Kasse (fiskaly SIGN FR)",
+      "signFrHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt mit fiskaly. Das unveränderbare Register ist bereits aktiv.",
       "nf525Title": "NF525-Bescheinigung",
       "nf525Hint": "Das unveränderbare Register ist bereits aktiv. Die Herstellerbescheinigung stellt Palee bereit."
     },

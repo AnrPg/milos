@@ -1,8 +1,9 @@
 defmodule PaleeWeb.AdminFiscalTillSigningController do
   @moduledoc """
-  Staff › Fiscal › cash-register security (ADR-251): the TSE (Germany) or
-  RKSV (Austria) connection, the signature of every receipt with what it
-  prints, retrying a signature and an RKSV null receipt.
+  Staff › Fiscal › cash-register security (ADR-251, ADR-266): the TSE
+  (Germany), RKSV (Austria) or fiskaly SIGN FR (France) connection, the
+  signature of every receipt with what it prints, retrying a signature
+  and an RKSV null receipt.
   """
 
   use PaleeWeb, :controller
@@ -24,11 +25,12 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
     name: :device,
     in: :path,
     required: true,
-    schema: %Schema{type: :string, enum: ["tse", "rksv"]}
+    schema: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]}
   }
 
   operation(:connection,
-    summary: "The TSE or RKSV connection (provider, environment, unit; never the credentials)",
+    summary:
+      "The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials)",
     parameters: [@device],
     responses: [ok: {"Connection", "application/json", C.till_connection_status()}]
   )
@@ -37,7 +39,7 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
     do: json(conn, FiscalTillSigning.connection(conn.assigns.tenant_context, device))
 
   operation(:save_connection,
-    summary: "Connect the till to a TSE (DE) or RKSV unit (AT): sandbox or fiskaly",
+    summary: "Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly",
     description:
       "`test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; " <>
         "saved ones are kept when none are sent. A new connection (or `reprovision`) creates and " <>
@@ -72,7 +74,7 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
         name: :device,
         in: :query,
         required: false,
-        schema: %Schema{type: :string, enum: ["tse", "rksv"]}
+        schema: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]}
       },
       %Parameter{
         name: :limit,

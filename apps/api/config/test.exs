@@ -117,5 +117,5 @@ config :palee, :stripe_connect, %{
 }
 
 config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]
-# ADR-250/251: Storecove and fiskaly calls go to a test plug.
+# ADR-250/251/266: fiskaly calls go to a test plug.
 config :palee, :fiscal_http, req_options: [plug: {Req.Test, Palee.FiscalHttp}]

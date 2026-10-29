@@ -173,3 +173,12 @@ fiskaly DSFinV-K process types (https://developer.fiskaly.com/dsfinvk/process_ty
 §131b BAO (https://www.ris.bka.gv.at/eli/bgbl/1961/194/P131b/NOR40186000),
 USP Registrierkassen (https://www.usp.gv.at/steuern-finanzen/steuerliche-rechte-und-pflichten/registrierkassen.html),
 USP "Bargeldgeschäft" (https://www.usp.gv.at/services/suchen-und-finden/lexikon/bargeldgeschaeft.html).
+
+## Update 2026-10-29: France (SIGN FR) and shared fiskaly credentials
+- France is the third device, `sign_fr`, through fiskaly SIGN FR on the
+  Unified API (ADR-266), with the same outbox, side table and endpoints.
+- The e-invoicing connection (ADR-250 update) reuses this connection's
+  fiskaly key and secret of the same environment when it has none of its
+  own. Open: SIGN DE v2 and SIGN AT v1 keys are older per-product keys and
+  may not be accepted by the Unified API; a business may then need a
+  Unified API key on the e-invoicing connection itself.

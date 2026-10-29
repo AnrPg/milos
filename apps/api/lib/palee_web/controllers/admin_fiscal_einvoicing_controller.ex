@@ -29,10 +29,12 @@ defmodule PaleeWeb.AdminFiscalEInvoicingController do
     do: json(conn, FiscalEInvoicing.connection(conn.assigns.tenant_context))
 
   operation(:save_connection,
-    summary: "Connect to Peppol: sandbox, or Storecove (test or production)",
+    summary: "Connect to Peppol: sandbox, or fiskaly E-INVOICE (test or production)",
     description:
-      "`test` and `production` send through Storecove and need the business's legal entity id " <>
-        "and API key; a saved key is kept when none is sent. The Peppol id defaults to the " <>
+      "`test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly " <>
+        "E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are " <>
+        "kept when none are sent, and without any the business's fiskaly till connection's " <>
+        "key and secret are used (one fiskaly account per business). The Peppol id defaults to the " <>
         "`0208` enterprise number of the business. The webhook URL is shown once, when a new " <>
         "token is made. Documents waiting for a connection are sent right after.",
     request_body: F.body(C.peppol_connection_body()),

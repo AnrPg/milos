@@ -12092,6 +12092,7 @@
     "back": "Atrás",
     "connected": "Conectado con {provider}",
     "connectedHint": "Los pagos van directamente a tu propia cuenta de {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay y Google Pay aparecen solos al pagar en cuanto los activas en tu panel de {provider}, donde {provider} los ofrece.",
     "testMode": "solo pagos de prueba",
     "statusActive": "Activo",
     "whatTitle": "Qué se paga online",
@@ -12279,6 +12280,8 @@
       "tseHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior.",
       "rksvTitle": "Dispositivo de seguridad de caja (RKSV)",
       "rksvHint": "Solo hace falta para los cobros en caja. Lo conectamos en un paso posterior.",
+      "signFrTitle": "Dispositivo de seguridad de caja (fiskaly SIGN FR)",
+      "signFrHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior. El registro inalterable ya está activo.",
       "nf525Title": "Certificación NF525",
       "nf525Hint": "El registro inalterable ya está activo. Palee aporta la certificación del editor."
     },

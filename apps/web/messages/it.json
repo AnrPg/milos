@@ -12092,6 +12092,7 @@
     "back": "Indietro",
     "connected": "Collegato con {provider}",
     "connectedHint": "I pagamenti vanno direttamente sul tuo account {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay e Google Pay compaiono da soli al pagamento appena li attivi nella dashboard di {provider}, dove {provider} li offre.",
     "testMode": "solo pagamenti di prova",
     "statusActive": "Attivo",
     "whatTitle": "Cosa si paga online",
@@ -12279,6 +12280,8 @@
       "tseHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo con fiskaly in un passaggio successivo.",
       "rksvTitle": "Dispositivo di sicurezza di cassa (RKSV)",
       "rksvHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo in un passaggio successivo.",
+      "signFrTitle": "Dispositivo di sicurezza di cassa (fiskaly SIGN FR)",
+      "signFrHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo con fiskaly in un passaggio successivo. Il registro inalterabile è già attivo.",
       "nf525Title": "Attestazione NF525",
       "nf525Hint": "Il registro inalterabile è già attivo. L'attestazione dell'editore la fornisce Palee."
     },
