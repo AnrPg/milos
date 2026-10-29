@@ -25,6 +25,8 @@ import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
 import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
+import { ClassDayWorkoutNote } from "@/components/schedule/ClassDayWorkoutNote";
+import type { DayWorkout } from "@/api/day-workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
 import {
@@ -90,6 +92,8 @@ type SlotPopupProps = {
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
   /** ADR-201: staff who manage coaching can give attendees a variation. */
   canProgramVariations?: boolean;
+  /** ADR-230, staff: the day WOD that covers this class, if any. */
+  dayWorkout?: DayWorkout | null;
 };
 
 export function SlotPopup({
@@ -110,6 +114,7 @@ export function SlotPopup({
   locations,
   guestsIncluded = false,
   canProgramVariations = false,
+  dayWorkout = null,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
@@ -347,6 +352,16 @@ export function SlotPopup({
               {i18n("addToCalendar33cead7")}
             </button>
           </div>
+
+          {isAdmin ? (
+            <ClassDayWorkoutNote
+              slot={slot}
+              dayWorkout={dayWorkout}
+              accessToken={accessToken}
+              isPast={isPast}
+              onChanged={onSlotChanged}
+            />
+          ) : null}
 
           <ClassStateNotice slot={slot} className="mt-4" />
 

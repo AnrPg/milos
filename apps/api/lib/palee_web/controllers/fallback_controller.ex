@@ -2679,6 +2679,10 @@ defmodule PaleeWeb.FallbackController do
     slot_not_full: {:conflict, "The class still has free spots"},
     # ADR-176: a draft class has no WOD yet.
     class_not_published: {:conflict, "This class isn't open yet"},
+    # ADR-230: day WODs.
+    day_in_the_past: {:unprocessable_entity, "A day WOD can be set from today on"},
+    no_day_workout: {:conflict, "No day WOD covers this class"},
+    day_class_started: {:conflict, "This class has started; its WOD stays as it was"},
     invalid_time_zone: {:unprocessable_entity, "Choose a known time zone"},
     time_zone_required: {:unprocessable_entity, "The gym's time zone must be set"},
     invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},

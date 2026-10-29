@@ -224,3 +224,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-225 | A WOD is assigned to a person (athlete or member) only when their package includes online programming or personal training | Accepted |
 | ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |
 | ADR-229 | The weekly workout goal is personal (the person, their coach, full-scope staff set it); the box sets only streak shields and their renewal | Accepted |
+| ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |

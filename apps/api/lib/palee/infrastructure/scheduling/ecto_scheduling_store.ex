@@ -1552,6 +1552,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       id: slot.id,
       organization_id: slot.organization_id,
       master_workout_id: slot.master_workout_id,
+      # ADR-230: set when the WOD is inherited from the day's WOD.
+      day_workout_id: slot.day_workout_id,
       class_series_id: slot.class_series_id,
       class_series: normalize_loaded_class_series(slot.class_series),
       name: slot.name,
@@ -1786,7 +1788,10 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         {:error, :not_found}
 
       %ScheduledClass{} = slot ->
-        case slot |> Ecto.Changeset.change(master_workout_id: new_workout_id) |> Repo.update() do
+        # ADR-230: a WOD set on the class itself overrides the day's WOD.
+        case slot
+             |> Ecto.Changeset.change(master_workout_id: new_workout_id, day_workout_id: nil)
+             |> Repo.update() do
           {:ok, updated} -> {:ok, %{id: updated.id}}
           {:error, changeset} -> {:error, changeset}
         end
