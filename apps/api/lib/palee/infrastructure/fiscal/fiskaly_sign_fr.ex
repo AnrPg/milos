@@ -205,6 +205,32 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignFr do
   defp present(value) when is_binary(value) and value != "", do: String.slice(value, 0, 128)
   defp present(_value), do: "-"
 
+  # ── Check (ADR-273) ─────────────────────────────────────────────────────
+
+  @doc """
+  «Δοκιμή σύνδεσης»: a token for the key, then the System Palee
+  provisioned (`GET /systems/{id}`). Nothing is signed.
+  """
+  @impl true
+  def check(connection) do
+    {result, _wire} =
+      run(connection, nil, fn token ->
+        with {:ok, system} <- system_id(connection),
+             {:ok, _vat} <- FiskalyUnified.vat_table(connection, token, system) do
+          {:ok, %{}}
+        end
+      end)
+
+    case result do
+      {:error, {:rejected, [%{code: code} | _]}}
+      when code in ["system_not_found", "not_provisioned", "not_found"] ->
+        {:error, :unit_not_found}
+
+      other ->
+        other
+    end
+  end
+
   # ── Signing ─────────────────────────────────────────────────────────────
 
   @impl true

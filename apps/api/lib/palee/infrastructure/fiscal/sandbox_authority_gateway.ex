@@ -13,6 +13,10 @@ defmodule Palee.Infrastructure.Fiscal.SandboxAuthorityGateway do
 
   alias Palee.Infrastructure.Fiscal.MyData.XmlCodec
 
+  @doc "ADR-273: the sandbox is always reachable and needs no credentials."
+  @impl true
+  def check(_connection), do: {:ok, %{}}
+
   @impl true
   def submit(_connection, invoice) do
     body = XmlCodec.invoices_doc([invoice])

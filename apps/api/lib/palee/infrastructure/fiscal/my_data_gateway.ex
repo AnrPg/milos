@@ -52,6 +52,43 @@ defmodule Palee.Infrastructure.Fiscal.MyDataGateway do
     end
   end
 
+  # A MARK no document will reach for years: the answer lists nothing.
+  @check_mark "999999999999999"
+
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): `GET /RequestTransmittedDocs` for documents
+  after a MARK no document has, with the business's user and key. Nothing
+  is reported; a 200 means AADE took the credentials, 401/403 that it
+  refused them. The key never leaves the headers.
+  """
+  @impl true
+  def check(connection) do
+    with {:ok, base_url} <- base_url(connection.environment),
+         :ok <- credentials(connection) do
+      config = Application.get_env(:palee, :mydata, [])
+
+      [
+        url: base_url <> "/RequestTransmittedDocs",
+        params: [mark: @check_mark],
+        headers: [
+          {"aade-user-id", connection.user_id},
+          {"ocp-apim-subscription-key", connection.subscription_key}
+        ],
+        receive_timeout: Keyword.get(config, :check_timeout, 15_000),
+        retry: false,
+        decode_body: false
+      ]
+      |> Keyword.merge(Keyword.get(config, :req_options, []))
+      |> Req.get()
+      |> case do
+        {:ok, %Req.Response{status: 200}} -> {:ok, %{}}
+        {:ok, %Req.Response{status: status}} when status in [401, 403] -> {:error, {:unauthorized, {:http, status}}}
+        {:ok, %Req.Response{status: status}} -> {:error, {:http, status}}
+        {:error, exception} -> {:error, {:network, Exception.message(exception)}}
+      end
+    end
+  end
+
   defp base_url(environment) do
     urls =
       Map.merge(

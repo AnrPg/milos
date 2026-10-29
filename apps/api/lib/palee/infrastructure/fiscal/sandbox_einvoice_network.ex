@@ -17,6 +17,10 @@ defmodule Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork do
 
   @unreachable "0000000097"
 
+  @doc "ADR-273: the sandbox access point is always there and needs no credentials."
+  @impl true
+  def check(_connection), do: {:ok, %{}}
+
   @impl true
   def submit(_connection, %{ubl: ubl, idempotency_guid: guid, recipient: recipient}) do
     body = UblWriter.write(ubl)
