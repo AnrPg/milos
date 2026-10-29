@@ -5,11 +5,27 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
   `card_terminal` money with the ADR-222 document only after Viva (stubbed
   with Req.Test) confirms the transaction. Cancel, decline, duplicates, an
   unconfirmed result and a lost one are covered, with the sandbox app too.
+
+  ADR-264: a walk-in pays a free sale (a Finance sale with no membership
+  and its fiscal receipt, once per intent); a tip and a card surcharge
+  Viva confirms on top of the amount are recorded apart and the payment
+  succeeds; any other difference still fails.
   """
   use PaleeWeb.ConnCase, async: false
 
-  alias Palee.{Finance, Organizations, Payments}
+  alias Palee.{Finance, Fiscal, Organizations, Payments}
+  alias Palee.Application.Payments.TerminalFulfilment
   alias Palee.Payments.PaymentStore
+
+  @identity %{
+    legal_name: "CrossFit Αθήνα ΙΚΕ",
+    country_code: "GR",
+    tax_id: "090000045",
+    tax_office: "Α' Αθηνών",
+    street: "Ερμού",
+    postal_code: "10563",
+    city: "Αθήνα"
+  }
 
   import Palee.TestFixtures
 
@@ -492,9 +508,19 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
 
     connect_sandbox(conn, ctx)
 
-    # A free sale needs a member; walk-ins pay shop orders only.
+    # A walk-in may pay a free sale (ADR-264) or a shop order, never a
+    # member's invoice; a free sale always says what it is for.
     conn
-    |> start(ctx, %{purpose: "free_sale", amount_cents: 500, description: "Chalk"})
+    |> start(ctx, %{purpose: "free_sale", amount_cents: 500, description: "  "})
+    |> json_response(422)
+    |> then(&assert(&1["code"] == "payment_purpose_required"))
+
+    conn
+    |> start(ctx, %{
+      purpose: "finance_invoice",
+      purpose_id: Ecto.UUID.generate(),
+      amount_cents: 500
+    })
     |> json_response(422)
     |> then(&assert(&1["code"] == "terminal_member_required"))
 
@@ -673,6 +699,268 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
       description: "Chalk"
     })
     |> json_response(403)
+  end
+
+  # ── ADR-264 ─────────────────────────────────────────────────────────────
+
+  defp viva_with_extras(payment, tip, surcharge) do
+    payment
+    |> viva_paid(payment["amount_cents"] + tip + surcharge)
+    |> Map.merge(%{"tipAmount" => tip / 100, "surchargeAmount" => surcharge / 100})
+  end
+
+  defp save_identity(ctx) do
+    {:ok, _identity} =
+      Fiscal.save_identity(ctx.context, @identity, ctx.admin.id, DateTime.utc_now())
+  end
+
+  defp receipts(ctx) do
+    case Fiscal.list_documents(ctx.context, %{kind: "receipt"}) do
+      %{documents: documents} -> documents
+      documents -> documents
+    end
+  end
+
+  test "a walk-in pays a free sale with a tip and a surcharge: one memberless sale, one receipt",
+       %{conn: conn} = ctx do
+    connect_viva(ctx)
+    save_identity(ctx)
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{
+        purpose: "free_sale",
+        amount_cents: 1_200,
+        description: "Πρωτεΐνη",
+        charge_category: "product"
+      })
+      |> json_response(201)
+
+    assert payment["user_id"] == nil
+    assert payment["purpose_type"] == "free_sale"
+    assert payment["metadata"]["walk_in"] == true
+    assert payment["app_request"]["params"]["amount"] == "1200"
+    assert payment["tip_cents"] == 0
+
+    # The card paid 12.00 + a 2.00 tip + a 0.36 surcharge.
+    stub_viva(%{"tx-walk-in" => viva_with_extras(payment, 200, 36)})
+
+    paid =
+      conn
+      |> result(ctx, %{
+        reference: payment["reference"],
+        status: "success",
+        transaction_id: "tx-walk-in"
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert paid["status"] == "succeeded"
+    assert paid["fulfilment_status"] == "done"
+    assert paid["amount_cents"] == 1_200
+    assert paid["tip_cents"] == 200
+    assert paid["surcharge_cents"] == 36
+
+    # Finance: a sale with no membership, its lines and payment traced to the intent.
+    lineage = Finance.revenue_lineage(ctx.context, "walk_in_sale", paid["id"])
+    assert [%{} = sale_payment] = lineage.payments
+    assert sale_payment.id == paid["finance_payment_id"]
+    assert sale_payment.membership_id == nil
+    assert sale_payment.amount_cents == 1_236
+    assert sale_payment.payment_method == "card_terminal"
+    assert sale_payment.revenue_stream == "other"
+    assert sale_payment.params["tip_cents"] == 200
+    assert [%{total_cents: 1_200, description: "Πρωτεΐνη"}] = lineage.invoice_lines
+
+    assert [%{total_cents: 36, description: "Επιβάρυνση κάρτας"}] =
+             Finance.revenue_lineage(ctx.context, "card_surcharge", paid["id"]).invoice_lines
+
+    # Nobody's member payments changed.
+    assert payments_of(ctx) == []
+
+    # The receipt: the sale and the surcharge, never the tip.
+    assert [receipt] = receipts(ctx)
+    assert receipt.source_id == paid["finance_payment_id"]
+    assert receipt.gross_cents == 1_236
+    assert receipt.payment_method == "card"
+
+    lines = Fiscal.get_document(ctx.context, receipt.id).lines
+    assert Enum.map(lines, & &1.description) == ["Πρωτεΐνη", "Επιβάρυνση κάρτας"]
+    assert Enum.all?(lines, &(&1.tax_category == "standard"))
+
+    # Fulfilling the same intent again records nothing twice.
+    {:ok, intent} = Payments.get(ctx.context, paid["id"])
+    assert {:ok, again} = TerminalFulfilment.fulfil(ctx.context, intent)
+    assert again.finance_payment_id == paid["finance_payment_id"]
+    assert again.fiscal_document_id == receipt.id
+    assert [_one] = Finance.revenue_lineage(ctx.context, "walk_in_sale", paid["id"]).payments
+    assert [_one_receipt] = receipts(ctx)
+  end
+
+  test "a walk-in's free sale is refunded with its credit note", %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+    save_identity(ctx)
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{purpose: "free_sale", amount_cents: 2_000, description: "Drop-in"})
+      |> json_response(201)
+
+    paid =
+      conn
+      |> as(ctx.admin)
+      |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{
+        outcome: "succeeded",
+        tip_cents: 300
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert %{"status" => "succeeded", "tip_cents" => 300, "surcharge_cents" => 0} = paid
+    assert [%{gross_cents: 2_000}] = receipts(ctx)
+
+    refund =
+      conn
+      |> as(ctx.admin)
+      |> post("/api/org/#{ctx.organization.slug}/admin/payments/#{paid["id"]}/refunds", %{
+        amount_cents: 500,
+        reason: "Changed mind",
+        idempotency_key: "walk-in-refund-1"
+      })
+      |> json_response(201)
+
+    assert refund["refund"]["status"] == "succeeded"
+
+    lineage = Finance.revenue_lineage(ctx.context, "walk_in_sale", paid["id"])
+    assert [%{amount_cents: 500, revenue_stream: "other"}] = lineage.reversals
+
+    notes = Fiscal.list_documents(ctx.context, %{kind: "credit_note"})
+    notes = if is_map(notes), do: notes.documents, else: notes
+    assert [%{gross_cents: 500}] = notes
+  end
+
+  test "a member's invoice paid with a tip and a surcharge: the invoice for its amount, the surcharge apart",
+       %{conn: conn} = ctx do
+    connect_viva(ctx)
+    save_identity(ctx)
+    invoice = open_invoice(ctx.context, ctx.membership, 4_500)
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{
+        purpose: "finance_invoice",
+        purpose_id: invoice.id,
+        user_id: ctx.member.id,
+        amount_cents: 4_500
+      })
+      |> json_response(201)
+
+    stub_viva(%{"tx-extras" => viva_with_extras(payment, 500, 135)})
+
+    paid =
+      conn
+      |> result(ctx, %{reference: payment["reference"], status: "success", transaction_id: "tx-extras"})
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert %{"status" => "succeeded", "tip_cents" => 500, "surcharge_cents" => 135} = paid
+    assert paid["fulfilment_status"] == "done"
+
+    {:ok, invoice} = Finance.get_invoice(ctx.context, invoice.id)
+    assert invoice.status == "paid"
+
+    assert [%{amount_cents: 4_500, payment_method: "card_terminal"}] = payments_of(ctx)
+
+    surcharge = Finance.revenue_lineage(ctx.context, "card_surcharge", paid["id"])
+    assert [%{amount_cents: 135, membership_id: membership_id}] = surcharge.payments
+    assert membership_id == ctx.membership.id
+
+    assert [receipt] = receipts(ctx)
+    assert receipt.gross_cents == 4_635
+    lines = Fiscal.get_document(ctx.context, receipt.id).lines
+    assert List.last(lines).description == "Επιβάρυνση κάρτας"
+    assert List.last(lines).gross_cents == 135
+
+    # The worker running the fulfilment again records the surcharge once.
+    {:ok, intent} = Payments.get(ctx.context, paid["id"])
+    assert {:ok, _same} = TerminalFulfilment.fulfil(ctx.context, intent)
+    assert [_one] = Finance.revenue_lineage(ctx.context, "card_surcharge", paid["id"]).payments
+    assert [_one_receipt] = receipts(ctx)
+  end
+
+  test "any difference that is not a named tip or surcharge still fails", %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{purpose: "free_sale", amount_cents: 1_000, description: "Bar"})
+      |> json_response(201)
+
+    failed =
+      conn
+      |> as(ctx.admin)
+      |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{
+        outcome: "succeeded",
+        tip_cents: 100,
+        amount_cents: 1_150
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert failed["status"] == "failed"
+    assert failed["failure_code"] == "amount_mismatch"
+    assert failed["finance_payment_id"] == nil
+    assert Finance.revenue_lineage(ctx.context, "walk_in_sale", payment["id"]).payments == []
+  end
+
+  test "a shop order paid with a surcharge: the order for its total, the surcharge apart",
+       %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+    shop = "/api/org/#{ctx.organization.slug}"
+
+    %{"variants" => [variant]} =
+      conn
+      |> as(ctx.admin)
+      |> post("#{shop}/staff/shop/products", %{
+        title: "Chalk",
+        category: "accessories",
+        status: "published",
+        variants: [%{price_cents: 500, initial_quantity: 3}]
+      })
+      |> json_response(201)
+      |> Map.fetch!("product")
+
+    %{"order" => order} =
+      conn
+      |> as(ctx.member)
+      |> post("#{shop}/me/shop/orders", %{
+        lines: [%{variant_id: variant["id"], quantity: 1}],
+        idempotency_key: "order-" <> Ecto.UUID.generate()
+      })
+      |> json_response(201)
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{purpose: "shop_order", purpose_id: order["id"], amount_cents: 500})
+      |> json_response(201)
+
+    settled =
+      conn
+      |> as(ctx.admin)
+      |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{
+        outcome: "succeeded",
+        surcharge_cents: 15
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert %{"status" => "succeeded", "fulfilment_status" => "done", "surcharge_cents" => 15} =
+             settled
+
+    assert Palee.Shop.get_order(ctx.context, order["id"]).payment_status == :paid
+
+    assert [%{amount_cents: 15, payment_method: "card_terminal"}] =
+             Finance.revenue_lineage(ctx.context, "card_surcharge", settled["id"]).payments
   end
 
   defp add_tenant_member(organization, user, role) do
