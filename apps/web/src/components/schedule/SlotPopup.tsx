@@ -16,6 +16,7 @@ import {
   sendSlotMessage,
   type ClassAction,
   type ScheduleBooking,
+  type ScheduleCoach,
   type ScheduleLocation,
   type ScheduleSlot,
 } from "@/api/schedule";
@@ -45,6 +46,7 @@ import {
   localizeMemberBookingError,
   memberSlotState,
   slotCreditCost,
+  slotCoachName,
   slotLocationName,
   waitlistPositionLabel,
 } from "@/components/schedule/member-booking";
@@ -87,6 +89,8 @@ type SlotPopupProps = {
   /** Called after a waitlist or guest change; the popup stays open. */
   onSlotChanged?: () => void;
   locations?: ScheduleLocation[];
+  /** The coaches of the schedule window (the class shows its own). */
+  coaches?: ScheduleCoach[];
   /** The member's package includes guest passes (ADR-097). */
   guestsIncluded?: boolean;
   /** ADR-176: "+ New WOD" from the missing-WOD notice (writes one, comes back linked). */
@@ -112,6 +116,7 @@ export function SlotPopup({
   onCancelBooking,
   onSlotChanged,
   locations,
+  coaches,
   guestsIncluded = false,
   canProgramVariations = false,
   dayWorkout = null,
@@ -129,6 +134,7 @@ export function SlotPopup({
   // ADR-200: pause/resume, cancel/restore and delete apply to upcoming classes only.
   const stateActions = isAdmin && onClassAction && !isPast ? classActionsFor(slot) : [];
   const locationName = slotLocationName(slot, locations);
+  const coachName = slotCoachName(slot, coaches);
   const creditCost = slotCreditCost(slot);
   const [waitlistBusy, setWaitlistBusy] = useState(false);
   const [waitlistError, setWaitlistError] = useState<string | null>(null);
@@ -419,6 +425,17 @@ export function SlotPopup({
             <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} />
           ) : null}
 
+          {/* The class's coach (ADR-100); members see it in their summary strip. */}
+          {isAdmin && coachName ? (
+            <p
+              className="mt-4 inline-block rounded-full px-3 py-1 text-xs font-semibold"
+              data-testid="slot-coach"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+            >
+              {t("classCoachChip", { coach: coachName })}
+            </p>
+          ) : null}
+
           {/* Compact info strip (admin sees full detail; members get a summary) */}
           {isAdmin ? (
             <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -481,6 +498,15 @@ export function SlotPopup({
                   style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)", color: "var(--primary-strong)" }}
                 >
                   {i18n("mbEventMarker")}
+                </span>
+              ) : null}
+              {coachName ? (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  data-testid="slot-coach"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {t("classCoachChip", { coach: coachName })}
                 </span>
               ) : null}
               {locationName ? (

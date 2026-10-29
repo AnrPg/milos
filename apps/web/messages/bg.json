@@ -152,6 +152,7 @@
     "openLogin": "Отвори входа в нов раздел"
   },
   "Schedule": {
+    "classCoachChip": "Треньор: {coach}",
     "introduction": "въведение в графика на занятията",
     "showIntro": "Показване на интро",
     "title": "График",

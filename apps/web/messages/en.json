@@ -152,6 +152,7 @@
     "openLogin": "Open Login In New Tab"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "class schedule introduction",
     "showIntro": "Show intro",
     "title": "Schedule",

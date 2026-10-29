@@ -152,6 +152,7 @@
     "openLogin": "Abrir inicio de sesión en otra pestaña"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introducción al horario de clases",
     "showIntro": "Mostrar introducción",
     "title": "Horario",

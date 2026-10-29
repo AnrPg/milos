@@ -152,6 +152,7 @@
     "openLogin": "Anmeldung in neuem Tab öffnen"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "Einführung in den Kursplan",
     "showIntro": "Einführung anzeigen",
     "title": "Kursplan",

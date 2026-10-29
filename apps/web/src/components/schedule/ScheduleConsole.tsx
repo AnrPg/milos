@@ -18,6 +18,7 @@ import {
   type SeriesEditScope,
   type ScheduleBooking,
   type ClassTypeRecord,
+  type ScheduleCoach,
   type ScheduleLocation,
   type ScheduleSlot,
   type ScheduleSlotPayload,
@@ -204,6 +205,7 @@ export function ScheduleConsole({
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  const [windowCoaches, setWindowCoaches] = useState<ScheduleCoach[]>([]);
   // ADR-230: the WOD of each day in the window (staff), and the day being edited.
   const [dayWorkouts, setDayWorkouts] = useState<DayWorkout[]>([]);
   const [dayWodDate, setDayWodDate] = useState<string | null>(null);
@@ -285,6 +287,7 @@ export function ScheduleConsole({
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
       setLocations(Array.isArray(window.locations) ? window.locations : []);
+      setWindowCoaches(Array.isArray(window.coaches) ? window.coaches : []);
       setDayWorkouts(Array.isArray(window.day_workouts) ? window.day_workouts : []);
       return nextSlots;
     } catch (loadError) {
@@ -855,6 +858,7 @@ export function ScheduleConsole({
             days={days}
             isAdmin={isAdmin}
             locations={locations}
+            coaches={windowCoaches}
             onCreateSlot={(isoDate) => openCreateEditor(isoDate)}
             onOpenDay={openDay}
             onSelectSlot={setSelectedSlot}
@@ -904,6 +908,7 @@ export function ScheduleConsole({
           guestsIncluded={includesGuestPasses(entitlement)}
           canProgramVariations={can(membership, "manage_coaching")}
           locations={locations}
+          coaches={windowCoaches}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
             void loadSchedule();

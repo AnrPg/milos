@@ -152,6 +152,7 @@
     "openLogin": "Ouvrir la connexion dans un nouvel onglet"
   },
   "Schedule": {
+    "classCoachChip": "Coach : {coach}",
     "introduction": "introduction au planning des cours",
     "showIntro": "Afficher l'introduction",
     "title": "Planning",

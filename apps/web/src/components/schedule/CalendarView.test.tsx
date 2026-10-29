@@ -57,6 +57,18 @@ describe("CalendarView", () => {
     expect(onOpenDay).toHaveBeenLastCalledWith("2026-10-15");
   });
 
+  it("each class shows its own coach, in the day and the week views", () => {
+    const coached = { ...slot("c1", "2026-10-14T06:00:00Z"), coach_user_id: "coach-1" } as ScheduleSlot;
+    const coaches = [{ id: "coach-1", nickname: "Xristoforos", avatar_url: null }];
+
+    const { unmount } = render(<CalendarView {...base} days={1} startDate="2026-10-14" slots={[coached, busyDay[1]]} coaches={coaches} />);
+    expect(screen.getAllByTestId("slot-details").map((node) => node.textContent)).toEqual(["Xristoforos"]);
+    unmount();
+
+    render(<CalendarView {...base} days={7} startDate="2026-10-12" slots={[coached, busyDay[1]]} coaches={coaches} />);
+    expect(screen.getAllByTestId("slot-coach").map((node) => node.textContent)).toEqual(["Xristoforos"]);
+  });
+
   it("the day view lists every class of that day and nothing else", () => {
     render(<CalendarView {...base} days={1} startDate="2026-10-14" slots={[...busyDay, otherDay]} />);
 

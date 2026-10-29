@@ -152,6 +152,7 @@
     "openLogin": "Abrir início de sessão num novo separador"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introdução ao horário das aulas",
     "showIntro": "Mostrar introdução",
     "title": "Cronograma",

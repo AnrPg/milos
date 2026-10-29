@@ -152,6 +152,7 @@
     "openLogin": "Открыть вход в новой вкладке"
   },
   "Schedule": {
+    "classCoachChip": "Тренер: {coach}",
     "introduction": "введение в расписание занятий",
     "showIntro": "Показать введение",
     "title": "Расписание",

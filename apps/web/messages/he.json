@@ -152,6 +152,7 @@
     "openLogin": "פתיחת התחברות בכרטיסייה חדשה"
   },
   "Schedule": {
+    "classCoachChip": "מאמן: {coach}",
     "introduction": "היכרות עם מערכת השיעורים",
     "showIntro": "הצג מבוא",
     "title": "לוח זמנים",

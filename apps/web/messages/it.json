@@ -152,6 +152,7 @@
     "openLogin": "Apri accesso in una nuova scheda"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introduzione al calendario delle lezioni",
     "showIntro": "Mostra introduzione",
     "title": "Calendario",

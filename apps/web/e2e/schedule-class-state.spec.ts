@@ -212,6 +212,25 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await expect(editor).toBeVisible();
   });
 
+  test("a class shows its coach on the calendar and in its details", async ({ page }) => {
+    await asOwner(page);
+    await page.route("**/api/org/box1/schedule?**", (route) =>
+      route.fulfill(
+        json({
+          class_types: [{ id: "ct", name: "CrossFit", archived_at: null }],
+          locations: [],
+          coaches: [{ id: "owner-1", nickname: "Olga", avatar_url: null }],
+          slots: [{ ...seriesClass, coach_user_id: "owner-1" }],
+        }),
+      ),
+    );
+
+    await page.goto("/admin/schedule");
+    await expect(page.getByRole("button", { name: /CrossFit/ }).first()).toContainText("Olga");
+    await page.getByRole("button", { name: /CrossFit/ }).first().click();
+    await expect(page.getByRole("dialog").getByTestId("slot-coach")).toHaveText("Coach: Olga");
+  });
+
   test("a cancelled class shows its reason and offers restore", async ({ page }) => {
     await asOwner(page);
     await withClass(page, { ...seriesClass, cancelled_at: new Date().toISOString(), cancel_reason: "Coach is ill" });

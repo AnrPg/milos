@@ -152,6 +152,7 @@
     "openLogin": "Aanmelden in nieuw tabblad openen"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introductie lesrooster",
     "showIntro": "Inleiding tonen",
     "title": "Schema",

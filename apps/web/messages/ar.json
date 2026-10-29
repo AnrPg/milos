@@ -152,6 +152,7 @@
     "openLogin": "فتح تسجيل الدخول في علامة تبويب جديدة"
   },
   "Schedule": {
+    "classCoachChip": "المدرب: {coach}",
     "introduction": "مقدمة جدول الحصص",
     "showIntro": "عرض المقدمة",
     "title": "جدول",

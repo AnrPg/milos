@@ -152,6 +152,7 @@
     "openLogin": "Άνοιγμα σελίδας σύνδεσης σε νέα καρτέλα"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "εισαγωγή του προγράμματος τμημάτων",
     "showIntro": "Εμφάνιση Πλήρους Τίτλου",
     "title": "Πρόγραμμα",
