@@ -1358,6 +1358,7 @@ defmodule PaleeWeb.Router do
     get("/documents/templates", AdminDocumentsController, :index)
     post("/documents/templates", AdminDocumentsController, :create)
     get("/documents/starters", AdminDocumentsController, :starters)
+    get("/documents/outstanding", AdminDocumentsController, :outstanding)
     get("/documents/templates/:id", AdminDocumentsController, :show)
     get("/documents/templates/:id/versions/:version_id", AdminDocumentsController, :version)
     post("/documents/templates/:id/versions", AdminDocumentsController, :publish)

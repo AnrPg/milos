@@ -163818,6 +163818,103 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/documents/outstanding": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.outstanding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "clients": {
+                      "description": "Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign",
+                      "type": "integer"
+                    },
+                    "templates": {
+                      "items": {
+                        "properties": {
+                          "clients": {
+                            "description": "Clients who have not signed",
+                            "items": {
+                              "properties": {
+                                "display_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "handle": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "unsigned",
+                                    "resign_required"
+                                  ],
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "display_name",
+                                "handle",
+                                "status",
+                                "user_id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "outstanding": {
+                            "type": "integer"
+                          },
+                          "signed": {
+                            "description": "Clients whose signature counts",
+                            "type": "integer"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "clients",
+                          "outstanding",
+                          "signed",
+                          "template_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "clients",
+                    "templates"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outstanding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Per active document: how many clients signed and who has not",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/documents/requests": {
       "get": {
         "callbacks": {},

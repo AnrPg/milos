@@ -4,9 +4,10 @@ defmodule Palee.Application.Documents.HealthCertificatesAdmin do
 
   Staff with `manage_health_certificates` see every client's certificate
   dates, open the file (each look is audited), upload one on a client's
-  behalf and delete one. Staff who only hold `view_health` (coaches, for
-  their own clients) see a status and nothing else: valid, expired or
-  missing.
+  behalf and delete one. `view_health_certificates` (front desk by default)
+  sees the same dates and files but changes nothing. Staff who only hold
+  `view_health` (coaches, for their own clients) see a status and nothing
+  else: valid, expired or missing.
   """
 
   alias Palee.Application.AuthorizeClientAccess
@@ -124,7 +125,9 @@ defmodule Palee.Application.Documents.HealthCertificatesAdmin do
   end
 
   defp manager?(context),
-    do: Organizations.capability_scope(context, :manage_health_certificates) == :all
+    do:
+      Organizations.capability_scope(context, :manage_health_certificates) == :all or
+        Organizations.capability_scope(context, :view_health_certificates) == :all
 
   defp client(context, user_id) when is_binary(user_id) do
     if Organizations.client_role(context, user_id), do: :ok, else: {:error, :not_found}

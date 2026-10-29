@@ -121,6 +121,18 @@ defmodule Palee.Organizations.Domain.AccessPolicyTest do
     assert AccessPolicy.can?(granted, :manage_health_certificates)
   end
 
+  test "front desk requests signatures and sees health certificates by default (ADR-252)" do
+    for role <- [:owner, :admin, :front_desk] do
+      assert AccessPolicy.scope(caps([role]), :request_signatures) == :all
+      assert AccessPolicy.scope(caps([role]), :view_health_certificates) == :all
+    end
+
+    for role <- [:coach, :head_coach, :accountant, :janitor, :member, :athlete] do
+      refute AccessPolicy.can?(caps([role]), :request_signatures)
+      refute AccessPolicy.can?(caps([role]), :view_health_certificates)
+    end
+  end
+
   test "rights are the union of roles and the wider scope wins" do
     both = caps([:coach, :admin])
     assert AccessPolicy.scope(both, :manage_coaching) == :all

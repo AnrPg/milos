@@ -9,6 +9,8 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode 
 import { fetchAdminUsers, type AdminUserDirectoryEntry } from "@/api/admin-users";
 import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { DocumentsLink } from "@/components/documents/staff/DocumentsConsole";
+import { useDocumentsAccess } from "@/components/documents/use-documents";
 import { InviteClientsButton } from "@/components/invites/InviteClients";
 import { PageHeader } from "@/components/PageHeader";
 import { RoleLabel, SemanticLabel } from "@/components/semantic-label";
@@ -60,6 +62,7 @@ export function AdminUsersDirectory() {
   const locale = useUiLocale();
   const organizationSlug = useOrganizationSlug();
   const { membership } = useSelectedMembershipRole();
+  const documentsAccess = useDocumentsAccess();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -148,6 +151,7 @@ export function AdminUsersDirectory() {
                   {t("importLink")}
                 </Link>
               ) : null}
+              {documentsAccess.any ? <DocumentsLink /> : null}
               <InviteClientsButton />
             </>
           }
