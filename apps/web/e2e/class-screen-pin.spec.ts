@@ -79,8 +79,9 @@ test.describe("Class timer remote › On screen", () => {
     await page.route("**/api/org/box1/class-timers/c18/screens", (route) => route.fulfill(json({ screens, views: ["timer", "leaderboard", "wod"] })));
     await page.route("**/api/org/box1/class-timers/c18/screens/s1/override", (route) => {
       if (route.request().method() === "PUT") {
-        pinned = bodyOf(route.request());
-        screens = [screenRow({ override: { view: pinned.view, slot_id: "c18", until: null }, focus_changed: { at: new Date().toISOString(), by: { id: "coach-1", name: "Nikos" } } })];
+        const body = bodyOf(route.request());
+        pinned = body;
+        screens = [screenRow({ override: { view: body.view, slot_id: "c18", until: null }, focus_changed: { at: new Date().toISOString(), by: { id: "coach-1", name: "Nikos" } } })];
       } else {
         unpinned = true;
         screens = [screenRow()];
