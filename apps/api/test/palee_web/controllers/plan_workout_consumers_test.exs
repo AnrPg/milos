@@ -9,7 +9,8 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
 
   import Palee.StructuredPlanFixtures
 
-  alias Palee.Application.AthleteTrainingVolume
+  alias Palee.Analytics.Domain.ProgressStats
+  alias Palee.Application.{AthleteTrainingVolume, ListWorkoutExecutions}
   alias Palee.{Identity, Organizations}
 
   defp create_user!(nickname, role) do
@@ -30,7 +31,10 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
       end
 
     membership_role = if role == :admin, do: :owner, else: :member
-    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(user, membership_role)
+
+    {:ok, _membership} =
+      Organizations.ensure_legacy_membership_for_migration(user, membership_role)
+
     user
   end
 
@@ -106,15 +110,24 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
 
     by_section = Enum.group_by(segments, & &1["section_id"])
     assert length(by_section[strength["id"]]) == 7
-    assert [%{"kind" => "countdown", "duration_seconds" => 420, "scoreable" => true} = amrap_segment] =
+
+    assert [
+             %{"kind" => "countdown", "duration_seconds" => 420, "scoreable" => true} =
+               amrap_segment
+           ] =
              by_section[amrap["id"]]
 
     assert amrap_segment["score_config"] == %{"type" => "rounds_reps"}
-    assert [%{"kind" => "countup", "score_config" => %{"type" => "time"}}] = by_section[thrusters["id"]]
+
+    assert [%{"kind" => "countup", "score_config" => %{"type" => "time"}}] =
+             by_section[thrusters["id"]]
 
     execution_id =
       athlete_conn
-      |> json(:post, "/api/executions", %{master_workout_id: workout["id"], source: "self_selected"})
+      |> json(:post, "/api/executions", %{
+        master_workout_id: workout["id"],
+        source: "self_selected"
+      })
       |> json_response(201)
       |> get_in(["execution", "id"])
 
@@ -187,5 +200,15 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
              "Thruster" => 1,
              "Burpee over Bar" => 3
            }
+
+    # Execution lists (journal, Πρόοδος stats): the plan workload and the heaviest sets.
+    {:ok, [listed]} =
+      ListWorkoutExecutions.call(%{user_id: athlete.id, organization_id: nil}, athlete.id)
+
+    assert %{volume_kg: 3330, sets: 13, logged_sets: 2, top_sets: top_sets} = listed.plan_workload
+
+    assert %{load_kg: 70, reps: 8} = Enum.find(top_sets, &(&1.name == "Back Squat"))
+
+    assert %{totals: %{volume_kg: 3330}} = ProgressStats.build([listed], Date.utc_today())
   end
 end
