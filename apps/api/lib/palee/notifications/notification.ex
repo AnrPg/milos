@@ -41,6 +41,8 @@ defmodule Palee.Notifications.Notification do
     :inventory_digest,
     :shop_stock_low,
     :shop_order_placed,
+    :payment_failed,
+    :payment_needs_attention,
     :shop_order_ready,
     :shop_order_reminder,
     :shop_order_cancelled,
@@ -110,7 +112,10 @@ defmodule Palee.Notifications.Notification do
     :password_reset_completed,
     :business_demo_idle,
     :email_key_expiring,
-    :member_leaving
+    :member_leaving,
+    # ADR-252: documents to sign and health certificates.
+    :document_signature_requested,
+    :health_certificate_expiring
   ]
 
   schema "notifications" do

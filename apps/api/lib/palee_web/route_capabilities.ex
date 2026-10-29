@@ -13,6 +13,9 @@ defmodule PaleeWeb.RouteCapabilities do
 
   @controller_defaults %{
     W.AdminWorkoutController => [:manage_workouts],
+    # ADR-252: templates, versions, requirement, settings and audit.
+    W.AdminDocumentsController => [:manage_settings],
+    W.AdminHealthCertificatesController => [:manage_health_certificates],
     # The class form's WOD picker: whoever schedules classes picks WODs.
     W.AdminWorkoutChoiceController => [:manage_schedule, :manage_workouts],
     # ADR-230: the day's WOD, like linking a WOD to one class.
@@ -53,8 +56,14 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminAiSettingsController => [:manage_settings],
     # ADR-184: demo data and the activation request (owners and admins).
     W.AdminBusinessController => [:manage_settings],
+    # ADR-255: settings catalog and setup recipes (applying is owner only, in the service).
+    W.AdminSetupController => [:manage_settings],
     # ADR-191: partner perks.
-    W.AdminPerkController => [:manage_perks]
+    W.AdminPerkController => [:manage_perks],
+    # ADR-253: box screens (TVs on the wall), their codes and overrides.
+    W.AdminBoxScreenController => [:manage_settings, :manage_locations],
+    # ADR-254: CSV imports (owners and admins hold manage_settings).
+    W.AdminImportController => [:manage_settings]
   }
 
   @actions %{
@@ -242,6 +251,11 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :show} => [:view_finance_reports, :manage_billing],
     {W.AdminPaymentsController, :refund} => [:manage_billing],
     {W.AdminPaymentsController, :retry} => [:manage_billing],
+    {W.AdminPaymentsController, :save_options} => [:manage_billing],
+    {W.AdminPaymentsController, :attention} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
+    {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
     # ADR-249: Tap to Pay is taking money at the desk, like ADR-222.
     {W.AdminTerminalPaymentsController, :availability} => [:take_payments],
     {W.AdminTerminalPaymentsController, :create} => [:take_payments],
@@ -249,6 +263,25 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminTerminalPaymentsController, :show} => [:take_payments],
     {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
     {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
+    # ADR-252: documents are box rules (manage_settings: which are
+    # mandatory, their text, the booking gate); asking clients to sign and
+    # reading who signed is membership work too.
+    {W.AdminDocumentsController, :index} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :show} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :version} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :request} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :requests} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :cancel_request} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :signatures} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :evidence} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :member} => [:manage_settings, :manage_memberships],
+    # ADR-252: health certificates are health data (GDPR art. 9): dates and
+    # files need manage_health_certificates; view_health (coaches, own
+    # clients) sees only valid / expired / missing in the list.
+    {W.AdminHealthCertificatesController, :index} => [
+      :manage_health_certificates,
+      :view_health
+    ],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [

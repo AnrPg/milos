@@ -30,14 +30,16 @@ defmodule Palee.Workers.TransmitFiscalDocumentsJob do
     :ok
   end
 
+  # Transmission always answers with counts; a crash is logged, never retried here.
   defp transmit(organization_id, which) do
-    case FiscalReporting.transmit(%{organization_id: organization_id}, which) do
-      {:ok, _counts} ->
-        :ok
+    {:ok, _counts} = FiscalReporting.transmit(%{organization_id: organization_id}, which)
+    :ok
+  rescue
+    error ->
+      Logger.error(
+        "fiscal transmission failed for #{organization_id}: #{Exception.message(error)}"
+      )
 
-      error ->
-        Logger.error("fiscal transmission failed for #{organization_id}: #{inspect(error)}")
-        :ok
-    end
+      :ok
   end
 end

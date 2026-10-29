@@ -71,7 +71,9 @@ config :palee, Oban,
        {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
        # ADR-246/247: settle online payments; hourly autopay of due invoices.
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
-       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}}
+       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},
+       # ADR-252: reminders before a client's health certificate expires.
+       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob}
      ]}
   ],
   queues: [
@@ -87,7 +89,9 @@ config :palee, Oban,
     # ADR-243: reports to the tax authority (one HTTP call per document).
     fiscal: 2,
     # ADR-246: provider calls for online payments.
-    payments: 2
+    payments: 2,
+    # ADR-254: CSV imports, one at a time per node (each row its own transaction).
+    imports: 1
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -163,6 +167,13 @@ config :palee, :fiscal_store, Palee.Infrastructure.Fiscal.EctoFiscalStore
 config :palee, :fiscal_journal_signer, Palee.Infrastructure.Fiscal.Ed25519JournalSigner
 config :palee, :fiscal_transmission_store, Palee.Infrastructure.Fiscal.EctoTransmissionStore
 
+# ADR-255: setup recipes.
+config :palee,
+       :setup_recipe_application_store,
+       Palee.Infrastructure.Setup.EctoRecipeApplicationStore
+
+config :palee, :setup_business_configurator, Palee.Application.Setup.ServicesConfigurator
+
 # ADR-243: the gateway that reports documents, per connection environment.
 config :palee, :fiscal_authority_gateways, %{
   "sandbox" => Palee.Infrastructure.Fiscal.SandboxAuthorityGateway,
@@ -173,12 +184,27 @@ config :palee, :fiscal_authority_gateways, %{
 # ADR-246/247: online payments through the business's own provider account.
 config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
 config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
+config :palee, :payment_notifier, Palee.Application.Payments.FailureNotices
 
 config :palee, :payment_gateways, %{
   "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,
   "viva" => Palee.Infrastructure.Payments.VivaGateway,
   "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
+# ADR-252: documents and signatures. The evidence store is where an advanced
+# e-signature provider plugs in later.
+config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
+
+config :palee,
+       :documents_evidence_store,
+       Palee.Infrastructure.Documents.StorageSignatureEvidenceStore
+
+config :palee,
+       :documents_certificate_renderer,
+       Palee.Infrastructure.Documents.PdfCertificateRenderer
+# ADR-254: CSV imports (upload, dry run, apply, undo).
+config :palee, :import_store, Palee.Infrastructure.Imports.EctoImportStore
+config :palee, :import_clock, Palee.Infrastructure.Imports.SystemClock
 
 # ADR-249: Tap to Pay through the provider's terminal app on a staff phone
 # (providers without one are absent). The phone app's id and the callback
@@ -258,18 +284,26 @@ config :palee, :domain_event_handlers, %{
   attendance_recorded: [
     Palee.Application.TrialReactions,
     Palee.Application.ReferralReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
   # ADR-156: the invite funnel follows events, trials, joining and paying.
   event_attendance_recorded: [Palee.Application.ReferralReactions],
   membership_payment_recorded: [Palee.Application.ReferralReactions],
   booking_cancelled: [
     Palee.Application.TrialReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
-  booking_made: [Palee.Application.WalletReactions],
-  class_cancelled: [Palee.Application.TrialReactions]
+  booking_made: [Palee.Application.WalletReactions, Palee.Application.BoxScreenReactions],
+  class_cancelled: [Palee.Application.TrialReactions, Palee.Application.BoxScreenReactions],
+  # ADR-253: box screens refresh their leaderboards.
+  workout_result_recorded: [Palee.Application.BoxScreenReactions]
 }
+
+# ADR-253: box screens (store and the clock they run on).
+config :palee, :box_screen_store, Palee.Infrastructure.BoxScreens.EctoBoxScreenStore
+config :palee, :box_screen_clock, Palee.Infrastructure.BoxScreens.SystemClock
 
 config :palee,
        :saved_filter_store,

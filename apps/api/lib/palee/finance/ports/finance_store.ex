@@ -18,6 +18,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
               {:ok, map()} | {:error, term()}
   @callback reverse_credit_ledger_entry(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
+  @callback reverse_credit_grant(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
   @callback get_invoice(Ecto.UUID.t()) :: {:ok, struct()} | {:error, :not_found}
   @callback member_shop_terms(Ecto.UUID.t()) ::
               %{membership_id: Ecto.UUID.t(), member_discount_percent: integer() | nil} | nil
@@ -54,6 +56,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
               map()
             ) :: {:ok, map()} | {:error, term()}
   @callback list_expiring_memberships(non_neg_integer()) :: [map()]
+  @doc "ADR-252: people whose subscription to `package_id` covers `date`."
+  @callback package_holder_user_ids(Ecto.UUID.t(), Date.t()) :: [Ecto.UUID.t()]
   @callback operational_queues(map()) :: map()
   @callback financial_summary(map()) :: map()
   @callback package_location_scopes() :: %{optional(String.t()) => :all | [String.t()]}
@@ -73,6 +77,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback open_attributed_referral(map()) :: {:ok, map()} | {:error, term()}
   @callback count_referral_events_since(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
   @callback referral_outcomes([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => map()}
+  @callback cancel_subscription(Ecto.UUID.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback extend_current_subscription(Ecto.UUID.t(), pos_integer()) ::
               {:ok, map()} | {:error, term()}
   @callback create_referral_event(map()) :: {:ok, map()} | {:error, term()}

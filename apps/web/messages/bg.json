@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "Премахни {nickname}",
     "groupProgrammingNoMatches": "Няма съвпадения.",
     "roleAccessSpaces": "Помещения и планове на етажи",
+    "roleAccessHealthCertificates": "Медицински бележки",
     "apiErrorSpaceUnavailable": "Помещението е недостъпно по това време. Изберете друго помещение или друг час.",
     "apiErrorSpaceArchived": "Това помещение е архивирано.",
     "apiErrorSpaceWrongBranch": "Това помещение е на друг филиал.",

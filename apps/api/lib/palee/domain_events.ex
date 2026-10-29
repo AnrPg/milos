@@ -13,13 +13,16 @@ defmodule Palee.DomainEvents do
 
     * `:membership_activated` - `%{organization_id, user_id, at}`
     * `:attendance_recorded` - `%{organization_id, scheduled_class_id, user_id, booking_id, status, at}`
-    * `:booking_made` - `%{organization_id, booking_id, user_id, at}` (ADR-155)
-    * `:booking_cancelled` - `%{organization_id, booking_id, user_id, kind, by, at}`
+    * `:booking_made` - `%{organization_id, scheduled_class_id, booking_id, user_id, at}` (ADR-155)
+    * `:booking_cancelled` - `%{organization_id, scheduled_class_id, booking_id, user_id, kind, by, at}`
     * `:class_cancelled` - `%{organization_id, scheduled_class_id, at}` (the class is gone)
     * `:event_attendance_recorded` - `%{organization_id, community_event_id, user_id, at}`
       (staff ticked «Ήρθε» at a club event, ADR-156)
     * `:membership_payment_recorded` - `%{organization_id, user_id, membership_id, payment_id,
       amount_cents, at}` (a package payment or receipt, not an event payment, ADR-156)
+    * `:workout_result_recorded` - `%{organization_id, workout_id, at}`: a result of a box's
+      workout was finished in the app or logged (ADR-253); box screens refresh their
+      leaderboards
   """
 
   require Logger

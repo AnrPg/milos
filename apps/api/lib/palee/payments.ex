@@ -11,7 +11,7 @@ defmodule Palee.Payments do
   """
 
   alias Palee.Payments.PaymentStore
-  alias Palee.Payments.Domain.{Consent, IntentPolicy}
+  alias Palee.Payments.Domain.{AccountOptions, Consent, IntentPolicy}
 
   @providers ~w(sandbox viva stripe)
   @environments ~w(test live)
@@ -43,6 +43,31 @@ defmodule Palee.Payments do
       %{status: "active", provider: "sandbox"} -> sandbox_enabled?()
       %{status: "active"} -> true
       _other -> false
+    end
+  end
+
+  @doc """
+  Whether members may pay `purpose` online now (ADR-260): the account is
+  active and the business left that purpose on.
+  """
+  def available?(context, purpose) do
+    case PaymentStore.get_account(context) do
+      %{status: "active"} = account ->
+        available?(context) and AccountOptions.allows?(account.options || %{}, purpose)
+
+      _other ->
+        false
+    end
+  end
+
+  @doc "Changes what members pay online and who hears about failed charges."
+  def save_options(context, params, actor_id, %DateTime{} = _now) do
+    with %{} = account <-
+           PaymentStore.get_account(context) || {:error, :online_payments_unavailable},
+         {:ok, options} <- AccountOptions.change(account.options || %{}, params),
+         {:ok, saved} <-
+           PaymentStore.save_account(context, %{options: options, updated_by_id: actor_id}) do
+      {:ok, public_account(saved)}
     end
   end
 
@@ -175,6 +200,7 @@ defmodule Palee.Payments do
       :updated_at
     ])
     |> Map.put(:credentials_set, (account.credentials || %{}) |> Map.keys() |> Enum.sort())
+    |> Map.put(:options, AccountOptions.resolve(account[:options] || %{}))
   end
 
   defp active_account(context) do
@@ -423,9 +449,30 @@ defmodule Palee.Payments do
           end
 
         {:ok, updated} = apply_outcome(context, account, intent, changes)
+        notify_decline(context, account, intent, updated)
         finish(intent, updated)
     end
   end
+
+  # ADR-260: a declined saved-card charge (not a provider outage) is told to
+  # the member each time, and to staff once no retry is left.
+  defp notify_decline(context, account, %{initiation: "merchant"} = before, updated) do
+    declined? = declines(updated) > declines(before)
+    final? = updated.status == "failed"
+
+    if declined? or final? do
+      notifier().charge_declined(context, updated, %{
+        final: final?,
+        options: account[:options] || %{}
+      })
+    end
+
+    :ok
+  end
+
+  defp notify_decline(_context, _account, _intent, _updated), do: :ok
+
+  defp declines(intent), do: Map.get(intent.consent || %{}, "declines", 0)
 
   defp charge(context, account, intent, now) do
     case intent.payment_method_id && PaymentStore.get_method(context, intent.payment_method_id) do
@@ -856,6 +903,70 @@ defmodule Palee.Payments do
     Enum.any?(intents, &(&1.refunded_cents > 0))
   end
 
+  @doc """
+  Saved-card charges that need a person (ADR-260): declined and waiting for
+  a retry, or failed for good, until staff close them or the purpose is
+  paid online.
+  """
+  def attention(context, filters \\ %{}) do
+    list(context, Map.merge(filters, %{attention: true}))
+  end
+
+  @doc "Staff close a failed charge in the queue (e.g. paid at the desk)."
+  def dismiss_attention(context, intent_id, actor_id, %DateTime{} = now) do
+    with {:ok, intent} <- merchant_intent(context, intent_id),
+         {:ok, updated} <-
+           PaymentStore.update_intent(context, intent.id, %{
+             attention_resolved_at: now,
+             attention_resolved_by_id: actor_id,
+             attention_resolution: "dismissed",
+             # A charge still waiting for a retry stops here too.
+             status: if(intent.status == "scheduled", do: "cancelled", else: intent.status),
+             next_attempt_at: nil
+           }) do
+      {:ok, public_intent(updated)}
+    end
+  end
+
+  @doc """
+  Staff try a declined charge once more now. A charge that failed for good
+  gets one more attempt; a further decline fails it again without new
+  retries.
+  """
+  def retry_charge(context, intent_id, %DateTime{} = now) do
+    with {:ok, intent} <- merchant_intent(context, intent_id),
+         true <- intent.status in ["scheduled", "failed"] || {:error, :payment_not_retryable},
+         true <- is_nil(intent.attention_resolved_at) || {:error, :payment_not_retryable},
+         {:ok, _updated} <-
+           PaymentStore.update_intent(context, intent.id, %{
+             status: "scheduled",
+             next_attempt_at: now,
+             consent:
+               Map.put(intent.consent || %{}, "declines", length(IntentPolicy.dunning_days()))
+           }) do
+      process(context, intent.id, now)
+      {:ok, context |> PaymentStore.get_intent(intent.id) |> public_intent()}
+    end
+  end
+
+  @doc "Sends the member again the link to pay with another card."
+  def send_card_link(context, intent_id, %DateTime{} = now) do
+    with {:ok, intent} <- merchant_intent(context, intent_id),
+         true <- is_binary(intent.user_id) || {:error, :not_found} do
+      notifier().card_link(context, intent, now)
+      {:ok, public_intent(intent)}
+    end
+  end
+
+  defp merchant_intent(context, intent_id) do
+    case PaymentStore.get_intent(context, intent_id) do
+      %{initiation: "merchant"} = intent -> {:ok, intent}
+      _other -> {:error, :not_found}
+    end
+  end
+
+  defp notifier, do: Application.fetch_env!(:palee, :payment_notifier)
+
   def list(context, filters) do
     %{intents: intents, total: total} = PaymentStore.list_intents(context, filters)
     %{payments: Enum.map(intents, &public_intent/1), total: total}
@@ -886,8 +997,12 @@ defmodule Palee.Payments do
       :succeeded_at,
       :next_attempt_at,
       :inserted_at,
-      :metadata
+      :metadata,
+      :attention_resolved_at,
+      :attention_resolution
     ])
+    |> Map.put(:declines, declines(intent))
+    |> Map.put(:retries, length(IntentPolicy.dunning_days()))
   end
 
   # ── Tenant data (ADR-117) ───────────────────────────────────────────────

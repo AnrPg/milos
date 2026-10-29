@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "Retirer {nickname}",
     "groupProgrammingNoMatches": "Personne ne correspond.",
     "roleAccessSpaces": "Espaces et plans d’étage",
+    "roleAccessHealthCertificates": "Certificats médicaux",
     "apiErrorSpaceUnavailable": "L’espace est indisponible à ce moment-là. Choisis un autre espace ou une autre heure.",
     "apiErrorSpaceArchived": "Cet espace est archivé.",
     "apiErrorSpaceWrongBranch": "Cet espace appartient à un autre site.",

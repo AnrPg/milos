@@ -615,6 +615,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-screen/classes/{slot_id}/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A class's timer, for a class the screen shows */
+        get: operations["PaleeWeb.BoxScreenController.class_timer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pair this TV with the code staff got (no sign-in)
+         * @description Case, spaces and dashes do not matter. A code pairs one device once. The display token lasts 90 days and is renewed with `POST /api/box-screen/token`.
+         */
+        post: operations["PaleeWeb.BoxScreenController.pair"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the screen shows today: classes, WODs, leaderboards and the focus */
+        get: operations["PaleeWeb.BoxScreenController.today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renew the display token */
+        post: operations["PaleeWeb.BoxScreenController.token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-search": {
         parameters: {
             query?: never;
@@ -4688,6 +4759,86 @@ export interface paths {
         patch: operations["PaleeWeb.AdminScheduleController.reject_booking"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/box-screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's screens (those of the branches the staff member works at) */
+        get: operations["PaleeWeb.AdminBoxScreenController.index"];
+        put?: never;
+        /**
+         * Add a box screen and get its pairing code
+         * @description The code is shown once and works for 15 minutes; type it on the TV. A box has at most 20 screens. `location_id` null shows the whole box.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a box screen: its TV stops at once */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete"];
+        options?: never;
+        head?: never;
+        /** Rename a box screen or move it to another branch */
+        patch: operations["PaleeWeb.AdminBoxScreenController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what a screen shows and pin it
+         * @description `wod`, `timer`, `leaderboard`, `bookings` or one `class` (with `slot_id`, one of today's classes on the screen), optionally until a time. The TV changes at once.
+         */
+        put: operations["PaleeWeb.AdminBoxScreenController.put_override"];
+        post?: never;
+        /** Return the screen to automatic («Επιστροφή στο αυτόματο») */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/pairing-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A new pairing code for a screen (to pair it with another TV)
+         * @description Replaces any pending code. The paired TV keeps working until another device pairs with the new code.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.pairing_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/branding": {
         parameters: {
             query?: never;
@@ -5530,6 +5681,352 @@ export interface paths {
         get?: never;
         /** Whether members may start groups, and whether staff approve them first */
         put: operations["PaleeWeb.AdminCommunityController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The documents audit log, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Clients with their health certificate status */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.index"];
+        put?: never;
+        /** Record an uploaded health certificate with its dates */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's health certificates, newest first */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a client's health certificate: get a presigned upload */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.request_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a health certificate and its file (audited) */
+        delete: operations["PaleeWeb.AdminHealthCertificatesController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the certificate file (audited) */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's documents, signatures and health certificate status */
+        get: operations["PaleeWeb.AdminDocumentsController.member"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signature requests, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a pending request */
+        post: operations["PaleeWeb.AdminDocumentsController.cancel_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's document rules (booking gate, health certificates) */
+        get: operations["PaleeWeb.AdminDocumentsController.settings"];
+        /** Change the box's document rules (audited) */
+        put: operations["PaleeWeb.AdminDocumentsController.save_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signatures with their evidence, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to a signature's PDF certificate (audited) */
+        get: operations["PaleeWeb.AdminDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/starters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ready-made drafts to start from (always marked for legal review) */
+        get: operations["PaleeWeb.AdminDocumentsController.starters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's documents, active first */
+        get: operations["PaleeWeb.AdminDocumentsController.index"];
+        put?: never;
+        /** Create a document with its first version */
+        post: operations["PaleeWeb.AdminDocumentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A document with its versions and the current text */
+        get: operations["PaleeWeb.AdminDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a document: no longer offered, required or requested */
+        post: operations["PaleeWeb.AdminDocumentsController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask one client, every client, a role or a package's holders to sign
+         * @description Clients who already signed the required version or have a pending request are skipped. Each new request notifies its client.
+         */
+        post: operations["PaleeWeb.AdminDocumentsController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark a document mandatory (blocks booking) or optional (only offered) */
+        put: operations["PaleeWeb.AdminDocumentsController.set_requirement"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a new version (major: everyone signs again; minor: signatures still count) */
+        post: operations["PaleeWeb.AdminDocumentsController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One version's text */
+        get: operations["PaleeWeb.AdminDocumentsController.version"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -6849,6 +7346,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's imports, newest first */
+        get: operations["PaleeWeb.AdminImportController.index"];
+        put?: never;
+        /**
+         * Upload a CSV file (≤ 5 MB, ≤ 20,000 rows) as a draft import
+         * @description The encoding (UTF-8/16, Windows-1252, ISO-8859-7, Windows-1253) and the delimiter (`,` `;` tab) are detected; the columns get a proposed mapping from the chosen system's preset, or the best matching one.
+         */
+        post: operations["PaleeWeb.AdminImportController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fields, presets (best guesses), date orders, limits and codes of imports */
+        get: operations["PaleeWeb.AdminImportController.catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One import with its dry run, counts per row status and outcome, and report */
+        get: operations["PaleeWeb.AdminImportController.show"];
+        put?: never;
+        post?: never;
+        /** Delete an import that was never applied */
+        delete: operations["PaleeWeb.AdminImportController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply the import in the background (each row once; again only finishes the rest) */
+        post: operations["PaleeWeb.AdminImportController.apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email invitations to the people the import brought in (at most 200 per call)
+         * @description Only people with an address who have not claimed their profile and were not invited yet; within the business's daily invitation limits.
+         */
+        post: operations["PaleeWeb.AdminImportController.invitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save the mapping and options of a draft and run the dry run
+         * @description Nothing is written outside the import: every row gets its outcome and warnings.
+         */
+        post: operations["PaleeWeb.AdminImportController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An import's rows with their outcome, warnings and what applying them did */
+        get: operations["PaleeWeb.AdminImportController.rows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo an applied import (within 7 days of its end) */
+        post: operations["PaleeWeb.AdminImportController.undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/locations": {
         parameters: {
             query?: never;
@@ -6991,6 +7635,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/account/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what members pay online and who hears about failed charges
+         * @description Keys left out keep their value. Every purpose is on by default.
+         */
+        put: operations["PaleeWeb.AdminPaymentsController.save_options"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saved-card charges that need a person (Ουρές)
+         * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid.
+         */
+        get: operations["PaleeWeb.AdminPaymentsController.attention"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/{id}": {
         parameters: {
             query?: never;
@@ -7002,6 +7686,40 @@ export interface paths {
         get: operations["PaleeWeb.AdminPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/card-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the member the link to pay with another card again */
+        post: operations["PaleeWeb.AdminPaymentsController.card_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a failed charge (e.g. paid at the desk); stops its retries */
+        post: operations["PaleeWeb.AdminPaymentsController.dismiss_charge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7036,6 +7754,23 @@ export interface paths {
         put?: never;
         /** Ask the provider about a payment now */
         post: operations["PaleeWeb.AdminPaymentsController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/retry-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Charge the saved card once more now */
+        post: operations["PaleeWeb.AdminPaymentsController.retry_charge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7919,6 +8654,80 @@ export interface paths {
          * @description ADR-176: `confirmed` sets the zone. `inferred` is a guess (the device's zone, else an IP-derived zone from the edge) and never replaces a confirmed zone.
          */
         put: operations["PaleeWeb.AdminSettingsController.update_time_zone"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Setup recipes per kind of box, and the recipes this business applied */
+        get: operations["PaleeWeb.AdminSetupController.recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply a recipe (owner only); applying it again changes nothing
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.
+         */
+        post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What applying a recipe would change now (dry run; nothing is saved) */
+        post: operations["PaleeWeb.AdminSetupController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every business setting with its level (basic or under «Προχωρημένα»)
+         * @description CP-H1: the web shows the settings with `advanced: false` and keeps the rest under «Προχωρημένα», closed by default. `verdict` says why (derive: the app or a recipe sets it; remove: not shown to owners).
+         */
+        get: operations["PaleeWeb.AdminSetupController.settings"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -10028,6 +10837,162 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My documents: what is outstanding, offered or signed, and my health certificate */
+        get: operations["PaleeWeb.MyDocumentsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record my uploaded health certificate with its dates */
+        post: operations["PaleeWeb.MyDocumentsController.create_health_certificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload my health certificate: get a presigned upload */
+        post: operations["PaleeWeb.MyDocumentsController.request_health_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete my health certificate and its file */
+        delete: operations["PaleeWeb.MyDocumentsController.delete_health_certificate"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to my health certificate file */
+        get: operations["PaleeWeb.MyDocumentsController.health_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My signatures, newest first */
+        get: operations["PaleeWeb.MyDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the PDF certificate of my signature */
+        get: operations["PaleeWeb.MyDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current text of a document, to read before signing */
+        get: operations["PaleeWeb.MyDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}/sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign the current version (typed name and/or drawn signature)
+         * @description Simple electronic signature (eIDAS art. 25): the evidence keeps the SHA-256 of the exact text, the time, the IP address, the device and the account, and a PDF certificate is stored. `version_id` must be the version that was read.
+         */
+        post: operations["PaleeWeb.MyDocumentsController.sign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/entitlement": {
         parameters: {
             query?: never;
@@ -10258,6 +11223,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a package on the payment provider's page (and book a class once paid)
+         * @description Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.buy_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What buying a package online costs, and the texts to agree to */
+        get: operations["PaleeWeb.MyPaymentsController.package_terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/payment-methods": {
         parameters: {
             query?: never;
@@ -10354,6 +11356,26 @@ export interface paths {
         get: operations["PaleeWeb.MyPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw from a package bought online within 14 days
+         * @description Gives back the price less the part already used, and ends the package.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.withdraw"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10648,6 +11670,23 @@ export interface paths {
         put?: never;
         /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
         post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid shop order on the payment provider's page */
+        post: operations["PaleeWeb.MyPaymentsController.pay_shop_order"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13738,6 +14777,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["PaleeWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/boxes/{slug}/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The packages a published box sells online (ADR-248) */
+        get: operations["PaleeWeb.PublicBoxController.packages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -19260,6 +20316,353 @@ export interface components {
             photo_ids?: string[];
             services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
+        /** BoxScreen */
+        BoxScreen: {
+            /** @description Who last changed what the screen shows, and when */
+            focus_changed: {
+                /** Format: date-time */
+                at: string;
+                by: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string | null;
+                } | null;
+            } | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: date-time */
+            last_seen_at: string | null;
+            /**
+             * Format: uuid
+             * @description The branch; null for the whole box
+             */
+            location_id: string | null;
+            name: string;
+            /**
+             * BoxScreenOverride
+             * @description What staff pinned on the screen; null when it follows the day automatically
+             */
+            override: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            } | null;
+            paired: boolean;
+            /** Format: date-time */
+            paired_at: string | null;
+            /**
+             * Format: date-time
+             * @description When the pending pairing code stops working; null without one
+             */
+            pairing_expires_at: string | null;
+        };
+        /** BoxScreenClass */
+        BoxScreenClass: {
+            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+            bookings: {
+                capacity: number;
+                count: number;
+                names: string[];
+                unnamed: number;
+                waitlist: number;
+            };
+            cancelled: boolean;
+            class_type: string | null;
+            coach_name: string | null;
+            duration_minutes: number;
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id: string | null;
+            name: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+            /** Format: uuid */
+            workout_id: string | null;
+        };
+        /**
+         * BoxScreenFocus
+         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+         */
+        BoxScreenFocus: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** @enum {string} */
+            source: "auto" | "staff";
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        };
+        /**
+         * BoxScreenLeaderboard
+         * @description Only people who opted in to leaderboards; never journal-private results
+         */
+        BoxScreenLeaderboard: {
+            entries: {
+                /** @description First word of the display name */
+                name: string;
+                rank: number;
+                scale_level_slug: string | null;
+                unit: string | null;
+                value: string | null;
+            }[];
+            score: {
+                name?: string | null;
+                score_type?: string | null;
+                unit?: string | null;
+            } | null;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /**
+         * BoxScreenOverride
+         * @description What staff pinned on the screen; null when it follows the day automatically
+         */
+        BoxScreenOverride: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        } | null;
+        /**
+         * BoxScreenPairingCode
+         * @description Shown once: typed on the TV within 15 minutes
+         */
+        BoxScreenPairingCode: {
+            /** @example ACEF-3467 */
+            code: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        /** BoxScreenToday */
+        BoxScreenToday: {
+            box: {
+                name: string | null;
+            };
+            classes: {
+                /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                bookings: {
+                    capacity: number;
+                    count: number;
+                    names: string[];
+                    unnamed: number;
+                    waitlist: number;
+                };
+                cancelled: boolean;
+                class_type: string | null;
+                coach_name: string | null;
+                duration_minutes: number;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id: string | null;
+                name: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+                /** Format: uuid */
+                workout_id: string | null;
+            }[];
+            /**
+             * Format: date
+             * @description Today on the box's clock
+             */
+            date: string;
+            /**
+             * BoxScreenFocus
+             * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+             */
+            focus: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** @enum {string} */
+                source: "auto" | "staff";
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            };
+            leaderboards: {
+                entries: {
+                    /** @description First word of the display name */
+                    name: string;
+                    rank: number;
+                    scale_level_slug: string | null;
+                    unit: string | null;
+                    value: string | null;
+                }[];
+                score: {
+                    name?: string | null;
+                    score_type?: string | null;
+                    unit?: string | null;
+                } | null;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            screen: {
+                branch: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            server_now: string;
+            time_zone: string;
+            workouts: {
+                /** WorkoutBody */
+                body: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** @enum {string} */
+                    kind: "free_text";
+                    /** @description The assistant also derived exercises (see `sections`) */
+                    structured: boolean;
+                    text: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "text_sections";
+                    sections: {
+                        /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                        document: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        id: string | null;
+                        /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                        scoring: {
+                            [key: string]: unknown;
+                        }[];
+                        text: string;
+                        /** SectionTimerPreset */
+                        timer: {
+                            duration_seconds?: number | null;
+                            /** @enum {string} */
+                            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                            interval_seconds?: number | null;
+                            rest_seconds?: number | null;
+                            rounds?: number | null;
+                            work_seconds?: number | null;
+                        } | null;
+                        /** @description Null when untitled */
+                        title: string | null;
+                    }[];
+                } | {
+                    /** @enum {string} */
+                    kind: "structured";
+                    sections: {
+                        /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                        exercises: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        id: string | null;
+                        name: string;
+                        scoreable: boolean;
+                        subtitle?: string | null;
+                        timer: {
+                            [key: string]: unknown;
+                        } | null;
+                    }[];
+                };
+                /** Format: uuid */
+                id: string;
+                title: string | null;
+                type: string | null;
+            }[];
+        };
+        /** BoxScreenToken */
+        BoxScreenToken: {
+            /** Format: date-time */
+            expires_at: string;
+            token: string;
+        };
+        /** BoxScreenWorkout */
+        BoxScreenWorkout: {
+            /** WorkoutBody */
+            body: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** @enum {string} */
+                kind: "free_text";
+                /** @description The assistant also derived exercises (see `sections`) */
+                structured: boolean;
+                text: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            } | {
+                /** @enum {string} */
+                kind: "text_sections";
+                sections: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    id: string | null;
+                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                    scoring: {
+                        [key: string]: unknown;
+                    }[];
+                    text: string;
+                    /** SectionTimerPreset */
+                    timer: {
+                        duration_seconds?: number | null;
+                        /** @enum {string} */
+                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                        interval_seconds?: number | null;
+                        rest_seconds?: number | null;
+                        rounds?: number | null;
+                        work_seconds?: number | null;
+                    } | null;
+                    /** @description Null when untitled */
+                    title: string | null;
+                }[];
+            } | {
+                /** @enum {string} */
+                kind: "structured";
+                sections: {
+                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                    exercises: {
+                        [key: string]: unknown;
+                    }[];
+                    /** Format: uuid */
+                    id: string | null;
+                    name: string;
+                    scoreable: boolean;
+                    subtitle?: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                }[];
+            };
+            /** Format: uuid */
+            id: string;
+            title: string | null;
+            type: string | null;
+        };
         /** BoxSearchResponse */
         BoxSearchResponse: {
             boxes: {
@@ -20206,7 +21609,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             /** @enum {string} */
@@ -20444,7 +21847,7 @@ export interface components {
             /** @enum {string} */
             kind: "class" | "open_gym";
             /** @enum {string|null} */
-            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
             override?: boolean;
         } | null;
         /** CheckInRules */
@@ -20536,7 +21939,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             choices?: {
@@ -42852,6 +44255,336 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.BoxScreenController.class_timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class timer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            duration_minutes?: number;
+                            /** Format: uuid */
+                            id?: string;
+                            name?: string;
+                            /** Format: date-time */
+                            scheduled_at?: string;
+                        };
+                        segments: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: date-time */
+                        server_now: string;
+                        timer: {
+                            current_segment_index: number;
+                            duration_adjustments?: {
+                                [key: string]: unknown;
+                            };
+                            lock_version: number;
+                            paused_elapsed_ms: number;
+                            /** Format: date-time */
+                            segment_started_at_utc?: string | null;
+                            /** @enum {string} */
+                            status: "ready" | "running" | "paused" | "finished";
+                            timer_preset?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                        workout?: {
+                            [key: string]: unknown;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Not on this screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Display token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        box: {
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        expires_at: string;
+                        screen: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        token: string;
+                    };
+                };
+            };
+            /** @description Wrong or expired code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Today */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        box: {
+                            name: string | null;
+                        };
+                        classes: {
+                            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                            bookings: {
+                                capacity: number;
+                                count: number;
+                                names: string[];
+                                unnamed: number;
+                                waitlist: number;
+                            };
+                            cancelled: boolean;
+                            class_type: string | null;
+                            coach_name: string | null;
+                            duration_minutes: number;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id: string | null;
+                            name: string | null;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            workout_id: string | null;
+                        }[];
+                        /**
+                         * Format: date
+                         * @description Today on the box's clock
+                         */
+                        date: string;
+                        /**
+                         * BoxScreenFocus
+                         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+                         */
+                        focus: {
+                            /** Format: uuid */
+                            slot_id: string | null;
+                            /** @enum {string} */
+                            source: "auto" | "staff";
+                            /** Format: date-time */
+                            until: string | null;
+                            /** @enum {string} */
+                            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                        };
+                        leaderboards: {
+                            entries: {
+                                /** @description First word of the display name */
+                                name: string;
+                                rank: number;
+                                scale_level_slug: string | null;
+                                unit: string | null;
+                                value: string | null;
+                            }[];
+                            score: {
+                                name?: string | null;
+                                score_type?: string | null;
+                                unit?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            workout_id: string;
+                        }[];
+                        screen: {
+                            branch: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        server_now: string;
+                        time_zone: string;
+                        workouts: {
+                            /** WorkoutBody */
+                            body: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            title: string | null;
+                            type: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Display token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        token: string;
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.BoxSearchController.index": {
         parameters: {
             query: {
@@ -44301,7 +46034,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         choices?: {
@@ -62351,6 +64084,592 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminBoxScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screens */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        max_screens: number;
+                        override_views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Too many screens */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description One of today's classes on the screen; required for `class`
+                     */
+                    slot_id?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.pairing_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminBrandingController.show": {
         parameters: {
             query?: never;
@@ -63438,7 +65757,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -63596,7 +65915,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -68885,6 +71204,1252 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDocumentsController.audit": {
+        parameters: {
+            query?: {
+                subject_id?: string;
+                action?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audit events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            action: string;
+                            /** Format: uuid */
+                            actor_id: string | null;
+                            details: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: uuid */
+                            subject_id: string | null;
+                            subject_type: string;
+                            /** Format: uuid */
+                            subject_user_id: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.index": {
+        parameters: {
+            query?: {
+                status?: "missing" | "valid" | "expiring" | "expired";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        full_access: boolean;
+                        health_certificates: {
+                            /** @description Only for staff who manage health certificates */
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            display_name: string | null;
+                            handle: string | null;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        required: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.client": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificates: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.request_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Client documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        /** @enum {string} */
+                        health_certificate_status: "missing" | "valid" | "expiring" | "expired";
+                        outstanding: number;
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.requests": {
+        parameters: {
+            query?: {
+                status?: "pending" | "signed" | "cancelled";
+                template_id?: string;
+                user_id?: string;
+                batch_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.cancel_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.save_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    block_booking_on_health_certificate?: boolean;
+                    block_booking_on_unsigned?: boolean;
+                    health_certificate_reminder_days?: number;
+                    health_certificate_required?: boolean;
+                    health_certificate_validity_months?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.signatures": {
+        parameters: {
+            query?: {
+                template_id?: string;
+                user_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.starters": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Drafts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        starters: {
+                            body: string;
+                            draft: boolean;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            language: string;
+                            legal_review_required: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            title: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.index": {
+        parameters: {
+            query?: {
+                status?: "active" | "archived";
+                requirement?: "mandatory" | "optional";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        templates: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** @enum {string} */
+                    kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    /** @enum {string} */
+                    requirement?: "mandatory" | "optional";
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current_version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        } | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "person" | "all_clients" | "role" | "package";
+                    /** Format: uuid */
+                    package_id?: string;
+                    /** @enum {string} */
+                    role?: "member" | "athlete";
+                    /** Format: uuid */
+                    user_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Requests */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        audience: string;
+                        /** Format: uuid */
+                        batch_id: string;
+                        created: number;
+                        recipients: number;
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Already signed or already asked */
+                        skipped: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.set_requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    requirement: "mandatory" | "optional";
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /**
+                     * @description major (default): everyone signs again; minor: earlier signatures count
+                     * @enum {string}
+                     */
+                    change_kind?: "major" | "minor";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Version */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceAccountingController.exports": {
         parameters: {
             query?: {
@@ -71204,6 +74769,7 @@ export interface operations {
                     name: string;
                     /** @enum {string} */
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -71371,6 +74937,7 @@ export interface operations {
                     name?: string;
                     /** @enum {string} */
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -73817,6 +77384,714 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminImportController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Imports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        imports: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description The CSV file (≤ 5 MB)
+                     */
+                    file: string;
+                    /** @enum {string|null} */
+                    source?: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        date_orders: ("dmy" | "mdy" | "ymd")[];
+                        encodings: ("utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253")[];
+                        errors: ("missing_person" | "missing_name")[];
+                        fields: {
+                            /** @enum {string} */
+                            group: "person" | "package" | "credit" | "payment" | "visit";
+                            /** @enum {string} */
+                            key: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date";
+                            /** @enum {string} */
+                            type: "text" | "email" | "phone" | "role" | "date" | "status" | "money" | "payment_method";
+                        }[];
+                        limits: {
+                            max_bytes: number;
+                            max_invitations: number;
+                            max_rows: number;
+                            undo_days: number;
+                        };
+                        outcomes: ("create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid")[];
+                        presets: {
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            key: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            name: string;
+                        }[];
+                        roles: ("member" | "athlete")[];
+                        row_statuses: ("pending" | "applied" | "skipped" | "failed" | "undone")[];
+                        statuses: ("draft" | "queued" | "applying" | "applied" | "failed" | "undone")[];
+                        warnings: ("invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    limit?: number;
+                    person_ids?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Invitations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        failed: number;
+                        remaining: number;
+                        results: {
+                            email: string;
+                            error: string | null;
+                            /** Format: uuid */
+                            person_id: string;
+                            /** @enum {string} */
+                            status: "queued" | "failed";
+                        }[];
+                        sent: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    date_order?: "dmy" | "mdy" | "ymd";
+                    /** @enum {string} */
+                    default_role?: "member" | "athlete";
+                    mapping?: {
+                        column: number;
+                        /** @enum {string|null} */
+                        field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.rows": {
+        parameters: {
+            query?: {
+                status?: "pending" | "applied" | "skipped" | "failed" | "undone";
+                outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid";
+                after_row?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_after_row: number | null;
+                        rows: {
+                            /** Format: date-time */
+                            applied_at?: string | null;
+                            cells: string[];
+                            error_code?: string | null;
+                            errors: {
+                                /** @enum {string} */
+                                code: "missing_person" | "missing_name";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid" | null;
+                            result: {
+                                [key: string]: unknown;
+                            };
+                            row_number: number;
+                            /** @enum {string} */
+                            status: "pending" | "applied" | "skipped" | "failed" | "undone";
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            warnings: {
+                                /** @enum {string} */
+                                code: "invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFacilityController.index_locations": {
         parameters: {
             query?: never;
@@ -74261,9 +78536,13 @@ export interface operations {
                     "application/json": {
                         payments: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -74278,6 +78557,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74287,6 +78569,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -74325,6 +78608,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -74387,6 +78681,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -74399,6 +78704,138 @@ export interface operations {
                         } | null;
                         environments: string[];
                         providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.save_options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notify_member?: boolean;
+                    notify_staff?: boolean;
+                    purposes?: {
+                        autopay?: boolean;
+                        drop_in?: boolean;
+                        packages?: boolean;
+                        personal_training?: boolean;
+                        shop?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        environments: string[];
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payments: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                        total: number;
                     };
                 };
             };
@@ -74424,9 +78861,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -74441,6 +78882,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74450,6 +78894,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -74471,6 +78916,138 @@ export interface operations {
                                 /** @enum {string} */
                                 status: "pending" | "succeeded" | "failed";
                             }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.card_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.dismiss_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
                         };
                     };
                 };
@@ -74542,9 +79119,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -74559,6 +79140,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74568,6 +79152,73 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.retry_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -79166,6 +83817,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79293,6 +83946,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79393,6 +84048,344 @@ export interface operations {
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recipes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applications: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        }[];
+                        /** @description Only the owner applies a recipe */
+                        can_apply: boolean;
+                        recipes: {
+                            class_types: string[];
+                            documents: string[];
+                            key: string;
+                            /** @description In the business's language */
+                            name: string;
+                            /** @description The same text in English and Greek */
+                            names: {
+                                el: string;
+                                en: string;
+                            };
+                            packages: {
+                                base_price_cents: number;
+                                billing_period: string;
+                                code: string;
+                                name: string;
+                                package_type: string;
+                            }[];
+                            /** @enum {string} */
+                            provider_kind: "coach" | "gym" | "organiser";
+                            role_grants: {
+                                [key: string]: string[];
+                            };
+                            settings: {
+                                advanced: boolean;
+                                key: string;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                value: unknown;
+                            }[];
+                            /** @description The same text in English and Greek */
+                            summaries: {
+                                el: string;
+                                en: string;
+                            };
+                            summary: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.apply_recipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applied */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description An applied recipe: which, when, by whom and what changed */
+                        application: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        };
+                        /** @description What applying the recipe changes now (a dry run until applied) */
+                        plan: {
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            name: string;
+                            recipe: string;
+                            unchanged: string[];
+                            version: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not the owner */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description A step failed; nothing changed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change_count: number;
+                        changes: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        manual: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        name: string;
+                        recipe: string;
+                        unchanged: string[];
+                        version: number;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced_settings: string[];
+                        counts: {
+                            advanced: number;
+                            basic: number;
+                            derive: number;
+                            remove: number;
+                        };
+                        settings: {
+                            advanced: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            default: unknown;
+                            field: string;
+                            /** @description `<section>.<field>` */
+                            key: string;
+                            section: string;
+                            set_by_recipe: boolean;
+                            /** @enum {string} */
+                            verdict: "advanced" | "basic" | "derive" | "remove";
+                        }[];
                     };
                 };
             };
@@ -90946,6 +95939,474 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyDocumentsController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        health_certificate: {
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            required: boolean;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                        };
+                        outstanding: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.create_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.request_health_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.delete_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.health_file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: string | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description I have read and accept the text */
+                    agreed: boolean;
+                    drawn_signature?: {
+                        height: number;
+                        strokes: number[][][];
+                        width: number;
+                    };
+                    typed_name?: string;
+                    /**
+                     * Format: uuid
+                     * @description The version read
+                     */
+                    version_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Signature */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signature: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyFinanceController.entitlement": {
         parameters: {
             query?: never;
@@ -91493,9 +96954,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -91510,6 +96975,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91519,6 +96987,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -91750,6 +97219,125 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.buy_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    book_slot_id?: string;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                    start_now?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.package_terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        package: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        };
+                        start_now_text: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPaymentsController.methods": {
         parameters: {
             query?: never;
@@ -91901,9 +97489,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -91918,6 +97510,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91927,6 +97522,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -91966,9 +97562,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -91983,6 +97583,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91992,6 +97595,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -92024,9 +97628,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -92041,6 +97649,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92050,6 +97661,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -92057,6 +97669,33 @@ export interface operations {
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                        refunded_cents: number;
                     };
                 };
             };
@@ -93574,6 +99213,80 @@ export interface operations {
                             status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                             subtotal_cents?: number;
                             total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.pay_shop_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -108781,6 +114494,51 @@ export interface operations {
                         published_at?: string | null;
                         /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
                         time_zone?: string;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicBoxController.packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        online_payments: boolean;
+                        packages: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        }[];
+                        withdrawal_days: number | null;
                     };
                 };
             };

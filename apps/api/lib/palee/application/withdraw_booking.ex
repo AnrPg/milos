@@ -20,6 +20,7 @@ defmodule Palee.Application.WithdrawBooking do
 
       Palee.DomainEvents.publish(:booking_cancelled, %{
         organization_id: booking.organization_id,
+        scheduled_class_id: booking.scheduled_class_id,
         booking_id: booking.id,
         user_id: booking.user_id,
         kind: Map.get(booking, :kind, "member"),

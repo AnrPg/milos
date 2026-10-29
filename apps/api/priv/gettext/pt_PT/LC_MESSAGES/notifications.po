@@ -720,3 +720,29 @@ msgstr "Um membro da box vai sair"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} vai sair da box. Último dia: %{date}."
+
+msgid "Card payment failed"
+msgstr "O pagamento com cartão falhou"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "O pagamento de %{amount} por %{what} foi recusado. Vamos tentar novamente de forma automática, ou pode pagar agora com outro cartão."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "O pagamento de %{amount} por %{what} foi recusado e não será tentado de novo. Pague com outro cartão para o manter."
+
+msgid "A card payment needs attention"
+msgstr "Um pagamento com cartão precisa de atenção"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "O pagamento de %{amount} por %{what} falhou após todas as novas tentativas."
+msgid "A document to sign"
+msgstr "Um documento para assinar"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} pede-te que leias e assines «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "O teu atestado médico expira em breve"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Carrega um novo atestado médico antes de %{date}."

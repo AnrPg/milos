@@ -1,5 +1,7 @@
 package app.palee.member;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 
@@ -15,5 +17,21 @@ public class MainActivity extends BridgeActivity {
         // ADR-249: Tap to Pay through the Viva.com Terminal app.
         registerPlugin(PaleeVivaTerminalPlugin.class);
         super.onCreate(savedInstanceState);
+        createPushChannel();
+    }
+
+    // ADR-256: the channel FCM delivers push messages to (the manifest names it
+    // as the default), with a name in the phone's language instead of FCM's
+    // "Miscellaneous". Creating an existing channel again only renames it.
+    private void createPushChannel() {
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager == null) return;
+        NotificationChannel channel = new NotificationChannel(
+            getString(R.string.palee_push_channel_id),
+            getString(R.string.palee_push_channel_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        );
+        channel.setDescription(getString(R.string.palee_push_channel_description));
+        manager.createNotificationChannel(channel);
     }
 }

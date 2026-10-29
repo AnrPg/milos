@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADR-256: το κανάλι ειδοποιήσεων του Palee (φαίνεται στις ρυθμίσεις εφαρμογής του Android). -->
+<resources>
+    <string name="palee_push_channel_name">Ειδοποιήσεις Palee</string>
+    <string name="palee_push_channel_description">Κρατήσεις, μηνύματα και νέα από το box σου. Διάλεξε ποιες θέλεις στο Palee › Εγώ › Ρυθμίσεις.</string>
+</resources>

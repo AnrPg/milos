@@ -57,6 +57,10 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().reverse_credit_ledger_entry(membership_id, entry_id, params)
 
   @impl true
+  def reverse_credit_grant(membership_id, entry_id, params),
+    do: adapter().reverse_credit_grant(membership_id, entry_id, params)
+
+  @impl true
   def get_invoice(invoice_id), do: adapter().get_invoice(invoice_id)
   @impl true
   def update_invoice_params(invoice_id, params),
@@ -136,6 +140,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_expiring_memberships(days), do: adapter().list_expiring_memberships(days)
   @impl true
+  def package_holder_user_ids(package_id, date),
+    do: adapter().package_holder_user_ids(package_id, date)
+
+  @impl true
   def operational_queues(params), do: adapter().operational_queues(params)
   @impl true
   def financial_summary(params), do: adapter().financial_summary(params)
@@ -178,6 +186,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def extend_current_subscription(membership_id, days),
     do: adapter().extend_current_subscription(membership_id, days)
+
+  @impl true
+  def cancel_subscription(membership_id, subscription_id),
+    do: adapter().cancel_subscription(membership_id, subscription_id)
 
   @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)

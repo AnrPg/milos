@@ -24,6 +24,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     view_billing_contacts: :all,
     view_client_training: :all,
     view_health: :all,
+    # ADR-252: clients' health certificates (dates and files, GDPR art. 9).
+    manage_health_certificates: :all,
     view_feedback: :all,
     manage_packages: :all,
     view_package_catalog: :all,
@@ -162,7 +164,9 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
       :view_finance_reports,
       :manage_shop,
       # ADR-202: adding and archiving spaces and drawing floor plans.
-      :manage_spaces
+      :manage_spaces,
+      # ADR-252: the desk collecting clients' health certificates.
+      :manage_health_certificates
     ]
   }
 

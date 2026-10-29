@@ -720,3 +720,29 @@ msgstr "Een boxlid vertrekt"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} verlaat de box. Laatste dag: %{date}."
+
+msgid "Card payment failed"
+msgstr "Kaartbetaling mislukt"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "De betaling van %{amount} voor %{what} is geweigerd. We proberen het automatisch opnieuw, of je betaalt nu met een andere kaart."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "De betaling van %{amount} voor %{what} is geweigerd en wordt niet opnieuw geprobeerd. Betaal met een andere kaart om het te behouden."
+
+msgid "A card payment needs attention"
+msgstr "Een kaartbetaling vraagt aandacht"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "De betaling van %{amount} voor %{what} is na alle nieuwe pogingen mislukt."
+msgid "A document to sign"
+msgstr "Een document om te ondertekenen"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} vraagt je „%{title}” te lezen en te ondertekenen."
+
+msgid "Your health certificate expires soon"
+msgstr "Je medische verklaring verloopt binnenkort"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Upload vóór %{date} een nieuwe medische verklaring."

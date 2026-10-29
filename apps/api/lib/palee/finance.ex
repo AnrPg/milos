@@ -155,6 +155,15 @@ defmodule Palee.Finance do
   def reverse_credit_ledger_entry(context, membership_id, entry_id, params),
     do: scoped(context, fn -> reverse_credit_ledger_entry(membership_id, entry_id, params) end)
 
+  @doc """
+  ADR-254: takes back a manual credit grant (an import being undone) with a
+  negative reversal entry. Params: `amount_cents`, `request_id`, `reason`,
+  `created_by_id`.
+  """
+  def reverse_credit_grant(context, membership_id, entry_id, params),
+    do:
+      scoped(context, fn -> FinanceStore.reverse_credit_grant(membership_id, entry_id, params) end)
+
   defdelegate get_invoice(invoice_id), to: FinanceStore, as: :get_invoice
   def get_invoice(context, invoice_id), do: scoped(context, fn -> get_invoice(invoice_id) end)
 
@@ -286,6 +295,10 @@ defmodule Palee.Finance do
   def list_expiring_memberships(context, days),
     do: scoped(context, fn -> list_expiring_memberships(days) end)
 
+  @doc "ADR-252: people whose subscription to `package_id` covers `date` (bulk document requests)."
+  def package_holder_user_ids(context, package_id, %Date{} = date),
+    do: scoped(context, fn -> FinanceStore.package_holder_user_ids(package_id, date) end)
+
   defdelegate operational_queues(params \\ %{}), to: OperationalQueues, as: :call
 
   def operational_queues(context, params),
@@ -363,6 +376,14 @@ defmodule Palee.Finance do
 
   def extend_current_subscription(context, membership_id, days),
     do: scoped(context, fn -> FinanceStore.extend_current_subscription(membership_id, days) end)
+
+  @doc """
+  ADR-254: cancels one subscription of `membership_id` (undoing an import
+  that assigned it) and refreshes the member's entitlement.
+  """
+  def cancel_subscription(context, membership_id, subscription_id),
+    do:
+      scoped(context, fn -> FinanceStore.cancel_subscription(membership_id, subscription_id) end)
 
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
 

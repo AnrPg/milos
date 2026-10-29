@@ -28,9 +28,64 @@ defmodule PaleeWeb.Schemas.Payments do
         last_error: @text,
         checked_at: @time,
         updated_at: @time,
-        webhook_url: %Schema{type: :string}
+        webhook_url: %Schema{type: :string},
+        options: options()
       },
-      required: [:credentials_set, :environment, :id, :provider, :settings, :status, :webhook_url]
+      required: [
+        :credentials_set,
+        :environment,
+        :id,
+        :options,
+        :provider,
+        :settings,
+        :status,
+        :webhook_url
+      ]
+    }
+  end
+
+  @doc "ADR-260: what members pay online and who hears about failed charges."
+  def options do
+    flag = %Schema{type: :boolean}
+
+    purposes = %Schema{
+      type: :object,
+      properties: %{
+        packages: flag,
+        autopay: flag,
+        drop_in: flag,
+        shop: flag,
+        personal_training: flag
+      },
+      required: [:autopay, :drop_in, :packages, :personal_training, :shop]
+    }
+
+    %Schema{
+      type: :object,
+      properties: %{purposes: purposes, notify_member: flag, notify_staff: flag},
+      required: [:notify_member, :notify_staff, :purposes]
+    }
+  end
+
+  def options_body do
+    flag = %Schema{type: :boolean}
+
+    %Schema{
+      type: :object,
+      properties: %{
+        purposes: %Schema{
+          type: :object,
+          properties: %{
+            packages: flag,
+            autopay: flag,
+            drop_in: flag,
+            shop: flag,
+            personal_training: flag
+          }
+        },
+        notify_member: flag,
+        notify_staff: flag
+      }
     }
   end
 
@@ -104,11 +159,16 @@ defmodule PaleeWeb.Schemas.Payments do
         succeeded_at: @time,
         next_attempt_at: @time,
         inserted_at: @time,
-        metadata: %Schema{type: :object, additionalProperties: true}
+        metadata: %Schema{type: :object, additionalProperties: true},
+        attention_resolved_at: @time,
+        attention_resolution: @text,
+        declines: @int,
+        retries: @int
       },
       required: [
         :amount_cents,
         :currency,
+        :declines,
         :description,
         :environment,
         :fulfilment_status,
@@ -118,6 +178,7 @@ defmodule PaleeWeb.Schemas.Payments do
         :purpose_id,
         :purpose_type,
         :refunded_cents,
+        :retries,
         :status
       ]
     }

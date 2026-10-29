@@ -10,7 +10,9 @@ import { useEffect, useRef } from "react";
 import { markNotificationClicked } from "@/api/notifications";
 import { useSession } from "@/components/session-provider";
 import { isNative, nativePlatform } from "@/lib/platform";
-import { inAppPath, notificationPath } from "@/lib/platform/app-links";
+import { notificationPath } from "@/lib/platform/app-links";
+import { finishCheckout } from "@/lib/platform/checkout";
+import { routeDeepLink } from "@/lib/platform/deep-links";
 import { nativePushSupported } from "@/lib/platform/native-push";
 
 type Removable = { remove: () => Promise<void> };
@@ -41,8 +43,11 @@ export function NativeAppBridge() {
 
       keep(
         await App.addListener("appUrlOpen", ({ url }) => {
-          const path = inAppPath(url, window.location.origin);
-          if (path) router.push(path);
+          const link = routeDeepLink(url, window.location.origin);
+          if (!link) return;
+          // ADR-256: back from the provider's checkout page in the in-app browser.
+          if (link.kind === "payment_return") void finishCheckout();
+          router.push(link.path);
         }),
       );
 

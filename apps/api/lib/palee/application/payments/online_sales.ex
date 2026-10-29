@@ -18,7 +18,7 @@ defmodule Palee.Application.Payments.OnlineSales do
 
   alias Palee.Application.{PublicBox, PublicURL, SubmitBooking}
   alias Palee.Application.Shop.Checkout
-  alias Palee.{Finance, Fiscal, Organizations, Payments, Shop}
+  alias Palee.{Finance, Fiscal, Identity, Organizations, Payments, Shop}
   alias Palee.Payments.Domain.{Consent, Withdrawal}
 
   # ── Packages ────────────────────────────────────────────────────────────
@@ -29,7 +29,7 @@ defmodule Palee.Application.Payments.OnlineSales do
       {:ok,
        %{
          packages: context |> sold_online() |> Enum.map(&public_package/1),
-         online_payments: Payments.available?(context),
+         online_payments: Payments.available?(context, "packages"),
          withdrawal_days: if(withdrawal_applies?(context), do: Withdrawal.days())
        }}
     end
@@ -39,7 +39,22 @@ defmodule Palee.Application.Payments.OnlineSales do
     context
     |> Finance.list_packages()
     |> Enum.filter(&(&1.active and &1[:sold_online] == true and &1.base_price_cents > 0))
+    |> reject_switched_off(context)
   end
+
+  # ADR-260: a purpose the business switched off is not offered online.
+  # Without a connected provider the page still lists the packages, with
+  # `online_payments: false`.
+  defp reject_switched_off(packages, context) do
+    if Payments.available?(context),
+      do: Enum.filter(packages, &Payments.available?(context, online_purpose(&1))),
+      else: packages
+  end
+
+  # ADR-260: which «what is paid online» switch covers a package.
+  defp online_purpose(%{package_type: "pt_pack"}), do: "personal_training"
+  defp online_purpose(%{package_type: type}) when type in ["drop_in", "trial"], do: "drop_in"
+  defp online_purpose(_package), do: "packages"
 
   defp public_package(package) do
     Map.take(package, [
@@ -62,7 +77,7 @@ defmodule Palee.Application.Payments.OnlineSales do
       {:ok,
        %{
          package: public_package(package),
-         available: Payments.available?(context),
+         available: Payments.available?(context, online_purpose(package)),
          withdrawal_days: if(applies, do: Withdrawal.days()),
          start_now_text: if(applies, do: Withdrawal.text(language)),
          consent_text: Consent.text(language, card_terms(context, package, language)),
@@ -82,6 +97,9 @@ defmodule Palee.Application.Payments.OnlineSales do
     now = DateTime.utc_now()
 
     with {:ok, package} <- package_for_sale(context, package_id),
+         true <-
+           Payments.available?(context, online_purpose(package)) ||
+             {:error, :online_payments_unavailable},
          {:ok, withdrawal} <-
            Withdrawal.record(
              withdrawal_applies?(context),
@@ -122,14 +140,20 @@ defmodule Palee.Application.Payments.OnlineSales do
   end
 
   defp package_for_sale(context, package_id) do
-    case Finance.get_package(context, package_id) do
-      {:ok, %{active: true, sold_online: true} = package} when package.base_price_cents > 0 ->
-        {:ok, package}
+    case Ecto.UUID.cast(package_id) do
+      {:ok, id} ->
+        case Finance.get_package(context, id) do
+          %{active: true, sold_online: true} = package when package.base_price_cents > 0 ->
+            {:ok, package}
 
-      {:ok, _package} ->
-        {:error, :package_not_for_sale}
+          %{} ->
+            {:error, :package_not_for_sale}
 
-      _missing ->
+          nil ->
+            {:error, :not_found}
+        end
+
+      :error ->
         {:error, :not_found}
     end
   end
@@ -194,13 +218,19 @@ defmodule Palee.Application.Payments.OnlineSales do
        when is_binary(slot_id) do
     member = context |> Map.put(:user_id, intent.user_id)
 
-    case SubmitBooking.call(member, %{id: intent.user_id}, slot_id) do
-      {:ok, _booking} ->
-        :ok
-
+    with %{} = actor <- Identity.find_by_id(intent.user_id) || {:error, :not_found},
+         {:ok, _booking} <- SubmitBooking.call(member, actor, slot_id) do
+      :ok
+    else
       {:error, reason} ->
         Logger.info("booking after package purchase #{intent.id} refused: #{inspect(reason)}")
     end
+  rescue
+    # The money and the package are recorded; a booking failure never undoes them.
+    error ->
+      Logger.error(
+        "booking after package purchase #{intent.id} failed: #{Exception.message(error)}"
+      )
   end
 
   defp book_after_purchase(_context, _intent), do: :ok
@@ -282,13 +312,14 @@ defmodule Palee.Application.Payments.OnlineSales do
   def fulfil_shop_order(context, intent) do
     member = Map.put(context, :user_id, intent.user_id)
 
-    with {:ok, order} <-
+    # The order's Finance payment is recorded by the shop (ADR-190 lineage).
+    with {:ok, _order} <-
            Checkout.settle_online(member, intent.purpose_id, %{
              provider: intent.provider,
              reference: intent.provider_transaction_id,
              idempotency_key: "capture:" <> intent.purpose_id
            }) do
-      {:ok, %{finance_payment_id: order[:finance_payment_id]}}
+      {:ok, %{}}
     end
   end
 

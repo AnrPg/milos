@@ -73,6 +73,8 @@ defmodule Palee.Application.LogTrainingEntry do
              job_builder: job_builder()
            ),
          :ok <- process_inline_if_needed(entry, outcome) do
+      if outcome == :created, do: CompleteWorkout.publish_result(entry, entry.performed_at_utc)
+
       TrackAnalyticsEvent.call("training_log_entry_logged", context, entry, %{
         metadata:
           %{section_score_count: length(entry.section_scores || [])}

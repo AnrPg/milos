@@ -150,6 +150,27 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "widget")
   end
 
+  # ADR-253: box screens. Pairing has no sign-in, so a tight budget per
+  # address bounds guessing codes; a paired screen polls with its own token.
+  pipeline :box_screen_pairing do
+    plug(PaleeWeb.Plugs.RateLimit, max: 10, interval: 60_000, bucket: "box-screen-pair")
+  end
+
+  pipeline :box_screen do
+    plug(PaleeWeb.Plugs.AuthenticateBoxScreen)
+    plug(PaleeWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "box-screen")
+  end
+
+  # Staff create screens and pairing codes (each POST makes a code).
+  pipeline :box_screen_code_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit,
+      max: 30,
+      interval: 3_600_000,
+      bucket: "box-screen-codes",
+      methods: ["POST"]
+    )
+  end
+
   # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
   pipeline :check_in_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
@@ -511,6 +532,28 @@ defmodule PaleeWeb.Router do
     post("/packages/:id/buy", MyPaymentsController, :buy_package)
     post("/payments/:id/withdraw", MyPaymentsController, :withdraw)
     post("/shop/orders/:id/pay-online", MyPaymentsController, :pay_shop_order)
+    # ADR-252: Box › Documents (sign, certificates, health certificate).
+    get("/documents", MyDocumentsController, :index)
+    get("/documents/signatures", MyDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", MyDocumentsController, :evidence)
+
+    post(
+      "/documents/health-certificate/uploads",
+      MyDocumentsController,
+      :request_health_upload
+    )
+
+    post("/documents/health-certificate", MyDocumentsController, :create_health_certificate)
+    get("/documents/health-certificate/:id/file", MyDocumentsController, :health_file)
+
+    delete(
+      "/documents/health-certificate/:id",
+      MyDocumentsController,
+      :delete_health_certificate
+    )
+
+    get("/documents/:id", MyDocumentsController, :show)
+    post("/documents/:id/sign", MyDocumentsController, :sign)
     # ADR-220: the member's renewal choice and leaving the box.
     put(
       "/membership/subscriptions/:id/auto-renew",
@@ -911,6 +954,26 @@ defmodule PaleeWeb.Router do
     post("/appointments/:id/cancel", AppointmentsController, :cancel)
   end
 
+  # ADR-253: box screens, their pairing codes and overrides.
+  scope "/api/org/:organization_slug/admin", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited,
+      :box_screen_code_rate_limited
+    ])
+
+    get("/box-screens", AdminBoxScreenController, :index)
+    post("/box-screens", AdminBoxScreenController, :create)
+    patch("/box-screens/:id", AdminBoxScreenController, :update)
+    delete("/box-screens/:id", AdminBoxScreenController, :delete)
+    post("/box-screens/:id/pairing-code", AdminBoxScreenController, :pairing_code)
+    put("/box-screens/:id/override", AdminBoxScreenController, :put_override)
+    delete("/box-screens/:id/override", AdminBoxScreenController, :delete_override)
+  end
+
   scope "/api/org/:organization_slug/admin", PaleeWeb do
     pipe_through([
       :api,
@@ -1035,6 +1098,11 @@ defmodule PaleeWeb.Router do
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     put("/settings/time-zone", AdminSettingsController, :update_time_zone)
+    # ADR-255: the settings catalog («Προχωρημένα») and the setup recipes.
+    get("/setup/settings", AdminSetupController, :settings)
+    get("/setup/recipes", AdminSetupController, :recipes)
+    post("/setup/recipes/:key/preview", AdminSetupController, :preview)
+    post("/setup/recipes/:key/apply", AdminSetupController, :apply_recipe)
     # ADR-174: the gym's AI settings (own key, scaling switch, usage).
     get("/ai-settings", AdminAiSettingsController, :show)
     put("/ai-settings", AdminAiSettingsController, :update)
@@ -1212,10 +1280,61 @@ defmodule PaleeWeb.Router do
     # ADR-246/247: online payments through the business's provider account.
     get("/payments/account", AdminPaymentsController, :account)
     put("/payments/account", AdminPaymentsController, :save_account)
+    put("/payments/account/options", AdminPaymentsController, :save_options)
+    get("/payments/attention", AdminPaymentsController, :attention)
     get("/payments", AdminPaymentsController, :index)
     get("/payments/:id", AdminPaymentsController, :show)
     post("/payments/:id/refunds", AdminPaymentsController, :refund)
     post("/payments/:id/retry", AdminPaymentsController, :retry)
+    post("/payments/:id/retry-charge", AdminPaymentsController, :retry_charge)
+    post("/payments/:id/dismiss", AdminPaymentsController, :dismiss_charge)
+    post("/payments/:id/card-link", AdminPaymentsController, :card_link)
+    # ADR-252: documents, signatures and health certificates.
+    get("/documents/templates", AdminDocumentsController, :index)
+    post("/documents/templates", AdminDocumentsController, :create)
+    get("/documents/starters", AdminDocumentsController, :starters)
+    get("/documents/templates/:id", AdminDocumentsController, :show)
+    get("/documents/templates/:id/versions/:version_id", AdminDocumentsController, :version)
+    post("/documents/templates/:id/versions", AdminDocumentsController, :publish)
+    put("/documents/templates/:id/requirement", AdminDocumentsController, :set_requirement)
+    post("/documents/templates/:id/archive", AdminDocumentsController, :archive)
+    post("/documents/templates/:id/requests", AdminDocumentsController, :request)
+    get("/documents/requests", AdminDocumentsController, :requests)
+    post("/documents/requests/:id/cancel", AdminDocumentsController, :cancel_request)
+    get("/documents/signatures", AdminDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", AdminDocumentsController, :evidence)
+    get("/documents/members/:user_id", AdminDocumentsController, :member)
+    get("/documents/settings", AdminDocumentsController, :settings)
+    put("/documents/settings", AdminDocumentsController, :save_settings)
+    get("/documents/audit", AdminDocumentsController, :audit)
+    get("/documents/health-certificates", AdminHealthCertificatesController, :index)
+
+    get(
+      "/documents/health-certificates/members/:user_id",
+      AdminHealthCertificatesController,
+      :client
+    )
+
+    post(
+      "/documents/health-certificates/uploads",
+      AdminHealthCertificatesController,
+      :request_upload
+    )
+
+    post("/documents/health-certificates", AdminHealthCertificatesController, :create)
+    get("/documents/health-certificates/:id/file", AdminHealthCertificatesController, :file)
+    delete("/documents/health-certificates/:id", AdminHealthCertificatesController, :delete)
+    # ADR-254: CSV imports.
+    get("/imports/catalog", AdminImportController, :catalog)
+    get("/imports", AdminImportController, :index)
+    post("/imports", AdminImportController, :create)
+    get("/imports/:id", AdminImportController, :show)
+    get("/imports/:id/rows", AdminImportController, :rows)
+    post("/imports/:id/preview", AdminImportController, :preview)
+    post("/imports/:id/apply", AdminImportController, :apply)
+    post("/imports/:id/invitations", AdminImportController, :invitations)
+    post("/imports/:id/undo", AdminImportController, :undo)
+    delete("/imports/:id", AdminImportController, :delete)
 
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
@@ -1923,6 +2042,21 @@ defmodule PaleeWeb.Router do
     get("/me/check-in/geofences", ScanCheckInController, :geofences)
     get("/me/connected-devices", WalletController, :devices)
     delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  # ADR-253: the box screen (a TV): pairing, then its display token only.
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen_pairing])
+
+    post("/pair", BoxScreenController, :pair)
+  end
+
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen])
+
+    get("/today", BoxScreenController, :today)
+    post("/token", BoxScreenController, :token)
+    get("/classes/:slot_id/timer", BoxScreenController, :class_timer)
   end
 
   scope "/api/widget", PaleeWeb do

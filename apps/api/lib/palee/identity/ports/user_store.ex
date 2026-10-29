@@ -9,6 +9,11 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback create_demo_person(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
   @callback demo_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
+  @doc "ADR-254: a profile an import of `organization_id` holds until it is claimed."
+  @callback create_held_person(Ecto.UUID.t(), map()) ::
+              {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  @doc "ADR-254: the profiles of each login email, `%{email => [%{id, held_by_organization_id}]}`."
+  @callback profiles_by_emails([String.t()]) :: %{String.t() => [map()]}
   @callback visible_user_ids([Ecto.UUID.t()], Ecto.UUID.t() | nil) :: [Ecto.UUID.t()]
   @callback add_profile(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :not_found | :profile_limit | Ecto.Changeset.t()}
