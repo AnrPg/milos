@@ -153,8 +153,13 @@ export function human(secs: number): PlanText {
 
 const CLOCK_MSS = /^(\d+):([0-5]\d)$/;
 
-/** One duration in normalised text, with how a bare number was read. */
+/** One duration in normalised text, with how a bare number was read (at most `MAX_NUMBER` seconds). */
 function readClock(v: string, dflt: "min" | "smart"): { secs: number; assumed: "min" | "sec" | null } | "bad" {
+  const r = readClockRaw(v, dflt);
+  return r !== "bad" && r.secs > MAX_NUMBER ? "bad" : r;
+}
+
+function readClockRaw(v: string, dflt: "min" | "smart"): { secs: number; assumed: "min" | "sec" | null } | "bad" {
   let m = CLOCK_MSS.exec(v);
   if (m) return { secs: +m[1] * 60 + +m[2], assumed: null };
   m = new RegExp(`^(\\d+)\\s*(?:${MIN_RE})\\s*(\\d+)\\s*(?:${SEC_RE})?$`).exec(v);
@@ -225,12 +230,17 @@ export function parseTimes(text: string, dflt: "min" | "smart" = "min"): ParsedT
 export const showTimes = (p: ParsedTimes | null | "bad"): string =>
   !p || p === "bad" ? "" : p.range ? `${clock(p.secs[0])}–${clock(p.secs[1])}` : p.secs.map(clock).join(" · ");
 
+/** Largest number any value may hold (reps, metres, seconds, kg); above it the text does not read. */
+export const MAX_NUMBER = 1_000_000_000;
+/** Largest count (rounds, times, sets, structure counts), so clocks and tables stay finite. */
+export const MAX_COUNT = 999;
+
 /**
- * A whole positive count ("8"), or null. Spaces are ignored.
+ * A whole positive count ("8") up to `MAX_COUNT`, or null. Spaces are ignored.
  */
 export function parseCount(text: unknown): number | null {
   const v = normText(text);
-  return /^\d+$/.test(v) && +v > 0 ? +v : null;
+  return /^\d+$/.test(v) && +v > 0 && +v <= MAX_COUNT ? +v : null;
 }
 
 /**
@@ -242,7 +252,7 @@ export function parseCountRange(text: unknown): { min: number; max: number } | n
   if (!m) return null;
   const min = +m[1];
   const max = +(m[2] || m[1]);
-  return min > 0 && max >= min ? { min, max } : null;
+  return min > 0 && max >= min && max <= MAX_COUNT ? { min, max } : null;
 }
 
 // ── number lists ───────────────────────────────────────────────────────────
@@ -282,7 +292,7 @@ export function parseNums(text: string): ParsedNums | "bad" {
   if (words) {
     const a = toNum(words[1]);
     const b = toNum(words[2]);
-    return a <= b && !cont ? { entries: [{ min: a, max: b }], cont: false } : "bad";
+    return a <= b && b <= MAX_NUMBER && !cont ? { entries: [{ min: a, max: b }], cont: false } : "bad";
   }
   if (v.includes(",")) {
     const one = new RegExp(`^${NUM}(?:\\s*(?:-|${RANGE_WORDS})\\s*${NUM})?$`);
@@ -290,7 +300,7 @@ export function parseNums(text: string): ParsedNums | "bad" {
       const r = one.exec(p);
       return r ? { min: toNum(r[1]), max: toNum(r[2] || r[1]) } : null;
     });
-    if (sets.some((e) => !e || e.max < e.min) || (cont && sets.length < 2)) return "bad";
+    if (sets.some((e) => !e || e.max < e.min || e.max > MAX_NUMBER) || (cont && sets.length < 2)) return "bad";
     return { entries: sets as NumEntry[], cont };
   }
   const parts = v.split(/\s*-\s*/);
@@ -298,6 +308,7 @@ export function parseNums(text: string): ParsedNums | "bad" {
   if (!parts.every((p) => whole.test(p))) return "bad";
   const nums = parts.map(toNum);
   if (cont && nums.length < 2) return "bad";
+  if (nums.some((n) => n > MAX_NUMBER)) return "bad";
   if (nums.length === 2 && nums[0] < nums[1] && !cont) return { entries: [{ min: nums[0], max: nums[1] }], cont, ambiguous: "list" };
   const out: ParsedNums = { entries: nums.map((n) => ({ min: n, max: n })), cont };
   if (!cont && nums.length >= 3) {
@@ -400,7 +411,7 @@ export function parseDose(text: string): ParsedDose | null | "bad" {
   if (sx) {
     out.sets = { min: +sx[1], max: +(sx[2] || sx[1]) };
     v = sx[3].trim();
-    if (!out.sets.min || out.sets.max < out.sets.min) return "bad";
+    if (!out.sets.min || out.sets.max < out.sets.min || out.sets.max > MAX_COUNT) return "bad";
     if (!v) return out;
   }
   const mx = new RegExp(`^(?:(\\S+)\\s+)?(?:max|amrap|μεγιστ\\S*)(?:\\s*(${alt(Object.keys(MAX_UNIT))}))?(?:\\s+(?:in|σε)\\s+(\\S+))?$`).exec(v);
@@ -430,7 +441,7 @@ export function parseDose(text: string): ParsedDose | null | "bad" {
   if (p === "bad") return "bad";
   out.entries = p.entries.map((e) => ({ min: e.min * scale, max: e.max * scale }));
   out.cont = p.cont;
-  if (out.entries.some((e) => e.min <= 0)) return "bad";
+  if (out.entries.some((e) => e.min <= 0 || e.max > MAX_NUMBER)) return "bad";
   if (out.sets && (out.entries.length > 1 || out.cont)) return "bad";
   // with sets written ("4x8-10") a dash can only be a range
   const amb = out.sets ? undefined : ambiguityOf({ ...p, entries: out.entries }, out.unit);
@@ -540,7 +551,8 @@ export function showDose(d: ParsedDose): string {
     return `${sets}${d.max.within ? `${d.max.within}s ` : ""}max${unit}${side}`;
   }
   if (!d.entries) return `${sets}${side}`;
-  const one = (e: NumEntry) => (e.min === e.max ? numStr(e.min) : `${numStr(e.min)}-${numStr(e.max)}`);
+  // full precision: the canonical text must read back exactly
+  const one = (e: NumEntry) => (e.min === e.max ? String(e.min) : `${e.min}-${e.max}`);
   const es = d.entries;
   // "-" joins a list, except when it would read as a range: ranges inside, or two rising values
   const dash = es.length > 1 && es.every((e) => e.min === e.max) && !(es.length === 2 && es[0].min < es[1].min);
@@ -724,6 +736,13 @@ const LU = `\\s*(${LOAD_UNIT_RE})?`;
 const unitOfLoad = (u: string | undefined): LoadUnit | null => (!u ? null : u === "%" ? "%" : "kg");
 
 function readLoadCell(raw: string): LoadToken {
+  const tok = readLoadCellRaw(raw);
+  // numbers past MAX_NUMBER do not read: they are the coach's words
+  const nums = "n" in tok ? [tok.n] : "a" in tok ? [tok.a, tok.b] : [];
+  return nums.some((n) => Math.abs(n) > MAX_NUMBER) ? { t: "words", text: raw.trim() } : tok;
+}
+
+function readLoadCellRaw(raw: string): LoadToken {
   const v = normLoadText(raw);
   if (!v) return { t: "empty" };
   let m = new RegExp(`^([+-])${LN}${LU}$`).exec(v);
@@ -773,13 +792,10 @@ export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
   let rising = false;
   tokens.forEach((tok, i) => {
     errors.push(null);
+    // a refused column is skipped: the columns after it continue from the last good one
     const fail = (code: PlanErrorCode) => {
       errors[i] = code;
       values.push("");
-      prev = null;
-      delta = null;
-      spread = null;
-      rising = false;
     };
     if (tok.t !== "empty") rising = false;
     switch (tok.t) {
