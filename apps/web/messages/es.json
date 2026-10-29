@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Recompensas por recomendación",
     "financeOperationsIntroduction1d3b6fc": "introducción a las operaciones financieras",
     "financeOperations60f9e5a": "Operaciones financieras",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gestiona socios, paquetes de suscripción, promociones, recomendaciones y colas operativas.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gestiona socios, paquetes de suscripción, promociones, recomendaciones y pendientes.",
     "financeAnalytics271fe3b": "Analítica financiera →",
     "urgentFinanceAttention8b067dd": "Atención financiera urgente",
     "noUrgentFinanceItemsb14485e": "No hay elementos financieros urgentes.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Nombre de la campaña",
     "startsOn6d888f7": "Empieza el",
     "endsOn5c262f3": "Termina el",
-    "loadingQueuea1e2a39": "Cargando cola…",
-    "noItemsInThisQueuec992fc9": "No hay elementos en esta cola.",
+    "loadingQueuea1e2a39": "Cargando pendientes…",
+    "noItemsInThisQueuec992fc9": "No hay nada pendiente aquí.",
     "noReferralProgramsYet8445c6c": "Aún no hay programas de recomendaciones.",
     "noReferralEventsYeta4b3417": "Aún no hay eventos de recomendación.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Aún no hay recompensas. Aprueba un evento de recomendación para emitir recompensas.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Precio base en EUR",
     "activePackagebd72220": "Paquete de suscripción activo",
     "membershipRevenueCockpit0b90204": "Panel de ingresos por membresías",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gestiona paquetes de suscripción, perfiles financieros de socios, pagos manuales, promociones, recompensas por recomendación y colas operativas desde un solo panel.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gestiona paquetes de suscripción, perfiles financieros de socios, pagos manuales, promociones, recompensas por recomendación y pendientes desde un solo panel.",
     "createMembershipPackage3b5ed69": "Crear paquete de suscripción",
     "priceInEur0e33182": "Precio en euros",
     "tagsCommaSeparated7bfd75e": "Etiquetas, separadas por comas",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Canjes máximos",
     "codeActivee55ce6f": "Código activo",
     "createCodecdeaf88": "Crear código",
-    "operationalQueuesc2120a9": "Colas operativas",
+    "operationalQueuesc2120a9": "Pendientes",
     "pendingReferralRewards110afb2": "Recompensas por recomendación pendientes",
     "referralLifecycleManagementd2d3c90": "Gestión del ciclo de las recomendaciones",
     "createReferralProgram80d2646": "Crear programa de recomendaciones",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Último",
     "packages0a99901": "Paquetes de suscripción",
     "promotions086e09b": "Promociones",
-    "queues83dbc32": "Colas",
+    "queues83dbc32": "Pendientes",
     "trial5f7537c": "Periodo de prueba",
     "comped1945ffe": "Cortesía",
     "all6a72085": "Todos",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "No se encontraron registros activos.",
     "featureFinanceCleanupUnknown": "desconocido",
     "featureFinanceCleanupNoSelection": "Ningún registro seleccionado",
-    "featureFinanceCleanupImpact": "Al eliminarlo, el registro deja de aparecer en saldos, colas de vencidos, ingresos y listas del perfil.",
+    "featureFinanceCleanupImpact": "Al eliminarlo, el registro deja de aparecer en saldos, pagos vencidos, ingresos y listas del perfil.",
     "featureFinanceCleanupReason": "Motivo",
     "featureFinanceCleanupPassword": "Contraseña de administrador",
     "featureFinanceCleanupSuccess": "Se ha eliminado el registro.",
@@ -12127,7 +12127,7 @@
     "graceHint": "Las reservas siguen funcionando estos días después del primer fallo",
     "graceDays": "{count, plural, =0 {Ninguno} one {# día} other {# días}}",
     "notifyStaff": "Avisar al equipo",
-    "notifyStaffHint": "En Finanzas › Colas, tras el último fallo",
+    "notifyStaffHint": "En Finanzas › Pendientes, tras el último fallo",
     "disconnectTitle": "Desconectar de {provider}",
     "disconnectHint": "Las tarjetas guardadas dejan de cobrarse",
     "disconnect": "Desconectar",
@@ -12250,7 +12250,8 @@
       "branchCode": "Cámbialo solo si tienes una sucursal registrada en la AADE.",
       "optional": "Opcional.",
       "iban": "Opcional. Se imprime en las facturas que se pagan por transferencia.",
-      "qrIban": "Opcional. Para facturas QR con referencia QR."
+      "qrIban": "Opcional. Para facturas QR con referencia QR.",
+      "checkDigitsOk": "Dígitos de control: correctos."
     },
     "reason": {
       "blank": "Completa este campo.",
@@ -12289,6 +12290,21 @@
       "sandbox": "entorno de pruebas",
       "test": "prueba",
       "production": "producción"
+    },
+    "registry": {
+      "lookup": "Rellenar desde el número fiscal (ΑΦΜ)",
+      "looking": "Consultando a la AADE…",
+      "orByHand": "O rellena los campos tú mismo.",
+      "found": "Encontrados en el registro de la AADE. Revísalos.",
+      "foundLater": "La AADE también dio la dirección y el código de actividad (ΚΑΔ): los encontrarás rellenados en los siguientes pasos.",
+      "error": {
+        "invalid_tax_id": "Este número fiscal no es correcto. Revisa los dígitos.",
+        "registry_not_connected": "Faltan las credenciales del registro de la AADE. Rellena los campos tú mismo.",
+        "registry_credentials_rejected": "La AADE no aceptó las credenciales. Rellena los campos tú mismo.",
+        "registry_not_found": "La AADE no encontró este número fiscal.",
+        "registry_limit_reached": "Demasiadas consultas. Inténtalo de nuevo en un rato.",
+        "registry_unavailable": "La AADE no responde ahora. Inténtalo más tarde o rellena los campos tú mismo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "categoría=valor, uno por línea",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Enviar por email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Devolución de producto",
+      "billing_error": "Error de cobro",
+      "subscription_cancelled": "Suscripción cancelada",
+      "other": "Otro"
+    },
+    "pickReason": "Elige un motivo.",
+    "refundToCard": "Devolver el dinero a la tarjeta {card}",
+    "refundToCardHint": "A través de {provider}, junto con la nota de crédito. Desactívalo si devolviste el dinero de otra forma.",
+    "refundingToCard": "El dinero vuelve a la tarjeta {card} (2–5 días hábiles).",
+    "noRefund": "Sin devolución de dinero.",
+    "emailTitle": "Enviar {number} por email",
+    "emailTo": "Email del destinatario",
+    "emailHint": "Enviamos el PDF en el idioma del documento.",
+    "emailSend": "Enviar",
+    "emailSending": "Enviando…",
+    "emailSent": "Enviado a {to}.",
+    "emailError": {
+      "invalid_address": "Este email no parece correcto. Revísalo.",
+      "no_recipient": "Escribe el email al que enviarlo.",
+      "throttled": "Se acaba de enviar a este email. Inténtalo más tarde.",
+      "suppressed": "Este email no acepta nuestros mensajes. Prueba con otro.",
+      "business_not_activated": "Los emails a clientes empiezan en cuanto se active tu box."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Ajustes",

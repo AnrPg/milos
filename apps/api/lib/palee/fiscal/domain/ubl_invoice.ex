@@ -46,6 +46,45 @@ defmodule Palee.Fiscal.Domain.UblInvoice do
     "en" => "Payable on receipt"
   }
 
+  # ADR-265: a credit note's reason travels as the document note (BT-22,
+  # one `cbc:Note`, PEPPOL-EN16931-R002); UBL's DiscrepancyResponse is not
+  # part of Peppol BIS Billing 3.
+  @credit_reasons %{
+    "en" => %{
+      "product_return" => "Credit note: product returned",
+      "billing_error" => "Credit note: billing error",
+      "subscription_cancelled" => "Credit note: subscription cancelled",
+      "other" => "Credit note"
+    },
+    "fr" => %{
+      "product_return" => "Avoir : retour de produit",
+      "billing_error" => "Avoir : erreur de facturation",
+      "subscription_cancelled" => "Avoir : résiliation de l'abonnement",
+      "other" => "Avoir"
+    },
+    "nl" => %{
+      "product_return" => "Creditnota: product geretourneerd",
+      "billing_error" => "Creditnota: factuurfout",
+      "subscription_cancelled" => "Creditnota: abonnement opgezegd",
+      "other" => "Creditnota"
+    },
+    "de" => %{
+      "product_return" => "Gutschrift: Warenrückgabe",
+      "billing_error" => "Gutschrift: fehlerhafte Abrechnung",
+      "subscription_cancelled" => "Gutschrift: Kündigung des Abonnements",
+      "other" => "Gutschrift"
+    }
+  }
+
+  @doc "The document note (BT-22) of a credit note's reason, or nil."
+  def credit_note_text(%{kind: "credit_note", credit_reason: reason} = document)
+      when is_binary(reason) do
+    texts = Map.get(@credit_reasons, document.language, @credit_reasons["en"])
+    Map.get(texts, reason, texts["other"])
+  end
+
+  def credit_note_text(_document), do: nil
+
   def customization_id, do: @customization
   def profile_id, do: @profile
 
@@ -86,7 +125,10 @@ defmodule Palee.Fiscal.Domain.UblInvoice do
           ) ++
           [
             {if(credit?, do: "cbc:CreditNoteTypeCode", else: "cbc:InvoiceTypeCode"),
-             if(credit?, do: "381", else: "380")},
+             if(credit?, do: "381", else: "380")}
+          ] ++
+          document_note(document) ++
+          [
             {"cbc:DocumentCurrencyCode", currency},
             {"cbc:BuyerReference", buyer_reference(document)}
           ] ++
@@ -148,6 +190,13 @@ defmodule Palee.Fiscal.Domain.UblInvoice do
     case document.buyer do
       %{reference: reference} when is_binary(reference) and reference != "" -> reference
       _buyer -> document.number
+    end
+  end
+
+  defp document_note(document) do
+    case credit_note_text(document) do
+      nil -> []
+      text -> [{"cbc:Note", text}]
     end
   end
 

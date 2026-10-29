@@ -9,6 +9,7 @@ import type {
   WorkoutVariationRecord,
 } from "@/api/workouts";
 import { PRINT_TOKENS, rgbChannels, type ThemeTokens } from "@/lib/theme";
+import { formatClock } from "@/lib/clock";
 
 /** A print colour (PRINT_TOKENS) as jsPDF RGB channels. */
 const ink = (token: keyof ThemeTokens) => rgbChannels(PRINT_TOKENS[token]);
@@ -491,7 +492,7 @@ export function buildExecutionDocument(
     category: labels.workoutHistory,
     title: execution.workout_title ?? labels.workout,
     metadata: [
-      { label: labels.date, value: new Date(completedDate).toLocaleString(locale) },
+      { label: labels.date, value: formatClock(new Date(completedDate), locale, { dateStyle: "medium", timeStyle: "short" }) },
       { label: labels.type, value: displayValue(execution.workout_type ?? labels.session) },
       { label: labels.scale, value: displayValue(execution.scale_level_slug ?? labels.baseOnly) },
       { label: labels.source, value: displayValue(execution.source) },

@@ -1,10 +1,11 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import type { JournalComment } from "@/api/journal-comments";
 import { SemanticLabel } from "@/components/semantic-label";
 import { changeSummary } from "@/lib/journal-comments";
+import { withClock } from "@/lib/clock";
 
 /**
  * One list of Σχόλια (ADR-140 §1), oldest first, the same wherever the entry
@@ -29,6 +30,7 @@ export function CommentList({
 }) {
   const t = useTranslations("MemberApp.comments");
   const format = useFormatter();
+  const locale = useLocale();
 
   if (comments.length === 0) {
     return emptyText ? (
@@ -65,7 +67,7 @@ export function CommentList({
               <span className="shrink-0 text-xs" style={{ color: "var(--dim)" }}>
                 {pendingIds.includes(comment.id)
                   ? t("pending")
-                  : format.dateTime(new Date(comment.written_at), { dateStyle: "short", timeStyle: "short" })}
+                  : format.dateTime(new Date(comment.written_at), withClock(locale, { dateStyle: "short", timeStyle: "short" }))}
               </span>
             </div>
             {comment.change ? (

@@ -191,6 +191,12 @@ defmodule PaleeWeb.Schemas.Fiscal do
         gross_cents: %Schema{type: :integer},
         tax_breakdown: %Schema{type: :array, items: tax_group()},
         corrects_document_id: %Schema{@uuid | nullable: true},
+        credit_reason: %Schema{
+          type: :string,
+          nullable: true,
+          enum: ["product_return", "billing_error", "subscription_cancelled", "other"],
+          description: "Why a credit note was issued (ADR-265); null on other documents."
+        },
         source_type: %Schema{type: :string, nullable: true},
         source_id: %Schema{@uuid | nullable: true},
         content_hash: %Schema{type: :string},
@@ -230,7 +236,36 @@ defmodule PaleeWeb.Schemas.Fiscal do
     %Schema{
       document()
       | properties:
-          Map.put(document().properties, :credit_notes, %Schema{type: :array, items: document()})
+          document().properties
+          |> Map.put(:credit_notes, %Schema{type: :array, items: document()})
+          |> Map.put(:refund_option, refund_option())
+    }
+  end
+
+  @doc "ADR-265: the card a document was paid with, when its money can go back there."
+  def refund_option do
+    %Schema{
+      type: :object,
+      nullable: true,
+      properties: %{
+        provider: %Schema{type: :string},
+        card_brand: %Schema{type: :string, nullable: true},
+        card_last4: %Schema{type: :string, nullable: true},
+        refundable_cents: %Schema{type: :integer}
+      },
+      required: [:provider, :refundable_cents]
+    }
+  end
+
+  @doc "ADR-265: the answer of a credit note, with the refund that issued it."
+  def credit_result do
+    %Schema{
+      type: :object,
+      properties: %{
+        document: %Schema{document() | nullable: true},
+        refund: %Schema{PaleeWeb.Schemas.Payments.refund() | nullable: true}
+      },
+      required: [:document, :refund]
     }
   end
 
@@ -251,6 +286,14 @@ defmodule PaleeWeb.Schemas.Fiscal do
       additionalProperties: false,
       properties: %{
         idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 120},
+        reason: %Schema{
+          type: :string,
+          enum: ["product_return", "billing_error", "subscription_cancelled", "other"]
+        },
+        refund: %Schema{
+          type: :boolean,
+          description: "Give the money back to the card the document was paid with (ADR-265)."
+        },
         lines: %Schema{
           type: :array,
           maxItems: 200,
@@ -264,7 +307,7 @@ defmodule PaleeWeb.Schemas.Fiscal do
           }
         }
       },
-      required: [:idempotency_key]
+      required: [:idempotency_key, :reason]
     }
   end
 

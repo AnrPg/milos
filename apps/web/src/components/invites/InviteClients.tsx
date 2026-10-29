@@ -39,6 +39,7 @@ import {
 } from "@/components/invites/StaffInviteFields";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
+import { formatClock } from "@/lib/clock";
 
 type Tab = "link" | "bulk" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -323,7 +324,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
 
   if (demo) return <DemoNotice />;
 
-  const expiry = (value: string) => new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  const expiry = (value: string) => formatClock(new Date(value), locale, { dateStyle: "medium", timeStyle: "short" });
 
   if (issued?.email) {
     return (
@@ -669,7 +670,7 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
               </p>
             ) : null}
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              {t("expires", { date: new Date(invitation.expires_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) })}
+              {t("expires", { date: formatClock(new Date(invitation.expires_at), locale, { dateStyle: "medium", timeStyle: "short" }) })}
             </p>
           </div>
           {confirming === invitation.id ? (

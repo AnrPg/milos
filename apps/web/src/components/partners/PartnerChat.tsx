@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import {
   BLOCKS_KEY,
@@ -31,6 +31,7 @@ import { Popover } from "@/components/ui/Popover";
 import { inboxHref } from "@/components/chat/inbox/inbox-model";
 import { useRealtimeFallbackInterval } from "@/lib/realtime";
 import { BackLink } from "@/components/ui/BackLink";
+import { withClock } from "@/lib/clock";
 
 type Confirm = "end" | "block" | null;
 
@@ -44,6 +45,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
   const t = useTranslations("Partners");
   const tUi = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const token = usePartnersToken();
   const queryClient = useQueryClient();
@@ -202,7 +204,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
             <Bubble
               key={message.id}
               message={message}
-              time={format.dateTime(new Date(message.created_at), { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}
+              time={format.dateTime(new Date(message.created_at), withClock(locale, { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" }))}
             />
           ))}
         </ol>
@@ -310,6 +312,7 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
 function Bubble({ message, time }: { message: PartnerMessage; time: string }) {
   const t = useTranslations("Partners");
   const format = useFormatter();
+  const locale = useLocale();
   const mine = message.mine;
   return (
     <li className={["flex max-w-[85%] flex-col gap-0.5", mine ? "self-end items-end" : "self-start items-start"].join(" ")}>
@@ -322,7 +325,7 @@ function Bubble({ message, time }: { message: PartnerMessage; time: string }) {
         >
           <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t("planEyebrow")}</span>
           <span className="font-bold">{message.plan.name ?? t("planClass")}</span>
-          <span>{format.dateTime(new Date(message.plan.scheduled_at), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+          <span>{format.dateTime(new Date(message.plan.scheduled_at), withClock(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</span>
           {message.body ? <span className="whitespace-pre-wrap" style={{ color: "var(--text-soft)" }}>{message.body}</span> : null}
           <span className="text-xs font-semibold" style={{ color: "var(--primary)" }}>{t("planBook")}</span>
         </Link>

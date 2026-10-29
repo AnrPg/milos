@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Награди за препоръки",
     "financeOperationsIntroduction1d3b6fc": "въвеждане на финансови операции",
     "financeOperations60f9e5a": "Финансови операции",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Управлявай членовете на бокса, абонаментните пакети, промоциите, препоръките и оперативните опашки.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Управлявай членовете на бокса, абонаментните пакети, промоциите, препоръките и висящите въпроси.",
     "financeAnalytics271fe3b": "Финансови анализи →",
     "urgentFinanceAttention8b067dd": "Спешно финансово внимание",
     "noUrgentFinanceItemsb14485e": "Няма спешни финансови елементи.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Име на кампанията",
     "startsOn6d888f7": "Започва на",
     "endsOn5c262f3": "Завършва на",
-    "loadingQueuea1e2a39": "Зареждане на опашката...",
-    "noItemsInThisQueuec992fc9": "Няма елементи в тази опашка.",
+    "loadingQueuea1e2a39": "Зареждане на висящите въпроси…",
+    "noItemsInThisQueuec992fc9": "Тук няма висящи въпроси.",
     "noReferralProgramsYet8445c6c": "Все още няма програми за препоръки.",
     "noReferralEventsYeta4b3417": "Все още няма реферални събития.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Все още няма награди. Одобрете събитие за препоръка, за да издадете награди.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Базова цена в EUR",
     "activePackagebd72220": "Активен абонаментен пакет",
     "membershipRevenueCockpit0b90204": "Кокпит за приходи от членство",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Управлявай абонаментните пакети, финансовите профили на членовете, ръчните плащания, промоциите, наградите за препоръки и оперативните опашки от един административен панел.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Управлявай абонаментните пакети, финансовите профили на членовете, ръчните плащания, промоциите, наградите за препоръки и висящите въпроси от един административен панел.",
     "createMembershipPackage3b5ed69": "Създай абонаментен пакет",
     "priceInEur0e33182": "Цена в EUR",
     "tagsCommaSeparated7bfd75e": "Етикети, разделени със запетая",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Максимални изкупувания",
     "codeActivee55ce6f": "Кодът е активен",
     "createCodecdeaf88": "Създайте код",
-    "operationalQueuesc2120a9": "Оперативни опашки",
+    "operationalQueuesc2120a9": "Висящи въпроси",
     "pendingReferralRewards110afb2": "Очакващи награди за препоръки",
     "referralLifecycleManagementd2d3c90": "Управление на жизнения цикъл на рефералите",
     "createReferralProgram80d2646": "Създайте реферална програма",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Последно",
     "packages0a99901": "Абонаментни пакети",
     "promotions086e09b": "Промоции",
-    "queues83dbc32": "Опашки",
+    "queues83dbc32": "Висящи въпроси",
     "trial5f7537c": "Пробен период",
     "comped1945ffe": "Comped",
     "all6a72085": "Всички",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "Няма намерени активни записи.",
     "featureFinanceCleanupUnknown": "неизвестен",
     "featureFinanceCleanupNoSelection": "Няма избран запис",
-    "featureFinanceCleanupImpact": "Изчистването скрива записа от салда, просрочени опашки, приходи и списъци с профили.",
+    "featureFinanceCleanupImpact": "Изчистването скрива записа от салда, просрочени плащания, приходи и списъци с профили.",
     "featureFinanceCleanupReason": "Причина",
     "featureFinanceCleanupPassword": "Административна парола",
     "featureFinanceCleanupSuccess": "Записът беше изчистен.",
@@ -12127,7 +12127,7 @@
     "graceHint": "Записванията продължават толкова дни след първия неуспех",
     "graceDays": "{count, plural, =0 {Няма} one {# ден} other {# дни}}",
     "notifyStaff": "Известие до екипа",
-    "notifyStaffHint": "Във Финанси › Опашки, след последния неуспех",
+    "notifyStaffHint": "Във Финанси › Висящи въпроси, след последния неуспех",
     "disconnectTitle": "Прекъсване на връзката с {provider}",
     "disconnectHint": "Запазените карти вече не се таксуват",
     "disconnect": "Прекъсване",
@@ -12250,7 +12250,8 @@
       "branchCode": "Променяй само ако имаш обект, регистриран в AADE.",
       "optional": "По избор.",
       "iban": "По избор. Отпечатва се на фактурите за плащане по банков път.",
-      "qrIban": "По избор. За QR фактури с QR референция."
+      "qrIban": "По избор. За QR фактури с QR референция.",
+      "checkDigitsOk": "Контролна цифра: вярна."
     },
     "reason": {
       "blank": "Попълни това поле.",
@@ -12289,6 +12290,21 @@
       "sandbox": "тестова среда",
       "test": "тест",
       "production": "реална среда"
+    },
+    "registry": {
+      "lookup": "Попълване от данъчния номер (ΑΦΜ)",
+      "looking": "Търсене в AADE…",
+      "orByHand": "Или попълни полетата сам.",
+      "found": "Намерени в регистъра на AADE. Провери ги.",
+      "foundLater": "AADE даде също адрес и код на дейност (ΚΑΔ): ще ги намериш попълнени в следващите стъпки.",
+      "error": {
+        "invalid_tax_id": "Този данъчен номер не е верен. Провери цифрите.",
+        "registry_not_connected": "Липсват данните за достъп до регистъра на AADE. Попълни полетата сам.",
+        "registry_credentials_rejected": "AADE не прие данните за достъп. Попълни полетата сам.",
+        "registry_not_found": "AADE не намери този данъчен номер.",
+        "registry_limit_reached": "Твърде много търсения. Опитай отново след малко.",
+        "registry_unavailable": "AADE не отговаря в момента. Опитай по-късно или попълни полетата сам."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "категория=стойност, по една на ред",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Изпращане по имейл",
+    "reason": "Причина",
+    "reasons": {
+      "product_return": "Върнат продукт",
+      "billing_error": "Грешно таксуване",
+      "subscription_cancelled": "Отказан абонамент",
+      "other": "Друго"
+    },
+    "pickReason": "Избери причина.",
+    "refundToCard": "Връщане на парите по картата {card}",
+    "refundToCardHint": "Чрез {provider}, заедно с кредитното известие. Изключи го, ако си върнал парите по друг начин.",
+    "refundingToCard": "Парите се връщат по картата {card} (2–5 работни дни).",
+    "noRefund": "Без връщане на пари.",
+    "emailTitle": "Изпращане на {number} по имейл",
+    "emailTo": "Имейл на получателя",
+    "emailHint": "Изпращаме PDF файла на езика на документа.",
+    "emailSend": "Изпрати",
+    "emailSending": "Изпращане…",
+    "emailSent": "Изпратено до {to}.",
+    "emailError": {
+      "invalid_address": "Този имейл не изглежда правилен. Провери го.",
+      "no_recipient": "Напиши имейла, до който да се изпрати.",
+      "throttled": "Току-що беше изпратено до този имейл. Опитай по-късно.",
+      "suppressed": "Този имейл не приема наши съобщения. Опитай с друг.",
+      "business_not_activated": "Имейлите до клиенти започват, щом бъде активиран твоят бокс."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Настройки",
@@ -12511,12 +12553,12 @@
     "codePlaceholder": "ABCD-EFGH",
     "pageTitle": "Palee TV",
     "onScreen": "На екрана",
-    "onScreenTitle": "Покажи този клас на екран",
-    "onScreenHint": "Само днес, на екраните на твоя клас. Екранът се връща на автоматичен режим, когато денят на класа свърши.",
+    "onScreenTitle": "Покажи това занятие на екран",
+    "onScreenHint": "Само днес, на екраните на твоето занятие. Екранът се връща на автоматичен режим, когато денят на занятието свърши.",
     "classView": {
-      "timer": "Таймер на класа",
-      "leaderboard": "Класиране на класа",
-      "wod": "WOD на класа"
+      "timer": "Таймер на занятието",
+      "leaderboard": "Класиране на занятието",
+      "wod": "WOD на занятието"
     }
   },
   "Pay": {

@@ -153,7 +153,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
   end
 
   @doc """
-  Οικονομικά › Ουρές: saved-card charges that need a person. A charge for
+  Οικονομικά › Εκκρεμότητες: saved-card charges that need a person. A charge for
   an invoice that has since been paid any other way (desk, transfer) is
   left out.
   """

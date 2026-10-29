@@ -2,7 +2,7 @@ defmodule PaleeWeb.PaymentOptionsControllerTest do
   @moduledoc """
   ADR-260 end to end with the sandbox provider: what members pay online,
   and a declined saved card: the member hears about it each time, it waits
-  in the Ουρές queue, staff send the card link again, charge once more or
+  in the Εκκρεμότητες tab, staff send the card link again, charge once more or
   close it, and staff hear when no retry is left.
   """
   use PaleeWeb.ConnCase, async: false
@@ -216,7 +216,7 @@ defmodule PaleeWeb.PaymentOptionsControllerTest do
     assert failed["status"] == "failed"
     assert "payment_needs_attention" in types(ctx.admin.id)
 
-    # The notice opens the failed charges in Οικονομικά › Ουρές.
+    # The notice opens the failed charges in Οικονομικά › Εκκρεμότητες.
     staff_notice =
       ctx.admin.id
       |> Notifications.list_for_user()

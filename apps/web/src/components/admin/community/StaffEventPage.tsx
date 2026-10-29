@@ -42,6 +42,7 @@ import { adminHref } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { BackLink } from "@/components/ui/BackLink";
+import { clockFormat } from "@/lib/clock";
 
 type ListTab = "going" | "waitlisted" | "cancelled" | "came";
 const LIST_TABS: ListTab[] = ["going", "waitlisted", "cancelled", "came"];
@@ -238,7 +239,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
         <Panel title={t("trialTitle")}>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>
             {event.trial_offer.sent_at
-              ? t("trialSent", { date: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(event.trial_offer.sent_at)) })
+              ? t("trialSent", { date: clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(event.trial_offer.sent_at)) })
               : t("trialHint")}
           </p>
           <SheetButton
@@ -325,7 +326,7 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
   const { manage, checkIn, takePayments } = scope;
   const holds = row.status === "going";
   const clock = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+    clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const notes = [
     row.source === "guest" ? t("guestOf", { name: row.invited_by?.nickname ?? "?" }) : null,
     row.paid_at ? t("paidWith", { method: t(["pay", row.payment_method ?? "other"].join("_")) }) : null,

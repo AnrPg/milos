@@ -190,6 +190,18 @@ msgstr "Fingerabdruck des Belegs (SHA-256)"
 msgid "Page"
 msgstr "Seite"
 
+msgid "Reason for the credit note"
+msgstr "Grund der Gutschrift"
+
+msgid "Product returned"
+msgstr "Warenrückgabe"
+
+msgid "Billing error"
+msgstr "Fehlerhafte Abrechnung"
+
+msgid "Subscription cancelled"
+msgstr "Kündigung des Abonnements"
+
 msgid "Technical security system (TSE)"
 msgstr "Technische Sicherheitseinrichtung (TSE)"
 

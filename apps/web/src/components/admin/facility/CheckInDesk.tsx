@@ -23,6 +23,7 @@ import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { SPARK_GO_STYLE } from "@/lib/spark";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" };
 
@@ -78,7 +79,7 @@ export function CheckInDesk() {
   });
 
   const time = (value: string) =>
-    new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+    clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 
   const toneColor = { success: "var(--success)", info: "var(--muted)" } as const;
 

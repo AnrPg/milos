@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Récompenses de parrainage",
     "financeOperationsIntroduction1d3b6fc": "introduction aux opérations financières",
     "financeOperations60f9e5a": "Opérations financières",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gère les membres, les forfaits d'abonnement, les promotions, les parrainages et les files de traitement.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gère les membres, les forfaits d'abonnement, les promotions, les parrainages et les éléments en attente.",
     "financeAnalytics271fe3b": "Analyse financière →",
     "urgentFinanceAttention8b067dd": "Finances : points urgents",
     "noUrgentFinanceItemsb14485e": "Aucun élément financier urgent.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Nom de la campagne",
     "startsOn6d888f7": "Commence le",
     "endsOn5c262f3": "Se termine le",
-    "loadingQueuea1e2a39": "Chargement de la file…",
-    "noItemsInThisQueuec992fc9": "Aucun élément dans cette file.",
+    "loadingQueuea1e2a39": "Chargement des éléments en attente…",
+    "noItemsInThisQueuec992fc9": "Aucun élément en attente ici.",
     "noReferralProgramsYet8445c6c": "Aucun programme de parrainage pour l'instant.",
     "noReferralEventsYeta4b3417": "Aucun événement de parrainage pour l'instant.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Aucune récompense pour l'instant. Approuve un événement de parrainage pour émettre des récompenses.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Prix de base en EUR",
     "activePackagebd72220": "Forfait d'abonnement actif",
     "membershipRevenueCockpit0b90204": "Pilotage des revenus des abonnements",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gère les forfaits d’abonnement, les profils financiers des membres, les paiements manuels, les promotions, les récompenses de parrainage et les files de traitement depuis une seule interface d’administration.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gère les forfaits d’abonnement, les profils financiers des membres, les paiements manuels, les promotions, les récompenses de parrainage et les éléments en attente depuis une seule interface d’administration.",
     "createMembershipPackage3b5ed69": "Créer un forfait d’abonnement",
     "priceInEur0e33182": "Prix en EUR",
     "tagsCommaSeparated7bfd75e": "Tags, séparés par des virgules",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Utilisations maximales",
     "codeActivee55ce6f": "Code actif",
     "createCodecdeaf88": "Créer un code",
-    "operationalQueuesc2120a9": "Files de traitement",
+    "operationalQueuesc2120a9": "Éléments en attente",
     "pendingReferralRewards110afb2": "Récompenses de parrainage en attente",
     "referralLifecycleManagementd2d3c90": "Gestion du cycle de vie des parrainages",
     "createReferralProgram80d2646": "Créer un programme de parrainage",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Dernier",
     "packages0a99901": "Forfaits d'abonnement",
     "promotions086e09b": "Promotions",
-    "queues83dbc32": "Files",
+    "queues83dbc32": "Éléments en attente",
     "trial5f7537c": "Essai",
     "comped1945ffe": "Offert",
     "all6a72085": "Tout",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "Aucun enregistrement actif trouvé.",
     "featureFinanceCleanupUnknown": "inconnu",
     "featureFinanceCleanupNoSelection": "Aucun enregistrement sélectionné",
-    "featureFinanceCleanupImpact": "La purge retire l’enregistrement des soldes, des files de retards, des revenus et des listes du profil.",
+    "featureFinanceCleanupImpact": "La purge retire l’enregistrement des soldes, des retards de paiement, des revenus et des listes du profil.",
     "featureFinanceCleanupReason": "Motif",
     "featureFinanceCleanupPassword": "Mot de passe administrateur",
     "featureFinanceCleanupSuccess": "L’enregistrement a été purgé.",
@@ -12127,7 +12127,7 @@
     "graceHint": "Les réservations continuent pendant ce nombre de jours après le premier échec",
     "graceDays": "{count, plural, =0 {Aucun} one {# jour} other {# jours}}",
     "notifyStaff": "Prévenir l'équipe",
-    "notifyStaffHint": "Dans Finances › Files, après le dernier échec",
+    "notifyStaffHint": "Dans Finances › Éléments en attente, après le dernier échec",
     "disconnectTitle": "Se déconnecter de {provider}",
     "disconnectHint": "Les cartes enregistrées ne sont plus débitées",
     "disconnect": "Déconnecter",
@@ -12250,7 +12250,8 @@
       "branchCode": "À changer seulement si tu as un établissement déclaré auprès de l'AADE.",
       "optional": "Facultatif.",
       "iban": "Facultatif. Imprimé sur les factures à régler par virement.",
-      "qrIban": "Facultatif. Pour les QR-factures avec référence QR."
+      "qrIban": "Facultatif. Pour les QR-factures avec référence QR.",
+      "checkDigitsOk": "Chiffres de contrôle : corrects."
     },
     "reason": {
       "blank": "Complète ce champ.",
@@ -12289,6 +12290,21 @@
       "sandbox": "bac à sable",
       "test": "test",
       "production": "production"
+    },
+    "registry": {
+      "lookup": "Remplir à partir du numéro fiscal (ΑΦΜ)",
+      "looking": "Recherche auprès de l'AADE…",
+      "orByHand": "Ou remplis les champs toi-même.",
+      "found": "Trouvé dans le registre de l'AADE. Vérifie les informations.",
+      "foundLater": "L'AADE a aussi donné l'adresse et le code d'activité (ΚΑΔ) : tu les trouveras remplis aux étapes suivantes.",
+      "error": {
+        "invalid_tax_id": "Ce numéro fiscal n'est pas correct. Vérifie les chiffres.",
+        "registry_not_connected": "Les identifiants du registre AADE manquent. Remplis les champs toi-même.",
+        "registry_credentials_rejected": "L'AADE n'a pas accepté les identifiants. Remplis les champs toi-même.",
+        "registry_not_found": "L'AADE n'a pas trouvé ce numéro fiscal.",
+        "registry_limit_reached": "Trop de recherches. Réessaie dans un moment.",
+        "registry_unavailable": "L'AADE ne répond pas pour le moment. Réessaie plus tard ou remplis les champs toi-même."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "catégorie=valeur, une par ligne",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Envoyer par e-mail",
+    "reason": "Motif",
+    "reasons": {
+      "product_return": "Retour de produit",
+      "billing_error": "Erreur de facturation",
+      "subscription_cancelled": "Abonnement résilié",
+      "other": "Autre"
+    },
+    "pickReason": "Choisis un motif.",
+    "refundToCard": "Rembourser sur la carte {card}",
+    "refundToCardHint": "Via {provider}, avec l'avoir. Désactive-le si tu as rendu l'argent autrement.",
+    "refundingToCard": "L'argent est remboursé sur la carte {card} (2 à 5 jours ouvrés).",
+    "noRefund": "Sans remboursement.",
+    "emailTitle": "Envoyer {number} par e-mail",
+    "emailTo": "E-mail du destinataire",
+    "emailHint": "Nous envoyons le PDF dans la langue du document.",
+    "emailSend": "Envoyer",
+    "emailSending": "Envoi…",
+    "emailSent": "Envoyé à {to}.",
+    "emailError": {
+      "invalid_address": "Cet e-mail ne semble pas correct. Vérifie-le.",
+      "no_recipient": "Indique l'e-mail auquel l'envoyer.",
+      "throttled": "Il vient d'être envoyé à cet e-mail. Réessaie plus tard.",
+      "suppressed": "Cet e-mail n'accepte pas nos messages. Essaie une autre adresse.",
+      "business_not_activated": "Les e-mails aux clients commencent dès que ta box est activée."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Réglages",

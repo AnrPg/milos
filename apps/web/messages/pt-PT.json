@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Recompensas de indicação",
     "financeOperationsIntroduction1d3b6fc": "introdução de operações financeiras",
     "financeOperations60f9e5a": "Operações financeiras",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gere membros da box, pacotes de subscrição, promoções, indicações e filas operacionais.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gere membros da box, pacotes de subscrição, promoções, indicações e pendentes.",
     "financeAnalytics271fe3b": "Análise financeira →",
     "urgentFinanceAttention8b067dd": "Atenção financeira urgente",
     "noUrgentFinanceItemsb14485e": "Não há itens financeiros urgentes.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Nome da campanha",
     "startsOn6d888f7": "Começa em",
     "endsOn5c262f3": "Termina em",
-    "loadingQueuea1e2a39": "A carregar fila…",
-    "noItemsInThisQueuec992fc9": "Nenhum item nesta fila.",
+    "loadingQueuea1e2a39": "A carregar pendentes…",
+    "noItemsInThisQueuec992fc9": "Nada pendente aqui.",
     "noReferralProgramsYet8445c6c": "Ainda não há programas de referência.",
     "noReferralEventsYeta4b3417": "Nenhum evento de referência ainda.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Ainda não há recompensas. Aprove um evento de indicação para emitir recompensas.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Preço base em EUR",
     "activePackagebd72220": "Pacote de subscrição ativo",
     "membershipRevenueCockpit0b90204": "Cockpit de receita de associados",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gere pacotes de subscrição, perfis financeiros dos membros, pagamentos manuais, promoções, recompensas por indicação e filas operacionais a partir de um único painel de administração.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gere pacotes de subscrição, perfis financeiros dos membros, pagamentos manuais, promoções, recompensas por indicação e pendentes a partir de um único painel de administração.",
     "createMembershipPackage3b5ed69": "Criar pacote de subscrição",
     "priceInEur0e33182": "Preço em euros",
     "tagsCommaSeparated7bfd75e": "Tags, separadas por vírgula",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Resgates máximos",
     "codeActivee55ce6f": "Código ativo",
     "createCodecdeaf88": "Criar código",
-    "operationalQueuesc2120a9": "Filas operacionais",
+    "operationalQueuesc2120a9": "Pendentes",
     "pendingReferralRewards110afb2": "Recompensas de indicação pendentes",
     "referralLifecycleManagementd2d3c90": "Gerenciamento do ciclo de vida de referência",
     "createReferralProgram80d2646": "Crie um programa de referência",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Último",
     "packages0a99901": "Pacotes de subscrição",
     "promotions086e09b": "Promoções",
-    "queues83dbc32": "Filas",
+    "queues83dbc32": "Pendentes",
     "trial5f7537c": "Experimental",
     "comped1945ffe": "Comped",
     "all6a72085": "Todos",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "Nenhum registro ativo encontrado.",
     "featureFinanceCleanupUnknown": "desconhecido",
     "featureFinanceCleanupNoSelection": "Nenhum registro selecionado",
-    "featureFinanceCleanupImpact": "A eliminação oculta o registro de saldos, filas vencidas, receitas e listas de perfis.",
+    "featureFinanceCleanupImpact": "A eliminação oculta o registo de saldos, pagamentos em atraso, receitas e listas de perfis.",
     "featureFinanceCleanupReason": "Razão",
     "featureFinanceCleanupPassword": "Senha de administrador",
     "featureFinanceCleanupSuccess": "O registro foi apagado.",
@@ -12127,7 +12127,7 @@
     "graceHint": "As reservas continuam durante estes dias após a primeira falha",
     "graceDays": "{count, plural, =0 {Nenhum} one {# dia} other {# dias}}",
     "notifyStaff": "Avisar a equipa",
-    "notifyStaffHint": "Em Finanças › Filas, após a última falha",
+    "notifyStaffHint": "Em Finanças › Pendentes, após a última falha",
     "disconnectTitle": "Desligar da {provider}",
     "disconnectHint": "Os cartões guardados deixam de ser cobrados",
     "disconnect": "Desligar",
@@ -12250,7 +12250,8 @@
       "branchCode": "Altera apenas se tiveres um estabelecimento registado na AADE.",
       "optional": "Opcional.",
       "iban": "Opcional. Impresso nas faturas a pagar por transferência.",
-      "qrIban": "Opcional. Para faturas QR com referência QR."
+      "qrIban": "Opcional. Para faturas QR com referência QR.",
+      "checkDigitsOk": "Dígitos de controlo: corretos."
     },
     "reason": {
       "blank": "Preenche este campo.",
@@ -12289,6 +12290,21 @@
       "sandbox": "ambiente de testes",
       "test": "teste",
       "production": "produção"
+    },
+    "registry": {
+      "lookup": "Preencher a partir do NIF (ΑΦΜ)",
+      "looking": "A consultar a AADE…",
+      "orByHand": "Ou preenche os campos tu mesmo.",
+      "found": "Encontrados no registo da AADE. Verifica-os.",
+      "foundLater": "A AADE também deu a morada e o código de atividade (ΚΑΔ): vais encontrá-los preenchidos nos passos seguintes.",
+      "error": {
+        "invalid_tax_id": "Este NIF não está correto. Verifica os dígitos.",
+        "registry_not_connected": "Faltam as credenciais do registo da AADE. Preenche os campos tu mesmo.",
+        "registry_credentials_rejected": "A AADE não aceitou as credenciais. Preenche os campos tu mesmo.",
+        "registry_not_found": "A AADE não encontrou este NIF.",
+        "registry_limit_reached": "Demasiadas consultas. Tenta novamente daqui a pouco.",
+        "registry_unavailable": "A AADE não está a responder. Tenta mais tarde ou preenche os campos tu mesmo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "categoria=valor, um por linha",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Enviar por email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Devolução de produto",
+      "billing_error": "Erro de cobrança",
+      "subscription_cancelled": "Subscrição cancelada",
+      "other": "Outro"
+    },
+    "pickReason": "Escolhe um motivo.",
+    "refundToCard": "Reembolso no cartão {card}",
+    "refundToCardHint": "Através de {provider}, junto com a nota de crédito. Desliga se devolveste o dinheiro de outra forma.",
+    "refundingToCard": "O dinheiro volta ao cartão {card} (2–5 dias úteis).",
+    "noRefund": "Sem reembolso.",
+    "emailTitle": "Enviar {number} por email",
+    "emailTo": "Email do destinatário",
+    "emailHint": "Enviamos o PDF na língua do documento.",
+    "emailSend": "Enviar",
+    "emailSending": "A enviar…",
+    "emailSent": "Enviado para {to}.",
+    "emailError": {
+      "invalid_address": "Este email não parece correto. Verifica-o.",
+      "no_recipient": "Escreve o email para onde enviar.",
+      "throttled": "Acabou de ser enviado para este email. Tenta mais tarde.",
+      "suppressed": "Este email não aceita as nossas mensagens. Tenta outro.",
+      "business_not_activated": "Os emails para clientes começam assim que a tua box for ativada."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Definições",

@@ -16,6 +16,7 @@ import { DocumentPanel } from "./DocumentPanel";
 import { FISCAL_DOCUMENTS_KEY, paymentKey, TransmissionPill } from "./document-bits";
 import { buyerName, groupByDay, localToday, matchesFilter, monthRange, transmissionState, utcDay, type KindFilter } from "./documents-model";
 import { Card, Chip, formatMoney, hintStyle, Icon, linkButtonClass, linkButtonStyle, Pill } from "./fiscal-ui";
+import { clockFormat } from "@/lib/clock";
 
 export { FISCAL_DOCUMENTS_KEY };
 
@@ -184,7 +185,7 @@ function DocumentRow({ document, selected, onOpen }: { document: FiscalDocument;
   const t = useTranslations("FiscalDocuments");
   const locale = useUiLocale();
   const buyer = buyerName(document);
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(document.issued_at));
+  const time = clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(document.issued_at));
   const credit = document.kind === "credit_note";
   return (
     <li className="border-b last:border-b-0" style={{ borderColor: "var(--border)" }}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
 import { deleteMyCheckIn, fetchMyCheckIns, submitCheckIn, type CheckInRecord } from "@/api/wellbeing";
@@ -21,6 +21,7 @@ import {
   type CheckInValue,
 } from "./check-in";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { withClock } from "@/lib/clock";
 
 const TIMELINE_DAYS = 14;
 const QUESTION_KEYS = ["sleep", "energy", "mood", "stress", "body"] as const;
@@ -169,9 +170,10 @@ function AnswerButton({
 function SavedLine({ at }: { at: string }) {
   const t = useTranslations("MemberApp.checkIn");
   const format = useFormatter();
+  const locale = useLocale();
   return (
     <p className="text-sm font-semibold" style={{ color: "var(--success, var(--primary-strong))" }}>
-      {t("saved", { time: format.dateTime(new Date(at), { hour: "2-digit", minute: "2-digit" }) })}
+      {t("saved", { time: format.dateTime(new Date(at), withClock(locale, { hour: "2-digit", minute: "2-digit" })) })}
     </p>
   );
 }
@@ -191,6 +193,7 @@ function CheckInTimeline({
 }) {
   const t = useTranslations("MemberApp.checkIn");
   const format = useFormatter();
+  const locale = useLocale();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const latest = latestAnswers(checkIns);
@@ -245,7 +248,7 @@ function CheckInTimeline({
                       fill={point.note ? "var(--primary-strong)" : "var(--primary)"}
                     >
                       <title>
-                        {`${format.dateTime(new Date(point.at), { dateStyle: "short", timeStyle: "short" })} · ${t(`answer.${key}.${point.value}`)}${point.note ? ` · ${point.note}` : ""}`}
+                        {`${format.dateTime(new Date(point.at), withClock(locale, { dateStyle: "short", timeStyle: "short" }))} · ${t(`answer.${key}.${point.value}`)}${point.note ? ` · ${point.note}` : ""}`}
                       </title>
                     </circle>
                   ))}
@@ -267,7 +270,7 @@ function CheckInTimeline({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-semibold" style={{ color: "var(--text)" }}>
-                      {format.dateTime(new Date(checkIn.recorded_at), { dateStyle: "medium", timeStyle: "short" })}
+                      {format.dateTime(new Date(checkIn.recorded_at), withClock(locale, { dateStyle: "medium", timeStyle: "short" }))}
                     </span>
                     <button
                       type="button"

@@ -31,8 +31,16 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   @payment_methods ~w(cash card bank_transfer online other)
   @max_lines 200
   @max_text 300
+  # ADR-265: why a credit note was issued; part of the issued document.
+  @credit_reasons ~w(product_return billing_error subscription_cancelled other)
 
   def kinds, do: @kinds ++ ["credit_note"]
+  def credit_reasons, do: @credit_reasons
+
+  @doc "`{:ok, reason}` (nil when none is given) or `{:error, :invalid_credit_reason}`."
+  def credit_reason(nil), do: {:ok, nil}
+  def credit_reason(reason) when reason in @credit_reasons, do: {:ok, reason}
+  def credit_reason(_reason), do: {:error, :invalid_credit_reason}
   def payment_methods, do: @payment_methods
   def currencies, do: @currencies
 

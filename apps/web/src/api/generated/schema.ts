@@ -7231,7 +7231,7 @@ export interface paths {
         put?: never;
         /**
          * Issue a credit note for a document (all that is left, or chosen quantities)
-         * @description Documents are never changed: a credit note corrects them. Idempotent by `idempotency_key`.
+         * @description Documents are never changed: a credit note corrects them, with its reason (ADR-265). With `refund: true` the money goes back to the card the document was paid with and that refund issues the note (`document` is null when the refund could not issue it yet). Idempotent by `idempotency_key`.
          */
         post: operations["PaleeWeb.AdminFiscalController.credit"];
         delete?: never;
@@ -7254,6 +7254,26 @@ export interface paths {
          * @description An uncertain submission may already have reached the access point: check its portal first. It is sent with the same idempotency GUID, so a copy is refused, not delivered.
          */
         post: operations["PaleeWeb.AdminFiscalEInvoicingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email a fiscal document's PDF to its buyer or to a typed address (ADR-265)
+         * @description Queued in the email outbox with the PDF attached, in the document's language (or `language`), and journaled. Without `to` the buyer's email printed on the document is used. Idempotent by `idempotency_key`; one address gets at most a few a day (`throttled`); a business in demo mode cannot send (`business_not_activated`).
+         */
+        post: operations["PaleeWeb.AdminFiscalTaxController.email_document"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7454,6 +7474,47 @@ export interface paths {
          * @description `test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.
          */
         put: operations["PaleeWeb.AdminFiscalEInvoicingController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/registry-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The AADE registry connection (environment and user; never the password) */
+        get: operations["PaleeWeb.AdminFiscalRegistryController.connection"];
+        /**
+         * Connect AADE's registry service (RgWsPublic2) with the business's credentials
+         * @description `production` needs the special credentials AADE issued to the business for this service; a saved password is kept when none is sent. `sandbox` answers with made-up details and needs none.
+         */
+        put: operations["PaleeWeb.AdminFiscalRegistryController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/registry/businesses/{tax_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A Greek business's registry details by ΑΦΜ (AADE)
+         * @description The ΑΦΜ's check digit is verified first (`invalid_tax_id`). Errors: `registry_not_connected`, `registry_credentials_rejected`, `registry_not_found`, `registry_limit_reached`, `registry_unavailable`.
+         */
+        get: operations["PaleeWeb.AdminFiscalRegistryController.lookup"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -7980,7 +8041,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Saved-card charges that need a person (Ουρές)
+         * Saved-card charges that need a person (Εκκρεμότητες)
          * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid. Each names the member (`member_name`).
          */
         get: operations["PaleeWeb.AdminPaymentsController.attention"];
@@ -77165,6 +77226,11 @@ export interface operations {
                             /** Format: uuid */
                             corrects_document_id?: string | null;
                             country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
                             currency: string;
                             /** @description The document's Peppol submission (ADR-250). */
                             einvoice?: {
@@ -77355,6 +77421,11 @@ export interface operations {
                                 /** Format: uuid */
                                 corrects_document_id?: string | null;
                                 country_code: string;
+                                /**
+                                 * @description Why a credit note was issued (ADR-265); null on other documents.
+                                 * @enum {string|null}
+                                 */
+                                credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
                                 currency: string;
                                 /** @description The document's Peppol submission (ADR-250). */
                                 einvoice?: {
@@ -77505,6 +77576,11 @@ export interface operations {
                                     updated_at?: string;
                                 } | null;
                             }[];
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
                             currency: string;
                             /** @description The document's Peppol submission (ADR-250). */
                             einvoice?: {
@@ -77565,6 +77641,12 @@ export interface operations {
                             number: string;
                             payment_method?: string | null;
                             prices_include_tax: boolean;
+                            refund_option?: {
+                                card_brand?: string | null;
+                                card_last4?: string | null;
+                                provider: string;
+                                refundable_cents: number;
+                            } | null;
                             seller: {
                                 [key: string]: unknown;
                             };
@@ -77677,6 +77759,10 @@ export interface operations {
                         position: number;
                         quantity: number;
                     }[];
+                    /** @enum {string} */
+                    reason: "product_return" | "billing_error" | "subscription_cancelled" | "other";
+                    /** @description Give the money back to the card the document was paid with (ADR-265). */
+                    refund?: boolean;
                 };
             };
         };
@@ -77696,6 +77782,11 @@ export interface operations {
                             /** Format: uuid */
                             corrects_document_id?: string | null;
                             country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
                             currency: string;
                             /** @description The document's Peppol submission (ADR-250). */
                             einvoice?: {
@@ -77845,7 +77936,23 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at?: string;
                             } | null;
-                        };
+                        } | null;
+                        refund: {
+                            amount_cents: number;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            currency: string;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            reason?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "succeeded" | "failed";
+                        } | null;
                     };
                 };
             };
@@ -77864,6 +77971,11 @@ export interface operations {
                             /** Format: uuid */
                             corrects_document_id?: string | null;
                             country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
                             currency: string;
                             /** @description The document's Peppol submission (ADR-250). */
                             einvoice?: {
@@ -78013,7 +78125,23 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at?: string;
                             } | null;
-                        };
+                        } | null;
+                        refund: {
+                            amount_cents: number;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            currency: string;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            reason?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "succeeded" | "failed";
+                        } | null;
                     };
                 };
             };
@@ -78065,6 +78193,65 @@ export interface operations {
                             submitted_at?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.email_document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+                    /** @description The address; the buyer's email on the document when left out. */
+                    to?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The email of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
                         };
                     };
                 };
@@ -78713,6 +78900,127 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                             webhook_url?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The AADE registry connection; the password is never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            has_password: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            user_id?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    environment: "sandbox" | "production";
+                    /** Format: password */
+                    password?: string;
+                    username?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The AADE registry connection; the password is never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            has_password: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            user_id?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ΑΦΜ (9 digits) */
+                tax_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Business */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        business: {
+                            active: boolean;
+                            activities: {
+                                code: string;
+                                description?: string | null;
+                                main: boolean;
+                            }[];
+                            activity_code?: string | null;
+                            activity_description?: string | null;
+                            building_number?: string | null;
+                            city?: string | null;
+                            legal_name?: string | null;
+                            legal_status?: string | null;
+                            postal_code?: string | null;
+                            street?: string | null;
+                            tax_id: string;
+                            tax_office?: string | null;
+                            tax_office_code?: string | null;
+                            trade_name?: string | null;
+                            vat_registered: boolean;
                         };
                     };
                 };
@@ -81514,6 +81822,8 @@ export interface operations {
                                 currency: string;
                                 failure_message?: string | null;
                                 /** Format: uuid */
+                                finance_reversal_id?: string | null;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
                                 inserted_at?: string | null;
@@ -81691,6 +82001,8 @@ export interface operations {
                             completed_at?: string | null;
                             currency: string;
                             failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */

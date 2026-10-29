@@ -22,6 +22,7 @@ import {
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { Select } from "@/components/ui/Select";
+import { clockFormat } from "@/lib/clock";
 
 export const FORM_REVIEWS_KEY = ["staff", "form-reviews"] as const;
 
@@ -96,7 +97,7 @@ export function FormReviewQueue() {
 
   const reviews = query.data ?? [];
   const when = (iso: string | null | undefined) =>
-    iso ? new Intl.DateTimeFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso)) : "—";
+    iso ? clockFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso)) : "—";
 
   return (
     <StaffPanel

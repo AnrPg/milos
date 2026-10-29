@@ -178,6 +178,12 @@ config :palee,
 config :palee, :setup_business_configurator, Palee.Application.Setup.ServicesConfigurator
 
 # ADR-243: the gateway that reports documents, per connection environment.
+# ADR-265: the AADE registry (RgWsPublic2) adapter, per connection environment.
+config :palee, :fiscal_business_registries, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxBusinessRegistry,
+  "production" => Palee.Infrastructure.Fiscal.AadeRegistry
+}
+
 config :palee, :fiscal_authority_gateways, %{
   "sandbox" => Palee.Infrastructure.Fiscal.SandboxAuthorityGateway,
   "test" => Palee.Infrastructure.Fiscal.MyDataGateway,

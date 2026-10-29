@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Premi per gli inviti",
     "financeOperationsIntroduction1d3b6fc": "introduzione alle operazioni finanziarie",
     "financeOperations60f9e5a": "Operazioni finanziarie",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gestisci soci, pacchetti di abbonamento, promozioni, inviti e code operative.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Gestisci soci, pacchetti di abbonamento, promozioni, inviti e voci in sospeso.",
     "financeAnalytics271fe3b": "Analisi finanziaria →",
     "urgentFinanceAttention8b067dd": "Attenzione finanziaria urgente",
     "noUrgentFinanceItemsb14485e": "Nessuna voce finanziaria urgente.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Nome della campagna",
     "startsOn6d888f7": "Inizia il",
     "endsOn5c262f3": "Finisce il",
-    "loadingQueuea1e2a39": "Caricamento coda...",
-    "noItemsInThisQueuec992fc9": "Nessun elemento in questa coda.",
+    "loadingQueuea1e2a39": "Caricamento delle voci in sospeso…",
+    "noItemsInThisQueuec992fc9": "Nessuna voce in sospeso qui.",
     "noReferralProgramsYet8445c6c": "Ancora nessun programma inviti.",
     "noReferralEventsYeta4b3417": "Ancora nessun invito.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Ancora nessun premio. Approva un invito per emettere premi.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Prezzo base in euro",
     "activePackagebd72220": "Pacchetto di abbonamento attivo",
     "membershipRevenueCockpit0b90204": "Pannello entrate abbonamenti",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gestisci pacchetti di abbonamento, profili finanziari dei soci, pagamenti manuali, promozioni, premi per gli inviti e code operative da un'unica area di amministrazione.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Gestisci pacchetti di abbonamento, profili finanziari dei soci, pagamenti manuali, promozioni, premi per gli inviti e voci in sospeso da un'unica area di amministrazione.",
     "createMembershipPackage3b5ed69": "Crea pacchetto di abbonamento",
     "priceInEur0e33182": "Prezzo in euro",
     "tagsCommaSeparated7bfd75e": "Tag separati da virgole",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Utilizzi massimi",
     "codeActivee55ce6f": "Codice attivo",
     "createCodecdeaf88": "Crea codice",
-    "operationalQueuesc2120a9": "Code operative",
+    "operationalQueuesc2120a9": "Voci in sospeso",
     "pendingReferralRewards110afb2": "Premi per inviti in attesa",
     "referralLifecycleManagementd2d3c90": "Gestione del ciclo di vita degli inviti",
     "createReferralProgram80d2646": "Crea un programma inviti",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Ultimo",
     "packages0a99901": "Pacchetti di abbonamento",
     "promotions086e09b": "Promozioni",
-    "queues83dbc32": "Code",
+    "queues83dbc32": "Voci in sospeso",
     "trial5f7537c": "Prova",
     "comped1945ffe": "Omaggio",
     "all6a72085": "Tutti",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "Nessun record attivo trovato.",
     "featureFinanceCleanupUnknown": "sconosciuto",
     "featureFinanceCleanupNoSelection": "Nessun record selezionato",
-    "featureFinanceCleanupImpact": "L'eliminazione nasconde il record da saldi, code degli scaduti, entrate ed elenchi dei profili.",
+    "featureFinanceCleanupImpact": "L'eliminazione nasconde il record da saldi, pagamenti scaduti, entrate ed elenchi dei profili.",
     "featureFinanceCleanupReason": "Motivo",
     "featureFinanceCleanupPassword": "Password amministratore",
     "featureFinanceCleanupSuccess": "Il record è stato eliminato.",
@@ -12127,7 +12127,7 @@
     "graceHint": "Le prenotazioni continuano per questi giorni dopo il primo errore",
     "graceDays": "{count, plural, =0 {Nessuno} one {# giorno} other {# giorni}}",
     "notifyStaff": "Avvisa lo staff",
-    "notifyStaffHint": "In Finanze › Code, dopo l'ultimo errore",
+    "notifyStaffHint": "In Finanze › Voci in sospeso, dopo l'ultimo errore",
     "disconnectTitle": "Scollega da {provider}",
     "disconnectHint": "Le carte salvate non vengono più addebitate",
     "disconnect": "Scollega",
@@ -12250,7 +12250,8 @@
       "branchCode": "Da cambiare solo se hai una sede secondaria registrata presso l'AADE.",
       "optional": "Facoltativo.",
       "iban": "Facoltativo. Stampato sulle fatture da pagare con bonifico.",
-      "qrIban": "Facoltativo. Per le QR-fatture con riferimento QR."
+      "qrIban": "Facoltativo. Per le QR-fatture con riferimento QR.",
+      "checkDigitsOk": "Cifre di controllo: corrette."
     },
     "reason": {
       "blank": "Compila questo campo.",
@@ -12289,6 +12290,21 @@
       "sandbox": "sandbox",
       "test": "test",
       "production": "produzione"
+    },
+    "registry": {
+      "lookup": "Compila dal codice fiscale (ΑΦΜ)",
+      "looking": "Ricerca presso l'AADE…",
+      "orByHand": "Oppure compila i campi da solo.",
+      "found": "Trovati nel registro dell'AADE. Controllali.",
+      "foundLater": "L'AADE ha fornito anche indirizzo e codice attività (ΚΑΔ): li troverai compilati nei passaggi successivi.",
+      "error": {
+        "invalid_tax_id": "Questo codice fiscale non è corretto. Controlla le cifre.",
+        "registry_not_connected": "Mancano le credenziali del registro AADE. Compila i campi da solo.",
+        "registry_credentials_rejected": "L'AADE non ha accettato le credenziali. Compila i campi da solo.",
+        "registry_not_found": "L'AADE non ha trovato questo codice fiscale.",
+        "registry_limit_reached": "Troppe ricerche. Riprova tra poco.",
+        "registry_unavailable": "L'AADE non risponde ora. Riprova più tardi o compila i campi da solo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "categoria=valore, uno per riga",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Invia via email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Reso del prodotto",
+      "billing_error": "Errore di addebito",
+      "subscription_cancelled": "Abbonamento annullato",
+      "other": "Altro"
+    },
+    "pickReason": "Scegli un motivo.",
+    "refundToCard": "Rimborso sulla carta {card}",
+    "refundToCardHint": "Tramite {provider}, insieme alla nota di credito. Disattivalo se hai restituito i soldi in un altro modo.",
+    "refundingToCard": "I soldi tornano sulla carta {card} (2–5 giorni lavorativi).",
+    "noRefund": "Senza rimborso.",
+    "emailTitle": "Invia {number} via email",
+    "emailTo": "Email del destinatario",
+    "emailHint": "Inviamo il PDF nella lingua del documento.",
+    "emailSend": "Invia",
+    "emailSending": "Invio…",
+    "emailSent": "Inviato a {to}.",
+    "emailError": {
+      "invalid_address": "Questa email non sembra corretta. Controllala.",
+      "no_recipient": "Scrivi l'email a cui inviarlo.",
+      "throttled": "È appena stato inviato a questa email. Riprova più tardi.",
+      "suppressed": "Questa email non accetta i nostri messaggi. Provane un'altra.",
+      "business_not_activated": "Le email ai clienti partono appena il tuo box è attivato."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Impostazioni",

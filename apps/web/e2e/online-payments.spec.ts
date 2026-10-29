@@ -4,7 +4,7 @@ import { chooseOption } from "./support/select";
 
 // Online payments for staff (mockup s3, option B; ADR-246/260/261):
 // Ρυθμίσεις › Πληρωμές is one card with defaults, and failed saved-card
-// charges that need a person show in Οικονομικά › Ουρές. The API is stubbed;
+// charges that need a person show in Οικονομικά › Εκκρεμότητες. The API is stubbed;
 // anything not stubbed answers `{}`.
 
 const json = (route: Route, body: unknown, status = 200) =>
@@ -201,7 +201,7 @@ test("coming back connected says so", async ({ page }) => {
   await expect(page.getByText("Συνδεδεμένο με Viva")).toBeVisible();
 });
 
-test("failed charges that need a person wait in Finance › Queues", async ({ page }) => {
+test("failed charges that need a person wait in Finance › Pending items", async ({ page }) => {
   const writes: Write[] = [];
   await stub(
     page,

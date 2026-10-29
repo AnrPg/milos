@@ -727,10 +727,15 @@ defmodule Palee.Payments do
 
   # ── Refunds ─────────────────────────────────────────────────────────────
 
-  @doc "Gives back part or all of a succeeded payment through the provider."
+  @doc """
+  Gives back part or all of a succeeded payment through the provider.
+
+  `params`: `amount_cents`, `idempotency_key`, `reason` and, from the
+  credit-note panel (ADR-265), `fiscal_credit` – an opaque map the
+  fulfilment hands on to the credit note the refund issues.
+  """
   def refund(context, intent_id, params, actor_id, %DateTime{} = now) do
     key = params[:idempotency_key]
-    amount = params[:amount_cents]
 
     with true <-
            (is_binary(key) and byte_size(key) in 8..200) || {:error, :idempotency_key_required},
@@ -738,12 +743,43 @@ defmodule Palee.Payments do
       case PaymentStore.get_refund_by_key(context, key) do
         %{intent_id: ^intent_id} = existing -> {:ok, public_refund(existing)}
         %{} -> {:error, :duplicate_idempotency_key}
-        nil -> new_refund(context, intent, amount, key, params[:reason], actor_id, now)
+        nil -> new_refund(context, intent, params, actor_id, now)
       end
     end
   end
 
-  defp new_refund(context, intent, amount, key, reason, actor_id, now) do
+  @doc "The refund made under `idempotency_key` (public fields), or nil (ADR-265)."
+  def refund_by_key(context, key) when is_binary(key) do
+    case PaymentStore.get_refund_by_key(context, key) do
+      nil -> nil
+      refund -> public_refund(refund)
+    end
+  end
+
+  @doc """
+  The succeeded online or terminal payment that recorded Finance payment
+  `finance_payment_id` (public fields), or nil (ADR-265).
+  """
+  def succeeded_for_finance_payment(context, finance_payment_id)
+      when is_binary(finance_payment_id) do
+    context
+    |> PaymentStore.list_intents(%{
+      finance_payment_id: finance_payment_id,
+      status: "succeeded",
+      limit: 1
+    })
+    |> Map.fetch!(:intents)
+    |> case do
+      [intent | _] -> public_intent(intent)
+      [] -> nil
+    end
+  end
+
+  defp new_refund(context, intent, params, actor_id, now) do
+    amount = params[:amount_cents]
+    key = params[:idempotency_key]
+    reason = params[:reason]
+
     with :ok <- IntentPolicy.validate_refund(intent, amount),
          {:ok, account} <- refund_account(context, intent),
          {:ok, refund} <-
@@ -754,6 +790,7 @@ defmodule Palee.Payments do
              currency: intent.currency,
              status: "pending",
              reason: reason && String.slice(reason, 0, 300),
+             fiscal_credit: params[:fiscal_credit],
              idempotency_key: key,
              created_by_id: actor_id
            }) do
@@ -834,6 +871,7 @@ defmodule Palee.Payments do
       :status,
       :reason,
       :failure_message,
+      :finance_reversal_id,
       :completed_at,
       :inserted_at
     ])

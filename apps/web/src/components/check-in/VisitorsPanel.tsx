@@ -8,6 +8,7 @@ import { fetchVisitors, VISITORS_KEY, type Visitor } from "@/api/check-in";
 import { subscribeNever } from "@/lib/maps";
 import { subscribeToTopic } from "@/lib/realtime";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 const readVisitor = () => new URLSearchParams(window.location.search).get("visitor");
 const serverVisitor = () => null;
@@ -49,7 +50,7 @@ export function VisitorsPanel({ token, organizationId, date }: { token: string; 
     if (highlighted && hasData) sectionRef.current?.scrollIntoView({ block: "start" });
   }, [hasData, highlighted]);
 
-  const time = (iso: string) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const time = (iso: string) => clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const list = visitors.data ?? [];
 
   return (

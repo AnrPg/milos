@@ -210,6 +210,21 @@ defmodule PaleeWeb.FallbackController do
     idempotency_key_reused:
       {:conflict, "This idempotency key was already used for a different request"},
     already_credited: {:conflict, "This document has already been fully credited"},
+    invalid_credit_reason: {:unprocessable_entity, "Choose why the credit note is issued"},
+    refund_not_available:
+      {:conflict,
+       "This document was not paid online or by card terminal: give the money back another way"},
+    registry_not_connected:
+      {:conflict,
+       "Add the AADE registry credentials of the business to fill in details from the tax ID"},
+    registry_credentials_rejected:
+      {:conflict, "AADE refused the registry credentials of the business. Check them"},
+    registry_not_found: {:not_found, "AADE has no business with this tax ID"},
+    registry_limit_reached: {:too_many_requests, "Too many look-ups for now. Try again later"},
+    registry_unavailable:
+      {:service_unavailable, "The AADE registry is not answering. Try again later"},
+    invalid_tax_id: {:unprocessable_entity, "Check the tax ID: its check digit is wrong"},
+    no_recipient: {:unprocessable_entity, "Enter an email address"},
     credit_exceeds_document: {:unprocessable_entity, "More than what is left on the document"},
     not_creditable: {:unprocessable_entity, "A credit note cannot be credited"},
     unknown_line: {:unprocessable_entity, "The document has no such line"},

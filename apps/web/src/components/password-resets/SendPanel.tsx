@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import type { PasswordResetLink } from "@/api/password-resets";
 import { buildMailto, resetLinkFor } from "@/components/password-resets/reset-email";
+import { formatClock } from "@/lib/clock";
 
 type Field = "to" | "subject" | "body" | "link";
 
@@ -42,7 +43,7 @@ export function SendPanel({
   const subject = t("emailSubject");
   const body = t("emailBody", { name: personName, handle: personHandle, link: resetLink, sender });
   const mailto = buildMailto({ to: link.email, subject, body });
-  const validUntil = new Date(link.expires_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  const validUntil = formatClock(new Date(link.expires_at), locale, { dateStyle: "medium", timeStyle: "short" });
 
   const fields: Array<{ id: Field; label: string; value: string; multiline?: boolean }> = [
     { id: "to", label: t("fieldTo"), value: link.email },

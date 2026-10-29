@@ -137,27 +137,66 @@ defmodule PaleeWeb.AdminFiscalControllerTest do
 
       path = "#{ctx.admin}/fiscal/documents/#{ctx.document.id}"
 
-      assert %{"document" => %{"lines" => [%{"quantity" => 2}], "credit_notes" => []}} =
-               ctx.owner |> get_json(path) |> json_response(200)
+      assert %{
+               "document" => %{
+                 "lines" => [%{"quantity" => 2}],
+                 "credit_notes" => [],
+                 "credit_reason" => nil,
+                 "refund_option" => nil
+               }
+             } = ctx.owner |> get_json(path) |> json_response(200)
 
       body = %{
         "idempotency_key" => "credit-0001",
+        "reason" => "product_return",
         "lines" => [%{"position" => 1, "quantity" => 1}]
       }
 
-      assert %{"document" => %{"number" => "C-000001", "gross_cents" => 6000}} =
+      # ADR-265: staff always give the reason.
+      assert ctx.owner
+             |> send_json(:post, "#{path}/credit-notes", Map.delete(body, "reason"))
+             |> json_response(422)
+
+      assert ctx.owner
+             |> send_json(:post, "#{path}/credit-notes", %{body | "reason" => "whim"})
+             |> json_response(422)
+
+      assert %{
+               "document" => %{
+                 "number" => "C-000001",
+                 "gross_cents" => 6000,
+                 "credit_reason" => "product_return"
+               },
+               "refund" => nil
+             } =
                ctx.owner |> send_json(:post, "#{path}/credit-notes", body) |> json_response(201)
 
       assert %{"document" => %{"number" => "C-000001"}} =
                ctx.owner |> send_json(:post, "#{path}/credit-notes", body) |> json_response(200)
 
+      # The same key with another reason is another request.
+      assert %{"code" => "idempotency_key_reused"} =
+               ctx.owner
+               |> send_json(:post, "#{path}/credit-notes", %{body | "reason" => "other"})
+               |> json_response(409)
+
+      assert %{"document" => %{"credit_notes" => [%{"credit_reason" => "product_return"}]}} =
+               ctx.owner |> get_json(path) |> json_response(200)
+
       assert %{"code" => "credit_exceeds_document"} =
                ctx.owner
                |> send_json(:post, "#{path}/credit-notes", %{
                  "idempotency_key" => "credit-0002",
+                 "reason" => "billing_error",
                  "lines" => [%{"position" => 1, "quantity" => 2}]
                })
                |> json_response(422)
+
+      # The reason is part of the journal and the journal still verifies.
+      assert %{"verification" => %{"valid" => true}} =
+               ctx.owner
+               |> get_json("#{ctx.admin}/fiscal/journal/verification")
+               |> json_response(200)
     end
 
     test "verifies the journal and downloads the archive", ctx do

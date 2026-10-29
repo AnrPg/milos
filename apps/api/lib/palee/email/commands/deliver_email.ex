@@ -96,7 +96,8 @@ defmodule Palee.Email.Commands.DeliverEmail do
           text: text,
           html: html,
           message_id: message.message_id,
-          headers: headers
+          headers: headers,
+          attachments: attachments(body)
         })
       end
 
@@ -150,6 +151,22 @@ defmodule Palee.Email.Commands.DeliverEmail do
       {:error, reason}
     end
   end
+
+  # ADR-265: files stored base64 in the encrypted body.
+  defp attachments(%{"attachments" => [_ | _] = attachments}) do
+    Enum.flat_map(attachments, fn
+      %{"filename" => filename, "content_type" => type, "data" => data} ->
+        case Base.decode64(data) do
+          {:ok, binary} -> [%{filename: filename, content_type: type, data: binary}]
+          :error -> []
+        end
+
+      _other ->
+        []
+    end)
+  end
+
+  defp attachments(_body), do: []
 
   defp body(%Message{encrypted_body: nil}), do: {:error, :undecryptable}
 

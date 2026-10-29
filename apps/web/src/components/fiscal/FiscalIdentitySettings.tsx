@@ -8,10 +8,12 @@ import {
   fetchAuthorityConnection,
   fetchFiscalCountries,
   fetchFiscalIdentity,
+  lookupRegistryBusiness,
   saveFiscalIdentity,
   type CountryProfile,
   type IdentityStatus,
 } from "@/api/fiscal";
+import { ApiError } from "@/api/client";
 import { useSession } from "@/components/session-provider";
 import { BackLink } from "@/components/ui/BackLink";
 import { Dialog } from "@/components/ui/Dialog";
@@ -27,8 +29,10 @@ import {
   doneGroups,
   draftOf,
   changesFor,
+  fromRegistry,
   groupFields,
   GROUPS,
+  isValidAfm,
   localTerm,
   nextStep,
   progress,
@@ -38,6 +42,7 @@ import {
   type FieldDef,
   type FieldKey,
   type GroupKey,
+  type RegistryLater,
   type VatScheme,
 } from "./identity-model";
 import {
@@ -362,9 +367,32 @@ function GroupPanel({
   const [errors, setErrors] = useState<FormErrors<FieldKey> | null>(null);
   const scheme = (draft.vat_scheme ?? "standard") as VatScheme;
   const fields: FieldDef[] = groupFields(profile, scheme)[group];
+  // «Συμπλήρωση από το ΑΦΜ» (ADR-265): Greek businesses, business row only.
+  const offersLookup = group === "business" && country === "GR";
+  const [found, setFound] = useState<{ later: RegistryLater } | null>(null);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+
+  const lookup = useMutation({
+    mutationFn: () => lookupRegistryBusiness(token, (draft.tax_id ?? "").trim()),
+    onSuccess: ({ business }) => {
+      const { shown, later } = fromRegistry(business, draft);
+      setDraft((current) => ({ ...current, ...shown }));
+      setFound({ later });
+      setErrors(null);
+    },
+    onError: (failure) => {
+      const code = failure instanceof ApiError ? failure.payload.code : undefined;
+      setLookupError(
+        code && (REGISTRY_ERRORS as readonly string[]).includes(code)
+          ? t(`registry.error.${code as (typeof REGISTRY_ERRORS)[number]}`)
+          : formErrorsFrom(failure, translate, []).message,
+      );
+    },
+  });
 
   const save = useMutation({
-    mutationFn: () => saveFiscalIdentity(token, changesFor(fields, draft, country)),
+    // What the registry gave for later rows (address, ΚΑΔ) is saved with this one.
+    mutationFn: () => saveFiscalIdentity(token, { ...changesFor(fields, draft, country), ...(found?.later ?? {}) }),
     onSuccess: (data) => {
       queryClient.setQueryData(FISCAL_IDENTITY_KEY, data);
       onClose();
@@ -388,6 +416,10 @@ function GroupPanel({
 
   const set = (key: FieldKey, value: string) => {
     setDraft((current) => ({ ...current, [key]: value }));
+    if (key === "tax_id") {
+      setFound(null);
+      setLookupError(null);
+    }
     if (errors?.fields[key]) setErrors({ ...errors, fields: { ...errors.fields, [key]: undefined } });
   };
 
@@ -422,7 +454,21 @@ function GroupPanel({
             error={errors?.fields[field.key]}
             onChange={(value) => set(field.key, value)}
             taxId={draft.tax_id ?? ""}
-          />
+          >
+            {offersLookup && field.key === "tax_id" ? (
+              <RegistryLookup
+                ready={isValidAfm(draft.tax_id ?? "")}
+                pending={lookup.isPending}
+                found={found !== null}
+                foundLater={Object.keys(found?.later ?? {}).length > 0}
+                error={lookupError}
+                onLookup={() => {
+                  setLookupError(null);
+                  lookup.mutate();
+                }}
+              />
+            ) : null}
+          </FieldInput>
         ))}
       </div>
     </Dialog>
@@ -436,6 +482,7 @@ function FieldInput({
   error,
   onChange,
   taxId,
+  children,
 }: {
   field: FieldDef;
   country: string;
@@ -443,6 +490,7 @@ function FieldInput({
   error?: string;
   onChange: (value: string) => void;
   taxId: string;
+  children?: ReactNode;
 }) {
   const t = useTranslations("FiscalIdentity");
   const id = `fiscal-field-${field.key}`;
@@ -485,6 +533,64 @@ function FieldInput({
         />
       )}
       {error ? <FieldError id={errorId}>{error}</FieldError> : hint ? <span className="text-xs" style={hintStyle}>{hint}</span> : null}
+      {children}
+    </div>
+  );
+}
+
+const REGISTRY_ERRORS = [
+  "invalid_tax_id",
+  "registry_not_connected",
+  "registry_credentials_rejected",
+  "registry_not_found",
+  "registry_limit_reached",
+  "registry_unavailable",
+] as const;
+
+/** Mockup s1 C: «Συμπλήρωση από το ΑΦΜ» under the ΑΦΜ, once its check digit is right. */
+function RegistryLookup({
+  ready,
+  pending,
+  found,
+  foundLater,
+  error,
+  onLookup,
+}: {
+  ready: boolean;
+  pending: boolean;
+  found: boolean;
+  foundLater: boolean;
+  error: string | null;
+  onLookup: () => void;
+}) {
+  const t = useTranslations("FiscalIdentity");
+  return (
+    <div className="mt-1 grid gap-1.5" data-testid="fiscal-registry">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          className={ghostButtonClass}
+          style={ghostButtonStyle}
+          onClick={onLookup}
+          disabled={!ready || pending}
+          data-testid="fiscal-registry-lookup"
+        >
+          <Icon name="search" size={14} />
+          {pending ? t("registry.looking") : t("registry.lookup")}
+        </button>
+        <span className="text-xs" style={hintStyle}>{t("registry.orByHand")}</span>
+      </div>
+      {error ? (
+        <FieldError id="fiscal-registry-error">{error}</FieldError>
+      ) : found ? (
+        <p className="grid gap-0.5 text-xs" role="status" data-testid="fiscal-registry-found">
+          <span className="flex items-center gap-1.5" style={{ color: "var(--success)" }}>
+            <Icon name="check" size={13} />
+            {t("registry.found")}
+          </span>
+          {foundLater ? <span style={hintStyle}>{t("registry.foundLater")}</span> : null}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -492,6 +598,7 @@ function FieldInput({
 function fieldHint(t: Translate, key: FieldKey, country: string, value: string, taxId: string): string | null {
   switch (key) {
     case "tax_id":
+      return country === "GR" && isValidAfm(value) ? t("hint.checkDigitsOk") : t("hint.checkDigits");
     case "vat_number":
       return t("hint.checkDigits");
     case "vat_scheme":

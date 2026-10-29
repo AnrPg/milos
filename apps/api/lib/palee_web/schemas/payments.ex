@@ -216,6 +216,7 @@ defmodule PaleeWeb.Schemas.Payments do
         status: %Schema{type: :string, enum: ["pending", "succeeded", "failed"]},
         reason: @text,
         failure_message: @text,
+        finance_reversal_id: %Schema{@uuid | nullable: true},
         completed_at: @time,
         inserted_at: @time
       },
@@ -236,7 +237,7 @@ defmodule PaleeWeb.Schemas.Payments do
     }
   end
 
-  @doc "ADR-260: the Ουρές queue names the person each charge is for."
+  @doc "ADR-260: the Εκκρεμότητες tab names the person each charge is for."
   def attention_page do
     item = %Schema{
       allOf: [

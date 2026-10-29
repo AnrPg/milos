@@ -13,7 +13,7 @@ defmodule Palee.Payments.Domain.AccountOptions do
     * `notify_member` – a member hears about every declined charge, with a
       link to pay with another card;
     * `notify_staff` – staff with billing rights hear when the last retry
-      failed (the Ουρές queue lists such charges either way).
+      failed (the Εκκρεμότητες tab lists such charges either way).
 
   The retry schedule (1, 3, 7 days) lives in `IntentPolicy` and the grace
   days in the finance settings (`subscription_grace_days`): one place each.

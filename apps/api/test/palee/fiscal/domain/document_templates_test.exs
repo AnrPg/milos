@@ -394,6 +394,24 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
       assert credit.title == "Credit note"
       assert {_label, "I-000042 (" <> _date} = List.keyfind(credit.meta, labels.corrects, 0)
       assert credit.qr_bill == nil
+      # No reason, no reason line.
+      refute List.keyfind(credit.meta, labels.credit_reason, 0)
+
+      # ADR-265: the reason is printed in the document's language.
+      reasoned =
+        DocumentView.build(
+          swiss_invoice(%{
+            kind: "credit_note",
+            number: "C-000002",
+            corrects_document_id: original.id,
+            credit_reason: "subscription_cancelled"
+          }),
+          labels: labels,
+          language: "en",
+          original: original
+        )
+
+      assert {labels.credit_reason, "Subscription cancelled"} in reasoned.meta
     end
   end
 

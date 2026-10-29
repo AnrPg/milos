@@ -28,6 +28,39 @@ defmodule Palee.EmailTest do
     assert {:error, :not_found} = Email.status(Ecto.UUID.generate())
   end
 
+  test "a PDF attachment travels encrypted with the body and is cleared once sent (ADR-265)" do
+    pdf = "%PDF-1.7 sample"
+    attachment = %{filename: "R-000001.pdf", content_type: "application/pdf", data: pdf}
+
+    assert {:error, :invalid_attachment} =
+             Email.enqueue(:sample_notice, "jo@box.test", @assigns,
+               attachments: [%{attachment | content_type: "application/x-msdownload"}]
+             )
+
+    assert {:error, :invalid_attachment} =
+             Email.enqueue(:sample_notice, "jo@box.test", @assigns,
+               attachments: [%{attachment | filename: "../R.pdf"}]
+             )
+
+    assert {:error, :attachment_too_large} =
+             Email.enqueue(:sample_notice, "jo@box.test", @assigns,
+               attachments: [%{attachment | data: :binary.copy("a", 5_000_001)}]
+             )
+
+    assert {:ok, message} =
+             Email.enqueue(:sample_notice, "jo@box.test", @assigns, attachments: [attachment])
+
+    refute message.encrypted_body =~ "PDF"
+    assert deliver_enqueued_emails() == 1
+
+    Swoosh.TestAssertions.assert_email_sent(fn sent ->
+      assert [%Swoosh.Attachment{filename: "R-000001.pdf", data: ^pdf}] = sent.attachments
+    end)
+
+    assert %{encrypted_body: nil, status: "sent"} =
+             Palee.Repo.get!(Palee.Email.Message, message.id)
+  end
+
   test "an idempotency key enqueues once and lists by prefix" do
     opts = [idempotency_key: "sample:1:first"]
     assert {:ok, first} = Email.enqueue(:sample_notice, "jo@box.test", @assigns, opts)

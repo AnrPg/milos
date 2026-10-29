@@ -14,6 +14,7 @@ defmodule Palee.Email.Templates do
     corporate_invoice_issued: Palee.Email.Templates.CorporateInvoiceIssued,
     corporate_invoice_reminder: Palee.Email.Templates.CorporateInvoiceReminder,
     email_change_confirm: Palee.Email.Templates.EmailChangeConfirm,
+    fiscal_document: Palee.Email.Templates.FiscalDocument,
     organization_invitation: Palee.Email.Templates.OrganizationInvitation,
     owner_invitation: Palee.Email.Templates.OwnerInvitation,
     password_reset: Palee.Email.Templates.PasswordReset,

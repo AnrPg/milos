@@ -423,7 +423,7 @@
     "referralRewards22d6a91": "Verwijzingsbeloningen",
     "financeOperationsIntroduction1d3b6fc": "introductie van financiële operaties",
     "financeOperations60f9e5a": "Financiële operaties",
-    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Beheer leden, abonnementspakketten, acties, verwijzingen en operationele wachtrijen.",
+    "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d": "Beheer leden, abonnementspakketten, acties, verwijzingen en openstaande zaken.",
     "financeAnalytics271fe3b": "Financiële analyses →",
     "urgentFinanceAttention8b067dd": "Dringende financiële aandacht",
     "noUrgentFinanceItemsb14485e": "Geen dringende financiële zaken.",
@@ -542,8 +542,8 @@
     "campaignNameaa5d0e7": "Campagnenaam",
     "startsOn6d888f7": "Begint op",
     "endsOn5c262f3": "Eindigt op",
-    "loadingQueuea1e2a39": "Wachtrij laden…",
-    "noItemsInThisQueuec992fc9": "Geen items in deze wachtrij.",
+    "loadingQueuea1e2a39": "Openstaande zaken laden…",
+    "noItemsInThisQueuec992fc9": "Hier staat niets open.",
     "noReferralProgramsYet8445c6c": "Er zijn nog geen verwijzingsprogramma's.",
     "noReferralEventsYeta4b3417": "Nog geen verwijzingsevenementen.",
     "noRewardsYetApproveAReferralEventTo2747e6d": "Nog geen beloningen. Keur een verwijzingsevenement goed om beloningen uit te reiken.",
@@ -726,7 +726,7 @@
     "basePriceInEur4b30144": "Basisprijs in EUR",
     "activePackagebd72220": "Actief abonnementspakket",
     "membershipRevenueCockpit0b90204": "Cockpit voor lidmaatschapsinkomsten",
-    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Beheer abonnementspakketten, financiële ledenprofielen, handmatige betalingen, acties, verwijzingsbeloningen en operationele wachtrijen vanaf één beheerscherm.",
+    "managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90": "Beheer abonnementspakketten, financiële ledenprofielen, handmatige betalingen, acties, verwijzingsbeloningen en openstaande zaken vanaf één beheerscherm.",
     "createMembershipPackage3b5ed69": "Abonnementspakket aanmaken",
     "priceInEur0e33182": "Prijs in EUR",
     "tagsCommaSeparated7bfd75e": "Tags, door komma's gescheiden",
@@ -742,7 +742,7 @@
     "maximumRedemptions86769db": "Maximale aflossingen",
     "codeActivee55ce6f": "Code actief",
     "createCodecdeaf88": "Code maken",
-    "operationalQueuesc2120a9": "Operationele wachtrijen",
+    "operationalQueuesc2120a9": "Openstaande zaken",
     "pendingReferralRewards110afb2": "In afwachting van verwijzingsbeloningen",
     "referralLifecycleManagementd2d3c90": "Beheer van de levenscyclus van verwijzingen",
     "createReferralProgram80d2646": "Verwijzingsprogramma maken",
@@ -1381,7 +1381,7 @@
     "lastd1c69a8": "Laatste",
     "packages0a99901": "Abonnementspakketten",
     "promotions086e09b": "Promoties",
-    "queues83dbc32": "Wachtrijen",
+    "queues83dbc32": "Openstaande zaken",
     "trial5f7537c": "Proefperiode",
     "comped1945ffe": "Comped",
     "all6a72085": "Allemaal",
@@ -2776,7 +2776,7 @@
     "featureFinanceCleanupEmpty": "Geen actieve records gevonden.",
     "featureFinanceCleanupUnknown": "onbekend",
     "featureFinanceCleanupNoSelection": "Geen record geselecteerd",
-    "featureFinanceCleanupImpact": "Opschonen verbergt de record voor saldi, achterstallige wachtrijen, inkomsten en profiellijsten.",
+    "featureFinanceCleanupImpact": "Opschonen verbergt de record voor saldi, achterstallige betalingen, inkomsten en profiellijsten.",
     "featureFinanceCleanupReason": "Reden",
     "featureFinanceCleanupPassword": "Beheerderswachtwoord",
     "featureFinanceCleanupSuccess": "Het record werd gewist.",
@@ -12127,7 +12127,7 @@
     "graceHint": "Boekingen blijven zoveel dagen na de eerste mislukking werken",
     "graceDays": "{count, plural, =0 {Geen} one {# dag} other {# dagen}}",
     "notifyStaff": "Team laten weten",
-    "notifyStaffHint": "In Financiën › Wachtrijen, na de laatste mislukking",
+    "notifyStaffHint": "In Financiën › Openstaande zaken, na de laatste mislukking",
     "disconnectTitle": "Ontkoppelen van {provider}",
     "disconnectHint": "Bewaarde kaarten worden niet meer belast",
     "disconnect": "Ontkoppelen",
@@ -12250,7 +12250,8 @@
       "branchCode": "Alleen wijzigen als je een vestiging hebt die bij de AADE is aangemeld.",
       "optional": "Optioneel.",
       "iban": "Optioneel. Staat op facturen die per overschrijving worden betaald.",
-      "qrIban": "Optioneel. Voor QR-facturen met een QR-referentie."
+      "qrIban": "Optioneel. Voor QR-facturen met een QR-referentie.",
+      "checkDigitsOk": "Controlecijfers: juist."
     },
     "reason": {
       "blank": "Vul dit in.",
@@ -12289,6 +12290,21 @@
       "sandbox": "sandbox",
       "test": "test",
       "production": "productie"
+    },
+    "registry": {
+      "lookup": "Invullen vanuit het fiscaal nummer (ΑΦΜ)",
+      "looking": "Opzoeken bij de AADE…",
+      "orByHand": "Of vul de velden zelf in.",
+      "found": "Gevonden in het register van de AADE. Controleer ze.",
+      "foundLater": "De AADE gaf ook het adres en de activiteitscode (ΚΑΔ): je vindt ze ingevuld in de volgende stappen.",
+      "error": {
+        "invalid_tax_id": "Dit fiscaal nummer klopt niet. Controleer de cijfers.",
+        "registry_not_connected": "De inloggegevens voor het AADE-register ontbreken. Vul de velden zelf in.",
+        "registry_credentials_rejected": "De AADE heeft de inloggegevens niet geaccepteerd. Vul de velden zelf in.",
+        "registry_not_found": "De AADE heeft dit fiscaal nummer niet gevonden.",
+        "registry_limit_reached": "Te veel zoekopdrachten. Probeer het zo meteen opnieuw.",
+        "registry_unavailable": "De AADE antwoordt nu niet. Probeer het later of vul de velden zelf in."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "categorie=waarde, één per regel",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Per e-mail versturen",
+    "reason": "Reden",
+    "reasons": {
+      "product_return": "Product retour",
+      "billing_error": "Verkeerd gefactureerd",
+      "subscription_cancelled": "Abonnement opgezegd",
+      "other": "Anders"
+    },
+    "pickReason": "Kies een reden.",
+    "refundToCard": "Terugbetalen op de kaart {card}",
+    "refundToCardHint": "Via {provider}, samen met de creditnota. Zet het uit als je het geld op een andere manier hebt teruggegeven.",
+    "refundingToCard": "Het geld gaat terug naar de kaart {card} (2–5 werkdagen).",
+    "noRefund": "Zonder terugbetaling.",
+    "emailTitle": "{number} per e-mail versturen",
+    "emailTo": "E-mail van de ontvanger",
+    "emailHint": "We sturen de pdf in de taal van het document.",
+    "emailSend": "Versturen",
+    "emailSending": "Versturen…",
+    "emailSent": "Verstuurd naar {to}.",
+    "emailError": {
+      "invalid_address": "Dit e-mailadres lijkt niet te kloppen. Controleer het.",
+      "no_recipient": "Vul het e-mailadres in waarnaar het moet.",
+      "throttled": "Het is net naar dit adres verstuurd. Probeer het later opnieuw.",
+      "suppressed": "Dit adres accepteert onze berichten niet. Probeer een ander.",
+      "business_not_activated": "E-mails aan klanten starten zodra je box is geactiveerd."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Instellingen",

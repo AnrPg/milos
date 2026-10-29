@@ -190,6 +190,18 @@ msgstr "Impronta del documento (SHA-256)"
 msgid "Page"
 msgstr "Pagina"
 
+msgid "Reason for the credit note"
+msgstr "Motivo della nota di credito"
+
+msgid "Product returned"
+msgstr "Reso del prodotto"
+
+msgid "Billing error"
+msgstr "Errore di fatturazione"
+
+msgid "Subscription cancelled"
+msgstr "Disdetta dell'abbonamento"
+
 msgid "Technical security system (TSE)"
 msgstr "Dispositivo tecnico di sicurezza (TSE)"
 

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import type { BodyCatalogEntry, BodyMetric, BodyPhoto, BodySnapshot } from "@/api/body";
 import { formatDelta, formatMetric, unitOf } from "@/lib/body";
+import { clockFormat } from "@/lib/clock";
 
 /** Joins key parts, so dynamic message keys stay plain strings. */
 export const key = (...parts: string[]) => parts.join(".");
@@ -219,6 +220,6 @@ export function dateFormat(locale: string) {
     day: (iso: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(new Date(iso)),
     dayYear: (iso: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(iso)),
     dateTime: (iso: string) =>
-      new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso)),
+      clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso)),
   };
 }

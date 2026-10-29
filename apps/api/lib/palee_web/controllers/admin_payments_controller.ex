@@ -129,7 +129,7 @@ defmodule PaleeWeb.AdminPaymentsController do
   end
 
   operation(:attention,
-    summary: "Saved-card charges that need a person (Ουρές)",
+    summary: "Saved-card charges that need a person (Εκκρεμότητες)",
     description:
       "Declined and waiting for a retry, or failed for good, until staff close them or " <>
         "the purpose is paid. Each names the member (`member_name`).",

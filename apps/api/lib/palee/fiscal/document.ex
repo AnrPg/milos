@@ -9,7 +9,7 @@ defmodule Palee.Fiscal.Document do
 
   @fields ~w(id kind series sequence number issue_date issued_at currency prices_include_tax
              country_code language seller buyer payment_method net_cents tax_cents gross_cents
-             tax_breakdown corrects_document_id source_type source_id idempotency_key
+             tax_breakdown corrects_document_id credit_reason source_type source_id idempotency_key
              request_hash content_hash journal_position created_by_id)a
 
   schema "fiscal_documents" do
@@ -32,6 +32,7 @@ defmodule Palee.Fiscal.Document do
     field :gross_cents, :integer
     field :tax_breakdown, {:array, :map}, default: []
     field :corrects_document_id, :binary_id
+    field :credit_reason, :string
     field :source_type, :string
     field :source_id, :binary_id
     field :idempotency_key, :string

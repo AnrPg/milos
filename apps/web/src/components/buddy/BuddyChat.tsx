@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import { BUDDIES_KEY, fetchBuddyMessages, markBuddyMessagesRead, sendBuddyMessage, type BuddyMessage } from "@/api/buddies";
 import { ErrorLine } from "@/components/community/Sheet";
@@ -15,6 +15,7 @@ import { BUDDY_FALLBACK_REFETCH_MS } from "./buddy-realtime";
 import { buddyErrorMessage } from "./errors";
 import { useBuddies, useBuddyToken } from "./use-buddies";
 import { useRealtimeFallbackInterval } from "@/lib/realtime";
+import { withClock } from "@/lib/clock";
 
 /**
  * The pair's own conversation (ADR-160 §6): replies to «Χρειάζομαι
@@ -27,6 +28,7 @@ export function BuddyChat({ linkId }: { linkId: string }) {
   const t = useTranslations("Buddy");
   const tUi = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const token = useBuddyToken();
   const queryClient = useQueryClient();
   const overview = useBuddies();
@@ -118,7 +120,7 @@ export function BuddyChat({ linkId }: { linkId: string }) {
             <Bubble
               key={message.id}
               message={message}
-              time={format.dateTime(new Date(message.created_at), { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}
+              time={format.dateTime(new Date(message.created_at), withClock(locale, { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" }))}
               readLabel={message.id === lastMineRead ? t("read") : null}
             />
           ))}

@@ -242,9 +242,10 @@ must have an ADR. See `template.md` for the format.
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
 | ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
 | ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |
-| ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Ουρές queue | Accepted |
+| ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Εκκρεμότητες tab | Accepted |
 | ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |
 | ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |
 | ADR-263 | Member payment screens: buy a subscription package, pay an invoice, saved cards and autopay, withdrawal, /pay/return with the sandbox page, the box's sales page; API adds provider, services, autopay at checkout, dated visits without withdrawal | Accepted |
 | ADR-264 | Tap to Pay for walk-ins' free sales (memberless Finance stream sale with its receipt, idempotent per intent); tips (staff's, not revenue) and card surcharges (revenue on the sale's receipt) Viva confirms on top of the amount | Accepted |
+| ADR-265 | Credit note reason (immutable, hashed, printed, UBL note) and refund to the card that issues the note; «Αποστολή με email» of a document PDF through the outbox (attachments); «Συμπλήρωση από το ΑΦΜ» from AADE RgWsPublic2 with the business's own encrypted credentials | Accepted |
 | ADR-266 | French till receipts signed through fiskaly SIGN FR next to Palee's own journal (ADR-241/242); fiskaly must confirm certification coverage in writing; Monaco not covered | Accepted |

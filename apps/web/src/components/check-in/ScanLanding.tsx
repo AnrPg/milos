@@ -14,6 +14,7 @@ import { adminHref } from "@/lib/organization-slug";
 import { clockOffset, nothingReasonKey, scanBody, scanView, undoSecondsLeft, type ScanSource } from "./check-in";
 import { checkInErrorKey } from "./errors";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 /** A trial without an approval rule books straight away. */
 const AUTO_APPROVAL = "auto" as const;
@@ -370,7 +371,7 @@ function BoxLine({ result }: { result: ScanResult }) {
 
 function useClock() {
   const locale = useLocale();
-  return (iso: string) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return (iso: string) => clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
 function useDay() {

@@ -2,14 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import type { FiscalDocument } from "@/api/fiscal";
 import {
+  buyerEmail,
   buyerName,
   canCredit,
+  cardLabel,
   canRetry,
   creditAmount,
   creditLines,
   groupByDay,
   matchesFilter,
   monthRange,
+  providerName,
   ratePercent,
   sellerLine,
   transmissionState,
@@ -95,5 +98,22 @@ describe("printed parties", () => {
     ).toBe("ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε. · 801234567 · Ζ΄ Αθηνών · Φωκίωνος Νέγρη 12, 11361 Αθήνα");
     expect(ratePercent(2400)).toBe("24");
     expect(ratePercent(550)).toBe("5.5");
+  });
+});
+
+describe("ADR-265 helpers", () => {
+  it("reads the buyer's email as printed", () => {
+    expect(buyerEmail({ buyer: { email: " maria@example.com " } })).toBe("maria@example.com");
+    expect(buyerEmail({ buyer: { name: "Maria" } })).toBeNull();
+    expect(buyerEmail({ buyer: null })).toBeNull();
+  });
+
+  it("names the card and the provider of a refund", () => {
+    expect(cardLabel({ card_last4: "4242", card_brand: "visa" })).toBe("••4242");
+    expect(cardLabel({ card_last4: null, card_brand: "visa" })).toBe("visa");
+    expect(cardLabel({ card_last4: null, card_brand: null })).toBe("••••");
+    expect(providerName("viva")).toBe("Viva");
+    expect(providerName("stripe")).toBe("Stripe");
+    expect(providerName("mollie")).toBe("Mollie");
   });
 });
